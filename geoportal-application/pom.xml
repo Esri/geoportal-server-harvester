@@ -8,7 +8,6 @@
     <name>Esri :: Geoportal Server :: Harvester :: Application</name>
     <modules>
         <module>geoportal-harvester-engine</module>
-        <module>geoportal-harvester-jar</module>
         <module>geoportal-harvester-war</module>
     </modules>
     <properties>
