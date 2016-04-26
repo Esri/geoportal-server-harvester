@@ -20,8 +20,6 @@ import com.esri.geoportal.harvester.api.DataSource;
 import com.esri.geoportal.harvester.api.DataSourceFactory;
 import com.esri.geoportal.harvester.api.DataDestinationFactory;
 import com.esri.geoportal.harvester.api.DataDestination;
-import com.esri.geoportal.harvester.engine.support.DataDestinationRegistry;
-import com.esri.geoportal.harvester.engine.support.DataSourceRegistry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

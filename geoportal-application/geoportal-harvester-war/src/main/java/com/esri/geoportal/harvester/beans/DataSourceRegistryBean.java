@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.csw.CswSourceFactory;
-import com.esri.geoportal.harvester.engine.support.DataSourceRegistry;
+import com.esri.geoportal.harvester.engine.DataSourceRegistry;
 import com.esri.geoportal.harvester.waf.WafSourceFactory;
 import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Service;

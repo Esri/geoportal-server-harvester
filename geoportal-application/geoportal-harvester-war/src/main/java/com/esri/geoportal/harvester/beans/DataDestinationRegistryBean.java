@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.folder.FolderPublisherFactory;
 import com.esri.geoportal.harvester.gpt.GptPublisherFactory;
-import com.esri.geoportal.harvester.engine.support.DataDestinationRegistry;
+import com.esri.geoportal.harvester.engine.DataDestinationRegistry;
 import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
