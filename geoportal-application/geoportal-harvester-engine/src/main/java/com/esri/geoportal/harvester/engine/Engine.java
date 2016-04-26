@@ -135,4 +135,30 @@ public class Engine {
   public List<Map.Entry<UUID,TaskDefinition>> selectTaskDefinitions(Predicate<? super Map.Entry<UUID, TaskDefinition>> predicate) {
     return taskManager.select().stream().filter(predicate!=null? predicate: (Map.Entry<UUID, TaskDefinition> e) -> true).collect(Collectors.toList());
   }
+  
+  /**
+   * Reads task definition.
+   * @param taskId task id
+   * @return task definition
+   */
+  public TaskDefinition readTaskDefinition(UUID taskId) {
+    return taskManager.read(taskId);
+  }
+  
+  /**
+   * Deletes task definition.
+   * @param taskId task id
+   */
+  public void deleteTaskDefinition(UUID taskId) {
+    taskManager.delete(taskId);
+  }
+  
+  /**
+   * Adds task definition.
+   * @param taskDefinition task definition
+   * @return id of a new task
+   */
+  public UUID addTask(TaskDefinition taskDefinition) {
+    return taskManager.create(taskDefinition);
+  }
 }

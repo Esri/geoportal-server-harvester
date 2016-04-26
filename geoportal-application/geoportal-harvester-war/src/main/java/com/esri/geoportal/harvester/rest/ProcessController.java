@@ -19,8 +19,6 @@ import com.esri.geoportal.harvester.engine.TaskDefinition;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import com.esri.geoportal.harvester.engine.Process;
 import com.esri.geoportal.harvester.engine.Task;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
