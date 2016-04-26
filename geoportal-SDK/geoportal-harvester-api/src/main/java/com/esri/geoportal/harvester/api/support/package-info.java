@@ -13,14 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api;
-
-import java.util.Map;
 
 /**
- * Data registry.
- * @param <F> factory type
+ * Harvester API. Provides generic implementation of defined interfaces.
  */
-public interface DataRegistry<F> extends Map<String,F> {
-  
-}
+package com.esri.geoportal.harvester.api.support;

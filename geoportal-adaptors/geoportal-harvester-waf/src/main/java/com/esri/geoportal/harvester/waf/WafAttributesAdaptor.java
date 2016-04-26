@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.waf;
 
-import com.esri.geoportal.harvester.impl.BotsAttributesAdaptor;
+import com.esri.geoportal.harvester.api.support.BotsAttributesAdaptor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;

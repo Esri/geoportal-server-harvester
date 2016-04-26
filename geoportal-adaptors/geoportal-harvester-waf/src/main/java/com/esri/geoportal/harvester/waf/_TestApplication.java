@@ -22,7 +22,7 @@ import com.esri.geoportal.harvester.api.DataDestination;
 import com.esri.geoportal.harvester.api.DataDestinationException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.DataSource;
-import com.esri.geoportal.harvester.impl.DataCollector;
+import com.esri.geoportal.harvester.api.support.DataCollector;
 import java.net.URL;
 import java.util.Arrays;
 

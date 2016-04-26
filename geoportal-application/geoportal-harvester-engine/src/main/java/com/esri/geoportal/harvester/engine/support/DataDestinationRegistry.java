@@ -13,8 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.esri.geoportal.harvester.engine.support;
+
+import com.esri.geoportal.harvester.api.DataDestinationFactory;
 
 /**
- * Harvester API. Provides generic implementation of defined interfaces.
+ * Data publisher registry.
  */
-package com.esri.geoportal.harvester.impl;
+public class DataDestinationRegistry extends BaseDataRegistry<DataDestinationFactory> {
+}

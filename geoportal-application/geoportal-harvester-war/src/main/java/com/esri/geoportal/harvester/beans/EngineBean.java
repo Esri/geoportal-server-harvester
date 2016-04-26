@@ -19,8 +19,8 @@ import com.esri.geoportal.harvester.engine.ReportBuilder;
 import com.esri.geoportal.harvester.engine.Engine;
 import com.esri.geoportal.harvester.engine.ProcessManager;
 import com.esri.geoportal.harvester.engine.TaskManager;
-import com.esri.geoportal.harvester.impl.DataDestinationRegistry;
-import com.esri.geoportal.harvester.impl.DataSourceRegistry;
+import com.esri.geoportal.harvester.engine.support.DataDestinationRegistry;
+import com.esri.geoportal.harvester.engine.support.DataSourceRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

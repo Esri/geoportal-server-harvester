@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.impl;
+package com.esri.geoportal.harvester.engine.support;
 
-import com.esri.geoportal.harvester.api.DataDestinationFactory;
+import com.esri.geoportal.harvester.api.DataSourceFactory;
 
 /**
- * Data publisher registry.
+ * Data source registry.
  */
-public class DataDestinationRegistry extends BaseDataRegistry<DataDestinationFactory> {
+public class DataSourceRegistry  extends BaseDataRegistry<DataSourceFactory> {
 }

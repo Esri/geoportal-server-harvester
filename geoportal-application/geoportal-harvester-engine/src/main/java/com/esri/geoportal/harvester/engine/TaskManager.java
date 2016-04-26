@@ -15,6 +15,8 @@
  */
 package com.esri.geoportal.harvester.engine;
 
+import com.esri.geoportal.harvester.engine.support.CrudsRepo;
+
 /**
  * Task manager.
  */

@@ -18,8 +18,8 @@ package com.esri.geoportal.harvester.waf;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.harvester.api.DataSource;
-import com.esri.geoportal.harvester.impl.DataCollector;
-import com.esri.geoportal.harvester.impl.DataPrintStreamDestination;
+import com.esri.geoportal.harvester.api.support.DataCollector;
+import com.esri.geoportal.harvester.api.support.DataPrintStreamDestination;
 import java.net.URL;
 import java.util.Arrays;
 

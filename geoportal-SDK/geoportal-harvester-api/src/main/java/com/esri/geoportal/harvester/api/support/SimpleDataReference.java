@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.impl;
+package com.esri.geoportal.harvester.api.support;
 
 import com.esri.geoportal.harvester.api.DataReference;
 import java.util.Date;

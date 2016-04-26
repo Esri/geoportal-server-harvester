@@ -15,8 +15,6 @@
  */
 package com.esri.geoportal.harvester.api;
 
-import java.util.Map;
-
 /**
  * Data source factory.
  */

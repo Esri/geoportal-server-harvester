@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.impl;
+package com.esri.geoportal.harvester.engine.support;
 
-import com.esri.geoportal.harvester.api.DataSourceFactory;
+import java.util.HashMap;
 
 /**
- * Data source registry.
+ * Base data registry.
+ * @param <F> type of the factory
  */
-public class DataSourceRegistry  extends BaseDataRegistry<DataSourceFactory> {
+public abstract class BaseDataRegistry<F> extends HashMap<String,F> {
 }
