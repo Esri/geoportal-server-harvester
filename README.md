@@ -15,7 +15,7 @@ Building the source code:
 
 Deploying war file:
 
-1. Deploy 'geoportal-application\geoportal-harvester-war\target\geoportal-harvester-war-<version>.war' into the web server of your choice.
+1. Deploy 'geoportal-application\geoportal-harvester-war\target\geoportal-harvester-war-&lt;version&gt;.war' into the web server of your choice.
 
 ## Requirements
 
