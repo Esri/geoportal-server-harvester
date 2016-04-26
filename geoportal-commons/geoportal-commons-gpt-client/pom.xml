@@ -39,7 +39,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>request-config</artifactId>
+            <artifactId>commons-utils</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
