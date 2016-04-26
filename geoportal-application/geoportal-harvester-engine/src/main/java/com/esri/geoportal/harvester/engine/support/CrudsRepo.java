@@ -35,8 +35,9 @@ public interface CrudsRepo<T> {
   /**
    * Removes data.
    * @param id data id
+   * @return <code>true</code> if updated
    */
-  void delete(UUID id);
+  boolean delete(UUID id);
 
   /**
    * Reads data by id.
@@ -55,7 +56,8 @@ public interface CrudsRepo<T> {
    * Updates data.
    * @param id data id
    * @param data data
+   * @return <code>true</code> if updated
    */
-  void update(UUID id, T data);
+  boolean update(UUID id, T data);
   
 }

@@ -81,4 +81,14 @@ public class TaskController {
     return new TaskInfo(id, taskDefinition);
   }
   
+  
+  /**
+   * Updates task by id.
+   * @param taskId task id
+   * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
+   */
+  @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  public TaskInfo updateTask(@RequestBody TaskDefinition taskDefinition, @PathVariable UUID taskId) {
+    return null;
+  }
 }

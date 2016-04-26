@@ -38,8 +38,8 @@ public class ProcessManagerBean implements ProcessManager  {
   }
 
   @Override
-  public void update(UUID id, Process process) {
-    processes.put(id, process);
+  public boolean update(UUID id, Process process) {
+    return processes.put(id, process)!=null;
   }
 
   @Override
@@ -48,8 +48,8 @@ public class ProcessManagerBean implements ProcessManager  {
   }
 
   @Override
-  public void delete(UUID id) {
-    processes.remove(id);
+  public boolean delete(UUID id) {
+    return processes.remove(id)!=null;
   }
 
   @Override

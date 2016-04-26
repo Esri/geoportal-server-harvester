@@ -78,16 +78,17 @@ public class TaskManagerBean implements TaskManager {
   }
 
   @Override
-  public void update(UUID id, TaskDefinition taskDef) {
+  public boolean update(UUID id, TaskDefinition taskDef) {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("UPDATE TASKS SET taskDefinition = ? WHERE ID = ?");
         ) {
       st.setString(1, serializeTaskDef(taskDef));
       st.setString(2, id.toString());
-      st.executeUpdate();
+      return st.executeUpdate()>0;
     } catch (SQLException|JsonProcessingException ex) {
       LOG.error("Error selecting taksk", ex);
+      return false;
     }
   }
 
@@ -114,15 +115,16 @@ public class TaskManagerBean implements TaskManager {
   }
 
   @Override
-  public void delete(UUID id) {
+  public boolean delete(UUID id) {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("DELETE * FROM TASKS WHERE ID = ?");
         ) {
       st.setString(1, id.toString());
-      st.executeUpdate();
+      return st.executeUpdate()>0;
     } catch (SQLException ex) {
       LOG.error("Error selecting taksk", ex);
+      return false;
     }
   }
 
