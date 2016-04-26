@@ -48,14 +48,12 @@ public class TaskManagerBean implements TaskManager {
 
   /**
    * Initializes database.
-   *
-   * @throws SQLException if database initialization fails
    */
   @PostConstruct
-  public void init() throws SQLException {
+  public void init() {
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("CREATE TABLE TASKS ( id varchar(38) PRIMARY KEY, taskDefinition varchar(1024) NOT NULL)");
+            PreparedStatement st = connection.prepareStatement("CREATE TABLE IF NOT EXISTS TASKS ( id varchar(38) PRIMARY KEY, taskDefinition varchar(1024) NOT NULL)");
         ) {
       st.execute();
     } catch (SQLException ex) {
