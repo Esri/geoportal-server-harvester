@@ -27,7 +27,7 @@ public interface CrudsRepo<T> {
 
   /**
    * Creates process.
-   * @param T data
+   * @param data data
    * @return id of the data
    */
   UUID create(T data);

@@ -33,7 +33,7 @@ public class DataCollector<T> {
   /**
    * Creates instance of the collector.
    * @param source data source
-   * @param destination data destination
+   * @param destinations data destinations
    */
   public DataCollector(DataSource<T> source, List<DataDestination<T>> destinations) {
     this.source = source;

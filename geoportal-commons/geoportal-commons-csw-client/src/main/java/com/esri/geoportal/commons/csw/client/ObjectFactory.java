@@ -31,7 +31,7 @@ public class ObjectFactory {
   
   /**
    * Gets new instance of the profiles.
-   * @return 
+   * @return profiles
    */
   public IProfiles newProfiles() {
     if (profiles==null) {

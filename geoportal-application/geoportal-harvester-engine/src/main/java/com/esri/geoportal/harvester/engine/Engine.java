@@ -42,6 +42,9 @@ public class Engine {
 
   /**
    * Creates instance of the engine.
+   * @param reportBuilder report builder
+   * @param taskManager task manager
+   * @param processManager process manager
    * @param dsReg data source registry
    * @param dpReg data publisher registry
    */

@@ -85,7 +85,7 @@ public class Client implements IClient {
   /**
    * Creates instance of the CSW client.
    *
-   * @param executor HTTP executor
+   * @param httpClient HTTP client
    * @param baseUrl base URL
    * @param profile CSW profile
    */

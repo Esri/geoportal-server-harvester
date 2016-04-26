@@ -31,7 +31,7 @@ public class DataPrintStreamDestination implements DataDestination<String> {
 
   /**
    * Creates instance of the destination.
-   * @param out 
+   * @param out output print stream
    */
   public DataPrintStreamDestination(PrintStream out) {
     this.out = out;

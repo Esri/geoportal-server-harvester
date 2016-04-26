@@ -30,6 +30,7 @@ public class ProcessInfo {
    * Creates instance of the process info.
    * @param id process id
    * @param description process description
+   * @param status process status
    */
   public ProcessInfo(UUID id, String description, Status status) {
     this.id = id;

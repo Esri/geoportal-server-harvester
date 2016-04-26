@@ -85,14 +85,6 @@ public CapabilitiesParse(Capabilities capabilities) {
 }
 
 // methods =====================================================================
-/**
- * Sax start element
- * @param uri
- * @param localName
- * @param qName
- * @param attrib
- * @throws SAXException
- */
 @SuppressWarnings("unchecked")
 @Override
 public void startElement(String uri, String localName, String qName,
@@ -133,13 +125,6 @@ public void startElement(String uri, String localName, String qName,
   
 }
 
-/**
- * Sax end element
- * @param uri
- * @param localName
- * @param qName
- * @throws SAXException
- */
 @Override
 public void endElement(String uri, String localName, String qName)
     throws SAXException {

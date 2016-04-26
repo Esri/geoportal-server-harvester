@@ -47,7 +47,7 @@ public class WafFile {
 
   /**
    * Reads content.
-   * @param httpExecutor HTTP executor
+   * @param httpClient HTTP client
    * @return content reference
    * @throws IOException if reading content fails
    */

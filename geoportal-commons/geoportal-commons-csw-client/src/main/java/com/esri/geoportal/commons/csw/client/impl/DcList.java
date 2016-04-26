@@ -60,7 +60,7 @@ public DcList(String dcList) {
 
 // methods =====================================================================
 /**
- * Adds the.
+ * Adds the dc string
  * 
  * @param dcString the dc string
  */
@@ -89,11 +89,10 @@ public void add(String dcString) {
 }
 
 /**
- * Gets the.
+ * Gets the dc string
  * 
  * @param scheme the scheme (if null or empty, EMPTY_SCHEME will be used)
- * 
- * @return the list< string>
+ * @return list dc strings
  */
 public List<String> get(String scheme) {
   scheme = StringUtils.trimToEmpty(scheme);

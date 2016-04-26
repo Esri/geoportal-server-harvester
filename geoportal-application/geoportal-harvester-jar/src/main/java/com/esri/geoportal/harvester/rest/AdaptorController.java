@@ -55,7 +55,7 @@ public class AdaptorController {
   
   /**
    * Lists all source types. A source might be: WAF, CSW, etc.
-   * @return 
+   * @return array of source types
    */
   @RequestMapping(value = "/rest/harvester/adaptors/sources", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public String[] listSourceTypes() {
@@ -64,7 +64,7 @@ public class AdaptorController {
   
   /**
    * Lists all destination types. A destination might be: GPT, FOLDER, etc.
-   * @return 
+   * @return array of destination types
    */
   @RequestMapping(value = "/rest/harvester/adaptors/destinations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public String[] listDestinationTypes() {

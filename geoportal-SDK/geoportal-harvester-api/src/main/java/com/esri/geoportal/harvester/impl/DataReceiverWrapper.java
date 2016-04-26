@@ -29,7 +29,7 @@ public class DataReceiverWrapper implements DataReceiver<String> {
 
   /**
    * Creates instance of the wrapper.
-   * @param out 
+   * @param out output print stream
    */
   public DataReceiverWrapper(PrintStream out) {
     this.out = out;
