@@ -1,0 +1,215 @@
+/* See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * Esri Inc. licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.esri.geoportal.commons.robots;
+
+import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+
+/**
+ * Parser of "robots.txt" file.
+ */
+public class BotsParser {
+
+  private static final Logger LOG = LoggerFactory.getLogger(BotsParser.class);
+
+  private final BotsConfig botsConfig;
+  private final HttpClient httpClient;
+
+  /**
+   * Gets default instance.
+   *
+   * @param botsConfig bots configuration
+   * @param httpClient http client
+   * @return instance
+   */
+  public static BotsParser getInstance(BotsConfig botsConfig,HttpClient httpClient) {
+      boolean enabled = botsConfig.isEnabled();
+      boolean override = botsConfig.isOverride();
+      String userAgent = botsConfig.getUserAgent();
+
+      LOG.info(String.format("Creating default RobotsTxtParser :: enabled: %b, override: %b, user-agent: %s", enabled, override, userAgent));
+
+      return new BotsParser(botsConfig,httpClient);
+  }
+
+  /**
+   * Creates instance of the parser.
+   * @param botsConfig bots config
+   * @param httpClient http client
+   */
+  /*package*/BotsParser(BotsConfig botsConfig,HttpClient httpClient) {
+    this.botsConfig = botsConfig;
+    this.httpClient = httpClient;
+  }
+
+  /**
+   * Gets user agent.
+   *
+   * @return user agent
+   */
+  public String getUserAgent() {
+    return botsConfig.getUserAgent();
+  }
+
+  /**
+   * Checks if using robots.txt is enabled.
+   *
+   * @return <code>true</code> if using robots.txt is enabled
+   */
+  public boolean isEnabled() {
+    return botsConfig.isEnabled();
+  }
+
+  /**
+   * Checks if robots.txt enabled flag can be overridden.
+   *
+   * @return <code>true</code> if robots.txt enabled flag can be overridden
+   */
+  public boolean canOverride() {
+    return botsConfig.isOverride();
+  }
+
+  /**
+   * Parses context of the Robots.txt file if available.
+   *
+   * @param mode robots.txt mode
+   * @param matchingStrategy matching strategy
+   * @param winningStrategy winning strategy
+   * @param serverUrl url of the server which is expected to have robots.txt
+   * present
+   * @return instance of {@link Bots} or <code>null</code> if unable to
+   * obtain robots.txt
+   */
+  public Bots readRobotsTxt(BotsMode mode, MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, String serverUrl) {
+    if (canParse(mode) && serverUrl != null) {
+      try {
+        return BotsParser.this.readRobotsTxt(mode, matchingStrategy, winningStrategy, new URL(serverUrl));
+      } catch (MalformedURLException ex) {
+        LOG.warn(String.format("Invalid server url: %s", serverUrl), ex);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Parses context of the Robots.txt file if available.
+   *
+   * @param mode robots.txt mode
+   * @param matchingStrategy matching strategy
+   * @param winningStrategy winning strategy
+   * @param serverUrl url of the server which is expected to have robots.txt
+   * present
+   * @return instance of {@link Bots} or <code>null</code> if unable to
+   * obtain robots.txt
+   */
+  public Bots readRobotsTxt(BotsMode mode, MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, URL serverUrl) {
+    if (canParse(mode) && serverUrl != null) {
+      LOG.info(String.format("Accessing robots.txt for: %s", serverUrl.toExternalForm()));
+      try {
+        URL robotsTxtUrl = getRobotsTxtUrl(serverUrl);
+        if (robotsTxtUrl != null) {
+          HttpGet method = new HttpGet(robotsTxtUrl.toExternalForm());
+          method.setConfig(DEFAULT_REQUEST_CONFIG);
+          method.setHeader("User-Agent", botsConfig.getUserAgent());
+          HttpResponse response = httpClient.execute(method);
+          if (response.getStatusLine().getStatusCode()<300) {
+            InputStream responseStream = response.getEntity().getContent();
+            Bots robots = BotsParser.this.readRobotsTxt(mode, matchingStrategy, winningStrategy, responseStream);
+            if (robots != null) {
+              LOG.info(String.format("Received Robotx.txt for: %s", serverUrl.toExternalForm()));
+              LOG.debug(String.format("Robotx.txt for: %s\n%s", serverUrl.toExternalForm(), robots.toString()));
+            }
+            return robots;
+          }
+        }
+      } catch (IOException ex) {
+        LOG.debug(String.format("Unable to access robots.txt for: %s", serverUrl.toExternalForm()));
+        LOG.debug("",ex);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Parses robots TXT
+   *
+   * @param mode robots.txt mode
+   * @param matchingStrategy matching strategy
+   * @param winningStrategy winning strategy
+   * @param robotsTxt stream of data
+   * @return instance or RobotsTxt or <code>null</code>
+   */
+  public Bots readRobotsTxt(BotsMode mode, MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, InputStream robotsTxt) {
+    Bots robots = null;
+    BotsReader reader = null;
+
+    try {
+      if (canParse(mode)) {
+        reader = new BotsReader(getUserAgent(), matchingStrategy, winningStrategy, robotsTxt);
+        robots = reader.readRobotsTxt();
+      }
+    } catch (IOException ex) {
+      LOG.warn("Unable to parse robots.txt", ex);
+      return null;
+    } finally {
+      if (reader != null) {
+        try {
+          reader.close();
+        } catch (IOException ex) {
+        }
+      }
+    }
+
+    return robots;
+  }
+
+  private boolean canParse(BotsMode mode) {
+    mode = mode != null ? mode : BotsMode.getDefault();
+
+    switch (mode) {
+      case inherit:
+        return isEnabled();
+      case always:
+        return true;
+      case never:
+        return false;
+    }
+
+    return true;
+  }
+
+  private URL getRobotsTxtUrl(URL baseUrl) {
+    try {
+      if (baseUrl != null) {
+        if (baseUrl.getPort() >= 0) {
+          return new URL(String.format("%s://%s:%d/robots.txt", baseUrl.getProtocol(), baseUrl.getHost(), baseUrl.getPort()));
+        } else {
+          return new URL(String.format("%s://%s/robots.txt", baseUrl.getProtocol(), baseUrl.getHost()));
+        }
+      }
+    } catch (MalformedURLException ex) {
+      LOG.warn("Invalid robots.txt url.", ex);
+    }
+    return null;
+  }
+}

@@ -1,12 +1,13 @@
-*.class
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.ear
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+/geoportal-adaptors/target/
+/target/
+/geoportal-application/target/
+/geoportal-SDK/target/
+/geoportal-SDK/geoportal-harvester-api/target/
+/geoportal-adaptors/geoportal-harvester-console/target/
+/geoportal-adaptors/geoportal-harvester-csw/target/
+/geoportal-adaptors/geoportal-harvester-folder/target/
+/geoportal-adaptors/geoportal-harvester-gpt/target/
+/geoportal-adaptors/geoportal-harvester-waf/target/
+/geoportal-application/geoportal-harvester-engine/target/
+/geoportal-application/geoportal-harvester-jar/target/
+/geoportal-application/geoportal-harvester-war/target/
