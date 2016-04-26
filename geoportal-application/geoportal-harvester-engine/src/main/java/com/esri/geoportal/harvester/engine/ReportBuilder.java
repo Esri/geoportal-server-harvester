@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.engine;
 
 import com.esri.geoportal.harvester.api.DataDestinationException;
+import com.esri.geoportal.harvester.api.DataProcessorException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.DataSourceException;
 
@@ -47,19 +48,19 @@ public interface ReportBuilder {
    * @param process process
    * @param ex exception
    */
-  void harvestError(Process process, DataSourceException ex);
+  void error(Process process, DataSourceException ex);
   
   /**
    * Make publish error entry.
    * @param process process
    * @param ex exception
    */
-  void publishError(Process process, DataDestinationException ex);
+  void error(Process process, DataDestinationException ex);
   
   /**
-   * Make generalError entry without associated data.
+   * Make error entry without associated data.
    * @param process process
-   * @param message error message
+   * @param ex error message
    */
-  void generalError(Process process, String message);
+  void error(Process process, DataProcessorException ex);
 }

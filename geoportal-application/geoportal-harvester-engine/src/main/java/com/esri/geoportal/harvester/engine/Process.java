@@ -77,13 +77,13 @@ public class Process {
                   d.publish(dataReference);
                   reportBuilder.success(Process.this,dataReference);
                 } catch (DataDestinationException ex) {
-                  reportBuilder.publishError(Process.this,ex);
+                  reportBuilder.error(Process.this,ex);
                 }
               }
             }
           }
         } catch (DataSourceException ex) {
-          reportBuilder.harvestError(Process.this,ex);
+          reportBuilder.error(Process.this,ex);
           abort();
         } finally {
           reportBuilder.completed(Process.this);

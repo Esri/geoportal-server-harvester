@@ -100,17 +100,17 @@ public class ReportStatistics implements ReportBuilder {
   }
 
   @Override
-  public void harvestError(Process process, DataSourceException ex) {
+  public void error(Process process, DataSourceException ex) {
     ++harvestFailed;
   }
 
   @Override
-  public void publishError(Process process, DataDestinationException ex) {
+  public void error(Process process, DataDestinationException ex) {
     ++publishFailed;
   }
 
   @Override
-  public void generalError(Process process, String message) {
+  public void error(Process process, com.esri.geoportal.harvester.api.DataProcessorException ex) {
     failure = true;
   }
   

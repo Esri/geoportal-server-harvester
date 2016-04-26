@@ -45,17 +45,17 @@ public class ReportLogger implements ReportBuilder {
   }
 
   @Override
-  public void harvestError(Process process, DataSourceException ex) {
+  public void error(Process process, DataSourceException ex) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public void publishError(Process process, DataDestinationException ex) {
+  public void error(Process process, DataDestinationException ex) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public void generalError(Process process, String message) {
+  public void error(Process process, com.esri.geoportal.harvester.api.DataProcessorException ex) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
   

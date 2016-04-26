@@ -57,17 +57,17 @@ public class ReportBuilderBean implements ReportBuilder {
   }
 
   @Override
-  public void harvestError(Process process, DataSourceException ex) {
-    rb.harvestError(process, ex);
+  public void error(Process process, DataSourceException ex) {
+    rb.error(process, ex);
   }
 
   @Override
-  public void publishError(Process process, DataDestinationException ex) {
-    rb.publishError(process, ex);
+  public void error(Process process, DataDestinationException ex) {
+    rb.error(process, ex);
   }
 
   @Override
-  public void generalError(Process process, String message) {
-    rb.generalError(process, message);
+  public void error(Process process, com.esri.geoportal.harvester.api.DataProcessorException ex) {
+    rb.error(process, ex);
   }
 }
