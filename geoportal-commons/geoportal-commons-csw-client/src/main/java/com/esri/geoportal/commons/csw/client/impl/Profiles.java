@@ -18,7 +18,10 @@ package com.esri.geoportal.commons.csw.client.impl;
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import org.xml.sax.SAXException;
@@ -32,6 +35,11 @@ public class Profiles extends HashMap<String,IProfile> implements IProfiles {
   @Override
   public IProfile getProfileById(String id) {
     return get(id);
+  }
+  
+  @Override
+  public List<IProfile> listAll() {
+    return new ArrayList<>(this.values());
   }
   
   /**

@@ -15,6 +15,8 @@
  */
 package com.esri.geoportal.commons.csw.client;
 
+import java.util.List;
+
 /**
  * List of profiles.
  */
@@ -26,4 +28,10 @@ public interface IProfiles {
    * @return profile
    */
   IProfile getProfileById(String id);
+  
+  /**
+   * Lists all profiles.
+   * @return list of all profiles
+   */
+  List<IProfile> listAll();
 }

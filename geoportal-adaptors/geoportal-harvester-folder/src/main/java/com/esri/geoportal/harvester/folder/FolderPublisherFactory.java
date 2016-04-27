@@ -15,8 +15,13 @@
  */
 package com.esri.geoportal.harvester.folder;
 
+import com.esri.geoportal.harvester.api.DataAdaptorTemplate;
 import com.esri.geoportal.harvester.api.DataDestinationFactory;
 import com.esri.geoportal.harvester.api.DataDestination;
+import static com.esri.geoportal.harvester.folder.FolderAttributesAdaptor.P_HOST_URL;
+import static com.esri.geoportal.harvester.folder.FolderAttributesAdaptor.P_ROOT_FOLDER;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,6 +33,14 @@ public class FolderPublisherFactory implements DataDestinationFactory {
   public DataDestination create(Map<String, String> attributes) throws IllegalArgumentException {
     FolderAttributesAdaptor attr = new FolderAttributesAdaptor(attributes);
     return new FolderDataDestination(attr);
+  }
+
+  @Override
+  public DataAdaptorTemplate getTemplate() {
+    List<DataAdaptorTemplate.Argument> arguments = new ArrayList<>();
+    arguments.add(new DataAdaptorTemplate.StringArgument(P_ROOT_FOLDER, "Root folder"));
+    arguments.add(new DataAdaptorTemplate.StringArgument(P_HOST_URL, "Source host URL"));
+    return new DataAdaptorTemplate("FOLDER", "Folder", arguments);
   }
   
 }

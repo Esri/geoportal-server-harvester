@@ -27,8 +27,8 @@ import java.util.Set;
  * Folder attributes adaptor.
  */
 public class FolderAttributesAdaptor extends AbstractMap<String,String> {
-  private static final String P_ROOT_FOLDER = "folder.root.folder";
-  private static final String P_HOST_URL    = "folder.host.url";
+  public static final String P_ROOT_FOLDER = "folder.root.folder";
+  public static final String P_HOST_URL    = "folder.host.url";
   
   private final Map<String,String> attributes;
   

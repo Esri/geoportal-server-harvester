@@ -29,8 +29,8 @@ import java.util.Map;
  */
 public class CswAttributesAdaptor extends BotsAttributesAdaptor {
 
-  private static final String P_HOST_URL = "csw.host.url";
-  private static final String P_PROFILE_ID = "csw.profile.id";
+  public static final String P_HOST_URL = "csw.host.url";
+  public static final String P_PROFILE_ID = "csw.profile.id";
   
   private URL hostUrl;
   private IProfile profile;

@@ -25,7 +25,7 @@ import java.util.Map;
  * WAF attributes adaptor.
  */
 public class WafAttributesAdaptor extends BotsAttributesAdaptor {
-  private static final String P_HOST_URL    = "waf.host.url";
+  public static final String P_HOST_URL    = "waf.host.url";
 
   private URL hostUrl;
   

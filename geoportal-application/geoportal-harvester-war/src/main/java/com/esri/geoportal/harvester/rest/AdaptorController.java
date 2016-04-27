@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.rest;
 
+import com.esri.geoportal.harvester.api.DataAdaptorTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -58,8 +59,8 @@ public class AdaptorController {
    * @return array of source types
    */
   @RequestMapping(value = "/rest/harvester/adaptors/sources", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public String[] listSourceTypes() {
-    return engine.getSourcesTypes().toArray(new String[0]);
+  public DataAdaptorTemplate[] listSourceTypes() {
+    return engine.getSourcesTypes().toArray(new DataAdaptorTemplate[0]);
   }
   
   /**
@@ -67,7 +68,7 @@ public class AdaptorController {
    * @return array of destination types
    */
   @RequestMapping(value = "/rest/harvester/adaptors/destinations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public String[] listDestinationTypes() {
-    return engine.getDestinationsTypes().toArray(new String[0]);
+  public DataAdaptorTemplate[] listDestinationTypes() {
+    return engine.getDestinationsTypes().toArray(new DataAdaptorTemplate[0]);
   }
 }

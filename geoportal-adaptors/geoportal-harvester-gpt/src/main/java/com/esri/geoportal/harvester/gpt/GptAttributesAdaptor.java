@@ -26,9 +26,9 @@ import java.util.Set;
  * GPT attributes adaptor.
  */
 public class GptAttributesAdaptor extends AbstractMap<String,String>  {
-  private static final String P_HOST_URL        = "gpt.host.url";
-  private static final String P_USER_NAME       = "gpt.user.name";
-  private static final String P_USER_PASSWORD   = "gpt.user.password";
+  public static final String P_HOST_URL        = "gpt.host.url";
+  public static final String P_USER_NAME       = "gpt.user.name";
+  public static final String P_USER_PASSWORD   = "gpt.user.password";
   
   private final Map<String,String> attributes;
   

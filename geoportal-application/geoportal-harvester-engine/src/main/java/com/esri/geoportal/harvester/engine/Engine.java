@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.engine;
 
 import com.esri.geoportal.harvester.api.DataAdaptorDefinition;
+import com.esri.geoportal.harvester.api.DataAdaptorTemplate;
 import com.esri.geoportal.harvester.api.DataSource;
 import com.esri.geoportal.harvester.api.DataSourceFactory;
 import com.esri.geoportal.harvester.api.DataDestinationFactory;
@@ -58,16 +59,16 @@ public class Engine {
    * Gets sources types.
    * @return collection of sources types
    */
-  public Collection<String> getSourcesTypes() {
-    return dsReg.keySet();
+  public Collection<DataAdaptorTemplate> getSourcesTypes() {
+    return dsReg.getTemplates();
   }
 
   /**
    * Gets destinations types.
    * @return collection of destinations types
    */
-  public Collection<String> getDestinationsTypes() {
-    return dpReg.keySet();
+  public Collection<DataAdaptorTemplate> getDestinationsTypes() {
+    return dpReg.getTemplates();
   }
 
   /**

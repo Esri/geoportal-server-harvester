@@ -29,4 +29,10 @@ public interface DataAdaptorFactory<T extends DataAdaptor> {
    * @throws IllegalArgumentException if incomplete or invalid attributes
    */
   T create(Map<String,String> attributes) throws IllegalArgumentException;
+  
+  /**
+   * Gets adaptor template.
+   * @return adaptor template
+   */
+  DataAdaptorTemplate getTemplate();
 }

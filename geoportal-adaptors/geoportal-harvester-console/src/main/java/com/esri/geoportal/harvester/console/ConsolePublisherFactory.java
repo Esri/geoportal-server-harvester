@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.console;
 
+import com.esri.geoportal.harvester.api.DataAdaptorTemplate;
 import com.esri.geoportal.harvester.api.DataDestinationFactory;
 import com.esri.geoportal.harvester.api.DataDestination;
 import java.util.Map;
@@ -26,24 +27,12 @@ public class ConsolePublisherFactory implements DataDestinationFactory {
 
   @Override
   public DataDestination create(Map<String, String> attributes) throws IllegalArgumentException {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  /*
-  @Override
-  public DataDestination create(InitParams initParams) {
-    try {
-      ConsoleInitParams castedInitParams = (ConsoleInitParams)initParams;
-      return new ConsoleDataDestination(castedInitParams);
-    } catch (ClassCastException ex) {
-      throw new IllegalArgumentException("Invalid init params type", ex);
-    }
+    return new ConsoleDataDestination();
   }
 
   @Override
-  public boolean canConsume(InitParams initParams) {
-    return initParams instanceof ConsoleInitParams;
+  public DataAdaptorTemplate getTemplate() {
+    return new DataAdaptorTemplate("CONSOLE", "Console output", null);
   }
-*/
   
 }
