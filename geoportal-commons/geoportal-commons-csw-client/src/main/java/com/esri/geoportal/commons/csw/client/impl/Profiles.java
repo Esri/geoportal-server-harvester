@@ -19,9 +19,9 @@ import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import org.xml.sax.SAXException;
@@ -29,17 +29,39 @@ import org.xml.sax.SAXException;
 /**
  * Profiles implementation.
  */
-public class Profiles extends HashMap<String,IProfile> implements IProfiles {
+public class Profiles implements IProfiles {
+  private static final String DEFAULT_PROFILE_ID = "urn:ogc:CSW:2.0.2:HTTP:OGCCORE:ESRI:GPT";
   private static Profiles instance;
+  
+  private List<IProfile> orderedList = new ArrayList<>();
+  private Map<String,IProfile> mappedValued = new HashMap<>();
+
+  /**
+   * Adds a profile.
+   * @param value profile
+   */
+  public void add(IProfile value) {
+    orderedList.add(value);
+    mappedValued.put(value.getId(), value);
+  }
 
   @Override
   public IProfile getProfileById(String id) {
-    return get(id);
+    return mappedValued.get(id);
   }
   
   @Override
   public List<IProfile> listAll() {
-    return new ArrayList<>(this.values());
+    return orderedList;
+  }
+
+  @Override
+  public IProfile getDefaultProfile() {
+    IProfile defaultProfile = getProfileById(DEFAULT_PROFILE_ID);
+    if (defaultProfile==null && !orderedList.isEmpty()) {
+      defaultProfile = orderedList.get(0);
+    }
+    return defaultProfile;
   }
   
   /**
@@ -63,7 +85,7 @@ public class Profiles extends HashMap<String,IProfile> implements IProfiles {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    keySet().forEach(k->sb.append(sb.length()>0?",":"").append(k));
+    orderedList.forEach(k->sb.append(sb.length()>0?",":"").append(k.getId()));
     return String.format("[%s]", sb);
   }
 }

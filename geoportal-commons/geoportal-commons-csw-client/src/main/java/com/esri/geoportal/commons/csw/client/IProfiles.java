@@ -34,4 +34,10 @@ public interface IProfiles {
    * @return list of all profiles
    */
   List<IProfile> listAll();
+  
+  /**
+   * Gets default profile.
+   * @return default profile
+   */
+  IProfile getDefaultProfile();
 }

@@ -80,7 +80,7 @@ public class ProfilesLoader {
         prof.setKvp(getRecordByIdReqKVP);
         prof.setGetRecordByIdRspXslt(getRecordByIdRspXslt);
         
-        profiles.put(prof.getId(), prof);
+        profiles.add(prof);
       }
     }
     return profiles;

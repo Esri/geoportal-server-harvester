@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.csw;
 
+import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.ObjectFactory;
 import com.esri.geoportal.harvester.api.DataAdaptorTemplate;
@@ -48,7 +49,8 @@ public class CswSourceFactory implements DataSourceFactory {
     Choice<String>[] choices = profiles.listAll().stream().map(p->new Choice<String>(p.getId(),p.getName())).toArray(Choice[]::new);
     arguments.add(new DataAdaptorTemplate.ChoiceArgument(P_PROFILE_ID, "Profile", Arrays.asList(choices)){
       public String getDefault() {
-        return choices[0].getName();
+        IProfile defaultProfile = profiles.getDefaultProfile();
+        return defaultProfile!=null? defaultProfile.getId(): null;
       }
     });
     return new DataAdaptorTemplate("CSW", "Catalogue service for the web", arguments);

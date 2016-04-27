@@ -32,19 +32,103 @@ import com.esri.geoportal.harvester.beans.EngineBean;
    /rest/harvester/adaptors/sources
    /rest/harvester/adaptors/destinations
  * </code></pre>
- * It would alway return a JSON array of strings, where each string is an
- * identifier of the adaptor, for example:
+ * It would alway return a JSON array of templates, where each template is a
+ * blueprint how to build UI for each adaptor, for example:
  * <pre><code>
    [ 
-     "WAF, 
-     "CSW" 
+      {
+        name: "WAF",
+        label: "Web accessible folder",
+        arguments: [
+          {
+            name: "waf.host.url",
+            label: "URL",
+            type: "string"
+          }
+        ]
+      }, 
+      {
+        name: "CSW",
+        label: "Catalogue service for the web",
+        arguments: [
+        {
+          name: "csw.host.url",
+          label: "URL",
+          type: "string"
+        },
+        {
+        name: "csw.profile.id",
+        label: "Profile",
+        choices: [
+          {
+            name: "urn:ogc:CSW:2.0.1:HTTP:OGCCORE:GeoNetwork",
+            value: "GeoNetwork CSW 2.0.1 OGCCORE"
+          },
+          {
+            name: "urn:ogc:CSW:2.0.2:HTTP:APISO:PYCSW",
+            value: "pycsw"
+          },
+          {
+            name: "urn:ogc:CSW:2.0.2:HTTP:OGCCORE:ESRI:GPT",
+            value: "ArcGIS Server Geoportal Extension (GPT)"
+          },
+          {
+            name: "urn:ogc:CSW:2.0.2:HTTP:APISO:GeoNetwork",
+            value: "GeoNetwork CSW 2.0.2 APISO"
+          },
+          {
+            name: "urn:ogc:CSW:2.0.2:HTTP:OGCISO:ESRI:GPT",
+            value: "ArcGIS Server Geoportal Extension (version 10) CSW ISO AP"
+          },
+        ],
+        default: "urn:ogc:CSW:2.0.2:HTTP:OGCCORE:ESRI:GPT",
+        type: "choice"
+        }
+        ]
+        } 
    ]
    
    or
    
    [ 
-     "GPT", 
-     "FOLDER" 
+      {
+        name: "GPT",
+        label: "Geoportal Server New Generation",
+        arguments: [
+          {
+            name: "gpt.host.url",
+            label: "URL",
+            type: "string"
+          },
+          {
+            name: "gpt.user.name",
+            label: "User name",
+            type: "string"
+          },
+          {
+            name: "gpt.user.password",
+            label: "User password",
+            password: true,
+            type: "string"
+          }
+        ]
+      }, 
+      {
+        name: "FOLDER",
+        label: "Folder",
+        arguments: [
+          {
+            name: "folder.root.folder",
+            label: "Root folder",
+            type: "string"
+          },
+          {
+            name: "folder.host.url",
+            label: "Source host URL",
+            type: "string"
+          }
+        ]
+      } 
    ]
  * </code></pre>
  */
