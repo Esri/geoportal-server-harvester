@@ -148,6 +148,7 @@ public class Engine {
   /**
    * Deletes task definition.
    * @param taskId task id
+   * @return <code>true</code> if task definition has been deleted
    */
   public boolean deleteTaskDefinition(UUID taskId) {
     return taskManager.delete(taskId);

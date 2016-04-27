@@ -84,6 +84,7 @@ public class TaskController {
   
   /**
    * Updates task by id.
+   * @param taskDefinition task definition
    * @param taskId task id
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
