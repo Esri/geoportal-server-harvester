@@ -77,7 +77,7 @@ public class TaskController {
    */
   @RequestMapping(value = "/rest/harvester/tasks", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   public TaskInfo addTask(@RequestBody TaskDefinition taskDefinition) {
-    UUID id = engine.addTask(taskDefinition);
+    UUID id = engine.addTaskDefinition(taskDefinition);
     return new TaskInfo(id, taskDefinition);
   }
   
@@ -89,6 +89,7 @@ public class TaskController {
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public TaskInfo updateTask(@RequestBody TaskDefinition taskDefinition, @PathVariable UUID taskId) {
-    return null;
+    TaskDefinition oldTaskDef = engine.updateTaskDefinition(taskId, taskDefinition);
+    return oldTaskDef!=null? new TaskInfo(taskId, oldTaskDef): null;
   }
 }

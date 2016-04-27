@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.csw;
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.ObjectFactory;
-import com.esri.geoportal.harvester.impl.BotsAttributesAdaptor;
+import com.esri.geoportal.harvester.api.support.BotsAttributesAdaptor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;

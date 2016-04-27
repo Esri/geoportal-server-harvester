@@ -149,8 +149,8 @@ public class Engine {
    * Deletes task definition.
    * @param taskId task id
    */
-  public void deleteTaskDefinition(UUID taskId) {
-    taskManager.delete(taskId);
+  public boolean deleteTaskDefinition(UUID taskId) {
+    return taskManager.delete(taskId);
   }
   
   /**
@@ -158,7 +158,23 @@ public class Engine {
    * @param taskDefinition task definition
    * @return id of a new task
    */
-  public UUID addTask(TaskDefinition taskDefinition) {
+  public UUID addTaskDefinition(TaskDefinition taskDefinition) {
     return taskManager.create(taskDefinition);
+  }
+  
+  /**
+   * Updates task.
+   * @param taskId task id
+   * @param taskDefinition task definition
+   * @return old task definition or <code>null</code> if no old task
+   */
+  public TaskDefinition updateTaskDefinition(UUID taskId, TaskDefinition taskDefinition) {
+    TaskDefinition oldTaskDef = taskManager.read(taskId);
+    if (oldTaskDef!=null) {
+      if (!taskManager.update(taskId, taskDefinition)) {
+        oldTaskDef = null;
+      }
+    }
+    return oldTaskDef;
   }
 }
