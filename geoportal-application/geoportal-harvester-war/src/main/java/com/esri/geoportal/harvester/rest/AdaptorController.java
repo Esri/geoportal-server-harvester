@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.esri.geoportal.harvester.beans.EngineBean;
+import java.util.UUID;
+import org.springframework.web.bind.annotation.PathVariable;
 /**
  * Adaptor information controller.
  * <p>
@@ -140,7 +142,7 @@ public class AdaptorController {
   
   /**
    * Lists all source types. A source might be: WAF, CSW, etc.
-   * @return array of source types
+   * @return array adaptor templates
    */
   @RequestMapping(value = "/rest/harvester/adaptors/sources", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public DataAdaptorTemplate[] listSourceTypes() {
@@ -149,10 +151,30 @@ public class AdaptorController {
   
   /**
    * Lists all destination types. A destination might be: GPT, FOLDER, etc.
-   * @return array of destination types
+   * @return array adaptor templates
    */
   @RequestMapping(value = "/rest/harvester/adaptors/destinations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public DataAdaptorTemplate[] listDestinationTypes() {
     return engine.getDestinationsTypes().toArray(new DataAdaptorTemplate[0]);
+  }
+  
+  /**
+   * Get single source.
+   * @param name id of the adaptor
+   * @return adaptor template
+   */
+  @RequestMapping(value = "/rest/harvester/adaptors/sources/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataAdaptorTemplate getSource(@PathVariable String name) {
+    return engine.getSourcesTypes().stream().filter(a->a.getName().equals(name)).findFirst().orElse(null);
+  }
+  
+  /**
+   * Get single destination.
+   * @param name id of the adaptor
+   * @return adaptor template
+   */
+  @RequestMapping(value = "/rest/harvester/adaptors/destinations/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataAdaptorTemplate getDestination(@PathVariable String name) {
+    return engine.getDestinationsTypes().stream().filter(a->a.getName().equals(name)).findFirst().orElse(null);
   }
 }
