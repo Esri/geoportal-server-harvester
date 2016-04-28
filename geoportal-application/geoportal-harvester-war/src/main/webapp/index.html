@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <title>Harvester</title>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    
+    <link rel="stylesheet" href="//esri.github.io/calcite-bootstrap/assets/css/calcite-bootstrap.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.16/esri/themes/calcite/dijit/calcite.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.16/esri/themes/calcite/esri/esri.css">
+    <link rel="stylesheet" href="./app/style/main.css">
+    <link rel="stylesheet" href="./lib/typeahead.css">
+    
+    <script type="text/javascript">
+      var dojoConfig = {
+        locale: "en",
+        parseOnLoad: true,
+        packages: [
+          {
+            name: 'app',
+            location: location.pathname.replace(/\/[^/]*$/, '') + '/app',
+          }
+        ]
+      };
+    </script>
+    
+    <script src="//js.arcgis.com/3.16/"></script>
+    <script src="lib/calcite-bootstrap/scripts/vendor.js"></script>
+    <script src="lib/calcite-bootstrap/scripts/plugins.js"></script>
+    <script src="lib/typeahead.js"></script>
+    
+  </head>
+  
+  
+  <body class="calcite">
+    <script>
+    require(["app"],function() {
+      require(["dojo/ready","app/main/App"],
+      function(ready,App) {
+        ready(function() {
+          var app = new App({},"app");
+          app.startup();
+        });
+      });
+    });
+    </script>
+    <div id="app"></div>
+  </body>
+</html>

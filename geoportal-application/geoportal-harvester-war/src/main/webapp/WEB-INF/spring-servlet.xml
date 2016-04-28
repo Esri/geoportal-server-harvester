@@ -21,6 +21,7 @@
   
 	<context:component-scan base-package="com.esri.geoportal.harvester.rest, com.esri.geoportal.harvester.beans" />
 	<mvc:annotation-driven />
+    <mvc:default-servlet-handler />
 
     <bean id="config"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
