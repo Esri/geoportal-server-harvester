@@ -20,8 +20,9 @@ define(["dojo/_base/declare",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../nls/resources",
-        "dojo/text!./templates/Nav.html"],
-  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
+        "dojo/text!./templates/Nav.html",
+        "dojo/topic"],
+  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -29,6 +30,26 @@ define(["dojo/_base/declare",
     
       postCreate: function(){
         
+      },
+      
+      _onhome: function() {
+        console.log("Home");
+        topic.publish("nav","home");
+      },
+      
+      _onconnectors: function() {
+        console.log("Connectors");
+        topic.publish("nav","connectors");
+      },
+      
+      _ontasks: function() {
+        console.log("Tasks");
+        topic.publish("nav","tasks");
+      },
+      
+      _onprocesses: function() {
+        console.log("Processes");
+        topic.publish("nav","processes");
       }
     });
 });

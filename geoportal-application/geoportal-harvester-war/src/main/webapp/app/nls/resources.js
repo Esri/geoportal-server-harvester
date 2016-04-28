@@ -22,6 +22,17 @@ define({
       error: "Error",
       ok: "OK",
       open: "Open"
+    },
+    
+    header: {
+      caption: "Geoportal Server Harvester ver. 2.0"
+    },
+    
+    navigation: {
+      home: "Home",
+      connectors: "Connectors",
+      tasks: "Tasks",
+      processes: "Processes"
     }
 
   }

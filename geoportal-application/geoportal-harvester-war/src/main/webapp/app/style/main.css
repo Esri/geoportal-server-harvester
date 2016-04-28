@@ -24,6 +24,17 @@ html,body {
   height: 100%;
 }
 
+.h-nav > .h-nav-button {
+  cursor: pointer;
+  border: black solid thin;
+  margin-bottom: 0.5em;
+  margin-right: 1em;;
+}
+
+.h-nav > .h-nav-button:hover {
+  background: aqua;
+}
+
 .h-nav-layout {
   width: 120px;
 }
