@@ -20,7 +20,7 @@ define(["dojo/_base/declare",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../nls/resources",
-        "dojo/text!./templates/App.html"],
+        "dojo/text!./templates/Nav.html"],
   function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{

@@ -1,0 +1,24 @@
+html,body {
+  height: 100%;
+}
+
+.h-app {
+  height: 100%;
+}
+
+.h-header {
+  height: 60px;
+  background-color: aquamarine;
+}
+
+.h-nav {
+  width: 120px;
+  height: 100%;
+  float: left;
+  border-right: black solid thin;
+}
+
+.h-stage {
+  height: 100%;
+  float: left;
+}
