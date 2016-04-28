@@ -1,24 +1,37 @@
 html,body {
   height: 100%;
+  margin-bottom: 0px;
 }
 
 .h-app {
   height: 100%;
+  width: 100%;
+}
+
+.h-header-layout {
+  height: 60px;
 }
 
 .h-header {
-  height: 60px;
-  background-color: aquamarine;
+  height: 100%;
+}
+
+.h-content-layout {
+  
 }
 
 .h-nav {
-  width: 120px;
   height: 100%;
-  float: left;
-  border-right: black solid thin;
+}
+
+.h-nav-layout {
+  width: 120px;
 }
 
 .h-stage {
   height: 100%;
-  float: left;
+}
+
+.h-stage-layout {
+  
 }

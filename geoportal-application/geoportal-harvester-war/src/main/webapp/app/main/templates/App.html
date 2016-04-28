@@ -1,5 +1,17 @@
-<div class="h-app" data-dojo-attach-point="contentNode">
-  <div data-dojo-type="app/main/Header"></div>
-  <div data-dojo-type="app/main/Nav"></div>
-  <div data-dojo-type="app/main/Stage"></div>
+<div style="display: table;" class="h-app" data-dojo-attach-point="contentNode">
+  <div style="display: table-row;" class="h-header-layout">
+    <div data-dojo-type="app/main/Header"></div>
+  </div>
+  <div style="display: table-row;" class="h-content-layout">
+    <div style="height: 100%;">
+      <div style="display: table; width: 100%; height: 100%">
+        <div style="display: table-cell;" class="h-nav-layout">
+          <div data-dojo-type="app/main/Nav"></div>
+        </div>
+        <div style="display: table-cell" class="h-stage-layout">
+          <div data-dojo-type="app/main/Stage"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
