@@ -21,7 +21,7 @@
         packages: [
           {
             name: 'app',
-            location: location.pathname.replace(/\/[^/]*$/, '') + '/app',
+            location: location.pathname.replace(/\/[^/]*$/, '') + '/app'
           }
         ]
       };
@@ -32,10 +32,6 @@
     <script src="lib/calcite-bootstrap/scripts/plugins.js"></script>
     <script src="lib/typeahead.js"></script>
     
-  </head>
-  
-  
-  <body class="calcite">
     <script>
     require(["app"],function() {
       require(["dojo/ready","app/main/App"],
@@ -47,6 +43,11 @@
       });
     });
     </script>
+    
+  </head>
+  
+  
+  <body class="calcite">
     <div id="app"></div>
   </body>
 </html>
