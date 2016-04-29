@@ -15,10 +15,10 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.DataDestination;
-import com.esri.geoportal.harvester.api.DataDestinationException;
+import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.DataSourceException;
+import com.esri.geoportal.harvester.api.DataInputException;
+import com.esri.geoportal.harvester.api.DataOutput;
 
 /**
  * Process.
@@ -72,17 +72,17 @@ public class Process {
             reportBuilder.started(Process.this);
             while(task.getDataSource().hasNext()) {
               DataReference<String> dataReference = task.getDataSource().next();
-              for (DataDestination<String> d: task.getDataDestinations()) {
+              for (DataOutput<String> d: task.getDataDestinations()) {
                 try {
                   d.publish(dataReference);
                   reportBuilder.success(Process.this,dataReference);
-                } catch (DataDestinationException ex) {
+                } catch (DataOutputException ex) {
                   reportBuilder.error(Process.this,ex);
                 }
               }
             }
           }
-        } catch (DataSourceException ex) {
+        } catch (DataInputException ex) {
           reportBuilder.error(Process.this,ex);
           abort();
         } finally {

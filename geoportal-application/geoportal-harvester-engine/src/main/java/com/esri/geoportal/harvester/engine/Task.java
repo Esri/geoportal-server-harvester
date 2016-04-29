@@ -15,24 +15,24 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.DataSource;
-import com.esri.geoportal.harvester.api.DataDestination;
 import java.util.List;
+import com.esri.geoportal.harvester.api.DataOutput;
+import com.esri.geoportal.harvester.api.DataInput;
 
 /**
  * Task.
  * @param <T> type of the data
  */
 public class Task<T> implements AutoCloseable {
-  private final DataSource<T> dataSource;
-  private final List<DataDestination<T>> dataDestinations;
+  private final DataInput<T> dataSource;
+  private final List<DataOutput<T>> dataDestinations;
   
   /**
    * Creates instance of the task.
    * @param dataSource data source
    * @param dataDestinations data destination
    */
-  public Task(DataSource<T> dataSource, List<DataDestination<T>> dataDestinations) {
+  public Task(DataInput<T> dataSource, List<DataOutput<T>> dataDestinations) {
     this.dataSource = dataSource;
     this.dataDestinations = dataDestinations;
   }
@@ -41,7 +41,7 @@ public class Task<T> implements AutoCloseable {
    * Gets data source.
    * @return data source
    */
-  public DataSource<T> getDataSource() {
+  public DataInput<T> getDataSource() {
     return dataSource;
   }
 
@@ -49,14 +49,14 @@ public class Task<T> implements AutoCloseable {
    * Gets data publisher.
    * @return data publisher
    */
-  public List<DataDestination<T>> getDataDestinations() {
+  public List<DataOutput<T>> getDataDestinations() {
     return dataDestinations;
   }
 
   @Override
   public void close() throws Exception {
     getDataSource().close();
-    for (DataDestination d: getDataDestinations()) {
+    for (DataOutput d: getDataDestinations()) {
       try {
         d.close();
       } catch (Exception ex) {}

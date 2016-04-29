@@ -47,21 +47,21 @@ html,body {
   height: 100%;
 }
 
-.h-adaptors {
+.h-connectors {
   margin-bottom: 1em;
 }
 
-.h-adaptors-caption {
+.h-connectors-caption {
   font-size: medium;
   font-weight: bold;
   background-color: lightgray;
 }
 
-.h-adaptor {
+.h-connector {
   
 }
 
-.h-adaptor-name {
+.h-connector-name {
   margin-right: 0.5em;
   font-weight: bold;
 }

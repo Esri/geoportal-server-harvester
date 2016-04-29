@@ -15,22 +15,22 @@
  */
 package com.esri.geoportal.harvester.engine.support;
 
-import com.esri.geoportal.harvester.api.DataAdaptorFactory;
-import com.esri.geoportal.harvester.api.DataAdaptorTemplate;
+import com.esri.geoportal.harvester.api.DataConnectorTemplate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import com.esri.geoportal.harvester.api.DataConnectorFactory;
 
 /**
  * Base data registry.
  * @param <F> type of the factory
  */
-public abstract class BaseDataRegistry<F extends DataAdaptorFactory> extends HashMap<String,F> {
+public abstract class BaseDataRegistry<F extends DataConnectorFactory> extends HashMap<String,F> {
   /**
    * Gets all templates.
    * @return list of all templates
    */
-  public List<DataAdaptorTemplate> getTemplates() {
-    return Arrays.asList(values().stream().map(f->f.getTemplate()).toArray(DataAdaptorTemplate[]::new));
+  public List<DataConnectorTemplate> getTemplates() {
+    return Arrays.asList(values().stream().map(f->f.getTemplate()).toArray(DataConnectorTemplate[]::new));
   }
 }

@@ -15,10 +15,10 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.DataDestinationException;
+import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataProcessorException;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.DataSourceException;
+import com.esri.geoportal.harvester.api.DataInputException;
 
 /**
  * Report builder.
@@ -48,14 +48,14 @@ public interface ReportBuilder {
    * @param process process
    * @param ex exception
    */
-  void error(Process process, DataSourceException ex);
+  void error(Process process, DataInputException ex);
   
   /**
    * Make publish error entry.
    * @param process process
    * @param ex exception
    */
-  void error(Process process, DataDestinationException ex);
+  void error(Process process, DataOutputException ex);
   
   /**
    * Make error entry without associated data.

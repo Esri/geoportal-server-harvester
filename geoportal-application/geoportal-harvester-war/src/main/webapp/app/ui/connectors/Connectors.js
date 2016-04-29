@@ -16,27 +16,36 @@
 
 define(["dojo/_base/declare",
         "dojo/_base/lang",
+        "dojo/_base/array",
+        "dojo/html",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/Connectors.html",
-        "dojo/topic",
-        "dojo/dom-style",
-        "app/ui/connectors/Adaptors"
+        "app/rest/Connectors",
+        "app/ui/connectors/Connector"
       ],
-  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic,domStyle){
+  function(declare,lang,array,html,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,Connectors,Connector){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
     
       postCreate: function(){
-        topic.subscribe("nav",lang.hitch(this,this._onNav));
+        html.set(this.captionNode,this.i18n.connectors[this.category]);
+        var rest = new Connectors();
+        rest[this.category]().then(lang.hitch(this,this.processConnectors));
       },
       
-      _onNav: function(evt) {
-        domStyle.set(this.domNode,"display", evt==="connectors"? "block": "none");
+      processConnectors: function(response) {
+        console.log(response);
+        array.forEach(response,lang.hitch(this,this.processConnector));
+      },
+      
+      processConnector: function(connector) {
+        var widget = new Connector(connector).placeAt(this.domNode);
+        widget.startup();
       }
     });
 });

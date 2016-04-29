@@ -15,9 +15,9 @@
  */
 package com.esri.geoportal.harvester.support;
 
-import com.esri.geoportal.harvester.api.DataDestinationException;
+import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.DataSourceException;
+import com.esri.geoportal.harvester.api.DataInputException;
 import com.esri.geoportal.harvester.engine.Process;
 import com.esri.geoportal.harvester.engine.ReportBuilder;
 import org.slf4j.Logger;
@@ -45,12 +45,12 @@ public class ReportLogger implements ReportBuilder {
   }
 
   @Override
-  public void error(Process process, DataSourceException ex) {
+  public void error(Process process, DataInputException ex) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public void error(Process process, DataDestinationException ex) {
+  public void error(Process process, DataOutputException ex) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 

@@ -35,9 +35,9 @@ define({
       processes: "Processes"
     },
     
-    adaptors: {
-      sources: "Inbound adaptors",
-      destinations: "Outbound adaptors"
+    connectors: {
+      inbound:  "Inbound connectors",
+      outbound: "Outbound connectors"
     }
 
   }

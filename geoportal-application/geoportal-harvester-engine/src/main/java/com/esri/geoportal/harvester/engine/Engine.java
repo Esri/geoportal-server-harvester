@@ -15,12 +15,8 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.DataAdaptorDefinition;
-import com.esri.geoportal.harvester.api.DataAdaptorTemplate;
-import com.esri.geoportal.harvester.api.DataSource;
-import com.esri.geoportal.harvester.api.DataSourceFactory;
-import com.esri.geoportal.harvester.api.DataDestinationFactory;
-import com.esri.geoportal.harvester.api.DataDestination;
+import com.esri.geoportal.harvester.api.DataConnectorDefinition;
+import com.esri.geoportal.harvester.api.DataConnectorTemplate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,6 +24,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import com.esri.geoportal.harvester.api.DataOutput;
+import com.esri.geoportal.harvester.api.DataOutputFactory;
+import com.esri.geoportal.harvester.api.DataInput;
+import com.esri.geoportal.harvester.api.DataInputFactory;
 
 /**
  * Harvesting engine.
@@ -36,8 +36,8 @@ public class Engine {
   private final ReportBuilder reportBuilder;
   private final TaskManager taskManager;
   private final ProcessManager processManager;
-  private final DataSourceRegistry dsReg;
-  private final DataDestinationRegistry dpReg;
+  private final DataInboundConnectorRegistry dsReg;
+  private final DataOutboundConnectorRegistry dpReg;
 
   /**
    * Creates instance of the engine.
@@ -47,7 +47,7 @@ public class Engine {
    * @param dsReg data source registry
    * @param dpReg data publisher registry
    */
-  public Engine(ReportBuilder reportBuilder, TaskManager taskManager, ProcessManager processManager, DataSourceRegistry dsReg, DataDestinationRegistry dpReg) {
+  public Engine(ReportBuilder reportBuilder, TaskManager taskManager, ProcessManager processManager, DataInboundConnectorRegistry dsReg, DataOutboundConnectorRegistry dpReg) {
     this.reportBuilder = reportBuilder;
     this.taskManager = taskManager;
     this.processManager = processManager;
@@ -56,18 +56,18 @@ public class Engine {
   }
 
   /**
-   * Gets sources types.
-   * @return collection of sources types
+   * Gets inbound connector templates.
+   * @return collection of inbound connector templates
    */
-  public Collection<DataAdaptorTemplate> getSourcesTypes() {
+  public Collection<DataConnectorTemplate> getInboundConnectorTemplates() {
     return dsReg.getTemplates();
   }
 
   /**
-   * Gets destinations types.
-   * @return collection of destinations types
+   * Gets outbound connector templates.
+   * @return collection of outbound connector templates
    */
-  public Collection<DataAdaptorTemplate> getDestinationsTypes() {
+  public Collection<DataConnectorTemplate> getOutboundConnectorTemplates() {
     return dpReg.getTemplates();
   }
 
@@ -91,27 +91,27 @@ public class Engine {
   
   /**
    * Creates task to execute.
-   * @param dsParams data source init parameters
-   * @param dpParams data publisher init parameters
+   * @param dsParams data input init parameter
+   * @param dpParams data output init parameters
    * @return task
    */
-  public Task createTask(DataAdaptorDefinition dsParams, List<DataAdaptorDefinition> dpParams) {
-    DataSourceFactory dsFactory = dsReg.get(dsParams.getType());
+  public Task createTask(DataConnectorDefinition dsParams, List<DataConnectorDefinition> dpParams) {
+    DataInputFactory dsFactory = dsReg.get(dsParams.getType());
     
     if (dsFactory==null) {
       throw new IllegalArgumentException("Invalid data source init parameters");
     }
     
-    DataSource dataSource = dsFactory.create(dsParams.getAttributes());
+    DataInput dataSource = dsFactory.create(dsParams.getAttributes());
 
-    ArrayList<DataDestination> dataDestinations =  new ArrayList<>();
-    for (DataAdaptorDefinition def: dpParams) {
-      DataDestinationFactory dpFactory = dpReg.get(def.getType());
+    ArrayList<DataOutput> dataDestinations =  new ArrayList<>();
+    for (DataConnectorDefinition def: dpParams) {
+      DataOutputFactory dpFactory = dpReg.get(def.getType());
       if (dpFactory==null) {
         throw new IllegalArgumentException("Invalid data publisher init parameters");
       }
 
-      DataDestination dataPublisher = dpFactory.create(def.getAttributes());
+      DataOutput dataPublisher = dpFactory.create(def.getAttributes());
       dataDestinations.add(dataPublisher);
     }
     

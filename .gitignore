@@ -16,3 +16,8 @@
 /geoportal-commons/geoportal-commons-robots/target/
 /geoportal-commons/geoportal-commons-csw-client/target/
 /geoportal-commons/geoportal-commons-gpt-client/target/
+/geoportal-connectors/geoportal-harvester-console/target/
+/geoportal-connectors/geoportal-harvester-csw/target/
+/geoportal-connectors/geoportal-harvester-folder/target/
+/geoportal-connectors/geoportal-harvester-gpt/target/
+/geoportal-connectors/geoportal-harvester-waf/target/

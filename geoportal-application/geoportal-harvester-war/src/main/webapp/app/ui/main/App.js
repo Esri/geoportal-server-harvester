@@ -24,7 +24,7 @@ define(["dojo/_base/declare",
         "dijit/layout/ContentPane", 
         "dijit/layout/LayoutContainer",
         "app/ui/home/Home",
-        "app/ui/connectors/Connectors",
+        "app/ui/connectors/ConnectorsPane",
         "app/ui/tasks/Tasks",
         "app/ui/processes/Processes"
       ],

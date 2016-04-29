@@ -19,8 +19,8 @@ import com.esri.geoportal.harvester.engine.ReportBuilder;
 import com.esri.geoportal.harvester.engine.Engine;
 import com.esri.geoportal.harvester.engine.ProcessManager;
 import com.esri.geoportal.harvester.engine.TaskManager;
-import com.esri.geoportal.harvester.engine.DataDestinationRegistry;
-import com.esri.geoportal.harvester.engine.DataSourceRegistry;
+import com.esri.geoportal.harvester.engine.DataOutboundConnectorRegistry;
+import com.esri.geoportal.harvester.engine.DataInboundConnectorRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
 public class EngineBean extends Engine {
 
   @Autowired
-  public EngineBean(ReportBuilder reportBuilder, TaskManager taskManager, ProcessManager processManager, DataSourceRegistry dsReg, DataDestinationRegistry dpReg) {
+  public EngineBean(ReportBuilder reportBuilder, TaskManager taskManager, ProcessManager processManager, DataInboundConnectorRegistry dsReg, DataOutboundConnectorRegistry dpReg) {
     super(reportBuilder, taskManager, processManager, dsReg, dpReg);
   }
 }

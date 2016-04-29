@@ -15,9 +15,9 @@
  */
 package com.esri.geoportal.harvester.support;
 
-import com.esri.geoportal.harvester.api.DataDestinationException;
+import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.DataSourceException;
+import com.esri.geoportal.harvester.api.DataInputException;
 import com.esri.geoportal.harvester.engine.Process;
 import com.esri.geoportal.harvester.engine.ReportBuilder;
 import java.util.Calendar;
@@ -100,12 +100,12 @@ public class ReportStatistics implements ReportBuilder {
   }
 
   @Override
-  public void error(Process process, DataSourceException ex) {
+  public void error(Process process, DataInputException ex) {
     ++harvestFailed;
   }
 
   @Override
-  public void error(Process process, DataDestinationException ex) {
+  public void error(Process process, DataOutputException ex) {
     ++publishFailed;
   }
 

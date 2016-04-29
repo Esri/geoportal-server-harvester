@@ -7,7 +7,7 @@
     <packaging>pom</packaging>
     <name>Esri :: Geoportal Server :: Harvester</name>
     <modules>
-        <module>geoportal-adaptors</module>
+        <module>geoportal-connectors</module>
         <module>geoportal-application</module>
         <module>geoportal-SDK</module>
         <module>geoportal-commons</module>

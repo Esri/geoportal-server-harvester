@@ -17,6 +17,7 @@ package com.esri.geoportal.commons.gpt.client;
 
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -40,7 +41,7 @@ import org.apache.http.impl.client.HttpClients;
 /**
  * GPT 2.0 Client.
  */
-public class Client {
+public class Client implements Closeable {
   private final HttpClient httpClient;
   private final URL url;
   private final String userName;
@@ -109,6 +110,13 @@ public class Client {
       System.out.println(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
       ObjectMapper mapper = new ObjectMapper();
       return mapper.readValue(responseContent, Response.class);
+    }
+  }
+
+  @Override
+  public void close() throws IOException {
+    if (httpClient instanceof Closeable) {
+      ((Closeable)httpClient).close();
     }
   }
 }

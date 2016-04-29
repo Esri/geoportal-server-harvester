@@ -15,27 +15,27 @@
  */
 package com.esri.geoportal.harvester.api.support;
 
-import com.esri.geoportal.harvester.api.DataDestination;
-import com.esri.geoportal.harvester.api.DataDestinationException;
+import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.DataSource;
-import com.esri.geoportal.harvester.api.DataSourceException;
+import com.esri.geoportal.harvester.api.DataInputException;
 import java.util.List;
+import com.esri.geoportal.harvester.api.DataOutput;
+import com.esri.geoportal.harvester.api.DataInput;
 
 /**
  * Data collector.
  * @param <T> type of data
  */
 public class DataCollector<T> {
-  private final DataSource<T> source;
-  private final List<DataDestination<T>> destinations;
+  private final DataInput<T> source;
+  private final List<DataOutput<T>> destinations;
 
   /**
    * Creates instance of the collector.
    * @param source data source
    * @param destinations data destinations
    */
-  public DataCollector(DataSource<T> source, List<DataDestination<T>> destinations) {
+  public DataCollector(DataInput<T> source, List<DataOutput<T>> destinations) {
     this.source = source;
     this.destinations = destinations;
   }
@@ -50,16 +50,16 @@ public class DataCollector<T> {
       top: while (source.hasNext()) {
         if (Thread.currentThread().isInterrupted()) break;
         DataReference<T> dataReference = source.next();
-        for (DataDestination<T> d: destinations) {
+        for (DataOutput<T> d: destinations) {
           if (Thread.currentThread().isInterrupted()) break top;
           try {
             d.publish(dataReference);
-          } catch (DataDestinationException ex) {
+          } catch (DataOutputException ex) {
             onDestinationException(ex);
           }
         }
       }
-    } catch (DataSourceException ex) {
+    } catch (DataInputException ex) {
       onSourceException(ex);
     } finally {
       onComplete();
@@ -68,6 +68,6 @@ public class DataCollector<T> {
   
   protected void onStart() {}
   protected void onComplete() {}
-  protected void onSourceException(DataSourceException ex) {}
-  protected void onDestinationException(DataDestinationException ex) {}
+  protected void onSourceException(DataInputException ex) {}
+  protected void onDestinationException(DataOutputException ex) {}
 }
