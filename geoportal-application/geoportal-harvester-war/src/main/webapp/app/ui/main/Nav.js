@@ -33,22 +33,18 @@ define(["dojo/_base/declare",
       },
       
       _onhome: function() {
-        console.log("Home");
         topic.publish("nav","home");
       },
       
       _onconnectors: function() {
-        console.log("Connectors");
         topic.publish("nav","connectors");
       },
       
       _ontasks: function() {
-        console.log("Tasks");
         topic.publish("nav","tasks");
       },
       
       _onprocesses: function() {
-        console.log("Processes");
         topic.publish("nav","processes");
       }
     });

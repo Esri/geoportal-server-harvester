@@ -22,9 +22,10 @@ define(["dojo/_base/declare",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/Connectors.html",
         "dojo/topic",
-        "dojo/dom-style"
+        "dojo/dom-style",
+        "app/rest/Adaptors"
       ],
-  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic,domStyle){
+  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic,domStyle,Adaptors){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -32,6 +33,13 @@ define(["dojo/_base/declare",
     
       postCreate: function(){
         topic.subscribe("nav",lang.hitch(this,this._onNav));
+        var adaptors = new Adaptors();
+        adaptors.sources().then(function(response){
+          console.log(response);
+        });
+        adaptors.destinations().then(function(response){
+          console.log(response);
+        });
       },
       
       _onNav: function(evt) {
