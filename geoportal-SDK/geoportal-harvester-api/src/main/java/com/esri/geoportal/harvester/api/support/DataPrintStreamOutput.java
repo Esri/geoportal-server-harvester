@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.api.support;
 
-import com.esri.geoportal.harvester.api.DataConnectorDefinition;
+import com.esri.geoportal.harvester.api.DataConnector;
 import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import java.io.IOException;
@@ -47,8 +47,8 @@ public class DataPrintStreamOutput implements DataOutput<String> {
   }
 
   @Override
-  public DataConnectorDefinition getDefinition() {
-    DataConnectorDefinition def = new DataConnectorDefinition();
+  public DataConnector getDefinition() {
+    DataConnector def = new DataConnector();
     def.setType("DataPrintStreamDestination");;
     return def;
   }

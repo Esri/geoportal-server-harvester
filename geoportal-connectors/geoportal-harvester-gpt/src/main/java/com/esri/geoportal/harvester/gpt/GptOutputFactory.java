@@ -16,13 +16,13 @@
 package com.esri.geoportal.harvester.gpt;
 
 import com.esri.geoportal.commons.gpt.client.Client;
-import com.esri.geoportal.harvester.api.DataConnectorTemplate;
+import com.esri.geoportal.harvester.api.DataConnector;
+import com.esri.geoportal.harvester.api.DataBrokerUiTemplate;
 import static com.esri.geoportal.harvester.gpt.GptAttributesAdaptor.P_HOST_URL;
 import static com.esri.geoportal.harvester.gpt.GptAttributesAdaptor.P_USER_NAME;
 import static com.esri.geoportal.harvester.gpt.GptAttributesAdaptor.P_USER_PASSWORD;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import com.esri.geoportal.harvester.api.DataOutput;
 import com.esri.geoportal.harvester.api.DataOutputFactory;
 
@@ -32,23 +32,23 @@ import com.esri.geoportal.harvester.api.DataOutputFactory;
 public class GptOutputFactory implements DataOutputFactory {
 
   @Override
-  public DataOutput create(Map<String, String> attributes) throws IllegalArgumentException {
-    GptAttributesAdaptor attr = new GptAttributesAdaptor(attributes);
+  public DataOutput create(DataConnector connector) throws IllegalArgumentException {
+    GptAttributesAdaptor attr = new GptAttributesAdaptor(connector.getAttributes());
     Client client = new Client(attr.getHostUrl(), attr.getUserName(), attr.getUserName());
     return new GptDataOutput(attr,client);
   }
 
   @Override
-  public DataConnectorTemplate getTemplate() {
-    List<DataConnectorTemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new DataConnectorTemplate.StringArgument(P_HOST_URL, "URL"));
-    arguments.add(new DataConnectorTemplate.StringArgument(P_USER_NAME, "User name"));
-    arguments.add(new DataConnectorTemplate.StringArgument(P_USER_PASSWORD, "User password") {
+  public DataBrokerUiTemplate getTemplate() {
+    List<DataBrokerUiTemplate.Argument> arguments = new ArrayList<>();
+    arguments.add(new DataBrokerUiTemplate.StringArgument(P_HOST_URL, "URL"));
+    arguments.add(new DataBrokerUiTemplate.StringArgument(P_USER_NAME, "User name"));
+    arguments.add(new DataBrokerUiTemplate.StringArgument(P_USER_PASSWORD, "User password") {
       public boolean isPassword() {
         return true;
       }
     });
-    return new DataConnectorTemplate("GPT", "Geoportal Server New Generation", arguments);
+    return new DataBrokerUiTemplate("GPT", "Geoportal Server New Generation", arguments);
   }
 
   

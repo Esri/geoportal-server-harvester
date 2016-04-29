@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.gpt;
 
 import com.esri.geoportal.commons.gpt.client.Client;
-import com.esri.geoportal.harvester.api.DataConnectorDefinition;
+import com.esri.geoportal.harvester.api.DataConnector;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.DataOutputException;
 import java.io.IOException;
@@ -41,8 +41,8 @@ public class GptDataOutput implements DataOutput<String> {
   }
 
   @Override
-  public DataConnectorDefinition getDefinition() {
-    DataConnectorDefinition def = new DataConnectorDefinition();
+  public DataConnector getDefinition() {
+    DataConnector def = new DataConnector();
     def.setType("GPT");
     def.setAttributes(attributes);
     return def;

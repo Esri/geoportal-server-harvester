@@ -15,12 +15,12 @@
  */
 package com.esri.geoportal.harvester.folder;
 
-import com.esri.geoportal.harvester.api.DataConnectorTemplate;
+import com.esri.geoportal.harvester.api.DataConnector;
+import com.esri.geoportal.harvester.api.DataBrokerUiTemplate;
 import static com.esri.geoportal.harvester.folder.FolderAttributesAdaptor.P_HOST_URL;
 import static com.esri.geoportal.harvester.folder.FolderAttributesAdaptor.P_ROOT_FOLDER;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import com.esri.geoportal.harvester.api.DataOutput;
 import com.esri.geoportal.harvester.api.DataOutputFactory;
 
@@ -30,17 +30,17 @@ import com.esri.geoportal.harvester.api.DataOutputFactory;
 public class FolderPublisherFactory implements DataOutputFactory {
 
   @Override
-  public DataOutput create(Map<String, String> attributes) throws IllegalArgumentException {
-    FolderAttributesAdaptor attr = new FolderAttributesAdaptor(attributes);
+  public DataOutput create(DataConnector connector) throws IllegalArgumentException {
+    FolderAttributesAdaptor attr = new FolderAttributesAdaptor(connector.getAttributes());
     return new FolderDataOutput(attr);
   }
 
   @Override
-  public DataConnectorTemplate getTemplate() {
-    List<DataConnectorTemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new DataConnectorTemplate.StringArgument(P_ROOT_FOLDER, "Root folder"));
-    arguments.add(new DataConnectorTemplate.StringArgument(P_HOST_URL, "Source host URL"));
-    return new DataConnectorTemplate("FOLDER", "Folder", arguments);
+  public DataBrokerUiTemplate getTemplate() {
+    List<DataBrokerUiTemplate.Argument> arguments = new ArrayList<>();
+    arguments.add(new DataBrokerUiTemplate.StringArgument(P_ROOT_FOLDER, "Root folder"));
+    arguments.add(new DataBrokerUiTemplate.StringArgument(P_HOST_URL, "Source host URL"));
+    return new DataBrokerUiTemplate("FOLDER", "Folder", arguments);
   }
   
 }

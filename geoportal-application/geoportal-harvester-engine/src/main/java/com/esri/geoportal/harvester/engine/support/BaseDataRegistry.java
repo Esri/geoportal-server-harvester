@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine.support;
 
-import com.esri.geoportal.harvester.api.DataConnectorTemplate;
+import com.esri.geoportal.harvester.api.DataBrokerUiTemplate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +30,7 @@ public abstract class BaseDataRegistry<F extends DataBrokerFactory> extends Hash
    * Gets all templates.
    * @return list of all templates
    */
-  public List<DataConnectorTemplate> getTemplates() {
-    return Arrays.asList(values().stream().map(f->f.getTemplate()).toArray(DataConnectorTemplate[]::new));
+  public List<DataBrokerUiTemplate> getTemplates() {
+    return Arrays.asList(values().stream().map(f->f.getTemplate()).toArray(DataBrokerUiTemplate[]::new));
   }
 }

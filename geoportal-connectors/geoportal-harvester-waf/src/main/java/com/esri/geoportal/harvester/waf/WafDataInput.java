@@ -19,7 +19,7 @@ import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.http.BotsHttpClientFactory;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
-import com.esri.geoportal.harvester.api.DataConnectorDefinition;
+import com.esri.geoportal.harvester.api.DataConnector;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.DataInputException;
 import java.io.Closeable;
@@ -54,8 +54,8 @@ public class WafDataInput implements DataInput<String>, Closeable  {
   }
 
   @Override
-  public DataConnectorDefinition getDefinition() {
-    DataConnectorDefinition def = new DataConnectorDefinition();
+  public DataConnector getDefinition() {
+    DataConnector def = new DataConnector();
     def.setType("WAF");
     def.setAttributes(attributes);
     return def;

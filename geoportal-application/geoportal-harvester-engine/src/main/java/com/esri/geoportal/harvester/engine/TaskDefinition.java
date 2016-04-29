@@ -15,21 +15,21 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.DataConnectorDefinition;
+import com.esri.geoportal.harvester.api.DataConnector;
 import java.util.List;
 
 /**
  * Process definition.
  */
 public class TaskDefinition {
-  private DataConnectorDefinition source;
-  private List<DataConnectorDefinition> destinations;
+  private DataConnector source;
+  private List<DataConnector> destinations;
 
   /**
    * Gets source definition.
    * @return source definition
    */
-  public DataConnectorDefinition getSource() {
+  public DataConnector getSource() {
     return source;
   }
 
@@ -37,7 +37,7 @@ public class TaskDefinition {
    * Sets source definition.
    * @param source source definition
    */
-  public void setSource(DataConnectorDefinition source) {
+  public void setSource(DataConnector source) {
     this.source = source;
   }
 
@@ -45,7 +45,7 @@ public class TaskDefinition {
    * Gets destinations.
    * @return destinations
    */
-  public List<DataConnectorDefinition> getDestinations() {
+  public List<DataConnector> getDestinations() {
     return destinations;
   }
 
@@ -53,7 +53,7 @@ public class TaskDefinition {
    * Sets destinations.
    * @param destinations destinations
    */
-  public void setDestinations(List<DataConnectorDefinition> destinations) {
+  public void setDestinations(List<DataConnector> destinations) {
     this.destinations = destinations;
   }
   

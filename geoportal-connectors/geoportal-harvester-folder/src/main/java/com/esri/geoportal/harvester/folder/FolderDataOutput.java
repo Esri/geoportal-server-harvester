@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.folder;
 
-import com.esri.geoportal.harvester.api.DataConnectorDefinition;
+import com.esri.geoportal.harvester.api.DataConnector;
 import com.esri.geoportal.harvester.api.DataReference;
 import static com.esri.geoportal.harvester.folder.PathUtil.sanitizeFileName;
 import static com.esri.geoportal.harvester.folder.StringListUtil.head;
@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataOutput;
+import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
 import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
 
 /**
@@ -50,8 +51,8 @@ public class FolderDataOutput implements DataOutput<String> {
   }
 
   @Override
-  public DataConnectorDefinition getDefinition() {
-    DataConnectorDefinition def = new DataConnectorDefinition();
+  public DataConnector getDefinition() {
+    DataConnector def = new DataConnector();
     def.setType("FOLDER");
     def.setAttributes(attributes);
     return def;

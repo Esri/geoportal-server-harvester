@@ -15,8 +15,8 @@
  */
 package com.esri.geoportal.harvester.console;
 
-import com.esri.geoportal.harvester.api.DataConnectorTemplate;
-import java.util.Map;
+import com.esri.geoportal.harvester.api.DataConnector;
+import com.esri.geoportal.harvester.api.DataBrokerUiTemplate;
 import com.esri.geoportal.harvester.api.DataOutput;
 import com.esri.geoportal.harvester.api.DataOutputFactory;
 
@@ -26,13 +26,13 @@ import com.esri.geoportal.harvester.api.DataOutputFactory;
 public class ConsoleOutputFactory implements DataOutputFactory {
 
   @Override
-  public DataOutput create(Map<String, String> attributes) throws IllegalArgumentException {
+  public DataOutput create(DataConnector connector) throws IllegalArgumentException {
     return new ConsoleDataDestination();
   }
 
   @Override
-  public DataConnectorTemplate getTemplate() {
-    return new DataConnectorTemplate("CONSOLE", "Console output", null);
+  public DataBrokerUiTemplate getTemplate() {
+    return new DataBrokerUiTemplate("CONSOLE", "Console output", null);
   }
   
 }

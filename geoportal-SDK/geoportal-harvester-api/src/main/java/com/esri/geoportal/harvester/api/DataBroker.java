@@ -23,5 +23,5 @@ public interface DataBroker {
    * Gets definition.
    * @return definition
    */
-  DataConnectorDefinition getDefinition();
+  DataConnector getDefinition();
 }

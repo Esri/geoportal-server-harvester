@@ -15,8 +15,8 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.DataConnectorDefinition;
-import com.esri.geoportal.harvester.api.DataConnectorTemplate;
+import com.esri.geoportal.harvester.api.DataConnector;
+import com.esri.geoportal.harvester.api.DataBrokerUiTemplate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -59,7 +59,7 @@ public class Engine {
    * Gets inbound connector templates.
    * @return collection of inbound connector templates
    */
-  public Collection<DataConnectorTemplate> getInboundConnectorTemplates() {
+  public Collection<DataBrokerUiTemplate> getInboundConnectorTemplates() {
     return dsReg.getTemplates();
   }
 
@@ -67,7 +67,7 @@ public class Engine {
    * Gets outbound connector templates.
    * @return collection of outbound connector templates
    */
-  public Collection<DataConnectorTemplate> getOutboundConnectorTemplates() {
+  public Collection<DataBrokerUiTemplate> getOutboundConnectorTemplates() {
     return dpReg.getTemplates();
   }
 
@@ -95,23 +95,23 @@ public class Engine {
    * @param dpParams data output init parameters
    * @return task
    */
-  public Task createTask(DataConnectorDefinition dsParams, List<DataConnectorDefinition> dpParams) {
+  public Task createTask(DataConnector dsParams, List<DataConnector> dpParams) {
     DataInputFactory dsFactory = dsReg.get(dsParams.getType());
     
     if (dsFactory==null) {
       throw new IllegalArgumentException("Invalid data source init parameters");
     }
     
-    DataInput dataSource = dsFactory.create(dsParams.getAttributes());
+    DataInput dataSource = dsFactory.create(dsParams);
 
     ArrayList<DataOutput> dataDestinations =  new ArrayList<>();
-    for (DataConnectorDefinition def: dpParams) {
+    for (DataConnector def: dpParams) {
       DataOutputFactory dpFactory = dpReg.get(def.getType());
       if (dpFactory==null) {
         throw new IllegalArgumentException("Invalid data publisher init parameters");
       }
 
-      DataOutput dataPublisher = dpFactory.create(def.getAttributes());
+      DataOutput dataPublisher = dpFactory.create(def);
       dataDestinations.add(dataPublisher);
     }
     

@@ -23,16 +23,16 @@ import java.util.Map;
  */
 public interface DataBrokerFactory<T extends DataBroker> {
   /**
-   * Creates instance of the connector.
-   * @param attributes attributes used to initialize attributes
+   * Creates instance of the broker.
+   * @param connector connector
    * @return instance of the attributes
    * @throws IllegalArgumentException if incomplete or invalid attributes
    */
-  T create(Map<String,String> attributes) throws IllegalArgumentException;
+  T create(DataConnector connector) throws IllegalArgumentException;
   
   /**
    * Gets attributes template.
    * @return attributes template
    */
-  DataConnectorTemplate getTemplate();
+  DataBrokerUiTemplate getTemplate();
 }

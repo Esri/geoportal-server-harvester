@@ -21,7 +21,7 @@ import com.esri.geoportal.commons.csw.client.IRecord;
 import com.esri.geoportal.commons.csw.client.IRecords;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
-import com.esri.geoportal.harvester.api.DataConnectorDefinition;
+import com.esri.geoportal.harvester.api.DataConnector;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.DataInputException;
 import com.esri.geoportal.harvester.api.support.SimpleDataReference;
@@ -54,8 +54,8 @@ public class CswDataInput implements DataInput<String>, AutoCloseable {
   }
 
   @Override
-  public DataConnectorDefinition getDefinition() {
-    DataConnectorDefinition def = new DataConnectorDefinition();
+  public DataConnector getDefinition() {
+    DataConnector def = new DataConnector();
     def.setType("CSW");
     def.setAttributes(attributes);
     return def;

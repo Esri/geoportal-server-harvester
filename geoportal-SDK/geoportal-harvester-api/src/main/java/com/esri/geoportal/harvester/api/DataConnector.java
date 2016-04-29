@@ -15,14 +15,46 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import java.util.Map;
+
 /**
- * General concept of the connector.
+ * Connector definition.
  */
-public interface DataConnector {
-  
+public class DataConnector {
+  private String type;
+  private Map<String,String> attributes;
+
   /**
-   * Gets description of the source.
-   * @return textual description
+   * Gets adaptor type.
+   * @return adaptor type
    */
-  String getDescription();
+  public String getType() {
+    return type;
+  }
+
+  /**
+   * Sets adaptor type.
+   * @param type adaptor type
+   */
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  /**
+   * Gets adaptor attributes.
+   * @return adaptor attributes
+   */
+  public Map<String, String> getAttributes() {
+    return attributes;
+  }
+
+  /**
+   * Sets adaptor attributes.
+   * @param attributes adaptor attributes
+   */
+  public void setAttributes(Map<String, String> attributes) {
+    this.attributes = attributes;
+  }
+  
+  
 }
