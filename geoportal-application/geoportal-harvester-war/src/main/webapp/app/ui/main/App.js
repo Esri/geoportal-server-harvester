@@ -19,14 +19,14 @@ define(["dojo/_base/declare",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
-        "dojo/i18n!../nls/resources",
+        "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/App.html",
         "dijit/layout/ContentPane", 
         "dijit/layout/LayoutContainer",
-        "app/home/Home",
-        "app/connectors/Connectors",
-        "app/tasks/Tasks",
-        "app/processes/Processes"
+        "app/ui/home/Home",
+        "app/ui/connectors/Connectors",
+        "app/ui/tasks/Tasks",
+        "app/ui/processes/Processes"
       ],
   function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
   

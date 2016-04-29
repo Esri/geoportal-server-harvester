@@ -19,7 +19,7 @@ define(["dojo/_base/declare",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
-        "dojo/i18n!../nls/resources",
+        "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/Header.html"],
   function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
   

@@ -19,7 +19,7 @@ define(["dojo/_base/declare",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
-        "dojo/i18n!../nls/resources",
+        "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/Connectors.html",
         "dojo/topic",
         "dojo/dom-style"
