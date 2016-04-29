@@ -20,22 +20,22 @@ define(["dojo/_base/declare",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../nls/resources",
-        "dojo/text!./templates/App.html",
-        "dijit/layout/ContentPane", 
-        "dijit/layout/LayoutContainer",
-        "app/home/Home",
-        "app/connectors/Connectors",
-        "app/tasks/Tasks",
-        "app/processes/Processes"
+        "dojo/text!./templates/Tasks.html",
+        "dojo/topic",
+        "dojo/dom-style"
       ],
-  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
+  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic,domStyle){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
     
       postCreate: function(){
-        
+        topic.subscribe("nav",lang.hitch(this,this._onNav));
+      },
+      
+      _onNav: function(evt) {
+        domStyle.set(this.domNode,"display", evt==="tasks"? "block": "none");
       }
     });
 });
