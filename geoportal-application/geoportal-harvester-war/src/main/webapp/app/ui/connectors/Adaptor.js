@@ -20,23 +20,19 @@ define(["dojo/_base/declare",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
-        "dojo/text!./templates/Connectors.html",
-        "dojo/topic",
-        "dojo/dom-style",
-        "app/ui/connectors/Adaptors"
+        "dojo/text!./templates/Adaptor.html"
       ],
-  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic,domStyle){
+  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
+      
+      constructor: function(args) {
+        this.data = args;
+      },
     
       postCreate: function(){
-        topic.subscribe("nav",lang.hitch(this,this._onNav));
-      },
-      
-      _onNav: function(evt) {
-        domStyle.set(this.domNode,"display", evt==="connectors"? "block": "none");
       }
     });
 });

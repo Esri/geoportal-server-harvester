@@ -33,6 +33,11 @@ define({
       connectors: "Connectors",
       tasks: "Tasks",
       processes: "Processes"
+    },
+    
+    adaptors: {
+      sources: "Inbound adaptors",
+      destinations: "Outbound adaptors"
     }
 
   }

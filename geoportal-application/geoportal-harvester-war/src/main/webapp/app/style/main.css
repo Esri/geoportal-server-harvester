@@ -46,3 +46,26 @@ html,body {
 .h-stage {
   height: 100%;
 }
+
+.h-adaptors {
+  margin-bottom: 1em;
+}
+
+.h-adaptors-caption {
+  font-size: medium;
+  font-weight: bold;
+  background-color: lightgray;
+}
+
+.h-adaptor {
+  
+}
+
+.h-adaptor-name {
+  margin-right: 0.5em;
+  font-weight: bold;
+}
+
+.h-adaptor-title {
+  
+}
