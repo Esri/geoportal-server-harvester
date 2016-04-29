@@ -1,5 +1,9 @@
 html,body {
-  height: 100%;
+  width:100%; 
+  height:100%; 
+  margin:0; 
+  padding:0; 
+  overflow:hidden;
   margin-bottom: 0px;
 }
 
@@ -13,11 +17,11 @@ html,body {
 }
 
 .h-header {
-  height: 100%;
+  
 }
 
-.h-content-layout {
-  
+.h-nav-layout {
+  width: 120px;
 }
 
 .h-nav {
@@ -35,14 +39,10 @@ html,body {
   background: aqua;
 }
 
-.h-nav-layout {
-  width: 120px;
+.h-stage-layout {
+  
 }
 
 .h-stage {
   height: 100%;
-}
-
-.h-stage-layout {
-  
 }
