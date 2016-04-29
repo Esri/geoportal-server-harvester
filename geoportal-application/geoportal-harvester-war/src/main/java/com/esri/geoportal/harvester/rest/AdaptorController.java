@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.esri.geoportal.harvester.beans.EngineBean;
-import java.util.UUID;
 import org.springframework.web.bind.annotation.PathVariable;
 /**
  * Adaptor information controller.
