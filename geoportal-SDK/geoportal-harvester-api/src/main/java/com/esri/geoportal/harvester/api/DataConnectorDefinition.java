@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.api;
 import java.util.Map;
 
 /**
- * Adaptor definition.
+ * Connector definition.
  */
 public class DataConnectorDefinition {
   private String type;

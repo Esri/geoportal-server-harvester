@@ -62,11 +62,6 @@ public class CswDataInput implements DataInput<String>, AutoCloseable {
   }
 
   @Override
-  public String getDescription() {
-    return String.format("CSW [%s, %s]", attributes.getHostUrl(), attributes.getProfile());
-  }
-
-  @Override
   public boolean hasNext() throws DataInputException {
     try {
       assertClient();
@@ -130,7 +125,7 @@ public class CswDataInput implements DataInput<String>, AutoCloseable {
 
   @Override
   public String toString() {
-    return getDescription();
+    return String.format("CSW [%s, %s]", attributes.getHostUrl(), attributes.getProfile());
   }
 
 }

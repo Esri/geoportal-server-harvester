@@ -49,11 +49,6 @@ public class GptDataOutput implements DataOutput<String> {
   }
 
   @Override
-  public String getDescription() {
-    return String.format("GPT [%s]", attributes.getHostUrl());
-  }
-
-  @Override
   public void publish(DataReference<String> ref) throws DataOutputException {
     try {
       String content = ref.getContent();
@@ -65,7 +60,7 @@ public class GptDataOutput implements DataOutput<String> {
   
   @Override
   public String toString() {
-    return getDescription();
+    return String.format("GPT [%s]", attributes.getHostUrl());
   }
 
   @Override

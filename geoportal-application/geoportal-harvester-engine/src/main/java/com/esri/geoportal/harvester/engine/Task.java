@@ -66,7 +66,7 @@ public class Task<T> implements AutoCloseable {
   @Override
   public String toString() {
     StringBuilder descriptions = new StringBuilder();
-    dataDestinations.forEach(d->descriptions.append(descriptions.length()>0? ", ": "").append(d.getDescription()));
-    return String.format("TASK :: %s --> [%s]", dataSource.getDescription(), descriptions);
+    dataDestinations.forEach(d->descriptions.append(descriptions.length()>0? ", ": "").append(d.toString()));
+    return String.format("TASK :: %s --> [%s]", dataSource.toString(), descriptions);
   }
 }

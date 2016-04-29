@@ -62,11 +62,6 @@ public class WafDataInput implements DataInput<String>, Closeable  {
   }
 
   @Override
-  public String getDescription() {
-    return String.format("WAF [%s]", attributes.getHostUrl());
-  }
-
-  @Override
   public boolean hasNext() throws DataInputException {
     
     try {
@@ -133,6 +128,6 @@ public class WafDataInput implements DataInput<String>, Closeable  {
 
   @Override
   public String toString() {
-    return getDescription();
+    return String.format("WAF [%s]", attributes.getHostUrl());
   }
 }

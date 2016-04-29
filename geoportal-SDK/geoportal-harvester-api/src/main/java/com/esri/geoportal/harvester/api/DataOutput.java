@@ -19,7 +19,7 @@ package com.esri.geoportal.harvester.api;
  * Data output.
  * @param <T> type of the data
  */
-public interface DataOutput<T> extends DataConnector, AutoCloseable {
+public interface DataOutput<T> extends DataBroker, AutoCloseable {
   
   /**
    * Publishes data.

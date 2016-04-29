@@ -54,11 +54,6 @@ public class _TestApplication {
       }
 
       @Override
-      public String getDescription() {
-        return "adhoc";
-      }
-
-      @Override
       public void close() throws Exception {
       }
     };

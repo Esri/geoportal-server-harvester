@@ -52,14 +52,9 @@ public class FolderDataOutput implements DataOutput<String> {
   @Override
   public DataConnectorDefinition getDefinition() {
     DataConnectorDefinition def = new DataConnectorDefinition();
-    def.setType("WAF");
+    def.setType("FOLDER");
     def.setAttributes(attributes);
     return def;
-  }
-
-  @Override
-  public String getDescription() {
-    return String.format("FOLDER [%s]", rootFolder);
   }
 
   @Override
@@ -129,7 +124,7 @@ public class FolderDataOutput implements DataOutput<String> {
   
   @Override
   public String toString() {
-    return getDescription();
+    return String.format("FOLDER [%s]", rootFolder);
   }
 
   @Override

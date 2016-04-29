@@ -18,5 +18,5 @@ package com.esri.geoportal.harvester.api;
 /**
  * Data input factory.
  */
-public interface DataInputFactory extends DataConnectorFactory<DataInput> {
+public interface DataInputFactory extends DataBrokerFactory<DataInput> {
 }

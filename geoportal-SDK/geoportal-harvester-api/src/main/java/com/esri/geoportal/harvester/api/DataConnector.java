@@ -19,11 +19,6 @@ package com.esri.geoportal.harvester.api;
  * General concept of the connector.
  */
 public interface DataConnector {
-  /**
-   * Gets definition.
-   * @return definition
-   */
-  DataConnectorDefinition getDefinition();
   
   /**
    * Gets description of the source.

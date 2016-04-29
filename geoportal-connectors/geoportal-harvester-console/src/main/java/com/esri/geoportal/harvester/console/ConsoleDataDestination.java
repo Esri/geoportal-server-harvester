@@ -41,11 +41,6 @@ public class ConsoleDataDestination implements DataOutput<String> {
   }
 
   @Override
-  public String getDescription() {
-    return String.format("CONSOLE");
-  }
-
-  @Override
   public void publish(DataReference<String> ref) throws DataOutputException {
     try {
       counter++;
@@ -61,7 +56,7 @@ public class ConsoleDataDestination implements DataOutput<String> {
   
   @Override
   public String toString() {
-    return getDescription();
+    return String.format("CONSOLE");
   }
 
   @Override

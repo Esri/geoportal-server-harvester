@@ -54,11 +54,6 @@ public class DataPrintStreamOutput implements DataOutput<String> {
   }
 
   @Override
-  public String getDescription() {
-    return "DataPrintStreamDestination";
-  }
-
-  @Override
   public void close() throws Exception {
   }
 }

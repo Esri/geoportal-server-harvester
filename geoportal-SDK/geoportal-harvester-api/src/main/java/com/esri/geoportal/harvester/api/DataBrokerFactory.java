@@ -18,10 +18,10 @@ package com.esri.geoportal.harvester.api;
 import java.util.Map;
 
 /**
- * Data connector factory.
- * @param <T> specific type of the connector
+ * Data broker factory.
+ * @param <T> specific type of the broker
  */
-public interface DataConnectorFactory<T extends DataConnector> {
+public interface DataBrokerFactory<T extends DataBroker> {
   /**
    * Creates instance of the connector.
    * @param attributes attributes used to initialize attributes
