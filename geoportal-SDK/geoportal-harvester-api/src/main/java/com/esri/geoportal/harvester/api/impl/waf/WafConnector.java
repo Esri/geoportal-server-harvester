@@ -15,9 +15,11 @@
  */
 package com.esri.geoportal.harvester.api.impl.waf;
 
+import static com.esri.geoportal.harvester.api.impl.waf.WafArguments.ARG_URL;
 import com.esri.geoportal.harvester.api.n.BrokerDefinition;
 import com.esri.geoportal.harvester.api.n.ConnectorTemplate;
 import com.esri.geoportal.harvester.api.n.InputConnector;
+import com.esri.geoportal.harvester.api.n.InvalidDefinitionException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,12 +32,12 @@ public class WafConnector implements InputConnector<WafBroker> {
   @Override
   public ConnectorTemplate getTemplate() {
     List<ConnectorTemplate.Argument> args = new ArrayList<>();
-    args.add(new ConnectorTemplate.StringArgument("URL", "Url"));
+    args.add(new ConnectorTemplate.StringArgument(ARG_URL, "Url"));
     return new ConnectorTemplate("WAF", "Web Accessible Folder", args);
   }
 
   @Override
-  public WafBroker createBroker(BrokerDefinition definition) {
+  public WafBroker createBroker(BrokerDefinition definition) throws InvalidDefinitionException {
     return new WafBroker(new WafArguments(definition));
   }
 }

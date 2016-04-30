@@ -21,5 +21,5 @@ package com.esri.geoportal.harvester.api.n;
  */
 public interface Connector<B extends Broker> {
   ConnectorTemplate getTemplate();
-  B createBroker(BrokerDefinition definition);
+  B createBroker(BrokerDefinition definition) throws InvalidDefinitionException;
 }

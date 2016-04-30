@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.api.impl.waf;
 
 import com.esri.geoportal.harvester.api.n.BrokerDefinition;
+import com.esri.geoportal.harvester.api.n.InvalidDefinitionException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -24,21 +25,25 @@ import java.net.URL;
  * @author Piotr Andzel
  */
 public class WafArguments {
+  public static final String ARG_URL = "waf.url";
   private final BrokerDefinition def;
+  private URL url;
 
-  public WafArguments(BrokerDefinition def) {
+  public WafArguments(BrokerDefinition def) throws InvalidDefinitionException {
     this.def = def;
-  }
-  
-  public URL getUrl() {
     try {
-      return new URL(def.get("url"));
+      url = new URL(def.get(ARG_URL));
     } catch (MalformedURLException|NullPointerException ex) {
-      return null;
+      throw new InvalidDefinitionException("Invalid URL", ex);
     }
   }
   
+  public URL getUrl() {
+    return url;
+  }
+  
   public void setUrl(URL url) {
-    def.put("url", url.toExternalForm());
+    this.url = url;
+    def.put(ARG_URL, url.toExternalForm());
   }
 }
