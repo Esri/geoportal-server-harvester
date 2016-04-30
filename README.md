@@ -1,5 +1,7 @@
 # geoportal-server-harvester
-As part of the evolution of Geoportal Server, the harvesting capability has been separated into its own module. This because there are use cases where the harvesting can be used in with catalogs of content (for example ArcGIS Online) without the Geoportal Server's catalog. This repository thus contains the harvesting capability, while it's sibling [geoportal-server-catalog](https://github.com/ArcGIS/geoportal-server-catalog) is the new catalog of Geoportal Server.
+As part of the evolution of Geoportal Server, the harvesting capability has been separated into its own module. This because there are use cases where the harvesting can be used as a stand-alone broker between catalogs of content. 
+
+This repository thus contains the harvesting capability, while it's sibling [geoportal-server-catalog](https://github.com/ArcGIS/geoportal-server-catalog) is the new catalog of Geoportal Server.
 
 ## Features
 
