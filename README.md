@@ -4,7 +4,7 @@ Next generation harvester for Geoportal Server.
 ## Features
 
 * Support for harvesting WAF and CSW repositories
-* Publication into the next generation catalog or a local folder
+* Publication into Geoportal Server catalog or a local folder
 * Extensibility
 
 ## Instructions
