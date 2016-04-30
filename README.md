@@ -11,11 +11,11 @@ As part of the evolution of Geoportal Server, the harvesting capability has been
 
 Building the source code:
 
-1. Run 'mvn clean install'
+* Run 'mvn clean install'
 
 Deploying war file:
 
-1. Deploy 'geoportal-application\geoportal-harvester-war\target\geoportal-harvester-war-&lt;version&gt;.war' into the web server of your choice.
+* Deploy 'geoportal-application\geoportal-harvester-war\target\geoportal-harvester-war-&lt;version&gt;.war' into the web server of your choice.
 
 ## Requirements
 
