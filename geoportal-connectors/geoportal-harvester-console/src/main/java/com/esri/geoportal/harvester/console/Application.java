@@ -23,11 +23,13 @@ import com.esri.geoportal.harvester.api.support.DataReferenceSerializer;
  */
 public class Application {
   public static void main(String[] args) throws Exception {
-    ConsoleDataDestination publisher = new ConsoleDataDestination();
+    ConsoleConnector connector = new ConsoleConnector();
+    ConsoleDefinition definition = new ConsoleDefinition();
+    ConsoleBroker broker = connector.createBroker(definition);
     DataReferenceSerializer ser = new DataReferenceSerializer();
     DataReference<String> ref = null;
     while (( ref = ser.deserialize(System.in))!=null) {
-      publisher.publish(ref);
+      broker.publish(ref);
     }
   }
 }
