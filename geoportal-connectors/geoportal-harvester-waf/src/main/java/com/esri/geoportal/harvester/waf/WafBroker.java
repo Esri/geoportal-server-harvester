@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Piotr Andzel.
+ * Copyright 2016 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,7 @@ import java.util.Set;
 import org.apache.http.impl.client.HttpClients;
 
 /**
- *
- * @author Piotr Andzel
+ * WAF broker.
  */
 public class WafBroker implements InputBroker<String> {
   private final WafDefinition arguments;

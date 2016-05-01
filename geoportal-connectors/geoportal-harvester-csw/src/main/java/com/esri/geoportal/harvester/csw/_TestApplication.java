@@ -20,14 +20,14 @@ import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.ObjectFactory;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
-import com.esri.geoportal.harvester.api.DataConnector;
 import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.support.DataCollector;
 import java.net.URL;
 import java.util.Arrays;
-import com.esri.geoportal.harvester.api.DataOutput;
-import com.esri.geoportal.harvester.api.DataInput;
+import com.esri.geoportal.harvester.api.n.InputBroker;
+import com.esri.geoportal.harvester.api.n.OutputBroker;
+import java.io.IOException;
 
 /**
  * Test application.
@@ -37,7 +37,7 @@ public class _TestApplication {
   public static void main(String[] args) throws Exception {
     String sUrl = "http://gptogc.esri.com/geoportal/csw?request=GetCapabilities&service=CSW";
     String sProfile = "urn:ogc:CSW:2.0.2:HTTP:OGCCORE:ESRI:GPT";
-    DataOutput<String> dst = new DataOutput<String>() {
+    OutputBroker<String> destination = new OutputBroker<String>() {
       int counter = 0;
       
       @Override
@@ -49,12 +49,8 @@ public class _TestApplication {
       }
 
       @Override
-      public DataConnector getDefinition() {
-        return null;
-      }
-
-      @Override
-      public void close() throws Exception {
+      public void close() throws IOException {
+        // no closing necessary
       }
     };
 
@@ -64,13 +60,14 @@ public class _TestApplication {
 
     if (profile != null) {
       URL start = new URL(sUrl);
-      CswAttributesAdaptor initParams = new CswAttributesAdaptor();
-      initParams.setHostUrl(start);
-      initParams.setProfile(profile);
-      initParams.setBotsConfig(BotsConfig.DEFAULT);
-      initParams.setBotsMode(BotsMode.inherit);
-      try (DataInput csw = new CswDataInput(initParams);) {
-        DataCollector<String> dataCollector = new DataCollector<>(csw, Arrays.asList(new DataOutput[]{dst}));
+      CswConnector connector = new CswConnector();
+      CswDefinition definition = new CswDefinition();
+      definition.setHostUrl(start);
+      definition.setProfile(profile);
+      definition.setBotsConfig(BotsConfig.DEFAULT);
+      definition.setBotsMode(BotsMode.inherit);
+        try (InputBroker<String> csw = connector.createBroker(definition);) {
+        DataCollector<String> dataCollector = new DataCollector<>(csw, Arrays.asList(new OutputBroker[]{destination}));
         dataCollector.collect();
       }
     }

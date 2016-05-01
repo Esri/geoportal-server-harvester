@@ -24,7 +24,7 @@ import com.esri.geoportal.harvester.api.support.DataCollector;
 import com.esri.geoportal.harvester.api.support.DataPrintStreamOutput;
 import java.net.URL;
 import java.util.Arrays;
-import com.esri.geoportal.harvester.api.DataInput;
+import com.esri.geoportal.harvester.api.n.InputBroker;
 
 /**
  * Application.
@@ -38,13 +38,14 @@ public class Application {
       DataPrintStreamOutput destination = new DataPrintStreamOutput(System.out);
       
       if (profile!=null) {
+        CswConnector connector = new CswConnector();
         URL start = new URL(args[0]);
-        CswAttributesAdaptor initParams = new CswAttributesAdaptor();
-        initParams.setHostUrl(start);
-        initParams.setProfile(profile);
-        initParams.setBotsConfig(BotsConfig.DEFAULT);
-        initParams.setBotsMode(BotsMode.inherit);
-        try (DataInput csw = new CswDataInput(initParams);) {
+        CswDefinition definition = new CswDefinition();
+        definition.setHostUrl(start);
+        definition.setProfile(profile);
+        definition.setBotsConfig(BotsConfig.DEFAULT);
+        definition.setBotsMode(BotsMode.inherit);
+        try (InputBroker<String> csw = connector.createBroker(definition);) {
           DataCollector<String> dataCollector = new DataCollector<>(csw, Arrays.asList(new DataPrintStreamOutput[]{destination}));
           dataCollector.collect();
         }
