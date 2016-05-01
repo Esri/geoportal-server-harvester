@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api.n;
-
-import java.util.HashMap;
+package com.esri.geoportal.harvester.api;
 
 /**
- * Broker definition.
+ * Connector.
+ * @param <B> broker type.
  */
-public abstract class BrokerDefinition extends HashMap<String,String> {
-  public abstract String getType();
+public interface Connector<B extends Broker, D extends BrokerDefinition> {
+  ConnectorTemplate getTemplate();
+  B createBroker(D definition) throws InvalidDefinitionException;
 }

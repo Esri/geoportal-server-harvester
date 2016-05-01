@@ -23,7 +23,7 @@ import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.harvester.api.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.n.InputBroker;
+import com.esri.geoportal.harvester.api.InputBroker;
 import com.esri.geoportal.harvester.api.support.SimpleDataReference;
 import java.io.IOException;
 import java.util.Iterator;

@@ -15,9 +15,9 @@
  */
 package com.esri.geoportal.harvester.folder;
 
-import com.esri.geoportal.harvester.api.n.ConnectorTemplate;
-import com.esri.geoportal.harvester.api.n.InvalidDefinitionException;
-import com.esri.geoportal.harvester.api.n.OutputConnector;
+import com.esri.geoportal.harvester.api.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.OutputConnector;
 import static com.esri.geoportal.harvester.folder.FolderDefinition.P_HOST_URL;
 import static com.esri.geoportal.harvester.folder.FolderDefinition.P_ROOT_FOLDER;
 import java.util.ArrayList;

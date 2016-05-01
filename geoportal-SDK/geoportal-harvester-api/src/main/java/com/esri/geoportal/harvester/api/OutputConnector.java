@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api.n;
+package com.esri.geoportal.harvester.api;
 
 /**
- * Input connector.
+ * Output connector.
+ * @param <D> data type
  */
-public interface InputConnector<B extends InputBroker, D extends BrokerDefinition> extends Connector<B,D> {
+public interface OutputConnector<B extends OutputBroker, D extends BrokerDefinition> extends Connector<B,D> {
   
 }

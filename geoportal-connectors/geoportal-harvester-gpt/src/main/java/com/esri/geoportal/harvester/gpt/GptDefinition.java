@@ -15,8 +15,8 @@
  */
 package com.esri.geoportal.harvester.gpt;
 
-import com.esri.geoportal.harvester.api.n.BrokerDefinition;
-import com.esri.geoportal.harvester.api.n.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.InvalidDefinitionException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;

@@ -16,9 +16,9 @@
 package com.esri.geoportal.harvester.gpt;
 
 import com.esri.geoportal.commons.gpt.client.Client;
-import com.esri.geoportal.harvester.api.n.ConnectorTemplate;
-import com.esri.geoportal.harvester.api.n.InvalidDefinitionException;
-import com.esri.geoportal.harvester.api.n.OutputConnector;
+import com.esri.geoportal.harvester.api.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.OutputConnector;
 import static com.esri.geoportal.harvester.gpt.GptDefinition.P_HOST_URL;
 import static com.esri.geoportal.harvester.gpt.GptDefinition.P_USER_NAME;
 import static com.esri.geoportal.harvester.gpt.GptDefinition.P_USER_PASSWORD;

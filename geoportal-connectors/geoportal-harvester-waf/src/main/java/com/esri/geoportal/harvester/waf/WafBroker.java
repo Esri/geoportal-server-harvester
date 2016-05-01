@@ -21,7 +21,7 @@ import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.harvester.api.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.n.InputBroker;
+import com.esri.geoportal.harvester.api.InputBroker;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;

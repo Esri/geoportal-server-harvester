@@ -15,10 +15,10 @@
  */
 package com.esri.geoportal.harvester.waf;
 
-import com.esri.geoportal.harvester.api.n.BrokerDefinition;
-import com.esri.geoportal.harvester.api.n.ConnectorTemplate;
-import com.esri.geoportal.harvester.api.n.InputConnector;
-import com.esri.geoportal.harvester.api.n.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.InputConnector;
+import com.esri.geoportal.harvester.api.InvalidDefinitionException;
 import static com.esri.geoportal.harvester.waf.WafDefinition.P_HOST_URL;
 import java.util.ArrayList;
 import java.util.List;

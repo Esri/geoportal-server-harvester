@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.engine;
 import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.DataInputException;
-import com.esri.geoportal.harvester.api.n.OutputBroker;
+import com.esri.geoportal.harvester.api.OutputBroker;
 
 /**
  * Process.

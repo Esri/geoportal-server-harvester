@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.rest;
 
-import com.esri.geoportal.harvester.api.DataBrokerUiTemplate;
+import com.esri.geoportal.harvester.api.ConnectorTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -144,8 +144,8 @@ public class ConnectorController {
    * @return array of connector templates
    */
   @RequestMapping(value = "/rest/harvester/connectors/inbound", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataBrokerUiTemplate[] listSourceTypes() {
-    return engine.getInboundConnectorTemplates().toArray(new DataBrokerUiTemplate[0]);
+  public ConnectorTemplate[] listSourceTypes() {
+    return engine.getInboundConnectorTemplates().toArray(new ConnectorTemplate[0]);
   }
   
   /**
@@ -153,8 +153,8 @@ public class ConnectorController {
    * @return array of connector templates
    */
   @RequestMapping(value = "/rest/harvester/connectors/outbound", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataBrokerUiTemplate[] listDestinationTypes() {
-    return engine.getOutboundConnectorTemplates().toArray(new DataBrokerUiTemplate[0]);
+  public ConnectorTemplate[] listDestinationTypes() {
+    return engine.getOutboundConnectorTemplates().toArray(new ConnectorTemplate[0]);
   }
   
   /**
@@ -163,7 +163,7 @@ public class ConnectorController {
    * @return connector template
    */
   @RequestMapping(value = "/rest/harvester/connectors/inbound/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataBrokerUiTemplate getSource(@PathVariable String name) {
+  public ConnectorTemplate getSource(@PathVariable String name) {
     return engine.getInboundConnectorTemplates().stream().filter(a->a.getName().equals(name)).findFirst().orElse(null);
   }
   
@@ -173,7 +173,7 @@ public class ConnectorController {
    * @return connector template
    */
   @RequestMapping(value = "/rest/harvester/connectors/outbound/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataBrokerUiTemplate getDestination(@PathVariable String name) {
+  public ConnectorTemplate getDestination(@PathVariable String name) {
     return engine.getOutboundConnectorTemplates().stream().filter(a->a.getName().equals(name)).findFirst().orElse(null);
   }
 }

@@ -15,13 +15,11 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import java.util.HashMap;
+
 /**
- * Data broker.
+ * Broker definition.
  */
-public interface DataBroker {
-  /**
-   * Gets definition.
-   * @return definition
-   */
-  DataConnector getDefinition();
+public abstract class BrokerDefinition extends HashMap<String,String> {
+  public abstract String getType();
 }

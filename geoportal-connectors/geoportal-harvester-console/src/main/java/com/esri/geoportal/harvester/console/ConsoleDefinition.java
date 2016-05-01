@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.console;
 
-import com.esri.geoportal.harvester.api.n.BrokerDefinition;
+import com.esri.geoportal.harvester.api.BrokerDefinition;
 
 /**
  * Console definition.

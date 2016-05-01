@@ -15,7 +15,6 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.DataBrokerUiTemplate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -23,12 +22,13 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import com.esri.geoportal.harvester.api.n.BrokerDefinition;
-import com.esri.geoportal.harvester.api.n.InputBroker;
-import com.esri.geoportal.harvester.api.n.InputConnector;
-import com.esri.geoportal.harvester.api.n.InvalidDefinitionException;
-import com.esri.geoportal.harvester.api.n.OutputBroker;
-import com.esri.geoportal.harvester.api.n.OutputConnector;
+import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.InputBroker;
+import com.esri.geoportal.harvester.api.InputConnector;
+import com.esri.geoportal.harvester.api.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.OutputBroker;
+import com.esri.geoportal.harvester.api.OutputConnector;
 
 /**
  * Harvesting engine.
@@ -60,7 +60,7 @@ public class Engine {
    * Gets inbound connector templates.
    * @return collection of inbound connector templates
    */
-  public Collection<DataBrokerUiTemplate> getInboundConnectorTemplates() {
+  public Collection<ConnectorTemplate> getInboundConnectorTemplates() {
     return dsReg.getTemplates();
   }
 
@@ -68,7 +68,7 @@ public class Engine {
    * Gets outbound connector templates.
    * @return collection of outbound connector templates
    */
-  public Collection<DataBrokerUiTemplate> getOutboundConnectorTemplates() {
+  public Collection<ConnectorTemplate> getOutboundConnectorTemplates() {
     return dpReg.getTemplates();
   }
 

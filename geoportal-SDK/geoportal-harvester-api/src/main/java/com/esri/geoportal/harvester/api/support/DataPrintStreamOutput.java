@@ -19,7 +19,7 @@ import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import java.io.IOException;
 import java.io.PrintStream;
-import com.esri.geoportal.harvester.api.n.OutputBroker;
+import com.esri.geoportal.harvester.api.OutputBroker;
 
 /**
  * Data print stream output.

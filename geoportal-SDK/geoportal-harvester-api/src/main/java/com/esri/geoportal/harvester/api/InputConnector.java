@@ -13,21 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api.n;
-
-import com.esri.geoportal.harvester.api.DataOutputException;
-import com.esri.geoportal.harvester.api.DataReference;
+package com.esri.geoportal.harvester.api;
 
 /**
- * Output broker.
- * @param <D> data type
+ * Input connector.
  */
-public interface OutputBroker<D> extends Broker {
+public interface InputConnector<B extends InputBroker, D extends BrokerDefinition> extends Connector<B,D> {
   
-  /**
-   * Publishes data.
-   * @param ref data reference
-   * @throws DataOutputException if publishing data fails
-   */
-  void publish(DataReference<D> ref) throws DataOutputException;
 }

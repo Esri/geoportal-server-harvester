@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api.n;
+package com.esri.geoportal.harvester.api;
+
+import java.io.Closeable;
 
 /**
- * Connector.
- * @param <B> broker type.
+ * Broker.
  */
-public interface Connector<B extends Broker, D extends BrokerDefinition> {
-  ConnectorTemplate getTemplate();
-  B createBroker(D definition) throws InvalidDefinitionException;
+public interface Broker extends Closeable {
+  
 }

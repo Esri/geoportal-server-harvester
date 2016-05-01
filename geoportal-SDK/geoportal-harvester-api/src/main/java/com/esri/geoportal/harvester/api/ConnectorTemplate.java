@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.harvester.api.*;
 import java.util.List;
 
 /**
@@ -22,7 +23,7 @@ import java.util.List;
  * <p>
  * Connector template is used to generate information sufficient to build form UI.
  */
-public class DataBrokerUiTemplate {
+public class ConnectorTemplate {
   private final String name;
   private final String label;
   private final List<Argument> arguments;
@@ -33,7 +34,7 @@ public class DataBrokerUiTemplate {
    * @param label label
    * @param arguments arguments
    */
-  public DataBrokerUiTemplate(String name, String label, List<Argument> arguments) {
+  public ConnectorTemplate(String name, String label, List<Argument> arguments) {
     this.name = name;
     this.label = label;
     this.arguments = arguments;

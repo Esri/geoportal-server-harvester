@@ -19,12 +19,12 @@ import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.n.BrokerDefinition;
+import com.esri.geoportal.harvester.api.BrokerDefinition;
 import com.esri.geoportal.harvester.api.support.DataCollector;
 import java.net.URL;
 import java.util.Arrays;
-import com.esri.geoportal.harvester.api.n.InputBroker;
-import com.esri.geoportal.harvester.api.n.OutputBroker;
+import com.esri.geoportal.harvester.api.InputBroker;
+import com.esri.geoportal.harvester.api.OutputBroker;
 import java.io.IOException;
 
 /**

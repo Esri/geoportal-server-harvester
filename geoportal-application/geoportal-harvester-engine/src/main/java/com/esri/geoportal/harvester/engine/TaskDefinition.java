@@ -15,11 +15,11 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.n.BrokerDefinition;
-import com.esri.geoportal.harvester.api.n.InputBroker;
-import com.esri.geoportal.harvester.api.n.InputConnector;
-import com.esri.geoportal.harvester.api.n.OutputBroker;
-import com.esri.geoportal.harvester.api.n.OutputConnector;
+import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.InputBroker;
+import com.esri.geoportal.harvester.api.InputConnector;
+import com.esri.geoportal.harvester.api.OutputBroker;
+import com.esri.geoportal.harvester.api.OutputConnector;
 import java.util.List;
 
 /**

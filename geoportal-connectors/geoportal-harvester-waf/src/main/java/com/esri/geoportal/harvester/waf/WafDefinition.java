@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.waf;
 
-import com.esri.geoportal.harvester.api.n.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.support.BotsAttributesAdaptor;
 import java.net.MalformedURLException;
 import java.net.URL;
