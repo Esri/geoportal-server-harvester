@@ -1,21 +1,26 @@
 # geoportal-server-harvester
-Next generation harvester for Geoportal Server.
+As part of the evolution of Geoportal Server, the harvesting capability has been separated into its own module. This because there are use cases where the harvesting can be used as a stand-alone broker between catalogs of content. 
+
+This repository thus contains the harvesting capability, while it's sibling [geoportal-server-catalog](https://github.com/ArcGIS/geoportal-server-catalog) is the new catalog of Geoportal Server.
+
+## Releases and Downloads
+- 2.0.0 - Initial release of geoportal-server-harvester. Click [here](https://github.com/ArcGIS/geoportal-server-harvester/releases) for release notes and downloads.
 
 ## Features
 
 * Support for harvesting WAF and CSW repositories
-* Publication into the next generation catalog or a local folder
+* Publication into Geoportal Server catalog or a local folder
 * Extensibility
 
 ## Instructions
 
 Building the source code:
 
-1. Run 'mvn clean install'
+* Run 'mvn clean install'
 
 Deploying war file:
 
-1. Deploy 'geoportal-application\geoportal-harvester-war\target\geoportal-harvester-war-&lt;version&gt;.war' into the web server of your choice.
+* Deploy 'geoportal-application\geoportal-harvester-war\target\geoportal-harvester-war-&lt;version&gt;.war' into the web server of your choice.
 
 ## Requirements
 
@@ -41,4 +46,4 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-A copy of the license is available in the repository's [LICENSE](LICENSE?raw=true) file.
+A copy of the license is available in the repository's [LICENSE](LICENSE.txt) file.
