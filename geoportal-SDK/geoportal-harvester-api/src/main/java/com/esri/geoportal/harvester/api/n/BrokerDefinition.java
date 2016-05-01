@@ -21,5 +21,4 @@ import java.util.HashMap;
  * Broker definition.
  */
 public class BrokerDefinition extends HashMap<String,String> {
-  
 }

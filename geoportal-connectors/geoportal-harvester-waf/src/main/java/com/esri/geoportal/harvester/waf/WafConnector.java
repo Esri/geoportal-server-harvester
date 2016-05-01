@@ -13,31 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api.impl.waf;
+package com.esri.geoportal.harvester.waf;
 
-import static com.esri.geoportal.harvester.api.impl.waf.WafArguments.ARG_URL;
 import com.esri.geoportal.harvester.api.n.BrokerDefinition;
 import com.esri.geoportal.harvester.api.n.ConnectorTemplate;
 import com.esri.geoportal.harvester.api.n.InputConnector;
 import com.esri.geoportal.harvester.api.n.InvalidDefinitionException;
+import static com.esri.geoportal.harvester.waf.WafDefinition.P_HOST_URL;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * @author Piotr Andzel
+ * Waf connector.
  */
-public class WafConnector implements InputConnector<WafBroker> {
+public class WafConnector implements InputConnector<WafBroker,WafDefinition> {
 
   @Override
   public ConnectorTemplate getTemplate() {
     List<ConnectorTemplate.Argument> args = new ArrayList<>();
-    args.add(new ConnectorTemplate.StringArgument(ARG_URL, "Url"));
+    args.add(new ConnectorTemplate.StringArgument(P_HOST_URL, "Url"));
     return new ConnectorTemplate("WAF", "Web Accessible Folder", args);
   }
 
   @Override
-  public WafBroker createBroker(BrokerDefinition definition) throws InvalidDefinitionException {
-    return new WafBroker(new WafArguments(definition));
+  public WafBroker createBroker(WafDefinition definition) throws InvalidDefinitionException {
+    return new WafBroker(definition.validate());
   }
 }

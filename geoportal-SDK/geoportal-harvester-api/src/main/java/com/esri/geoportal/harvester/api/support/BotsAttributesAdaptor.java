@@ -18,37 +18,19 @@ package com.esri.geoportal.harvester.api.support;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsConfigImpl;
 import com.esri.geoportal.commons.robots.BotsMode;
-import java.util.AbstractMap;
-import java.util.Map;
-import java.util.Set;
+import com.esri.geoportal.harvester.api.n.BrokerDefinition;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * Bots attributes adaptor.
  */
-public class BotsAttributesAdaptor extends AbstractMap<String,String> {
+public class BotsAttributesAdaptor extends BrokerDefinition {
 
   protected static final String P_BOTS_AGENT = "bots.config.agent";
   protected static final String P_BOTS_ENABLED = "bots.config.enabled";
   protected static final String P_BOTS_OVERRIDE = "bots.config.override";
   protected static final String P_BOTS_MODE = "bots.mode";
-
-  protected final Map<String, String> attributes;
-
-  /**
-   * Creates instance of the adaptor
-   *
-   * @param attributes attributes
-   */
-  public BotsAttributesAdaptor(Map<String, String> attributes) {
-    this.attributes = attributes;
-  }
-
-  @Override
-  public Set<Map.Entry<String, String>> entrySet() {
-    return attributes.entrySet();
-  }
 
   /**
    * Gets bots mode.
@@ -56,7 +38,7 @@ public class BotsAttributesAdaptor extends AbstractMap<String,String> {
    * @return bots mode
    */
   public BotsMode getBotsMode() {
-    String sBootMode = attributes.get(P_BOTS_MODE);
+    String sBootMode = this.get(P_BOTS_MODE);
     return BotsMode.parseMode(sBootMode);
   }
 
@@ -66,7 +48,7 @@ public class BotsAttributesAdaptor extends AbstractMap<String,String> {
    * @param botsMode bots mode
    */
   public void setBotsMode(BotsMode botsMode) {
-    attributes.put(P_BOTS_MODE, botsMode.name());
+    this.put(P_BOTS_MODE, botsMode.name());
   }
 
   /**
@@ -76,9 +58,9 @@ public class BotsAttributesAdaptor extends AbstractMap<String,String> {
    */
   public BotsConfig getBotsConfig() {
     return new BotsConfigImpl(
-            StringUtils.defaultIfBlank(attributes.get(P_BOTS_AGENT), BotsConfig.DEFAULT.getUserAgent()), 
-            BooleanUtils.toBoolean(StringUtils.defaultIfBlank(attributes.get(P_BOTS_ENABLED), Boolean.toString(BotsConfig.DEFAULT.isEnabled()))), 
-            BooleanUtils.toBoolean(StringUtils.defaultIfBlank(attributes.get(P_BOTS_OVERRIDE), Boolean.toString(BotsConfig.DEFAULT.isOverride())))
+            StringUtils.defaultIfBlank(this.get(P_BOTS_AGENT), BotsConfig.DEFAULT.getUserAgent()), 
+            BooleanUtils.toBoolean(StringUtils.defaultIfBlank(this.get(P_BOTS_ENABLED), Boolean.toString(BotsConfig.DEFAULT.isEnabled()))), 
+            BooleanUtils.toBoolean(StringUtils.defaultIfBlank(this.get(P_BOTS_OVERRIDE), Boolean.toString(BotsConfig.DEFAULT.isOverride())))
     );
   }
 
@@ -88,8 +70,8 @@ public class BotsAttributesAdaptor extends AbstractMap<String,String> {
    * @param botsConfig bots config
    */
   public void setBotsConfig(BotsConfig botsConfig) {
-    attributes.put(P_BOTS_AGENT, botsConfig.getUserAgent());
-    attributes.put(P_BOTS_ENABLED, Boolean.toString(botsConfig.isEnabled()));
-    attributes.put(P_BOTS_OVERRIDE, Boolean.toString(botsConfig.isOverride()));
+    this.put(P_BOTS_AGENT, botsConfig.getUserAgent());
+    this.put(P_BOTS_ENABLED, Boolean.toString(botsConfig.isEnabled()));
+    this.put(P_BOTS_OVERRIDE, Boolean.toString(botsConfig.isOverride()));
   }
 }

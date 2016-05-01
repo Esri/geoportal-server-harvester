@@ -31,6 +31,8 @@ import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataOutput;
 import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
 import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
+import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
+import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
 
 /**
  * Folder data output.

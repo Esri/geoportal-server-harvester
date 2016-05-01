@@ -15,9 +15,11 @@
  */
 package com.esri.geoportal.harvester.api.n;
 
+import java.io.Closeable;
+
 /**
  * Broker.
  */
-public interface Broker {
+public interface Broker extends Closeable {
   
 }

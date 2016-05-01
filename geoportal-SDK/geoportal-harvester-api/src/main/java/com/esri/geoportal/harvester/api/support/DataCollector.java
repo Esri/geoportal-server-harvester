@@ -19,25 +19,25 @@ import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.DataInputException;
 import java.util.List;
-import com.esri.geoportal.harvester.api.DataOutput;
-import com.esri.geoportal.harvester.api.DataInput;
+import com.esri.geoportal.harvester.api.n.InputBroker;
+import com.esri.geoportal.harvester.api.n.OutputBroker;
 
 /**
  * Data collector.
  * @param <T> type of data
  */
 public class DataCollector<T> {
-  private final DataInput<T> source;
-  private final List<DataOutput<T>> destinations;
+  private final InputBroker<T> inputBroker;
+  private final List<OutputBroker<T>> outputBrokers;
 
   /**
    * Creates instance of the collector.
    * @param source data source
-   * @param destinations data destinations
+   * @param outputBrokers data destinations
    */
-  public DataCollector(DataInput<T> source, List<DataOutput<T>> destinations) {
-    this.source = source;
-    this.destinations = destinations;
+  public DataCollector(InputBroker<T> source, List<OutputBroker<T>> outputBrokers) {
+    this.inputBroker = source;
+    this.outputBrokers = outputBrokers;
   }
   
   /**
@@ -47,10 +47,10 @@ public class DataCollector<T> {
     onStart();
     
     try {
-      top: while (source.hasNext()) {
+      top: while (inputBroker.hasNext()) {
         if (Thread.currentThread().isInterrupted()) break;
-        DataReference<T> dataReference = source.next();
-        for (DataOutput<T> d: destinations) {
+        DataReference<T> dataReference = inputBroker.next();
+        for (OutputBroker<T> d: outputBrokers) {
           if (Thread.currentThread().isInterrupted()) break top;
           try {
             d.publish(dataReference);

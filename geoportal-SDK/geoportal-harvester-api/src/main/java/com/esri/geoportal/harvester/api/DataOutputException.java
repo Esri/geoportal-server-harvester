@@ -15,53 +15,55 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.harvester.api.n.OutputBroker;
+
 /**
  * Data output exception.
  * <p>
  * Exception associated with output.
  */
 public class DataOutputException extends DataException {
-  private final DataOutput output;
+  private final OutputBroker outputBroker;
 
   /**
    * Gets data output.
    * @return data output
    */
-  public DataOutput getOutput() {
-    return output;
+  public OutputBroker getOutputBroker() {
+    return outputBroker;
   }
 
   /**
    * Creates a new instance of <code>DataOutputException</code> without
    * detail message.
-   * @param output output
+   * @param outputBroker output
    */
-  public DataOutputException(DataOutput output) {
-    this.output = output;
+  public DataOutputException(OutputBroker outputBroker) {
+    this.outputBroker = outputBroker;
   }
 
   /**
    * Constructs an instance of <code>DataOutputException</code> with the
    * specified detail message.
    *
-   * @param output output
+   * @param outputBroker output
    * @param msg the detail message.
    */
-  public DataOutputException(DataOutput output, String msg) {
+  public DataOutputException(OutputBroker outputBroker, String msg) {
     super(msg);
-    this.output = output;
+    this.outputBroker = outputBroker;
   }
 
   /**
    * Constructs an instance of <code>DataOutputException</code> with the
    * specified detail message.
    *
-   * @param output output
+   * @param outputBroker output
    * @param msg the detail message.
    * @param t cause
    */
-  public DataOutputException(DataOutput output, String msg, Throwable t) {
+  public DataOutputException(OutputBroker outputBroker, String msg, Throwable t) {
     super(msg,t);
-    this.output = output;
+    this.outputBroker = outputBroker;
   }
 }

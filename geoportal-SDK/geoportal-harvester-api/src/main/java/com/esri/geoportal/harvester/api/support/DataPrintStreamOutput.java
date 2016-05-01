@@ -15,17 +15,16 @@
  */
 package com.esri.geoportal.harvester.api.support;
 
-import com.esri.geoportal.harvester.api.DataConnector;
 import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import java.io.IOException;
 import java.io.PrintStream;
-import com.esri.geoportal.harvester.api.DataOutput;
+import com.esri.geoportal.harvester.api.n.OutputBroker;
 
 /**
  * Data print stream output.
  */
-public class DataPrintStreamOutput implements DataOutput<String> {
+public class DataPrintStreamOutput implements OutputBroker<String> {
   private final DataReferenceSerializer SERIALIZER = new DataReferenceSerializer();
   private final PrintStream out;
 
@@ -47,13 +46,8 @@ public class DataPrintStreamOutput implements DataOutput<String> {
   }
 
   @Override
-  public DataConnector getDefinition() {
-    DataConnector def = new DataConnector();
-    def.setType("DataPrintStreamDestination");;
-    return def;
+  public void close() throws IOException {
+    // no closing necessary
   }
-
-  @Override
-  public void close() throws Exception {
-  }
+  
 }

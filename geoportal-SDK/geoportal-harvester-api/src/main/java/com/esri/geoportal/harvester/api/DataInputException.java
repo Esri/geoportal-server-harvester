@@ -15,53 +15,55 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.harvester.api.n.InputBroker;
+
 /**
- * Data input exception.
+ * Input broker exception.
  * <p>
- * Exception associated with the input.
+ * Exception associated with the input broker.
  */
 public class DataInputException extends DataException {
-  private final DataInput dataInput;
+  private final InputBroker inputBroker;
 
   /**
-   * Gets data input.
-   * @return data input
+   * Gets input broker.
+   * @return input broker
    */
-  public DataInput getDataSource() {
-    return dataInput;
+  public InputBroker getInputBroker() {
+    return inputBroker;
   }
 
   /**
    * Creates a new instance of <code>DataInputException</code> without detail
    * message.
-   * @param dataInput data input
+   * @param inputBroker input broker
    */
-  public DataInputException(DataInput dataInput) {
-    this.dataInput = dataInput;
+  public DataInputException(InputBroker inputBroker) {
+    this.inputBroker = inputBroker;
   }
 
   /**
    * Constructs an instance of <code>DataInputException</code> with the
    * specified detail message.
    *
-   * @param dataInput data input
+   * @param inputBroker input broker
    * @param msg the detail message.
    */
-  public DataInputException(DataInput dataInput, String msg) {
+  public DataInputException(InputBroker inputBroker, String msg) {
     super(msg);
-    this.dataInput = dataInput;
+    this.inputBroker = inputBroker;
   }
 
   /**
    * Constructs an instance of <code>DataInputException</code> with the
    * specified detail message.
    *
-   * @param dataInput data input
+   * @param inputBroker input broker
    * @param msg the detail message.
    * @param t cause
    */
-  public DataInputException(DataInput dataInput, String msg, Throwable t) {
+  public DataInputException(InputBroker inputBroker, String msg, Throwable t) {
     super(msg,t);
-    this.dataInput = dataInput;
+    this.inputBroker = inputBroker;
   }
 }

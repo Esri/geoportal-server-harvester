@@ -19,6 +19,6 @@ package com.esri.geoportal.harvester.api.n;
  * Output connector.
  * @param <D> data type
  */
-public interface OutputConnector<D> extends Connector<OutputBroker<D>> {
+public interface OutputConnector<B extends OutputBroker, D extends BrokerDefinition> extends Connector<B,D> {
   
 }

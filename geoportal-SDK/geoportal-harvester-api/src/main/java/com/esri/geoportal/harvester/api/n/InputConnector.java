@@ -18,6 +18,6 @@ package com.esri.geoportal.harvester.api.n;
 /**
  * Input connector.
  */
-public interface InputConnector<B extends InputBroker> extends Connector<B> {
+public interface InputConnector<B extends InputBroker, D extends BrokerDefinition> extends Connector<B,D> {
   
 }
