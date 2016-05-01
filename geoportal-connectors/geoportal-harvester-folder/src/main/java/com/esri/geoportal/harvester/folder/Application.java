@@ -28,15 +28,16 @@ public class Application {
     if (args.length==2) {
       File rootFolder = new File(args[0]);
       URL hostUrl = new URL(args[1]);
-      FolderAttributesAdaptor initParams = new FolderAttributesAdaptor();
-      initParams.setRootFolder(rootFolder);
-      initParams.setHostUrl(hostUrl);
-      FolderDataOutput pub = new FolderDataOutput(initParams);
+      FolderConnector connector = new FolderConnector();
+      FolderDefinition definition = new FolderDefinition();
+      definition.setRootFolder(rootFolder);
+      definition.setHostUrl(hostUrl);
+      FolderBroker broker = connector.createBroker(definition);
     
       DataReferenceSerializer ser = new DataReferenceSerializer();
       DataReference<String> ref = null;
       while (( ref = ser.deserialize(System.in))!=null) {
-        pub.publish(ref);
+        broker.publish(ref);
       }
     }
   }
