@@ -29,18 +29,18 @@ public class Application {
       URL url = new URL(args[0]+(args[0].endsWith("/")? "": "/"));
       String userName = args[1];
       String password = args[2];
-      GptAttributesAdaptor initParams = new GptAttributesAdaptor();
-      initParams.setHostUrl(url);
-      initParams.setUserName(userName);
-      initParams.setPassword(password);
+      GptConnector connector = new GptConnector();
+      GptDefinition definition = new GptDefinition();
+      definition.setHostUrl(url);
+      definition.setUserName(userName);
+      definition.setPassword(password);
       
-      Client client = new Client(url, userName, password);
-      GptDataOutput publisher = new GptDataOutput(initParams,client);
+      GptBroker broker = connector.createBroker(definition);
       DataReferenceSerializer ser = new DataReferenceSerializer();
       DataReference<String> ref = null;
       while (( ref = ser.deserialize(System.in))!=null) {
         System.out.println(String.format("publishing: %s", ref.getSourceUri()));
-        publisher.publish(ref);
+        broker.publish(ref);
       }
     }
   }
