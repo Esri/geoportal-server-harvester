@@ -15,8 +15,6 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.folder.FolderPublisherFactory;
-import com.esri.geoportal.harvester.gpt.GptOutputFactory;
 import com.esri.geoportal.harvester.engine.DataOutboundConnectorRegistry;
 import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,9 @@ public class DataOutboundConnectorRegistryBean extends DataOutboundConnectorRegi
   
   @PostConstruct
   public void init() {
+    /*
     put("FOLDER", new FolderPublisherFactory());
     put("GPT", new GptOutputFactory());
+    */
   }
 }

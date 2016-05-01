@@ -24,9 +24,15 @@ import java.net.URL;
  *
  */
 public class WafDefinition extends BotsAttributesAdaptor {
+  public static final String TYPE = "WAF";
   public static final String P_HOST_URL    = "waf.host.url";
   
   private URL hostUrl;
+
+  @Override
+  public String getType() {
+    return TYPE;
+  }
   
   public WafDefinition validate() throws InvalidDefinitionException {
     if (getHostUrl()==null) {

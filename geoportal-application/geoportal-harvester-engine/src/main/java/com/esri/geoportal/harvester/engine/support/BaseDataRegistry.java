@@ -19,13 +19,13 @@ import com.esri.geoportal.harvester.api.DataBrokerUiTemplate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import com.esri.geoportal.harvester.api.DataBrokerFactory;
+import com.esri.geoportal.harvester.api.n.Connector;
 
 /**
  * Base data registry.
  * @param <F> type of the factory
  */
-public abstract class BaseDataRegistry<F extends DataBrokerFactory> extends HashMap<String,F> {
+public abstract class BaseDataRegistry<F extends Connector> extends HashMap<String,F> {
   /**
    * Gets all templates.
    * @return list of all templates

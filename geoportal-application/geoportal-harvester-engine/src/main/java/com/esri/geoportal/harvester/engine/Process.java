@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.engine;
 import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.DataInputException;
-import com.esri.geoportal.harvester.api.DataOutput;
+import com.esri.geoportal.harvester.api.n.OutputBroker;
 
 /**
  * Process.
@@ -72,7 +72,7 @@ public class Process {
             reportBuilder.started(Process.this);
             while(task.getDataSource().hasNext()) {
               DataReference<String> dataReference = task.getDataSource().next();
-              for (DataOutput<String> d: task.getDataDestinations()) {
+              for (OutputBroker<String> d: task.getDataDestinations()) {
                 try {
                   d.publish(dataReference);
                   reportBuilder.success(Process.this,dataReference);

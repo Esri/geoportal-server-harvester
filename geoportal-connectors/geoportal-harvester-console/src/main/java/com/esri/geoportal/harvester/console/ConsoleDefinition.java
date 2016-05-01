@@ -21,5 +21,11 @@ import com.esri.geoportal.harvester.api.n.BrokerDefinition;
  * Console definition.
  */
 public class ConsoleDefinition extends BrokerDefinition {
+  public static final String TYPE = "CONSOLE";
+
+  @Override
+  public String getType() {
+    return TYPE;
+  }
   
 }

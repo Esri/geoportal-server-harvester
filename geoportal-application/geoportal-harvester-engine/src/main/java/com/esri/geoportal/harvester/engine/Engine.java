@@ -15,7 +15,6 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.DataConnector;
 import com.esri.geoportal.harvester.api.DataBrokerUiTemplate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,10 +23,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import com.esri.geoportal.harvester.api.DataOutput;
-import com.esri.geoportal.harvester.api.DataOutputFactory;
-import com.esri.geoportal.harvester.api.DataInput;
-import com.esri.geoportal.harvester.api.DataInputFactory;
+import com.esri.geoportal.harvester.api.n.BrokerDefinition;
+import com.esri.geoportal.harvester.api.n.InputBroker;
+import com.esri.geoportal.harvester.api.n.InputConnector;
+import com.esri.geoportal.harvester.api.n.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.n.OutputBroker;
+import com.esri.geoportal.harvester.api.n.OutputConnector;
 
 /**
  * Harvesting engine.
@@ -95,23 +96,23 @@ public class Engine {
    * @param dpParams data output init parameters
    * @return task
    */
-  public Task createTask(DataConnector dsParams, List<DataConnector> dpParams) {
-    DataInputFactory dsFactory = dsReg.get(dsParams.getType());
+  public Task<String> createTask(BrokerDefinition dsParams, List<BrokerDefinition> dpParams) throws InvalidDefinitionException {
+    InputConnector<InputBroker,BrokerDefinition> dsFactory = dsReg.get(dsParams.getType());
     
     if (dsFactory==null) {
       throw new IllegalArgumentException("Invalid data source init parameters");
     }
     
-    DataInput dataSource = dsFactory.create(dsParams);
+    InputBroker<String> dataSource = dsFactory.createBroker(dsParams);
 
-    ArrayList<DataOutput> dataDestinations =  new ArrayList<>();
-    for (DataConnector def: dpParams) {
-      DataOutputFactory dpFactory = dpReg.get(def.getType());
+    ArrayList<OutputBroker<String>> dataDestinations =  new ArrayList<>();
+    for (BrokerDefinition def: dpParams) {
+      OutputConnector<OutputBroker,BrokerDefinition> dpFactory = dpReg.get(def.getType());
       if (dpFactory==null) {
         throw new IllegalArgumentException("Invalid data publisher init parameters");
       }
 
-      DataOutput dataPublisher = dpFactory.create(def);
+      OutputBroker<String> dataPublisher = dpFactory.createBroker(def);
       dataDestinations.add(dataPublisher);
     }
     

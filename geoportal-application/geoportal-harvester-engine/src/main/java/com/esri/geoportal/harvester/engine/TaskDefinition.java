@@ -15,21 +15,25 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.DataConnector;
+import com.esri.geoportal.harvester.api.n.BrokerDefinition;
+import com.esri.geoportal.harvester.api.n.InputBroker;
+import com.esri.geoportal.harvester.api.n.InputConnector;
+import com.esri.geoportal.harvester.api.n.OutputBroker;
+import com.esri.geoportal.harvester.api.n.OutputConnector;
 import java.util.List;
 
 /**
  * Process definition.
  */
 public class TaskDefinition {
-  private DataConnector source;
-  private List<DataConnector> destinations;
+  private BrokerDefinition source;
+  private List<BrokerDefinition> destinations;
 
   /**
    * Gets source definition.
    * @return source definition
    */
-  public DataConnector getSource() {
+  public BrokerDefinition getSource() {
     return source;
   }
 
@@ -37,7 +41,7 @@ public class TaskDefinition {
    * Sets source definition.
    * @param source source definition
    */
-  public void setSource(DataConnector source) {
+  public void setSource(BrokerDefinition source) {
     this.source = source;
   }
 
@@ -45,7 +49,7 @@ public class TaskDefinition {
    * Gets destinations.
    * @return destinations
    */
-  public List<DataConnector> getDestinations() {
+  public List<BrokerDefinition> getDestinations() {
     return destinations;
   }
 
@@ -53,7 +57,7 @@ public class TaskDefinition {
    * Sets destinations.
    * @param destinations destinations
    */
-  public void setDestinations(List<DataConnector> destinations) {
+  public void setDestinations(List<BrokerDefinition> destinations) {
     this.destinations = destinations;
   }
   

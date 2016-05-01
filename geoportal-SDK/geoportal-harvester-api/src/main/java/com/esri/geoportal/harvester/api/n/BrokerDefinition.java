@@ -20,5 +20,6 @@ import java.util.HashMap;
 /**
  * Broker definition.
  */
-public class BrokerDefinition extends HashMap<String,String> {
+public abstract class BrokerDefinition extends HashMap<String,String> {
+  public abstract String getType();
 }

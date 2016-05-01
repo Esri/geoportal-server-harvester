@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.rest;
 
+import com.esri.geoportal.harvester.api.n.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.TaskDefinition;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import com.esri.geoportal.harvester.engine.Process;
@@ -24,7 +25,9 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -106,12 +109,16 @@ public class ProcessController {
    * @return process info
    */
   @RequestMapping(value = "/rest/harvester/processes", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ProcessInfo createProcess(@RequestBody TaskDefinition taskDefinition) {
-    Task task = engine.createTask(taskDefinition.getSource(), taskDefinition.getDestinations());
-    UUID processId = engine.createProcess(task);
-    Process process = engine.getProcess(processId);
-    process.begin();
-    return new ProcessInfo(processId, process.getDescription(), process.getStatus());
+  public ResponseEntity<ProcessInfo> createProcess(@RequestBody TaskDefinition taskDefinition) {
+    try {
+      Task task = engine.createTask(taskDefinition.getSource(), taskDefinition.getDestinations());
+      UUID processId = engine.createProcess(task);
+      Process process = engine.getProcess(processId);
+      process.begin();
+      return new ResponseEntity<ProcessInfo>(new ProcessInfo(processId, process.getDescription(), process.getStatus()), HttpStatus.OK);
+    } catch (InvalidDefinitionException ex) {
+      return new ResponseEntity<ProcessInfo>(HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**

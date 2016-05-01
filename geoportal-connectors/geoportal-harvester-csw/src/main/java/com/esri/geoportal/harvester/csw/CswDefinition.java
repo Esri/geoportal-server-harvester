@@ -27,12 +27,18 @@ import java.net.URL;
  * CSW definition.
  */
 public class CswDefinition extends BotsAttributesAdaptor  {
+  public static final String TYPE = "CSW";
   
   public static final String P_HOST_URL = "csw.host.url";
   public static final String P_PROFILE_ID = "csw.profile.id";
   
   private URL hostUrl;
   private IProfile profile;
+
+  @Override
+  public String getType() {
+    return TYPE;
+  }
 
   
   public CswDefinition validate() throws InvalidDefinitionException {

@@ -25,7 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Bots attributes adaptor.
  */
-public class BotsAttributesAdaptor extends BrokerDefinition {
+public abstract class BotsAttributesAdaptor extends BrokerDefinition {
 
   protected static final String P_BOTS_AGENT = "bots.config.agent";
   protected static final String P_BOTS_ENABLED = "bots.config.enabled";

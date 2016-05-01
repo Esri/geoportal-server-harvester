@@ -16,10 +16,10 @@
 package com.esri.geoportal.harvester.engine;
 
 import com.esri.geoportal.harvester.engine.support.BaseDataRegistry;
-import com.esri.geoportal.harvester.api.DataOutputFactory;
+import com.esri.geoportal.harvester.api.n.OutputConnector;
 
 /**
  * Data outbound connector registry.
  */
-public class DataOutboundConnectorRegistry extends BaseDataRegistry<DataOutputFactory> {
+public class DataOutboundConnectorRegistry extends BaseDataRegistry<OutputConnector> {
 }
