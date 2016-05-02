@@ -15,9 +15,6 @@
  */
 package com.esri.geoportal.harvester.api;
 
-import com.esri.geoportal.harvester.api.DataInputException;
-import com.esri.geoportal.harvester.api.DataReference;
-
 /**
  * Input broker.
  * <p>

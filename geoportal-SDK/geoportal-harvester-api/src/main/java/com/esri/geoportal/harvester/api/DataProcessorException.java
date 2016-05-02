@@ -16,8 +16,10 @@
 package com.esri.geoportal.harvester.api;
 
 /**
- *
- * @author Esri, Inc
+ * Data processor exception.
+ * <p>
+ * Indicating issues with the harvesting workflow itself rather than any particular
+ * broker.
  */
 public class DataProcessorException extends DataException {
 

@@ -16,7 +16,6 @@
 package com.esri.geoportal.harvester.api;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Date;
 
 /**

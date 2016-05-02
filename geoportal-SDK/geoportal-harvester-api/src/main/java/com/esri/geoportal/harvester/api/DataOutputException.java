@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.api;
 /**
  * Data output exception.
  * <p>
- * Exception associated with output.
+ * Exception associated with output broker.
  */
 public class DataOutputException extends DataException {
   private final OutputBroker outputBroker;
