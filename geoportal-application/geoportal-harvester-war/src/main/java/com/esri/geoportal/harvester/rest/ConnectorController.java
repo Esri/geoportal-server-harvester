@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.PathVariable;
  * It provides a way to obtain information about available adaptors (sources, 
  * destinations). There is a separate REST endpoint for source and destination.
  * <pre><code>
-   /rest/harvester/adaptors/sources
-   /rest/harvester/adaptors/destinations
+   /rest/harvester/connectors/inbound
+   /rest/harvester/connectors/outbound
  * </code></pre>
  * It would alway return a JSON array of templates, where each template is a
  * blueprint how to build UI for each adaptor, for example:
