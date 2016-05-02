@@ -17,7 +17,14 @@ package com.esri.geoportal.harvester.api;
 
 /**
  * Output connector.
- * @param <D> data type
+ * <p>
+ * Provides factory methods to create instance of the {@link OutputBroker} as well 
+ * as template definition.
+ * 
+ * @param <B> type of the broker
+ * @param <D> type of the broker definition
+ * 
+ * @see OutputBroker
  */
 public interface OutputConnector<B extends OutputBroker, D extends BrokerDefinition> extends Connector<B,D> {
   

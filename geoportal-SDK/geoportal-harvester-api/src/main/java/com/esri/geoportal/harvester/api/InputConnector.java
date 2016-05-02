@@ -17,6 +17,14 @@ package com.esri.geoportal.harvester.api;
 
 /**
  * Input connector.
+ * <p>
+ * Provides factory methods to create instance of the {@link InputBroker} as well 
+ * as template definition.
+ * 
+ * @param <B> type of the broker
+ * @param <D> type of the broker definition
+ * 
+ * @see InputBroker
  */
 public interface InputConnector<B extends InputBroker, D extends BrokerDefinition> extends Connector<B,D> {
   

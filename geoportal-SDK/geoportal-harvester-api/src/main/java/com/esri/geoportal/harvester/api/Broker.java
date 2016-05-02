@@ -19,6 +19,13 @@ import java.io.Closeable;
 
 /**
  * Broker.
+ * <p>
+ * It represents a mechanism of obtaining or publishing data. There are two sub-types
+ * of this interface: {@link InputBroker} used to get data and {@link OutputBroker}
+ * used to publish data.
+ * 
+ * @see InputBroker
+ * @see OutputBroker
  * @see BrokerDefinition
  * @see Connector
  */

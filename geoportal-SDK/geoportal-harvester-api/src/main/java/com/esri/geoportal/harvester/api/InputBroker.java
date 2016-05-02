@@ -20,7 +20,12 @@ import com.esri.geoportal.harvester.api.DataReference;
 
 /**
  * Input broker.
+ * <p>
+ * Provides mechanism to obtain data.
+ * 
  * @param <D> data type
+ * 
+ * @see InputConnector
  */
 public interface InputBroker<D> extends Broker {
   

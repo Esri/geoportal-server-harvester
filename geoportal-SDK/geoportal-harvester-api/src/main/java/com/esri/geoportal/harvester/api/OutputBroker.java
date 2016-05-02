@@ -20,7 +20,11 @@ import com.esri.geoportal.harvester.api.DataReference;
 
 /**
  * Output broker.
+ * <p>
+ * Provides mechanism to publish data.
+ * 
  * @param <D> data type
+ * @see OutputConnector
  */
 public interface OutputBroker<D> extends Broker {
   

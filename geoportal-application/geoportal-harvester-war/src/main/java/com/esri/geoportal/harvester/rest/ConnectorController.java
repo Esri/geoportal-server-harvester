@@ -164,7 +164,7 @@ public class ConnectorController {
    */
   @RequestMapping(value = "/rest/harvester/connectors/inbound/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ConnectorTemplate getSource(@PathVariable String name) {
-    return engine.getInboundConnectorTemplates().stream().filter(a->a.getName().equals(name)).findFirst().orElse(null);
+    return engine.getInboundConnectorTemplates().stream().filter(a->a.getType().equals(name)).findFirst().orElse(null);
   }
   
   /**
@@ -174,6 +174,6 @@ public class ConnectorController {
    */
   @RequestMapping(value = "/rest/harvester/connectors/outbound/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ConnectorTemplate getDestination(@PathVariable String name) {
-    return engine.getOutboundConnectorTemplates().stream().filter(a->a.getName().equals(name)).findFirst().orElse(null);
+    return engine.getOutboundConnectorTemplates().stream().filter(a->a.getType().equals(name)).findFirst().orElse(null);
   }
 }

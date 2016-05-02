@@ -25,28 +25,28 @@ import java.util.List;
  * @see Connector
  */
 public class ConnectorTemplate {
-  private final String name;
+  private final String type;
   private final String label;
   private final List<Argument> arguments;
 
   /**
    * Creates instance of the template.
-   * @param name name
+   * @param type type
    * @param label label
    * @param arguments arguments
    */
-  public ConnectorTemplate(String name, String label, List<Argument> arguments) {
-    this.name = name;
+  public ConnectorTemplate(String type, String label, List<Argument> arguments) {
+    this.type = type;
     this.label = label;
     this.arguments = arguments;
   }
 
   /**
-   * Gets name.
-   * @return name
+   * Gets type.
+   * @return type
    */
-  public String getName() {
-    return name;
+  public String getType() {
+    return type;
   }
 
   /**
@@ -97,7 +97,7 @@ public class ConnectorTemplate {
 
     /**
      * Creates instance of the argument.
-     * @param name name
+     * @param name type
      * @param label label
      */
     public ArgumentBase(String name, String label) {
@@ -127,7 +127,7 @@ public class ConnectorTemplate {
   public static class StringArgument extends ArgumentBase<String> {
     /**
      * Creates instance of the argument.
-     * @param name name
+     * @param name type
      * @param label label
      */
     public StringArgument(String name, String label) {
@@ -146,7 +146,7 @@ public class ConnectorTemplate {
   public static class IntegerArgument extends ArgumentBase<Integer> {
     /**
      * Creates instance of the argument.
-     * @param name name
+     * @param name type
      * @param label label
      */
     public IntegerArgument(String name, String label) {
@@ -169,7 +169,7 @@ public class ConnectorTemplate {
 
     /**
      * Creates instance of the choice.
-     * @param name name
+     * @param name type
      * @param value value
      */
     public Choice(String name, CT value) {
@@ -178,8 +178,8 @@ public class ConnectorTemplate {
     }
 
     /**
-     * Gets name.
-     * @return name
+     * Gets type.
+     * @return type
      */
     public String getName() {
       return name;
@@ -208,7 +208,7 @@ public class ConnectorTemplate {
 
     /**
      * Creates instance of the argument.
-     * @param name name
+     * @param name type
      * @param label label
      * @param choices choices
      */

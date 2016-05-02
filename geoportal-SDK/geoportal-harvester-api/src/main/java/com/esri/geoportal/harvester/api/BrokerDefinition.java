@@ -19,6 +19,17 @@ import java.util.HashMap;
 
 /**
  * Broker definition.
+ * <p>
+ * It is a map of properties mean to be serializable. Based upon this information,
+ * a {@link Connector} will be able to produce an instance of the {@link Broker}.
+ * <p>
+ * This class must be extended with the class providing explicit methods translating
+ * from/to the named attribute within the map. For example, a concretized class
+ * may provide a pair of getter and setter: getHostUrl() and setHostUrl() which 
+ * return or accept an argument of type URL. This value will be serialized into 
+ * string and stored within the map under predetermined key.
+ * 
+ * @see Connector
  * @see Broker
  */
 public abstract class BrokerDefinition extends HashMap<String,String> {
