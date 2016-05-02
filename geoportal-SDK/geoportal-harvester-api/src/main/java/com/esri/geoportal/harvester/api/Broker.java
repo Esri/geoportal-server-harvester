@@ -19,6 +19,8 @@ import java.io.Closeable;
 
 /**
  * Broker.
+ * @see BrokerDefinition
+ * @see Connector
  */
 public interface Broker extends Closeable {
   

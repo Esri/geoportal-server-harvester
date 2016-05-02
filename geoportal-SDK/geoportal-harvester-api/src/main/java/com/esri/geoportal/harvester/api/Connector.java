@@ -18,8 +18,22 @@ package com.esri.geoportal.harvester.api;
 /**
  * Connector.
  * @param <B> broker type.
+ * @param <D> broker definition type
+ * @see Broker
+ * @see BrokerDefinition
  */
 public interface Connector<B extends Broker, D extends BrokerDefinition> {
+  /**
+   * Gets connector UI template.
+   * @return connector UI template
+   */
   ConnectorTemplate getTemplate();
+  
+  /**
+   * Creates new broker instance based on broker definition.
+   * @param definition broker definition
+   * @return broker instance
+   * @throws InvalidDefinitionException if provided definition is invalid
+   */
   B createBroker(D definition) throws InvalidDefinitionException;
 }

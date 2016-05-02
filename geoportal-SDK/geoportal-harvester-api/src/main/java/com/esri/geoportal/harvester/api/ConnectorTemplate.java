@@ -22,6 +22,7 @@ import java.util.List;
  * Data broker UI template.
  * <p>
  * Connector template is used to generate information sufficient to build form UI.
+ * @see Connector
  */
 public class ConnectorTemplate {
   private final String name;
