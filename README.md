@@ -1,10 +1,10 @@
 # geoportal-server-harvester
 As part of the evolution of Geoportal Server, the harvesting capability has been separated into its own module. This because there are use cases where the harvesting can be used as a stand-alone broker between catalogs of content. 
 
-This repository thus contains the harvesting capability, while it's sibling [geoportal-server-catalog](https://github.com/ArcGIS/geoportal-server-catalog) is the new catalog of Geoportal Server.
+This repository thus contains the harvesting capability, while it's sibling [geoportal-server-catalog](https://github.com/Esri/geoportal-server-catalog) is the new catalog of Geoportal Server.
 
 ## Releases and Downloads
-- 2.0.0 - Initial release of geoportal-server-harvester. Click [here](https://github.com/ArcGIS/geoportal-server-harvester/releases) for release notes and downloads.
+- 2.0.0 - Initial release of geoportal-server-harvester. Click [here](https://github.com/Esri/geoportal-server-harvester/releases) for release notes and downloads.
 
 ## Features
 
@@ -21,6 +21,7 @@ Building the source code:
 Deploying war file:
 
 * Deploy 'geoportal-application\geoportal-harvester-war\target\geoportal-harvester-war-&lt;version&gt;.war' into the web server of your choice.
+* No configuration required.
 
 ## Requirements
 
