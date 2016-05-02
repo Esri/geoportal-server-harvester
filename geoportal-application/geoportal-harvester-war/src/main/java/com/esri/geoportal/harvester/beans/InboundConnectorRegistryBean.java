@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.csw.CswConnector;
 import com.esri.geoportal.harvester.csw.CswDefinition;
-import com.esri.geoportal.harvester.engine.DataInboundConnectorRegistry;
+import com.esri.geoportal.harvester.engine.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.waf.WafConnector;
 import com.esri.geoportal.harvester.waf.WafDefinition;
 import javax.annotation.PostConstruct;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
  * Data source registry bean.
  */
 @Service
-public class DataInboundConnectorRegistryBean extends DataInboundConnectorRegistry {
+public class InboundConnectorRegistryBean extends InboundConnectorRegistry {
   
   @PostConstruct
   public void init() {

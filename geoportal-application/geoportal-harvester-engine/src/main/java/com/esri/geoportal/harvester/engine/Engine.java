@@ -37,8 +37,8 @@ public class Engine {
   private final ReportBuilder reportBuilder;
   private final TaskManager taskManager;
   private final ProcessManager processManager;
-  private final DataInboundConnectorRegistry dsReg;
-  private final DataOutboundConnectorRegistry dpReg;
+  private final InboundConnectorRegistry dsReg;
+  private final OutboundConnectorRegistry dpReg;
 
   /**
    * Creates instance of the engine.
@@ -48,7 +48,7 @@ public class Engine {
    * @param dsReg data source registry
    * @param dpReg data publisher registry
    */
-  public Engine(ReportBuilder reportBuilder, TaskManager taskManager, ProcessManager processManager, DataInboundConnectorRegistry dsReg, DataOutboundConnectorRegistry dpReg) {
+  public Engine(ReportBuilder reportBuilder, TaskManager taskManager, ProcessManager processManager, InboundConnectorRegistry dsReg, OutboundConnectorRegistry dpReg) {
     this.reportBuilder = reportBuilder;
     this.taskManager = taskManager;
     this.processManager = processManager;

@@ -15,10 +15,11 @@
  */
 package com.esri.geoportal.harvester.beans;
 
+import static com.esri.geoportal.harvester.support.TaskDefinitionSerializer.deserializeTaskDef;
+import static com.esri.geoportal.harvester.support.TaskDefinitionSerializer.serializeTaskDef;
 import com.esri.geoportal.harvester.engine.TaskDefinition;
 import com.esri.geoportal.harvester.engine.TaskManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -149,15 +150,5 @@ public class TaskManagerBean implements TaskManager {
       LOG.error("Error selecting taksk", ex);
     }
     return map.entrySet();
-  }
-
-  private String serializeTaskDef(TaskDefinition taskDef) throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper();
-    return mapper.writeValueAsString(taskDef);
-  }
-
-  private TaskDefinition deserializeTaskDef(String strTaskDef) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    return mapper.readValue(strTaskDef, TaskDefinition.class);
   }
 }

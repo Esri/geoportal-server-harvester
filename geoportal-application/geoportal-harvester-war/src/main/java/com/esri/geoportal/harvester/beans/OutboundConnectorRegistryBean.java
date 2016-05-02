@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.engine.DataOutboundConnectorRegistry;
+import com.esri.geoportal.harvester.engine.OutboundConnectorRegistry;
 import com.esri.geoportal.harvester.folder.FolderConnector;
 import com.esri.geoportal.harvester.folder.FolderDefinition;
 import com.esri.geoportal.harvester.gpt.GptConnector;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
  * Data outbound connector registry bean.
  */
 @Service
-public class DataOutboundConnectorRegistryBean extends DataOutboundConnectorRegistry {
+public class OutboundConnectorRegistryBean extends OutboundConnectorRegistry {
   
   @PostConstruct
   public void init() {
