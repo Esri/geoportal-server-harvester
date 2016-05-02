@@ -20,7 +20,7 @@ define(["dojo/_base/declare",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
-        "dojo/text!./templates/Home.html",
+        "dojo/text!./templates/TasksPane.html",
         "dojo/topic",
         "dojo/dom-style"
       ],
@@ -35,7 +35,7 @@ define(["dojo/_base/declare",
       },
       
       _onNav: function(evt) {
-        domStyle.set(this.domNode,"display", evt==="home"? "block": "none");
+        domStyle.set(this.domNode,"display", evt==="tasks"? "block": "none");
       }
     });
 });

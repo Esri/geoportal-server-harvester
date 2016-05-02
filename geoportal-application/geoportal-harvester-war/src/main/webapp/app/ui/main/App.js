@@ -23,10 +23,11 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/App.html",
         "dijit/layout/ContentPane", 
         "dijit/layout/LayoutContainer",
-        "app/ui/home/Home",
+        "app/ui/home/HomePane",
         "app/ui/connectors/ConnectorsPane",
-        "app/ui/tasks/Tasks",
-        "app/ui/processes/Processes"
+        "app/ui/brokers/BrokersPane",
+        "app/ui/tasks/TasksPane",
+        "app/ui/processes/ProcessesPane"
       ],
   function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
   

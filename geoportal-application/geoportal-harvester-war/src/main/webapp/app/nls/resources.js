@@ -31,6 +31,7 @@ define({
     navigation: {
       home: "Home",
       connectors: "Connectors",
+      brokers: "Brokers",
       tasks: "Tasks",
       processes: "Processes"
     },

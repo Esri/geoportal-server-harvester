@@ -20,36 +20,22 @@ define(["dojo/_base/declare",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
-        "dojo/text!./templates/Nav.html",
-        "dojo/topic"],
-  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic){
+        "dojo/text!./templates/HomePane.html",
+        "dojo/topic",
+        "dojo/dom-style"
+      ],
+  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic,domStyle){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
     
       postCreate: function(){
-        
+        topic.subscribe("nav",lang.hitch(this,this._onNav));
       },
       
-      _onhome: function() {
-        topic.publish("nav","home");
-      },
-      
-      _onconnectors: function() {
-        topic.publish("nav","connectors");
-      },
-      
-      _onbrokers: function() {
-        topic.publish("nav","brokers");
-      },
-      
-      _ontasks: function() {
-        topic.publish("nav","tasks");
-      },
-      
-      _onprocesses: function() {
-        topic.publish("nav","processes");
+      _onNav: function(evt) {
+        domStyle.set(this.domNode,"display", evt==="home"? "block": "none");
       }
     });
 });
