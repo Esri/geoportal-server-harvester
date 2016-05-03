@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.api.support;
 
+import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import java.io.IOException;
@@ -48,6 +49,11 @@ public class DataPrintStreamOutput implements OutputBroker<String> {
   @Override
   public void close() throws IOException {
     // no closing necessary
+  }
+
+  @Override
+  public Connector getConnector() {
+    return null;
   }
   
 }

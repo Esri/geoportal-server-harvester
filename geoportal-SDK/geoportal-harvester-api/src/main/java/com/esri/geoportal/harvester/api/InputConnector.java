@@ -22,10 +22,9 @@ package com.esri.geoportal.harvester.api;
  * as template definition.
  * 
  * @param <B> type of the broker
- * @param <D> type of the broker definition
  * 
  * @see InputBroker
  */
-public interface InputConnector<B extends InputBroker, D extends BrokerDefinition> extends Connector<B,D> {
+public interface InputConnector<B extends InputBroker> extends Connector<B> {
   
 }

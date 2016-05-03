@@ -14,6 +14,7 @@
  */
 package com.esri.geoportal.harvester.console;
 
+import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.OutputBroker;
@@ -24,6 +25,15 @@ import java.io.IOException;
  */
 public class ConsoleBroker implements OutputBroker<String>  {
   private long counter = 0;
+  private final ConsoleConnector connector;
+
+  /**
+   * Creates instance of the broker.
+   * @param connector connector
+   */
+  public ConsoleBroker(ConsoleConnector connector) {
+    this.connector = connector;
+  }
 
   @Override
   public void publish(DataReference<String> ref) throws DataOutputException {
@@ -42,6 +52,11 @@ public class ConsoleBroker implements OutputBroker<String>  {
   @Override
   public void close() throws IOException {
     // no closing neccessary
+  }
+
+  @Override
+  public Connector getConnector() {
+    return connector;
   }
   
 }

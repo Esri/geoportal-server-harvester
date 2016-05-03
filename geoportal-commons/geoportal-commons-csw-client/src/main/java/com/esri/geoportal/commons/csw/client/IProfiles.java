@@ -25,7 +25,7 @@ public interface IProfiles {
   /**
    * Gets profile by id.
    * @param id profile id
-   * @return profile
+   * @return profile or <code>null</code> if profile could not be found
    */
   IProfile getProfileById(String id);
   

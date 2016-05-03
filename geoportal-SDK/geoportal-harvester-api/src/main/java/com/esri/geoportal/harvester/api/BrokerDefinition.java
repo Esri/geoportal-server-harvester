@@ -15,7 +15,8 @@
  */
 package com.esri.geoportal.harvester.api;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Broker definition.
@@ -32,10 +33,39 @@ import java.util.HashMap;
  * @see Connector
  * @see Broker
  */
-public abstract class BrokerDefinition extends HashMap<String,String> {
+public final class BrokerDefinition {
+  private String type;
+  private Map<String,String> properties = new LinkedHashMap<>();
+
   /**
    * Gets broker type.
-   * @return broker type.
+   * @return broker type
    */
-  public abstract String getType();
+  public String getType() {
+    return type;
+  }
+
+  /**
+   * Sets broker type.
+   * @param type broker type
+   */
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  /**
+   * Gets broker properties.
+   * @return broker properties
+   */
+  public Map<String, String> getProperties() {
+    return properties;
+  }
+
+  /**
+   * Sets broker properties.
+   * @param properties broker properties
+   */
+  public void setProperties(Map<String, String> properties) {
+    this.properties = properties!=null? properties: new LinkedHashMap<>();
+  }
 }

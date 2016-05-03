@@ -15,18 +15,25 @@
  */
 package com.esri.geoportal.harvester.folder;
 
+import com.esri.geoportal.harvester.api.BrokerDefinition;
 import com.esri.geoportal.harvester.api.ConnectorTemplate;
 import com.esri.geoportal.harvester.api.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.OutputConnector;
-import static com.esri.geoportal.harvester.folder.FolderDefinition.P_HOST_URL;
-import static com.esri.geoportal.harvester.folder.FolderDefinition.P_ROOT_FOLDER;
+import static com.esri.geoportal.harvester.folder.FolderBrokerDefinitionAdaptor.P_HOST_URL;
+import static com.esri.geoportal.harvester.folder.FolderBrokerDefinitionAdaptor.P_ROOT_FOLDER;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Folder connector.
  */
-public class FolderConnector implements OutputConnector<FolderBroker,FolderDefinition> {
+public class FolderConnector implements OutputConnector<FolderBroker> {
+  public static final String TYPE = "FOLDER";
+
+  @Override
+  public String getType() {
+    return TYPE;
+  }
 
   @Override
   public ConnectorTemplate getTemplate() {
@@ -37,8 +44,8 @@ public class FolderConnector implements OutputConnector<FolderBroker,FolderDefin
   }
 
   @Override
-  public FolderBroker createBroker(FolderDefinition definition) throws InvalidDefinitionException {
-    return new FolderBroker(definition.validate());
+  public FolderBroker createBroker(BrokerDefinition definition) throws InvalidDefinitionException {
+    return new FolderBroker(this,new FolderBrokerDefinitionAdaptor(definition));
   }
   
 }

@@ -22,10 +22,9 @@ package com.esri.geoportal.harvester.api;
  * as template definition.
  * 
  * @param <B> type of the broker
- * @param <D> type of the broker definition
  * 
  * @see OutputBroker
  */
-public interface OutputConnector<B extends OutputBroker, D extends BrokerDefinition> extends Connector<B,D> {
+public interface OutputConnector<B extends OutputBroker> extends Connector<B> {
   
 }

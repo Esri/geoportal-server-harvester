@@ -19,6 +19,7 @@ import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.http.BotsHttpClientFactory;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
+import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.InputBroker;
@@ -34,14 +35,22 @@ import org.apache.http.impl.client.HttpClients;
  * WAF broker.
  */
 public class WafBroker implements InputBroker<String> {
-  private final WafDefinition arguments;
+  private final WafConnector connector;
+  private final WafBrokerDefinitionAdaptor arguments;
   private final Set<URL> visited = new HashSet<>();
   
   private BotsHttpClient httpClient;
   private LinkedList<WafFolder> subFolders;
   private LinkedList<WafFile> files;
 
-  public WafBroker(WafDefinition arguments) {
+  
+  /**
+   * Creates instance of the broker.
+   * @param connector connector
+   * @param arguments definition
+   */
+  public WafBroker(WafConnector connector, WafBrokerDefinitionAdaptor arguments) {
+    this.connector = connector;
     this.arguments = arguments;
   }
 
@@ -113,5 +122,10 @@ public class WafBroker implements InputBroker<String> {
   @Override
   public String toString() {
     return String.format("WAF [%s]", arguments.getHostUrl());
+  }
+
+  @Override
+  public Connector getConnector() {
+    return connector;
   }
 }

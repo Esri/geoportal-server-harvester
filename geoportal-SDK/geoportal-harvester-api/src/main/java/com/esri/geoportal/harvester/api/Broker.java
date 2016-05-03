@@ -30,5 +30,9 @@ import java.io.Closeable;
  * @see Connector
  */
 public interface Broker extends Closeable {
-  
+  /**
+   * Gets connector.
+   * @return connector
+   */
+  Connector getConnector();
 }

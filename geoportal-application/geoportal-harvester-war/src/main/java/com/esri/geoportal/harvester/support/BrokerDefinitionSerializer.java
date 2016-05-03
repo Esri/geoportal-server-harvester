@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.support;
 
 import com.esri.geoportal.harvester.api.BrokerDefinition;
-import com.esri.geoportal.harvester.waf.WafDefinition;
+import com.esri.geoportal.harvester.waf.WafBrokerDefinitionAdaptor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;

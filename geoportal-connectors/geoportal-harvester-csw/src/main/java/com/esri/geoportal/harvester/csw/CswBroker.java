@@ -21,6 +21,7 @@ import com.esri.geoportal.commons.csw.client.IRecords;
 import com.esri.geoportal.commons.csw.client.ObjectFactory;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
+import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.InputBroker;
@@ -36,14 +37,21 @@ import org.apache.http.impl.client.HttpClients;
 public class CswBroker implements InputBroker<String> {
   private static final int PAGE_SIZE = 10;
 
-  private final CswDefinition attributes;
+  private final CswConnector connector;
+  private final CswBrokerDefinitionAdaptor attributes;
   private CloseableHttpClient httpclient;
   private IClient client;
   private Iterator<IRecord> recs;
   private int start = 1;
   private boolean noMore;
 
-  public CswBroker(CswDefinition attributes) {
+  /**
+   * Creates instance of the broker.
+   * @param connector connector
+   * @param attributes attributes
+   */
+  public CswBroker(CswConnector connector, CswBrokerDefinitionAdaptor attributes) {
+    this.connector = connector;
     this.attributes = attributes;
   }
 
@@ -112,6 +120,11 @@ public class CswBroker implements InputBroker<String> {
   @Override
   public String toString() {
     return String.format("CSW [%s, %s]", attributes.getHostUrl(), attributes.getProfile());
+  }
+
+  @Override
+  public Connector getConnector() {
+    return connector;
   }
   
 }

@@ -15,11 +15,11 @@
  */
 package com.esri.geoportal.harvester.folder;
 
+import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.OutputBroker;
 import static com.esri.geoportal.harvester.folder.PathUtil.sanitizeFileName;
-import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
 import static com.esri.geoportal.harvester.folder.StringListUtil.head;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -30,19 +30,27 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
+import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
 
 /**
  * Folder broker.
  */
 public class FolderBroker implements OutputBroker<String>{
-  private final FolderDefinition definition;
+  private final FolderConnector connector;
+  private final FolderBrokerDefinitionAdaptor definition;
   private final File rootFolder;
   private final List<String> subFolder;
 
-  public FolderBroker(FolderDefinition definition) {
+  public FolderBroker(FolderConnector connector, FolderBrokerDefinitionAdaptor definition) {
+    this.connector = connector;
     this.definition = definition;
     this.rootFolder = definition.getRootFolder().toPath().resolve(definition.getHostUrl().getHost()).toFile();
     this.subFolder = splitPath(definition.getHostUrl().getPath());
+  }
+
+  @Override
+  public Connector getConnector() {
+    return connector;
   }
 
   @Override

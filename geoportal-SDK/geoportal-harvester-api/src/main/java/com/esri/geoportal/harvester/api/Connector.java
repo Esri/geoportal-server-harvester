@@ -22,21 +22,30 @@ package com.esri.geoportal.harvester.api;
  * {@link Broker} and create instance of the {@link ConnectorTemplate}.
  * 
  * @param <B> type of the broker
- * @param <D> type of the broker definition
  * 
  * @see InputConnector
  * @see OutputConnector
  * @see Broker
  * @see BrokerDefinition
  */
-public interface Connector<B extends Broker, D extends BrokerDefinition> {
+public interface Connector<B extends Broker> {
+  
+  /**
+   * Gets connector type.
+   * <p>
+   * Connector type is an unique string identifying connector, i.e.: WAF, CSW, etc.
+   * 
+   * @return connector type.
+   */
+  String getType();
+  
   /**
    * Creates new broker instance based on broker definition.
    * @param definition broker definition
    * @return broker instance
    * @throws InvalidDefinitionException if provided definition is invalid
    */
-  B createBroker(D definition) throws InvalidDefinitionException;
+  B createBroker(BrokerDefinition definition) throws InvalidDefinitionException;
   
   /**
    * Gets connector UI template.

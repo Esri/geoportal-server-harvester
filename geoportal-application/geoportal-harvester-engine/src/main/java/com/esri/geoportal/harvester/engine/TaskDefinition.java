@@ -16,16 +16,12 @@
 package com.esri.geoportal.harvester.engine;
 
 import com.esri.geoportal.harvester.api.BrokerDefinition;
-import com.esri.geoportal.harvester.api.InputBroker;
-import com.esri.geoportal.harvester.api.InputConnector;
-import com.esri.geoportal.harvester.api.OutputBroker;
-import com.esri.geoportal.harvester.api.OutputConnector;
 import java.util.List;
 
 /**
- * Process definition.
+ * Task definition.
  */
-public class TaskDefinition {
+public final class TaskDefinition {
   private BrokerDefinition source;
   private List<BrokerDefinition> destinations;
 
@@ -60,6 +56,4 @@ public class TaskDefinition {
   public void setDestinations(List<BrokerDefinition> destinations) {
     this.destinations = destinations;
   }
-  
-  
 }

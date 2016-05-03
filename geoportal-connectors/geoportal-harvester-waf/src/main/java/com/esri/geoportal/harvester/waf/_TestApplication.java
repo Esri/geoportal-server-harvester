@@ -20,6 +20,7 @@ import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.support.DataCollector;
 import java.net.URL;
 import java.util.Arrays;
@@ -48,15 +49,21 @@ public class _TestApplication {
       public void close() throws IOException {
         // no closing necessary
       }
+
+      @Override
+      public Connector getConnector() {
+        return null;
+      }
     };
     
       WafConnector connector = new WafConnector();
       URL start = new URL(sUrl);
-      WafDefinition arguments = new WafDefinition();
-      arguments.setHostUrl(start);
-      arguments.setBotsConfig(BotsConfig.DEFAULT);
-      arguments.setBotsMode(BotsMode.never);
-      try (InputBroker<String> hv = connector.createBroker(arguments)) {
+      BrokerDefinition def = new BrokerDefinition();
+      WafBrokerDefinitionAdaptor adaptor = new WafBrokerDefinitionAdaptor(def);
+      adaptor.setHostUrl(start);
+      adaptor.setBotsConfig(BotsConfig.DEFAULT);
+      adaptor.setBotsMode(BotsMode.never);
+      try (InputBroker<String> hv = connector.createBroker(def)) {
         DataCollector<String> dataCollector = new DataCollector<>(hv, Arrays.asList(new OutputBroker[]{dst}));
         dataCollector.collect();
       }

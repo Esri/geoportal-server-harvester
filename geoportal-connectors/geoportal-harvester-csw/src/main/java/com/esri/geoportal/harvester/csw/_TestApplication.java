@@ -20,6 +20,8 @@ import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.ObjectFactory;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
+import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.support.DataCollector;
@@ -52,6 +54,11 @@ public class _TestApplication {
       public void close() throws IOException {
         // no closing necessary
       }
+
+      @Override
+      public Connector getConnector() {
+        return null;
+      }
     };
 
     ObjectFactory of = new ObjectFactory();
@@ -61,12 +68,13 @@ public class _TestApplication {
     if (profile != null) {
       URL start = new URL(sUrl);
       CswConnector connector = new CswConnector();
-      CswDefinition definition = new CswDefinition();
-      definition.setHostUrl(start);
-      definition.setProfile(profile);
-      definition.setBotsConfig(BotsConfig.DEFAULT);
-      definition.setBotsMode(BotsMode.inherit);
-        try (InputBroker<String> csw = connector.createBroker(definition);) {
+      BrokerDefinition def = new BrokerDefinition();
+      CswBrokerDefinitionAdaptor adaptor = new CswBrokerDefinitionAdaptor(def);
+      adaptor.setHostUrl(start);
+      adaptor.setProfile(profile);
+      adaptor.setBotsConfig(BotsConfig.DEFAULT);
+      adaptor.setBotsMode(BotsMode.inherit);
+        try (InputBroker<String> csw = connector.createBroker(def);) {
         DataCollector<String> dataCollector = new DataCollector<>(csw, Arrays.asList(new OutputBroker[]{destination}));
         dataCollector.collect();
       }

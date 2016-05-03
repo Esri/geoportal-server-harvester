@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.waf;
 
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
+import com.esri.geoportal.harvester.api.BrokerDefinition;
 import com.esri.geoportal.harvester.api.support.DataCollector;
 import com.esri.geoportal.harvester.api.support.DataPrintStreamOutput;
 import java.net.URL;
@@ -33,11 +34,12 @@ public class Application {
     for (String sUrl: args) {
       WafConnector connector = new WafConnector();
       URL start = new URL(sUrl);
-      WafDefinition definition = new WafDefinition();
-      definition.setHostUrl(start);
-      definition.setBotsConfig(BotsConfig.DEFAULT);
-      definition.setBotsMode(BotsMode.inherit);
-      try (InputBroker<String> hv = connector.createBroker(definition)) {
+      BrokerDefinition def = new BrokerDefinition();
+      WafBrokerDefinitionAdaptor adaptor = new WafBrokerDefinitionAdaptor(def);
+      adaptor.setHostUrl(start);
+      adaptor.setBotsConfig(BotsConfig.DEFAULT);
+      adaptor.setBotsMode(BotsMode.inherit);
+      try (InputBroker<String> hv = connector.createBroker(def)) {
         DataCollector<String> dataCollector = new DataCollector<>(hv, Arrays.asList(new DataPrintStreamOutput[]{destination}));
         dataCollector.collect();
       }

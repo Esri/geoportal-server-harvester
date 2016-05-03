@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.gpt;
 
 import com.esri.geoportal.commons.gpt.client.Client;
+import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.OutputBroker;
@@ -26,10 +27,18 @@ import java.net.URISyntaxException;
  * GPT broker.
  */
 public class GptBroker implements OutputBroker<String> {
-  private final GptDefinition definition;
+  private final GptConnector connector;
+  private final GptBrokerDefinitionAdaptor definition;
   private final Client client;
 
-  public GptBroker(GptDefinition definition, Client client) {
+  /**
+   * Creates instance of the broker.
+   * @param connector connector
+   * @param definition definition
+   * @param client client
+   */
+  public GptBroker(GptConnector connector, GptBrokerDefinitionAdaptor definition, Client client) {
+    this.connector = connector;
     this.definition = definition;
     this.client = client;
   }
@@ -47,6 +56,11 @@ public class GptBroker implements OutputBroker<String> {
   @Override
   public void close() throws IOException {
     client.close();
+  }
+
+  @Override
+  public Connector getConnector() {
+    return connector;
   }
   
 }

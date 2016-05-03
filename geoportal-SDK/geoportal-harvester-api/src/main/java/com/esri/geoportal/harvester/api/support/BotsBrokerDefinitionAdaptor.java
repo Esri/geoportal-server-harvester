@@ -23,22 +23,30 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Bots attributes adaptor.
+ * Bots properties adaptor.
  */
-public abstract class BotsAttributesAdaptor extends BrokerDefinition {
-
+public abstract class BotsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   protected static final String P_BOTS_AGENT = "bots.config.agent";
   protected static final String P_BOTS_ENABLED = "bots.config.enabled";
   protected static final String P_BOTS_OVERRIDE = "bots.config.override";
   protected static final String P_BOTS_MODE = "bots.mode";
 
+
+  /**
+   * Creates instance of the adaptor.
+   * @param def broker definition
+   */
+  public BotsBrokerDefinitionAdaptor(BrokerDefinition def) {
+    super(def);
+  }
+  
   /**
    * Gets bots mode.
    *
    * @return bots mode
    */
   public BotsMode getBotsMode() {
-    String sBootMode = this.get(P_BOTS_MODE);
+    String sBootMode = get(P_BOTS_MODE);
     return BotsMode.parseMode(sBootMode);
   }
 
@@ -48,7 +56,7 @@ public abstract class BotsAttributesAdaptor extends BrokerDefinition {
    * @param botsMode bots mode
    */
   public void setBotsMode(BotsMode botsMode) {
-    this.put(P_BOTS_MODE, botsMode.name());
+    set(P_BOTS_MODE, botsMode.name());
   }
 
   /**
@@ -58,9 +66,9 @@ public abstract class BotsAttributesAdaptor extends BrokerDefinition {
    */
   public BotsConfig getBotsConfig() {
     return new BotsConfigImpl(
-            StringUtils.defaultIfBlank(this.get(P_BOTS_AGENT), BotsConfig.DEFAULT.getUserAgent()), 
-            BooleanUtils.toBoolean(StringUtils.defaultIfBlank(this.get(P_BOTS_ENABLED), Boolean.toString(BotsConfig.DEFAULT.isEnabled()))), 
-            BooleanUtils.toBoolean(StringUtils.defaultIfBlank(this.get(P_BOTS_OVERRIDE), Boolean.toString(BotsConfig.DEFAULT.isOverride())))
+            StringUtils.defaultIfBlank(get(P_BOTS_AGENT), BotsConfig.DEFAULT.getUserAgent()), 
+            BooleanUtils.toBoolean(StringUtils.defaultIfBlank(get(P_BOTS_ENABLED), Boolean.toString(BotsConfig.DEFAULT.isEnabled()))), 
+            BooleanUtils.toBoolean(StringUtils.defaultIfBlank(get(P_BOTS_OVERRIDE), Boolean.toString(BotsConfig.DEFAULT.isOverride())))
     );
   }
 
@@ -70,8 +78,8 @@ public abstract class BotsAttributesAdaptor extends BrokerDefinition {
    * @param botsConfig bots config
    */
   public void setBotsConfig(BotsConfig botsConfig) {
-    this.put(P_BOTS_AGENT, botsConfig.getUserAgent());
-    this.put(P_BOTS_ENABLED, Boolean.toString(botsConfig.isEnabled()));
-    this.put(P_BOTS_OVERRIDE, Boolean.toString(botsConfig.isOverride()));
+    set(P_BOTS_AGENT, botsConfig.getUserAgent());
+    set(P_BOTS_ENABLED, Boolean.toString(botsConfig.isEnabled()));
+    set(P_BOTS_OVERRIDE, Boolean.toString(botsConfig.isOverride()));
   }
 }

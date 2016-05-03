@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.console;
 
+import com.esri.geoportal.harvester.api.BrokerDefinition;
 import com.esri.geoportal.harvester.api.ConnectorTemplate;
 import com.esri.geoportal.harvester.api.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.OutputConnector;
@@ -22,7 +23,13 @@ import com.esri.geoportal.harvester.api.OutputConnector;
 /**
  * Console connector.
  */
-public class ConsoleConnector implements OutputConnector<ConsoleBroker,ConsoleDefinition> {
+public class ConsoleConnector implements OutputConnector<ConsoleBroker> {
+  public static final String TYPE = "CONSOLE";
+
+  @Override
+  public String getType() {
+    return TYPE;
+  }
 
   @Override
   public ConnectorTemplate getTemplate() {
@@ -30,8 +37,8 @@ public class ConsoleConnector implements OutputConnector<ConsoleBroker,ConsoleDe
   }
 
   @Override
-  public ConsoleBroker createBroker(ConsoleDefinition definition) throws InvalidDefinitionException {
-    return new ConsoleBroker();
+  public ConsoleBroker createBroker(BrokerDefinition definition) throws InvalidDefinitionException {
+    return new ConsoleBroker(this);
   }
   
 }
