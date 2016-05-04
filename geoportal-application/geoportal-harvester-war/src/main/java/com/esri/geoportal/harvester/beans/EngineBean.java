@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.beans;
 
+import com.esri.geoportal.harvester.engine.BrokerDefinitionManager;
 import com.esri.geoportal.harvester.engine.ReportBuilder;
 import com.esri.geoportal.harvester.engine.Engine;
 import com.esri.geoportal.harvester.engine.ProcessManager;
@@ -30,8 +31,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class EngineBean extends Engine {
 
+  /**
+   * Engine bean.
+   * @param reportBuilder report builder
+   * @param taskManager task manager
+   * @param processManager process manager
+   * @param dsReg inputs registry
+   * @param dpReg outputs registry
+   * @param brokerDefinitionManager broker definition manager
+   */
   @Autowired
-  public EngineBean(ReportBuilder reportBuilder, TaskManager taskManager, ProcessManager processManager, InboundConnectorRegistry dsReg, OutboundConnectorRegistry dpReg) {
-    super(reportBuilder, taskManager, processManager, dsReg, dpReg);
+  public EngineBean(ReportBuilder reportBuilder, TaskManager taskManager, ProcessManager processManager, InboundConnectorRegistry dsReg, OutboundConnectorRegistry dpReg, BrokerDefinitionManager brokerDefinitionManager) {
+    super(reportBuilder, taskManager, processManager, dsReg, dpReg, brokerDefinitionManager);
   }
 }

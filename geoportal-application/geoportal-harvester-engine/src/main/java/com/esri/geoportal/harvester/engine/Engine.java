@@ -39,6 +39,7 @@ public class Engine {
   private final ProcessManager processManager;
   private final InboundConnectorRegistry dsReg;
   private final OutboundConnectorRegistry dpReg;
+  private final BrokerDefinitionManager brokerDefinitionManager;
 
   /**
    * Creates instance of the engine.
@@ -47,13 +48,15 @@ public class Engine {
    * @param processManager process manager
    * @param dsReg data source registry
    * @param dpReg data publisher registry
+   * @param brokerDefinitionManager broker definition manager
    */
-  public Engine(ReportBuilder reportBuilder, TaskManager taskManager, ProcessManager processManager, InboundConnectorRegistry dsReg, OutboundConnectorRegistry dpReg) {
+  public Engine(ReportBuilder reportBuilder, TaskManager taskManager, ProcessManager processManager, InboundConnectorRegistry dsReg, OutboundConnectorRegistry dpReg, BrokerDefinitionManager brokerDefinitionManager) {
     this.reportBuilder = reportBuilder;
     this.taskManager = taskManager;
     this.processManager = processManager;
     this.dsReg = dsReg;
     this.dpReg = dpReg;
+    this.brokerDefinitionManager = brokerDefinitionManager;
   }
 
   /**
