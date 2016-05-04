@@ -20,23 +20,23 @@ define(["dojo/_base/declare",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
-        "dojo/text!./templates/App.html",
-        "dijit/layout/ContentPane", 
-        "dijit/layout/LayoutContainer",
-        "app/ui/home/HomePane",
-        "app/ui/connectors/ConnectorsPane",
-        "app/ui/brokers/BrokersPane",
-        "app/ui/tasks/TasksPane",
-        "app/ui/processes/ProcessesPane"
+        "dojo/text!./templates/ConnectorsPane.html",
+        "dojo/topic",
+        "dojo/dom-style",
+        "hrv/ui/connectors/Connectors"
       ],
-  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
+  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic,domStyle){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
     
       postCreate: function(){
-        
+        topic.subscribe("nav",lang.hitch(this,this._onNav));
+      },
+      
+      _onNav: function(evt) {
+        domStyle.set(this.domNode,"display", evt==="connectors"? "block": "none");
       }
     });
 });

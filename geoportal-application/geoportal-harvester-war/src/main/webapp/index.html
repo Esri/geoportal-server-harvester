@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="//esri.github.io/calcite-bootstrap/assets/css/calcite-bootstrap.css">
     <link rel="stylesheet" href="https://js.arcgis.com/3.16/esri/themes/calcite/dijit/calcite.css">
     <link rel="stylesheet" href="https://js.arcgis.com/3.16/esri/themes/calcite/esri/esri.css">
-    <link rel="stylesheet" href="./app/style/main.css">
+    <link rel="stylesheet" href="hrv/style/main.css">
     <link rel="stylesheet" href="./lib/typeahead.css">
     
     <script type="text/javascript">
@@ -20,8 +20,8 @@
         parseOnLoad: true,
         packages: [
           {
-            name: 'app',
-            location: location.pathname.replace(/\/[^/]*$/, '') + '/app'
+            name: 'hrv',
+            location: location.pathname.replace(/\/[^/]*$/, '') + '/hrv'
           }
         ]
       };
@@ -33,11 +33,11 @@
     <script src="lib/typeahead.js"></script>
     
     <script>
-    require(["app"],function() {
-      require(["dojo/ready","app/ui/main/App"],
+    require(["hrv"],function() {
+      require(["dojo/ready","hrv/ui/main/App"],
       function(ready,App) {
         ready(function() {
-          var app = new App({},"app");
+          var app = new App({},"hrv");
           app.startup();
         });
       });
@@ -48,6 +48,6 @@
   
   
   <body class="calcite">
-    <div id="app"></div>
+    <div id="hrv"></div>
   </body>
 </html>
