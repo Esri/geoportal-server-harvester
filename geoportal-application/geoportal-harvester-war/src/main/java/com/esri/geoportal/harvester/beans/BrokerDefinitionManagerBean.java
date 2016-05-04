@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Esri, Inc..
+ * Copyright 2016 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import static com.esri.geoportal.harvester.support.TaskDefinitionSerializer.deserializeTaskDef;
-import static com.esri.geoportal.harvester.support.TaskDefinitionSerializer.serializeTaskDef;
-import com.esri.geoportal.harvester.engine.TaskDefinition;
-import com.esri.geoportal.harvester.engine.TaskManager;
+import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.engine.BrokerDefinitionManager;
+import static com.esri.geoportal.harvester.support.BrokerDefinitionSerializer.deserializeBrokerDef;
+import static com.esri.geoportal.harvester.support.BrokerDefinitionSerializer.serializeBrokerDef;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
 import java.sql.Connection;
@@ -37,12 +37,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * Task manager bean.
+ * Broker definition manager bean.
  */
 @Service
-public class TaskManagerBean implements TaskManager {
+public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
 
-  private final Logger LOG = LoggerFactory.getLogger(TaskManager.class);
+  private final Logger LOG = LoggerFactory.getLogger(BrokerDefinitionManager.class);
 
   @Autowired
   private DataSource dataSource;
@@ -54,62 +54,62 @@ public class TaskManagerBean implements TaskManager {
   public void init() {
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("CREATE TABLE IF NOT EXISTS TASKS ( id varchar(38) PRIMARY KEY, taskDefinition varchar(1024) NOT NULL)");
+            PreparedStatement st = connection.prepareStatement("CREATE TABLE IF NOT EXISTS BROKERS ( id varchar(38) PRIMARY KEY, brokerDefinition varchar(1024) NOT NULL)");
         ) {
       st.execute();
     } catch (SQLException ex) {
-      LOG.info("Error initializing task database", ex);
+      LOG.info("Error initializing broker definition database", ex);
     }
   }
 
   @Override
-  public UUID create(TaskDefinition taskDef) {
+  public UUID create(BrokerDefinition brokerDef) {
     UUID id = UUID.randomUUID();
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("INSERT INTO TASKS (taskDefinition,id) VALUES (?,?)");
+            PreparedStatement st = connection.prepareStatement("INSERT INTO BROKERS (taskDefinition,id) VALUES (?,?)");
         ) {
-      st.setString(1, serializeTaskDef(taskDef));
+      st.setString(1, serializeBrokerDef(brokerDef));
       st.setString(2, id.toString());
       st.executeUpdate();
     } catch (SQLException|JsonProcessingException ex) {
-      LOG.error("Error selecting task", ex);
+      LOG.error("Error selecting broker definition", ex);
     }
     return id;
   }
 
   @Override
-  public boolean update(UUID id, TaskDefinition taskDef) {
+  public boolean update(UUID id, BrokerDefinition brokerDef) {
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("UPDATE TASKS SET taskDefinition = ? WHERE ID = ?");
+            PreparedStatement st = connection.prepareStatement("UPDATE BROKERS SET taskDefinition = ? WHERE ID = ?");
         ) {
-      st.setString(1, serializeTaskDef(taskDef));
+      st.setString(1, serializeBrokerDef(brokerDef));
       st.setString(2, id.toString());
       return st.executeUpdate()>0;
     } catch (SQLException|JsonProcessingException ex) {
-      LOG.error("Error selecting task", ex);
+      LOG.error("Error selecting broker definition", ex);
       return false;
     }
   }
 
   @Override
-  public TaskDefinition read(UUID id) {
+  public BrokerDefinition read(UUID id) {
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("SELECT * FROM TASKS WHERE ID = ?");
+            PreparedStatement st = connection.prepareStatement("SELECT * FROM BROKERS WHERE ID = ?");
         ) {
       st.setString(1, id.toString());
       ResultSet rs = st.executeQuery();
       if (rs.next()) {
         try {
-          return deserializeTaskDef(rs.getString("taskDefinition"));
+          return deserializeBrokerDef(rs.getString("brokerDefinition"));
         } catch (IOException | SQLException ex) {
-          LOG.warn("Error reading task definition", ex);
+          LOG.warn("Error reading broker definition", ex);
         }
       }
     } catch (SQLException ex) {
-      LOG.error("Error selecting task", ex);
+      LOG.error("Error selecting broker definition", ex);
     }
     
     return null;
@@ -119,36 +119,37 @@ public class TaskManagerBean implements TaskManager {
   public boolean delete(UUID id) {
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("DELETE * FROM TASKS WHERE ID = ?");
+            PreparedStatement st = connection.prepareStatement("DELETE * FROM BROKERS WHERE ID = ?");
         ) {
       st.setString(1, id.toString());
       return st.executeUpdate()>0;
     } catch (SQLException ex) {
-      LOG.error("Error selecting task", ex);
+      LOG.error("Error selecting broker definition", ex);
       return false;
     }
   }
 
   @Override
-  public Collection<Map.Entry<UUID, TaskDefinition>> select() {
-    HashMap<UUID, TaskDefinition> map = new HashMap<>();
+  public Collection<Map.Entry<UUID, BrokerDefinition>> select() {
+    HashMap<UUID, BrokerDefinition> map = new HashMap<>();
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("SELECT * FROM TASKS");
+            PreparedStatement st = connection.prepareStatement("SELECT * FROM BROKERS");
         ) {
       ResultSet rs = st.executeQuery();
       while (rs.next()) {
         try {
           UUID id = UUID.fromString(rs.getString("id"));
-          TaskDefinition td = deserializeTaskDef(rs.getString("taskDefinition"));
+          BrokerDefinition td = deserializeBrokerDef(rs.getString("brokerDefinition"));
           map.put(id, td);
         } catch (IOException | SQLException ex) {
-          LOG.warn("Error reading task definition", ex);
+          LOG.warn("Error reading broker definition", ex);
         }
       }
     } catch (SQLException ex) {
-      LOG.error("Error selecting task", ex);
+      LOG.error("Error selecting broker definition", ex);
     }
     return map.entrySet();
   }
+  
 }
