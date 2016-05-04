@@ -95,6 +95,7 @@ public class Engine {
    * @param dsParams data input init parameter
    * @param dpParams data output init parameters
    * @return task
+   * @throws InvalidDefinitionException if one of broker definitions appears to be invalid
    */
   public Task<String> createTask(BrokerDefinition dsParams, List<BrokerDefinition> dpParams) throws InvalidDefinitionException {
     InputConnector<InputBroker> dsFactory = dsReg.get(dsParams.getType());
