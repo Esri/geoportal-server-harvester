@@ -8,6 +8,7 @@
     <name>Esri :: Geoportal Server :: Harvester :: SDK</name>
     <modules>
         <module>geoportal-harvester-api</module>
+        <module>geoportal-harvester-api-base</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

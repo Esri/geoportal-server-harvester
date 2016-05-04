@@ -17,4 +17,4 @@
 /**
  * Harvester API. Provides generic implementation of defined interfaces.
  */
-package com.esri.geoportal.harvester.api.support;
+package com.esri.geoportal.harvester.api.base;

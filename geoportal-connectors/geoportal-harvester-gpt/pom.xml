@@ -9,7 +9,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>harvester-api</artifactId>
+            <artifactId>harvester-api-base</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

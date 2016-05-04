@@ -25,7 +25,7 @@ import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.InputBroker;
-import com.esri.geoportal.harvester.api.support.SimpleDataReference;
+import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import java.io.IOException;
 import java.util.Iterator;
 import org.apache.http.impl.client.CloseableHttpClient;

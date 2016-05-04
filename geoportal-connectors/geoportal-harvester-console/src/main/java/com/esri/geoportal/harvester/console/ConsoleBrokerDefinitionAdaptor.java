@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.console;
 
 import com.esri.geoportal.harvester.api.BrokerDefinition;
-import com.esri.geoportal.harvester.api.support.BrokerDefinitionAdaptor;
+import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import org.apache.commons.lang3.StringUtils;
 
 /**

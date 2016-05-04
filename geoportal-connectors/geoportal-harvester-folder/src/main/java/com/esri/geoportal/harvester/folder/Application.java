@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.folder;
 
 import com.esri.geoportal.harvester.api.BrokerDefinition;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.support.DataReferenceSerializer;
+import com.esri.geoportal.harvester.api.base.DataReferenceSerializer;
 import java.io.File;
 import java.net.URL;
 

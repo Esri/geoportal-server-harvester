@@ -17,7 +17,8 @@ package com.esri.geoportal.harvester.waf;
 
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
-import com.esri.geoportal.harvester.api.support.SimpleDataReference;
+import com.esri.geoportal.harvester.api.base.SimpleDataReference;
+import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;

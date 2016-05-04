@@ -18,11 +18,13 @@ package com.esri.geoportal.harvester.waf;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.harvester.api.BrokerDefinition;
-import com.esri.geoportal.harvester.api.support.DataCollector;
-import com.esri.geoportal.harvester.api.support.DataPrintStreamOutput;
+import com.esri.geoportal.harvester.api.base.DataCollector;
+import com.esri.geoportal.harvester.api.base.DataPrintStreamOutput;
 import java.net.URL;
 import java.util.Arrays;
 import com.esri.geoportal.harvester.api.InputBroker;
+import com.esri.geoportal.harvester.api.base.DataCollector;
+import com.esri.geoportal.harvester.api.base.DataPrintStreamOutput;
 
 /**
  * Application.

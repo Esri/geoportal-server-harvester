@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.folder;
 
 import com.esri.geoportal.harvester.api.BrokerDefinition;
-import com.esri.geoportal.harvester.api.support.BrokerDefinitionAdaptor;
+import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;

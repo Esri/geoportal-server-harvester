@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.gpt;
 import com.esri.geoportal.commons.gpt.client.Client;
 import com.esri.geoportal.harvester.api.BrokerDefinition;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.support.DataReferenceSerializer;
+import com.esri.geoportal.harvester.api.base.DataReferenceSerializer;
 import java.net.URL;
 
 /**

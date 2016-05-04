@@ -15,17 +15,19 @@
  */
 package com.esri.geoportal.commons.utils;
 
+import org.apache.http.client.config.RequestConfig;
+
 /**
  * Various constants used by harvester.
  */
-public class Constants extends org.apache.http.client.config.RequestConfig {
+public class Constants {
   public static final int CONNECTION_TIMEOUT = 5000;
   public static final int SOCKET_TIMEOUT = 3000;
   
   /**
    * HTTP Request configuration with timeouts.
    */
-  public static final org.apache.http.client.config.RequestConfig DEFAULT_REQUEST_CONFIG = 
+  public static final RequestConfig DEFAULT_REQUEST_CONFIG = 
           org.apache.http.client.config.RequestConfig.custom()
           .setConnectTimeout(CONNECTION_TIMEOUT)
           .setSocketTimeout(SOCKET_TIMEOUT).build();

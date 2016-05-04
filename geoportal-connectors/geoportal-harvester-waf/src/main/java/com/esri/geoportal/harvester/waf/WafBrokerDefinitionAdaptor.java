@@ -16,7 +16,8 @@
 package com.esri.geoportal.harvester.waf;
 
 import com.esri.geoportal.harvester.api.BrokerDefinition;
-import com.esri.geoportal.harvester.api.support.BotsBrokerDefinitionAdaptor;
+import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
+import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.apache.commons.lang3.StringUtils;

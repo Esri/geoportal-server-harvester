@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.console;
 
 import com.esri.geoportal.harvester.api.BrokerDefinition;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.support.DataReferenceSerializer;
+import com.esri.geoportal.harvester.api.base.DataReferenceSerializer;
 
 /**
  * Application.
