@@ -19,7 +19,6 @@ import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.ObjectFactory;
 import com.esri.geoportal.harvester.api.BrokerDefinition;
-import com.esri.geoportal.harvester.api.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.support.BotsBrokerDefinitionAdaptor;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,15 +27,17 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * CSW definition.
  */
-public class CswBrokerDefinitionAdaptor extends BotsBrokerDefinitionAdaptor  {
+public class CswBrokerDefinitionAdaptor extends BotsBrokerDefinitionAdaptor {
+
   public static final String P_HOST_URL = "csw.host.url";
   public static final String P_PROFILE_ID = "csw.profile.id";
-  
+
   private URL hostUrl;
   private IProfile profile;
 
   /**
    * Creates instance of the adaptor.
+   *
    * @param def broker definition
    */
   public CswBrokerDefinitionAdaptor(BrokerDefinition def) {
@@ -45,47 +46,52 @@ public class CswBrokerDefinitionAdaptor extends BotsBrokerDefinitionAdaptor  {
       def.setType(CswConnector.TYPE);
     } else if (!CswConnector.TYPE.equals(def.getType())) {
       throw new IllegalArgumentException("Broker definition doesn't match");
-    }
-    try {
-      hostUrl = new URL(get(P_HOST_URL));
-    } catch (MalformedURLException ex) {
-      throw new IllegalArgumentException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
-    }
-    ObjectFactory of = new ObjectFactory();
-    IProfiles profiles = of.newProfiles();
-    profile = profiles.getProfileById(this.get(P_PROFILE_ID));
-    if (profile==null) {
-      throw new IllegalArgumentException(String.format("Invalid %s: %s", P_PROFILE_ID,get(P_PROFILE_ID)));
+    } else {
+      try {
+        hostUrl = new URL(get(P_HOST_URL));
+      } catch (MalformedURLException ex) {
+        throw new IllegalArgumentException(String.format("Invalid %s: %s", P_HOST_URL, get(P_HOST_URL)), ex);
+      }
+      ObjectFactory of = new ObjectFactory();
+      IProfiles profiles = of.newProfiles();
+      profile = profiles.getProfileById(this.get(P_PROFILE_ID));
+      if (profile == null) {
+        throw new IllegalArgumentException(String.format("Invalid %s: %s", P_PROFILE_ID, get(P_PROFILE_ID)));
+      }
     }
   }
-  
+
   /**
    * Gets host url.
+   *
    * @return host url
    */
   public URL getHostUrl() {
     return hostUrl;
   }
-  
+
   /**
    * Sets host url.
+   *
    * @param url host url
    */
   public void setHostUrl(URL url) {
     this.hostUrl = url;
     set(P_HOST_URL, url.toExternalForm());
   }
-  
+
   /**
    * Gets profile.
+   *
    * @return profile
    */
   public IProfile getProfile() {
     return profile;
   }
-  
+
   /**
    * Sets profile.
+   *
    * @param profile profile
    */
   public void setProfile(IProfile profile) {

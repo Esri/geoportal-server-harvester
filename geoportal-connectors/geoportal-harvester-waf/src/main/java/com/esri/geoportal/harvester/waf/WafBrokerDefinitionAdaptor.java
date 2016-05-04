@@ -35,11 +35,12 @@ public class WafBrokerDefinitionAdaptor extends BotsBrokerDefinitionAdaptor {
       def.setType(WafConnector.TYPE);
     } else if (!WafConnector.TYPE.equals(def.getType())) {
       throw new IllegalArgumentException("Broker definition doesn't match");
-    }
-    try {
-      hostUrl = new URL(get(P_HOST_URL));
-    } catch (MalformedURLException ex) {
-      throw new IllegalArgumentException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
+    } else {
+      try {
+        hostUrl = new URL(get(P_HOST_URL));
+      } catch (MalformedURLException ex) {
+        throw new IllegalArgumentException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
+      }
     }
   }
   

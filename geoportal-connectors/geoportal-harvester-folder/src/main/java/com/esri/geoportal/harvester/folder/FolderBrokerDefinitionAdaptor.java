@@ -43,16 +43,17 @@ public class FolderBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
       def.setType(FolderConnector.TYPE);
     } else if (!FolderConnector.TYPE.equals(def.getType())) {
       throw new IllegalArgumentException("Broker definition doesn't match");
-    }
-    try {
-      this.hostUrl = new URL(get(P_HOST_URL));
-    } catch (MalformedURLException ex) {
-      throw new IllegalArgumentException(String.format("Invalid %s: %s",P_HOST_URL,get(P_HOST_URL)), ex);
-    }
-    try {
-      this.rootFolder = new File(get(P_ROOT_FOLDER));
-    } catch (NullPointerException ex) {
-      throw new IllegalArgumentException(String.format("Invalid %s: %s",P_ROOT_FOLDER,get(P_ROOT_FOLDER)), ex);
+    } else {
+      try {
+        this.hostUrl = new URL(get(P_HOST_URL));
+      } catch (MalformedURLException ex) {
+        throw new IllegalArgumentException(String.format("Invalid %s: %s",P_HOST_URL,get(P_HOST_URL)), ex);
+      }
+      try {
+        this.rootFolder = new File(get(P_ROOT_FOLDER));
+      } catch (NullPointerException ex) {
+        throw new IllegalArgumentException(String.format("Invalid %s: %s",P_ROOT_FOLDER,get(P_ROOT_FOLDER)), ex);
+      }
     }
   }
 

@@ -16,7 +16,6 @@
 package com.esri.geoportal.harvester.gpt;
 
 import com.esri.geoportal.harvester.api.BrokerDefinition;
-import com.esri.geoportal.harvester.api.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.support.BrokerDefinitionAdaptor;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -36,7 +35,7 @@ public class GptBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
 
   /**
    * Creates instance of the adaptor.
-   * @param def adaptor
+   * @param def broker definition
    */
   public GptBrokerDefinitionAdaptor(BrokerDefinition def) {
     super(def);
@@ -44,14 +43,15 @@ public class GptBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
       def.setType(GptConnector.TYPE);
     } else if (!GptConnector.TYPE.equals(def.getType())) {
       throw new IllegalArgumentException("Broker definition doesn't match");
+    } else {
+      try {
+        hostUrl = new URL(get(P_HOST_URL));
+      } catch (MalformedURLException ex) {
+        throw new IllegalArgumentException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
+      }
+      userName = get(P_USER_NAME);
+      password = get(P_USER_PASSWORD);
     }
-    try {
-      hostUrl = new URL(get(P_HOST_URL));
-    } catch (MalformedURLException ex) {
-      throw new IllegalArgumentException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
-    }
-    userName = get(P_USER_NAME);
-    password = get(P_USER_PASSWORD);
   }
 
   /**
