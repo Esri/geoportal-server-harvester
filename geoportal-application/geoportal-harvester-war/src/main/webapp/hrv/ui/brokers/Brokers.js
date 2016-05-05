@@ -24,9 +24,10 @@ define(["dojo/_base/declare",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/Brokers.html",
-        "hrv/rest/Brokers"
+        "hrv/rest/Brokers",
+        "hrv/ui/brokers/Broker",
       ],
-  function(declare,lang,array,html,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,Brokers){
+  function(declare,lang,array,html,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,Brokers,Broker){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -46,6 +47,16 @@ define(["dojo/_base/declare",
       
       processBrokers: function(response) {
         console.log("Brokers ["+this.category+"]", response);
+        array.forEach(response,lang.hitch(this,this.processBroker));
+      },
+      
+      processBroker: function(broker) {
+        var widget = new Broker(broker).placeAt(this.contentNode);
+        widget.startup();
+      },
+      
+      _onAdd: function(evt) {
+        console.log("TODO: adding broker...");
       }
     });
 });

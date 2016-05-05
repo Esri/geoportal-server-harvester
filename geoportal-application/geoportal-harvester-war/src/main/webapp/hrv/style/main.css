@@ -84,6 +84,35 @@ html,body {
   
 }
 
+.h-broker > span {
+  margin-right: 1em;
+}
+
+.h-broker-type {
+  font-size: medium;
+  font-weight: bold;
+  background-color: lightgray;
+}
+
+.h-broker-label {
+}
+
+.h-broker-edit {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.h-broker-remove {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.h-brokers-add {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+
 .h-status {
   
 }

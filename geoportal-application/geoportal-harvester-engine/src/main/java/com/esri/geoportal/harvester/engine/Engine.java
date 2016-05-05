@@ -31,6 +31,7 @@ import com.esri.geoportal.harvester.api.OutputBroker;
 import com.esri.geoportal.harvester.api.OutputConnector;
 import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.INBOUND;
 import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.OUTBOUND;
+import java.util.Arrays;
 import java.util.Set;
 
 /**

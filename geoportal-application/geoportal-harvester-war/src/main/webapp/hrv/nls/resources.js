@@ -43,7 +43,10 @@ define({
     
     brokers: {
       input: "Input brokers",
-      output: "Output brokers"
+      output: "Output brokers",
+      edit: "edit",
+      remove: "remove",
+      add: "Add"
     }
 
   }
