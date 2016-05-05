@@ -16,27 +16,24 @@
 
 define(["dojo/_base/declare",
         "dojo/_base/lang",
+        "dojo/_base/array",
+        "dojo/html",
+        "dojo/topic",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
-        "dojo/text!./templates/BrokersPane.html",
-        "dojo/topic",
-        "dojo/dom-style",
-        "hrv/ui/brokers/Brokers"
+        "dojo/text!./templates/Brokers.html",
+        "hrv/rest/Brokers"
       ],
-  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic,domStyle){
+  function(declare,lang,array,html,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,Brokers){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
     
       postCreate: function(){
-        topic.subscribe("nav",lang.hitch(this,this._onNav));
-      },
-      
-      _onNav: function(evt) {
-        domStyle.set(this.domNode,"display", evt==="brokers"? "block": "none");
+        html.set(this.captionNode,this.i18n.brokers[this.category]);
       }
     });
 });

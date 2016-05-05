@@ -39,6 +39,11 @@ define({
     connectors: {
       inbound:  "Inbound connectors",
       outbound: "Outbound connectors"
+    },
+    
+    brokers: {
+      input: "Input brokers",
+      output: "Output brokers"
     }
 
   }
