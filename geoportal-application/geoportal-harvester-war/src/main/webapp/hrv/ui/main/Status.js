@@ -18,14 +18,14 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/html",
         "dojo/dom-class",
+        "dojo/topic",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
-        "dojo/text!./templates/Status.html",
-        "dojo/topic"
+        "dojo/text!./templates/Status.html"
       ],
-  function(declare,lang,html,domClass,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic){
+  function(declare,lang,html,domClass,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,

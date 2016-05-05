@@ -18,6 +18,7 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/html",
+        "dojo/topic",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
@@ -26,7 +27,7 @@ define(["dojo/_base/declare",
         "hrv/rest/Connectors",
         "hrv/ui/connectors/Connector"
       ],
-  function(declare,lang,array,html,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,Connectors,Connector){
+  function(declare,lang,array,html,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,Connectors,Connector){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -35,7 +36,13 @@ define(["dojo/_base/declare",
       postCreate: function(){
         html.set(this.captionNode,this.i18n.connectors[this.category]);
         var rest = new Connectors();
-        rest[this.category]().then(lang.hitch(this,this.processConnectors));
+        rest[this.category]().then(
+          lang.hitch(this,this.processConnectors),
+          lang.hitch(this,function(error){
+            console.error(error);
+            topic.publish("msg",new Error("Unable to access connectors information"));
+          })
+        );
       },
       
       processConnectors: function(response) {
