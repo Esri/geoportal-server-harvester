@@ -25,7 +25,7 @@ define(["dojo/_base/declare",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/Brokers.html",
         "hrv/rest/Brokers",
-        "hrv/ui/brokers/Broker",
+        "hrv/ui/brokers/Broker"
       ],
   function(declare,lang,array,html,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,Brokers,Broker){
   

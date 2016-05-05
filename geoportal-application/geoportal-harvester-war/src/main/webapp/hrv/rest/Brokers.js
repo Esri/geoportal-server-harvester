@@ -29,6 +29,10 @@ define(["dojo/_base/declare",
       
       input: function() {
         return xhr("rest/harvester/brokers/input",{handleAs: "json"});
+      },
+      
+      delete: function(id) {
+        return xhr.del("rest/harvester/brokers/"+id,{handleAs: "json"});
       }
     });
 });

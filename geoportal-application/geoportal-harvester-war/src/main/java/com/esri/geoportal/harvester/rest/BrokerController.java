@@ -17,8 +17,10 @@ package com.esri.geoportal.harvester.rest;
 
 import com.esri.geoportal.harvester.engine.BrokerInfo;
 import com.esri.geoportal.harvester.beans.EngineBean;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,8 +35,8 @@ public class BrokerController {
   private EngineBean engine;
   
   /**
-   * Lists all inbound connectors. A connector might be: WAF, CSW, etc.
-   * @return array of connector templates
+   * Lists all input brokers.
+   * @return array of broker infos
    */
   @RequestMapping(value = "/rest/harvester/brokers/input", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public BrokerInfo[] listInboundBrokers() {
@@ -42,12 +44,26 @@ public class BrokerController {
   }
   
   /**
-   * Lists all outbound connectors. A connector might be: GPT, FOLDER, etc.
-   * @return array of connector templates
+   * Lists all output brokers.
+   * @return array of brokers infos
    */
   @RequestMapping(value = "/rest/harvester/brokers/output", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public BrokerInfo[] listOutboundBrokers() {
     return engine.getOutboundBrokersDefinitions().toArray(new BrokerInfo[0]);
+  }
+  
+  /**
+   * Deletes a broker.
+   * @param brokerId broker id
+   * @return broker definition
+   */
+  @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+  public BrokerInfo deleteBroker(@PathVariable UUID brokerId) {
+    BrokerInfo brokerInfo = engine.findBroker(brokerId);
+    if (brokerInfo!=null) {
+      engine.deleteBroker(brokerId);
+    }
+    return brokerInfo;
   }
 
 }

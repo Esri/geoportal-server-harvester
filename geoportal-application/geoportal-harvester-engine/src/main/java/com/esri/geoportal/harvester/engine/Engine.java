@@ -31,7 +31,6 @@ import com.esri.geoportal.harvester.api.OutputBroker;
 import com.esri.geoportal.harvester.api.OutputConnector;
 import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.INBOUND;
 import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.OUTBOUND;
-import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -102,6 +101,34 @@ public class Engine {
             .filter(e->outboundTypes.contains(e.getValue().getType()))
             .map(e->new BrokerInfo(e.getKey(),OUTBOUND,e.getValue()))
             .collect(Collectors.toList());
+  }
+  
+  /**
+   * Finds broker by id.
+   * @param brokerId broker id
+   * @return brokrt or <code>null</code> if no broker corresponding to the broker id can be found
+   */
+  public BrokerInfo findBroker(UUID brokerId) {
+    Set<String> inboundTypes = dpReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
+    Set<String> outboundTypes = dpReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
+    
+    BrokerDefinition brokerDefinition = brokerDefinitionManager.read(brokerId);
+    if (brokerDefinition!=null) {
+      return inboundTypes.contains(brokerDefinition.getType())? new BrokerInfo(brokerId, INBOUND, brokerDefinition)
+              :outboundTypes.contains(brokerDefinition.getType())? new BrokerInfo(brokerId, OUTBOUND, brokerDefinition)
+              :null;
+    }
+    
+    return null;
+  }
+  
+  /**
+   * Deletes broker.
+   * @param brokerId broker id
+   * @return <code>true</code> if broker has been deleted
+   */
+  public boolean deleteBroker(UUID brokerId) {
+    return brokerDefinitionManager.delete(brokerId);
   }
 
   /**
