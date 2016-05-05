@@ -29,6 +29,7 @@ import com.esri.geoportal.harvester.api.InputConnector;
 import com.esri.geoportal.harvester.api.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.OutputBroker;
 import com.esri.geoportal.harvester.api.OutputConnector;
+import com.esri.geoportal.harvester.engine.BrokerInfo.Category;
 import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.INBOUND;
 import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.OUTBOUND;
 import java.util.Set;
@@ -103,22 +104,39 @@ public class Engine {
             .collect(Collectors.toList());
   }
   
+  private Category getBrokerCategoryByType(String brokerType) {
+    Set<String> inboundTypes = dpReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
+    Set<String> outboundTypes = dpReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
+    return inboundTypes.contains(brokerType)? INBOUND: outboundTypes.contains(brokerType)? OUTBOUND: null;
+  }
+  
   /**
    * Finds broker by id.
    * @param brokerId broker id
    * @return brokrt or <code>null</code> if no broker corresponding to the broker id can be found
    */
   public BrokerInfo findBroker(UUID brokerId) {
-    Set<String> inboundTypes = dpReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
-    Set<String> outboundTypes = dpReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
-    
     BrokerDefinition brokerDefinition = brokerDefinitionManager.read(brokerId);
     if (brokerDefinition!=null) {
-      return inboundTypes.contains(brokerDefinition.getType())? new BrokerInfo(brokerId, INBOUND, brokerDefinition)
-              :outboundTypes.contains(brokerDefinition.getType())? new BrokerInfo(brokerId, OUTBOUND, brokerDefinition)
-              :null;
+      Category category = getBrokerCategoryByType(brokerDefinition.getType());
+      if (category!=null) {
+        return new BrokerInfo(brokerId, category, brokerDefinition);
+      }
     }
-    
+    return null;
+  }
+  
+  /**
+   * Creates a broker.
+   * @param brokerDefinition broker definition
+   * @return broker info or <code>null</code> if broker has not been created
+   */
+  public BrokerInfo createBroker(BrokerDefinition brokerDefinition) {
+    Category category = getBrokerCategoryByType(brokerDefinition.getType());
+    if (category!=null) {
+      UUID id = brokerDefinitionManager.create(brokerDefinition);
+      return new BrokerInfo(id, category, brokerDefinition);
+    }
     return null;
   }
   

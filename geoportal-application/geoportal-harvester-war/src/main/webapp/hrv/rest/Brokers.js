@@ -33,6 +33,10 @@ define(["dojo/_base/declare",
       
       delete: function(id) {
         return xhr.del("rest/harvester/brokers/"+id,{handleAs: "json"});
+      },
+      
+      create: function(brokerDefinition) {
+        return xhr.put("rest/harvester/brokers/"+id,{data: brokerDefinition, handleAs: "json"});
       }
     });
 });

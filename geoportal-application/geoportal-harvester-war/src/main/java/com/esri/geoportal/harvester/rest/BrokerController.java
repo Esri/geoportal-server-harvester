@@ -15,12 +15,14 @@
  */
 package com.esri.geoportal.harvester.rest;
 
+import com.esri.geoportal.harvester.api.BrokerDefinition;
 import com.esri.geoportal.harvester.engine.BrokerInfo;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -66,4 +68,15 @@ public class BrokerController {
     return brokerInfo;
   }
 
+  
+  /**
+   * Adds a new task.
+   * @param brokerDefinition
+   * @return task info of the newly created task
+   */
+  @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  public BrokerInfo createBroker(@RequestBody BrokerDefinition brokerDefinition) {
+    return engine.createBroker(brokerDefinition);
+  }
+  
 }
