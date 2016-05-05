@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.api;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Broker definition.
@@ -35,6 +36,7 @@ import java.util.Map;
  */
 public final class BrokerDefinition {
   private String type;
+  private String label;
   private Map<String,String> properties = new LinkedHashMap<>();
 
   /**
@@ -54,6 +56,22 @@ public final class BrokerDefinition {
   }
 
   /**
+   * Gets label.
+   * @return label
+   */
+  public String getLabel() {
+    return label;
+  }
+
+  /**
+   * Sets label.
+   * @param label label
+   */
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
+  /**
    * Gets broker properties.
    * @return broker properties
    */
@@ -67,5 +85,12 @@ public final class BrokerDefinition {
    */
   public void setProperties(Map<String, String> properties) {
     this.properties = properties!=null? properties: new LinkedHashMap<>();
+  }
+  
+  @Override
+  public String toString() {
+    return String.format("%s/%s/[%s]", type, label, properties.entrySet().stream()
+            .map(e->String.format("%s=%s", e.getKey(), e.getValue()))
+            .collect(Collectors.joining(", ")));
   }
 }

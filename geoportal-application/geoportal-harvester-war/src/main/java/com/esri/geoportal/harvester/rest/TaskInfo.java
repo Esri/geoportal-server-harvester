@@ -53,6 +53,6 @@ public class TaskInfo {
   
   @Override
   public String toString() {
-    return String.format("TASK INFO :: id: %s, taskDefinition: %s", id, taskDefinition);
+    return String.format("id: %s, taskDefinition: %s", id, taskDefinition);
   }
 }

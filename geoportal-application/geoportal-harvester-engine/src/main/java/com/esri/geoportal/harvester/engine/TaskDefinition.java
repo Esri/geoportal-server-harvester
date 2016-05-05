@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.engine;
 
 import com.esri.geoportal.harvester.api.BrokerDefinition;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Task definition.
@@ -55,5 +56,12 @@ public final class TaskDefinition {
    */
   public void setDestinations(List<BrokerDefinition> destinations) {
     this.destinations = destinations;
+  }
+  
+  @Override
+  public String toString() {
+    return String.format("SOURCE: %s, DESTINATIONS: [%s]", source, destinations!=null? destinations.stream()
+            .map(Object::toString)
+            .collect(Collectors.joining(", ")): null);
   }
 }
