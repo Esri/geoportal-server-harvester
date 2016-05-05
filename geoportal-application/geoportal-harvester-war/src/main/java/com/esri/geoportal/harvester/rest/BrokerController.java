@@ -41,7 +41,7 @@ public class BrokerController {
    * @return array of broker infos
    */
   @RequestMapping(value = "/rest/harvester/brokers/input", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public BrokerInfo[] listInboundBrokers() {
+  public BrokerInfo[] listInputBrokers() {
     return engine.getInboundBrokersDefinitions().toArray(new BrokerInfo[0]);
   }
   
@@ -50,14 +50,24 @@ public class BrokerController {
    * @return array of brokers infos
    */
   @RequestMapping(value = "/rest/harvester/brokers/output", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public BrokerInfo[] listOutboundBrokers() {
+  public BrokerInfo[] listOutputBrokers() {
     return engine.getOutboundBrokersDefinitions().toArray(new BrokerInfo[0]);
+  }
+  
+  /**
+   * Get a single broker.
+   * @param brokerId broker id
+   * @return broker info or <code>null</code> if no broker found
+   */
+  @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  public BrokerInfo getBroker(@PathVariable UUID brokerId) {
+    return engine.findBroker(brokerId);
   }
   
   /**
    * Deletes a broker.
    * @param brokerId broker id
-   * @return broker definition
+   * @return broker info
    */
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public BrokerInfo deleteBroker(@PathVariable UUID brokerId) {
@@ -67,16 +77,25 @@ public class BrokerController {
     }
     return brokerInfo;
   }
-
   
   /**
    * Adds a new task.
    * @param brokerDefinition
-   * @return task info of the newly created task
+   * @return broker info of the newly created broker
    */
   @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   public BrokerInfo createBroker(@RequestBody BrokerDefinition brokerDefinition) {
     return engine.createBroker(brokerDefinition);
+  }
+  
+  /**
+   * Adds a new task.
+   * @param brokerDefinition
+   * @return broker info of the task which has been replaced
+   */
+  @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  public BrokerInfo updateBroker(@RequestBody BrokerDefinition brokerDefinition, @PathVariable UUID brokerId) {
+    return engine.updateBroker(brokerId, brokerDefinition);
   }
   
 }

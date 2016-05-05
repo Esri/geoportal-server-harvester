@@ -141,6 +141,22 @@ public class Engine {
   }
   
   /**
+   * Creates a broker.
+   * @param brokerDefinition broker definition
+   * @return broker info or <code>null</code> if broker has not been created
+   */
+  public BrokerInfo updateBroker(UUID brokerId, BrokerDefinition brokerDefinition) {
+    BrokerDefinition oldBrokerDef = brokerDefinitionManager.read(brokerId);
+    if (oldBrokerDef!=null) {
+      if (!brokerDefinitionManager.update(brokerId, brokerDefinition)) {
+        oldBrokerDef = null;
+      }
+    }
+    Category category = oldBrokerDef!=null? getBrokerCategoryByType(oldBrokerDef.getType()): null;
+    return category!=null? new BrokerInfo(brokerId, category, brokerDefinition): null;
+  }
+  
+  /**
    * Deletes broker.
    * @param brokerId broker id
    * @return <code>true</code> if broker has been deleted
