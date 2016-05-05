@@ -16,6 +16,8 @@
 
 define(["dojo/_base/declare",
         "dojo/_base/lang",
+        "dojo/html",
+        "dojo/dom-class",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
@@ -23,14 +25,28 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/Status.html",
         "dojo/topic"
       ],
-  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic){
+  function(declare,lang,html,domClass,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
     
       postCreate: function(){
-        
+        topic.subscribe("msg",lang.hitch(this,this._onMsg));
+      },
+      
+      _onMsg: function(msg) {
+        domClass.remove(this.messageNode,"h-status-message-info");
+        domClass.remove(this.messageNode,"h-status-message-error");
+        if (!msg) {
+          html.set(this.messageNode,null);
+        } else if (msg instanceof Error) {
+          domClass.add(this.messageNode,"h-status-message-error");
+          html.set(this.messageNode,msg.message);
+        } else {
+          domClass.add(this.messageNode,"h-status-message-info");
+          html.set(this.messageNode,msg);
+        }
       }
     });
 });

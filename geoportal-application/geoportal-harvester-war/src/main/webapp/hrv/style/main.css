@@ -77,3 +77,11 @@ html,body {
 .h-status-message {
   
 }
+
+.h-status-message-info {
+  color: black;
+}
+
+.h-status-message-error {
+  color: red;
+}
