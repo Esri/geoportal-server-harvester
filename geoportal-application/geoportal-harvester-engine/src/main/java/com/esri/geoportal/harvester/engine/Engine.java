@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Esri, Inc..
+ * Copyright 2016 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,9 @@ import com.esri.geoportal.harvester.api.InputConnector;
 import com.esri.geoportal.harvester.api.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.OutputBroker;
 import com.esri.geoportal.harvester.api.OutputConnector;
+import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.INBOUND;
+import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.OUTBOUND;
+import java.util.Set;
 
 /**
  * Harvesting engine.
@@ -73,6 +76,31 @@ public class Engine {
    */
   public Collection<ConnectorTemplate> getOutboundConnectorTemplates() {
     return dpReg.getTemplates();
+  }
+
+  /**
+   * Gets inbound brokers definitions.
+   * @return collection of inbound brokers definitions
+   */
+  public Collection<BrokerInfo> getInboundBrokersDefinitions() {
+    Set<String> inboundTypes = dpReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
+    brokerDefinitionManager.select().stream().filter(e->inboundTypes.contains(e.getValue().getType()));
+    return brokerDefinitionManager.select().stream()
+            .filter(e->inboundTypes.contains(e.getValue().getType()))
+            .map(e->new BrokerInfo(e.getKey(),INBOUND,e.getValue()))
+            .collect(Collectors.toList());
+  }
+
+  /**
+   * Gets outbound brokers definitions.
+   * @return collection of outbound brokers definitions
+   */
+  public Collection<BrokerInfo> getOutboundBrokersDefinitions() {
+    Set<String> outboundTypes = dpReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
+    return brokerDefinitionManager.select().stream()
+            .filter(e->outboundTypes.contains(e.getValue().getType()))
+            .map(e->new BrokerInfo(e.getKey(),OUTBOUND,e.getValue()))
+            .collect(Collectors.toList());
   }
 
   /**

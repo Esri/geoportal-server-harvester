@@ -144,7 +144,7 @@ public class ConnectorController {
    * @return array of connector templates
    */
   @RequestMapping(value = "/rest/harvester/connectors/inbound", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ConnectorTemplate[] listSourceTypes() {
+  public ConnectorTemplate[] listInboundConnectors() {
     return engine.getInboundConnectorTemplates().toArray(new ConnectorTemplate[0]);
   }
   
@@ -153,7 +153,7 @@ public class ConnectorController {
    * @return array of connector templates
    */
   @RequestMapping(value = "/rest/harvester/connectors/outbound", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ConnectorTemplate[] listDestinationTypes() {
+  public ConnectorTemplate[] listOutboundConnectors() {
     return engine.getOutboundConnectorTemplates().toArray(new ConnectorTemplate[0]);
   }
   
@@ -163,7 +163,7 @@ public class ConnectorController {
    * @return connector template
    */
   @RequestMapping(value = "/rest/harvester/connectors/inbound/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ConnectorTemplate getSource(@PathVariable String name) {
+  public ConnectorTemplate getInboundConnector(@PathVariable String name) {
     return engine.getInboundConnectorTemplates().stream().filter(a->a.getType().equals(name)).findFirst().orElse(null);
   }
   
@@ -173,7 +173,7 @@ public class ConnectorController {
    * @return connector template
    */
   @RequestMapping(value = "/rest/harvester/connectors/outbound/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ConnectorTemplate getDestination(@PathVariable String name) {
+  public ConnectorTemplate getOutboundConnector(@PathVariable String name) {
     return engine.getOutboundConnectorTemplates().stream().filter(a->a.getType().equals(name)).findFirst().orElse(null);
   }
 }
