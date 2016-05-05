@@ -75,7 +75,9 @@ html,body {
 }
 
 .h-brokers-caption {
-  
+  font-size: medium;
+  font-weight: bold;
+  background-color: lightgray;
 }
 
 .h-broker {

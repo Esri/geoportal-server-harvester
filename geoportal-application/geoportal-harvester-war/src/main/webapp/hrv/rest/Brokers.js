@@ -23,12 +23,12 @@ define(["dojo/_base/declare",
   function(declare,lang,xhr,Deferred,json){
   
     return declare([],{
-      outbound: function() {
-        return xhr("rest/harvester/brokers/outbound",{handleAs: "json"});
+      output: function() {
+        return xhr("rest/harvester/brokers/output",{handleAs: "json"});
       },
       
-      inbound: function() {
-        return xhr("rest/harvester/brokers/inbound",{handleAs: "json"});
+      input: function() {
+        return xhr("rest/harvester/brokers/input",{handleAs: "json"});
       }
     });
 });

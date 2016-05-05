@@ -16,7 +16,6 @@
 package com.esri.geoportal.harvester.rest;
 
 import com.esri.geoportal.harvester.engine.BrokerInfo;
-import com.esri.geoportal.harvester.api.BrokerDefinition;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -37,7 +36,7 @@ public class BrokerController {
    * Lists all inbound connectors. A connector might be: WAF, CSW, etc.
    * @return array of connector templates
    */
-  @RequestMapping(value = "/rest/harvester/brokers/inbound", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(value = "/rest/harvester/brokers/input", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public BrokerInfo[] listInboundBrokers() {
     return engine.getInboundBrokersDefinitions().toArray(new BrokerInfo[0]);
   }
@@ -46,7 +45,7 @@ public class BrokerController {
    * Lists all outbound connectors. A connector might be: GPT, FOLDER, etc.
    * @return array of connector templates
    */
-  @RequestMapping(value = "/rest/harvester/brokers/outbound", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(value = "/rest/harvester/brokers/output", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public BrokerInfo[] listOutboundBrokers() {
     return engine.getOutboundBrokersDefinitions().toArray(new BrokerInfo[0]);
   }

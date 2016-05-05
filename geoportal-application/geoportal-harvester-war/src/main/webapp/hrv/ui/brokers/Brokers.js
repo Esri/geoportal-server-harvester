@@ -34,6 +34,18 @@ define(["dojo/_base/declare",
     
       postCreate: function(){
         html.set(this.captionNode,this.i18n.brokers[this.category]);
+        var rest = new Brokers();
+        rest[this.category]().then(
+          lang.hitch(this,this.processBrokers),
+          lang.hitch(this,function(error){
+            console.error(error);
+            topic.publish("msg",new Error("Unable to access brokers information"));
+          })
+        );
+      },
+      
+      processBrokers: function(response) {
+        console.log("Brokers ["+this.category+"]", response);
       }
     });
 });

@@ -46,7 +46,7 @@ define(["dojo/_base/declare",
       },
       
       processConnectors: function(response) {
-        console.log(response);
+        console.log("Connectors ["+this.category+"]",response);
         array.forEach(response,lang.hitch(this,this.processConnector));
       },
       
