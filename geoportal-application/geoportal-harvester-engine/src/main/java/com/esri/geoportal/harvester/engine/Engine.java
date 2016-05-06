@@ -84,7 +84,7 @@ public class Engine {
    * @return collection of inbound brokers definitions
    */
   public Collection<BrokerInfo> getInboundBrokersDefinitions() {
-    Set<String> inboundTypes = dpReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
+    Set<String> inboundTypes = dsReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
     brokerDefinitionManager.select().stream().filter(e->inboundTypes.contains(e.getValue().getType()));
     return brokerDefinitionManager.select().stream()
             .filter(e->inboundTypes.contains(e.getValue().getType()))
@@ -105,7 +105,7 @@ public class Engine {
   }
   
   private Category getBrokerCategoryByType(String brokerType) {
-    Set<String> inboundTypes = dpReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
+    Set<String> inboundTypes = dsReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
     Set<String> outboundTypes = dpReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
     return inboundTypes.contains(brokerType)? INBOUND: outboundTypes.contains(brokerType)? OUTBOUND: null;
   }

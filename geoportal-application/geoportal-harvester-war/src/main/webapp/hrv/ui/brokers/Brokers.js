@@ -19,6 +19,8 @@ define(["dojo/_base/declare",
         "dojo/_base/array",
         "dojo/on",
         "dojo/html",
+        "dojo/dom-construct",
+        "dojo/json",
         "dojo/topic",
         "dijit/Dialog",
         "dijit/_WidgetBase",
@@ -30,7 +32,7 @@ define(["dojo/_base/declare",
         "hrv/ui/brokers/Broker",
         "hrv/ui/brokers/BrokerEditorPane"
       ],
-  function(declare,lang,array,on,html,topic,Dialog,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,Brokers,Broker,BrokerEditorPane){
+  function(declare,lang,array,on,html,domConstruct,json,topic,Dialog,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,BrokersApi,Broker,BrokerEditorPane){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -38,7 +40,12 @@ define(["dojo/_base/declare",
     
       postCreate: function(){
         html.set(this.captionNode,this.i18n.brokers[this.category]);
-        var rest = new Brokers();
+        this.load();
+      },
+      
+      load: function() {
+        domConstruct.empty(this.contentNode);
+        var rest = new BrokersApi();
         rest[this.category]().then(
           lang.hitch(this,this.processBrokers),
           lang.hitch(this,function(error){
@@ -55,6 +62,19 @@ define(["dojo/_base/declare",
       
       processBroker: function(broker) {
         var widget = new Broker(broker).placeAt(this.contentNode);
+        on(widget,"remove",lang.hitch(this,function(evt){
+          var uuid = evt.uuid;
+          var brokersApi = new BrokersApi();
+          brokersApi.delete(uuid).then(
+            lang.hitch(this,function(){
+              this.load();
+            }),
+            lang.hitch(this,function(error){
+              console.error(error);
+              topic.publish("msg",new Error("Error removing broker"));
+            })
+          );
+        }));
         widget.startup();
       },
       
@@ -71,11 +91,23 @@ define(["dojo/_base/declare",
             brokerEditorPane.destroy();
           }
         });
-        on(brokerEditorPane,"submit",function(values){
-          var formData = values.formData;
-          brokerEditorDialog.destroy();
-          brokerEditorPane.destroy();
-        });
+        
+        on(brokerEditorPane,"submit",lang.hitch(this, function(evt){
+          var brokerDefinition = evt.brokerDefinition;
+          var brokersApi = new BrokersApi();
+          brokersApi.create(json.stringify(brokerDefinition)).then(
+            lang.hitch({brokerEditorPane: brokerEditorPane, brokerEditorDialog: brokerEditorDialog, self: this},function(){
+              this.brokerEditorDialog.destroy();
+              this.brokerEditorPane.destroy();
+              this.self.load();
+            }),
+            lang.hitch(this,function(error){
+              console.error(error);
+              topic.publish("msg",new Error("Error creating broker"));
+            })
+          );
+        }));
+        
         brokerEditorDialog.show();
       }
     });

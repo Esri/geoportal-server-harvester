@@ -21,10 +21,9 @@ define(["dojo/_base/declare",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
-        "dojo/text!./templates/Broker.html",
-        "hrv/rest/Brokers"
+        "dojo/text!./templates/Broker.html"
       ],
-  function(declare,lang,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,Brokers){
+  function(declare,lang,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -43,16 +42,7 @@ define(["dojo/_base/declare",
       
       _onRemove: function() {
         console.log("TODO: removing broker...");
-        var rest = new Brokers();
-        rest.delete(this.data.id).then(
-          lang.hitch(this,function(response){
-            this.destroy();
-          }),
-          lang.hitch(this,function(error){
-            console.error(error);
-            topic.publish("msg",new Error("Unable to access brokers information"));
-          })
-        );
+        this.emit("remove",{uuid: this.data.uuid});
       }
     });
 });

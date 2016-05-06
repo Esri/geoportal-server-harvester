@@ -22,25 +22,25 @@ import java.util.UUID;
  * Task info.
  */
 public class TaskInfo {
-  private final UUID id;
+  private final UUID uuid;
   private final TaskDefinition taskDefinition;
 
   /**
    * Creates instance of the task info.
-   * @param id  id of the task info
+   * @param uuid  uuid of the task info
    * @param taskDefinition task definition
    */
-  public TaskInfo(UUID id, TaskDefinition taskDefinition) {
-    this.id = id;
+  public TaskInfo(UUID uuid, TaskDefinition taskDefinition) {
+    this.uuid = uuid;
     this.taskDefinition = taskDefinition;
   }
 
   /**
-   * Gets id of the task info.
-   * @return id
+   * Gets uuid of the task info.
+   * @return uuid
    */
-  public UUID getId() {
-    return id;
+  public UUID getUuid() {
+    return uuid;
   }
 
   /**
@@ -53,6 +53,6 @@ public class TaskInfo {
   
   @Override
   public String toString() {
-    return String.format("id: %s, taskDefinition: %s", id, taskDefinition);
+    return String.format("id: %s, taskDefinition: %s", uuid, taskDefinition);
   }
 }

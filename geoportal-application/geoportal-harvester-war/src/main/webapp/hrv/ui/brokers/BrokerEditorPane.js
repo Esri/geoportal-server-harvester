@@ -27,12 +27,11 @@ define(["dojo/_base/declare",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/BrokerEditorPane.html",
         "hrv/rest/Connectors",
-        "hrv/rest/Brokers",
         "dijit/form/Select",
         "dijit/form/ValidationTextBox",
         "dijit/form/Form"
       ],
-  function(declare,lang,array,domConstruct,query,html,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,ConnectorsApi,BrokersApi,Select,ValidationTextBox){
+  function(declare,lang,array,domConstruct,query,html,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,ConnectorsApi,Select,ValidationTextBox){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -115,7 +114,14 @@ define(["dojo/_base/declare",
       _onSubmit: function() {
         var values = this.formWidget.getValues();
         if (this.formWidget.validate()) {
-          this.emit("submit",{formData: values});
+          var brokerDefinition = {
+            type: values.type,
+            label: values.label,
+            properties: values
+          };
+          delete brokerDefinition.properties.type;
+          delete brokerDefinition.properties.label;
+          this.emit("submit",{brokerDefinition: brokerDefinition});
         }
       }
     });

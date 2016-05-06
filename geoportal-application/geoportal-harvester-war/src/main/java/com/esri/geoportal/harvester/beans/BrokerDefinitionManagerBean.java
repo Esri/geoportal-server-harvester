@@ -67,7 +67,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
     UUID id = UUID.randomUUID();
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("INSERT INTO BROKERS (taskDefinition,id) VALUES (?,?)");
+            PreparedStatement st = connection.prepareStatement("INSERT INTO BROKERS (brokerDefinition,id) VALUES (?,?)");
         ) {
       st.setString(1, serializeBrokerDef(brokerDef));
       st.setString(2, id.toString());
@@ -82,7 +82,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
   public boolean update(UUID id, BrokerDefinition brokerDef) {
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("UPDATE BROKERS SET taskDefinition = ? WHERE ID = ?");
+            PreparedStatement st = connection.prepareStatement("UPDATE BROKERS SET brokerDefinition = ? WHERE ID = ?");
         ) {
       st.setString(1, serializeBrokerDef(brokerDef));
       st.setString(2, id.toString());
@@ -119,7 +119,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
   public boolean delete(UUID id) {
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("DELETE * FROM BROKERS WHERE ID = ?");
+            PreparedStatement st = connection.prepareStatement("DELETE FROM BROKERS WHERE ID = ?");
         ) {
       st.setString(1, id.toString());
       return st.executeUpdate()>0;

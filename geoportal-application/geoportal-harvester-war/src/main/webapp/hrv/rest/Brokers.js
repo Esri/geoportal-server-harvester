@@ -17,10 +17,9 @@
 define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/request/xhr",
-        "dojo/Deferred",
-        "dojo/json"
+        "dojo/Deferred"
       ],
-  function(declare,lang,xhr,Deferred,json){
+  function(declare,lang,xhr,Deferred){
   
     return declare([],{
       output: function() {
@@ -36,11 +35,11 @@ define(["dojo/_base/declare",
       },
       
       create: function(brokerDefinition) {
-        return xhr.put("rest/harvester/brokers",{data: brokerDefinition, handleAs: "json"});
+        return xhr.put("rest/harvester/brokers",{data: brokerDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
       },
       
       update: function(id, brokerDefinition) {
-        return xhr.post("rest/harvester/brokers/"+id,{data: brokerDefinition, handleAs: "json"});
+        return xhr.post("rest/harvester/brokers/"+id,{data: brokerDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
       }
     });
 });

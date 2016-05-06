@@ -22,28 +22,28 @@ import java.util.UUID;
  * Brokers information.
  */
 public class BrokerInfo {
-  private final UUID id;
+  private final UUID uuid;
   private final Category category;
   private final BrokerDefinition brokerDefinition;
 
   /**
    * Creates instance of the broker info.
-   * @param id broker id.
+   * @param uuid broker uuid.
    * @param category broker category
    * @param brokerDefinition broker definition
    */
-  public BrokerInfo(UUID id, Category category, BrokerDefinition brokerDefinition) {
-    this.id = id;
+  public BrokerInfo(UUID uuid, Category category, BrokerDefinition brokerDefinition) {
+    this.uuid = uuid;
     this.category = category;
     this.brokerDefinition = brokerDefinition;
   }
 
   /**
-   * Gets broker id.
-   * @return broker id
+   * Gets broker uuid.
+   * @return broker uuid
    */
-  public UUID getId() {
-    return id;
+  public UUID getUuid() {
+    return uuid;
   }
 
   /**
