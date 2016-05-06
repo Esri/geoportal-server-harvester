@@ -26,7 +26,7 @@ import org.apache.commons.lang3.StringUtils;
  * WAF broker definition adaptor.
  */
 public class WafBrokerDefinitionAdaptor extends BotsBrokerDefinitionAdaptor {
-  public static final String P_HOST_URL    = "waf.host.url";
+  public static final String P_HOST_URL    = "waf-host-url";
   
   private URL hostUrl;
 

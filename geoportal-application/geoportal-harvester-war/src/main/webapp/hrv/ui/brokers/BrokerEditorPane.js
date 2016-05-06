@@ -97,11 +97,12 @@ define(["dojo/_base/declare",
       },
       
       renderString: function(placeholderNode,arg) {
-        var input = new TextBox().placeAt(placeholderNode);
+        var input = new TextBox({name: arg.name}).placeAt(placeholderNode);
+        input.name = arg.name;
       },
       
       renderChoice: function(placeholderNode,arg) {
-        var select = new Select().placeAt(placeholderNode);
+        var select = new Select({name: arg.name}).placeAt(placeholderNode);
         array.forEach(arg.choices,function(choice){
           select.addOption({label: choice.value, value: choice.name});
         });
@@ -112,7 +113,8 @@ define(["dojo/_base/declare",
       },
       
       _onSubmit: function() {
-        this.emit("submit");
+        var values = this.formWidget.getValues();
+        this.emit("submit",{formData: values});
       }
     });
 });

@@ -27,8 +27,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class FolderBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
 
-  public static final String P_ROOT_FOLDER = "folder.root.folder";
-  public static final String P_HOST_URL = "folder.host.url";
+  public static final String P_ROOT_FOLDER = "folder-root-folder";
+  public static final String P_HOST_URL = "folder-host-url";
   
   private File rootFolder;
   private URL hostUrl;

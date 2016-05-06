@@ -29,8 +29,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class CswBrokerDefinitionAdaptor extends BotsBrokerDefinitionAdaptor {
 
-  public static final String P_HOST_URL = "csw.host.url";
-  public static final String P_PROFILE_ID = "csw.profile.id";
+  public static final String P_HOST_URL = "csw-host-url";
+  public static final String P_PROFILE_ID = "csw-profile-id";
 
   private URL hostUrl;
   private IProfile profile;

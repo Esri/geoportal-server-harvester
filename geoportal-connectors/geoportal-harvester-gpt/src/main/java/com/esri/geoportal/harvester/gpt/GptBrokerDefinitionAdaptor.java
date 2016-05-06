@@ -25,9 +25,9 @@ import org.apache.commons.lang3.StringUtils;
  * GPT broker definition adaptor.
  */
 public class GptBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
-  public static final String P_HOST_URL        = "gpt.host.url";
-  public static final String P_USER_NAME       = "gpt.user.name";
-  public static final String P_USER_PASSWORD   = "gpt.user.password";
+  public static final String P_HOST_URL        = "gpt-host-url";
+  public static final String P_USER_NAME       = "gpt-user-name";
+  public static final String P_USER_PASSWORD   = "gpt-user-password";
   
   private URL hostUrl;
   private String userName;

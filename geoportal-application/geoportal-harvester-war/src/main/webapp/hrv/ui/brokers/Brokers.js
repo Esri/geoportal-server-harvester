@@ -71,7 +71,7 @@ define(["dojo/_base/declare",
             brokerEditorPane.destroy();
           }
         });
-        on(brokerEditorPane,"submit",function(){
+        on(brokerEditorPane,"submit",function(values){
           brokerEditorDialog.destroy();
           brokerEditorPane.destroy();
         });
