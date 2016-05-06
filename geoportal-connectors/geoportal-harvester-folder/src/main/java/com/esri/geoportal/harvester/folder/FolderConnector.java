@@ -38,8 +38,8 @@ public class FolderConnector implements OutputConnector<FolderBroker> {
   @Override
   public ConnectorTemplate getTemplate() {
     List<ConnectorTemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new ConnectorTemplate.StringArgument(P_ROOT_FOLDER, "Root folder"));
-    arguments.add(new ConnectorTemplate.StringArgument(P_HOST_URL, "Source host URL"));
+    arguments.add(new ConnectorTemplate.StringArgument(P_ROOT_FOLDER, "Root folder", true));
+    arguments.add(new ConnectorTemplate.StringArgument(P_HOST_URL, "Source host URL", true));
     return new ConnectorTemplate("FOLDER", "Folder", arguments);
   }
 

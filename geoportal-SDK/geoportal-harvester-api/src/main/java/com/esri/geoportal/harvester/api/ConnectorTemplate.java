@@ -94,6 +94,7 @@ public class ConnectorTemplate {
   public static abstract class ArgumentBase<T> implements Argument<T> {
     private final String name;
     private final String label;
+    private final boolean required;
 
     /**
      * Creates instance of the argument.
@@ -103,6 +104,19 @@ public class ConnectorTemplate {
     public ArgumentBase(String name, String label) {
       this.name = name;
       this.label = label;
+      this.required = false;
+    }
+
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     * @param required <code>true</code> if argument is required
+     */
+    public ArgumentBase(String name, String label, boolean required) {
+      this.name = name;
+      this.label = label;
+      this.required = required;
     }
 
     @Override
@@ -115,9 +129,17 @@ public class ConnectorTemplate {
       return label;
     }
 
+    /**
+     * Checks if is required.
+     * @return <code>true</code> if required
+     */
+    public boolean getRequired() {
+      return required;
+    }
+
     @Override
     public String toString() {
-      return String.format("%s(%s,%s)", getType(), getName(), getLabel());
+      return String.format("%s(%s,%s,%b)", getType(), getName(), getLabel(),getRequired());
     }
   }
   
@@ -132,6 +154,15 @@ public class ConnectorTemplate {
      */
     public StringArgument(String name, String label) {
       super(name, label);
+    }
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     * @param required
+     */
+    public StringArgument(String name, String label, boolean required) {
+      super(name, label, required);
     }
 
     @Override
@@ -151,6 +182,15 @@ public class ConnectorTemplate {
      */
     public IntegerArgument(String name, String label) {
       super(name, label);
+    }
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     * @param required required
+     */
+    public IntegerArgument(String name, String label, boolean required) {
+      super(name, label, required);
     }
 
     @Override
@@ -214,6 +254,18 @@ public class ConnectorTemplate {
      */
     public ChoiceArgument(String name, String label, List<Choice<CT>> choices) {
       super(name, label);
+      this.choices = choices;
+    }
+
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     * @param required required
+     * @param choices choices
+     */
+    public ChoiceArgument(String name, String label, boolean required, List<Choice<CT>> choices) {
+      super(name, label, required);
       this.choices = choices;
     }
 

@@ -29,10 +29,10 @@ define(["dojo/_base/declare",
         "hrv/rest/Connectors",
         "hrv/rest/Brokers",
         "dijit/form/Select",
-        "dijit/form/TextBox",
+        "dijit/form/ValidationTextBox",
         "dijit/form/Form"
       ],
-  function(declare,lang,array,domConstruct,query,html,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,ConnectorsApi,BrokersApi,Select,TextBox){
+  function(declare,lang,array,domConstruct,query,html,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,ConnectorsApi,BrokersApi,Select,ValidationTextBox){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -97,12 +97,12 @@ define(["dojo/_base/declare",
       },
       
       renderString: function(placeholderNode,arg) {
-        var input = new TextBox({name: arg.name}).placeAt(placeholderNode);
+        var input = new ValidationTextBox({name: arg.name, required: arg.required}).placeAt(placeholderNode);
         input.name = arg.name;
       },
       
       renderChoice: function(placeholderNode,arg) {
-        var select = new Select({name: arg.name}).placeAt(placeholderNode);
+        var select = new Select({name: arg.name, required: arg.required}).placeAt(placeholderNode);
         array.forEach(arg.choices,function(choice){
           select.addOption({label: choice.value, value: choice.name});
         });
@@ -114,7 +114,9 @@ define(["dojo/_base/declare",
       
       _onSubmit: function() {
         var values = this.formWidget.getValues();
-        this.emit("submit",{formData: values});
+        if (this.formWidget.validate()) {
+          this.emit("submit",{formData: values});
+        }
       }
     });
 });

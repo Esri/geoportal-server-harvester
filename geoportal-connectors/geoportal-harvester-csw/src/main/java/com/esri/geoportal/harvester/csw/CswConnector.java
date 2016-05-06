@@ -43,7 +43,7 @@ public class CswConnector implements InputConnector<CswBroker> {
   @Override
   public ConnectorTemplate getTemplate() {
     List<ConnectorTemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new ConnectorTemplate.StringArgument(P_HOST_URL, "URL"));
+    arguments.add(new ConnectorTemplate.StringArgument(P_HOST_URL, "URL", true));
     ObjectFactory of = new ObjectFactory();
     IProfiles profiles = of.newProfiles();
     Choice<String>[] choices = profiles.listAll().stream().map(p->new Choice<String>(p.getId(),p.getName())).toArray(Choice[]::new);

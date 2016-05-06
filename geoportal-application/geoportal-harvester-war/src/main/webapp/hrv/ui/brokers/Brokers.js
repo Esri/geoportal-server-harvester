@@ -72,6 +72,7 @@ define(["dojo/_base/declare",
           }
         });
         on(brokerEditorPane,"submit",function(values){
+          var formData = values.formData;
           brokerEditorDialog.destroy();
           brokerEditorPane.destroy();
         });

@@ -37,7 +37,7 @@ public class WafConnector implements InputConnector<WafBroker> {
   @Override
   public ConnectorTemplate getTemplate() {
     List<ConnectorTemplate.Argument> args = new ArrayList<>();
-    args.add(new ConnectorTemplate.StringArgument(P_HOST_URL, "Url"));
+    args.add(new ConnectorTemplate.StringArgument(P_HOST_URL, "Url", true));
     return new ConnectorTemplate("WAF", "Web Accessible Folder", args);
   }
 

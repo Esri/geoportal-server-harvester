@@ -40,7 +40,7 @@ public class GptConnector implements OutputConnector<GptBroker> {
   @Override
   public ConnectorTemplate getTemplate() {
     List<ConnectorTemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new ConnectorTemplate.StringArgument(P_HOST_URL, "URL"));
+    arguments.add(new ConnectorTemplate.StringArgument(P_HOST_URL, "URL", true));
     arguments.add(new ConnectorTemplate.StringArgument(P_USER_NAME, "User name"));
     arguments.add(new ConnectorTemplate.StringArgument(P_USER_PASSWORD, "User password") {
       public boolean isPassword() {
