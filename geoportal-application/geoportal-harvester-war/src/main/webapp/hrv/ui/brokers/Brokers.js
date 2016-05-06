@@ -17,8 +17,10 @@
 define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
+        "dojo/on",
         "dojo/html",
         "dojo/topic",
+        "dijit/Dialog",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
@@ -26,9 +28,9 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/Brokers.html",
         "hrv/rest/Brokers",
         "hrv/ui/brokers/Broker",
-        "hrv/ui/brokers/BrokerEditor"
+        "hrv/ui/brokers/BrokerEditorPane"
       ],
-  function(declare,lang,array,html,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,Brokers,Broker,BrokerEditor){
+  function(declare,lang,array,on,html,topic,Dialog,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,Brokers,Broker,BrokerEditorPane){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -57,8 +59,20 @@ define(["dojo/_base/declare",
       },
       
       _onAdd: function(evt) {
-        var widget = new BrokerEditor({}).placeAt(this.contentNode);
-        widget.startup();
+        var brokerEditorPane = new BrokerEditorPane({
+          category: this.category==="input"? "inbound": this.category==="output"? "outbound": null
+        });
+        var brokerEditorDialog = new Dialog({
+          title: this.i18n.brokers.editor.caption,
+          content: brokerEditorPane,
+          onHide: function() {
+            brokerEditorDialog.destroy();
+          }
+        });
+        on(brokerEditorPane,"submit",function(){
+          brokerEditorDialog.destroy();
+        });
+        brokerEditorDialog.show();
       }
     });
 });

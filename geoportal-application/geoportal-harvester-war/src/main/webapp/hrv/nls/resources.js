@@ -41,7 +41,19 @@ define({
       output: "Output brokers",
       edit: "edit",
       remove: "remove",
-      add: "Add"
+      add: "Add",
+      editor: {
+        caption: "Broker",
+        type: "Type:",
+        title: "Title:",
+        submit: "Submit",
+        errors: {
+          connectorsLoadingErrors: {
+            inbound: "Error loading inbound connectors",
+            outbound: "Error loading outbound connectors"
+          }
+        }
+      }
     },
     
     tasks: {

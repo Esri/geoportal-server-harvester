@@ -23,10 +23,6 @@ define(["dojo/_base/declare",
   function(declare,lang,xhr,Deferred,json){
   
     return declare([],{
-      list: function(category) {
-        return xhr("rest/harvester/brokers"+(category? "/"+category: ""),{handleAs: "json"});
-      },
-      
       output: function() {
         return xhr("rest/harvester/brokers/output",{handleAs: "json"});
       },

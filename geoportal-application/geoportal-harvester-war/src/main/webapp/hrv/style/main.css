@@ -105,3 +105,32 @@ html,body {
 .h-status-message-error {
   color: red;
 }
+
+.h-broker-editor {
+}
+
+.h-broker-editor-form {
+  display: table;
+  border-spacing: 0.5em;
+}
+
+.h-broker-editor-line {
+  display: table-row;
+}
+
+.h-broker-editor-form div > span {
+  display: table-cell;
+}
+
+.h-broker-editor-argname {
+  font-weight: bold;
+}
+
+.h-broker-editor-argctrl {
+  
+}
+
+.h-broker-editor-footer {
+  
+}
+
