@@ -47,29 +47,6 @@ html,body {
   height: 100%;
 }
 
-.h-connectors {
-  margin-bottom: 1em;
-}
-
-.h-connectors-caption {
-  font-size: medium;
-  font-weight: bold;
-  background-color: lightgray;
-}
-
-.h-connector {
-  
-}
-
-.h-connector-name {
-  margin-right: 0.5em;
-  font-weight: bold;
-}
-
-.h-connector-title {
-  
-}
-
 .h-brokers {
   
 }

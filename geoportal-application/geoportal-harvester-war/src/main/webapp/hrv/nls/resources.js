@@ -36,17 +36,20 @@ define({
       processes: "Processes"
     },
     
-    connectors: {
-      inbound:  "Inbound connectors",
-      outbound: "Outbound connectors"
-    },
-    
     brokers: {
       input: "Input brokers",
       output: "Output brokers",
       edit: "edit",
       remove: "remove",
       add: "Add"
+    },
+    
+    tasks: {
+      
+    },
+    
+    processes: {
+      
     }
 
   }

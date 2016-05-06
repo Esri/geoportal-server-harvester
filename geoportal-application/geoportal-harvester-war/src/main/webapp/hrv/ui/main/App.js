@@ -28,7 +28,6 @@ define(["dojo/_base/declare",
         "hrv/ui/main/Nav",
         "hrv/ui/main/Stage",
         "hrv/ui/home/HomePane",
-        "hrv/ui/connectors/ConnectorsPane",
         "hrv/ui/brokers/BrokersPane",
         "hrv/ui/tasks/TasksPane",
         "hrv/ui/processes/ProcessesPane"

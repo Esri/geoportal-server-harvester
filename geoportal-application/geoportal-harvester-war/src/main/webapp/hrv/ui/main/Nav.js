@@ -37,10 +37,6 @@ define(["dojo/_base/declare",
         topic.publish("nav","home");
       },
       
-      _onconnectors: function() {
-        topic.publish("nav","connectors");
-      },
-      
       _onbrokers: function() {
         topic.publish("nav","brokers");
       },
