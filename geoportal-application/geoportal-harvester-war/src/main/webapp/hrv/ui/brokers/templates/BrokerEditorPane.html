@@ -1,17 +1,19 @@
 <div class="h-broker-editor" data-dojo-attach-point="contentNode">
-  <div class="h-broker-editor-form" data-dojo-attach-point="formNode">
-    <div class="h-broker-editor-line">
-      <span class="h-broker-editor-argname">${i18n.brokers.editor.type}</span>
-      <span>
-        <select data-dojo-type="dijit/form/Select" data-dojo-attach-point="typeSelector" data-dojo-attach-event="onChange:_onTypeChanged"></select>
-      </span>
-    </div>
+  <div data-dojo-type="dijit/form/Form" data-dojo-id="brokerForm" encType="multipart/form-data" action="" method="">
+    <div class="h-broker-editor-form" data-dojo-attach-point="formNode">
+      <div class="h-broker-editor-line">
+        <span class="h-broker-editor-argname">${i18n.brokers.editor.type}</span>
+        <span>
+          <select data-dojo-type="dijit/form/Select" data-dojo-attach-point="typeSelector" data-dojo-attach-event="onChange:_onTypeChanged"></select>
+        </span>
+      </div>
 
-    <div class="h-broker-editor-line">
-      <span class="h-broker-editor-argname">${i18n.brokers.editor.title}</span>
-      <span class="h-broker-editor-argctrl">
-        <select data-dojo-type="dijit/form/TextBox"></select>
-      </span>
+      <div class="h-broker-editor-line">
+        <span class="h-broker-editor-argname">${i18n.brokers.editor.title}</span>
+        <span class="h-broker-editor-argctrl">
+          <select data-dojo-type="dijit/form/TextBox"></select>
+        </span>
+      </div>
     </div>
   </div>
   

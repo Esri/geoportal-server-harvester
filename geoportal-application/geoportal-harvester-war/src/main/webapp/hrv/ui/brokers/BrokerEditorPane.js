@@ -29,7 +29,8 @@ define(["dojo/_base/declare",
         "hrv/rest/Connectors",
         "hrv/rest/Brokers",
         "dijit/form/Select",
-        "dijit/form/TextBox"
+        "dijit/form/TextBox",
+        "dijit/form/Form"
       ],
   function(declare,lang,array,domConstruct,query,html,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,ConnectorsApi,BrokersApi,Select,TextBox){
   
@@ -50,6 +51,9 @@ define(["dojo/_base/declare",
             topic.publish("msg",this.i18n.brokers.editor.errors.connectorsLoadingErrors[this.category]);
           })
         );
+        if (this.data) {
+          this.typeSelector.setDisabled(true);
+        }
       },
       
       processConnectors: function(response) {

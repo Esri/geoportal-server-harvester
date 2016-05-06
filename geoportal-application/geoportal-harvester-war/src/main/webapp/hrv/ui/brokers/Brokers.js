@@ -60,17 +60,20 @@ define(["dojo/_base/declare",
       
       _onAdd: function(evt) {
         var brokerEditorPane = new BrokerEditorPane({
-          category: this.category==="input"? "inbound": this.category==="output"? "outbound": null
+          category: this.category==="input"? "inbound": this.category==="output"? "outbound": null,
+          data: null
         });
         var brokerEditorDialog = new Dialog({
           title: this.i18n.brokers.editor.caption,
           content: brokerEditorPane,
           onHide: function() {
             brokerEditorDialog.destroy();
+            brokerEditorPane.destroy();
           }
         });
         on(brokerEditorPane,"submit",function(){
           brokerEditorDialog.destroy();
+          brokerEditorPane.destroy();
         });
         brokerEditorDialog.show();
       }
