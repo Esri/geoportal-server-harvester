@@ -20,7 +20,7 @@ import com.esri.geoportal.commons.http.BotsHttpClientFactory;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.harvester.api.Connector;
-import com.esri.geoportal.harvester.api.DataInputException;
+import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.InputBroker;
 import java.io.IOException;

@@ -15,10 +15,10 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.DataOutputException;
-import com.esri.geoportal.harvester.api.DataProcessorException;
+import com.esri.geoportal.harvester.api.ex.DataOutputException;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.DataInputException;
+import com.esri.geoportal.harvester.api.ex.DataInputException;
 
 /**
  * Report builder.

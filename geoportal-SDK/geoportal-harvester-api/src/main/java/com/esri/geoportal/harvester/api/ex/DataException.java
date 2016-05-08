@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Esri, Inc.
+ * Copyright 2016 Esri, Inc..
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,41 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api;
+package com.esri.geoportal.harvester.api.ex;
 
 /**
- * Data processor exception.
- * <p>
- * Indicating issues with the harvesting workflow itself rather than any particular
- * broker.
+ * General data exception.
  */
-public class DataProcessorException extends DataException {
+public class DataException extends Exception {
 
   /**
-   * Creates a new instance of <code>DataProcessorException</code> without
-   * detail message.
+   * Creates a new instance of <code>DataException</code> without detail
+   * message.
    */
-  public DataProcessorException() {
+  public DataException() {
   }
 
   /**
-   * Constructs an instance of <code>DataProcessorException</code> with the
-   * specified detail message.
+   * Constructs an instance of <code>DataException</code> with the specified
+   * detail message.
    *
    * @param msg the detail message.
    */
-  public DataProcessorException(String msg) {
+  public DataException(String msg) {
     super(msg);
   }
 
   /**
-   * Constructs an instance of <code>DataProcessorException</code> with the
-   * specified detail message.
+   * Constructs an instance of <code>DataException</code> with the specified
+   * detail message.
    *
    * @param msg the detail message.
    * @param t cause
    */
-  public DataProcessorException(String msg, Throwable t) {
-    super(msg, t);
+  public DataException(String msg, Throwable t) {
+    super(msg,t);
   }
 }

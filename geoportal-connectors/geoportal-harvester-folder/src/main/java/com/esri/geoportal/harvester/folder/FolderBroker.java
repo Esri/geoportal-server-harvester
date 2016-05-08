@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.folder;
 
 import com.esri.geoportal.harvester.api.Connector;
-import com.esri.geoportal.harvester.api.DataOutputException;
+import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.OutputBroker;
 import static com.esri.geoportal.harvester.folder.PathUtil.sanitizeFileName;
