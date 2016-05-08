@@ -96,7 +96,7 @@ public class WafBroker implements InputBroker<String> {
       assertExecutor();
       WafFile file = files.poll();
       return file.readContent(httpClient);
-    } catch (IOException ex) {
+    } catch (IOException|URISyntaxException ex) {
       throw new DataInputException(this, "Error reading data.", ex);
     }
   }

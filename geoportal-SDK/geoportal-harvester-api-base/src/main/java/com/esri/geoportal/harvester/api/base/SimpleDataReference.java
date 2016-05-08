@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.harvester.api.DataReference;
+import java.net.URI;
 import java.util.Date;
 
 /**
@@ -23,24 +24,24 @@ import java.util.Date;
  * @param <T> type of data
  */
 public class SimpleDataReference<T> implements DataReference<T> {
-  private final String sourceUri;
+  private final URI sourceUri;
   private final Date lastModifiedDate;
   private final T content;
 
-  public SimpleDataReference(String sourceUri) {
-    this.sourceUri = sourceUri;
-    this.lastModifiedDate = null;
-    this.content = null;
-  }
-
-  public SimpleDataReference(String sourceUri, Date lastModifiedDate, T content) {
+  /**
+   * Creates instance of the data reference.
+   * @param sourceUri source uri
+   * @param lastModifiedDate last modified date
+   * @param content content
+   */
+  public SimpleDataReference(URI sourceUri, Date lastModifiedDate, T content) {
     this.sourceUri = sourceUri;
     this.lastModifiedDate = lastModifiedDate;
     this.content = content;
   }
 
   @Override
-  public String getSourceUri() {
+  public URI getSourceUri() {
     return sourceUri;
   }
 

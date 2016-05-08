@@ -21,6 +21,7 @@ import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -52,14 +53,14 @@ public class WafFile {
    * @return content reference
    * @throws IOException if reading content fails
    */
-  public SimpleDataReference<String> readContent(BotsHttpClient httpClient) throws IOException {
+  public SimpleDataReference<String> readContent(BotsHttpClient httpClient) throws IOException, URISyntaxException {
     HttpGet method = new HttpGet(fileUrl.toExternalForm());
     method.setConfig(DEFAULT_REQUEST_CONFIG);
     HttpResponse response = httpClient.execute(method);
     try (InputStream input = response.getEntity().getContent();) {
       Date lastModifiedDate = readLastModifiedDate(response);
       String content = IOUtils.toString(input, "UTF-8");
-      return new SimpleDataReference<>(fileUrl.toExternalForm(), lastModifiedDate, content);
+      return new SimpleDataReference<>(fileUrl.toURI(), lastModifiedDate, content);
     }
   }
 

@@ -55,7 +55,7 @@ public class FolderBroker implements OutputBroker<String>{
 
   @Override
   public void publish(DataReference<String> ref) throws DataOutputException {
-      File f = generateFileName(ref.getSourceUri());
+      File f = generateFileName(ref.getSourceUri().toASCIIString());
       f.getParentFile().mkdirs();
       if (!f.getName().contains(".")) {
         f = f.getParentFile().toPath().resolve(f.getName()+".xml").toFile();
