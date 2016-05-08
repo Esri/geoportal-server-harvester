@@ -41,33 +41,33 @@ public class Engine {
   private final ReportBuilder reportBuilder;
   private final TaskManager taskManager;
   private final ProcessManager processManager;
-  private final InboundConnectorRegistry dsReg;
-  private final OutboundConnectorRegistry dpReg;
+  private final InboundConnectorRegistry inboundConnectorRegistry;
+  private final OutboundConnectorRegistry outboundConnectorRegistry;
   private final BrokerDefinitionManager brokerDefinitionManager;
 
   /**
    * Creates instance of the engine.
-   * @param reportBuilder report builder
+   * @param inboundConnectorRegistry inbound connector registry
+   * @param outboundConnectorRegistry outbound connector registry
+   * @param brokerDefinitionManager broker definition manager
    * @param taskManager task manager
    * @param processManager process manager
-   * @param dsReg data source registry
-   * @param dpReg data publisher registry
-   * @param brokerDefinitionManager broker definition manager
+   * @param reportBuilder report builder
    */
   public Engine(
-          ReportBuilder reportBuilder, 
+          InboundConnectorRegistry inboundConnectorRegistry, 
+          OutboundConnectorRegistry outboundConnectorRegistry, 
+          BrokerDefinitionManager brokerDefinitionManager,
           TaskManager taskManager, 
           ProcessManager processManager, 
-          InboundConnectorRegistry dsReg, 
-          OutboundConnectorRegistry dpReg, 
-          BrokerDefinitionManager brokerDefinitionManager
+          ReportBuilder reportBuilder 
   ) {
-    this.reportBuilder = reportBuilder;
+    this.inboundConnectorRegistry = inboundConnectorRegistry;
+    this.outboundConnectorRegistry = outboundConnectorRegistry;
     this.taskManager = taskManager;
     this.processManager = processManager;
-    this.dsReg = dsReg;
-    this.dpReg = dpReg;
     this.brokerDefinitionManager = brokerDefinitionManager;
+    this.reportBuilder = reportBuilder;
   }
 
   /**
@@ -75,7 +75,7 @@ public class Engine {
    * @return collection of inbound connector templates
    */
   public Collection<ConnectorTemplate> getInboundConnectorTemplates() {
-    return dsReg.getTemplates();
+    return inboundConnectorRegistry.getTemplates();
   }
 
   /**
@@ -83,7 +83,7 @@ public class Engine {
    * @return collection of outbound connector templates
    */
   public Collection<ConnectorTemplate> getOutboundConnectorTemplates() {
-    return dpReg.getTemplates();
+    return outboundConnectorRegistry.getTemplates();
   }
 
   /**
@@ -91,7 +91,7 @@ public class Engine {
    * @return collection of inbound brokers definitions
    */
   public Collection<BrokerInfo> getInboundBrokersDefinitions() {
-    Set<String> inboundTypes = dsReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
+    Set<String> inboundTypes = inboundConnectorRegistry.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
     brokerDefinitionManager.select().stream().filter(e->inboundTypes.contains(e.getValue().getType()));
     return brokerDefinitionManager.select().stream()
             .filter(e->inboundTypes.contains(e.getValue().getType()))
@@ -104,7 +104,7 @@ public class Engine {
    * @return collection of outbound brokers definitions
    */
   public Collection<BrokerInfo> getOutboundBrokersDefinitions() {
-    Set<String> outboundTypes = dpReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
+    Set<String> outboundTypes = outboundConnectorRegistry.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
     return brokerDefinitionManager.select().stream()
             .filter(e->outboundTypes.contains(e.getValue().getType()))
             .map(e->new BrokerInfo(e.getKey(),OUTBOUND,e.getValue()))
@@ -112,8 +112,8 @@ public class Engine {
   }
   
   private Category getBrokerCategoryByType(String brokerType) {
-    Set<String> inboundTypes = dsReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
-    Set<String> outboundTypes = dpReg.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
+    Set<String> inboundTypes = inboundConnectorRegistry.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
+    Set<String> outboundTypes = outboundConnectorRegistry.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
     return inboundTypes.contains(brokerType)? INBOUND: outboundTypes.contains(brokerType)? OUTBOUND: null;
   }
   
@@ -198,7 +198,7 @@ public class Engine {
    * @throws InvalidDefinitionException if one of broker definitions appears to be invalid
    */
   public Task<String> createTask(BrokerDefinition dsParams, List<BrokerDefinition> dpParams) throws InvalidDefinitionException {
-    InputConnector<InputBroker> dsFactory = dsReg.get(dsParams.getType());
+    InputConnector<InputBroker> dsFactory = inboundConnectorRegistry.get(dsParams.getType());
     
     if (dsFactory==null) {
       throw new IllegalArgumentException("Invalid data source init parameters");
@@ -208,7 +208,7 @@ public class Engine {
 
     ArrayList<OutputBroker<String>> dataDestinations =  new ArrayList<>();
     for (BrokerDefinition def: dpParams) {
-      OutputConnector<OutputBroker> dpFactory = dpReg.get(def.getType());
+      OutputConnector<OutputBroker> dpFactory = outboundConnectorRegistry.get(def.getType());
       if (dpFactory==null) {
         throw new IllegalArgumentException("Invalid data publisher init parameters");
       }

@@ -32,16 +32,23 @@ import org.springframework.stereotype.Service;
 public class EngineBean extends Engine {
 
   /**
-   * Engine bean.
-   * @param reportBuilder report builder
+   * Creates instance of the engine bean.
+   * @param inboundConnectorRegistry inbound connector registry
+   * @param outboundConnectorRegistry outbound connector registry
+   * @param brokerDefinitionManager broker definition manager
    * @param taskManager task manager
    * @param processManager process manager
-   * @param dsReg inputs registry
-   * @param dpReg outputs registry
-   * @param brokerDefinitionManager broker definition manager
+   * @param reportBuilder report builder
    */
   @Autowired
-  public EngineBean(ReportBuilder reportBuilder, TaskManager taskManager, ProcessManager processManager, InboundConnectorRegistry dsReg, OutboundConnectorRegistry dpReg, BrokerDefinitionManager brokerDefinitionManager) {
-    super(reportBuilder, taskManager, processManager, dsReg, dpReg, brokerDefinitionManager);
+  public EngineBean(
+          InboundConnectorRegistry inboundConnectorRegistry, 
+          OutboundConnectorRegistry outboundConnectorRegistry, 
+          BrokerDefinitionManager brokerDefinitionManager, 
+          TaskManager taskManager, 
+          ProcessManager processManager, 
+          ReportBuilder reportBuilder
+  ) {
+    super(inboundConnectorRegistry, outboundConnectorRegistry, brokerDefinitionManager, taskManager, processManager, reportBuilder);
   }
 }
