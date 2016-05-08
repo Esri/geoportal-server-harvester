@@ -21,7 +21,7 @@ import java.util.UUID;
 /**
  * Brokers information.
  */
-public class BrokerInfo {
+public final class BrokerInfo {
   private final UUID uuid;
   private final Category category;
   private final BrokerDefinition brokerDefinition;
