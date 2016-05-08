@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api;
+package com.esri.geoportal.harvester.api.specs;
+
+import com.esri.geoportal.harvester.api.Connector;
 
 /**
- * Output connector.
+ * Input connector.
  * <p>
- * Provides factory methods to create instance of the {@link OutputBroker} as well 
+ * Provides factory methods to create instance of the {@link InputBroker} as well 
  * as template definition.
  * 
  * @param <B> type of the broker
  * 
- * @see OutputBroker
+ * @see InputBroker
  */
-public interface OutputConnector<B extends OutputBroker> extends Connector<B> {
+public interface InputConnector<B extends InputBroker> extends Connector<B> {
   
 }

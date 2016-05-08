@@ -24,11 +24,11 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import com.esri.geoportal.harvester.api.BrokerDefinition;
 import com.esri.geoportal.harvester.api.ConnectorTemplate;
-import com.esri.geoportal.harvester.api.InputBroker;
-import com.esri.geoportal.harvester.api.InputConnector;
-import com.esri.geoportal.harvester.api.InvalidDefinitionException;
-import com.esri.geoportal.harvester.api.OutputBroker;
-import com.esri.geoportal.harvester.api.OutputConnector;
+import com.esri.geoportal.harvester.api.specs.InputBroker;
+import com.esri.geoportal.harvester.api.specs.InputConnector;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.specs.OutputBroker;
+import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import com.esri.geoportal.harvester.engine.BrokerInfo.Category;
 import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.INBOUND;
 import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.OUTBOUND;
@@ -54,7 +54,14 @@ public class Engine {
    * @param dpReg data publisher registry
    * @param brokerDefinitionManager broker definition manager
    */
-  public Engine(ReportBuilder reportBuilder, TaskManager taskManager, ProcessManager processManager, InboundConnectorRegistry dsReg, OutboundConnectorRegistry dpReg, BrokerDefinitionManager brokerDefinitionManager) {
+  public Engine(
+          ReportBuilder reportBuilder, 
+          TaskManager taskManager, 
+          ProcessManager processManager, 
+          InboundConnectorRegistry dsReg, 
+          OutboundConnectorRegistry dpReg, 
+          BrokerDefinitionManager brokerDefinitionManager
+  ) {
     this.reportBuilder = reportBuilder;
     this.taskManager = taskManager;
     this.processManager = processManager;

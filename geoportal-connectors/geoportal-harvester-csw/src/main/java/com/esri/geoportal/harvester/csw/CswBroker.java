@@ -24,7 +24,7 @@ import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.InputBroker;
+import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import java.io.IOException;
 import java.util.Iterator;

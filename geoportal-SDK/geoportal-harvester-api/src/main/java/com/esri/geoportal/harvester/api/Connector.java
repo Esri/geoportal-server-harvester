@@ -15,6 +15,8 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+
 /**
  * Connector.
  * <p>

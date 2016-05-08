@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.api.ex;
 
-import com.esri.geoportal.harvester.api.InputBroker;
+import com.esri.geoportal.harvester.api.specs.InputBroker;
 
 /**
  * Input broker exception.

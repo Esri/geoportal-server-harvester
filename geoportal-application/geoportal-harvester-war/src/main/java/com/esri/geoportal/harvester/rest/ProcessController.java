@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.rest;
 
-import com.esri.geoportal.harvester.api.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.TaskDefinition;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import com.esri.geoportal.harvester.engine.Process;

@@ -24,8 +24,8 @@ import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.base.DataCollector;
 import java.net.URL;
 import java.util.Arrays;
-import com.esri.geoportal.harvester.api.InputBroker;
-import com.esri.geoportal.harvester.api.OutputBroker;
+import com.esri.geoportal.harvester.api.specs.InputBroker;
+import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.base.DataCollector;
 import java.io.IOException;
 

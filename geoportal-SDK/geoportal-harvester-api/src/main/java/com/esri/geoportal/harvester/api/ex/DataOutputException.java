@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.api.ex;
 
-import com.esri.geoportal.harvester.api.OutputBroker;
+import com.esri.geoportal.harvester.api.specs.OutputBroker;
 
 /**
  * Data output exception.

@@ -19,7 +19,7 @@ import com.esri.geoportal.commons.gpt.client.Client;
 import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.OutputBroker;
+import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.io.IOException;
 import java.net.URISyntaxException;
 

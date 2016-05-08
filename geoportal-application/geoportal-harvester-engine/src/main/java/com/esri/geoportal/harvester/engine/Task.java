@@ -16,8 +16,8 @@
 package com.esri.geoportal.harvester.engine;
 
 import java.util.List;
-import com.esri.geoportal.harvester.api.InputBroker;
-import com.esri.geoportal.harvester.api.OutputBroker;
+import com.esri.geoportal.harvester.api.specs.InputBroker;
+import com.esri.geoportal.harvester.api.specs.OutputBroker;
 
 /**
  * Task.
