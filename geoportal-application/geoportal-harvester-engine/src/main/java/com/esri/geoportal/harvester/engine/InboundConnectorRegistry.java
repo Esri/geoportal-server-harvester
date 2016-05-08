@@ -15,11 +15,11 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.engine.support.BaseDataRegistry;
+import com.esri.geoportal.harvester.engine.support.BaseRegistry;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 
 /**
  * Data inbound connector registry.
  */
-public class InboundConnectorRegistry  extends BaseDataRegistry<InputConnector> {
+public class InboundConnectorRegistry  extends BaseRegistry<InputConnector> {
 }

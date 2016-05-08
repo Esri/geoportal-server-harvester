@@ -25,7 +25,7 @@ import com.esri.geoportal.harvester.api.ConnectorTemplate;
  * Base data registry.
  * @param <F> type of the factory
  */
-public abstract class BaseDataRegistry<F extends Connector> extends HashMap<String,F> {
+public abstract class BaseRegistry<F extends Connector> extends HashMap<String,F> {
   /**
    * Gets all templates.
    * @return list of all templates
