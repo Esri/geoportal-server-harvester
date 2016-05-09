@@ -108,6 +108,46 @@ define(["dojo/_base/declare",
       
       _onEdit: function(evt) {
         console.log("TODO editing broker...", evt.data);
+        
+        // create editor pane
+        var brokerEditorPane = new BrokerEditorPane({
+          category: this.category==="input"? "inbound": this.category==="output"? "outbound": null,
+          data: evt.data
+        });
+        
+        // create editor dialog box
+        var brokerEditorDialog = new Dialog({
+          title: this.i18n.brokers.editor.caption,
+          content: brokerEditorPane,
+          onHide: function() {
+            brokerEditorDialog.destroy();
+            brokerEditorPane.destroy();
+          }
+        });
+        
+        // listen to "submit" button click
+        on(brokerEditorPane,"submit",lang.hitch(this, function(evt){
+          var brokerDefinition = evt.brokerDefinition;
+          var brokersApi = new BrokersApi();
+          
+          // use API to update broker
+          console.log("TODO: updating broker...", evt.data);
+          /*
+          brokersApi.create(json.stringify(brokerDefinition)).then(
+            lang.hitch({brokerEditorPane: brokerEditorPane, brokerEditorDialog: brokerEditorDialog, self: this},function(){
+              this.brokerEditorDialog.destroy();
+              this.brokerEditorPane.destroy();
+              this.self.load();
+            }),
+            lang.hitch(this,function(error){
+              console.error(error);
+              topic.publish("msg",new Error("Error creating broker"));
+            })
+          );
+          */
+        }));
+        
+        brokerEditorDialog.show();
       },
       
       _onRemove: function(evt) {
