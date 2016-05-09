@@ -58,6 +58,13 @@ define(["dojo/_base/declare",
       processConnectors: function(response) {
         console.log("Connectors:",response);
         array.forEach(response,lang.hitch(this,this.processConnectorTemplate));
+        if (this.data) {
+          this.typeSelector.set('value',this.data.brokerDefinition.type);
+          setTimeout(lang.hitch(this,function(){
+            this.formWidget.setValues(this.data.brokerDefinition);
+            this.formWidget.setValues(this.data.brokerDefinition.properties);
+          }),100);
+        }
         if (response.length>0) {
           this.updateArgumentsForm(response[0].arguments);
         }
