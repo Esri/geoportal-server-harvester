@@ -34,6 +34,7 @@ public class Process {
   /**
    * Creates instance of the process.
    * @param reportBuilder report builder
+   * @param processor processor
    * @param task task
    */
   public Process(ReportBuilder reportBuilder, Processor processor, Task<String> task) {

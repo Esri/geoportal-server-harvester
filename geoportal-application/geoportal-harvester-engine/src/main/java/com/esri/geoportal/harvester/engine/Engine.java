@@ -24,6 +24,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import com.esri.geoportal.harvester.api.BrokerDefinition;
 import com.esri.geoportal.harvester.api.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -45,6 +46,7 @@ public class Engine {
   private final InboundConnectorRegistry inboundConnectorRegistry;
   private final OutboundConnectorRegistry outboundConnectorRegistry;
   private final TriggerRegistry triggerRegistry;
+  private final ProcessorRegistry processorRegistry;
   private final BrokerDefinitionManager brokerDefinitionManager;
 
   /**
@@ -62,6 +64,7 @@ public class Engine {
           InboundConnectorRegistry inboundConnectorRegistry, 
           OutboundConnectorRegistry outboundConnectorRegistry, 
           TriggerRegistry triggerRegistry,
+          ProcessorRegistry processorRegistry,
           BrokerDefinitionManager brokerDefinitionManager,
           TaskManager taskManager, 
           ProcessManager processManager, 
@@ -71,6 +74,7 @@ public class Engine {
     this.inboundConnectorRegistry = inboundConnectorRegistry;
     this.outboundConnectorRegistry = outboundConnectorRegistry;
     this.triggerRegistry = triggerRegistry;
+    this.processorRegistry = processorRegistry;
     this.taskManager = taskManager;
     this.processManager = processManager;
     this.brokerDefinitionManager = brokerDefinitionManager;
@@ -235,7 +239,7 @@ public class Engine {
    * @return process
    */
   public UUID createProcess(Task task) {
-    DefaultProcessor processor = new DefaultProcessor();
+    Processor processor = processorRegistry.getDefaultProcessor();
     Process process = new Process(reportBuilder, processor, task);
     return processManager.create(process);
   }

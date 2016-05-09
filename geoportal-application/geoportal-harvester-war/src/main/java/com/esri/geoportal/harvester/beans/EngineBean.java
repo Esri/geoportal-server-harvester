@@ -22,6 +22,7 @@ import com.esri.geoportal.harvester.engine.ProcessManager;
 import com.esri.geoportal.harvester.engine.TaskManager;
 import com.esri.geoportal.harvester.engine.OutboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.InboundConnectorRegistry;
+import com.esri.geoportal.harvester.engine.ProcessorRegistry;
 import com.esri.geoportal.harvester.engine.TriggerManager;
 import com.esri.geoportal.harvester.engine.TriggerRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,8 @@ public class EngineBean extends Engine {
    * Creates instance of the engine bean.
    * @param inboundConnectorRegistry inbound connector registry
    * @param outboundConnectorRegistry outbound connector registry
+   * @param triggerRegistry trigger registry
+   * @param processorRegistry processor registry
    * @param brokerDefinitionManager broker definition manager
    * @param taskManager task manager
    * @param processManager process manager
@@ -48,6 +51,7 @@ public class EngineBean extends Engine {
           InboundConnectorRegistry inboundConnectorRegistry, 
           OutboundConnectorRegistry outboundConnectorRegistry, 
           TriggerRegistry triggerRegistry,
+          ProcessorRegistry processorRegistry,
           BrokerDefinitionManager brokerDefinitionManager, 
           TaskManager taskManager, 
           ProcessManager processManager, 
@@ -58,6 +62,7 @@ public class EngineBean extends Engine {
             inboundConnectorRegistry, 
             outboundConnectorRegistry, 
             triggerRegistry, 
+            processorRegistry,
             brokerDefinitionManager, 
             taskManager, 
             processManager, 
