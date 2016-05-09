@@ -41,15 +41,17 @@ public class Engine {
   private final ReportBuilder reportBuilder;
   private final TaskManager taskManager;
   private final ProcessManager processManager;
+  private final TriggerManager triggerManager;
   private final InboundConnectorRegistry inboundConnectorRegistry;
   private final OutboundConnectorRegistry outboundConnectorRegistry;
-  private final TriggerManager triggerManager;
+  private final TriggerRegistry triggerRegistry;
   private final BrokerDefinitionManager brokerDefinitionManager;
 
   /**
    * Creates instance of the engine.
    * @param inboundConnectorRegistry inbound connector registry
    * @param outboundConnectorRegistry outbound connector registry
+   * @param triggerRegistry trigger registry
    * @param brokerDefinitionManager broker definition manager
    * @param taskManager task manager
    * @param processManager process manager
@@ -59,6 +61,7 @@ public class Engine {
   public Engine(
           InboundConnectorRegistry inboundConnectorRegistry, 
           OutboundConnectorRegistry outboundConnectorRegistry, 
+          TriggerRegistry triggerRegistry,
           BrokerDefinitionManager brokerDefinitionManager,
           TaskManager taskManager, 
           ProcessManager processManager, 
@@ -67,6 +70,7 @@ public class Engine {
   ) {
     this.inboundConnectorRegistry = inboundConnectorRegistry;
     this.outboundConnectorRegistry = outboundConnectorRegistry;
+    this.triggerRegistry = triggerRegistry;
     this.taskManager = taskManager;
     this.processManager = processManager;
     this.brokerDefinitionManager = brokerDefinitionManager;
