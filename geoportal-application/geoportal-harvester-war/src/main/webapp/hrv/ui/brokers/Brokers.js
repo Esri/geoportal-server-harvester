@@ -62,27 +62,19 @@ define(["dojo/_base/declare",
       
       processBroker: function(broker) {
         var widget = new Broker(broker).placeAt(this.contentNode);
-        on(widget,"remove",lang.hitch(this,function(evt){
-          var uuid = evt.uuid;
-          var brokersApi = new BrokersApi();
-          brokersApi.delete(uuid).then(
-            lang.hitch(this,function(){
-              this.load();
-            }),
-            lang.hitch(this,function(error){
-              console.error(error);
-              topic.publish("msg",new Error("Error removing broker"));
-            })
-          );
-        }));
+        on(widget,"remove",lang.hitch(this,this._onRemove));
+        on(widget,"edit",lang.hitch(this,this._onEdit));
         widget.startup();
       },
       
       _onAdd: function(evt) {
+        // create editor pane
         var brokerEditorPane = new BrokerEditorPane({
           category: this.category==="input"? "inbound": this.category==="output"? "outbound": null,
           data: null
         });
+        
+        // create editor dialog box
         var brokerEditorDialog = new Dialog({
           title: this.i18n.brokers.editor.caption,
           content: brokerEditorPane,
@@ -92,9 +84,12 @@ define(["dojo/_base/declare",
           }
         });
         
+        // listen to "submit" button click
         on(brokerEditorPane,"submit",lang.hitch(this, function(evt){
           var brokerDefinition = evt.brokerDefinition;
           var brokersApi = new BrokersApi();
+          
+          // use API create new broker
           brokersApi.create(json.stringify(brokerDefinition)).then(
             lang.hitch({brokerEditorPane: brokerEditorPane, brokerEditorDialog: brokerEditorDialog, self: this},function(){
               this.brokerEditorDialog.destroy();
@@ -109,6 +104,26 @@ define(["dojo/_base/declare",
         }));
         
         brokerEditorDialog.show();
+      },
+      
+      _onEdit: function(evt) {
+        console.log("TODO editing broker...", evt.data);
+      },
+      
+      _onRemove: function(evt) {
+        var uuid = evt.data.uuid;
+        var brokersApi = new BrokersApi();
+        
+        // use API to remove broker
+        brokersApi.delete(uuid).then(
+          lang.hitch(this,function(){
+            this.load();
+          }),
+          lang.hitch(this,function(error){
+            console.error(error);
+            topic.publish("msg",new Error("Error removing broker"));
+          })
+        );
       }
     });
 });

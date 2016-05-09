@@ -37,12 +37,11 @@ define(["dojo/_base/declare",
       },
       
       _onEdit: function() {
-        console.log("TODO: editing broker...");
+        this.emit("edit",{data: this.data});
       },
       
       _onRemove: function() {
-        console.log("TODO: removing broker...");
-        this.emit("remove",{uuid: this.data.uuid});
+        this.emit("remove",{data: this.data});
       }
     });
 });
