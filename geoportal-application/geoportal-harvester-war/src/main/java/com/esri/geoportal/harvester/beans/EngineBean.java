@@ -22,6 +22,7 @@ import com.esri.geoportal.harvester.engine.ProcessManager;
 import com.esri.geoportal.harvester.engine.TaskManager;
 import com.esri.geoportal.harvester.engine.OutboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.InboundConnectorRegistry;
+import com.esri.geoportal.harvester.engine.TriggerManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,7 @@ public class EngineBean extends Engine {
    * @param brokerDefinitionManager broker definition manager
    * @param taskManager task manager
    * @param processManager process manager
+   * @param triggerManager trigger manager
    * @param reportBuilder report builder
    */
   @Autowired
@@ -47,8 +49,9 @@ public class EngineBean extends Engine {
           BrokerDefinitionManager brokerDefinitionManager, 
           TaskManager taskManager, 
           ProcessManager processManager, 
+          TriggerManager triggerManager,
           ReportBuilder reportBuilder
   ) {
-    super(inboundConnectorRegistry, outboundConnectorRegistry, brokerDefinitionManager, taskManager, processManager, reportBuilder);
+    super(inboundConnectorRegistry, outboundConnectorRegistry, brokerDefinitionManager, taskManager, processManager, triggerManager, reportBuilder);
   }
 }
