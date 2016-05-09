@@ -21,7 +21,7 @@ import java.util.UUID;
 /**
  * Task info.
  */
-public class TaskInfo {
+public final class TaskInfo {
   private final UUID uuid;
   private final TaskDefinition taskDefinition;
 

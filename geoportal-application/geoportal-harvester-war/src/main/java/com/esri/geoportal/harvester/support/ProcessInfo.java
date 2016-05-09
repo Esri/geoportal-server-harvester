@@ -21,7 +21,7 @@ import java.util.UUID;
 /**
  * Process info.
  */
-public class ProcessInfo {
+public final class ProcessInfo {
   private final UUID id;
   private final String description;
   private final Status status;
