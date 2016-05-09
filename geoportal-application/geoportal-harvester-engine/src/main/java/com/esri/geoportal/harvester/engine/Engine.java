@@ -200,7 +200,7 @@ public class Engine {
   }
   
   /**
-   * Creates task to execute.
+   * Creates task to initialize.
    * @param dsParams data input init parameter
    * @param dpParams data output init parameters
    * @return task
@@ -235,7 +235,8 @@ public class Engine {
    * @return process
    */
   public UUID createProcess(Task task) {
-    Process process = new Process(reportBuilder, task);
+    DefaultProcessor processor = new DefaultProcessor();
+    Process process = new Process(reportBuilder, processor, task);
     return processManager.create(process);
   }
   

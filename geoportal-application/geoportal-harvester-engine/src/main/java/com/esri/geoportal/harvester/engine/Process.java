@@ -17,24 +17,28 @@ package com.esri.geoportal.harvester.engine;
 
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
-import com.esri.geoportal.harvester.api.specs.OutputBroker;
+import com.esri.geoportal.harvester.api.Processor.Handler;
 
 /**
  * Process.
  */
 public class Process {
   private final ReportBuilder reportBuilder;
+  private final Processor processor;
   private final Task<String> task;
-  private Thread thread;
+  
+  private Handler handler;
 
   /**
    * Creates instance of the process.
    * @param reportBuilder report builder
    * @param task task
    */
-  public Process(ReportBuilder reportBuilder, Task<String> task) {
+  public Process(ReportBuilder reportBuilder, Processor processor, Task<String> task) {
     this.reportBuilder = reportBuilder;
+    this.processor = processor;
     this.task = task;
   }
   
@@ -51,8 +55,8 @@ public class Process {
    * @return process status
    */
   public synchronized Status getStatus() {
-    if (thread==null) return Status.initialized;
-    if (thread.isAlive()) return Status.working;
+    if (handler==null) return Status.initialized;
+    if (handler.isActive()) return Status.working;
     return Status.completed;
   }
   
@@ -64,36 +68,32 @@ public class Process {
       throw new IllegalStateException(String.format("Error begininig the process: process is in %s state", getStatus()));
     }
     
-    thread = new Thread() {
+    handler = processor.initialize(task.getDataSource(), task.getDataDestinations(), new DefaultProcessor.Listener<String>() {
       @Override
-      public void run() {
-        try {
-          if (!task.getDataDestinations().isEmpty()) {
-            reportBuilder.started(Process.this);
-            while(task.getDataSource().hasNext()) {
-              DataReference<String> dataReference = task.getDataSource().next();
-              for (OutputBroker<String> d: task.getDataDestinations()) {
-                try {
-                  d.publish(dataReference);
-                  reportBuilder.success(Process.this,dataReference);
-                } catch (DataOutputException ex) {
-                  reportBuilder.error(Process.this,ex);
-                }
-              }
-            }
-          }
-        } catch (DataInputException ex) {
-          reportBuilder.error(Process.this,ex);
-          abort();
-        } finally {
-          reportBuilder.completed(Process.this);
-        }
+      public void onStarted() {
+        reportBuilder.started(Process.this);
       }
-    };
-    
-    thread.setDaemon(true);
-    thread.setName("Harvesting");
-    thread.start();
+
+      @Override
+      public void onCompleted() {
+        reportBuilder.completed(Process.this);
+      }
+
+      @Override
+      public void onSuccess(DataReference<String> dataReference) {
+        reportBuilder.success(Process.this, dataReference);
+      }
+
+      @Override
+      public void onError(DataOutputException ex) {
+        reportBuilder.error(Process.this, ex);
+      }
+
+      @Override
+      public void onError(DataInputException ex) {
+        reportBuilder.error(Process.this, ex);
+      }
+    });
   }
   
   /**
@@ -103,11 +103,8 @@ public class Process {
     if (getStatus()!=Status.working) {
       throw new IllegalStateException(String.format("Error aborting the process: process is in %s state", getStatus()));
     }
-    thread.interrupt();
-    try {
-      thread.join();
-    } catch (InterruptedException ex) {
-      // ignore
+    if (handler!=null) {
+      handler.abort();
     }
   }
 
