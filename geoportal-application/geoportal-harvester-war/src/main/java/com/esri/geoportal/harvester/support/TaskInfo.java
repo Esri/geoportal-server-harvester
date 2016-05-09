@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.rest;
+package com.esri.geoportal.harvester.support;
 
 import com.esri.geoportal.harvester.engine.TaskDefinition;
 import java.util.UUID;
