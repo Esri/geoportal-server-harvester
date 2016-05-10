@@ -74,7 +74,7 @@ public class Process {
       throw new IllegalStateException(String.format("Error begininig the process: process is in %s state", getStatus()));
     }
     
-    handler = processor.initialize(task.getDataSource(), task.getDataDestinations(), new DefaultProcessor.Listener<String>() {
+    handler = processor.initialize(task.getDataSource(), task.getDataDestinations(), new DefaultProcessor.Listener() {
       @Override
       public void onStarted() {
         reportBuilder.started(Process.this);
@@ -86,7 +86,7 @@ public class Process {
       }
 
       @Override
-      public void onSuccess(DataReference<String> dataReference) {
+      public void onSuccess(DataReference dataReference) {
         reportBuilder.success(Process.this, dataReference);
       }
 

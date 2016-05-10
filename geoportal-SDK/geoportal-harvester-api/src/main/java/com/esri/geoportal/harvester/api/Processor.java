@@ -60,7 +60,7 @@ public interface Processor<D> {
   /**
    * Process listener.
    */
-  interface Listener<D> {
+  interface Listener {
     /**
      * Called when process is onStarted
      */
@@ -75,7 +75,7 @@ public interface Processor<D> {
      * Called when data reference has been processed
      * @param dataReference data reference
      */
-    void onSuccess(DataReference<D> dataReference);
+    void onSuccess(DataReference dataReference);
     
     /**
      * Called for output onError.
