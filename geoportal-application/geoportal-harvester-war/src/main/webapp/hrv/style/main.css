@@ -134,3 +134,35 @@ html,body {
   
 }
 
+.h-processes {
+  
+}
+
+.h-processes-process {
+  
+}
+
+
+.h-processes-process > span {
+  margin-right: 1em;
+}
+
+.h-processes-process-uuid {
+  color: lightgray;
+}
+
+.h-processes-process-title {
+ font-weight: bold; 
+}
+
+.h-processes-process-status {
+  
+}
+
+.h-status-completed {
+  color: green;
+}
+
+.h-status-working {
+  color: darkorange;
+}
