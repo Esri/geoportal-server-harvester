@@ -57,6 +57,6 @@ public class SimpleDataReference<T> implements DataReference<T> {
   
   @Override
   public String toString() {
-    return String.format("REF %s (%s) %s", sourceUri, lastModifiedDate, content);
+    return String.format("REF %s (%s)", sourceUri, lastModifiedDate);
   }
 }

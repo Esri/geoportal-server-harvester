@@ -22,17 +22,29 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DefaultProcessor.
  */
 public class DefaultProcessor implements Processor<String> {
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultProcessor.class);
 
   @Override
   public Handler initialize(InputBroker<String> source, List<OutputBroker<String>> destinations, Listener l) {
+    final String harvestDescription = String.format("%s -> [%s}",
+            source,
+            destinations!=null? destinations.stream().map(d->d.toString()).collect(Collectors.joining(",")): null
+    );
+    
+    LOG.debug(String.format("Initializing default processor for harvesting: %s", harvestDescription));
+    
     Thread thread = new Thread(new Runnable() {
       @Override
       public void run() {
+        LOG.info(String.format("Started harvest: %s", harvestDescription));
         try {
           if (!destinations.isEmpty()) {
             l.onStarted();
@@ -42,8 +54,10 @@ public class DefaultProcessor implements Processor<String> {
               for (OutputBroker<String> d: destinations) {
                 try {
                   d.publish(dataReference);
+                  LOG.debug(String.format("Harvested %s during %s", dataReference, harvestDescription));
                   l.onSuccess(dataReference);
                 } catch (DataOutputException ex) {
+                  LOG.debug(String.format("Failed harvesting %s during %s", dataReference, harvestDescription));
                   l.onError(ex);
                 }
               }
@@ -53,6 +67,7 @@ public class DefaultProcessor implements Processor<String> {
           l.onError(ex);
         } finally {
           l.onCompleted();
+          LOG.info(String.format("Completed harvest: %s", harvestDescription));
         }
       }
     },"HARVESTING");
