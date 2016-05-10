@@ -25,6 +25,9 @@ import com.esri.geoportal.harvester.engine.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.ProcessorRegistry;
 import com.esri.geoportal.harvester.engine.TriggerManager;
 import com.esri.geoportal.harvester.engine.TriggerRegistry;
+import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +36,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class EngineBean extends Engine {
+  private static final Logger LOG = LoggerFactory.getLogger(EngineBean.class);
 
   /**
    * Creates instance of the engine bean.
@@ -69,5 +73,10 @@ public class EngineBean extends Engine {
             triggerManager, 
             reportBuilder
     );
+  }
+  
+  @PostConstruct
+  public void init() {
+    LOG.info("EngineBean initialized.");
   }
 }

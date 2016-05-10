@@ -19,6 +19,8 @@ import com.esri.geoportal.harvester.csw.CswConnector;
 import com.esri.geoportal.harvester.engine.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.waf.WafConnector;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -26,11 +28,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class InboundConnectorRegistryBean extends InboundConnectorRegistry {
+  private static final Logger LOG = LoggerFactory.getLogger(InboundConnectorRegistryBean.class);
   
   @PostConstruct
   public void init() {
     put(WafConnector.TYPE, new WafConnector());
     put(CswConnector.TYPE, new CswConnector());
+    LOG.info("InboundConnectorRegistryBean initialized.");
   }
   
 }

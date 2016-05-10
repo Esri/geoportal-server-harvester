@@ -57,6 +57,7 @@ public class TaskManagerBean implements TaskManager {
             PreparedStatement st = connection.prepareStatement("CREATE TABLE IF NOT EXISTS TASKS ( id varchar(38) PRIMARY KEY, taskDefinition varchar(1024) NOT NULL)");
         ) {
       st.execute();
+      LOG.info("TaskManagerBean initialized.");
     } catch (SQLException ex) {
       LOG.info("Error initializing task database", ex);
     }

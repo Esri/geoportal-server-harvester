@@ -24,6 +24,8 @@ import com.esri.geoportal.harvester.support.ReportDispatcher;
 import com.esri.geoportal.harvester.support.ReportLogger;
 import com.esri.geoportal.harvester.support.ReportStatistics;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -31,6 +33,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ReportBuilderBean implements ReportBuilder {
+  private static final Logger LOG = LoggerFactory.getLogger(ReportBuilderBean.class);
+  
   private ReportBuilder rb;
   
   @PostConstruct
@@ -39,6 +43,8 @@ public class ReportBuilderBean implements ReportBuilder {
     ReportLogger rl = new ReportLogger();
     
     rb = new ReportDispatcher(rs, rl);
+    
+    LOG.info("ReportBuilderBean initialized.");
   }
 
   @Override

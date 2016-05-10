@@ -42,7 +42,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
 
-  private final Logger LOG = LoggerFactory.getLogger(BrokerDefinitionManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BrokerDefinitionManager.class);
 
   @Autowired
   private DataSource dataSource;
@@ -57,6 +57,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
             PreparedStatement st = connection.prepareStatement("CREATE TABLE IF NOT EXISTS BROKERS ( id varchar(38) PRIMARY KEY, brokerDefinition varchar(1024) NOT NULL)");
         ) {
       st.execute();
+      LOG.info("BrokerDefinitionManagerBean initialized.");
     } catch (SQLException ex) {
       LOG.info("Error initializing broker definition database", ex);
     }

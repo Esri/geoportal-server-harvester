@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.esri.geoportal.harvester.beans.EngineBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
 /**
  * Connector information controller.
@@ -135,6 +137,7 @@ import org.springframework.web.bind.annotation.PathVariable;
  */
 @RestController
 public class ConnectorController {
+  private static final Logger LOG = LoggerFactory.getLogger(ConnectorController.class);
   
   @Autowired
   private EngineBean engine;
@@ -145,6 +148,7 @@ public class ConnectorController {
    */
   @RequestMapping(value = "/rest/harvester/connectors/inbound", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ConnectorTemplate[] listInboundConnectors() {
+    LOG.debug(String.format("GET /rest/harvester/connectors/inbound"));
     return engine.getInboundConnectorTemplates().toArray(new ConnectorTemplate[0]);
   }
   
@@ -154,6 +158,7 @@ public class ConnectorController {
    */
   @RequestMapping(value = "/rest/harvester/connectors/outbound", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ConnectorTemplate[] listOutboundConnectors() {
+    LOG.debug(String.format("GET /rest/harvester/connectors/outbound"));
     return engine.getOutboundConnectorTemplates().toArray(new ConnectorTemplate[0]);
   }
   

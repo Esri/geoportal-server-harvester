@@ -20,6 +20,8 @@ import com.esri.geoportal.harvester.beans.EngineBean;
 import com.esri.geoportal.harvester.engine.TaskDefinition;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class TaskController {
+  private static final Logger LOG = LoggerFactory.getLogger(TaskController.class);
   
   @Autowired
   private EngineBean engine;
@@ -43,6 +46,7 @@ public class TaskController {
    */
   @RequestMapping(value = "/rest/harvester/tasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public TaskInfo[] listTasks() {
+    LOG.debug(String.format("GET /rest/harvester/tasks"));
     return engine.selectTaskDefinitions(null).stream().map(d->new TaskInfo(d.getKey(), d.getValue())).collect(Collectors.toList()).toArray(new TaskInfo[0]);
   }
   
@@ -53,6 +57,7 @@ public class TaskController {
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public TaskInfo getTask(@PathVariable UUID taskId) {
+    LOG.debug(String.format("GET /rest/harvester/tasks/%s", taskId));
     TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
     return taskDefinition!=null? new TaskInfo(taskId, taskDefinition): null;
   }
@@ -64,6 +69,7 @@ public class TaskController {
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public TaskInfo deleteTask(@PathVariable UUID taskId) {
+    LOG.debug(String.format("DELETE /rest/harvester/tasks/%s", taskId));
     TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
     if (taskDefinition!=null) {
       engine.deleteTaskDefinition(taskId);
@@ -78,6 +84,7 @@ public class TaskController {
    */
   @RequestMapping(value = "/rest/harvester/tasks", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   public TaskInfo addTask(@RequestBody TaskDefinition taskDefinition) {
+    LOG.debug(String.format("PUT /rest/harvester/tasks <-- %s", taskDefinition));
     UUID id = engine.addTaskDefinition(taskDefinition);
     return new TaskInfo(id, taskDefinition);
   }
@@ -91,6 +98,7 @@ public class TaskController {
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public TaskInfo updateTask(@RequestBody TaskDefinition taskDefinition, @PathVariable UUID taskId) {
+    LOG.debug(String.format("POST /rest/harvester/tasks/%s <-- %s", taskId, taskDefinition));
     TaskDefinition oldTaskDef = engine.updateTaskDefinition(taskId, taskDefinition);
     return oldTaskDef!=null? new TaskInfo(taskId, oldTaskDef): null;
   }

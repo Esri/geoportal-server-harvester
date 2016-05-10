@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class ProcessController {
+  private static final Logger LOG = LoggerFactory.getLogger(ProcessController.class);
   
   @Autowired
   private EngineBean engine;
@@ -50,6 +53,7 @@ public class ProcessController {
    */
   @RequestMapping(value = "/rest/harvester/processes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ProcessInfo[] listAllProcesses() {
+    LOG.debug(String.format("GET /rest/harvester/processes"));
     return filterProcesses(e->true);
   }
   
@@ -60,6 +64,7 @@ public class ProcessController {
    */
   @RequestMapping(value = "/rest/harvester/processes/{processId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ProcessInfo getProcessInfo(@PathVariable UUID processId) {
+    LOG.debug(String.format("GET /rest/harvester/processes/%s", processId));
     Process process = engine.getProcess(processId);
     return process!=null? new ProcessInfo(processId, process.getDescription(), process.getStatus()): null;
   }
@@ -71,6 +76,7 @@ public class ProcessController {
    */
   @RequestMapping(value = "/rest/harvester/processes/{processId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ProcessInfo abortProcess(@PathVariable UUID processId) {
+    LOG.debug(String.format("DELETE /rest/harvester/processes/%s", processId));
     Process process = engine.getProcess(processId);
     if (process!=null) {
       try {
@@ -111,6 +117,7 @@ public class ProcessController {
    */
   @RequestMapping(value = "/rest/harvester/processes", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessInfo> createProcess(@RequestBody TaskDefinition taskDefinition) {
+    LOG.debug(String.format("PUT /rest/harvester/processes <-- %s", taskDefinition));
     try {
       Task task = engine.createTask(taskDefinition.getSource(), taskDefinition.getDestinations());
       UUID processId = engine.createProcess(taskDefinition.getProcessor(),task);

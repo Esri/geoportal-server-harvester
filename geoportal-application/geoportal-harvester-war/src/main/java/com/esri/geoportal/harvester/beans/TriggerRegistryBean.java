@@ -17,6 +17,8 @@ package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.engine.TriggerRegistry;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -24,9 +26,11 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class TriggerRegistryBean extends TriggerRegistry {
+  private final Logger LOG = LoggerFactory.getLogger(TriggerManagerBean.class);
    
   @PostConstruct
   public void init() {
+    LOG.info("TriggerRegistryBean initialized.");
   }
  
 }

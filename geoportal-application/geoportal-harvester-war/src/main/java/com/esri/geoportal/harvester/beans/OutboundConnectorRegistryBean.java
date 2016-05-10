@@ -19,6 +19,8 @@ import com.esri.geoportal.harvester.engine.OutboundConnectorRegistry;
 import com.esri.geoportal.harvester.folder.FolderConnector;
 import com.esri.geoportal.harvester.gpt.GptConnector;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -26,10 +28,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class OutboundConnectorRegistryBean extends OutboundConnectorRegistry {
+  private static final Logger LOG = LoggerFactory.getLogger(OutboundConnectorRegistryBean.class);
   
   @PostConstruct
   public void init() {
     put(FolderConnector.TYPE, new FolderConnector());
     put(GptConnector.TYPE, new GptConnector());
+    LOG.info("OutboundConnectorRegistryBean initialized.");
   }
 }

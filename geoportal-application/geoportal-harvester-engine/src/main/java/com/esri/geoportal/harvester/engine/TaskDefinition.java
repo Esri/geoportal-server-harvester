@@ -77,7 +77,7 @@ public final class TaskDefinition {
   
   @Override
   public String toString() {
-    return String.format("SOURCE: %s, DESTINATIONS: [%s]", source, destinations!=null? destinations.stream()
+    return String.format("PROCESSOR: %s, SOURCE: %s, DESTINATIONS: [%s]", processor, source, destinations!=null? destinations.stream()
             .map(Object::toString)
             .collect(Collectors.joining(", ")): null);
   }

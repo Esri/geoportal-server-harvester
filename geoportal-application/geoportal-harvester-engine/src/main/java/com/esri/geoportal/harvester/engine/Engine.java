@@ -137,7 +137,7 @@ public class Engine {
   /**
    * Finds broker by id.
    * @param brokerId broker id
-   * @return brokrt or <code>null</code> if no broker corresponding to the broker id can be found
+   * @return broker info or <code>null</code> if no broker corresponding to the broker id can be found
    */
   public BrokerInfo findBroker(UUID brokerId) {
     EntityDefinition brokerDefinition = brokerDefinitionManager.read(brokerId);

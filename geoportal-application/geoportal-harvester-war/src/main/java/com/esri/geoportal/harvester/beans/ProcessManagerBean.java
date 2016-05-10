@@ -21,6 +21,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -28,7 +31,14 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ProcessManagerBean implements ProcessManager  {
+  private static final Logger LOG = LoggerFactory.getLogger(ProcessManagerBean.class);
+  
   private final HashMap<UUID,Process> processes = new HashMap<>();
+  
+  @PostConstruct
+  public void init() {
+    LOG.info("ProcessManagerBean initialized.");
+  }
 
   @Override
   public UUID create(Process process) {
