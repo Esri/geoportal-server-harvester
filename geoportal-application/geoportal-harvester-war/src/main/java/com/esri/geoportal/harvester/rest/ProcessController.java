@@ -66,7 +66,7 @@ public class ProcessController {
   public ProcessInfo getProcessInfo(@PathVariable UUID processId) {
     LOG.debug(String.format("GET /rest/harvester/processes/%s", processId));
     Process process = engine.getProcess(processId);
-    return process!=null? new ProcessInfo(processId, process.getDescription(), process.getStatus()): null;
+    return process!=null? new ProcessInfo(processId, process.getTitle(), process.getStatus()): null;
   }
   
   /**
@@ -85,7 +85,7 @@ public class ProcessController {
         // ignore
       }
     }
-    return process!=null? new ProcessInfo(processId, process.getDescription(), process.getStatus()): null;
+    return process!=null? new ProcessInfo(processId, process.getTitle(), process.getStatus()): null;
   }
   
   /**
@@ -124,7 +124,7 @@ public class ProcessController {
       UUID processId = engine.createProcess(taskDefinition.getProcessor(),task);
       Process process = engine.getProcess(processId);
       process.begin();
-      return new ResponseEntity<>(new ProcessInfo(processId, process.getDescription(), process.getStatus()), HttpStatus.OK);
+      return new ResponseEntity<>(new ProcessInfo(processId, process.getTitle(), process.getStatus()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -137,7 +137,7 @@ public class ProcessController {
    */
   private ProcessInfo[] filterProcesses(Predicate<? super Map.Entry<UUID, Process>> predicate) {
     return engine.selectProcesses(predicate).stream()
-            .map(e->new ProcessInfo(e.getKey(),e.getValue().getDescription(),e.getValue().getStatus()))
+            .map(e->new ProcessInfo(e.getKey(),e.getValue().getTitle(),e.getValue().getStatus()))
             .collect(Collectors.toList()).toArray(new ProcessInfo[0]);
   }
   

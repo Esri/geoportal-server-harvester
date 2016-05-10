@@ -21,6 +21,7 @@ import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.Processor.Handler;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Process.
@@ -48,11 +49,11 @@ public class Process {
   }
   
   /**
-   * Gets process description.
-   * @return process description
+   * Gets process title.
+   * @return process title
    */
-  public String getDescription() {
-    return String.format("%s (%s)", task, getStatus());
+  public String getTitle() {
+    return String.format("%s --> [%s]", task.getDataSource().toString(), task.getDataDestinations().stream().map(d->d.toString()).collect(Collectors.joining(",")));
   }
   
   /**
@@ -60,7 +61,7 @@ public class Process {
    * @return process status
    */
   public synchronized Status getStatus() {
-    if (handler==null || !handler.isActive()) return Status.initialized;
+    if (handler==null) return Status.initialized;
     if (handler.isActive()) return Status.working;
     return Status.completed;
   }

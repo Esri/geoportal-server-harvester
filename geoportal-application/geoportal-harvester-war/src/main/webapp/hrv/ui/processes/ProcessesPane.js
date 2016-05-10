@@ -16,15 +16,19 @@
 
 define(["dojo/_base/declare",
         "dojo/_base/lang",
+        "dojo/_base/array",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/ProcessesPane.html",
         "dojo/topic",
-        "dojo/dom-style"
+        "dojo/dom-style",
+        "dojo/dom-construct",
+        "hrv/rest/Processes",
+        "hrv/ui/processes/Process"
       ],
-  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic,domStyle){
+  function(declare,lang,array,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic,domStyle,domConstruct,Processes,Process){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -34,8 +38,29 @@ define(["dojo/_base/declare",
         topic.subscribe("nav",lang.hitch(this,this._onNav));
       },
       
+      processProcesses: function(response) {
+        console.log("TODO handle response:", response);
+        array.forEach(response,lang.hitch(this,this.processSingleProcess));
+      },
+      
+      processSingleProcess: function(info) {
+        var widget = new Process(info).placeAt(this.processesNode);
+        widget.startup();
+      },
+      
       _onNav: function(evt) {
         domStyle.set(this.domNode,"display", evt==="processes"? "block": "none");
+        if (evt==="processes") {
+          domConstruct.empty(this.processesNode);
+        
+          var rest = new Processes();
+          rest.list().then(
+            lang.hitch(this,this.processProcesses),
+            lang.hitch(this,function(error){
+              topic.publish("msg",this.i18n.processes.errors.loading);
+            })
+          );
+        }
       }
     });
 });

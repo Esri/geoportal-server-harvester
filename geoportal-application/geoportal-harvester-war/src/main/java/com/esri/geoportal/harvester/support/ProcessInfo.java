@@ -22,28 +22,28 @@ import java.util.UUID;
  * Process info.
  */
 public final class ProcessInfo {
-  private final UUID id;
+  private final UUID uuid;
   private final String description;
   private final Status status;
 
   /**
    * Creates instance of the process info.
-   * @param id process id
+   * @param uuid process uuid
    * @param description process description
    * @param status process status
    */
-  public ProcessInfo(UUID id, String description, Status status) {
-    this.id = id;
+  public ProcessInfo(UUID uuid, String description, Status status) {
+    this.uuid = uuid;
     this.description = description;
     this.status = status;
   }
 
   /**
-   * Gets process id.
-   * @return process id
+   * Gets process uuid.
+   * @return process uuid
    */
-  public UUID getId() {
-    return id;
+  public UUID getUuid() {
+    return uuid;
   }
 
   /**
@@ -64,7 +64,7 @@ public final class ProcessInfo {
   
   @Override
   public String toString() {
-    return String.format("PROCESS :: id: %s, description: %s, status: %s", id, description, status);
+    return String.format("PROCESS :: id: %s, description: %s, status: %s", uuid, description, status);
   }
   
 }

@@ -61,7 +61,9 @@ define({
     },
     
     processes: {
-      
+      errors: {
+        loading: "Error loading processes"
+      }
     }
 
   }
