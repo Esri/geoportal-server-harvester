@@ -95,22 +95,23 @@ public class ProcessController {
    * a process designed to harvest from WAF to a local folder:
    * <pre><code>
 {
+    "processor": null,
     "source": {
         "type": "WAF",
-        "attributes": {
-            "waf.host.url": "http://gptsrv12r2/wafMetadata/metadataSamples"
+        "properties": {
+            "waf-host-url": "http://gptsrv12r2/wafMetadata/metadataSamples/"
         }
     },
     "destinations": [
         {
             "type": "FOLDER",
-            "attributes": {
-                "folder.host.url": "http://gptsrv12r2",
-                "folder.root.folder": "c:\\data"
+            "properties": {
+                "folder-root-folder": "c:\\data",
+                "folder-host-url": "http://gptsrv12r2"
             }
         }
     ]
-}   
+}
    * </code></pre>
    * @param taskDefinition task definition
    * @return process info
@@ -123,9 +124,9 @@ public class ProcessController {
       UUID processId = engine.createProcess(taskDefinition.getProcessor(),task);
       Process process = engine.getProcess(processId);
       process.begin();
-      return new ResponseEntity<ProcessInfo>(new ProcessInfo(processId, process.getDescription(), process.getStatus()), HttpStatus.OK);
+      return new ResponseEntity<>(new ProcessInfo(processId, process.getDescription(), process.getStatus()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
-      return new ResponseEntity<ProcessInfo>(HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
   }
 
