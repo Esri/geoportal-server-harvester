@@ -97,6 +97,8 @@ public class Client implements IClient {
 
   @Override
   public IRecords findRecords(int start, int max) throws Exception {
+    LOG.debug(String.format("Executing findRecords(start=%d,max=%d)", start, max));
+    
     loadCapabilities();
 
     Criteria crt = new Criteria();
@@ -119,6 +121,8 @@ public class Client implements IClient {
 
   @Override
   public String readMetadata(String id) throws Exception {
+    LOG.debug(String.format("Executing readMetadata(id=%d)", id));
+    
     loadCapabilities();
 
     String getRecordByIdUrl = createGetMetadataByIdUrl(capabilites.get_getRecordByIDGetURL(), URLEncoder.encode(id, "UTF-8"));
@@ -269,6 +273,8 @@ public class Client implements IClient {
     // perform transformation
     StringWriter writer = new StringWriter();
     transformer.transform(new StreamSource(contentStream), new StreamResult(writer));
+    
+    LOG.trace(String.format("Received records:\n%s", writer.toString()));
 
     try (ByteArrayInputStream transformedContentStream = new ByteArrayInputStream(writer.toString().getBytes("UTF-8"))) {
 
@@ -321,6 +327,7 @@ public class Client implements IClient {
    */
   private void loadCapabilities() throws IOException, ParserConfigurationException, SAXException {
     if (capabilites == null) {
+      LOG.debug(String.format("Loading capabilities"));
       RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(5000).setSocketTimeout(2500).build();
       HttpGet getRequest = new HttpGet(baseUrl.toExternalForm());
       getRequest.setConfig(requestConfig);

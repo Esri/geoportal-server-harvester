@@ -26,6 +26,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -36,6 +38,7 @@ import org.xml.sax.SAXException;
  * Profiles factory.
  */
 public class ProfilesLoader {
+  private final Logger LOG = LoggerFactory.getLogger(ProfilesLoader.class);
   private static final String CONFIG_FILE_PATH = CONFIG_FOLDER_PATH+"/CSWProfiles.xml";
   
   /**
@@ -47,6 +50,7 @@ public class ProfilesLoader {
    * @throws XPathExpressionException if invalid XPath expression
    */
   public Profiles load() throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
+    LOG.info(String.format("Loading profiles"));
     Profiles profiles = new Profiles();
     try (InputStream profilesXml = Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_FILE_PATH);) {
       DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
