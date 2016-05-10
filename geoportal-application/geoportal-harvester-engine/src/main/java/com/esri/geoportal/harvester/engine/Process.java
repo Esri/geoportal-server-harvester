@@ -60,7 +60,7 @@ public class Process {
    * @return process status
    */
   public synchronized Status getStatus() {
-    if (handler==null) return Status.initialized;
+    if (handler==null || !handler.isActive()) return Status.initialized;
     if (handler.isActive()) return Status.working;
     return Status.completed;
   }
