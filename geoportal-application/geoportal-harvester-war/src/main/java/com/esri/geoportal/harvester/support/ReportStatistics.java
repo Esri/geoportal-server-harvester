@@ -22,11 +22,15 @@ import com.esri.geoportal.harvester.engine.Process;
 import com.esri.geoportal.harvester.engine.ReportBuilder;
 import java.util.Calendar;
 import java.util.Date;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Report statistics.
  */
 public class ReportStatistics implements ReportBuilder {
+  private final Logger LOG = LoggerFactory.getLogger(ReportStatistics.class);
+  
   private Date startDate;
   private Date endDate;
   
@@ -87,11 +91,13 @@ public class ReportStatistics implements ReportBuilder {
   @Override
   public void started(Process process) {
     startDate = Calendar.getInstance().getTime();
+    LOG.info(String.format("Harvesting of %s started at %s", process.getTask(), startDate));
   }
 
   @Override
   public void completed(Process process) {
     endDate = Calendar.getInstance().getTime();
+    LOG.info(String.format("Harvesting of %s completed at %s. No. succeded: %d, no. failed: %d", process.getTask(), endDate, succeeded, harvestFailed+publishFailed));
   }
 
   @Override
