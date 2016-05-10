@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.support;
 
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class BrokerDefinitionSerializer {
    * @return serialized broker definition
    * @throws JsonProcessingException if serializing fails
    */
-  public static String serializeBrokerDef(BrokerDefinition brokerDef) throws JsonProcessingException {
+  public static String serializeBrokerDef(EntityDefinition brokerDef) throws JsonProcessingException {
     ObjectMapper mapper = new ObjectMapper();
     return mapper.writeValueAsString(brokerDef);
   }
@@ -42,8 +42,8 @@ public class BrokerDefinitionSerializer {
    * @return broker definition
    * @throws IOException if de-serializing task definition fails
    */
-  public static BrokerDefinition deserializeBrokerDef(String strBrokerDef) throws IOException {
+  public static EntityDefinition deserializeBrokerDef(String strBrokerDef) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    return mapper.readValue(strBrokerDef, BrokerDefinition.class);
+    return mapper.readValue(strBrokerDef, EntityDefinition.class);
   }
 }

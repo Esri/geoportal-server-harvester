@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.waf;
 
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,7 +29,7 @@ public class WafBrokerDefinitionAdaptor extends BotsBrokerDefinitionAdaptor {
   
   private URL hostUrl;
 
-  public WafBrokerDefinitionAdaptor(BrokerDefinition def) throws IllegalArgumentException {
+  public WafBrokerDefinitionAdaptor(EntityDefinition def) throws IllegalArgumentException {
     super(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(WafConnector.TYPE);

@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.csw;
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.ObjectFactory;
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -40,7 +40,7 @@ public class CswBrokerDefinitionAdaptor extends BotsBrokerDefinitionAdaptor {
    *
    * @param def broker definition
    */
-  public CswBrokerDefinitionAdaptor(BrokerDefinition def) {
+  public CswBrokerDefinitionAdaptor(EntityDefinition def) {
     super(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(CswConnector.TYPE);

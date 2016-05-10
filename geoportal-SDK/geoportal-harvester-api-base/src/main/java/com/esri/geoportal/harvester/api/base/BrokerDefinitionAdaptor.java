@@ -15,20 +15,20 @@
  */
 package com.esri.geoportal.harvester.api.base;
 
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 
 /**
  * Broker adaptor.
  */
 public abstract class BrokerDefinitionAdaptor {
   
-  private final BrokerDefinition def;
+  private final EntityDefinition def;
 
   /**
    * Creates instance of the adaptor.
    * @param def broker definition
    */
-  public BrokerDefinitionAdaptor(BrokerDefinition def) {
+  public BrokerDefinitionAdaptor(EntityDefinition def) {
     this.def = def;
   }
   

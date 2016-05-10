@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.folder;
 
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.DataReferenceSerializer;
 import java.io.File;
@@ -30,7 +30,7 @@ public class Application {
       File rootFolder = new File(args[0]);
       URL hostUrl = new URL(args[1]);
       FolderConnector connector = new FolderConnector();
-      BrokerDefinition def = new BrokerDefinition();
+      EntityDefinition def = new EntityDefinition();
       FolderBrokerDefinitionAdaptor adaptor = new FolderBrokerDefinitionAdaptor(def);
       adaptor.setRootFolder(rootFolder);
       adaptor.setHostUrl(hostUrl);

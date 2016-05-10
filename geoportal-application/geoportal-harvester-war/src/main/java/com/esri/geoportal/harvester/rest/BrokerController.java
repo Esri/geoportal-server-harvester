@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.rest;
 
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.engine.BrokerInfo;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import java.util.UUID;
@@ -84,7 +84,7 @@ public class BrokerController {
    * @return broker info of the newly created broker
    */
   @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  public BrokerInfo createBroker(@RequestBody BrokerDefinition brokerDefinition) {
+  public BrokerInfo createBroker(@RequestBody EntityDefinition brokerDefinition) {
     return engine.createBroker(brokerDefinition);
   }
   
@@ -94,7 +94,7 @@ public class BrokerController {
    * @return broker info of the task which has been replaced
    */
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public BrokerInfo updateBroker(@RequestBody BrokerDefinition brokerDefinition, @PathVariable UUID brokerId) {
+  public BrokerInfo updateBroker(@RequestBody EntityDefinition brokerDefinition, @PathVariable UUID brokerId) {
     return engine.updateBroker(brokerId, brokerDefinition);
   }
   

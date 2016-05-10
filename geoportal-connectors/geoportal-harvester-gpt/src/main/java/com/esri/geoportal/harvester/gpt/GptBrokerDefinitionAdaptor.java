@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.gpt;
 
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,7 +37,7 @@ public class GptBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    * Creates instance of the adaptor.
    * @param def broker definition
    */
-  public GptBrokerDefinitionAdaptor(BrokerDefinition def) {
+  public GptBrokerDefinitionAdaptor(EntityDefinition def) {
     super(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(GptConnector.TYPE);

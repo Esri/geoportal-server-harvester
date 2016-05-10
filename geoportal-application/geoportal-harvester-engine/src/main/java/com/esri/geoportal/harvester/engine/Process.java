@@ -20,6 +20,7 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.Processor.Handler;
+import java.util.Map;
 
 /**
  * Process.
@@ -27,6 +28,7 @@ import com.esri.geoportal.harvester.api.Processor.Handler;
 public class Process {
   private final ReportBuilder reportBuilder;
   private final Processor processor;
+  private final Map<String,String> processorEnv;
   private final Task<String> task;
   
   private Handler handler;
@@ -35,11 +37,13 @@ public class Process {
    * Creates instance of the process.
    * @param reportBuilder report builder
    * @param processor processor
+   * @param processorEnv processor variables
    * @param task task
    */
-  public Process(ReportBuilder reportBuilder, Processor processor, Task<String> task) {
+  public Process(ReportBuilder reportBuilder, Processor processor, Map<String,String> processorEnv, Task<String> task) {
     this.reportBuilder = reportBuilder;
     this.processor = processor;
+    this.processorEnv = processorEnv;
     this.task = task;
   }
   

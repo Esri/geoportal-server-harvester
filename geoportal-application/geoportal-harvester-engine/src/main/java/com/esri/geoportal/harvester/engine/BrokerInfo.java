@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import java.util.UUID;
 
 /**
@@ -24,7 +24,7 @@ import java.util.UUID;
 public final class BrokerInfo {
   private final UUID uuid;
   private final Category category;
-  private final BrokerDefinition brokerDefinition;
+  private final EntityDefinition brokerDefinition;
 
   /**
    * Creates instance of the broker info.
@@ -32,7 +32,7 @@ public final class BrokerInfo {
    * @param category broker category
    * @param brokerDefinition broker definition
    */
-  public BrokerInfo(UUID uuid, Category category, BrokerDefinition brokerDefinition) {
+  public BrokerInfo(UUID uuid, Category category, EntityDefinition brokerDefinition) {
     this.uuid = uuid;
     this.category = category;
     this.brokerDefinition = brokerDefinition;
@@ -58,7 +58,7 @@ public final class BrokerInfo {
    * Gets broker definition.
    * @return broker definition
    */
-  public BrokerDefinition getBrokerDefinition() {
+  public EntityDefinition getBrokerDefinition() {
     return brokerDefinition;
   }
   

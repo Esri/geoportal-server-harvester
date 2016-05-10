@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.console;
 
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import org.apache.commons.lang3.StringUtils;
 
@@ -28,7 +28,7 @@ public class ConsoleBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    * Creates instance of the adaptor.
    * @param def broker definition
    */
-  public ConsoleBrokerDefinitionAdaptor(BrokerDefinition def) {
+  public ConsoleBrokerDefinitionAdaptor(EntityDefinition def) {
     super(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(ConsoleConnector.TYPE);

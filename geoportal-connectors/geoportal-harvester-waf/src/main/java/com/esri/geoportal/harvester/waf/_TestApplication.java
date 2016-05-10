@@ -19,7 +19,7 @@ import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.base.DataCollector;
 import java.net.URL;
@@ -59,7 +59,7 @@ public class _TestApplication {
     
       WafConnector connector = new WafConnector();
       URL start = new URL(sUrl);
-      BrokerDefinition def = new BrokerDefinition();
+      EntityDefinition def = new EntityDefinition();
       WafBrokerDefinitionAdaptor adaptor = new WafBrokerDefinitionAdaptor(def);
       adaptor.setHostUrl(start);
       adaptor.setBotsConfig(BotsConfig.DEFAULT);

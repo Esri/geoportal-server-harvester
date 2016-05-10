@@ -28,7 +28,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
  * @see InputConnector
  * @see OutputConnector
  * @see Broker
- * @see BrokerDefinition
+ * @see EntityDefinition
  */
 public interface Connector<B extends Broker> {
   
@@ -47,7 +47,7 @@ public interface Connector<B extends Broker> {
    * @return broker instance
    * @throws InvalidDefinitionException if provided definition is invalid
    */
-  B createBroker(BrokerDefinition definition) throws InvalidDefinitionException;
+  B createBroker(EntityDefinition definition) throws InvalidDefinitionException;
   
   /**
    * Gets connector UI template.

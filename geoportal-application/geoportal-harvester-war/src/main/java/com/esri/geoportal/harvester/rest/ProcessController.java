@@ -113,7 +113,7 @@ public class ProcessController {
   public ResponseEntity<ProcessInfo> createProcess(@RequestBody TaskDefinition taskDefinition) {
     try {
       Task task = engine.createTask(taskDefinition.getSource(), taskDefinition.getDestinations());
-      UUID processId = engine.createProcess(task);
+      UUID processId = engine.createProcess(taskDefinition.getProcessor(),task);
       Process process = engine.getProcess(processId);
       process.begin();
       return new ResponseEntity<ProcessInfo>(new ProcessInfo(processId, process.getDescription(), process.getStatus()), HttpStatus.OK);

@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.gpt;
 
 import com.esri.geoportal.commons.gpt.client.Client;
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.ConnectorTemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
@@ -51,7 +51,7 @@ public class GptConnector implements OutputConnector<GptBroker> {
   }
 
   @Override
-  public GptBroker createBroker(BrokerDefinition definition) throws InvalidDefinitionException {
+  public GptBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     GptBrokerDefinitionAdaptor adaptor = new GptBrokerDefinitionAdaptor(definition);
     Client client = new Client(adaptor.getHostUrl(), adaptor.getUserName(), adaptor.getUserName());
     return new GptBroker(this, adaptor, client);

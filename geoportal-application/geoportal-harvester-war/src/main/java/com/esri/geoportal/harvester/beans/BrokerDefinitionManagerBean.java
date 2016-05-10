@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.engine.BrokerDefinitionManager;
 import static com.esri.geoportal.harvester.support.BrokerDefinitionSerializer.deserializeBrokerDef;
 import static com.esri.geoportal.harvester.support.BrokerDefinitionSerializer.serializeBrokerDef;
@@ -63,7 +63,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
   }
 
   @Override
-  public UUID create(BrokerDefinition brokerDef) {
+  public UUID create(EntityDefinition brokerDef) {
     UUID id = UUID.randomUUID();
     try (
             Connection connection = dataSource.getConnection();
@@ -79,7 +79,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
   }
 
   @Override
-  public boolean update(UUID id, BrokerDefinition brokerDef) {
+  public boolean update(UUID id, EntityDefinition brokerDef) {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("UPDATE BROKERS SET brokerDefinition = ? WHERE ID = ?");
@@ -94,7 +94,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
   }
 
   @Override
-  public BrokerDefinition read(UUID id) {
+  public EntityDefinition read(UUID id) {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("SELECT * FROM BROKERS WHERE ID = ?");
@@ -130,8 +130,8 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
   }
 
   @Override
-  public Collection<Map.Entry<UUID, BrokerDefinition>> select() {
-    HashMap<UUID, BrokerDefinition> map = new HashMap<>();
+  public Collection<Map.Entry<UUID, EntityDefinition>> select() {
+    HashMap<UUID, EntityDefinition> map = new HashMap<>();
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("SELECT * FROM BROKERS");
@@ -140,7 +140,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
       while (rs.next()) {
         try {
           UUID id = UUID.fromString(rs.getString("id"));
-          BrokerDefinition td = deserializeBrokerDef(rs.getString("brokerDefinition"));
+          EntityDefinition td = deserializeBrokerDef(rs.getString("brokerDefinition"));
           map.put(id, td);
         } catch (IOException | SQLException ex) {
           LOG.warn("Error reading broker definition", ex);

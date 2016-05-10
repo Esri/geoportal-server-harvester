@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.waf;
 
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.ConnectorTemplate;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -42,7 +42,7 @@ public class WafConnector implements InputConnector<WafBroker> {
   }
 
   @Override
-  public WafBroker createBroker(BrokerDefinition definition) throws InvalidDefinitionException {
+  public WafBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new WafBroker(this,new WafBrokerDefinitionAdaptor(definition));
   }
 }

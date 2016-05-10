@@ -20,10 +20,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Broker definition.
+ * Entity definition.
  * <p>
  * It is a map of properties mean to be serializable. Based upon this information,
- * a {@link Connector} will be able to produce an instance of the {@link Broker}.
+ * a {@link Connector} will be able to produce an instance of the {@link Broker},
+ * or a {@link Processor} can be produced by a factory.
  * <p>
  * This class must be extended with the class providing explicit methods translating
  * from/to the named attribute within the map. For example, a concretized class
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
  * @see Connector
  * @see Broker
  */
-public final class BrokerDefinition {
+public final class EntityDefinition {
   private String type;
   private String label;
   private Map<String,String> properties = new LinkedHashMap<>();

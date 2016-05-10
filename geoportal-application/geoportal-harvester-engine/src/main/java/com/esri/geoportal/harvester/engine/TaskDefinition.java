@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,14 +23,31 @@ import java.util.stream.Collectors;
  * Task definition.
  */
 public final class TaskDefinition {
-  private BrokerDefinition source;
-  private List<BrokerDefinition> destinations;
+  private EntityDefinition processor;
+  private EntityDefinition source;
+  private List<EntityDefinition> destinations;
+
+  /**
+   * Gets processor definition.
+   * @return processor definition or <code>null</code> if default processor shall be used
+   */
+  public EntityDefinition getProcessor() {
+    return processor;
+  }
+
+  /**
+   * Sets processor definition.
+   * @param processor processor definition or <code>null</code> for default processor
+   */
+  public void setProcessor(EntityDefinition processor) {
+    this.processor = processor;
+  }
 
   /**
    * Gets source definition.
    * @return source definition
    */
-  public BrokerDefinition getSource() {
+  public EntityDefinition getSource() {
     return source;
   }
 
@@ -38,7 +55,7 @@ public final class TaskDefinition {
    * Sets source definition.
    * @param source source definition
    */
-  public void setSource(BrokerDefinition source) {
+  public void setSource(EntityDefinition source) {
     this.source = source;
   }
 
@@ -46,7 +63,7 @@ public final class TaskDefinition {
    * Gets destinations.
    * @return destinations
    */
-  public List<BrokerDefinition> getDestinations() {
+  public List<EntityDefinition> getDestinations() {
     return destinations;
   }
 
@@ -54,7 +71,7 @@ public final class TaskDefinition {
    * Sets destinations.
    * @param destinations destinations
    */
-  public void setDestinations(List<BrokerDefinition> destinations) {
+  public void setDestinations(List<EntityDefinition> destinations) {
     this.destinations = destinations;
   }
   

@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.folder;
 
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import java.io.File;
 import java.net.MalformedURLException;
@@ -37,7 +37,7 @@ public class FolderBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    * Creates instance of the adaptor.
    * @param def broker definition
    */
-  public FolderBrokerDefinitionAdaptor(BrokerDefinition def) throws IllegalArgumentException {
+  public FolderBrokerDefinitionAdaptor(EntityDefinition def) throws IllegalArgumentException {
     super(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(FolderConnector.TYPE);

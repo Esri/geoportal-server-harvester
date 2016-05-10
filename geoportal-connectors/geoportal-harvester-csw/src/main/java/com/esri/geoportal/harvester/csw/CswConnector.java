@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.csw;
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.ObjectFactory;
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.ConnectorTemplate;
 import com.esri.geoportal.harvester.api.ConnectorTemplate.Choice;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
@@ -57,7 +57,7 @@ public class CswConnector implements InputConnector<CswBroker> {
   }
 
   @Override
-  public CswBroker createBroker(BrokerDefinition definition) throws InvalidDefinitionException {
+  public CswBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new CswBroker(this, new CswBrokerDefinitionAdaptor(definition));
   }
 }

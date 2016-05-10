@@ -20,7 +20,7 @@ import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.ObjectFactory;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.DataCollector;
 import com.esri.geoportal.harvester.api.base.DataPrintStreamOutput;
 import java.net.URL;
@@ -41,7 +41,7 @@ public class Application {
       if (profile!=null) {
         CswConnector connector = new CswConnector();
         URL start = new URL(args[0]);
-        BrokerDefinition def = new BrokerDefinition();
+        EntityDefinition def = new EntityDefinition();
         CswBrokerDefinitionAdaptor adaptor = new CswBrokerDefinitionAdaptor(def);
         adaptor.setHostUrl(start);
         adaptor.setProfile(profile);

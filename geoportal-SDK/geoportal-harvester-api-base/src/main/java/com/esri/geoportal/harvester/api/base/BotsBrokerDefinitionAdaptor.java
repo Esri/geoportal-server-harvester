@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.api.base;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsConfigImpl;
 import com.esri.geoportal.commons.robots.BotsMode;
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,7 +36,7 @@ public abstract class BotsBrokerDefinitionAdaptor extends BrokerDefinitionAdapto
    * Creates instance of the adaptor.
    * @param def broker definition
    */
-  public BotsBrokerDefinitionAdaptor(BrokerDefinition def) {
+  public BotsBrokerDefinitionAdaptor(EntityDefinition def) {
     super(def);
   }
   

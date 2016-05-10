@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.gpt;
 
 import com.esri.geoportal.commons.gpt.client.Client;
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.DataReferenceSerializer;
 import java.net.URL;
@@ -31,7 +31,7 @@ public class Application {
       String userName = args[1];
       String password = args[2];
       GptConnector connector = new GptConnector();
-      BrokerDefinition def = new BrokerDefinition();
+      EntityDefinition def = new EntityDefinition();
       GptBrokerDefinitionAdaptor adaptor = new GptBrokerDefinitionAdaptor(def);
       adaptor.setHostUrl(url);
       adaptor.setUserName(userName);

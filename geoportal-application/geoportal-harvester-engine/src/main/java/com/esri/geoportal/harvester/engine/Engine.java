@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import com.esri.geoportal.harvester.api.BrokerDefinition;
+import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.ConnectorTemplate;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
@@ -54,6 +54,7 @@ public class Engine {
    * @param inboundConnectorRegistry inbound connector registry
    * @param outboundConnectorRegistry outbound connector registry
    * @param triggerRegistry trigger registry
+   * @param processorRegistry processor registry
    * @param brokerDefinitionManager broker definition manager
    * @param taskManager task manager
    * @param processManager process manager
@@ -135,7 +136,7 @@ public class Engine {
    * @return brokrt or <code>null</code> if no broker corresponding to the broker id can be found
    */
   public BrokerInfo findBroker(UUID brokerId) {
-    BrokerDefinition brokerDefinition = brokerDefinitionManager.read(brokerId);
+    EntityDefinition brokerDefinition = brokerDefinitionManager.read(brokerId);
     if (brokerDefinition!=null) {
       Category category = getBrokerCategoryByType(brokerDefinition.getType());
       if (category!=null) {
@@ -150,7 +151,7 @@ public class Engine {
    * @param brokerDefinition broker definition
    * @return broker info or <code>null</code> if broker has not been created
    */
-  public BrokerInfo createBroker(BrokerDefinition brokerDefinition) {
+  public BrokerInfo createBroker(EntityDefinition brokerDefinition) {
     Category category = getBrokerCategoryByType(brokerDefinition.getType());
     if (category!=null) {
       UUID id = brokerDefinitionManager.create(brokerDefinition);
@@ -165,8 +166,8 @@ public class Engine {
    * @param brokerDefinition broker definition
    * @return broker info or <code>null</code> if broker has not been created
    */
-  public BrokerInfo updateBroker(UUID brokerId, BrokerDefinition brokerDefinition) {
-    BrokerDefinition oldBrokerDef = brokerDefinitionManager.read(brokerId);
+  public BrokerInfo updateBroker(UUID brokerId, EntityDefinition brokerDefinition) {
+    EntityDefinition oldBrokerDef = brokerDefinitionManager.read(brokerId);
     if (oldBrokerDef!=null) {
       if (!brokerDefinitionManager.update(brokerId, brokerDefinition)) {
         oldBrokerDef = null;
@@ -210,7 +211,7 @@ public class Engine {
    * @return task
    * @throws InvalidDefinitionException if one of broker definitions appears to be invalid
    */
-  public Task<String> createTask(BrokerDefinition dsParams, List<BrokerDefinition> dpParams) throws InvalidDefinitionException {
+  public Task<String> createTask(EntityDefinition dsParams, List<EntityDefinition> dpParams) throws InvalidDefinitionException {
     InputConnector<InputBroker> dsFactory = inboundConnectorRegistry.get(dsParams.getType());
     
     if (dsFactory==null) {
@@ -220,7 +221,7 @@ public class Engine {
     InputBroker<String> dataSource = dsFactory.createBroker(dsParams);
 
     ArrayList<OutputBroker<String>> dataDestinations =  new ArrayList<>();
-    for (BrokerDefinition def: dpParams) {
+    for (EntityDefinition def: dpParams) {
       OutputConnector<OutputBroker> dpFactory = outboundConnectorRegistry.get(def.getType());
       if (dpFactory==null) {
         throw new IllegalArgumentException("Invalid data publisher init parameters");
@@ -238,9 +239,16 @@ public class Engine {
    * @param task task for the process
    * @return process
    */
-  public UUID createProcess(Task task) {
-    Processor processor = processorRegistry.getDefaultProcessor();
-    Process process = new Process(reportBuilder, processor, task);
+  public UUID createProcess(EntityDefinition processorDefinition, Task task) throws InvalidDefinitionException {
+    Processor processor = processorDefinition==null?
+            processorRegistry.getDefaultProcessor():
+            processorRegistry.get(processorDefinition.getType())!=null?
+            processorRegistry.get(processorDefinition.getType()):
+            null;
+    if (processor==null) {
+      throw new InvalidDefinitionException(String.format("Unable to select processor based on definition: %s", processorDefinition));
+    }
+    Process process = new Process(reportBuilder, processor, processorDefinition.getProperties(), task);
     return processManager.create(process);
   }
   
