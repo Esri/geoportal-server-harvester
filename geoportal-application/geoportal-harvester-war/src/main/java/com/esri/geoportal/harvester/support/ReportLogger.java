@@ -41,22 +41,22 @@ public class ReportLogger implements ReportBuilder {
 
   @Override
   public void success(Process process, DataReference dataReference) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    LOG.info(String.format("Success harvesting data: %s during processing task: %s", dataReference, process.getTask()));
   }
 
   @Override
   public void error(Process process, DataInputException ex) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    LOG.error(String.format("Error processing task: %s", process.getTask()), ex);
   }
 
   @Override
   public void error(Process process, DataOutputException ex) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    LOG.error(String.format("Error processing task: %s", process.getTask()), ex);
   }
 
   @Override
   public void error(Process process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    LOG.error(String.format("Error processing task: %s", process.getTask()), ex);
   }
   
 }

@@ -99,6 +99,8 @@ public class Process {
         reportBuilder.error(Process.this, ex);
       }
     });
+    
+    handler.begin();
   }
   
   /**

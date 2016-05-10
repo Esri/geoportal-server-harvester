@@ -83,6 +83,12 @@ public class FolderBroker implements OutputBroker<String>{
     // no need to close
   }
   
+
+  @Override
+  public String toString() {
+    return String.format("FOLDER [%s]", definition.getRootFolder());
+  }
+  
   private File generateFileName(String uri) {
     String sUri = uri;
     

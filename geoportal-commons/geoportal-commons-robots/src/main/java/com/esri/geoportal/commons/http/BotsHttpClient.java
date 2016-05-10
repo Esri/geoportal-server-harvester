@@ -170,8 +170,10 @@ public class BotsHttpClient implements HttpClient, Closeable {
       try {
         String orgUri = uri.toString();
         PHP php = parsePHP(bots.getHost());
-        uri = updateURI(uri,php);
-        if (!uri.equals(orgUri)) {
+        if (php!=null) {
+          uri = updateURI(uri,php);
+        }
+        if (!uri.toString().equals(orgUri)) {
           LOG.debug(String.format("Uri updated from %s to %s", orgUri, uri));
         }
       } catch (URISyntaxException ex) {

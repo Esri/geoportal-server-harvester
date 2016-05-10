@@ -252,7 +252,7 @@ public class Engine {
     if (processor==null) {
       throw new InvalidDefinitionException(String.format("Unable to select processor based on definition: %s", processorDefinition));
     }
-    Process process = new Process(reportBuilder, processor, processorDefinition.getProperties(), task);
+    Process process = new Process(reportBuilder, processor, processorDefinition!=null? processorDefinition.getProperties(): null, task);
     return processManager.create(process);
   }
   
