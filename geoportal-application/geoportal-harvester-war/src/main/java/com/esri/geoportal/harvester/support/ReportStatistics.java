@@ -18,12 +18,12 @@ package com.esri.geoportal.harvester.support;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
-import com.esri.geoportal.harvester.engine.DefaultProcess;
 import com.esri.geoportal.harvester.engine.ReportBuilder;
 import java.util.Calendar;
 import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.esri.geoportal.harvester.api.ProcessHandle;
 
 /**
  * Report statistics.
@@ -89,34 +89,34 @@ public class ReportStatistics implements ReportBuilder {
   }
 
   @Override
-  public void started(DefaultProcess process) {
+  public void started(ProcessHandle process) {
     startDate = Calendar.getInstance().getTime();
     LOG.info(String.format("Harvesting of %s started at %s", process, startDate));
   }
 
   @Override
-  public void completed(DefaultProcess process) {
+  public void completed(ProcessHandle process) {
     endDate = Calendar.getInstance().getTime();
     LOG.info(String.format("Harvesting of %s completed at %s. No. succeded: %d, no. failed: %d", process, endDate, succeeded, harvestFailed+publishFailed));
   }
 
   @Override
-  public void success(DefaultProcess process, DataReference dataReference) {
+  public void success(ProcessHandle process, DataReference dataReference) {
     ++succeeded;
   }
 
   @Override
-  public void error(DefaultProcess process, DataInputException ex) {
+  public void error(ProcessHandle process, DataInputException ex) {
     ++harvestFailed;
   }
 
   @Override
-  public void error(DefaultProcess process, DataOutputException ex) {
+  public void error(ProcessHandle process, DataOutputException ex) {
     ++publishFailed;
   }
 
   @Override
-  public void error(DefaultProcess process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
+  public void error(ProcessHandle process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
     failure = true;
   }
   

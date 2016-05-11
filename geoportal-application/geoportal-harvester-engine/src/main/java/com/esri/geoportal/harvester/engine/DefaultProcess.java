@@ -25,13 +25,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.esri.geoportal.harvester.api.Process;
 import java.util.Collections;
+import com.esri.geoportal.harvester.api.ProcessHandle;
 
 /**
  * DefaultProcess.
  */
-public class DefaultProcess implements Process {
+public class DefaultProcess implements ProcessHandle {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultProcess.class);
   private final List<Listener> listeners = Collections.synchronizedList(new ArrayList<>());
   private final InputBroker source;
@@ -88,6 +88,7 @@ public class DefaultProcess implements Process {
    * Gets process title.
    * @return process title
    */
+  @Override
   public String getTitle() {
     return String.format("%s --> [%s]", source.toString(), destinations.stream().map(d->d.toString()).collect(Collectors.joining(",")));
   }

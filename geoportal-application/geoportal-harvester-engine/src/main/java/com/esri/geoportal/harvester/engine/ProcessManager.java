@@ -16,9 +16,10 @@
 package com.esri.geoportal.harvester.engine;
 
 import com.esri.geoportal.harvester.engine.support.CrudsRepo;
+import com.esri.geoportal.harvester.api.ProcessHandle;
 
 /**
  * DefaultProcess manager.
  */
-public interface ProcessManager extends CrudsRepo<DefaultProcess> {
+public interface ProcessManager extends CrudsRepo<ProcessHandle> {
 }

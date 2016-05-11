@@ -30,6 +30,6 @@ public interface Processor {
    * @param destinations data destination
    * @return instance of the process
    */
-  Process submit(InputBroker source, List<OutputBroker> destinations);
+  ProcessHandle submit(InputBroker source, List<OutputBroker> destinations);
   
 }

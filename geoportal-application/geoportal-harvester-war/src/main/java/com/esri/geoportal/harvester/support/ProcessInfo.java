@@ -15,11 +15,11 @@
  */
 package com.esri.geoportal.harvester.support;
 
-import com.esri.geoportal.harvester.api.Process.Status;
+import com.esri.geoportal.harvester.api.ProcessHandle.Status;
 import java.util.UUID;
 
 /**
- * Process info.
+ * ProcessHandle info.
  */
 public final class ProcessInfo {
   private final UUID uuid;

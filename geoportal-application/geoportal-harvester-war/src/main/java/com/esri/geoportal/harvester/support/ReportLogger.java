@@ -18,10 +18,10 @@ package com.esri.geoportal.harvester.support;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
-import com.esri.geoportal.harvester.engine.DefaultProcess;
 import com.esri.geoportal.harvester.engine.ReportBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.esri.geoportal.harvester.api.ProcessHandle;
 
 /**
  * Report logger.
@@ -30,32 +30,32 @@ public class ReportLogger implements ReportBuilder {
   private final Logger LOG = LoggerFactory.getLogger(ReportLogger.class);
 
   @Override
-  public void started(DefaultProcess process) {
+  public void started(ProcessHandle process) {
     LOG.info(String.format("Started processing task: %s", process));
   }
 
   @Override
-  public void completed(DefaultProcess process) {
+  public void completed(ProcessHandle process) {
     LOG.info(String.format("Completed processing task: %s", process));
   }
 
   @Override
-  public void success(DefaultProcess process, DataReference dataReference) {
+  public void success(ProcessHandle process, DataReference dataReference) {
     LOG.info(String.format("Success harvesting data: %s during processing task: %s", dataReference, process));
   }
 
   @Override
-  public void error(DefaultProcess process, DataInputException ex) {
+  public void error(ProcessHandle process, DataInputException ex) {
     LOG.error(String.format("Error processing task: %s", process), ex);
   }
 
   @Override
-  public void error(DefaultProcess process, DataOutputException ex) {
+  public void error(ProcessHandle process, DataOutputException ex) {
     LOG.error(String.format("Error processing task: %s", process), ex);
   }
 
   @Override
-  public void error(DefaultProcess process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
+  public void error(ProcessHandle process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
     LOG.error(String.format("Error processing task: %s", process), ex);
   }
   

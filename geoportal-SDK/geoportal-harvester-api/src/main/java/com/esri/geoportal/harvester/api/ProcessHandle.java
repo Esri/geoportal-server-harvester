@@ -19,9 +19,14 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 
 /**
- * Process.
+ * ProcessHandle.
  */
-public interface Process {
+public interface ProcessHandle {
+  /**
+   * Gets process title.
+   * @return process title
+   */
+  String getTitle();
 
   /**
    * Begins the process.
@@ -46,7 +51,7 @@ public interface Process {
   void addListener(Listener listener);
   
   /**
-   * Process status.
+   * ProcessHandle status.
    */
   enum Status {
     /** just submitted */
@@ -60,7 +65,7 @@ public interface Process {
   }
     
   /**
-   * Process listener.
+   * ProcessHandle listener.
    */
   interface Listener {
     /**
