@@ -23,7 +23,6 @@ import java.util.List;
 
 /**
  * Processor.
- * @param <D> data type
  */
 public interface Processor {
 
@@ -34,60 +33,6 @@ public interface Processor {
    * @param l events listener
    * @return 
    */
-  Handler initialize(InputBroker source, List<OutputBroker> destinations, Listener l);
-  
-  /**
-   * Process handler.
-   */
-  interface Handler {
-    /**
-     * Begins process.
-     */
-    void begin();
-    
-    /**
-     * Aborts process.
-     */
-    void abort();
-    
-    /**
-     * Checks if process is active.
-     * @return <code>true</code> if process is active
-     */
-    boolean isActive();
-  }
-  
-  /**
-   * Process listener.
-   */
-  interface Listener {
-    /**
-     * Called when process is onStarted
-     */
-    void onStarted();
-    
-    /**
-     * Called when process is onCompleted
-     */
-    void onCompleted();
-    
-    /**
-     * Called when data reference has been processed
-     * @param dataReference data reference
-     */
-    void onSuccess(DataReference dataReference);
-    
-    /**
-     * Called for output onError.
-     * @param ex onError
-     */
-    public void onError(DataOutputException ex);
-    
-    /**
-     * Called for input onError.
-     * @param ex onError
-     */
-    public void onError(DataInputException ex);
-  }
+  IProcess submit(InputBroker source, List<OutputBroker> destinations);
   
 }

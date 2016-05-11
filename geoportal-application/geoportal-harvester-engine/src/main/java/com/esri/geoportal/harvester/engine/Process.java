@@ -15,24 +15,26 @@
  */
 package com.esri.geoportal.harvester.engine;
 
+import com.esri.geoportal.harvester.api.IProcess;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
-import com.esri.geoportal.harvester.api.Processor.Handler;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * Process.
  */
-public class Process {
+public class Process implements IProcess {
   private final ReportBuilder reportBuilder;
   private final Processor processor;
   private final Map<String,String> processorEnv;
   private final Task task;
+  private final ArrayList<Listener> listeners = new ArrayList<>();
   
-  private Handler handler;
+  private Status status = Status.submitted;
 
   /**
    * Creates instance of the process.
@@ -47,6 +49,11 @@ public class Process {
     this.processorEnv = processorEnv;
     this.task = task;
   }
+
+  @Override
+  public void addListener(Listener listener) {
+    listeners.add(listener);
+  }
   
   /**
    * Gets process title.
@@ -60,21 +67,30 @@ public class Process {
    * Gets process status.
    * @return process status
    */
+  @Override
   public synchronized Status getStatus() {
-    if (handler==null) return Status.initialized;
-    if (handler.isActive()) return Status.working;
-    return Status.completed;
+    return status;
+  }
+  
+  /**
+   * Sets status.
+   * @param status 
+   */
+  private synchronized void setStatus(Status status) {
+    this.status = status;
   }
   
   /**
    * Begins the process.
    */
+  @Override
   public synchronized void begin() {
-    if (getStatus()!=Status.initialized) {
+    if (getStatus()!=Status.submitted) {
       throw new IllegalStateException(String.format("Error begininig the process: process is in %s state", getStatus()));
     }
     
-    handler = processor.initialize(task.getDataSource(), task.getDataDestinations(), new DefaultProcessor.Listener() {
+    /*
+    handler = processor.submit(task.getDataSource(), task.getDataDestinations(), new DefaultProcessor.Listener() {
       @Override
       public void onStarted() {
         reportBuilder.started(Process.this);
@@ -102,18 +118,22 @@ public class Process {
     });
     
     handler.begin();
+    */
   }
   
   /**
    * Aborts the process.
    */
+  @Override
   public synchronized void abort() {
     if (getStatus()!=Status.working) {
       throw new IllegalStateException(String.format("Error aborting the process: process is in %s state", getStatus()));
     }
+    /*
     if (handler!=null) {
       handler.abort();
     }
+    */
   }
 
   /**
@@ -128,5 +148,4 @@ public class Process {
   public String toString() {
     return String.format("PROCESS:: status: %s, task: %s", getStatus(), task);
   }
-  
 }

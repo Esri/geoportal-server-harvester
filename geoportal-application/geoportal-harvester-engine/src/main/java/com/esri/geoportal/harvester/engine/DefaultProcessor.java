@@ -33,7 +33,7 @@ public class DefaultProcessor implements Processor {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultProcessor.class);
 
   @Override
-  public Handler initialize(InputBroker source, List<OutputBroker> destinations, Listener l) {
+  public Process submit(InputBroker source, List<OutputBroker> destinations) {
     final String harvestDescription = String.format("%s -> [%s}",
             source,
             destinations!=null? destinations.stream().map(d->d.toString()).collect(Collectors.joining(",")): null
@@ -41,6 +41,7 @@ public class DefaultProcessor implements Processor {
     
     LOG.debug(String.format("Initializing default processor for harvesting: %s", harvestDescription));
     
+    /*
     Thread thread = new Thread(new Runnable() {
       @Override
       public void run() {
@@ -74,23 +75,9 @@ public class DefaultProcessor implements Processor {
     
     thread.setDaemon(true);
     
-    Handler handler = new Handler() {
-      @Override
-      public void begin() {
-        thread.start();
-      }
-
-      @Override
-      public void abort() {
-        thread.interrupt();
-      }
-
-      @Override
-      public boolean isActive() {
-        return thread.isAlive();
-      }
-    };
-    
     return handler;
+    */
+    
+    return null;
   }
 }
