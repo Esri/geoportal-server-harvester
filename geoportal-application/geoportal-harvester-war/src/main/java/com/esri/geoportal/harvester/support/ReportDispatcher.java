@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.support;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
-import com.esri.geoportal.harvester.engine.Process;
+import com.esri.geoportal.harvester.engine.DefaultProcess;
 import com.esri.geoportal.harvester.engine.ReportBuilder;
 import java.util.Arrays;
 import java.util.List;
@@ -38,32 +38,32 @@ public class ReportDispatcher implements ReportBuilder {
   }
 
   @Override
-  public void started(Process process) {
+  public void started(DefaultProcess process) {
     builders.forEach(b->b.started(process));
   }
 
   @Override
-  public void completed(Process process) {
+  public void completed(DefaultProcess process) {
     builders.forEach(b->b.completed(process));
   }
 
   @Override
-  public void success(Process process, DataReference dataReference) {
+  public void success(DefaultProcess process, DataReference dataReference) {
     builders.forEach(b->b.success(process, dataReference));
   }
 
   @Override
-  public void error(Process process, DataInputException ex) {
+  public void error(DefaultProcess process, DataInputException ex) {
     builders.forEach(b->b.error(process, ex));
   }
 
   @Override
-  public void error(Process process, DataOutputException ex) {
+  public void error(DefaultProcess process, DataOutputException ex) {
     builders.forEach(b->b.error(process, ex));
   }
 
   @Override
-  public void error(Process process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
+  public void error(DefaultProcess process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
     builders.forEach(b->b.error(process, ex));
   }
 }

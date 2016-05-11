@@ -33,7 +33,7 @@ public class DefaultProcessor implements Processor {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultProcessor.class);
 
   @Override
-  public Process submit(InputBroker source, List<OutputBroker> destinations) {
+  public DefaultProcess submit(InputBroker source, List<OutputBroker> destinations) {
     final String harvestDescription = String.format("%s -> [%s}",
             source,
             destinations!=null? destinations.stream().map(d->d.toString()).collect(Collectors.joining(",")): null

@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.engine.ProcessManager;
-import com.esri.geoportal.harvester.engine.Process;
+import com.esri.geoportal.harvester.engine.DefaultProcess;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,13 +27,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * Process manager bean.
+ * DefaultProcess manager bean.
  */
 @Service
 public class ProcessManagerBean implements ProcessManager  {
   private static final Logger LOG = LoggerFactory.getLogger(ProcessManagerBean.class);
   
-  private final HashMap<UUID,Process> processes = new HashMap<>();
+  private final HashMap<UUID,DefaultProcess> processes = new HashMap<>();
   
   @PostConstruct
   public void init() {
@@ -41,19 +41,19 @@ public class ProcessManagerBean implements ProcessManager  {
   }
 
   @Override
-  public UUID create(Process process) {
+  public UUID create(DefaultProcess process) {
     UUID id = UUID.randomUUID();
     processes.put(id, process);
     return id;
   }
 
   @Override
-  public boolean update(UUID id, Process process) {
+  public boolean update(UUID id, DefaultProcess process) {
     return processes.put(id, process)!=null;
   }
 
   @Override
-  public Process read(UUID id) {
+  public DefaultProcess read(UUID id) {
     return processes.get(id);
   }
 
@@ -63,7 +63,7 @@ public class ProcessManagerBean implements ProcessManager  {
   }
 
   @Override
-  public Collection<Map.Entry<UUID, Process>> select() {
+  public Collection<Map.Entry<UUID, DefaultProcess>> select() {
     return processes.entrySet();
   }
 }

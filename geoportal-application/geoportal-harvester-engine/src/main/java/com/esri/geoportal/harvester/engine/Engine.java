@@ -195,7 +195,7 @@ public class Engine {
    * @param processId process id.
    * @return process or <code>null</code> if no process available for the given process id
    */
-  public Process getProcess(UUID processId) {
+  public DefaultProcess getProcess(UUID processId) {
     return processManager.read(processId);
   }
   
@@ -204,8 +204,8 @@ public class Engine {
    * @param predicate predicate
    * @return list of processes matching predicate
    */
-  public List<Map.Entry<UUID,Process>> selectProcesses(Predicate<? super Map.Entry<UUID, Process>> predicate) {
-    return processManager.select().stream().filter(predicate!=null? predicate: (Map.Entry<UUID, Process> e) -> true).collect(Collectors.toList());
+  public List<Map.Entry<UUID,DefaultProcess>> selectProcesses(Predicate<? super Map.Entry<UUID, DefaultProcess>> predicate) {
+    return processManager.select().stream().filter(predicate!=null? predicate: (Map.Entry<UUID, DefaultProcess> e) -> true).collect(Collectors.toList());
   }
   
   /**
@@ -252,7 +252,8 @@ public class Engine {
     if (processor==null) {
       throw new InvalidDefinitionException(String.format("Unable to select processor based on definition: %s", processorDefinition));
     }
-    Process process = new Process(reportBuilder, processor, processorDefinition!=null? processorDefinition.getProperties(): null, task);
+    DefaultProcess process = new DefaultProcess(task.getDataSource(),task.getDataDestinations());
+    process.begin();
     return processManager.create(process);
   }
   

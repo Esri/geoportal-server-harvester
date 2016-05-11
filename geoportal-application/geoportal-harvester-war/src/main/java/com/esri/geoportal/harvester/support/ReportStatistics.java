@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.support;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
-import com.esri.geoportal.harvester.engine.Process;
+import com.esri.geoportal.harvester.engine.DefaultProcess;
 import com.esri.geoportal.harvester.engine.ReportBuilder;
 import java.util.Calendar;
 import java.util.Date;
@@ -89,34 +89,34 @@ public class ReportStatistics implements ReportBuilder {
   }
 
   @Override
-  public void started(Process process) {
+  public void started(DefaultProcess process) {
     startDate = Calendar.getInstance().getTime();
-    LOG.info(String.format("Harvesting of %s started at %s", process.getTask(), startDate));
+    LOG.info(String.format("Harvesting of %s started at %s", process, startDate));
   }
 
   @Override
-  public void completed(Process process) {
+  public void completed(DefaultProcess process) {
     endDate = Calendar.getInstance().getTime();
-    LOG.info(String.format("Harvesting of %s completed at %s. No. succeded: %d, no. failed: %d", process.getTask(), endDate, succeeded, harvestFailed+publishFailed));
+    LOG.info(String.format("Harvesting of %s completed at %s. No. succeded: %d, no. failed: %d", process, endDate, succeeded, harvestFailed+publishFailed));
   }
 
   @Override
-  public void success(Process process, DataReference dataReference) {
+  public void success(DefaultProcess process, DataReference dataReference) {
     ++succeeded;
   }
 
   @Override
-  public void error(Process process, DataInputException ex) {
+  public void error(DefaultProcess process, DataInputException ex) {
     ++harvestFailed;
   }
 
   @Override
-  public void error(Process process, DataOutputException ex) {
+  public void error(DefaultProcess process, DataOutputException ex) {
     ++publishFailed;
   }
 
   @Override
-  public void error(Process process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
+  public void error(DefaultProcess process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
     failure = true;
   }
   

@@ -28,39 +28,39 @@ public interface ReportBuilder {
    * Called to indicate beginning of the process.
    * @param process process
    */
-  void started(Process process);
+  void started(DefaultProcess process);
   
   /**
    * Called to indicated completion of the process
    * @param process process
    */
-  void completed(Process process);
+  void completed(DefaultProcess process);
   
   /**
    * Make success entry.
    * @param process process
    * @param dataReference data reference
    */
-  void success(Process process, DataReference dataReference);
+  void success(DefaultProcess process, DataReference dataReference);
   
   /**
    * Make harvest error entry.
    * @param process process
    * @param ex exception
    */
-  void error(Process process, DataInputException ex);
+  void error(DefaultProcess process, DataInputException ex);
   
   /**
    * Make publish error entry.
    * @param process process
    * @param ex exception
    */
-  void error(Process process, DataOutputException ex);
+  void error(DefaultProcess process, DataOutputException ex);
   
   /**
    * Make error entry without associated data.
    * @param process process
    * @param ex error message
    */
-  void error(Process process, DataProcessorException ex);
+  void error(DefaultProcess process, DataProcessorException ex);
 }
