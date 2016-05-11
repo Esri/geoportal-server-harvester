@@ -123,7 +123,6 @@ public class ProcessController {
       Task task = engine.createTask(taskDefinition.getSource(), taskDefinition.getDestinations());
       UUID processId = engine.createProcess(taskDefinition.getProcessor(),task);
       DefaultProcess process = engine.getProcess(processId);
-      process.begin();
       return new ResponseEntity<>(new ProcessInfo(processId, process.getTitle(), process.getStatus()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
