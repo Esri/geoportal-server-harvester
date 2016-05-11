@@ -39,11 +39,11 @@ public class _TestApplication {
   public static void main(String[] args) throws Exception {
     String sUrl = "http://gptogc.esri.com/geoportal/csw?request=GetCapabilities&service=CSW";
     String sProfile = "urn:ogc:CSW:2.0.2:HTTP:OGCCORE:ESRI:GPT";
-    OutputBroker<String> destination = new OutputBroker<String>() {
+    OutputBroker destination = new OutputBroker() {
       int counter = 0;
       
       @Override
-      public void publish(DataReference<String> ref) throws DataOutputException {
+      public void publish(DataReference ref) throws DataOutputException {
         counter++;
         if (counter%20==0) {
           System.out.println(String.format("Counter: %d", counter));
@@ -74,8 +74,8 @@ public class _TestApplication {
       adaptor.setProfile(profile);
       adaptor.setBotsConfig(BotsConfig.DEFAULT);
       adaptor.setBotsMode(BotsMode.inherit);
-        try (InputBroker<String> csw = connector.createBroker(def);) {
-        DataCollector<String> dataCollector = new DataCollector<>(csw, Arrays.asList(new OutputBroker[]{destination}));
+      try (InputBroker csw = connector.createBroker(def);) {
+        DataCollector dataCollector = new DataCollector(csw, Arrays.asList(new OutputBroker[]{destination}));
         dataCollector.collect();
       }
     }

@@ -25,7 +25,7 @@ import java.util.List;
  * Processor.
  * @param <D> data type
  */
-public interface Processor<D> {
+public interface Processor {
 
   /**
    * Initialize processor.
@@ -34,7 +34,7 @@ public interface Processor<D> {
    * @param l events listener
    * @return 
    */
-  Handler initialize(InputBroker<D> source, List<OutputBroker<D>> destinations, Listener l);
+  Handler initialize(InputBroker source, List<OutputBroker> destinations, Listener l);
   
   /**
    * Process handler.

@@ -35,11 +35,11 @@ import java.io.IOException;
 public class _TestApplication {
   public static void main(String[] args) throws Exception {
     String sUrl = "http://data.nodc.noaa.gov/nodc/archive/metadata/test/granule/iso/ghrsst_new";
-    OutputBroker<String> dst = new OutputBroker<String>() {
+    OutputBroker dst = new OutputBroker() {
       int counter = 0;
       
       @Override
-      public void publish(DataReference<String> ref) throws DataOutputException {
+      public void publish(DataReference ref) throws DataOutputException {
         counter++;
         if (counter%20==0) {
           System.out.println(String.format("Counter: %d", counter));
@@ -64,8 +64,8 @@ public class _TestApplication {
       adaptor.setHostUrl(start);
       adaptor.setBotsConfig(BotsConfig.DEFAULT);
       adaptor.setBotsMode(BotsMode.never);
-      try (InputBroker<String> hv = connector.createBroker(def)) {
-        DataCollector<String> dataCollector = new DataCollector<>(hv, Arrays.asList(new OutputBroker[]{dst}));
+      try (InputBroker hv = connector.createBroker(def)) {
+        DataCollector dataCollector = new DataCollector(hv, Arrays.asList(new OutputBroker[]{dst}));
         dataCollector.collect();
       }
   }

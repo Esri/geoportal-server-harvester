@@ -18,22 +18,20 @@ package com.esri.geoportal.harvester.api.specs;
 import com.esri.geoportal.harvester.api.Broker;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.DataReference;
 
 /**
  * Output broker.
  * <p>
  * Provides mechanism to publish data.
  * 
- * @param <D> data type
  * @see OutputConnector
  */
-public interface OutputBroker<D> extends Broker {
+public interface OutputBroker extends Broker {
   
   /**
    * Publishes data.
    * @param ref data reference
    * @throws DataOutputException if publishing data fails
    */
-  void publish(DataReference<D> ref) throws DataOutputException;
+  void publish(DataReference ref) throws DataOutputException;
 }

@@ -23,7 +23,7 @@ import java.io.IOException;
 /**
  * Console broker.
  */
-public class ConsoleBroker implements OutputBroker<String>  {
+public class ConsoleBroker implements OutputBroker  {
   private long counter = 0;
   private final ConsoleConnector connector;
 
@@ -36,7 +36,7 @@ public class ConsoleBroker implements OutputBroker<String>  {
   }
 
   @Override
-  public void publish(DataReference<String> ref) throws DataOutputException {
+  public void publish(DataReference ref) throws DataOutputException {
     try {
       counter++;
       

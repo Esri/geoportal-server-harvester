@@ -121,7 +121,7 @@ public class Client implements IClient {
 
   @Override
   public String readMetadata(String id) throws Exception {
-    LOG.debug(String.format("Executing readMetadata(id=%d)", id));
+    LOG.debug(String.format("Executing readMetadata(id=%s)", id));
     
     loadCapabilities();
 

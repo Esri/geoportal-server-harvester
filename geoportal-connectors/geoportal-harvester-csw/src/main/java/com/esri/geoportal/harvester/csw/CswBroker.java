@@ -26,6 +26,7 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Iterator;
@@ -35,7 +36,7 @@ import org.apache.http.impl.client.HttpClients;
 /**
  * CSW broker.
  */
-public class CswBroker implements InputBroker<String> {
+public class CswBroker implements InputBroker {
   private static final int PAGE_SIZE = 10;
 
   private final CswConnector connector;
@@ -88,11 +89,11 @@ public class CswBroker implements InputBroker<String> {
   }
 
   @Override
-  public DataReference<String> next() throws DataInputException {
+  public DataReference next() throws DataInputException {
     try {
       IRecord rec = recs.next();
       String metadata = client.readMetadata(rec.getId());
-      return new SimpleDataReference<>(URI.create(rec.getId()), rec.getLastModifiedDate(), metadata);
+      return new SimpleDataReference(URI.create(rec.getId().replaceAll("^\\{|\\}$","")), rec.getLastModifiedDate(), metadata.getBytes("UTF-8"));
     } catch (Exception ex) {
       throw new DataInputException(this, "Error reading data.", ex);
     }

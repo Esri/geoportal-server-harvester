@@ -53,14 +53,13 @@ public class WafFile {
    * @return content reference
    * @throws IOException if reading content fails
    */
-  public SimpleDataReference<String> readContent(BotsHttpClient httpClient) throws IOException, URISyntaxException {
+  public SimpleDataReference readContent(BotsHttpClient httpClient) throws IOException, URISyntaxException {
     HttpGet method = new HttpGet(fileUrl.toExternalForm());
     method.setConfig(DEFAULT_REQUEST_CONFIG);
     HttpResponse response = httpClient.execute(method);
-    try (InputStream input = response.getEntity().getContent();) {
-      Date lastModifiedDate = readLastModifiedDate(response);
-      String content = IOUtils.toString(input, "UTF-8");
-      return new SimpleDataReference<>(fileUrl.toURI(), lastModifiedDate, content);
+    Date lastModifiedDate = readLastModifiedDate(response);
+    try (InputStream input = response.getEntity().getContent()) {
+      return new SimpleDataReference(fileUrl.toURI(), lastModifiedDate, IOUtils.toByteArray(input));
     }
   }
 

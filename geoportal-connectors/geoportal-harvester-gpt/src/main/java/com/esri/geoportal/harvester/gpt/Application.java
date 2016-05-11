@@ -15,7 +15,6 @@
  */
 package com.esri.geoportal.harvester.gpt;
 
-import com.esri.geoportal.commons.gpt.client.Client;
 import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.DataReferenceSerializer;
@@ -39,7 +38,7 @@ public class Application {
       
       GptBroker broker = connector.createBroker(def);
       DataReferenceSerializer ser = new DataReferenceSerializer();
-      DataReference<String> ref = null;
+      DataReference ref = null;
       while (( ref = ser.deserialize(System.in))!=null) {
         System.out.println(String.format("publishing: %s", ref.getSourceUri()));
         broker.publish(ref);

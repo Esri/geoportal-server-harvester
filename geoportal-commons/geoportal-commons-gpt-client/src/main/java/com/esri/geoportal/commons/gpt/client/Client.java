@@ -32,7 +32,7 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -78,7 +78,7 @@ public class Client implements Closeable {
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  public Response publish(String document) throws IOException, URISyntaxException {
+  public Response publish(byte [] document) throws IOException, URISyntaxException {
     HttpHost targetHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
     CredentialsProvider credsProvider = new BasicCredentialsProvider();
     credsProvider.setCredentials(
@@ -96,7 +96,7 @@ public class Client implements Closeable {
     context.setCredentialsProvider(credsProvider);
     context.setAuthCache(authCache);
 
-    StringEntity entity = new StringEntity(document);
+    ByteArrayEntity entity = new ByteArrayEntity(document);
     HttpPut put = new HttpPut(url.toURI().resolve("rest/metadata/item"));
     put.setConfig(DEFAULT_REQUEST_CONFIG);
     put.setEntity(entity);

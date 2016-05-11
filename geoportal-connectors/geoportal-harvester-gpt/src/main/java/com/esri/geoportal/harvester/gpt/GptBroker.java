@@ -21,12 +21,14 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
+import org.apache.commons.io.IOUtils;
 
 /**
  * GPT broker.
  */
-public class GptBroker implements OutputBroker<String> {
+public class GptBroker implements OutputBroker {
   private final GptConnector connector;
   private final GptBrokerDefinitionAdaptor definition;
   private final Client client;
@@ -44,10 +46,9 @@ public class GptBroker implements OutputBroker<String> {
   }
 
   @Override
-  public void publish(DataReference<String> ref) throws DataOutputException {
+  public void publish(DataReference ref) throws DataOutputException {
     try {
-      String content = ref.getContent();
-      client.publish(content);
+      client.publish(ref.getContent());
     } catch (IOException|URISyntaxException ex) {
       throw new DataOutputException(this, "Error publishing data.", ex);
     }

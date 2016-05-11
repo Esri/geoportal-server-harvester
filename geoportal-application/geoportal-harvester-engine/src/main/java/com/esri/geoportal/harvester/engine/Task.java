@@ -21,18 +21,17 @@ import com.esri.geoportal.harvester.api.specs.OutputBroker;
 
 /**
  * Task.
- * @param <T> type of the data
  */
-public class Task<T> implements AutoCloseable {
-  private final InputBroker<T> dataSource;
-  private final List<OutputBroker<T>> dataDestinations;
+public class Task implements AutoCloseable {
+  private final InputBroker dataSource;
+  private final List<OutputBroker> dataDestinations;
   
   /**
    * Creates instance of the task.
    * @param dataSource data source
    * @param dataDestinations data destination
    */
-  public Task(InputBroker<T> dataSource, List<OutputBroker<T>> dataDestinations) {
+  public Task(InputBroker dataSource, List<OutputBroker> dataDestinations) {
     this.dataSource = dataSource;
     this.dataDestinations = dataDestinations;
   }
@@ -41,7 +40,7 @@ public class Task<T> implements AutoCloseable {
    * Gets data source.
    * @return data source
    */
-  public InputBroker<T> getDataSource() {
+  public InputBroker getDataSource() {
     return dataSource;
   }
 
@@ -49,14 +48,14 @@ public class Task<T> implements AutoCloseable {
    * Gets data publisher.
    * @return data publisher
    */
-  public List<OutputBroker<T>> getDataDestinations() {
+  public List<OutputBroker> getDataDestinations() {
     return dataDestinations;
   }
 
   @Override
   public void close() throws Exception {
     getDataSource().close();
-    for (OutputBroker<T> d: getDataDestinations()) {
+    for (OutputBroker d: getDataDestinations()) {
       try {
         d.close();
       } catch (Exception ex) {}

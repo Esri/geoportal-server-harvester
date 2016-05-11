@@ -215,23 +215,23 @@ public class Engine {
    * @return task
    * @throws InvalidDefinitionException if one of broker definitions appears to be invalid
    */
-  public Task<String> createTask(EntityDefinition dsParams, List<EntityDefinition> dpParams) throws InvalidDefinitionException {
+  public Task createTask(EntityDefinition dsParams, List<EntityDefinition> dpParams) throws InvalidDefinitionException {
     InputConnector<InputBroker> dsFactory = inboundConnectorRegistry.get(dsParams.getType());
     
     if (dsFactory==null) {
       throw new IllegalArgumentException("Invalid data source init parameters");
     }
     
-    InputBroker<String> dataSource = dsFactory.createBroker(dsParams);
+    InputBroker dataSource = dsFactory.createBroker(dsParams);
 
-    ArrayList<OutputBroker<String>> dataDestinations =  new ArrayList<>();
+    ArrayList<OutputBroker> dataDestinations =  new ArrayList<>();
     for (EntityDefinition def: dpParams) {
       OutputConnector<OutputBroker> dpFactory = outboundConnectorRegistry.get(def.getType());
       if (dpFactory==null) {
         throw new IllegalArgumentException("Invalid data publisher init parameters");
       }
 
-      OutputBroker<String> dataPublisher = dpFactory.createBroker(def);
+      OutputBroker dataPublisher = dpFactory.createBroker(def);
       dataDestinations.add(dataPublisher);
     }
     

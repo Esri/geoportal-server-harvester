@@ -21,12 +21,11 @@ import java.util.Date;
 
 /**
  * Simple data reference.
- * @param <T> type of data
  */
-public class SimpleDataReference<T> implements DataReference<T> {
+public class SimpleDataReference implements DataReference {
   private final URI sourceUri;
   private final Date lastModifiedDate;
-  private final T content;
+  private final byte [] content;
 
   /**
    * Creates instance of the data reference.
@@ -34,7 +33,7 @@ public class SimpleDataReference<T> implements DataReference<T> {
    * @param lastModifiedDate last modified date
    * @param content content
    */
-  public SimpleDataReference(URI sourceUri, Date lastModifiedDate, T content) {
+  public SimpleDataReference(URI sourceUri, Date lastModifiedDate, byte [] content) {
     this.sourceUri = sourceUri;
     this.lastModifiedDate = lastModifiedDate;
     this.content = content;
@@ -51,7 +50,7 @@ public class SimpleDataReference<T> implements DataReference<T> {
   }
 
   @Override
-  public T getContent() {
+  public byte [] getContent() {
     return content;
   }
   

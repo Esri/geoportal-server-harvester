@@ -29,11 +29,11 @@ import org.slf4j.LoggerFactory;
 /**
  * DefaultProcessor.
  */
-public class DefaultProcessor implements Processor<String> {
+public class DefaultProcessor implements Processor {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultProcessor.class);
 
   @Override
-  public Handler initialize(InputBroker<String> source, List<OutputBroker<String>> destinations, Listener l) {
+  public Handler initialize(InputBroker source, List<OutputBroker> destinations, Listener l) {
     final String harvestDescription = String.format("%s -> [%s}",
             source,
             destinations!=null? destinations.stream().map(d->d.toString()).collect(Collectors.joining(",")): null
@@ -50,8 +50,8 @@ public class DefaultProcessor implements Processor<String> {
             l.onStarted();
             while(source.hasNext()) {
               if (Thread.currentThread().isInterrupted()) break;
-              DataReference<String> dataReference = source.next();
-              for (OutputBroker<String> d: destinations) {
+              DataReference dataReference = source.next();
+              for (OutputBroker d: destinations) {
                 try {
                   d.publish(dataReference);
                   LOG.debug(String.format("Harvested %s during %s", dataReference, harvestDescription));

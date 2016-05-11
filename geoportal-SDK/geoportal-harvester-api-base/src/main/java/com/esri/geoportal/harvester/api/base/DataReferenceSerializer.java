@@ -47,11 +47,11 @@ public class DataReferenceSerializer {
    * @param ref data reference
    * @throws IOException if serialization fails
    */
-  public void serialize(PrintStream out, DataReference<String> ref) throws IOException {
+  public void serialize(PrintStream out, DataReference ref) throws IOException {
 
     byte[] bSourceUri = ENCODER.encode(ref.getSourceUri().toASCIIString().getBytes("UTF-8"));
     byte[] bLastModifiedDate = ENCODER.encode((ref.getLastModifiedDate() != null ? formatIsoDate(ref.getLastModifiedDate()) : "").getBytes("UTF-8"));
-    byte[] bContent = ENCODER.encode(ref.getContent().getBytes("UTF-8"));
+    byte[] bContent = ENCODER.encode(ref.getContent());
 
     out.write(bSourceUri);
     out.write(',');
@@ -71,7 +71,7 @@ public class DataReferenceSerializer {
    * @throws IOException if de-serialization fails
    * @throws URISyntaxException if de-serialization fails
    */
-  public DataReference<String> deserialize(InputStream input) throws IOException, URISyntaxException {
+  public DataReference deserialize(InputStream input) throws IOException, URISyntaxException {
     BufferedReader reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
     String line = reader.readLine();
     if (line != null) {
@@ -83,11 +83,10 @@ public class DataReferenceSerializer {
 
         URI sSourceUri = URI.create(new String(bSourceUri, "UTF-8"));
         String sLastModifiedDate = new String(bLastModifiedDate, "UTF-8");
-        String sContent = new String(bContent, "UTF-8");
 
         Date lastModifiedDate = !sLastModifiedDate.isEmpty() ? Date.from(OffsetDateTime.from(FORMATTER.parse(sLastModifiedDate)).toInstant()) : null;
 
-        return new SimpleDataReference<>(sSourceUri, lastModifiedDate, sContent);
+        return new SimpleDataReference(sSourceUri, lastModifiedDate, bContent);
       }
     }
     return null;

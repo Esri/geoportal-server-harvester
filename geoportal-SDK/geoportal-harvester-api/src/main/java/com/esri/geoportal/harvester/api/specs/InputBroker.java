@@ -24,11 +24,9 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
  * <p>
  * Provides mechanism to obtain data.
  * 
- * @param <D> data type
- * 
  * @see InputConnector
  */
-public interface InputBroker<D> extends Broker {
+public interface InputBroker extends Broker {
   
   /**
    * Checks if more data available.
@@ -42,5 +40,5 @@ public interface InputBroker<D> extends Broker {
    * @return data reference
    * @throws DataInputException if getting next data reference fails
    */
-  DataReference<D> next() throws DataInputException;
+  DataReference next() throws DataInputException;
 }

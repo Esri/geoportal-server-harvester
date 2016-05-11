@@ -25,7 +25,7 @@ import com.esri.geoportal.harvester.api.specs.OutputBroker;
 /**
  * Data print stream output.
  */
-public class DataPrintStreamOutput implements OutputBroker<String> {
+public class DataPrintStreamOutput implements OutputBroker {
   private final DataReferenceSerializer SERIALIZER = new DataReferenceSerializer();
   private final PrintStream out;
 
@@ -38,7 +38,7 @@ public class DataPrintStreamOutput implements OutputBroker<String> {
   }
 
   @Override
-  public void publish(DataReference<String> ref) throws DataOutputException {
+  public void publish(DataReference ref) throws DataOutputException {
     try {
       SERIALIZER.serialize(out, ref);
     } catch (IOException ex) {

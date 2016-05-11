@@ -30,7 +30,7 @@ public class Process {
   private final ReportBuilder reportBuilder;
   private final Processor processor;
   private final Map<String,String> processorEnv;
-  private final Task<String> task;
+  private final Task task;
   
   private Handler handler;
 
@@ -41,7 +41,7 @@ public class Process {
    * @param processorEnv processor variables
    * @param task task
    */
-  public Process(ReportBuilder reportBuilder, Processor processor, Map<String,String> processorEnv, Task<String> task) {
+  public Process(ReportBuilder reportBuilder, Processor processor, Map<String,String> processorEnv, Task task) {
     this.reportBuilder = reportBuilder;
     this.processor = processor;
     this.processorEnv = processorEnv;

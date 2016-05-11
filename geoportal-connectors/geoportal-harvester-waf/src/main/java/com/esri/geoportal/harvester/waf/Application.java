@@ -18,8 +18,6 @@ package com.esri.geoportal.harvester.waf;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.harvester.api.EntityDefinition;
-import com.esri.geoportal.harvester.api.base.DataCollector;
-import com.esri.geoportal.harvester.api.base.DataPrintStreamOutput;
 import java.net.URL;
 import java.util.Arrays;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
@@ -41,8 +39,8 @@ public class Application {
       adaptor.setHostUrl(start);
       adaptor.setBotsConfig(BotsConfig.DEFAULT);
       adaptor.setBotsMode(BotsMode.inherit);
-      try (InputBroker<String> hv = connector.createBroker(def)) {
-        DataCollector<String> dataCollector = new DataCollector<>(hv, Arrays.asList(new DataPrintStreamOutput[]{destination}));
+      try (InputBroker hv = connector.createBroker(def)) {
+        DataCollector dataCollector = new DataCollector(hv, Arrays.asList(new DataPrintStreamOutput[]{destination}));
         dataCollector.collect();
       }
     }

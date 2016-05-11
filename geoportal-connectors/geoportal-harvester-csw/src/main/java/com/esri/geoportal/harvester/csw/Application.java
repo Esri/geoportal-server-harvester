@@ -47,8 +47,8 @@ public class Application {
         adaptor.setProfile(profile);
         adaptor.setBotsConfig(BotsConfig.DEFAULT);
         adaptor.setBotsMode(BotsMode.inherit);
-        try (InputBroker<String> csw = connector.createBroker(def);) {
-          DataCollector<String> dataCollector = new DataCollector<>(csw, Arrays.asList(new DataPrintStreamOutput[]{destination}));
+        try (InputBroker csw = connector.createBroker(def);) {
+          DataCollector dataCollector = new DataCollector(csw, Arrays.asList(new DataPrintStreamOutput[]{destination}));
           dataCollector.collect();
         }
       }

@@ -24,18 +24,17 @@ import com.esri.geoportal.harvester.api.specs.OutputBroker;
 
 /**
  * Data collector.
- * @param <T> type of data
  */
-public class DataCollector<T> {
-  private final InputBroker<T> inputBroker;
-  private final List<OutputBroker<T>> outputBrokers;
+public class DataCollector {
+  private final InputBroker inputBroker;
+  private final List<OutputBroker> outputBrokers;
 
   /**
    * Creates instance of the collector.
    * @param source data source
    * @param outputBrokers data destinations
    */
-  public DataCollector(InputBroker<T> source, List<OutputBroker<T>> outputBrokers) {
+  public DataCollector(InputBroker source, List<OutputBroker> outputBrokers) {
     this.inputBroker = source;
     this.outputBrokers = outputBrokers;
   }
@@ -49,8 +48,8 @@ public class DataCollector<T> {
     try {
       top: while (inputBroker.hasNext()) {
         if (Thread.currentThread().isInterrupted()) break;
-        DataReference<T> dataReference = inputBroker.next();
-        for (OutputBroker<T> d: outputBrokers) {
+        DataReference dataReference = inputBroker.next();
+        for (OutputBroker d: outputBrokers) {
           if (Thread.currentThread().isInterrupted()) break top;
           try {
             d.publish(dataReference);

@@ -37,7 +37,7 @@ public class Application {
       FolderBroker broker = connector.createBroker(def);
     
       DataReferenceSerializer ser = new DataReferenceSerializer();
-      DataReference<String> ref = null;
+      DataReference ref = null;
       while (( ref = ser.deserialize(System.in))!=null) {
         broker.publish(ref);
       }

@@ -21,7 +21,6 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import static com.esri.geoportal.harvester.folder.PathUtil.sanitizeFileName;
 import static com.esri.geoportal.harvester.folder.StringListUtil.head;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,13 +28,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.io.IOUtils;
 import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
+import java.io.OutputStream;
 
 /**
  * Folder broker.
  */
-public class FolderBroker implements OutputBroker<String>{
+public class FolderBroker implements OutputBroker {
   private final FolderConnector connector;
   private final FolderBrokerDefinitionAdaptor definition;
   private final File rootFolder;
@@ -54,27 +53,16 @@ public class FolderBroker implements OutputBroker<String>{
   }
 
   @Override
-  public void publish(DataReference<String> ref) throws DataOutputException {
+  public void publish(DataReference ref) throws DataOutputException {
       File f = generateFileName(ref.getSourceUri().toASCIIString());
       f.getParentFile().mkdirs();
       if (!f.getName().contains(".")) {
         f = f.getParentFile().toPath().resolve(f.getName()+".xml").toFile();
       }
-      FileOutputStream output = null;
-      ByteArrayInputStream input = null;
-      try {
-        output = new FileOutputStream(f);
-        input = new ByteArrayInputStream(ref.getContent().getBytes("UTF-8"));
-        IOUtils.copy(input, output);
+      try (OutputStream output = new FileOutputStream(f);) {
+        output.write(ref.getContent());
       } catch (Exception ex) {
         throw new DataOutputException(this,"Error publishing data.", ex);
-      } finally {
-        if (input!=null) {
-          IOUtils.closeQuietly(input);
-        }
-        if (output!=null) {
-          IOUtils.closeQuietly(output);
-        }
       }
   }
 

@@ -16,15 +16,15 @@
 package com.esri.geoportal.harvester.api;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Date;
 
 /**
  * Data reference. It provides access to data itself as well as vital data 
  * information.
- * @param <T> type of data provided by the reference.
  */
-public interface DataReference<T> {
+public interface DataReference {
   /**
    * Gets source uri.
    * @return source uri
@@ -42,5 +42,5 @@ public interface DataReference<T> {
    * @return content
    * @throws IOException if getting content fails
    */
-  T getContent() throws IOException;
+  byte [] getContent() throws IOException;
 }

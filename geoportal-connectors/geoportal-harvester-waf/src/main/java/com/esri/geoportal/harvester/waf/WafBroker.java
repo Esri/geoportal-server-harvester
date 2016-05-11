@@ -34,7 +34,7 @@ import org.apache.http.impl.client.HttpClients;
 /**
  * WAF broker.
  */
-public class WafBroker implements InputBroker<String> {
+public class WafBroker implements InputBroker {
   private final WafConnector connector;
   private final WafBrokerDefinitionAdaptor arguments;
   private final Set<URL> visited = new HashSet<>();
@@ -91,7 +91,7 @@ public class WafBroker implements InputBroker<String> {
   }
 
   @Override
-  public DataReference<String> next() throws DataInputException {
+  public DataReference next() throws DataInputException {
     try {
       assertExecutor();
       WafFile file = files.poll();
