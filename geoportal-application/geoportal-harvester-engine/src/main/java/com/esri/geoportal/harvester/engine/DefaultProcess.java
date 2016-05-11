@@ -37,8 +37,10 @@ public class DefaultProcess implements Process {
   private final InputBroker source;
   private final List<OutputBroker> destinations;
   
-  private Status status = Status.submitted;
   private final Thread thread;
+  
+  private volatile boolean completed;
+  private volatile boolean aborting;
 
   /**
    * Creates instance of the process.
@@ -50,7 +52,6 @@ public class DefaultProcess implements Process {
     this.destinations = destinations;
     this.thread = new Thread(() -> {
       LOG.info(String.format("Started harvest: %s", getTitle()));
-      setStatus(Status.working);
       try {
         if (!destinations.isEmpty()) {
           while(source.hasNext()) {
@@ -71,7 +72,8 @@ public class DefaultProcess implements Process {
       } catch (DataInputException ex) {
         onError(ex);
       } finally {
-        setStatus(Status.completed);
+        completed = true;
+        aborting = false;
         LOG.info(String.format("Completed harvest: %s", getTitle()));
       }
     },"HARVESTING");
@@ -96,19 +98,10 @@ public class DefaultProcess implements Process {
    */
   @Override
   public synchronized Status getStatus() {
-    return status;
-  }
-  
-  /**
-   * Sets status.
-   * @param status 
-   */
-  private synchronized void setStatus(Status status) {
-    Status oldStatus = this.status;
-    this.status = status;
-    if (oldStatus!=status) {
-      listeners.forEach(l -> {l.onStatus(status);});
-    }
+    if (completed) return Status.completed;
+    if (aborting) return Status.aborting;
+    if (thread.isAlive()) return Status.working;
+    return Status.submitted;
   }
   
   private void onError(DataOutputException ex) {
@@ -142,6 +135,7 @@ public class DefaultProcess implements Process {
     if (getStatus()!=Status.working) {
       throw new IllegalStateException(String.format("Error aborting the process: process is in %s state", getStatus()));
     }
+    aborting = true;
     thread.interrupt();
   }
   
