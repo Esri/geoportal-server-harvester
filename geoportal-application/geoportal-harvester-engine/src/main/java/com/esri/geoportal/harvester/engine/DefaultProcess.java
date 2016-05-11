@@ -38,7 +38,7 @@ public class DefaultProcess implements Process {
   private final List<OutputBroker> destinations;
   
   private Status status = Status.submitted;
-  private Thread thread;
+  private final Thread thread;
 
   /**
    * Creates instance of the process.
@@ -48,34 +48,31 @@ public class DefaultProcess implements Process {
   public DefaultProcess(InputBroker source, List<OutputBroker> destinations) {
     this.source = source;
     this.destinations = destinations;
-    this.thread = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        LOG.info(String.format("Started harvest: %s", getTitle()));
-        setStatus(Status.working);
-        try {
-          if (!destinations.isEmpty()) {
-            while(source.hasNext()) {
-              if (Thread.currentThread().isInterrupted()) break;
-              DataReference dataReference = source.next();
-              for (OutputBroker d: destinations) {
-                try {
-                  d.publish(dataReference);
-                  LOG.debug(String.format("Harvested %s during %s", dataReference, getTitle()));
-                  onSuccess(dataReference);
-                } catch (DataOutputException ex) {
-                  LOG.debug(String.format("Failed harvesting %s during %s", dataReference, getTitle()));
-                  onError(ex);
-                }
+    this.thread = new Thread(() -> {
+      LOG.info(String.format("Started harvest: %s", getTitle()));
+      setStatus(Status.working);
+      try {
+        if (!destinations.isEmpty()) {
+          while(source.hasNext()) {
+            if (Thread.currentThread().isInterrupted()) break;
+            DataReference dataReference = source.next();
+            destinations.stream().forEach((d) -> {
+              try {
+                d.publish(dataReference);
+                LOG.debug(String.format("Harvested %s during %s", dataReference, getTitle()));
+                onSuccess(dataReference);
+              } catch (DataOutputException ex) {
+                LOG.debug(String.format("Failed harvesting %s during %s", dataReference, getTitle()));
+                onError(ex);
               }
-            }
+            });
           }
-        } catch (DataInputException ex) {
-          onError(ex);
-        } finally {
-          setStatus(Status.completed);
-          LOG.info(String.format("Completed harvest: %s", getTitle()));
         }
+      } catch (DataInputException ex) {
+        onError(ex);
+      } finally {
+        setStatus(Status.completed);
+        LOG.info(String.format("Completed harvest: %s", getTitle()));
       }
     },"HARVESTING");
   }
