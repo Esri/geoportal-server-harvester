@@ -15,7 +15,6 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.IProcess;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
@@ -26,13 +25,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.esri.geoportal.harvester.api.Process;
+import java.util.Collections;
 
 /**
  * DefaultProcess.
  */
-public class DefaultProcess implements IProcess {
+public class DefaultProcess implements Process {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultProcess.class);
-  private final ArrayList<Listener> listeners = new ArrayList<>();
+  private final List<Listener> listeners = Collections.synchronizedList(new ArrayList<>());
   private final InputBroker source;
   private final List<OutputBroker> destinations;
   
@@ -41,10 +42,8 @@ public class DefaultProcess implements IProcess {
 
   /**
    * Creates instance of the process.
-   * @param reportBuilder report builder
-   * @param processor processor
-   * @param processorEnv processor variables
-   * @param task task
+   * @param source source of data
+   * @param destinations data destinations
    */
   public DefaultProcess(InputBroker source, List<OutputBroker> destinations) {
     this.source = source;

@@ -28,9 +28,8 @@ public interface Processor {
    * Initialize processor.
    * @param source data source
    * @param destinations data destination
-   * @param l events listener
-   * @return 
+   * @return instance of the process
    */
-  IProcess submit(InputBroker source, List<OutputBroker> destinations);
+  Process submit(InputBroker source, List<OutputBroker> destinations);
   
 }

@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.support;
 
-import com.esri.geoportal.harvester.api.IProcess.Status;
+import com.esri.geoportal.harvester.api.Process.Status;
 import java.util.UUID;
 
 /**

@@ -21,7 +21,7 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 /**
  * Process.
  */
-public interface IProcess {
+public interface Process {
 
   /**
    * Begins the process.
