@@ -82,7 +82,7 @@ public class ProcessController {
       try {
         process.abort();
       } catch (IllegalStateException ex) {
-        // ignore
+        LOG.warn("Unable to abort the process.", ex);
       }
     }
     return process!=null? new ProcessInfo(processId, process.getTitle(), process.getStatus()): null;
