@@ -131,9 +131,8 @@ define(["dojo/_base/declare",
           var brokersApi = new BrokersApi();
           
           // use API to update broker
-          console.log("TODO: updating broker...", evt.data);
-          /*
-          brokersApi.create(json.stringify(brokerDefinition)).then(
+          console.log("TODO: updating broker...", evt.brokerDefinition);
+          brokersApi.update(brokerDefinition.uuid,json.stringify(brokerDefinition)).then(
             lang.hitch({brokerEditorPane: brokerEditorPane, brokerEditorDialog: brokerEditorDialog, self: this},function(){
               this.brokerEditorDialog.destroy();
               this.brokerEditorPane.destroy();
@@ -144,14 +143,13 @@ define(["dojo/_base/declare",
               topic.publish("msg",new Error("Error creating broker"));
             })
           );
-          */
         }));
         
         brokerEditorDialog.show();
       },
       
       _onRemove: function(evt) {
-        var uuid = evt.data.uuid;
+        var uuid = evt.brokerDefinition.uuid;
         var brokersApi = new BrokersApi();
         
         // use API to remove broker

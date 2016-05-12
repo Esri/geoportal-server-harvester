@@ -119,13 +119,19 @@ define(["dojo/_base/declare",
       },
       
       _onSubmit: function() {
-        var values = this.formWidget.getValues();
         if (this.formWidget.validate()) {
+          var values = this.formWidget.getValues();
           var brokerDefinition = {
             type: values.type,
             label: values.label,
             properties: values
           };
+          if (this.data && this.data.uuid) {
+            brokerDefinition.uuid = this.data.uuid;
+          }
+          if (this.data && this.data.brokerDefinition && this.data.brokerDefinition.type) {
+            brokerDefinition.type = this.data.brokerDefinition.type;
+          }
           delete brokerDefinition.properties.type;
           delete brokerDefinition.properties.label;
           this.emit("submit",{brokerDefinition: brokerDefinition});
