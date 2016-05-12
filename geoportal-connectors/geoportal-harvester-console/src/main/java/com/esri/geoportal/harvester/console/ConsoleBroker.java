@@ -40,7 +40,7 @@ public class ConsoleBroker implements OutputBroker  {
     try {
       counter++;
       
-      System.out.println(String.format("%s [%s]", ref.getSourceUri(), ref.getLastModifiedDate()));
+      System.out.println(String.format("%s [%s]", ref.getId(), ref.getLastModifiedDate()));
       System.out.println(String.format("%s", ref.getContent()));
       System.out.println(String.format("--- END OF %d ---", counter));
       System.out.println();

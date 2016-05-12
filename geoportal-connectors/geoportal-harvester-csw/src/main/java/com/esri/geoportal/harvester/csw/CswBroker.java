@@ -93,7 +93,7 @@ public class CswBroker implements InputBroker {
     try {
       IRecord rec = recs.next();
       String metadata = client.readMetadata(rec.getId());
-      return new SimpleDataReference(URI.create(rec.getId().replaceAll("^\\{|\\}$","")), rec.getLastModifiedDate(), metadata.getBytes("UTF-8"));
+      return new SimpleDataReference(rec.getId(), rec.getLastModifiedDate(), metadata.getBytes("UTF-8"));
     } catch (Exception ex) {
       throw new DataInputException(this, "Error reading data.", ex);
     }

@@ -40,7 +40,7 @@ public class Application {
       DataReferenceSerializer ser = new DataReferenceSerializer();
       DataReference ref = null;
       while (( ref = ser.deserialize(System.in))!=null) {
-        System.out.println(String.format("publishing: %s", ref.getSourceUri()));
+        System.out.println(String.format("publishing: %s", ref.getId()));
         broker.publish(ref);
       }
     }

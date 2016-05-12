@@ -59,7 +59,7 @@ public class WafFile {
     HttpResponse response = httpClient.execute(method);
     Date lastModifiedDate = readLastModifiedDate(response);
     try (InputStream input = response.getEntity().getContent()) {
-      return new SimpleDataReference(fileUrl.toURI(), lastModifiedDate, IOUtils.toByteArray(input));
+      return new SimpleDataReference(fileUrl.toExternalForm(), lastModifiedDate, IOUtils.toByteArray(input));
     }
   }
 

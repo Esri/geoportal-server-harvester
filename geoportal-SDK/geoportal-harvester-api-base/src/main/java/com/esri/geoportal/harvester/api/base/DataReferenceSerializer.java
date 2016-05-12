@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -49,7 +48,7 @@ public class DataReferenceSerializer {
    */
   public void serialize(PrintStream out, DataReference ref) throws IOException {
 
-    byte[] bSourceUri = ENCODER.encode(ref.getSourceUri().toASCIIString().getBytes("UTF-8"));
+    byte[] bSourceUri = ENCODER.encode(ref.getId().getBytes("UTF-8"));
     byte[] bLastModifiedDate = ENCODER.encode((ref.getLastModifiedDate() != null ? formatIsoDate(ref.getLastModifiedDate()) : "").getBytes("UTF-8"));
     byte[] bContent = ENCODER.encode(ref.getContent());
 
@@ -81,12 +80,12 @@ public class DataReferenceSerializer {
         byte[] bLastModifiedDate = DECODER.decode(split[1].getBytes("UTF-8"));
         byte[] bContent = DECODER.decode(split[2].getBytes("UTF-8"));
 
-        URI sSourceUri = URI.create(new String(bSourceUri, "UTF-8"));
+        String sId = new String(bSourceUri, "UTF-8");
         String sLastModifiedDate = new String(bLastModifiedDate, "UTF-8");
 
         Date lastModifiedDate = !sLastModifiedDate.isEmpty() ? Date.from(OffsetDateTime.from(FORMATTER.parse(sLastModifiedDate)).toInstant()) : null;
 
-        return new SimpleDataReference(sSourceUri, lastModifiedDate, bContent);
+        return new SimpleDataReference(sId, lastModifiedDate, bContent);
       }
     }
     return null;
