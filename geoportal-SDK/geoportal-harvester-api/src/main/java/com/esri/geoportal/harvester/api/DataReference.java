@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.api;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Date;
 
 /**
@@ -23,6 +24,10 @@ import java.util.Date;
  * information.
  */
 public interface DataReference {
+  /**
+   * Gets data record id.
+   * @return data record id
+   */
   String getId();
   
   /**
@@ -30,6 +35,12 @@ public interface DataReference {
    * @return last modified date or <code>null</code> if no date information available
    */
   Date getLastModifiedDate();
+  
+  /**
+   * Gets source uri.
+   * @return source uri
+   */
+  URI getSourceUri();
   
   /**
    * Gets content.

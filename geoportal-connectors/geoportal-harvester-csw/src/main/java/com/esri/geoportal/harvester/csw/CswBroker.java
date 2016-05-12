@@ -26,9 +26,7 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Iterator;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -93,7 +91,7 @@ public class CswBroker implements InputBroker {
     try {
       IRecord rec = recs.next();
       String metadata = client.readMetadata(rec.getId());
-      return new SimpleDataReference(rec.getId(), rec.getLastModifiedDate(), metadata.getBytes("UTF-8"));
+      return new SimpleDataReference(rec.getId(), rec.getLastModifiedDate(), attributes.getHostUrl().toURI(), metadata.getBytes("UTF-8"));
     } catch (Exception ex) {
       throw new DataInputException(this, "Error reading data.", ex);
     }
@@ -105,7 +103,7 @@ public class CswBroker implements InputBroker {
    */
   private void assertClient() throws IOException {
     if (client==null) {
-      CloseableHttpClient httpclient = HttpClients.createDefault();
+      httpclient = HttpClients.createDefault();
       Bots bots = BotsUtils.readBots(attributes.getBotsConfig(), httpclient, attributes.getBotsMode(), attributes.getHostUrl());
       ObjectFactory cf = new ObjectFactory();
       client = cf.newClient(attributes.getHostUrl().toExternalForm(), attributes.getProfile(), bots, attributes.getBotsMode());

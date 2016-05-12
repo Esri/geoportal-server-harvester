@@ -19,7 +19,6 @@ import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.DataReferenceSerializer;
 import java.io.File;
-import java.net.URL;
 
 /**
  * Application.
@@ -28,12 +27,10 @@ public class Application {
   public static void main(String[] args) throws Exception {
     if (args.length==2) {
       File rootFolder = new File(args[0]);
-      URL hostUrl = new URL(args[1]);
       FolderConnector connector = new FolderConnector();
       EntityDefinition def = new EntityDefinition();
       FolderBrokerDefinitionAdaptor adaptor = new FolderBrokerDefinitionAdaptor(def);
       adaptor.setRootFolder(rootFolder);
-      adaptor.setHostUrl(hostUrl);
       FolderBroker broker = connector.createBroker(def);
     
       DataReferenceSerializer ser = new DataReferenceSerializer();

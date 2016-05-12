@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -48,13 +49,16 @@ public class DataReferenceSerializer {
    */
   public void serialize(PrintStream out, DataReference ref) throws IOException {
 
-    byte[] bSourceUri = ENCODER.encode(ref.getId().getBytes("UTF-8"));
+    byte[] bId = ENCODER.encode(ref.getId().getBytes("UTF-8"));
     byte[] bLastModifiedDate = ENCODER.encode((ref.getLastModifiedDate() != null ? formatIsoDate(ref.getLastModifiedDate()) : "").getBytes("UTF-8"));
+    byte[] bSourceUri = ENCODER.encode(ref.getSourceUri().toASCIIString().getBytes("UTF-8"));
     byte[] bContent = ENCODER.encode(ref.getContent());
 
-    out.write(bSourceUri);
+    out.write(bId);
     out.write(',');
     out.write(bLastModifiedDate);
+    out.write(',');
+    out.write(bSourceUri);
     out.write(',');
     out.write(bContent);
     out.write('\r');
@@ -75,17 +79,19 @@ public class DataReferenceSerializer {
     String line = reader.readLine();
     if (line != null) {
       String[] split = line.split(",");
-      if (split.length == 3) {
-        byte[] bSourceUri = DECODER.decode(split[0].getBytes("UTF-8"));
+      if (split.length == 4) {
+        byte[] bId = DECODER.decode(split[0].getBytes("UTF-8"));
         byte[] bLastModifiedDate = DECODER.decode(split[1].getBytes("UTF-8"));
-        byte[] bContent = DECODER.decode(split[2].getBytes("UTF-8"));
+        byte[] bSourceUri = DECODER.decode(split[2].getBytes("UTF-8"));
+        byte[] bContent = DECODER.decode(split[3].getBytes("UTF-8"));
 
-        String sId = new String(bSourceUri, "UTF-8");
+        String sId = new String(bId, "UTF-8");
         String sLastModifiedDate = new String(bLastModifiedDate, "UTF-8");
+        URI sourceUri = URI.create(new String(bSourceUri, "UTF-8"));
 
         Date lastModifiedDate = !sLastModifiedDate.isEmpty() ? Date.from(OffsetDateTime.from(FORMATTER.parse(sLastModifiedDate)).toInstant()) : null;
 
-        return new SimpleDataReference(sId, lastModifiedDate, bContent);
+        return new SimpleDataReference(sId, lastModifiedDate, sourceUri, bContent);
       }
     }
     return null;

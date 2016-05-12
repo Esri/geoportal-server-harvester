@@ -19,7 +19,6 @@ import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.ConnectorTemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
-import static com.esri.geoportal.harvester.folder.FolderBrokerDefinitionAdaptor.P_HOST_URL;
 import static com.esri.geoportal.harvester.folder.FolderBrokerDefinitionAdaptor.P_ROOT_FOLDER;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,6 @@ public class FolderConnector implements OutputConnector<FolderBroker> {
   public ConnectorTemplate getTemplate() {
     List<ConnectorTemplate.Argument> arguments = new ArrayList<>();
     arguments.add(new ConnectorTemplate.StringArgument(P_ROOT_FOLDER, "Root folder", true));
-    arguments.add(new ConnectorTemplate.StringArgument(P_HOST_URL, "Source host URL", true));
     return new ConnectorTemplate("FOLDER", "Folder", arguments);
   }
 

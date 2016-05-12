@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
 import java.io.OutputStream;
+import java.net.URI;
 
 /**
  * Folder broker.
@@ -37,14 +38,15 @@ import java.io.OutputStream;
 public class FolderBroker implements OutputBroker {
   private final FolderConnector connector;
   private final FolderBrokerDefinitionAdaptor definition;
-  private final File rootFolder;
-  private final List<String> subFolder;
 
+  /**
+   * Creates instance of the broker.
+   * @param connector connector
+   * @param definition broker definition
+   */
   public FolderBroker(FolderConnector connector, FolderBrokerDefinitionAdaptor definition) {
     this.connector = connector;
     this.definition = definition;
-    this.rootFolder = definition.getRootFolder().toPath().resolve(definition.getHostUrl().getHost()).toFile();
-    this.subFolder = splitPath(definition.getHostUrl().getPath());
   }
 
   @Override
@@ -54,7 +56,7 @@ public class FolderBroker implements OutputBroker {
 
   @Override
   public void publish(DataReference ref) throws DataOutputException {
-      File f = generateFileName(ref.getId());
+      File f = generateFileName(ref.getSourceUri(), ref.getId());
       f.getParentFile().mkdirs();
       if (!f.getName().contains(".")) {
         f = f.getParentFile().toPath().resolve(f.getName()+".xml").toFile();
@@ -77,8 +79,11 @@ public class FolderBroker implements OutputBroker {
     return String.format("FOLDER [%s]", definition.getRootFolder());
   }
   
-  private File generateFileName(String uri) {
-    String sUri = uri;
+  private File generateFileName(URI sourceUri, String id) {
+    String sUri = id;
+    
+    File rootFolder = definition.getRootFolder().toPath().resolve(sourceUri.getHost()).toFile();
+    List<String> subFolder = splitPath(sourceUri.getPath());
     
     File fileName = rootFolder;
     try {

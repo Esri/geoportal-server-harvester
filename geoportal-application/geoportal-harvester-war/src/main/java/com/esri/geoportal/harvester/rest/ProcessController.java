@@ -106,8 +106,7 @@ public class ProcessController {
         {
             "type": "FOLDER",
             "properties": {
-                "folder-root-folder": "c:\\data",
-                "folder-host-url": "http://gptsrv12r2"
+                "folder-root-folder": "c:\\data"
             }
         }
     ]

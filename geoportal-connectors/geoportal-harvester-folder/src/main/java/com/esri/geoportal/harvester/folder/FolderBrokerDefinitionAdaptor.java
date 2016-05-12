@@ -18,8 +18,6 @@ package com.esri.geoportal.harvester.folder;
 import com.esri.geoportal.harvester.api.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -28,10 +26,8 @@ import org.apache.commons.lang3.StringUtils;
 public class FolderBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
 
   public static final String P_ROOT_FOLDER = "folder-root-folder";
-  public static final String P_HOST_URL = "folder-host-url";
   
   private File rootFolder;
-  private URL hostUrl;
 
   /**
    * Creates instance of the adaptor.
@@ -44,11 +40,6 @@ public class FolderBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
     } else if (!FolderConnector.TYPE.equals(def.getType())) {
       throw new IllegalArgumentException("Broker definition doesn't match");
     } else {
-      try {
-        this.hostUrl = new URL(get(P_HOST_URL));
-      } catch (MalformedURLException ex) {
-        throw new IllegalArgumentException(String.format("Invalid %s: %s",P_HOST_URL,get(P_HOST_URL)), ex);
-      }
       try {
         this.rootFolder = new File(get(P_ROOT_FOLDER));
       } catch (NullPointerException ex) {
@@ -74,22 +65,5 @@ public class FolderBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public void setRootFolder(File rootFolder) {
     this.rootFolder = rootFolder;
     set(P_ROOT_FOLDER, rootFolder.toString());
-  }
-
-  /**
-   * Gets host URL.
-   * @return host URL
-   */
-  public URL getHostUrl() {
-    return hostUrl;
-  }
-
-  /**
-   * Sets host URL
-   * @param url host URL
-   */
-  public void setHostUrl(URL url) {
-    this.hostUrl = url;
-    set(P_HOST_URL, url.toExternalForm());
   }
 }

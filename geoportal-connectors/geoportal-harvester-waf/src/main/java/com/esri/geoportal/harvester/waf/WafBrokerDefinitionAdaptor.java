@@ -29,6 +29,11 @@ public class WafBrokerDefinitionAdaptor extends BotsBrokerDefinitionAdaptor {
   
   private URL hostUrl;
 
+  /**
+   * Creates instance of the adaptor.
+   * @param def broker definition
+   * @throws IllegalArgumentException if invalid broker definition
+   */
   public WafBrokerDefinitionAdaptor(EntityDefinition def) throws IllegalArgumentException {
     super(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
@@ -44,10 +49,18 @@ public class WafBrokerDefinitionAdaptor extends BotsBrokerDefinitionAdaptor {
     }
   }
   
+  /**
+   * Gets host URL.
+   * @return host URL
+   */
   public URL getHostUrl() {
     return hostUrl;
   }
   
+  /**
+   * Sets host URL
+   * @param url host URL
+   */
   public void setHostUrl(URL url) {
     this.hostUrl = url;
     set(P_HOST_URL, url.toExternalForm());

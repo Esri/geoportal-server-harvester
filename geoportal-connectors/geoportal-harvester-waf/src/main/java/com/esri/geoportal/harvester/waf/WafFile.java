@@ -20,6 +20,7 @@ import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.ZonedDateTime;
@@ -35,14 +36,17 @@ import org.apache.http.client.methods.HttpGet;
  */
 public class WafFile {
 
+  private final URI sourceUri;
   private final URL fileUrl;
 
   /**
    * Creates instance of the WAF file.
    *
+   * @param sourceUri source URI
    * @param fileUrl file URL
    */
-  public WafFile(URL fileUrl) {
+  public WafFile(URI sourceUri, URL fileUrl) {
+    this.sourceUri = sourceUri;
     this.fileUrl = fileUrl;
   }
 
@@ -59,7 +63,7 @@ public class WafFile {
     HttpResponse response = httpClient.execute(method);
     Date lastModifiedDate = readLastModifiedDate(response);
     try (InputStream input = response.getEntity().getContent()) {
-      return new SimpleDataReference(fileUrl.toExternalForm(), lastModifiedDate, IOUtils.toByteArray(input));
+      return new SimpleDataReference(fileUrl.toExternalForm(), lastModifiedDate, sourceUri, IOUtils.toByteArray(input));
     }
   }
 

@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.waf;
 
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -27,14 +28,17 @@ import java.util.List;
  */
 public class WafFolder {
 
+  private final URI sourceUri;
   private final URL folderUrl;
 
   /**
    * Creates instance of the folder.
    *
+   * @param sourceUri source URI
    * @param folderUrl folder URL
    */
-  public WafFolder(URL folderUrl) {
+  public WafFolder(URI sourceUri, URL folderUrl) {
+    this.sourceUri = sourceUri;
     this.folderUrl = folderUrl;
   }
 
@@ -54,9 +58,9 @@ public class WafFolder {
 
     urls.forEach(u -> {
       if (u.toExternalForm().toLowerCase().endsWith(".xml")) {
-        files.add(new WafFile(u));
+        files.add(new WafFile(sourceUri, u));
       } else {
-        subFolders.add(new WafFolder(u));
+        subFolders.add(new WafFolder(sourceUri, u));
       }
     });
 
