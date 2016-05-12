@@ -242,8 +242,10 @@ public class Engine {
   
   /**
    * Creates process.
+   * @param processorDefinition process definition
    * @param task task for the process
-   * @return process
+   * @return id of the process
+   * @throws InvalidDefinitionException if processor definition is invalid
    */
   public UUID createProcess(EntityDefinition processorDefinition, Task task) throws InvalidDefinitionException {
     Processor processor = processorDefinition==null?

@@ -158,7 +158,7 @@ public final class ConnectorTemplate {
      * Creates instance of the argument.
      * @param name type
      * @param label label
-     * @param required
+     * @param required <code>true</code> if argument is required
      */
     public StringArgument(String name, String label, boolean required) {
       super(name, label, required);

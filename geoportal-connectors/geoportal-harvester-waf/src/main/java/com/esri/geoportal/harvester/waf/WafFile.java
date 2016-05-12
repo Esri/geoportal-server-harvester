@@ -18,7 +18,6 @@ package com.esri.geoportal.harvester.waf;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
-import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -52,6 +51,7 @@ public class WafFile {
    * @param httpClient HTTP client
    * @return content reference
    * @throws IOException if reading content fails
+   * @throws URISyntaxException if file url is an invalid URI
    */
   public SimpleDataReference readContent(BotsHttpClient httpClient) throws IOException, URISyntaxException {
     HttpGet method = new HttpGet(fileUrl.toExternalForm());

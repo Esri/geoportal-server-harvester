@@ -87,7 +87,7 @@ public class BrokerController {
   
   /**
    * Adds a new task.
-   * @param brokerDefinition
+   * @param brokerDefinition broker definition
    * @return broker info of the newly created broker
    */
   @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -98,7 +98,8 @@ public class BrokerController {
   
   /**
    * Adds a new task.
-   * @param brokerDefinition
+   * @param brokerDefinition broker definition
+   * @param brokerId broker id
    * @return broker info of the task which has been replaced
    */
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

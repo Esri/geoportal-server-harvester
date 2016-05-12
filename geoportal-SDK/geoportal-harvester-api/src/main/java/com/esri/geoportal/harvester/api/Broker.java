@@ -21,12 +21,12 @@ import java.io.Closeable;
  * Broker.
  * <p>
  * It represents a mechanism of obtaining or publishing data. There are two sub-types
- * of this interface: {@link InputBroker} used to get data and {@link OutputBroker}
+ * of this interface: {@link com.esri.geoportal.harvester.api.specs.InputBroker} used to get data and {@link com.esri.geoportal.harvester.api.specs.OutputBroker}
  * used to publish data.
  * 
- * @see InputBroker
- * @see OutputBroker
- * @see BrokerDefinition
+ * @see com.esri.geoportal.harvester.api.specs.InputBroker
+ * @see com.esri.geoportal.harvester.api.specs.OutputBroker
+ * @see EntityDefinition
  * @see Connector
  */
 public interface Broker extends Closeable {
