@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.engine.support.CrudsRepo;
 
 /**

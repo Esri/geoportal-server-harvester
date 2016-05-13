@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine;
 
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.engine.support.CrudsRepo;
 
 /**

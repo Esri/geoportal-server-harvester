@@ -15,8 +15,8 @@
  */
 package com.esri.geoportal.harvester.console;
 
-import com.esri.geoportal.harvester.api.EntityDefinition;
-import com.esri.geoportal.harvester.api.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.ConnectorTemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 

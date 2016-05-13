@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.support;
 
-import com.esri.geoportal.harvester.api.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;

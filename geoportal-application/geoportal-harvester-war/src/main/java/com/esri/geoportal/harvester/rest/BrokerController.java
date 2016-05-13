@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.rest;
 
-import com.esri.geoportal.harvester.api.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.engine.BrokerInfo;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import java.util.UUID;

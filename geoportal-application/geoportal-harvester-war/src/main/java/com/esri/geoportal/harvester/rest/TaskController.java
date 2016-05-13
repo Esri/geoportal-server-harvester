@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.rest;
 
 import com.esri.geoportal.harvester.support.TaskInfo;
 import com.esri.geoportal.harvester.beans.EngineBean;
-import com.esri.geoportal.harvester.engine.TaskDefinition;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;

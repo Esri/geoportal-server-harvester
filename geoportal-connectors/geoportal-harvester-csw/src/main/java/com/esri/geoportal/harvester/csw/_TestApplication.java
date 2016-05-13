@@ -20,7 +20,7 @@ import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.ObjectFactory;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
-import com.esri.geoportal.harvester.api.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;

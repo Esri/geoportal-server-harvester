@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.api;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Processor.
@@ -26,10 +27,11 @@ public interface Processor {
 
   /**
    * Initialize processor.
+   * @param processId process id
    * @param source data source
    * @param destinations data destination
    * @return instance of the process
    */
-  ProcessHandle submit(InputBroker source, List<OutputBroker> destinations);
+  ProcessHandle submit(UUID processId, InputBroker source, List<OutputBroker> destinations);
   
 }

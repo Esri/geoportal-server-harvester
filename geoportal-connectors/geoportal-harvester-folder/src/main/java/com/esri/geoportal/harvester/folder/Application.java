@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.folder;
 
-import com.esri.geoportal.harvester.api.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.DataReferenceSerializer;
 import java.io.File;

@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine;
 
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -22,8 +23,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import com.esri.geoportal.harvester.api.EntityDefinition;
-import com.esri.geoportal.harvester.api.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.ConnectorTemplate;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
@@ -244,10 +245,10 @@ public class Engine {
    * Creates process.
    * @param processorDefinition process definition
    * @param task task for the process
-   * @return id of the process
+   * @return process handle
    * @throws InvalidDefinitionException if processor definition is invalid
    */
-  public UUID createProcess(EntityDefinition processorDefinition, Task task) throws InvalidDefinitionException {
+  public ProcessHandle createProcess(EntityDefinition processorDefinition, Task task) throws InvalidDefinitionException {
     Processor processor = processorDefinition==null?
             processorRegistry.getDefaultProcessor():
             processorRegistry.get(processorDefinition.getType())!=null?
@@ -256,10 +257,23 @@ public class Engine {
     if (processor==null) {
       throw new InvalidDefinitionException(String.format("Unable to select processor based on definition: %s", processorDefinition));
     }
-    ProcessHandle process = new DefaultProcess(task.getDataSource(),task.getDataDestinations());
+    UUID processId = UUID.randomUUID();
+    ProcessHandle process = processor.submit(processId, task.getDataSource(),task.getDataDestinations());
     process.addListener(new ReportBuilderAdaptor(process, reportBuilder));
-    process.begin();
-    return processManager.create(process);
+    processManager.create(process);
+    return process;
+  }
+  
+  /**
+   * Submits task definition.
+   * @param taskDefinition task definition
+   * @return process handle
+   * @throws InvalidDefinitionException invalid definition exception
+   */
+  public ProcessHandle submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException {
+      Task task = createTask(taskDefinition.getSource(), taskDefinition.getDestinations());
+      ProcessHandle handle = createProcess(taskDefinition.getProcessor(),task);
+      return handle;
   }
   
   /**

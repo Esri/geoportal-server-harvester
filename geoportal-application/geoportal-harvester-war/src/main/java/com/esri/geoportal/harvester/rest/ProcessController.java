@@ -18,9 +18,8 @@ package com.esri.geoportal.harvester.rest;
 import com.esri.geoportal.harvester.api.ProcessHandle;
 import com.esri.geoportal.harvester.support.ProcessInfo;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
-import com.esri.geoportal.harvester.engine.TaskDefinition;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.beans.EngineBean;
-import com.esri.geoportal.harvester.engine.Task;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -119,10 +118,9 @@ public class ProcessController {
   public ResponseEntity<ProcessInfo> createProcess(@RequestBody TaskDefinition taskDefinition) {
     LOG.debug(String.format("PUT /rest/harvester/processes <-- %s", taskDefinition));
     try {
-      Task task = engine.createTask(taskDefinition.getSource(), taskDefinition.getDestinations());
-      UUID processId = engine.createProcess(taskDefinition.getProcessor(),task);
-      ProcessHandle process = engine.getProcess(processId);
-      return new ResponseEntity<>(new ProcessInfo(processId, process.getTitle(), process.getStatus()), HttpStatus.OK);
+      ProcessHandle process = engine.submitTaskDefinition(taskDefinition);
+      process.begin();
+      return new ResponseEntity<>(new ProcessInfo(process.getProcessId(), process.getTitle(), process.getStatus()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }

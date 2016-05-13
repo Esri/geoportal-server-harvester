@@ -13,14 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine;
-
-import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.engine.support.CrudsRepo;
 
 /**
- * Trigger manager.
+ * Final definitions.
  */
-public interface TriggerManager extends CrudsRepo<EntityDefinition> {
-  
-}
+package com.esri.geoportal.harvester.api.defs;

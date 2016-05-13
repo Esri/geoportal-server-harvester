@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.waf;
 
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
-import com.esri.geoportal.harvester.api.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import java.net.URL;
 import java.util.Arrays;
 import com.esri.geoportal.harvester.api.specs.InputBroker;

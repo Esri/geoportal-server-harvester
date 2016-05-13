@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.api.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.engine.BrokerDefinitionManager;
 import static com.esri.geoportal.harvester.support.BrokerDefinitionSerializer.deserializeBrokerDef;
 import static com.esri.geoportal.harvester.support.BrokerDefinitionSerializer.serializeBrokerDef;

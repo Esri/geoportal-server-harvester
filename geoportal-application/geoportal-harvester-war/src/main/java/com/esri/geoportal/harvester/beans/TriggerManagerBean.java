@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.api.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.engine.TriggerManager;
 import java.util.Collection;
 import java.util.Map;

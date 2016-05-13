@@ -15,9 +15,15 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+
 /**
  * Harvesting trigger.
  */
 public interface Trigger {
-  
+  /**
+   * Launches the process.
+   * @param taskDefinition task definition
+   */
+  void launch(TaskDefinition taskDefinition);
 }

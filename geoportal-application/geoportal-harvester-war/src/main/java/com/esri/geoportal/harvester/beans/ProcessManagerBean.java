@@ -43,9 +43,8 @@ public class ProcessManagerBean implements ProcessManager  {
 
   @Override
   public UUID create(ProcessHandle process) {
-    UUID id = UUID.randomUUID();
-    processes.put(id, process);
-    return id;
+    processes.put(process.getProcessId(), process);
+    return process.getProcessId();
   }
 
   @Override

@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.api.base;
 
-import com.esri.geoportal.harvester.api.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 
 /**
  * Broker adaptor.

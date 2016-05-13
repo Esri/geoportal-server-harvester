@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.support;
 
-import com.esri.geoportal.harvester.engine.TaskDefinition;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import java.util.UUID;
 
 /**

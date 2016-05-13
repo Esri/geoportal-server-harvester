@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api;
+package com.esri.geoportal.harvester.api.defs;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

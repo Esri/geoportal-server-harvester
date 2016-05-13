@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.rest;
 
-import com.esri.geoportal.harvester.api.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.defs.ConnectorTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -123,11 +123,6 @@ import org.springframework.web.bind.annotation.PathVariable;
           {
             name: "folder.root.folder",
             label: "Root folder",
-            type: "string"
-          },
-          {
-            name: "folder.host.url",
-            label: "Source host URL",
             type: "string"
           }
         ]

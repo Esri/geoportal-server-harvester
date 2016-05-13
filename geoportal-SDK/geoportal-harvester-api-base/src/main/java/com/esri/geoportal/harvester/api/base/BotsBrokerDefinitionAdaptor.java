@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.api.base;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsConfigImpl;
 import com.esri.geoportal.commons.robots.BotsMode;
-import com.esri.geoportal.harvester.api.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 

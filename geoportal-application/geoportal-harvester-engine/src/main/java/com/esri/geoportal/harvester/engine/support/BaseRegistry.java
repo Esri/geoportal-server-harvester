@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import com.esri.geoportal.harvester.api.Connector;
-import com.esri.geoportal.harvester.api.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.defs.ConnectorTemplate;
 
 /**
  * Base data registry.

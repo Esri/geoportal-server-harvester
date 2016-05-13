@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.folder;
 
-import com.esri.geoportal.harvester.api.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import java.io.File;
 import org.apache.commons.lang3.StringUtils;
