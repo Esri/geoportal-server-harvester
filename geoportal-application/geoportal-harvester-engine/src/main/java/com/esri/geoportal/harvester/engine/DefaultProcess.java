@@ -114,7 +114,7 @@ public class DefaultProcess implements ProcessHandle {
   }
   
   private void onSuccess(DataReference dataRef) {
-    listeners.forEach(l->{l.onSuccess(dataRef);});
+    listeners.forEach(l->{l.onDataProcessed(dataRef);});
   }
   
   /**

@@ -15,11 +15,12 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.harvester.api.ex.DataException;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 
 /**
- * ProcessHandle.
+ * Process handler.
  */
 public interface ProcessHandle {
   /**
@@ -70,27 +71,21 @@ public interface ProcessHandle {
   interface Listener {
     /**
      * Called when status changed
-     * @param newStatus new status
+     * @param status new status
      */
-    void onStatus(Status newStatus);
+    void onStatusChange(Status status);
     
     /**
      * Called when data reference has been processed
      * @param dataReference data reference
      */
-    void onSuccess(DataReference dataReference);
+    void onDataProcessed(DataReference dataReference);
     
     /**
      * Called for output onError.
      * @param ex onError
      */
-    public void onError(DataOutputException ex);
-    
-    /**
-     * Called for input onError.
-     * @param ex onError
-     */
-    public void onError(DataInputException ex);
+    public void onError(DataException ex);
   }
 
   
