@@ -21,6 +21,7 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.engine.ReportBuilder;
 import com.esri.geoportal.harvester.api.ProcessHandle;
+import com.esri.geoportal.harvester.api.ex.DataException;
 
 /**
  * Report builder adaptor.
@@ -29,13 +30,18 @@ public class ReportBuilderAdaptor implements Listener {
   private final ProcessHandle process;
   private final ReportBuilder reportBuilder;
 
+  /**
+   * Creates instance of the adaptor.
+   * @param process process
+   * @param reportBuilder report builder
+   */
   public ReportBuilderAdaptor(ProcessHandle process, ReportBuilder reportBuilder) {
     this.process = process;
     this.reportBuilder = reportBuilder;
   }
 
   @Override
-  public void onStatus(ProcessHandle.Status newStatus) {
+  public void onStatusChange(ProcessHandle.Status newStatus) {
     switch (newStatus) {
       case working:
         reportBuilder.started(process);
@@ -47,19 +53,18 @@ public class ReportBuilderAdaptor implements Listener {
   }
 
   @Override
-  public void onSuccess(DataReference dataReference) {
+  public void onDataProcessed(DataReference dataReference) {
     reportBuilder.success(process, dataReference);
   }
 
   @Override
-  public void onError(DataOutputException ex) {
-    reportBuilder.error(process, ex);
+  public void onError(DataException ex) {
+    if (ex instanceof DataInputException) {
+      reportBuilder.error(process, (DataInputException)ex);
+    }
+    if (ex instanceof DataOutputException) {
+      reportBuilder.error(process, (DataOutputException)ex);
+    }
   }
-
-  @Override
-  public void onError(DataInputException ex) {
-    reportBuilder.error(process, ex);
-  }
-  
   
 }
