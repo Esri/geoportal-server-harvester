@@ -16,7 +16,6 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.engine.ProcessManager;
-import com.esri.geoportal.harvester.engine.DefaultProcess;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.esri.geoportal.harvester.api.ProcessHandle;
+import com.esri.geoportal.harvester.engine.ProcessWrapper;
 
 /**
  * DefaultProcess manager bean.
@@ -43,13 +43,14 @@ public class ProcessManagerBean implements ProcessManager  {
 
   @Override
   public UUID create(ProcessHandle process) {
-    processes.put(process.getProcessId(), process);
-    return process.getProcessId();
+    UUID id = UUID.randomUUID();
+    processes.put(id, new ProcessWrapper(id, process));
+    return id;
   }
 
   @Override
   public boolean update(UUID id, ProcessHandle process) {
-    return processes.put(id, process)!=null;
+    return processes.put(id, new ProcessWrapper(id, process))!=null;
   }
 
   @Override

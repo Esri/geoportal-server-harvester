@@ -19,7 +19,6 @@ import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +30,8 @@ public class DefaultProcessor implements Processor {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultProcessor.class);
 
   @Override
-  public DefaultProcess submit(UUID processId, InputBroker source, List<OutputBroker> destinations) {
+  public DefaultProcess submit(InputBroker source, List<OutputBroker> destinations) {
     LOG.info(String.format("SUBMITTING: %s --> [%s]", source.toString(), destinations.stream().map(d->d.toString()).collect(Collectors.joining(","))));
-    return new DefaultProcess(processId, source, destinations);
+    return new DefaultProcess(source, destinations);
   }
 }

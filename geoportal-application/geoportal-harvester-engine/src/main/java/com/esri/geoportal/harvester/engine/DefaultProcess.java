@@ -36,7 +36,6 @@ public class DefaultProcess implements ProcessHandle {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultProcess.class);
   private final List<Listener> listeners = Collections.synchronizedList(new ArrayList<>());
   
-  private final UUID processId;
   private final InputBroker source;
   private final List<OutputBroker> destinations;
   
@@ -47,12 +46,10 @@ public class DefaultProcess implements ProcessHandle {
 
   /**
    * Creates instance of the process.
-   * @param processId process id
    * @param source source of data
    * @param destinations data destinations
    */
-  public DefaultProcess(UUID processId, InputBroker source, List<OutputBroker> destinations) {
-    this.processId = processId;
+  public DefaultProcess(InputBroker source, List<OutputBroker> destinations) {
     this.source = source;
     this.destinations = destinations;
     this.thread = new Thread(() -> {
@@ -86,7 +83,7 @@ public class DefaultProcess implements ProcessHandle {
 
   @Override
   public UUID getProcessId() {
-    return processId;
+    return null;
   }
 
   @Override

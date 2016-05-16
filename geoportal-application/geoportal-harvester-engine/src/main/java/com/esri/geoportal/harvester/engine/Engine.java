@@ -257,11 +257,10 @@ public class Engine {
     if (processor==null) {
       throw new InvalidDefinitionException(String.format("Unable to select processor based on definition: %s", processorDefinition));
     }
-    UUID processId = UUID.randomUUID();
-    ProcessHandle process = processor.submit(processId, task.getDataSource(),task.getDataDestinations());
+    ProcessHandle process = processor.submit(task.getDataSource(),task.getDataDestinations());
     process.addListener(new ReportBuilderAdaptor(process, reportBuilder));
-    processManager.create(process);
-    return process;
+    UUID id = processManager.create(process);
+    return processManager.read(id);
   }
   
   /**
