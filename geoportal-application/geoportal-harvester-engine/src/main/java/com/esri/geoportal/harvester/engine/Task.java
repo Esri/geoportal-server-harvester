@@ -18,11 +18,13 @@ package com.esri.geoportal.harvester.engine;
 import java.util.List;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
+import java.io.Closeable;
+import java.io.IOException;
 
 /**
  * Task.
  */
-public class Task implements AutoCloseable {
+public class Task implements Closeable {
   private final InputBroker dataSource;
   private final List<OutputBroker> dataDestinations;
   
@@ -53,12 +55,15 @@ public class Task implements AutoCloseable {
   }
 
   @Override
-  public void close() throws Exception {
-    getDataSource().close();
-    for (OutputBroker d: getDataDestinations()) {
-      try {
-        d.close();
-      } catch (Exception ex) {}
+  public void close() throws IOException {
+    try {
+      getDataSource().close();
+    } finally {
+      getDataDestinations().stream().forEach(d -> {
+        try {
+          d.close();
+        } catch (Exception ex) {}
+      });
     }
   }
   
