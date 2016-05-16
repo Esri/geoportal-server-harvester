@@ -136,6 +136,7 @@ public class DefaultProcess implements ProcessHandle {
     if (getStatus()!=Status.working) {
       throw new IllegalStateException(String.format("Error aborting the process: process is in %s state", getStatus()));
     }
+    LOG.info(String.format("Aborting process: %s", getTitle()));
     aborting = true;
     thread.interrupt();
   }
