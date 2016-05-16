@@ -248,7 +248,7 @@ public class Engine {
    * @return process handle
    * @throws InvalidDefinitionException if processor definition is invalid
    */
-  public ProcessHandle createProcess(EntityDefinition processorDefinition, Task task) throws InvalidDefinitionException {
+  public ProcessRef createProcess(EntityDefinition processorDefinition, Task task) throws InvalidDefinitionException {
     Processor processor = processorDefinition==null?
             processorRegistry.getDefaultProcessor():
             processorRegistry.get(processorDefinition.getType())!=null?
@@ -260,7 +260,7 @@ public class Engine {
     ProcessHandle process = processor.submit(task.getDataSource(),task.getDataDestinations());
     process.addListener(new ReportBuilderAdaptor(process, reportBuilder));
     UUID id = processManager.create(process);
-    return processManager.read(id);
+    return new ProcessRef(id, process);
   }
   
   /**
@@ -269,10 +269,10 @@ public class Engine {
    * @return process handle
    * @throws InvalidDefinitionException invalid definition exception
    */
-  public ProcessHandle submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException {
+  public ProcessRef submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException {
       Task task = createTask(taskDefinition.getSource(), taskDefinition.getDestinations());
-      ProcessHandle handle = createProcess(taskDefinition.getProcessor(),task);
-      return handle;
+      ProcessRef prInfo = createProcess(taskDefinition.getProcessor(),task);
+      return prInfo;
   }
   
   /**

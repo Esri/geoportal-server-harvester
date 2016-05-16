@@ -19,9 +19,9 @@ import com.esri.geoportal.harvester.api.ProcessHandle;
 import java.util.UUID;
 
 /**
- * Process wrapper.
+ * Process reference.
  */
-public class ProcessWrapper implements ProcessHandle {
+public class ProcessRef {
   private final UUID uuid;
   private final ProcessHandle processHandle;
 
@@ -30,43 +30,37 @@ public class ProcessWrapper implements ProcessHandle {
    * @param uuid id of the process
    * @param processHandle process handle
    */
-  public ProcessWrapper(UUID uuid, ProcessHandle processHandle) {
+  public ProcessRef(UUID uuid, ProcessHandle processHandle) {
     this.uuid = uuid;
     this.processHandle = processHandle;
   }
   
   @Override
   public String toString() {
-    return String.format("%s, uuid: %s", processHandle, uuid);
+    return String.format("%s, uuid: %s", processHandle, getProcessId());
   }
 
-  @Override
   public UUID getProcessId() {
     return uuid;
   }
 
-  @Override
   public String getTitle() {
     return processHandle.getTitle();
   }
 
-  @Override
   public void begin() {
     processHandle.begin();
   }
 
-  @Override
   public void abort() {
     processHandle.abort();
   }
 
-  @Override
-  public Status getStatus() {
+  public ProcessHandle.Status getStatus() {
     return processHandle.getStatus();
   }
 
-  @Override
-  public void addListener(Listener listener) {
+  public void addListener(ProcessHandle.Listener listener) {
     processHandle.addListener(listener);
   }
 }

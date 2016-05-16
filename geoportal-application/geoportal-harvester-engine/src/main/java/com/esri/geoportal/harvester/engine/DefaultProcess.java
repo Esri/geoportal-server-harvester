@@ -82,11 +82,6 @@ public class DefaultProcess implements ProcessHandle {
   }
 
   @Override
-  public UUID getProcessId() {
-    return null;
-  }
-
-  @Override
   public void addListener(Listener listener) {
     listeners.add(listener);
   }

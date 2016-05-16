@@ -15,14 +15,12 @@
  */
 package com.esri.geoportal.harvester.engine.support;
 
-import com.esri.geoportal.harvester.api.ProcessHandle;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.Engine;
-import com.esri.geoportal.harvester.engine.Task;
-import java.util.UUID;
+import com.esri.geoportal.harvester.engine.ProcessRef;
 
 /**
  * Base trigger implementation.
@@ -39,7 +37,7 @@ public abstract class BaseTrigger implements Trigger {
   }
   
   protected void fire(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
-    ProcessHandle process = engine.submitTaskDefinition(taskDefinition);
+    ProcessRef process = engine.submitTaskDefinition(taskDefinition);
     process.begin();
   }
 }

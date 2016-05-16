@@ -16,18 +16,11 @@
 package com.esri.geoportal.harvester.api;
 
 import com.esri.geoportal.harvester.api.ex.DataException;
-import java.util.UUID;
 
 /**
  * Process handler.
  */
 public interface ProcessHandle {
-  /**
-   * Gets process id.
-   * @return process id
-   */
-  UUID getProcessId();
-  
   /**
    * Gets process title.
    * @return process title

@@ -20,6 +20,7 @@ import com.esri.geoportal.harvester.support.ProcessInfo;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.beans.EngineBean;
+import com.esri.geoportal.harvester.engine.ProcessRef;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -118,7 +119,7 @@ public class ProcessController {
   public ResponseEntity<ProcessInfo> createProcess(@RequestBody TaskDefinition taskDefinition) {
     LOG.debug(String.format("PUT /rest/harvester/processes <-- %s", taskDefinition));
     try {
-      ProcessHandle process = engine.submitTaskDefinition(taskDefinition);
+      ProcessRef process = engine.submitTaskDefinition(taskDefinition);
       process.begin();
       return new ResponseEntity<>(new ProcessInfo(process.getProcessId(), process.getTitle(), process.getStatus()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
