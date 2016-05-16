@@ -22,12 +22,10 @@ import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import com.esri.geoportal.harvester.api.ProcessHandle;
-import java.util.UUID;
 
 /**
  * DefaultProcess.
@@ -92,7 +90,7 @@ public class DefaultProcess implements ProcessHandle {
    */
   @Override
   public String getTitle() {
-    return String.format("%s --> [%s]", source.toString(), destinations.stream().map(d->d.toString()).collect(Collectors.joining(",")));
+    return String.format("%s --> %s", source.toString(), destinations);
   }
   
   /**
