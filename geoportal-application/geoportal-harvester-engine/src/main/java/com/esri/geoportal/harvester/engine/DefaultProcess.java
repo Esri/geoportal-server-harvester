@@ -28,7 +28,7 @@ import java.util.Collections;
 import com.esri.geoportal.harvester.api.Processor;
 
 /**
- * DefaultProcess.
+ * Default process.
  */
 public class DefaultProcess implements Processor.Process {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultProcess.class);
@@ -63,18 +63,19 @@ public class DefaultProcess implements Processor.Process {
                 LOG.debug(String.format("Harvested %s during %s", dataReference, getTitle()));
                 onSuccess(dataReference);
               } catch (DataOutputException ex) {
-                LOG.debug(String.format("Failed harvesting %s during %s", dataReference, getTitle()));
+                LOG.warn(String.format("Failed harvesting %s during %s", dataReference, getTitle()));
                 onError(ex);
               }
             });
           }
         }
+        LOG.info(String.format("Completed harvest: %s", getTitle()));
       } catch (DataInputException ex) {
+        LOG.error(String.format("Failed harvesting of %s", getTitle()), ex);
         onError(ex);
       } finally {
         completed = true;
         aborting = false;
-        LOG.info(String.format("Completed harvest: %s", getTitle()));
       }
     },"HARVESTING");
   }
