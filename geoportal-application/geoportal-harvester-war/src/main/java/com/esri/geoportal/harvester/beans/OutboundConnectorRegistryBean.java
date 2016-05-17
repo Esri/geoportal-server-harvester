@@ -15,12 +15,13 @@
  */
 package com.esri.geoportal.harvester.beans;
 
+import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import com.esri.geoportal.harvester.engine.OutboundConnectorRegistry;
-import com.esri.geoportal.harvester.folder.FolderConnector;
-import com.esri.geoportal.harvester.gpt.GptConnector;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -30,10 +31,12 @@ import org.springframework.stereotype.Service;
 public class OutboundConnectorRegistryBean extends OutboundConnectorRegistry {
   private static final Logger LOG = LoggerFactory.getLogger(OutboundConnectorRegistryBean.class);
   
+  @Autowired
+  private List<OutputConnector> connectors;
+  
   @PostConstruct
   public void init() {
-    put(FolderConnector.TYPE, new FolderConnector());
-    put(GptConnector.TYPE, new GptConnector());
+    connectors.stream().forEach(c->put(c.getType(),c));
     LOG.info("OutboundConnectorRegistryBean initialized.");
   }
 }

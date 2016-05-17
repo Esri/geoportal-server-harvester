@@ -15,12 +15,13 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.csw.CswConnector;
+import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.engine.InboundConnectorRegistry;
-import com.esri.geoportal.harvester.waf.WafConnector;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -30,10 +31,12 @@ import org.springframework.stereotype.Service;
 public class InboundConnectorRegistryBean extends InboundConnectorRegistry {
   private static final Logger LOG = LoggerFactory.getLogger(InboundConnectorRegistryBean.class);
   
+  @Autowired
+  private List<InputConnector> connectors;
+  
   @PostConstruct
   public void init() {
-    put(WafConnector.TYPE, new WafConnector());
-    put(CswConnector.TYPE, new CswConnector());
+    connectors.stream().forEach(c->put(c.getType(),c));
     LOG.info("InboundConnectorRegistryBean initialized.");
   }
   
