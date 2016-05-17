@@ -15,22 +15,110 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.harvester.api.ex.DataException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Processor.
  */
+@FunctionalInterface
 public interface Processor {
 
   /**
-   * Initialize processor.
+   * Creates process.
+   *
    * @param source data source
    * @param destinations data destination
    * @return instance of the process
    */
-  ProcessHandle submit(InputBroker source, List<OutputBroker> destinations);
-  
+  Process createProcess(InputBroker source, List<OutputBroker> destinations);
+
+  /**
+   * Process
+   */
+  public interface Process {
+
+    /**
+     * Gets process title.
+     *
+     * @return process title
+     */
+    String getTitle();
+
+    /**
+     * Begins the process.
+     */
+    void begin();
+
+    /**
+     * Aborts the process.
+     */
+    void abort();
+
+    /**
+     * Gets process status.
+     *
+     * @return process status
+     */
+    Status getStatus();
+
+    /**
+     * Adds listened.
+     *
+     * @param listener listener
+     */
+    void addListener(Listener listener);
+  }
+
+  /**
+   * Process status.
+   */
+  enum Status {
+    /**
+     * just submitted
+     */
+    submitted,
+    /**
+     * currently being executing
+     */
+    working,
+    /**
+     * aborting
+     */
+    aborting,
+    /**
+     * completed (with or without errors or aborted)
+     */
+    completed
+  }
+
+  /**
+   * Process listener.
+   */
+  interface Listener {
+
+    /**
+     * Called when status changed
+     *
+     * @param status new status
+     */
+    void onStatusChange(Status status);
+
+    /**
+     * Called when data reference has been processed
+     *
+     * @param dataReference data reference
+     */
+    void onDataProcessed(DataReference dataReference);
+
+    /**
+     * Called for output onError.
+     *
+     * @param ex onError
+     */
+    public void onError(DataException ex);
+  }
+
 }

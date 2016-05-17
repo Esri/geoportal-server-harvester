@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.rest;
 
-import com.esri.geoportal.harvester.api.ProcessHandle;
+import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.support.ProcessInfo;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
@@ -65,7 +65,7 @@ public class ProcessController {
   @RequestMapping(value = "/rest/harvester/processes/{processId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ProcessInfo getProcessInfo(@PathVariable UUID processId) {
     LOG.debug(String.format("GET /rest/harvester/processes/%s", processId));
-    ProcessHandle process = engine.getProcess(processId);
+    Processor.Process process = engine.getProcess(processId);
     return process!=null? new ProcessInfo(processId, process.getTitle(), process.getStatus()): null;
   }
   
@@ -77,7 +77,7 @@ public class ProcessController {
   @RequestMapping(value = "/rest/harvester/processes/{processId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ProcessInfo abortProcess(@PathVariable UUID processId) {
     LOG.debug(String.format("DELETE /rest/harvester/processes/%s", processId));
-    ProcessHandle process = engine.getProcess(processId);
+    Processor.Process process = engine.getProcess(processId);
     if (process!=null) {
       try {
         process.abort();
@@ -132,7 +132,7 @@ public class ProcessController {
    * @param predicate predicate
    * @return array of filtered processes
    */
-  private ProcessInfo[] filterProcesses(Predicate<? super Map.Entry<UUID, ProcessHandle>> predicate) {
+  private ProcessInfo[] filterProcesses(Predicate<? super Map.Entry<UUID, Processor.Process>> predicate) {
     return engine.selectProcesses(predicate).stream()
             .map(e->new ProcessInfo(e.getKey(),e.getValue().getTitle(),e.getValue().getStatus()))
             .collect(Collectors.toList()).toArray(new ProcessInfo[0]);

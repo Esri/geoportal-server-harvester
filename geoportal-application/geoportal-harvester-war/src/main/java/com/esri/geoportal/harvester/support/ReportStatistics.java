@@ -23,7 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.esri.geoportal.harvester.api.ProcessHandle;
+import com.esri.geoportal.harvester.api.Processor;
 
 /**
  * Report statistics.
@@ -89,34 +89,34 @@ public class ReportStatistics implements ReportBuilder {
   }
 
   @Override
-  public void started(ProcessHandle process) {
+  public void started(Processor.Process process) {
     startDate = Calendar.getInstance().getTime();
     LOG.info(String.format("Harvesting of %s started at %s", process, startDate));
   }
 
   @Override
-  public void completed(ProcessHandle process) {
+  public void completed(Processor.Process process) {
     endDate = Calendar.getInstance().getTime();
     LOG.info(String.format("Harvesting of %s completed at %s. No. succeded: %d, no. failed: %d", process, endDate, succeeded, harvestFailed+publishFailed));
   }
 
   @Override
-  public void success(ProcessHandle process, DataReference dataReference) {
+  public void success(Processor.Process process, DataReference dataReference) {
     ++succeeded;
   }
 
   @Override
-  public void error(ProcessHandle process, DataInputException ex) {
+  public void error(Processor.Process process, DataInputException ex) {
     ++harvestFailed;
   }
 
   @Override
-  public void error(ProcessHandle process, DataOutputException ex) {
+  public void error(Processor.Process process, DataOutputException ex) {
     ++publishFailed;
   }
 
   @Override
-  public void error(ProcessHandle process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
+  public void error(Processor.Process process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
     failure = true;
   }
   

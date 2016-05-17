@@ -25,14 +25,14 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Collections;
-import com.esri.geoportal.harvester.api.ProcessHandle;
+import com.esri.geoportal.harvester.api.Processor;
 
 /**
  * DefaultProcess.
  */
-public class DefaultProcess implements ProcessHandle {
+public class DefaultProcess implements Processor.Process {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultProcess.class);
-  private final List<Listener> listeners = Collections.synchronizedList(new ArrayList<>());
+  private final List<Processor.Listener> listeners = Collections.synchronizedList(new ArrayList<>());
   
   private final InputBroker source;
   private final List<OutputBroker> destinations;
@@ -80,7 +80,7 @@ public class DefaultProcess implements ProcessHandle {
   }
 
   @Override
-  public void addListener(Listener listener) {
+  public void addListener(Processor.Listener listener) {
     listeners.add(listener);
   }
   
@@ -98,11 +98,11 @@ public class DefaultProcess implements ProcessHandle {
    * @return process status
    */
   @Override
-  public synchronized Status getStatus() {
-    if (completed) return Status.completed;
-    if (aborting) return Status.aborting;
-    if (thread.isAlive()) return Status.working;
-    return Status.submitted;
+  public synchronized Processor.Status getStatus() {
+    if (completed) return Processor.Status.completed;
+    if (aborting) return Processor.Status.aborting;
+    if (thread.isAlive()) return Processor.Status.working;
+    return Processor.Status.submitted;
   }
   
   private void onError(DataOutputException ex) {
@@ -122,7 +122,7 @@ public class DefaultProcess implements ProcessHandle {
    */
   @Override
   public synchronized void begin() {
-    if (getStatus()!=Status.submitted) {
+    if (getStatus()!=Processor.Status.submitted) {
       throw new IllegalStateException(String.format("Error begininig the process: process is in %s state", getStatus()));
     }
     thread.start();
@@ -133,7 +133,7 @@ public class DefaultProcess implements ProcessHandle {
    */
   @Override
   public synchronized void abort() {
-    if (getStatus()!=Status.working) {
+    if (getStatus()!=Processor.Status.working) {
       throw new IllegalStateException(String.format("Error aborting the process: process is in %s state", getStatus()));
     }
     LOG.info(String.format("Aborting process: %s", getTitle()));

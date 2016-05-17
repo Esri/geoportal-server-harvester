@@ -16,18 +16,17 @@
 package com.esri.geoportal.harvester.engine.support;
 
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.ProcessHandle.Listener;
+import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.engine.ReportBuilder;
-import com.esri.geoportal.harvester.api.ProcessHandle;
 import com.esri.geoportal.harvester.api.ex.DataException;
 
 /**
  * Report builder adaptor.
  */
-public class ReportBuilderAdaptor implements Listener {
-  private final ProcessHandle process;
+public class ReportBuilderAdaptor implements Processor.Listener {
+  private final Processor.Process process;
   private final ReportBuilder reportBuilder;
 
   /**
@@ -35,13 +34,13 @@ public class ReportBuilderAdaptor implements Listener {
    * @param process process
    * @param reportBuilder report builder
    */
-  public ReportBuilderAdaptor(ProcessHandle process, ReportBuilder reportBuilder) {
+  public ReportBuilderAdaptor(Processor.Process process, ReportBuilder reportBuilder) {
     this.process = process;
     this.reportBuilder = reportBuilder;
   }
 
   @Override
-  public void onStatusChange(ProcessHandle.Status newStatus) {
+  public void onStatusChange(Processor.Status newStatus) {
     switch (newStatus) {
       case working:
         reportBuilder.started(process);

@@ -38,7 +38,6 @@ import com.esri.geoportal.harvester.engine.support.ReportBuilderAdaptor;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.esri.geoportal.harvester.api.ProcessHandle;
 
 /**
  * Harvesting engine.
@@ -198,7 +197,7 @@ public class Engine {
    * @param processId process id.
    * @return process or <code>null</code> if no process available for the given process id
    */
-  public ProcessHandle getProcess(UUID processId) {
+  public Processor.Process getProcess(UUID processId) {
     return processManager.read(processId);
   }
   
@@ -207,8 +206,8 @@ public class Engine {
    * @param predicate predicate
    * @return list of processes matching predicate
    */
-  public List<Map.Entry<UUID,ProcessHandle>> selectProcesses(Predicate<? super Map.Entry<UUID, ProcessHandle>> predicate) {
-    return processManager.select().stream().filter(predicate!=null? predicate: (Map.Entry<UUID, ProcessHandle> e) -> true).collect(Collectors.toList());
+  public List<Map.Entry<UUID,Processor.Process>> selectProcesses(Predicate<? super Map.Entry<UUID, Processor.Process>> predicate) {
+    return processManager.select().stream().filter(predicate!=null? predicate: (Map.Entry<UUID, Processor.Process> e) -> true).collect(Collectors.toList());
   }
   
   /**
@@ -257,7 +256,7 @@ public class Engine {
     if (processor==null) {
       throw new InvalidDefinitionException(String.format("Unable to select processor based on definition: %s", processorDefinition));
     }
-    ProcessHandle process = processor.submit(task.getDataSource(),task.getDataDestinations());
+    Processor.Process process = processor.createProcess(task.getDataSource(),task.getDataDestinations());
     process.addListener(new ReportBuilderAdaptor(process, reportBuilder));
     UUID id = processManager.create(process);
     return new ProcessRef(id, process);

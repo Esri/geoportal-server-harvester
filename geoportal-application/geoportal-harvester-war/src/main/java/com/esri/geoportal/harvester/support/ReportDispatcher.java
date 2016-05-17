@@ -21,7 +21,7 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.engine.ReportBuilder;
 import java.util.Arrays;
 import java.util.List;
-import com.esri.geoportal.harvester.api.ProcessHandle;
+import com.esri.geoportal.harvester.api.Processor;
 
 /**
  * Report dispatcher.
@@ -38,32 +38,32 @@ public class ReportDispatcher implements ReportBuilder {
   }
 
   @Override
-  public void started(ProcessHandle process) {
+  public void started(Processor.Process process) {
     builders.forEach(b->b.started(process));
   }
 
   @Override
-  public void completed(ProcessHandle process) {
+  public void completed(Processor.Process process) {
     builders.forEach(b->b.completed(process));
   }
 
   @Override
-  public void success(ProcessHandle process, DataReference dataReference) {
+  public void success(Processor.Process process, DataReference dataReference) {
     builders.forEach(b->b.success(process, dataReference));
   }
 
   @Override
-  public void error(ProcessHandle process, DataInputException ex) {
+  public void error(Processor.Process process, DataInputException ex) {
     builders.forEach(b->b.error(process, ex));
   }
 
   @Override
-  public void error(ProcessHandle process, DataOutputException ex) {
+  public void error(Processor.Process process, DataOutputException ex) {
     builders.forEach(b->b.error(process, ex));
   }
 
   @Override
-  public void error(ProcessHandle process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
+  public void error(Processor.Process process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
     builders.forEach(b->b.error(process, ex));
   }
 }

@@ -30,7 +30,7 @@ public class DefaultProcessor implements Processor {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultProcessor.class);
 
   @Override
-  public DefaultProcess submit(InputBroker source, List<OutputBroker> destinations) {
+  public Processor.Process createProcess(InputBroker source, List<OutputBroker> destinations) {
     LOG.info(String.format("SUBMITTING: %s --> [%s]", source.toString(), destinations.stream().map(d->d.toString()).collect(Collectors.joining(","))));
     return new DefaultProcess(source, destinations);
   }
