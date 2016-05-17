@@ -19,15 +19,17 @@ define(["dojo/_base/declare",
         "dojo/_base/array",
         "dojo/dom-construct",
         "dojo/topic",
+        "dijit/Dialog",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/Tasks.html",
         "hrv/rest/Tasks",
-        "hrv/ui/tasks/Task"
+        "hrv/ui/tasks/Task",
+        "hrv/ui/tasks/TaskEditorPane"
       ],
-  function(declare,lang,array,domConstruct,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,Tasks,Task){
+  function(declare,lang,array,domConstruct,topic,Dialog,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,Tasks,Task,TaskEditorPane){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -59,6 +61,19 @@ define(["dojo/_base/declare",
       },
       
       _onAdd: function(evt) {
+        var taskEditorPane = new TaskEditorPane({});
+
+        // create editor dialog box
+        var editorEditorDialog = new Dialog({
+          title: this.i18n.tasks.editor.caption,
+          content: taskEditorPane,
+          onHide: function() {
+            editorEditorDialog.destroy();
+            taskEditorPane.destroy();
+          }
+        });
+        
+        editorEditorDialog.show();
       }
     });
 });

@@ -61,6 +61,9 @@ define({
       add: "Add",
       run: "run",
       remove: "remove",
+      editor: {
+        caption: "Task"
+      }
     },
     
     processes: {
