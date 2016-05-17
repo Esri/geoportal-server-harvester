@@ -166,3 +166,26 @@ html,body {
 .h-status-working {
   color: darkorange;
 }
+
+
+.h-tasks-add {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.h-tasks-caption {
+  font-size: medium;
+  font-weight: bold;
+  background-color: lightgray;
+}
+
+
+.h-task-remove {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.h-task-run {
+  text-decoration: underline;
+  cursor: pointer;
+}

@@ -15,9 +15,7 @@
  */
 package com.esri.geoportal.harvester.api.defs;
 
-import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Task definition.
@@ -77,8 +75,6 @@ public final class TaskDefinition {
   
   @Override
   public String toString() {
-    return String.format("PROCESSOR: %s, SOURCE: %s, DESTINATIONS: [%s]", processor, source, destinations!=null? destinations.stream()
-            .map(Object::toString)
-            .collect(Collectors.joining(", ")): null);
+    return String.format("PROCESSOR: %s, SOURCE: %s, DESTINATIONS: %s", processor, source, destinations!=null? destinations: null);
   }
 }

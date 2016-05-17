@@ -57,7 +57,10 @@ define({
     },
     
     tasks: {
-      
+      caption: "Tasks",
+      add: "Add",
+      run: "run",
+      remove: "remove",
     },
     
     processes: {
