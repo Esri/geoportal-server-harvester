@@ -16,28 +16,18 @@
 package com.esri.geoportal.harvester.rest;
 
 import com.esri.geoportal.harvester.api.Processor;
-import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.support.ProcessInfo;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.beans.EngineBean;
-import com.esri.geoportal.harvester.engine.BrokerInfo;
 import com.esri.geoportal.harvester.engine.ProcessRef;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.esri.geoportal.harvester.support.TaskDefinitionJsonUtility;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +49,15 @@ public class ProcessController {
   
   @Autowired
   private EngineBean engine;
+  private TaskDefinitionJsonUtility utility;
+  
+  /**
+   * Initializes bean.
+   */
+  @PostConstruct
+  public void init() {
+    utility = new TaskDefinitionJsonUtility(engine);
+  }
   
   /**
    * List all processes.
@@ -125,46 +124,16 @@ public class ProcessController {
     ]
 }
    * </code></pre>
-   * @param taskDefinition task definition
+   * @param taskDef task definition
    * @return process info
    */
   @RequestMapping(value = "/rest/harvester/processes", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ProcessInfo> createProcess(@RequestBody String taskDefinition) {
-    LOG.debug(String.format("PUT /rest/harvester/processes <-- %s", taskDefinition));
-    
-    ObjectMapper mapper = new ObjectMapper();
-    SimpleModule module = new SimpleModule();
-    JsonDeserializer<EntityDefinition> deserializer = new JsonDeserializer<EntityDefinition>() {
-      @Override
-      public EntityDefinition deserialize(JsonParser jp, DeserializationContext dc) throws IOException, JsonProcessingException {
-        ObjectCodec oc = jp.getCodec();
-        TreeNode treeNode = oc.readTree(jp);
-        TreeNode uuidNode = treeNode.get("uuid");
-        if (uuidNode!=null) {
-          String sUuid = uuidNode.toString();
-          try {
-            UUID uuid = UUID.fromString(sUuid);
-            BrokerInfo broker = engine.findBroker(uuid);
-            if (broker==null) {
-              throw new JsonParseException(jp,String.format("Invalid uuid: %s", sUuid));
-            }
-            return broker.getBrokerDefinition();
-          } catch (IllegalArgumentException ex) {
-            throw new JsonParseException(jp,String.format("Invalid uuid: %s", sUuid), ex);
-          }
-        } else {
-          ObjectMapper localMapper = new ObjectMapper();
-          EntityDefinition def = localMapper.treeToValue(treeNode, EntityDefinition.class);
-          return def;
-        }
-      }
-    };
-    module.addDeserializer(EntityDefinition.class, deserializer);
-    mapper.registerModule(module);
+  public ResponseEntity<ProcessInfo> createProcess(@RequestBody String taskDef) {
+    LOG.debug(String.format("PUT /rest/harvester/processes <-- %s", taskDef));
     
     try {
-      TaskDefinition tDef = mapper.readValue(taskDefinition,TaskDefinition.class);
-      ProcessRef process = engine.submitTaskDefinition(tDef);
+      TaskDefinition taskDefinition = utility.deserialize(taskDef);
+      ProcessRef process = engine.submitTaskDefinition(taskDefinition);
       process.begin();
       return new ResponseEntity<>(new ProcessInfo(process.getProcessId(), process.getTitle(), process.getStatus()), HttpStatus.OK);
     } catch (IOException|InvalidDefinitionException ex) {
