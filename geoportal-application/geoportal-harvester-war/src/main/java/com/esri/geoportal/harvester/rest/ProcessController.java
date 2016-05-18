@@ -21,13 +21,12 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import com.esri.geoportal.harvester.engine.ProcessRef;
-import com.esri.geoportal.harvester.support.TaskDefinitionJsonUtility;
+import static com.esri.geoportal.harvester.support.TaskDefinitionSerializer.deserialize;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,15 +48,6 @@ public class ProcessController {
   
   @Autowired
   private EngineBean engine;
-  private TaskDefinitionJsonUtility utility;
-  
-  /**
-   * Initializes bean.
-   */
-  @PostConstruct
-  public void init() {
-    utility = new TaskDefinitionJsonUtility(engine);
-  }
   
   /**
    * List all processes.
@@ -132,7 +122,7 @@ public class ProcessController {
     LOG.debug(String.format("PUT /rest/harvester/processes <-- %s", taskDef));
     
     try {
-      TaskDefinition taskDefinition = utility.deserialize(taskDef);
+      TaskDefinition taskDefinition = deserialize(engine,taskDef);
       ProcessRef process = engine.submitTaskDefinition(taskDefinition);
       process.begin();
       return new ResponseEntity<>(new ProcessInfo(process.getProcessId(), process.getTitle(), process.getStatus()), HttpStatus.OK);
