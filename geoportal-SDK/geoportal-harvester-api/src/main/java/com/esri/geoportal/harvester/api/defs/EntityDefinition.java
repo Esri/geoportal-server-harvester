@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.api.defs;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -93,5 +94,24 @@ public final class EntityDefinition {
     return String.format("%s/%s/[%s]", type, label, properties.entrySet().stream()
             .map(e->String.format("%s=%s", e.getKey(), e.getValue()))
             .collect(Collectors.joining(", ")));
+  }
+  
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof EntityDefinition) {
+      EntityDefinition ed = (EntityDefinition)o;
+      return ((getType()!=null && ed.getType()!=null && getType().equals(ed.getType()) || (getType()==null && ed.getType()==null))) && 
+              getProperties().equals(ed.getProperties());
+    }
+
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 5;
+    hash = 89 * hash + Objects.hashCode(this.type);
+    hash = 89 * hash + Objects.hashCode(this.properties);
+    return hash;
   }
 }

@@ -212,22 +212,21 @@ public class Engine {
   
   /**
    * Creates task to initialize.
-   * @param dsParams data input init parameter
-   * @param dpParams data output init parameters
+   * @param taskDefinition task definition
    * @return task
    * @throws InvalidDefinitionException if one of broker definitions appears to be invalid
    */
-  public Task createTask(EntityDefinition dsParams, List<EntityDefinition> dpParams) throws InvalidDefinitionException {
-    InputConnector<InputBroker> dsFactory = inboundConnectorRegistry.get(dsParams.getType());
+  public Task createTask(TaskDefinition taskDefinition) throws InvalidDefinitionException {
+    InputConnector<InputBroker> dsFactory = inboundConnectorRegistry.get(taskDefinition.getSource().getType());
     
     if (dsFactory==null) {
       throw new IllegalArgumentException("Invalid data source init parameters");
     }
     
-    InputBroker dataSource = dsFactory.createBroker(dsParams);
+    InputBroker dataSource = dsFactory.createBroker(taskDefinition.getSource());
 
     ArrayList<OutputBroker> dataDestinations =  new ArrayList<>();
-    for (EntityDefinition def: dpParams) {
+    for (EntityDefinition def: taskDefinition.getDestinations()) {
       OutputConnector<OutputBroker> dpFactory = outboundConnectorRegistry.get(def.getType());
       if (dpFactory==null) {
         throw new IllegalArgumentException("Invalid data publisher init parameters");
@@ -237,7 +236,7 @@ public class Engine {
       dataDestinations.add(dataPublisher);
     }
     
-    return new Task(dataSource, dataDestinations);
+    return new Task(taskDefinition, dataSource, dataDestinations);
   }
   
   /**
@@ -269,7 +268,7 @@ public class Engine {
    * @throws InvalidDefinitionException invalid definition exception
    */
   public ProcessRef submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException {
-      Task task = createTask(taskDefinition.getSource(), taskDefinition.getDestinations());
+      Task task = createTask(taskDefinition);
       ProcessRef prInfo = createProcess(taskDefinition.getProcessor(),task);
       return prInfo;
   }

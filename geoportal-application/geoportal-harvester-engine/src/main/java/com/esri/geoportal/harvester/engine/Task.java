@@ -15,27 +15,40 @@
  */
 package com.esri.geoportal.harvester.engine;
 
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import java.util.List;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Task.
  */
 public class Task implements Closeable {
+  private final TaskDefinition taskDefinition;
   private final InputBroker dataSource;
   private final List<OutputBroker> dataDestinations;
   
   /**
    * Creates instance of the task.
+   * @param taskDefiniton task definition
    * @param dataSource data source
    * @param dataDestinations data destination
    */
-  public Task(InputBroker dataSource, List<OutputBroker> dataDestinations) {
+  public Task(TaskDefinition taskDefiniton, InputBroker dataSource, List<OutputBroker> dataDestinations) {
+    this.taskDefinition = taskDefiniton;
     this.dataSource = dataSource;
     this.dataDestinations = dataDestinations;
+  }
+
+  /**
+   * Gets task definition.
+   * @return task definition
+   */
+  public TaskDefinition getTaskDefinition() {
+    return taskDefinition;
   }
 
   /**
@@ -69,8 +82,23 @@ public class Task implements Closeable {
   
   @Override
   public String toString() {
-    StringBuilder descriptions = new StringBuilder();
-    dataDestinations.forEach(d->descriptions.append(descriptions.length()>0? ", ": "").append(d.toString()));
-    return String.format("TASK :: %s --> [%s]", dataSource.toString(), descriptions);
+    return String.format("TASK :: %s", taskDefinition);
+  }
+  
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof Task) {
+      Task t = (Task)o;
+      return getTaskDefinition().equals(t.getTaskDefinition());
+    }
+
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 5;
+    hash = 53 * hash + Objects.hashCode(this.taskDefinition);
+    return hash;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Esri, Inc..
+ * Copyright 2016 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.api.defs;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Task definition.
@@ -76,5 +77,26 @@ public final class TaskDefinition {
   @Override
   public String toString() {
     return String.format("PROCESSOR: %s, SOURCE: %s, DESTINATIONS: %s", processor, source, destinations!=null? destinations: null);
+  }
+  
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof TaskDefinition) {
+      TaskDefinition td = (TaskDefinition)o;
+      return ((getProcessor()!=null && td.getProcessor()!=null && getProcessor().equals(td.getProcessor())) || (getProcessor()==null && td.getProcessor()==null)) &&
+             ((getSource()!=null && td.getSource()!=null && getSource().equals(td.getSource())) || (getSource()==null && td.getSource()==null)) &&
+             ((getDestinations()!=null && td.getDestinations()!=null && getDestinations().equals(td.getDestinations())) || (getDestinations()==null && td.getDestinations()==null)) ;
+    }
+    
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 3;
+    hash = 79 * hash + Objects.hashCode(this.processor);
+    hash = 79 * hash + Objects.hashCode(this.source);
+    hash = 79 * hash + Objects.hashCode(this.destinations);
+    return hash;
   }
 }
