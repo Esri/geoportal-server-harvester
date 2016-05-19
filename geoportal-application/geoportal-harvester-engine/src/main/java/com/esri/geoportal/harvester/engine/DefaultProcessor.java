@@ -15,9 +15,14 @@
  */
 package com.esri.geoportal.harvester.engine;
 
+import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Processor;
+import com.esri.geoportal.harvester.api.ex.DataInputException;
+import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -27,11 +32,163 @@ import org.slf4j.LoggerFactory;
  * DefaultProcessor.
  */
 public class DefaultProcessor implements Processor {
+
   private static final Logger LOG = LoggerFactory.getLogger(DefaultProcessor.class);
 
   @Override
   public Processor.Process createProcess(InputBroker source, List<OutputBroker> destinations) {
-    LOG.info(String.format("SUBMITTING: %s --> [%s]", source.toString(), destinations.stream().map(d->d.toString()).collect(Collectors.joining(","))));
+    LOG.info(String.format("SUBMITTING: %s --> [%s]", source.toString(), destinations.stream().map(d -> d.toString()).collect(Collectors.joining(","))));
     return new DefaultProcess(source, destinations);
+  }
+
+  /**
+   * Default process.
+   */
+  public static class DefaultProcess implements Processor.Process {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultProcess.class);
+    private final List<Processor.Listener> listeners = Collections.synchronizedList(new ArrayList<>());
+
+    private final InputBroker source;
+    private final List<OutputBroker> destinations;
+
+    private final Thread thread;
+
+    private volatile boolean completed;
+    private volatile boolean aborting;
+
+    /**
+     * Creates instance of the process.
+     *
+     * @param source source of data
+     * @param destinations data destinations
+     */
+    public DefaultProcess(InputBroker source, List<OutputBroker> destinations) {
+      this.source = source;
+      this.destinations = destinations;
+      this.thread = new Thread(() -> {
+        LOG.info(String.format("Started harvest: %s", getTitle()));
+        try {
+          if (!destinations.isEmpty()) {
+            while (source.hasNext()) {
+              if (Thread.currentThread().isInterrupted()) {
+                break;
+              }
+              DataReference dataReference = source.next();
+              destinations.stream().forEach((d) -> {
+                try {
+                  d.publish(dataReference);
+                  LOG.debug(String.format("Harvested %s during %s", dataReference, getTitle()));
+                  onSuccess(dataReference);
+                } catch (DataOutputException ex) {
+                  LOG.warn(String.format("Failed harvesting %s during %s", dataReference, getTitle()));
+                  onError(ex);
+                }
+              });
+            }
+          }
+          LOG.info(String.format("Completed harvest: %s", getTitle()));
+        } catch (DataInputException ex) {
+          LOG.error(String.format("Failed harvesting of %s", getTitle()), ex);
+          onError(ex);
+        } finally {
+          completed = true;
+          aborting = false;
+        }
+      }, "HARVESTING");
+    }
+
+    @Override
+    public void addListener(Processor.Listener listener) {
+      listeners.add(listener);
+    }
+
+    /**
+     * Gets process title.
+     *
+     * @return process title
+     */
+    @Override
+    public String getTitle() {
+      return String.format("%s --> %s", source.toString(), destinations);
+    }
+
+    /**
+     * Gets process status.
+     *
+     * @return process status
+     */
+    @Override
+    public synchronized Processor.Status getStatus() {
+      if (completed) {
+        return Processor.Status.completed;
+      }
+      if (aborting) {
+        return Processor.Status.aborting;
+      }
+      if (thread.isAlive()) {
+        return Processor.Status.working;
+      }
+      return Processor.Status.submitted;
+    }
+
+    /**
+     * Begins the process.
+     */
+    @Override
+    public synchronized void begin() {
+      if (getStatus() != Processor.Status.submitted) {
+        throw new IllegalStateException(String.format("Error begininig the process: process is in %s state", getStatus()));
+      }
+      thread.start();
+    }
+
+    /**
+     * Aborts the process.
+     */
+    @Override
+    public synchronized void abort() {
+      if (getStatus() != Processor.Status.working) {
+        throw new IllegalStateException(String.format("Error aborting the process: process is in %s state", getStatus()));
+      }
+      LOG.info(String.format("Aborting process: %s", getTitle()));
+      aborting = true;
+      thread.interrupt();
+    }
+
+    /**
+     * Called to handle output error.
+     * @param ex output exception
+     */
+    private void onError(DataOutputException ex) {
+      listeners.forEach(l -> {
+        l.onError(ex);
+      });
+    }
+
+    /**
+     * Called to handle input error.
+     * @param ex input exception
+     */
+    private void onError(DataInputException ex) {
+      listeners.forEach(l -> {
+        l.onError(ex);
+      });
+    }
+
+    /**
+     * Called to handle successful data processing
+     * @param dataRef data reference
+     */
+    private void onSuccess(DataReference dataRef) {
+      listeners.forEach(l -> {
+        l.onDataProcessed(dataRef);
+      });
+    }
+
+    @Override
+    public String toString() {
+      return String.format("PROCESS:: status: %s, title: %s", getStatus(), getTitle());
+    }
   }
 }

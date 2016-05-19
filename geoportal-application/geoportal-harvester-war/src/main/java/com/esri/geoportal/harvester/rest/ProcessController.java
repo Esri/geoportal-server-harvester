@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * DefaultProcess controller.
+ * Process controller.
  */
 @RestController
 public class ProcessController {
