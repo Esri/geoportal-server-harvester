@@ -32,12 +32,14 @@ import org.springframework.stereotype.Service;
 public class ProcessorRegistryBean extends ProcessorRegistry {
   private static final Logger LOG = LoggerFactory.getLogger(ProcessorRegistryBean.class);
   
-  @Autowired
+  @Autowired(required = false)
   private List<Processor> processors;
   
   @PostConstruct
   public void init() {
-    processors.stream().filter(p->!p.getType().equals(DefaultProcessor.TYPE)).forEach(p->put(p.getType(),p));
+    if (processors!=null) {
+      processors.stream().filter(p->!p.getType().equals(DefaultProcessor.TYPE)).forEach(p->put(p.getType(),p));
+    }
     LOG.info("ProcessorRegistryBean initialized.");
   }
   
