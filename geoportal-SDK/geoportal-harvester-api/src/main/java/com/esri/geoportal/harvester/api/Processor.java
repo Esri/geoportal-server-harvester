@@ -15,10 +15,8 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataException;
-import com.esri.geoportal.harvester.api.specs.InputBroker;
-import com.esri.geoportal.harvester.api.specs.OutputBroker;
-import java.util.List;
 
 /**
  * Processor.
@@ -33,17 +31,20 @@ public interface Processor {
 
   /**
    * Creates process.
-   *
-   * @param source data source
-   * @param destinations data destination
+   * @param task task
    * @return instance of the process
    */
-  Process createProcess(InputBroker source, List<OutputBroker> destinations);
+  Process createProcess(Task task);
 
   /**
    * Process
    */
   public interface Process {
+    /**
+     * Gets task.
+     * @return task
+     */
+    Task getTask();
 
     /**
      * Gets process title.

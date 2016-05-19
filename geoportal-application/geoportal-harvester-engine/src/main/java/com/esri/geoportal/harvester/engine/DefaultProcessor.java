@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.engine;
 
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Processor;
+import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import static jdk.nashorn.internal.objects.NativeRegExp.source;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,9 +44,9 @@ public class DefaultProcessor implements Processor {
   }
 
   @Override
-  public Processor.Process createProcess(InputBroker source, List<OutputBroker> destinations) {
-    LOG.info(String.format("SUBMITTING: %s --> [%s]", source.toString(), destinations.stream().map(d -> d.toString()).collect(Collectors.joining(","))));
-    return new DefaultProcess(source, destinations);
+  public Processor.Process createProcess(Task task) {
+    LOG.info(String.format("SUBMITTING: %s", task));
+    return new DefaultProcess(task);
   }
 
   /**
@@ -55,9 +57,7 @@ public class DefaultProcessor implements Processor {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultProcess.class);
     private final List<Processor.Listener> listeners = Collections.synchronizedList(new ArrayList<>());
 
-    private final InputBroker source;
-    private final List<OutputBroker> destinations;
-
+    private final Task task;
     private final Thread thread;
 
     private volatile boolean completed;
@@ -65,23 +65,20 @@ public class DefaultProcessor implements Processor {
 
     /**
      * Creates instance of the process.
-     *
-     * @param source source of data
-     * @param destinations data destinations
+     * @param task task
      */
-    public DefaultProcess(InputBroker source, List<OutputBroker> destinations) {
-      this.source = source;
-      this.destinations = destinations;
+    public DefaultProcess(Task task) {
+      this.task = task;
       this.thread = new Thread(() -> {
         LOG.info(String.format("Started harvest: %s", getTitle()));
         try {
-          if (!destinations.isEmpty()) {
-            while (source.hasNext()) {
+          if (!task.getDataDestinations().isEmpty()) {
+            while (task.getDataSource().hasNext()) {
               if (Thread.currentThread().isInterrupted()) {
                 break;
               }
-              DataReference dataReference = source.next();
-              destinations.stream().forEach((d) -> {
+              DataReference dataReference = task.getDataSource().next();
+              task.getDataDestinations().stream().forEach((d) -> {
                 try {
                   d.publish(dataReference);
                   LOG.debug(String.format("Harvested %s during %s", dataReference, getTitle()));
@@ -105,6 +102,11 @@ public class DefaultProcessor implements Processor {
     }
 
     @Override
+    public Task getTask() {
+      return task;
+    }
+
+    @Override
     public void addListener(Processor.Listener listener) {
       listeners.add(listener);
     }
@@ -116,7 +118,7 @@ public class DefaultProcessor implements Processor {
      */
     @Override
     public String getTitle() {
-      return String.format("%s --> %s", source.toString(), destinations);
+      return String.format("%s --> %s", task.getDataSource().toString(), task.getDataDestinations());
     }
 
     /**

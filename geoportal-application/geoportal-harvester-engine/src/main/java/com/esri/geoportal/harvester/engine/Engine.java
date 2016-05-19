@@ -256,7 +256,7 @@ public class Engine {
     if (processor==null) {
       throw new InvalidDefinitionException(String.format("Unable to select processor based on definition: %s", processorDefinition));
     }
-    Processor.Process process = processor.createProcess(task.getDataSource(),task.getDataDestinations());
+    Processor.Process process = processor.createProcess(task);
     process.addListener(new ReportBuilderAdaptor(process, reportBuilder));
     UUID id = processManager.create(process);
     return new ProcessRef(id, process);
