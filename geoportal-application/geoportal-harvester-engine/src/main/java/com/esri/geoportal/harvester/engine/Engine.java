@@ -161,8 +161,13 @@ public class Engine {
   public BrokerInfo createBroker(EntityDefinition brokerDefinition) {
     Category category = getBrokerCategoryByType(brokerDefinition.getType());
     if (category!=null) {
-      UUID id = brokerDefinitionManager.create(brokerDefinition);
-      return new BrokerInfo(id, category, brokerDefinition);
+      try {
+        UUID id = brokerDefinitionManager.create(brokerDefinition);
+        return new BrokerInfo(id, category, brokerDefinition);
+      } catch (IllegalArgumentException ex) {
+        LOG.warn("Attempt to submit process based on the same task twice.", ex);
+        return null;
+      }
     }
     return null;
   }

@@ -42,6 +42,15 @@ public class ProcessManagerBean implements ProcessManager  {
 
   @Override
   public UUID create(Processor.Process process) {
+    // this prevents submiting the same process twice
+    boolean exists = select().stream()
+            .filter(p->p.getValue().getStatus()!=Processor.Status.completed)
+            .map(e->e.getValue().getTask())
+            .anyMatch(td->td.equals(process.getTask()));
+    if (exists) {
+      throw new IllegalArgumentException(String.format("Process based on the task %s already exists",process.getTask()));
+    }
+    
     UUID id = UUID.randomUUID();
     processes.put(id, process);
     return id;
