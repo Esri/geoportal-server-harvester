@@ -23,8 +23,13 @@ import java.util.List;
 /**
  * Processor.
  */
-@FunctionalInterface
 public interface Processor {
+  
+  /**
+   * Gets type of the processor.
+   * @return type of the processor
+   */
+  public String getType();
 
   /**
    * Creates process.

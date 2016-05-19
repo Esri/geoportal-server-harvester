@@ -36,6 +36,12 @@ public abstract class BaseTrigger implements Trigger {
     this.engine = engine;
   }
   
+  /**
+   * Creates new process.
+   * @param taskDefinition task definition
+   * @throws DataProcessorException if creating process fails
+   * @throws InvalidDefinitionException if task definition is invalid
+   */
   protected void fire(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
     ProcessRef process = engine.submitTaskDefinition(taskDefinition);
     process.begin();

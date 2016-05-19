@@ -22,7 +22,7 @@ import java.util.Date;
 /**
  * Simple data reference.
  */
-public class SimpleDataReference implements DataReference {
+public final class SimpleDataReference implements DataReference {
   private final String id;
   private final Date lastModifiedDate;
   private final URI sourceUri;

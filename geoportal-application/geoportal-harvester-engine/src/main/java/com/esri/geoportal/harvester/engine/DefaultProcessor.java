@@ -32,8 +32,14 @@ import org.slf4j.LoggerFactory;
  * DefaultProcessor.
  */
 public class DefaultProcessor implements Processor {
+  public static final String TYPE = "DEFAULT";
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultProcessor.class);
+
+  @Override
+  public String getType() {
+    return TYPE;
+  }
 
   @Override
   public Processor.Process createProcess(InputBroker source, List<OutputBroker> destinations) {
