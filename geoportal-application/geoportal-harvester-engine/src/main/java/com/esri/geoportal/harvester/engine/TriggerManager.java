@@ -15,12 +15,12 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.engine.support.CrudsRepo;
 
 /**
  * Trigger manager.
  */
-public interface TriggerManager extends CrudsRepo<EntityDefinition> {
+public interface TriggerManager extends CrudsRepo<TriggerDefinition> {
   
 }

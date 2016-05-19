@@ -34,7 +34,7 @@ import java.util.UUID;
 /**
  * Task definition serializer.
  */
-public class TaskDefinitionSerializer {
+public class DefinitionSerializer {
   
   /**
    * De-serializes task definition.
@@ -100,5 +100,27 @@ public class TaskDefinitionSerializer {
   public static TaskDefinition deserializeTaskDef(String strTaskDef) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     return mapper.readValue(strTaskDef, TaskDefinition.class);
+  }
+
+  /**
+   * Serialize entity definition into JSON.
+   * @param entityDef entity definition
+   * @return serialized entity definition
+   * @throws JsonProcessingException if serializing fails
+   */
+  public static String serializeEntityDef(EntityDefinition entityDef) throws JsonProcessingException {
+    ObjectMapper mapper = new ObjectMapper();
+    return mapper.writeValueAsString(entityDef);
+  }
+
+  /**
+   * De-serialize entity definition.
+   * @param strEntityDef JSON form of entity definition
+   * @return entity definition
+   * @throws IOException if de-serializing entity definition fails
+   */
+  public static EntityDefinition deserializeEntityDef(String strEntityDef) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    return mapper.readValue(strEntityDef, EntityDefinition.class);
   }
 }

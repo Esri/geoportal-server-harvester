@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.ConnectorTemplate;
 import com.esri.geoportal.harvester.api.Processor;
+import com.esri.geoportal.harvester.api.Trigger;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -36,6 +38,7 @@ import com.esri.geoportal.harvester.engine.BrokerInfo.Category;
 import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.INBOUND;
 import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.OUTBOUND;
 import com.esri.geoportal.harvester.engine.support.ReportBuilderAdaptor;
+import java.util.HashMap;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,8 +47,12 @@ import org.slf4j.LoggerFactory;
  * Harvesting engine.
  */
 public class Engine {
+
   private static final Logger LOG = LoggerFactory.getLogger(Engine.class);
   
+  private final Map<String, Object> env = new HashMap<>();
+  private final Trigger.Context triggerContext = new TriggerContext();
+
   private final ReportBuilder reportBuilder;
   private final TaskManager taskManager;
   private final ProcessManager processManager;
@@ -58,6 +65,7 @@ public class Engine {
 
   /**
    * Creates instance of the engine.
+   *
    * @param inboundConnectorRegistry inbound connector registry
    * @param outboundConnectorRegistry outbound connector registry
    * @param triggerRegistry trigger registry
@@ -69,15 +77,15 @@ public class Engine {
    * @param reportBuilder report builder
    */
   public Engine(
-          InboundConnectorRegistry inboundConnectorRegistry, 
-          OutboundConnectorRegistry outboundConnectorRegistry, 
+          InboundConnectorRegistry inboundConnectorRegistry,
+          OutboundConnectorRegistry outboundConnectorRegistry,
           TriggerRegistry triggerRegistry,
           ProcessorRegistry processorRegistry,
           BrokerDefinitionManager brokerDefinitionManager,
-          TaskManager taskManager, 
-          ProcessManager processManager, 
+          TaskManager taskManager,
+          ProcessManager processManager,
           TriggerManager triggerManager,
-          ReportBuilder reportBuilder 
+          ReportBuilder reportBuilder
   ) {
     this.inboundConnectorRegistry = inboundConnectorRegistry;
     this.outboundConnectorRegistry = outboundConnectorRegistry;
@@ -91,7 +99,16 @@ public class Engine {
   }
 
   /**
+   * Gets trigger context.
+   * @return trigger context
+   */
+  public Trigger.Context getTriggerContext() {
+    return triggerContext;
+  }
+  
+  /**
    * Gets inbound connector templates.
+   *
    * @return collection of inbound connector templates
    */
   public Collection<ConnectorTemplate> getInboundConnectorTemplates() {
@@ -100,6 +117,7 @@ public class Engine {
 
   /**
    * Gets outbound connector templates.
+   *
    * @return collection of outbound connector templates
    */
   public Collection<ConnectorTemplate> getOutboundConnectorTemplates() {
@@ -108,59 +126,64 @@ public class Engine {
 
   /**
    * Gets inbound brokers definitions.
+   *
    * @return collection of inbound brokers definitions
    */
   public Collection<BrokerInfo> getInboundBrokersDefinitions() {
-    Set<String> inboundTypes = inboundConnectorRegistry.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
-    brokerDefinitionManager.select().stream().filter(e->inboundTypes.contains(e.getValue().getType()));
+    Set<String> inboundTypes = inboundConnectorRegistry.getTemplates().stream().map(t -> t.getType()).collect(Collectors.toSet());
+    brokerDefinitionManager.select().stream().filter(e -> inboundTypes.contains(e.getValue().getType()));
     return brokerDefinitionManager.select().stream()
-            .filter(e->inboundTypes.contains(e.getValue().getType()))
-            .map(e->new BrokerInfo(e.getKey(),INBOUND,e.getValue()))
+            .filter(e -> inboundTypes.contains(e.getValue().getType()))
+            .map(e -> new BrokerInfo(e.getKey(), INBOUND, e.getValue()))
             .collect(Collectors.toList());
   }
 
   /**
    * Gets outbound brokers definitions.
+   *
    * @return collection of outbound brokers definitions
    */
   public Collection<BrokerInfo> getOutboundBrokersDefinitions() {
-    Set<String> outboundTypes = outboundConnectorRegistry.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
+    Set<String> outboundTypes = outboundConnectorRegistry.getTemplates().stream().map(t -> t.getType()).collect(Collectors.toSet());
     return brokerDefinitionManager.select().stream()
-            .filter(e->outboundTypes.contains(e.getValue().getType()))
-            .map(e->new BrokerInfo(e.getKey(),OUTBOUND,e.getValue()))
+            .filter(e -> outboundTypes.contains(e.getValue().getType()))
+            .map(e -> new BrokerInfo(e.getKey(), OUTBOUND, e.getValue()))
             .collect(Collectors.toList());
   }
-  
+
   private Category getBrokerCategoryByType(String brokerType) {
-    Set<String> inboundTypes = inboundConnectorRegistry.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
-    Set<String> outboundTypes = outboundConnectorRegistry.getTemplates().stream().map(t->t.getType()).collect(Collectors.toSet());
-    return inboundTypes.contains(brokerType)? INBOUND: outboundTypes.contains(brokerType)? OUTBOUND: null;
+    Set<String> inboundTypes = inboundConnectorRegistry.getTemplates().stream().map(t -> t.getType()).collect(Collectors.toSet());
+    Set<String> outboundTypes = outboundConnectorRegistry.getTemplates().stream().map(t -> t.getType()).collect(Collectors.toSet());
+    return inboundTypes.contains(brokerType) ? INBOUND : outboundTypes.contains(brokerType) ? OUTBOUND : null;
   }
-  
+
   /**
    * Finds broker by id.
+   *
    * @param brokerId broker id
-   * @return broker info or <code>null</code> if no broker corresponding to the broker id can be found
+   * @return broker info or <code>null</code> if no broker corresponding to the
+   * broker id can be found
    */
   public BrokerInfo findBroker(UUID brokerId) {
     EntityDefinition brokerDefinition = brokerDefinitionManager.read(brokerId);
-    if (brokerDefinition!=null) {
+    if (brokerDefinition != null) {
       Category category = getBrokerCategoryByType(brokerDefinition.getType());
-      if (category!=null) {
+      if (category != null) {
         return new BrokerInfo(brokerId, category, brokerDefinition);
       }
     }
     return null;
   }
-  
+
   /**
    * Creates a broker.
+   *
    * @param brokerDefinition broker definition
    * @return broker info or <code>null</code> if broker has not been created
    */
   public BrokerInfo createBroker(EntityDefinition brokerDefinition) {
     Category category = getBrokerCategoryByType(brokerDefinition.getType());
-    if (category!=null) {
+    if (category != null) {
       try {
         UUID id = brokerDefinitionManager.create(brokerDefinition);
         return new BrokerInfo(id, category, brokerDefinition);
@@ -171,26 +194,28 @@ public class Engine {
     }
     return null;
   }
-  
+
   /**
    * Creates a broker.
+   *
    * @param brokerId broker id
    * @param brokerDefinition broker definition
    * @return broker info or <code>null</code> if broker has not been created
    */
   public BrokerInfo updateBroker(UUID brokerId, EntityDefinition brokerDefinition) {
     EntityDefinition oldBrokerDef = brokerDefinitionManager.read(brokerId);
-    if (oldBrokerDef!=null) {
+    if (oldBrokerDef != null) {
       if (!brokerDefinitionManager.update(brokerId, brokerDefinition)) {
         oldBrokerDef = null;
       }
     }
-    Category category = oldBrokerDef!=null? getBrokerCategoryByType(oldBrokerDef.getType()): null;
-    return category!=null? new BrokerInfo(brokerId, category, brokerDefinition): null;
+    Category category = oldBrokerDef != null ? getBrokerCategoryByType(oldBrokerDef.getType()) : null;
+    return category != null ? new BrokerInfo(brokerId, category, brokerDefinition) : null;
   }
-  
+
   /**
    * Deletes broker.
+   *
    * @param brokerId broker id
    * @return <code>true</code> if broker has been deleted
    */
@@ -200,65 +225,71 @@ public class Engine {
 
   /**
    * Gets process by process id.
+   *
    * @param processId process id.
-   * @return process or <code>null</code> if no process available for the given process id
+   * @return process or <code>null</code> if no process available for the given
+   * process id
    */
   public Processor.Process getProcess(UUID processId) {
     return processManager.read(processId);
   }
-  
+
   /**
    * Selects processes by predicate.
+   *
    * @param predicate predicate
    * @return list of processes matching predicate
    */
-  public List<Map.Entry<UUID,Processor.Process>> selectProcesses(Predicate<? super Map.Entry<UUID, Processor.Process>> predicate) {
-    return processManager.select().stream().filter(predicate!=null? predicate: (Map.Entry<UUID, Processor.Process> e) -> true).collect(Collectors.toList());
+  public List<Map.Entry<UUID, Processor.Process>> selectProcesses(Predicate<? super Map.Entry<UUID, Processor.Process>> predicate) {
+    return processManager.select().stream().filter(predicate != null ? predicate : (Map.Entry<UUID, Processor.Process> e) -> true).collect(Collectors.toList());
   }
-  
+
   /**
    * Creates task to initialize.
+   *
    * @param taskDefinition task definition
    * @return task
-   * @throws InvalidDefinitionException if one of broker definitions appears to be invalid
+   * @throws InvalidDefinitionException if one of broker definitions appears to
+   * be invalid
    */
   public Task createTask(TaskDefinition taskDefinition) throws InvalidDefinitionException {
     InputConnector<InputBroker> dsFactory = inboundConnectorRegistry.get(taskDefinition.getSource().getType());
-    
-    if (dsFactory==null) {
+
+    if (dsFactory == null) {
       throw new IllegalArgumentException("Invalid data source init parameters");
     }
-    
+
     InputBroker dataSource = dsFactory.createBroker(taskDefinition.getSource());
 
-    ArrayList<OutputBroker> dataDestinations =  new ArrayList<>();
-    for (EntityDefinition def: taskDefinition.getDestinations()) {
+    ArrayList<OutputBroker> dataDestinations = new ArrayList<>();
+    for (EntityDefinition def : taskDefinition.getDestinations()) {
       OutputConnector<OutputBroker> dpFactory = outboundConnectorRegistry.get(def.getType());
-      if (dpFactory==null) {
+      if (dpFactory == null) {
         throw new IllegalArgumentException("Invalid data publisher init parameters");
       }
 
       OutputBroker dataPublisher = dpFactory.createBroker(def);
       dataDestinations.add(dataPublisher);
     }
-    
+
     return new Task(taskDefinition, dataSource, dataDestinations);
   }
-  
+
   /**
    * Creates process.
+   *
    * @param processorDefinition process definition
    * @param task task for the process
    * @return process handle
    * @throws InvalidDefinitionException if processor definition is invalid
    */
   public ProcessRef createProcess(EntityDefinition processorDefinition, Task task) throws InvalidDefinitionException {
-    Processor processor = processorDefinition==null?
-            processorRegistry.getDefaultProcessor():
-            processorRegistry.get(processorDefinition.getType())!=null?
-            processorRegistry.get(processorDefinition.getType()):
-            null;
-    if (processor==null) {
+    Processor processor = processorDefinition == null
+            ? processorRegistry.getDefaultProcessor()
+            : processorRegistry.get(processorDefinition.getType()) != null
+            ? processorRegistry.get(processorDefinition.getType())
+            : null;
+    if (processor == null) {
       throw new InvalidDefinitionException(String.format("Unable to select processor based on definition: %s", processorDefinition));
     }
     Processor.Process process = processor.createProcess(task);
@@ -266,68 +297,103 @@ public class Engine {
     UUID id = processManager.create(process);
     return new ProcessRef(id, process);
   }
-  
+
   /**
    * Submits task definition.
+   *
    * @param taskDefinition task definition
    * @return process handle
    * @throws InvalidDefinitionException invalid definition exception
    */
   public ProcessRef submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException {
-      Task task = createTask(taskDefinition);
-      ProcessRef prInfo = createProcess(taskDefinition.getProcessor(),task);
-      return prInfo;
+    Task task = createTask(taskDefinition);
+    ProcessRef prInfo = createProcess(taskDefinition.getProcessor(), task);
+    return prInfo;
   }
-  
+
   /**
    * Selects task definitions.
+   *
    * @param predicate predicate
    * @return list of task definitions matching predicate
    */
-  public List<Map.Entry<UUID,TaskDefinition>> selectTaskDefinitions(Predicate<? super Map.Entry<UUID, TaskDefinition>> predicate) {
-    return taskManager.select().stream().filter(predicate!=null? predicate: (Map.Entry<UUID, TaskDefinition> e) -> true).collect(Collectors.toList());
+  public List<Map.Entry<UUID, TaskDefinition>> selectTaskDefinitions(Predicate<? super Map.Entry<UUID, TaskDefinition>> predicate) {
+    return taskManager.select().stream().filter(predicate != null ? predicate : (Map.Entry<UUID, TaskDefinition> e) -> true).collect(Collectors.toList());
   }
-  
+
   /**
    * Reads task definition.
+   *
    * @param taskId task id
    * @return task definition
    */
   public TaskDefinition readTaskDefinition(UUID taskId) {
     return taskManager.read(taskId);
   }
-  
+
   /**
    * Deletes task definition.
+   *
    * @param taskId task id
    * @return <code>true</code> if task definition has been deleted
    */
   public boolean deleteTaskDefinition(UUID taskId) {
     return taskManager.delete(taskId);
   }
-  
+
   /**
    * Adds task definition.
+   *
    * @param taskDefinition task definition
    * @return id of a new task
    */
   public UUID addTaskDefinition(TaskDefinition taskDefinition) {
     return taskManager.create(taskDefinition);
   }
-  
+
   /**
    * Updates task.
+   *
    * @param taskId task id
    * @param taskDefinition task definition
    * @return old task definition or <code>null</code> if no old task
    */
   public TaskDefinition updateTaskDefinition(UUID taskId, TaskDefinition taskDefinition) {
     TaskDefinition oldTaskDef = taskManager.read(taskId);
-    if (oldTaskDef!=null) {
+    if (oldTaskDef != null) {
       if (!taskManager.update(taskId, taskDefinition)) {
         oldTaskDef = null;
       }
     }
     return oldTaskDef;
+  }
+
+  /**
+   * Engine-bound trigger context.
+   */
+  private class TriggerContext implements Trigger.Context {
+
+    @Override
+    public synchronized Processor.Process submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
+      ProcessRef ref = submitTaskDefinition(taskDefinition);
+      return ref != null ? ref.getProcess() : null;
+    }
+
+    public synchronized <T> T getEnv(String varName, Class<T> clazz) {
+      try {
+        return clazz.cast(env.get(varName));
+      } catch (Exception ex) {
+        return null;
+      }
+    }
+
+    @Override
+    public synchronized void setEnv(String varName, Object var) {
+      if (var != null) {
+        env.put(varName, var);
+      } else {
+        env.remove(varName);
+      }
+    }
   }
 }

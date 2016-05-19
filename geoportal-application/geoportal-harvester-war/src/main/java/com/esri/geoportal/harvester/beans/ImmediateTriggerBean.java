@@ -15,31 +15,13 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.api.Trigger;
-import com.esri.geoportal.harvester.engine.TriggerRegistry;
-import java.util.List;
-import javax.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.esri.geoportal.harvester.engine.triggers.ImmediateTrigger;
 import org.springframework.stereotype.Service;
 
 /**
- * Trigger registry bean.
+ * Immediate trigger bean.
  */
 @Service
-public class TriggerRegistryBean extends TriggerRegistry {
-  private final Logger LOG = LoggerFactory.getLogger(TriggerManagerBean.class);
-   
-  @Autowired(required = false)
-  private List<Trigger> triggers;
+public class ImmediateTriggerBean extends ImmediateTrigger {
   
-  @PostConstruct
-  public void init() {
-    if (triggers!=null) {
-      triggers.stream().forEach(t->put(t.getType(),t));
-    }
-    LOG.info("TriggerRegistryBean initialized.");
-  }
- 
 }

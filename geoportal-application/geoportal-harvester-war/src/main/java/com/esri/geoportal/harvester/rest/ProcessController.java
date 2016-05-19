@@ -21,7 +21,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import com.esri.geoportal.harvester.engine.ProcessRef;
-import static com.esri.geoportal.harvester.support.TaskDefinitionSerializer.deserialize;
+import static com.esri.geoportal.harvester.support.DefinitionSerializer.deserialize;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
@@ -123,9 +123,9 @@ public class ProcessController {
     
     try {
       TaskDefinition taskDefinition = deserialize(engine,taskDef);
-      ProcessRef process = engine.submitTaskDefinition(taskDefinition);
-      process.begin();
-      return new ResponseEntity<>(new ProcessInfo(process.getProcessId(), process.getTitle(), process.getStatus()), HttpStatus.OK);
+      ProcessRef ref = engine.submitTaskDefinition(taskDefinition);
+      ref.getProcess().begin();
+      return new ResponseEntity<>(new ProcessInfo(ref.getProcessId(), ref.getProcess().getTitle(), ref.getProcess().getStatus()), HttpStatus.OK);
     } catch (IOException|InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }

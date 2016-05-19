@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.engine.TriggerManager;
 import java.util.Collection;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class TriggerManagerBean implements TriggerManager {
   }
 
   @Override
-  public UUID create(EntityDefinition data) {
+  public UUID create(TriggerDefinition data) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
@@ -48,17 +48,17 @@ public class TriggerManagerBean implements TriggerManager {
   }
 
   @Override
-  public EntityDefinition read(UUID id) {
+  public TriggerDefinition read(UUID id) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public Collection<Map.Entry<UUID, EntityDefinition>> select() {
+  public Collection<Map.Entry<UUID, TriggerDefinition>> select() {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public boolean update(UUID id, EntityDefinition data) {
+  public boolean update(UUID id, TriggerDefinition data) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
   

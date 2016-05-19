@@ -16,14 +16,57 @@
 package com.esri.geoportal.harvester.api;
 
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import java.util.Map;
 
 /**
  * Harvesting trigger.
  */
-public interface Trigger {
+public interface Trigger extends AutoCloseable {
   /**
-   * Launches the process.
-   * @param taskDefinition task definition
+   * Gets type of the trigger.
+   * @return type of the trigger
    */
-  void launch(TaskDefinition taskDefinition);
+  String getType();
+  
+  /**
+   * Initiates the process.
+   * @param triggerContext trigger context
+   * @param taskDefinition task definition
+   * @param arguments trigger arguments
+   * @throws DataProcessorException if creating process fails
+   * @throws InvalidDefinitionException if task definition is invalid
+   */
+  void initiate(Context triggerContext, TaskDefinition taskDefinition, Map<String,String> arguments) throws DataProcessorException, InvalidDefinitionException;
+  
+  /**
+   * Trigger context
+   */
+  interface Context {
+    /**
+     * Submits task definition to create and start new process.
+     * @param taskDefinition task definition
+     * @return instance of the process
+     * @throws DataProcessorException if processing fails
+     * @throws InvalidDefinitionException if task definition is invalid
+     */
+    Processor.Process submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException;
+    
+    /**
+     * Gets context variable.
+     * @param <T> type of the data
+     * @param varName variable name
+     * @param clazz class of the data
+     * @return variable value or <code>null</code> if no variable available
+     */
+    <T> T getEnv(String varName, Class<T> clazz);
+    
+    /**
+     * Sets context variable.
+     * @param varName variable name
+     * @param var variable value or <code>null</code> to remove 
+     */
+    void setEnv(String varName, Object var);
+  }
 }

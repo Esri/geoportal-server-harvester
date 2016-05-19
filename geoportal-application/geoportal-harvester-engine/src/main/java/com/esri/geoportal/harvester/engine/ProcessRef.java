@@ -23,44 +23,36 @@ import java.util.UUID;
  */
 public class ProcessRef {
   private final UUID uuid;
-  private final Processor.Process processHandle;
+  private final Processor.Process process;
 
   /**
    * Creates instance of the wrapper.
    * @param uuid id of the process
-   * @param processHandle process handle
+   * @param process process
    */
-  public ProcessRef(UUID uuid, Processor.Process processHandle) {
+  public ProcessRef(UUID uuid, Processor.Process process) {
     this.uuid = uuid;
-    this.processHandle = processHandle;
+    this.process = process;
   }
   
   @Override
   public String toString() {
-    return String.format("%s, uuid: %s", processHandle, getProcessId());
+    return String.format("%s, uuid: %s", process, getProcessId());
   }
 
+  /**
+   * Gets process id.
+   * @return process id
+   */
   public UUID getProcessId() {
     return uuid;
   }
 
-  public String getTitle() {
-    return processHandle.getTitle();
-  }
-
-  public void begin() {
-    processHandle.begin();
-  }
-
-  public void abort() {
-    processHandle.abort();
-  }
-
-  public Processor.Status getStatus() {
-    return processHandle.getStatus();
-  }
-
-  public void addListener(Processor.Listener listener) {
-    processHandle.addListener(listener);
+  /**
+   * Gets process.
+   * @return process
+   */
+  public Processor.Process getProcess() {
+    return process;
   }
 }

@@ -15,8 +15,8 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import static com.esri.geoportal.harvester.support.TaskDefinitionSerializer.deserializeTaskDef;
-import static com.esri.geoportal.harvester.support.TaskDefinitionSerializer.serializeTaskDef;
+import static com.esri.geoportal.harvester.support.DefinitionSerializer.deserializeTaskDef;
+import static com.esri.geoportal.harvester.support.DefinitionSerializer.serializeTaskDef;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.engine.TaskManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
