@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine;
+package com.esri.geoportal.harvester.api.defs;
 
-import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import java.util.List;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
@@ -26,7 +25,7 @@ import java.util.Objects;
 /**
  * Task.
  */
-public class Task implements Closeable {
+public final class Task implements Closeable {
   private final TaskDefinition taskDefinition;
   private final InputBroker dataSource;
   private final List<OutputBroker> dataDestinations;

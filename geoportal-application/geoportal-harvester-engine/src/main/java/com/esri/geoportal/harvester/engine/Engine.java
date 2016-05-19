@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine;
 
+import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import java.util.ArrayList;
 import java.util.Collection;
