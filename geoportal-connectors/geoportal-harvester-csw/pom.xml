@@ -14,11 +14,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>geoportal-commons-http</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>geoportal-commons-csw-client</artifactId>
             <version>${project.version}</version>
         </dependency>
