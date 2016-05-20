@@ -41,6 +41,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Process controller.
+ * Provides access to processes.
+ * <pre><code>
+   GET /rest/harvester/processes
+   GET /rest/harvester/processes/{processId}
+   DELETE /rest/harvester/processes/{processId}
+   PUT /rest/harvester/processes
+ * </code></pre>
  */
 @RestController
 public class ProcessController {

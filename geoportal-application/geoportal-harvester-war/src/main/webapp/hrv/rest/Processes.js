@@ -24,6 +24,18 @@ define(["dojo/_base/declare",
     return declare([],{
       list: function() {
         return xhr("rest/harvester/processes",{handleAs: "json"});
+      },
+      
+      read: function(processId) {
+        return xhr("rest/harvester/processes/"+processId,{handleAs: "json"});
+      },
+      
+      abort: function(processId) {
+        return xhr.del("rest/harvester/processes/"+processId,{handleAs: "json"});
+      },
+      
+      create: function(processDefinition) {
+        return xhr.put("rest/harvester/processes",{data: processDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
       }
     });
 });
