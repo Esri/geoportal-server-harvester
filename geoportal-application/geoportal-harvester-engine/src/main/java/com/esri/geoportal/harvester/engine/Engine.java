@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
 public class Engine {
 
   private static final Logger LOG = LoggerFactory.getLogger(Engine.class);
-  
+
   private final Map<String, Object> env = new HashMap<>();
   private final Trigger.Context triggerContext = new TriggerContext();
 
@@ -102,12 +102,27 @@ public class Engine {
 
   /**
    * Gets trigger context.
+   *
    * @return trigger context
    */
   public Trigger.Context getTriggerContext() {
     return triggerContext;
   }
-  
+
+  /**
+   * Fire all triggers.
+   */
+  public void fireTriggers() {
+    Trigger.Context context = getTriggerContext();
+    triggerManager.getInstances().stream().forEach((inst) -> {
+      try {
+        inst.activate(context);
+      } catch (DataProcessorException|InvalidDefinitionException ex) {
+        LOG.warn(String.format("Error activating trigger instance: %s", inst), ex);
+      }
+    });
+  }
+
   /**
    * Gets inbound connector templates.
    *
@@ -128,11 +143,12 @@ public class Engine {
 
   /**
    * Gets broker definitions.
+   *
    * @param category broker category
    * @return broker infos
    */
   public Collection<BrokerInfo> getBrokersDefinitions(Category category) {
-    if (category!=null) {
+    if (category != null) {
       Set<String> brokerTypes = listTypesByCategory(category);
       return brokerDefinitionManager.select().stream()
               .filter(e -> brokerTypes.contains(e.getValue().getType()))
@@ -356,26 +372,29 @@ public class Engine {
 
   /**
    * Lists types by category.
+   *
    * @param category category
    * @return set of types within the category
    */
   private Set<String> listTypesByCategory(Category category) {
-    List<UITemplate> templates = 
-            category==INBOUND? inboundConnectorRegistry.getTemplates(): 
-            category==OUTBOUND? outboundConnectorRegistry.getTemplates(): 
-            null;
-    
-    if (templates!=null) {
+    List<UITemplate> templates
+            = category == INBOUND ? inboundConnectorRegistry.getTemplates()
+                    : category == OUTBOUND ? outboundConnectorRegistry.getTemplates()
+                            : null;
+
+    if (templates != null) {
       return templates.stream().map(t -> t.getType()).collect(Collectors.toSet());
     } else {
       return Collections.EMPTY_SET;
     }
   }
-  
+
   /**
    * Gets broker category by broker type.
+   *
    * @param brokerType broker type
-   * @return broker category or <code>null</code> if category couldn't be determined
+   * @return broker category or <code>null</code> if category couldn't be
+   * determined
    */
   private Category getBrokerCategoryByType(String brokerType) {
     Set<String> inboundTypes = inboundConnectorRegistry.getTemplates().stream().map(t -> t.getType()).collect(Collectors.toSet());

@@ -15,12 +15,19 @@
  */
 package com.esri.geoportal.harvester.engine;
 
+import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.engine.support.CrudsRepo;
+import java.util.List;
 
 /**
  * Trigger manager.
  */
 public interface TriggerManager extends CrudsRepo<TriggerDefinition> {
   
+  /**
+   * Gets all active trigger instances.
+   * @return list of all active trigger instances
+   */
+  List<Trigger.Instance> getInstances();
 }

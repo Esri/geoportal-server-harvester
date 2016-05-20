@@ -124,7 +124,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
       st.setString(1, id.toString());
       return st.executeUpdate()>0;
     } catch (SQLException ex) {
-      LOG.error("Error selecting broker definition", ex);
+      LOG.error("Error deleting broker definition", ex);
       return false;
     }
   }

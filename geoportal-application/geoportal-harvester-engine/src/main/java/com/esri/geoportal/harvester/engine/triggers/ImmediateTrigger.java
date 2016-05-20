@@ -16,12 +16,10 @@
 package com.esri.geoportal.harvester.engine.triggers;
 
 import com.esri.geoportal.harvester.api.Trigger;
-import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
-import java.util.Map;
 
 /**
  * Immediate trigger.
@@ -40,21 +38,25 @@ public class ImmediateTrigger implements Trigger {
   }
 
   @Override
-  public Instance createInstance(EntityDefinition triggerDefinition) throws InvalidDefinitionException {
+  public Instance createInstance(TriggerDefinition triggerDefinition) throws InvalidDefinitionException {
     if (!getType().equals(triggerDefinition.getType())) {
       throw new InvalidDefinitionException(String.format("Invalid trigger definition: %s", triggerDefinition));
     }
-    return new ImmediateTriggerInstance(triggerDefinition.getProperties());
+    return new ImmediateTriggerInstance(triggerDefinition);
   }
   
   /**
    * Immediate trigger instance.
    */
   private class ImmediateTriggerInstance implements Trigger.Instance {
-    private final Map<String,String> arguments;
+    private final TriggerDefinition triggerDefinition;
 
-    public ImmediateTriggerInstance(Map<String, String> arguments) {
-      this.arguments = arguments;
+    /**
+     * Creates instance of the trigger instance
+     * @param triggerDefinition trigger definition
+     */
+    public ImmediateTriggerInstance(TriggerDefinition triggerDefinition) {
+      this.triggerDefinition = triggerDefinition;
     }
     
     @Override
@@ -64,10 +66,16 @@ public class ImmediateTrigger implements Trigger {
     
 
     @Override
-    public void activate(Trigger.Context context, TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
-      context.submit(taskDefinition);
+    public void activate(Trigger.Context context) throws DataProcessorException, InvalidDefinitionException {
+      context.submit(triggerDefinition.getTaskDefinition());
     }
 
+    
+    @Override
+    public String toString() {
+      return String.format("IMMEDIATE TRIGGER FOR : %s", triggerDefinition);
+    }
+    
     @Override
     public void close() throws Exception {
       // nothing to close (yet)

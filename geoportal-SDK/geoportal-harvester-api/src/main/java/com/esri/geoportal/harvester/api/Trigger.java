@@ -17,10 +17,10 @@ package com.esri.geoportal.harvester.api;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
-import java.util.Map;
 
 /**
  * Trigger.
@@ -44,7 +44,7 @@ public interface Trigger {
    * @return instance of the trigger
    * @throws InvalidDefinitionException if trigger definition is invalid
    */
-  Instance createInstance(EntityDefinition triggerDefinition) throws InvalidDefinitionException;
+  Instance createInstance(TriggerDefinition triggerDefinition) throws InvalidDefinitionException;
   
   /**
    * Trigger instance.
@@ -60,11 +60,10 @@ public interface Trigger {
     /**
      * Activates the trigger.
      * @param triggerContext trigger context
-     * @param taskDefinition task definition
      * @throws DataProcessorException if creating process fails
      * @throws InvalidDefinitionException if task definition is invalid
      */
-    void activate(Context triggerContext, TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException;
+    void activate(Context triggerContext) throws DataProcessorException, InvalidDefinitionException;
   }
   
   /**

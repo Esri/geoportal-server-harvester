@@ -15,14 +15,29 @@
  */
 package com.esri.geoportal.harvester.beans;
 
+import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.TriggerManager;
+import com.esri.geoportal.harvester.engine.TriggerRegistry;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.serialize;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -30,36 +45,137 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class TriggerManagerBean implements TriggerManager {
-  private final Logger LOG = LoggerFactory.getLogger(TriggerManagerBean.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TriggerManagerBean.class);
+  private final List<Trigger.Instance> instances = new ArrayList<>();
+
+  @Autowired
+  private DataSource dataSource;
+  
+  @Autowired
+  private TriggerRegistry triggerRegistry;
+
+  @Override
+  public List<Trigger.Instance> getInstances() {
+    return instances;
+  }
   
   @PostConstruct
   public void init() {
-    LOG.info("TriggerManagerBean initialized.");
+    try (
+            Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement("CREATE TABLE IF NOT EXISTS TRIGGERS ( id varchar(38) PRIMARY KEY, definition varchar(1024) NOT NULL)");
+        ) {
+      st.execute();
+    
+      select().stream()
+              .map(td->{ 
+                Trigger trigger = triggerRegistry.get(td.getValue().getType()); 
+                if (trigger!=null) {
+                  try {
+                    return trigger.createInstance(td.getValue());
+                  } catch (InvalidDefinitionException ex) {
+                    LOG.warn(String.format("Invalid trigger definiton: %s", td.getValue()), ex);
+                  }
+                }
+                return null;
+              })
+              .filter(i->i!=null)
+              .forEach(i->getInstances().add(i));
+      
+      LOG.info("TriggerManagerBean initialized.");
+    } catch (SQLException ex) {
+      LOG.info("Error initializing trigger definition database", ex);
+    }
   }
 
   @Override
   public UUID create(TriggerDefinition data) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    UUID id = UUID.randomUUID();
+    try (
+            Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement("INSERT INTO TRIGGERS (definition,id) VALUES (?,?)");
+        ) {
+      st.setString(1, serialize(data));
+      st.setString(2, id.toString());
+      st.executeUpdate();
+    } catch (SQLException|IOException ex) {
+      LOG.error("Error selecting trigger definition", ex);
+    }
+    return id;
   }
 
   @Override
   public boolean delete(UUID id) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    try (
+            Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement("DELETE FROM TRIGGERS WHERE ID = ?");
+        ) {
+      st.setString(1, id.toString());
+      return st.executeUpdate()>0;
+    } catch (SQLException ex) {
+      LOG.error("Error deleting trigger definition", ex);
+      return false;
+    }
   }
 
   @Override
   public TriggerDefinition read(UUID id) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    try (
+            Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement("SELECT * FROM TRIGGERS WHERE ID = ?");
+        ) {
+      st.setString(1, id.toString());
+      ResultSet rs = st.executeQuery();
+      if (rs.next()) {
+        try {
+          return deserialize(rs.getString("triggerDefinition"), TriggerDefinition.class);
+        } catch (IOException | SQLException ex) {
+          LOG.warn("Error reading broker definition", ex);
+        }
+      }
+    } catch (SQLException ex) {
+      LOG.error("Error selecting broker definition", ex);
+    }
+    
+    return null;
   }
 
   @Override
   public Collection<Map.Entry<UUID, TriggerDefinition>> select() {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    HashMap<UUID, TriggerDefinition> map = new HashMap<>();
+    try (
+            Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement("SELECT * FROM TRIGGERS");
+        ) {
+      ResultSet rs = st.executeQuery();
+      while (rs.next()) {
+        try {
+          UUID id = UUID.fromString(rs.getString("id"));
+          TriggerDefinition td = deserialize(rs.getString("triggerDefinition"), TriggerDefinition.class);
+          map.put(id, td);
+        } catch (IOException | SQLException ex) {
+          LOG.warn("Error reading broker definition", ex);
+        }
+      }
+    } catch (SQLException ex) {
+      LOG.error("Error selecting broker definition", ex);
+    }
+    return map.entrySet();
   }
 
   @Override
   public boolean update(UUID id, TriggerDefinition data) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    try (
+            Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement("UPDATE TRIGGERS SET triggerDefinition = ? WHERE ID = ?");
+        ) {
+      st.setString(1, serialize(data));
+      st.setString(2, id.toString());
+      return st.executeUpdate()>0;
+    } catch (SQLException|IOException ex) {
+      LOG.error("Error selecting broker definition", ex);
+      return false;
+    }
   }
   
 }
