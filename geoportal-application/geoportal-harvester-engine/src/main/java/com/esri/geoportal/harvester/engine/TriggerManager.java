@@ -31,4 +31,10 @@ public interface TriggerManager extends CrudsRepo<TriggerDefinition> {
    * @return list of all active trigger instances
    */
   Map<UUID,Trigger.Instance>  getInstances();
+  
+  /**
+   * Removes instance from the map.
+   * @param instance instance to remove
+   */
+  void removeInstance(Trigger.Instance instance);
 }

@@ -80,6 +80,12 @@ public interface Trigger {
     Processor.Process submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException;
     
     /**
+     * Removes instance of the trigger.
+     * @param instance instance of the trigger
+     */
+    void removeInstance(Instance instance);
+    
+    /**
      * Gets context variable.
      * @param <T> type of the data
      * @param varName variable name

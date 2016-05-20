@@ -28,6 +28,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -45,7 +46,7 @@ import org.springframework.stereotype.Service;
 public class TriggerManagerBean implements TriggerManager {
 
   private static final Logger LOG = LoggerFactory.getLogger(TriggerManagerBean.class);
-  private final Map<UUID,Trigger.Instance> instances = new HashMap<>();
+  private final Map<UUID,Trigger.Instance> instances = Collections.synchronizedMap(new HashMap<>());
 
   @Autowired
   private DataSource dataSource;
@@ -56,6 +57,18 @@ public class TriggerManagerBean implements TriggerManager {
   @Override
   public Map<UUID,Trigger.Instance> getInstances() {
     return instances;
+  }
+  
+  @Override
+  public void removeInstance(Trigger.Instance instance) {
+    UUID uuid = getInstances().entrySet().stream()
+            .filter(e->e.getValue()==instance)
+            .map(e->e.getKey())
+            .findFirst()
+            .orElse(null);
+    if (uuid!=null) {
+      getInstances().remove(uuid);
+    }
   }
 
   /**
