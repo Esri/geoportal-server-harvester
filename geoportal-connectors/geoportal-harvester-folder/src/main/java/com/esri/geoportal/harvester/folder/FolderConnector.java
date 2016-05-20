@@ -38,7 +38,7 @@ public class FolderConnector implements OutputConnector<FolderBroker> {
   public UITemplate getTemplate() {
     List<UITemplate.Argument> arguments = new ArrayList<>();
     arguments.add(new UITemplate.StringArgument(P_ROOT_FOLDER, "Root folder", true));
-    return new UITemplate("FOLDER", "Folder", arguments);
+    return new UITemplate(getType(), "Folder", arguments);
   }
 
   @Override

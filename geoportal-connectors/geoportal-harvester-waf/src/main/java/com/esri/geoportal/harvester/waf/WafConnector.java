@@ -38,7 +38,7 @@ public class WafConnector implements InputConnector<WafBroker> {
   public UITemplate getTemplate() {
     List<UITemplate.Argument> args = new ArrayList<>();
     args.add(new UITemplate.StringArgument(P_HOST_URL, "Url", true));
-    return new UITemplate("WAF", "Web Accessible Folder", args);
+    return new UITemplate(getType(), "Web Accessible Folder", args);
   }
 
   @Override

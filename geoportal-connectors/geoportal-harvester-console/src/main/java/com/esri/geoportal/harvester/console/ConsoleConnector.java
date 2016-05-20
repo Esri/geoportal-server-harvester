@@ -33,7 +33,7 @@ public class ConsoleConnector implements OutputConnector<ConsoleBroker> {
 
   @Override
   public UITemplate getTemplate() {
-    return new UITemplate("CONSOLE", "Console output", null);
+    return new UITemplate(getType(), "Console output", null);
   }
 
   @Override

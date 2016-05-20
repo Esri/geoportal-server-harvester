@@ -47,7 +47,7 @@ public class GptConnector implements OutputConnector<GptBroker> {
         return true;
       }
     });
-    return new UITemplate("GPT", "Geoportal Server New Generation", arguments);
+    return new UITemplate(getType(), "Geoportal Server New Generation", arguments);
   }
 
   @Override

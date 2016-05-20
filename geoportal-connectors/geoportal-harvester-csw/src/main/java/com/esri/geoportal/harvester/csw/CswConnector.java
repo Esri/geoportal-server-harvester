@@ -53,7 +53,7 @@ public class CswConnector implements InputConnector<CswBroker> {
         return defaultProfile!=null? defaultProfile.getId(): null;
       }
     });
-    return new UITemplate("CSW", "Catalogue service for the web", arguments);
+    return new UITemplate(getType(), "Catalogue service for the web", arguments);
   }
 
   @Override
