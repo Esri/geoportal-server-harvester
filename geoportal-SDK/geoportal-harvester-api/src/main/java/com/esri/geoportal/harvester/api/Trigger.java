@@ -15,7 +15,9 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.util.Map;
@@ -23,7 +25,7 @@ import java.util.Map;
 /**
  * Trigger.
  */
-public interface Trigger extends AutoCloseable {
+public interface Trigger {
   /**
    * Gets type of the trigger.
    * @return type of the trigger
@@ -31,14 +33,39 @@ public interface Trigger extends AutoCloseable {
   String getType();
   
   /**
-   * Initiates the process.
-   * @param triggerContext trigger context
-   * @param taskDefinition task definition
-   * @param arguments trigger arguments
-   * @throws DataProcessorException if creating process fails
-   * @throws InvalidDefinitionException if task definition is invalid
+   * Gets UI template.
+   * @return template
    */
-  void initiate(Context triggerContext, TaskDefinition taskDefinition, Map<String,String> arguments) throws DataProcessorException, InvalidDefinitionException;
+  UITemplate getTemplate();
+  
+  /**
+   * Creates instance of the trigger.
+   * @param triggerDefinition trigger definition
+   * @return instance of the trigger
+   * @throws InvalidDefinitionException if trigger definition is invalid
+   */
+  Instance createInstance(EntityDefinition triggerDefinition) throws InvalidDefinitionException;
+  
+  /**
+   * Trigger instance.
+   */
+  interface Instance extends AutoCloseable {
+    
+    /**
+     * Gets trigger.
+     * @return trigger
+     */
+    Trigger getTrigger();
+    
+    /**
+     * Activates the trigger.
+     * @param triggerContext trigger context
+     * @param taskDefinition task definition
+     * @throws DataProcessorException if creating process fails
+     * @throws InvalidDefinitionException if task definition is invalid
+     */
+    void activate(Context triggerContext, TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException;
+  }
   
   /**
    * Trigger context

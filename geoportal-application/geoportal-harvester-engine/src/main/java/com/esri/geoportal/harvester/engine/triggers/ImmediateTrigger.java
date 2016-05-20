@@ -16,7 +16,9 @@
 package com.esri.geoportal.harvester.engine.triggers;
 
 import com.esri.geoportal.harvester.api.Trigger;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.util.Map;
@@ -33,13 +35,42 @@ public class ImmediateTrigger implements Trigger {
   }
 
   @Override
-  public void initiate(Trigger.Context context, TaskDefinition taskDefinition, Map<String,String> arguments) throws DataProcessorException, InvalidDefinitionException {
-    context.submit(taskDefinition);
+  public UITemplate getTemplate() {
+    return new UITemplate(getType(), "Harvest now", null);
   }
 
   @Override
-  public void close() throws Exception {
-    // nothing to close (yet)
+  public Instance createInstance(EntityDefinition triggerDefinition) throws InvalidDefinitionException {
+    if (!getType().equals(triggerDefinition.getType())) {
+      throw new InvalidDefinitionException(String.format("Invalid trigger definition: %s", triggerDefinition));
+    }
+    return new ImmediateTriggerInstance(triggerDefinition.getProperties());
   }
   
+  /**
+   * Immediate trigger instance.
+   */
+  private class ImmediateTriggerInstance implements Trigger.Instance {
+    private final Map<String,String> arguments;
+
+    public ImmediateTriggerInstance(Map<String, String> arguments) {
+      this.arguments = arguments;
+    }
+    
+    @Override
+    public Trigger getTrigger() {
+      return ImmediateTrigger.this;
+    }
+    
+
+    @Override
+    public void activate(Trigger.Context context, TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
+      context.submit(taskDefinition);
+    }
+
+    @Override
+    public void close() throws Exception {
+      // nothing to close (yet)
+    }
+  }
 }
