@@ -16,6 +16,8 @@
 package com.esri.geoportal.harvester.engine;
 
 import com.esri.geoportal.harvester.api.Trigger;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.util.HashMap;
 
 /**
@@ -23,4 +25,17 @@ import java.util.HashMap;
  */
 public class TriggerRegistry extends HashMap<String, Trigger> {
   
+  /**
+   * Creates trigger instance.
+   * @param triggerDefinition trigger definition
+   * @return trigger instance
+   * @throws InvalidDefinitionException if trigger definition is invalid.
+   */
+  public Trigger.Instance createInstance(EntityDefinition triggerDefinition) throws InvalidDefinitionException {
+    Trigger trigger = get(triggerDefinition.getType());
+    if (trigger==null) {
+      throw new InvalidDefinitionException(String.format("Invalid trigger definition: %s", triggerDefinition));
+    }
+    return trigger.createInstance(triggerDefinition);
+  }
 }
