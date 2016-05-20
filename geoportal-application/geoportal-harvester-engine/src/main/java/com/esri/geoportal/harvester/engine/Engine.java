@@ -28,6 +28,7 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.Trigger;
+import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
@@ -114,7 +115,7 @@ public class Engine {
    */
   public void fireTriggers() {
     Trigger.Context context = getTriggerContext();
-    triggerManager.getInstances().stream().forEach((inst) -> {
+    triggerManager.getInstances().values().stream().forEach((inst) -> {
       try {
         inst.activate(context);
       } catch (DataProcessorException|InvalidDefinitionException ex) {
@@ -311,6 +312,26 @@ public class Engine {
     Task task = createTask(taskDefinition);
     ProcessRef prInfo = createProcess(taskDefinition.getProcessor(), task);
     return prInfo;
+  }
+  
+  /**
+   * Schedules task with trigger.
+   * @param taskDefinition task definition
+   * @param triggerDefinition trigger definition
+   * @return trigger definition
+   * @throws InvalidDefinitionException if invalid definition
+   * @throws DataProcessorException if error processing data
+   */
+  public TriggerDefinition scheduleTask(TaskDefinition taskDefinition, EntityDefinition triggerDefinition) throws InvalidDefinitionException, DataProcessorException {
+    TriggerDefinition trigDef = new TriggerDefinition();
+    trigDef.setType(triggerDefinition.getType());
+    trigDef.setTaskDefinition(taskDefinition);
+    trigDef.setArguments(triggerDefinition.getProperties());
+    
+    UUID id = triggerManager.create(trigDef);
+    triggerManager.getInstances().get(id).activate(getTriggerContext());
+    
+    return trigDef;
   }
 
   /**

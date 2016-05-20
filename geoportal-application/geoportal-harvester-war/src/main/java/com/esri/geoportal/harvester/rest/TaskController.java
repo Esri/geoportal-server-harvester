@@ -15,9 +15,12 @@
  */
 package com.esri.geoportal.harvester.rest;
 
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.support.TaskInfo;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.ProcessRef;
 import com.esri.geoportal.harvester.support.ProcessInfo;
@@ -131,6 +134,23 @@ public class TaskController {
       ref.getProcess().begin();
       return new ResponseEntity<>(new ProcessInfo(ref.getProcessId(), ref.getProcess().getTitle(), ref.getProcess().getStatus()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+  }
+  
+  /**
+   * Schedules task by id.
+   * @param taskId task id
+   * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
+   */
+  @RequestMapping(value = "/rest/harvester/tasks/{taskId}/schedule", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<TriggerDefinition> schedule(@RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId) {
+    LOG.debug(String.format("GET /rest/harvester/tasks/%s/echedule <-- %s", taskId, triggerDefinition));
+    TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
+    try {
+      TriggerDefinition trigDef = engine.scheduleTask(taskDefinition, triggerDefinition);
+      return new ResponseEntity<>(trigDef,HttpStatus.OK);
+    } catch (InvalidDefinitionException | DataProcessorException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
   }
