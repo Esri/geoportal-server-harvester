@@ -19,8 +19,8 @@ import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.ObjectFactory;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.ConnectorTemplate;
-import com.esri.geoportal.harvester.api.defs.ConnectorTemplate.Choice;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
+import com.esri.geoportal.harvester.api.defs.UITemplate.Choice;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import static com.esri.geoportal.harvester.csw.CswBrokerDefinitionAdaptor.P_HOST_URL;
@@ -41,19 +41,19 @@ public class CswConnector implements InputConnector<CswBroker> {
   }
 
   @Override
-  public ConnectorTemplate getTemplate() {
-    List<ConnectorTemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new ConnectorTemplate.StringArgument(P_HOST_URL, "URL", true));
+  public UITemplate getTemplate() {
+    List<UITemplate.Argument> arguments = new ArrayList<>();
+    arguments.add(new UITemplate.StringArgument(P_HOST_URL, "URL", true));
     ObjectFactory of = new ObjectFactory();
     IProfiles profiles = of.newProfiles();
     Choice<String>[] choices = profiles.listAll().stream().map(p->new Choice<String>(p.getId(),p.getName())).toArray(Choice[]::new);
-    arguments.add(new ConnectorTemplate.ChoiceArgument(P_PROFILE_ID, "Profile", Arrays.asList(choices)){
+    arguments.add(new UITemplate.ChoiceArgument(P_PROFILE_ID, "Profile", Arrays.asList(choices)){
       public String getDefault() {
         IProfile defaultProfile = profiles.getDefaultProfile();
         return defaultProfile!=null? defaultProfile.getId(): null;
       }
     });
-    return new ConnectorTemplate("CSW", "Catalogue service for the web", arguments);
+    return new UITemplate("CSW", "Catalogue service for the web", arguments);
   }
 
   @Override

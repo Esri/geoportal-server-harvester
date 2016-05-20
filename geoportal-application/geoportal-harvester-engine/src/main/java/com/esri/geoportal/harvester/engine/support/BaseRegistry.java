@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import com.esri.geoportal.harvester.api.Connector;
-import com.esri.geoportal.harvester.api.defs.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
 
 /**
  * Base data registry.
@@ -30,7 +30,7 @@ public abstract class BaseRegistry<F extends Connector> extends HashMap<String,F
    * Gets all templates.
    * @return list of all templates
    */
-  public List<ConnectorTemplate> getTemplates() {
-    return Arrays.asList(values().stream().map(f->f.getTemplate()).toArray(ConnectorTemplate[]::new));
+  public List<UITemplate> getTemplates() {
+    return Arrays.asList(values().stream().map(f->f.getTemplate()).toArray(UITemplate[]::new));
   }
 }

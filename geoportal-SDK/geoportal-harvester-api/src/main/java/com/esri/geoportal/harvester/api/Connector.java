@@ -16,14 +16,14 @@
 package com.esri.geoportal.harvester.api;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 
 /**
  * Connector.
  * <p>
  * It is a factory interface providing methods to create an instance of the
- * {@link Broker} and create instance of the {@link ConnectorTemplate}.
+ * {@link Broker} and create instance of the {@link UITemplate}.
  * 
  * @param <B> type of the broker
  * 
@@ -55,5 +55,5 @@ public interface Connector<B extends Broker> {
    * Gets connector UI template.
    * @return connector UI template
    */
-  ConnectorTemplate getTemplate();
+  UITemplate getTemplate();
 }

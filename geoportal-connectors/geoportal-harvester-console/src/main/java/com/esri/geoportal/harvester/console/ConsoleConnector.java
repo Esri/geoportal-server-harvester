@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.console;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 
@@ -32,8 +32,8 @@ public class ConsoleConnector implements OutputConnector<ConsoleBroker> {
   }
 
   @Override
-  public ConnectorTemplate getTemplate() {
-    return new ConnectorTemplate("CONSOLE", "Console output", null);
+  public UITemplate getTemplate() {
+    return new UITemplate("CONSOLE", "Console output", null);
   }
 
   @Override

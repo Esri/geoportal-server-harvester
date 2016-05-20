@@ -25,7 +25,7 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -40,7 +40,6 @@ import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.OUTBOUND;
 import com.esri.geoportal.harvester.engine.support.ReportBuilderAdaptor;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -114,7 +113,7 @@ public class Engine {
    *
    * @return collection of inbound connector templates
    */
-  public Collection<ConnectorTemplate> getInboundConnectorTemplates() {
+  public Collection<UITemplate> getInboundConnectorTemplates() {
     return inboundConnectorRegistry.getTemplates();
   }
 
@@ -123,7 +122,7 @@ public class Engine {
    *
    * @return collection of outbound connector templates
    */
-  public Collection<ConnectorTemplate> getOutboundConnectorTemplates() {
+  public Collection<UITemplate> getOutboundConnectorTemplates() {
     return outboundConnectorRegistry.getTemplates();
   }
 
@@ -361,7 +360,7 @@ public class Engine {
    * @return set of types within the category
    */
   private Set<String> listTypesByCategory(Category category) {
-    List<ConnectorTemplate> templates = 
+    List<UITemplate> templates = 
             category==INBOUND? inboundConnectorRegistry.getTemplates(): 
             category==OUTBOUND? outboundConnectorRegistry.getTemplates(): 
             null;
@@ -395,6 +394,7 @@ public class Engine {
       return ref != null ? ref.getProcess() : null;
     }
 
+    @Override
     public synchronized <T> T getEnv(String varName, Class<T> clazz) {
       try {
         return clazz.cast(env.get(varName));

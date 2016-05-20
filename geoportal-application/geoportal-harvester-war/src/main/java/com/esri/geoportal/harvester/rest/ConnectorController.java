@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.rest;
 
-import com.esri.geoportal.harvester.api.defs.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -144,9 +144,9 @@ public class ConnectorController {
    * @return array of connector templates
    */
   @RequestMapping(value = "/rest/harvester/connectors/inbound", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ConnectorTemplate[] listInboundConnectors() {
+  public UITemplate[] listInboundConnectors() {
     LOG.debug(String.format("GET /rest/harvester/connectors/inbound"));
-    return engine.getInboundConnectorTemplates().toArray(new ConnectorTemplate[0]);
+    return engine.getInboundConnectorTemplates().toArray(new UITemplate[0]);
   }
   
   /**
@@ -154,9 +154,9 @@ public class ConnectorController {
    * @return array of connector templates
    */
   @RequestMapping(value = "/rest/harvester/connectors/outbound", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ConnectorTemplate[] listOutboundConnectors() {
+  public UITemplate[] listOutboundConnectors() {
     LOG.debug(String.format("GET /rest/harvester/connectors/outbound"));
-    return engine.getOutboundConnectorTemplates().toArray(new ConnectorTemplate[0]);
+    return engine.getOutboundConnectorTemplates().toArray(new UITemplate[0]);
   }
   
   /**
@@ -165,7 +165,7 @@ public class ConnectorController {
    * @return connector template
    */
   @RequestMapping(value = "/rest/harvester/connectors/inbound/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ConnectorTemplate getInboundConnector(@PathVariable String id) {
+  public UITemplate getInboundConnector(@PathVariable String id) {
     LOG.debug(String.format("GET /rest/harvester/connectors/inbound/%s", id));
     return engine.getInboundConnectorTemplates().stream().filter(a->a.getType().equals(id)).findFirst().orElse(null);
   }
@@ -176,7 +176,7 @@ public class ConnectorController {
    * @return connector template
    */
   @RequestMapping(value = "/rest/harvester/connectors/outbound/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ConnectorTemplate getOutboundConnector(@PathVariable String id) {
+  public UITemplate getOutboundConnector(@PathVariable String id) {
     LOG.debug(String.format("GET /rest/harvester/connectors/outbound/%s", id));
     return engine.getOutboundConnectorTemplates().stream().filter(a->a.getType().equals(id)).findFirst().orElse(null);
   }

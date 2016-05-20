@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.folder;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import static com.esri.geoportal.harvester.folder.FolderBrokerDefinitionAdaptor.P_ROOT_FOLDER;
@@ -35,10 +35,10 @@ public class FolderConnector implements OutputConnector<FolderBroker> {
   }
 
   @Override
-  public ConnectorTemplate getTemplate() {
-    List<ConnectorTemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new ConnectorTemplate.StringArgument(P_ROOT_FOLDER, "Root folder", true));
-    return new ConnectorTemplate("FOLDER", "Folder", arguments);
+  public UITemplate getTemplate() {
+    List<UITemplate.Argument> arguments = new ArrayList<>();
+    arguments.add(new UITemplate.StringArgument(P_ROOT_FOLDER, "Root folder", true));
+    return new UITemplate("FOLDER", "Folder", arguments);
   }
 
   @Override

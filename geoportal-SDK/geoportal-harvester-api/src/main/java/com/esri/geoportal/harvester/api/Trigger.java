@@ -21,7 +21,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.util.Map;
 
 /**
- * Harvesting trigger.
+ * Trigger.
  */
 public interface Trigger extends AutoCloseable {
   /**

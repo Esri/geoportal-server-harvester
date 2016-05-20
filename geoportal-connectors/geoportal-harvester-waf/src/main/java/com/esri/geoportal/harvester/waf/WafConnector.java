@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.waf;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import static com.esri.geoportal.harvester.waf.WafBrokerDefinitionAdaptor.P_HOST_URL;
@@ -35,10 +35,10 @@ public class WafConnector implements InputConnector<WafBroker> {
   }
   
   @Override
-  public ConnectorTemplate getTemplate() {
-    List<ConnectorTemplate.Argument> args = new ArrayList<>();
-    args.add(new ConnectorTemplate.StringArgument(P_HOST_URL, "Url", true));
-    return new ConnectorTemplate("WAF", "Web Accessible Folder", args);
+  public UITemplate getTemplate() {
+    List<UITemplate.Argument> args = new ArrayList<>();
+    args.add(new UITemplate.StringArgument(P_HOST_URL, "Url", true));
+    return new UITemplate("WAF", "Web Accessible Folder", args);
   }
 
   @Override

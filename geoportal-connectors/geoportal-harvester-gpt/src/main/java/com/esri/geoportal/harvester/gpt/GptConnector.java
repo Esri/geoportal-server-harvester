@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.gpt;
 
 import com.esri.geoportal.commons.gpt.client.Client;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.ConnectorTemplate;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import static com.esri.geoportal.harvester.gpt.GptBrokerDefinitionAdaptor.P_HOST_URL;
@@ -38,16 +38,16 @@ public class GptConnector implements OutputConnector<GptBroker> {
   }
 
   @Override
-  public ConnectorTemplate getTemplate() {
-    List<ConnectorTemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new ConnectorTemplate.StringArgument(P_HOST_URL, "URL", true));
-    arguments.add(new ConnectorTemplate.StringArgument(P_USER_NAME, "User name"));
-    arguments.add(new ConnectorTemplate.StringArgument(P_USER_PASSWORD, "User password") {
+  public UITemplate getTemplate() {
+    List<UITemplate.Argument> arguments = new ArrayList<>();
+    arguments.add(new UITemplate.StringArgument(P_HOST_URL, "URL", true));
+    arguments.add(new UITemplate.StringArgument(P_USER_NAME, "User name"));
+    arguments.add(new UITemplate.StringArgument(P_USER_PASSWORD, "User password") {
       public boolean isPassword() {
         return true;
       }
     });
-    return new ConnectorTemplate("GPT", "Geoportal Server New Generation", arguments);
+    return new UITemplate("GPT", "Geoportal Server New Generation", arguments);
   }
 
   @Override
