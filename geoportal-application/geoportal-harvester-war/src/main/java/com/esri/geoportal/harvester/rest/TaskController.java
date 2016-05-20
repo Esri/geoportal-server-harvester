@@ -140,6 +140,7 @@ public class TaskController {
   
   /**
    * Schedules task by id.
+   * @param triggerDefinition trigger definition
    * @param taskId task id
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
