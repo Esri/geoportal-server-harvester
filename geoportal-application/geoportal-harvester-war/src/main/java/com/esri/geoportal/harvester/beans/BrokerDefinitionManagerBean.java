@@ -17,9 +17,8 @@ package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.engine.BrokerDefinitionManager;
-import static com.esri.geoportal.harvester.support.DefinitionSerializer.deserializeEntityDef;
-import static com.esri.geoportal.harvester.support.DefinitionSerializer.serializeEntityDef;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.serialize;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -70,10 +69,10 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("INSERT INTO BROKERS (brokerDefinition,id) VALUES (?,?)");
         ) {
-      st.setString(1, serializeEntityDef(brokerDef));
+      st.setString(1, serialize(brokerDef));
       st.setString(2, id.toString());
       st.executeUpdate();
-    } catch (SQLException|JsonProcessingException ex) {
+    } catch (SQLException|IOException ex) {
       LOG.error("Error selecting broker definition", ex);
     }
     return id;
@@ -85,10 +84,10 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("UPDATE BROKERS SET brokerDefinition = ? WHERE ID = ?");
         ) {
-      st.setString(1, serializeEntityDef(brokerDef));
+      st.setString(1, serialize(brokerDef));
       st.setString(2, id.toString());
       return st.executeUpdate()>0;
-    } catch (SQLException|JsonProcessingException ex) {
+    } catch (SQLException|IOException ex) {
       LOG.error("Error selecting broker definition", ex);
       return false;
     }
@@ -104,7 +103,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
       ResultSet rs = st.executeQuery();
       if (rs.next()) {
         try {
-          return deserializeEntityDef(rs.getString("brokerDefinition"));
+          return deserialize(rs.getString("brokerDefinition"), EntityDefinition.class);
         } catch (IOException | SQLException ex) {
           LOG.warn("Error reading broker definition", ex);
         }
@@ -141,7 +140,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
       while (rs.next()) {
         try {
           UUID id = UUID.fromString(rs.getString("id"));
-          EntityDefinition td = deserializeEntityDef(rs.getString("brokerDefinition"));
+          EntityDefinition td = deserialize(rs.getString("brokerDefinition"), EntityDefinition.class);
           map.put(id, td);
         } catch (IOException | SQLException ex) {
           LOG.warn("Error reading broker definition", ex);

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.support;
+package com.esri.geoportal.harvester.engine.support;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
@@ -34,7 +34,7 @@ import java.util.UUID;
 /**
  * Task definition serializer.
  */
-public class DefinitionSerializer {
+public class JsonSerializer {
   
   /**
    * De-serializes task definition.
@@ -81,46 +81,26 @@ public class DefinitionSerializer {
   }
 
   /**
-   * Serialize task definition into JSON.
-   * @param taskDef task definition
-   * @return serialized task definition
-   * @throws JsonProcessingException if serializing fails
+   * Serialize object into JSON.
+   * @param def definition to serialize
+   * @return serialized definition
+   * @throws IOException if serializing fails
    */
-  public static String serializeTaskDef(TaskDefinition taskDef) throws JsonProcessingException {
+  public static String serialize(Object def) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    return mapper.writeValueAsString(taskDef);
+    return mapper.writeValueAsString(def);
   }
 
   /**
    * De-serialize task definition.
-   * @param strTaskDef JSON form of task definition
-   * @return task definition
-   * @throws IOException if de-serializing task definition fails
+   * @param <T> type of the definition
+   * @param strDef JSON form of definition
+   * @param clazz class of the definition
+   * @return definition
+   * @throws IOException if de-serializing definition fails
    */
-  public static TaskDefinition deserializeTaskDef(String strTaskDef) throws IOException {
+  public static <T> T deserialize(String strDef, Class<T> clazz) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    return mapper.readValue(strTaskDef, TaskDefinition.class);
-  }
-
-  /**
-   * Serialize entity definition into JSON.
-   * @param entityDef entity definition
-   * @return serialized entity definition
-   * @throws JsonProcessingException if serializing fails
-   */
-  public static String serializeEntityDef(EntityDefinition entityDef) throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper();
-    return mapper.writeValueAsString(entityDef);
-  }
-
-  /**
-   * De-serialize entity definition.
-   * @param strEntityDef JSON form of entity definition
-   * @return entity definition
-   * @throws IOException if de-serializing entity definition fails
-   */
-  public static EntityDefinition deserializeEntityDef(String strEntityDef) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    return mapper.readValue(strEntityDef, EntityDefinition.class);
+    return mapper.readValue(strDef, clazz);
   }
 }

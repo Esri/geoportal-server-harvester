@@ -15,11 +15,10 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import static com.esri.geoportal.harvester.support.DefinitionSerializer.deserializeTaskDef;
-import static com.esri.geoportal.harvester.support.DefinitionSerializer.serializeTaskDef;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.serialize;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.engine.TaskManager;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -70,10 +69,10 @@ public class TaskManagerBean implements TaskManager {
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("INSERT INTO TASKS (taskDefinition,id) VALUES (?,?)");
         ) {
-      st.setString(1, serializeTaskDef(taskDef));
+      st.setString(1, serialize(taskDef));
       st.setString(2, id.toString());
       st.executeUpdate();
-    } catch (SQLException|JsonProcessingException ex) {
+    } catch (SQLException|IOException ex) {
       LOG.error("Error selecting task", ex);
     }
     return id;
@@ -85,10 +84,10 @@ public class TaskManagerBean implements TaskManager {
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("UPDATE TASKS SET taskDefinition = ? WHERE ID = ?");
         ) {
-      st.setString(1, serializeTaskDef(taskDef));
+      st.setString(1, serialize(taskDef));
       st.setString(2, id.toString());
       return st.executeUpdate()>0;
-    } catch (SQLException|JsonProcessingException ex) {
+    } catch (SQLException|IOException ex) {
       LOG.error("Error selecting task", ex);
       return false;
     }
@@ -104,7 +103,7 @@ public class TaskManagerBean implements TaskManager {
       ResultSet rs = st.executeQuery();
       if (rs.next()) {
         try {
-          return deserializeTaskDef(rs.getString("taskDefinition"));
+          return deserialize(rs.getString("taskDefinition"), TaskDefinition.class);
         } catch (IOException | SQLException ex) {
           LOG.warn("Error reading task definition", ex);
         }
@@ -141,7 +140,7 @@ public class TaskManagerBean implements TaskManager {
       while (rs.next()) {
         try {
           UUID id = UUID.fromString(rs.getString("id"));
-          TaskDefinition td = deserializeTaskDef(rs.getString("taskDefinition"));
+          TaskDefinition td = deserialize(rs.getString("taskDefinition"), TaskDefinition.class);
           map.put(id, td);
         } catch (IOException | SQLException ex) {
           LOG.warn("Error reading task definition", ex);
