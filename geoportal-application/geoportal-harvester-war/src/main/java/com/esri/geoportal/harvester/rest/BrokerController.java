@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.rest;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.engine.BrokerInfo;
 import com.esri.geoportal.harvester.beans.EngineBean;
+import com.esri.geoportal.harvester.engine.BrokerInfo.Category;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +28,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Broker controller
+ * Broker controller.
+ * <p>
+ * Provides access to brokers.
+ * <pre><code>
+   GET /rest/harvester/brokers?category=INBOUND
+   GET /rest/harvester/brokers?category=OUTBOUND
+   GET /rest/harvester/brokers/{brokerId}
+   DELETE /rest/harvester/brokers/{brokerId}
+   PUT /rest/harvester/brokers
+   POST /rest/harvester/brokers/{brokerId}
+ * </code></pre>
  */
 @RestController
 public class BrokerController {
@@ -39,24 +51,22 @@ public class BrokerController {
   @Autowired
   private EngineBean engine;
   
+
   /**
    * Lists all input brokers.
+   * @param category category (optional)
    * @return array of broker infos
    */
-  @RequestMapping(value = "/rest/harvester/brokers/input", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public BrokerInfo[] listInputBrokers() {
-    LOG.debug(String.format("GET /rest/harvester/brokers/input"));
-    return engine.getInboundBrokersDefinitions().toArray(new BrokerInfo[0]);
-  }
-  
-  /**
-   * Lists all output brokers.
-   * @return array of brokers infos
-   */
-  @RequestMapping(value = "/rest/harvester/brokers/output", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public BrokerInfo[] listOutputBrokers() {
-    LOG.debug(String.format("GET /rest/harvester/brokers/output"));
-    return engine.getOutboundBrokersDefinitions().toArray(new BrokerInfo[0]);
+  @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  public BrokerInfo[] listBrokers(@RequestParam(value = "category", required = false) String category) {
+    LOG.debug(String.format("GET /rest/harvester/brokers%s",category!=null? "&category="+category: ""));
+    Category ctg = null;
+    try {
+      ctg = Category.parse(category);
+    } catch (IllegalArgumentException ex) {
+      // ignore
+    }
+    return engine.getBrokersDefinitions(ctg).toArray(new BrokerInfo[0]);
   }
   
   /**

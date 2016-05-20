@@ -23,11 +23,11 @@ define(["dojo/_base/declare",
   
     return declare([],{
       output: function() {
-        return xhr("rest/harvester/brokers/output",{handleAs: "json"});
+        return xhr("rest/harvester/brokers?category=OUTPUT",{handleAs: "json"});
       },
       
       input: function() {
-        return xhr("rest/harvester/brokers/input",{handleAs: "json"});
+        return xhr("rest/harvester/brokers?category=INPUT",{handleAs: "json"});
       },
       
       delete: function(id) {

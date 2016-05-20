@@ -29,13 +29,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 /**
  * Connector information controller.
  * <p>
- * It provides a way to obtain information about available adaptors (sources, 
- * destinations). There is a separate REST endpoint for source and destination.
+ * It provides a way to obtain information about available connectors (inbound, 
+ * outbound). There is a separate REST endpoint for inbound and outbound connector.
  * <pre><code>
-   /rest/harvester/connectors/inbound
-   /rest/harvester/connectors/outbound
+   GET /rest/harvester/connectors/inbound
+   GET /rest/harvester/connectors/outbound
+   GET /rest/harvester/connectors/inbound/{id}
+   GET /rest/harvester/connectors/outbound/{id}
  * </code></pre>
- * It would alway return a JSON array of templates, where each template is a
+ * Each endpoint returns a JSON array of templates, where each template is a
  * blueprint how to build UI for each adaptor, for example:
  * <pre><code>
    [ 
@@ -159,21 +161,23 @@ public class ConnectorController {
   
   /**
    * Get single inbound connector.
-   * @param name id of the connector
+   * @param id id of the connector
    * @return connector template
    */
   @RequestMapping(value = "/rest/harvester/connectors/inbound/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ConnectorTemplate getInboundConnector(@PathVariable String name) {
-    return engine.getInboundConnectorTemplates().stream().filter(a->a.getType().equals(name)).findFirst().orElse(null);
+  public ConnectorTemplate getInboundConnector(@PathVariable String id) {
+    LOG.debug(String.format("GET /rest/harvester/connectors/inbound/%s", id));
+    return engine.getInboundConnectorTemplates().stream().filter(a->a.getType().equals(id)).findFirst().orElse(null);
   }
   
   /**
    * Get single outbound connector.
-   * @param name id of the connector
+   * @param id id of the connector
    * @return connector template
    */
   @RequestMapping(value = "/rest/harvester/connectors/outbound/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ConnectorTemplate getOutboundConnector(@PathVariable String name) {
-    return engine.getOutboundConnectorTemplates().stream().filter(a->a.getType().equals(name)).findFirst().orElse(null);
+  public ConnectorTemplate getOutboundConnector(@PathVariable String id) {
+    LOG.debug(String.format("GET /rest/harvester/connectors/outbound/%s", id));
+    return engine.getOutboundConnectorTemplates().stream().filter(a->a.getType().equals(id)).findFirst().orElse(null);
   }
 }

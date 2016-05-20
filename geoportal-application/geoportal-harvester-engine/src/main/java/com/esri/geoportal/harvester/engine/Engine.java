@@ -38,8 +38,11 @@ import com.esri.geoportal.harvester.engine.BrokerInfo.Category;
 import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.INBOUND;
 import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.OUTBOUND;
 import com.esri.geoportal.harvester.engine.support.ReportBuilderAdaptor;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,36 +128,20 @@ public class Engine {
   }
 
   /**
-   * Gets inbound brokers definitions.
-   *
-   * @return collection of inbound brokers definitions
+   * Gets broker definitions.
+   * @param category broker category
+   * @return broker infos
    */
-  public Collection<BrokerInfo> getInboundBrokersDefinitions() {
-    Set<String> inboundTypes = inboundConnectorRegistry.getTemplates().stream().map(t -> t.getType()).collect(Collectors.toSet());
-    brokerDefinitionManager.select().stream().filter(e -> inboundTypes.contains(e.getValue().getType()));
-    return brokerDefinitionManager.select().stream()
-            .filter(e -> inboundTypes.contains(e.getValue().getType()))
-            .map(e -> new BrokerInfo(e.getKey(), INBOUND, e.getValue()))
-            .collect(Collectors.toList());
-  }
-
-  /**
-   * Gets outbound brokers definitions.
-   *
-   * @return collection of outbound brokers definitions
-   */
-  public Collection<BrokerInfo> getOutboundBrokersDefinitions() {
-    Set<String> outboundTypes = outboundConnectorRegistry.getTemplates().stream().map(t -> t.getType()).collect(Collectors.toSet());
-    return brokerDefinitionManager.select().stream()
-            .filter(e -> outboundTypes.contains(e.getValue().getType()))
-            .map(e -> new BrokerInfo(e.getKey(), OUTBOUND, e.getValue()))
-            .collect(Collectors.toList());
-  }
-
-  private Category getBrokerCategoryByType(String brokerType) {
-    Set<String> inboundTypes = inboundConnectorRegistry.getTemplates().stream().map(t -> t.getType()).collect(Collectors.toSet());
-    Set<String> outboundTypes = outboundConnectorRegistry.getTemplates().stream().map(t -> t.getType()).collect(Collectors.toSet());
-    return inboundTypes.contains(brokerType) ? INBOUND : outboundTypes.contains(brokerType) ? OUTBOUND : null;
+  public Collection<BrokerInfo> getBrokersDefinitions(Category category) {
+    if (category!=null) {
+      Set<String> brokerTypes = listTypesByCategory(category);
+      return brokerDefinitionManager.select().stream()
+              .filter(e -> brokerTypes.contains(e.getValue().getType()))
+              .map(e -> new BrokerInfo(e.getKey(), category, e.getValue()))
+              .collect(Collectors.toList());
+    } else {
+      return Stream.concat(getBrokersDefinitions(INBOUND).stream(), getBrokersDefinitions(OUTBOUND).stream()).collect(Collectors.toSet());
+    }
   }
 
   /**
@@ -366,6 +353,35 @@ public class Engine {
       }
     }
     return oldTaskDef;
+  }
+
+  /**
+   * Lists types by category.
+   * @param category category
+   * @return set of types within the category
+   */
+  private Set<String> listTypesByCategory(Category category) {
+    List<ConnectorTemplate> templates = 
+            category==INBOUND? inboundConnectorRegistry.getTemplates(): 
+            category==OUTBOUND? outboundConnectorRegistry.getTemplates(): 
+            null;
+    
+    if (templates!=null) {
+      return templates.stream().map(t -> t.getType()).collect(Collectors.toSet());
+    } else {
+      return Collections.EMPTY_SET;
+    }
+  }
+  
+  /**
+   * Gets broker category by broker type.
+   * @param brokerType broker type
+   * @return broker category or <code>null</code> if category couldn't be determined
+   */
+  private Category getBrokerCategoryByType(String brokerType) {
+    Set<String> inboundTypes = inboundConnectorRegistry.getTemplates().stream().map(t -> t.getType()).collect(Collectors.toSet());
+    Set<String> outboundTypes = outboundConnectorRegistry.getTemplates().stream().map(t -> t.getType()).collect(Collectors.toSet());
+    return inboundTypes.contains(brokerType) ? INBOUND : outboundTypes.contains(brokerType) ? OUTBOUND : null;
   }
 
   /**

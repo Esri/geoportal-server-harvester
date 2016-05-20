@@ -69,6 +69,21 @@ public final class BrokerInfo {
     /** inbound broker */
     INBOUND, 
     /** outbound broker */
-    OUTBOUND
+    OUTBOUND;
+    
+    /**
+     * Parses category given as string (case insensitive).
+     * @param strCateg category as string
+     * @return category
+     * @throws IllegalArgumentException if invalid input.
+     */
+    public static Category parse(String strCateg) {
+      for (Category c: values()) {
+        if (c.name().equalsIgnoreCase(strCateg)) {
+          return c;
+        }
+      }
+      throw new IllegalArgumentException(String.format("Invalid category: %s", strCateg));
+    }
   }
 }
