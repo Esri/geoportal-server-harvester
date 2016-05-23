@@ -13,31 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.support;
+package com.esri.geoportal.harvester.engine.support;
 
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import java.util.UUID;
 
 /**
- * Trigger info.
+ * Trigger reference.
  */
-public class TriggerInfo {
+public final class TriggerReference {
   private final UUID uuid;
   private final TriggerDefinition triggerDefinition;
 
   /**
-   * Creates instance of the trigger info.
-   * @param uuid uuid
-   * @param triggerDefinition trigger definition
+   * Creates instance of the reference.
+   * @param uuid trigger uuid
+   * @param triggerDefinition trigger definition 
    */
-  public TriggerInfo(UUID uuid, TriggerDefinition triggerDefinition) {
+  public TriggerReference(UUID uuid, TriggerDefinition triggerDefinition) {
     this.uuid = uuid;
     this.triggerDefinition = triggerDefinition;
   }
 
   /**
-   * Gets trigger instance UUID.
-   * @return trigger instance UUID
+   * Gets trigger uuid.
+   * @return trigger uuid
    */
   public UUID getUuid() {
     return uuid;
@@ -53,6 +53,6 @@ public class TriggerInfo {
   
   @Override
   public String toString() {
-    return String.format("TRIGGER INFO :: uuid: %s, trigger definition: %s", uuid, triggerDefinition);
+    return String.format("TRIGGER REFERENCE :: uuid: %s, definition: %s", uuid, triggerDefinition);
   }
 }

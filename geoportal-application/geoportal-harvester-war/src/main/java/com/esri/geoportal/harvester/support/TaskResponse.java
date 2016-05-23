@@ -19,9 +19,9 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import java.util.UUID;
 
 /**
- * Task info.
+ * Task response.
  */
-public final class TaskInfo {
+public final class TaskResponse {
   private final UUID uuid;
   private final TaskDefinition taskDefinition;
 
@@ -30,7 +30,7 @@ public final class TaskInfo {
    * @param uuid  uuid of the task info
    * @param taskDefinition task definition
    */
-  public TaskInfo(UUID uuid, TaskDefinition taskDefinition) {
+  public TaskResponse(UUID uuid, TaskDefinition taskDefinition) {
     this.uuid = uuid;
     this.taskDefinition = taskDefinition;
   }

@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine;
 
+import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import com.esri.geoportal.harvester.engine.BrokerInfo.Category;
 import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.INBOUND;
 import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.OUTBOUND;
 import com.esri.geoportal.harvester.engine.support.ReportBuilderAdaptor;
+import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
@@ -286,7 +288,7 @@ public class Engine {
    * @return process handle
    * @throws InvalidDefinitionException if processor definition is invalid
    */
-  public ProcessRef createProcess(EntityDefinition processorDefinition, Task task) throws InvalidDefinitionException {
+  public ProcessReference createProcess(EntityDefinition processorDefinition, Task task) throws InvalidDefinitionException {
     Processor processor = processorDefinition == null
             ? processorRegistry.getDefaultProcessor()
             : processorRegistry.get(processorDefinition.getType()) != null
@@ -298,7 +300,7 @@ public class Engine {
     Processor.Process process = processor.createProcess(task);
     process.addListener(new ReportBuilderAdaptor(process, reportBuilder));
     UUID id = processManager.create(process);
-    return new ProcessRef(id, process);
+    return new ProcessReference(id, process);
   }
 
   /**
@@ -308,9 +310,9 @@ public class Engine {
    * @return process handle
    * @throws InvalidDefinitionException invalid definition exception
    */
-  public ProcessRef submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException {
+  public ProcessReference submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException {
     Task task = createTask(taskDefinition);
-    ProcessRef prInfo = createProcess(taskDefinition.getProcessor(), task);
+    ProcessReference prInfo = createProcess(taskDefinition.getProcessor(), task);
     return prInfo;
   }
   
@@ -322,7 +324,7 @@ public class Engine {
    * @throws InvalidDefinitionException if invalid definition
    * @throws DataProcessorException if error processing data
    */
-  public TriggerDefinition scheduleTask(TaskDefinition taskDefinition, EntityDefinition triggerDefinition) throws InvalidDefinitionException, DataProcessorException {
+  public TriggerReference scheduleTask(TaskDefinition taskDefinition, EntityDefinition triggerDefinition) throws InvalidDefinitionException, DataProcessorException {
     TriggerDefinition trigDef = new TriggerDefinition();
     trigDef.setType(triggerDefinition.getType());
     trigDef.setTaskDefinition(taskDefinition);
@@ -331,7 +333,7 @@ public class Engine {
     UUID id = triggerManager.create(trigDef);
     triggerManager.getInstances().get(id).activate(getTriggerContext());
     
-    return trigDef;
+    return new TriggerReference(id, trigDef);
   }
 
   /**
@@ -430,7 +432,7 @@ public class Engine {
 
     @Override
     public synchronized Processor.Process submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
-      ProcessRef ref = submitTaskDefinition(taskDefinition);
+      ProcessReference ref = submitTaskDefinition(taskDefinition);
       return ref != null ? ref.getProcess() : null;
     }
 

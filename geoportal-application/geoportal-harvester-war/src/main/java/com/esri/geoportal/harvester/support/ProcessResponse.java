@@ -19,9 +19,9 @@ import com.esri.geoportal.harvester.api.Processor;
 import java.util.UUID;
 
 /**
- * ProcessHandle info.
+ * Process response.
  */
-public final class ProcessInfo {
+public final class ProcessResponse {
   private final UUID uuid;
   private final String description;
   private final Processor.Status status;
@@ -32,7 +32,7 @@ public final class ProcessInfo {
    * @param description process description
    * @param status process status
    */
-  public ProcessInfo(UUID uuid, String description, Processor.Status status) {
+  public ProcessResponse(UUID uuid, String description, Processor.Status status) {
     this.uuid = uuid;
     this.description = description;
     this.status = status;

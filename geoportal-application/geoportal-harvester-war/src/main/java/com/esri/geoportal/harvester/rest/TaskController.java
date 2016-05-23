@@ -16,14 +16,16 @@
 package com.esri.geoportal.harvester.rest;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.support.TaskInfo;
+import com.esri.geoportal.harvester.support.TaskResponse;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
-import com.esri.geoportal.harvester.engine.ProcessRef;
-import com.esri.geoportal.harvester.support.ProcessInfo;
+import com.esri.geoportal.harvester.engine.support.ProcessReference;
+import com.esri.geoportal.harvester.engine.support.TriggerReference;
+import com.esri.geoportal.harvester.support.ProcessResponse;
+import com.esri.geoportal.harvester.support.TriggerResponse;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -63,9 +65,9 @@ public class TaskController {
    * @return array of task informations
    */
   @RequestMapping(value = "/rest/harvester/tasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public TaskInfo[] listTasks() {
+  public TaskResponse[] listTasks() {
     LOG.debug(String.format("GET /rest/harvester/tasks"));
-    return engine.selectTaskDefinitions(null).stream().map(d->new TaskInfo(d.getKey(), d.getValue())).collect(Collectors.toList()).toArray(new TaskInfo[0]);
+    return engine.selectTaskDefinitions(null).stream().map(d->new TaskResponse(d.getKey(), d.getValue())).collect(Collectors.toList()).toArray(new TaskResponse[0]);
   }
   
   /**
@@ -74,10 +76,10 @@ public class TaskController {
    * @return task info or <code>null</code> if no task found
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public TaskInfo getTask(@PathVariable UUID taskId) {
+  public TaskResponse getTask(@PathVariable UUID taskId) {
     LOG.debug(String.format("GET /rest/harvester/tasks/%s", taskId));
     TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
-    return taskDefinition!=null? new TaskInfo(taskId, taskDefinition): null;
+    return taskDefinition!=null? new TaskResponse(taskId, taskDefinition): null;
   }
   
   /**
@@ -86,13 +88,13 @@ public class TaskController {
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public TaskInfo deleteTask(@PathVariable UUID taskId) {
+  public TaskResponse deleteTask(@PathVariable UUID taskId) {
     LOG.debug(String.format("DELETE /rest/harvester/tasks/%s", taskId));
     TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
     if (taskDefinition!=null) {
       engine.deleteTaskDefinition(taskId);
     }
-    return taskDefinition!=null? new TaskInfo(taskId, taskDefinition): null;
+    return taskDefinition!=null? new TaskResponse(taskId, taskDefinition): null;
   }
   
   /**
@@ -101,10 +103,10 @@ public class TaskController {
    * @return task info of the newly created task
    */
   @RequestMapping(value = "/rest/harvester/tasks", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  public TaskInfo addTask(@RequestBody TaskDefinition taskDefinition) {
+  public TaskResponse addTask(@RequestBody TaskDefinition taskDefinition) {
     LOG.debug(String.format("PUT /rest/harvester/tasks <-- %s", taskDefinition));
     UUID id = engine.addTaskDefinition(taskDefinition);
-    return new TaskInfo(id, taskDefinition);
+    return new TaskResponse(id, taskDefinition);
   }
   
   /**
@@ -114,10 +116,10 @@ public class TaskController {
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public TaskInfo updateTask(@RequestBody TaskDefinition taskDefinition, @PathVariable UUID taskId) {
+  public TaskResponse updateTask(@RequestBody TaskDefinition taskDefinition, @PathVariable UUID taskId) {
     LOG.debug(String.format("POST /rest/harvester/tasks/%s <-- %s", taskId, taskDefinition));
     TaskDefinition oldTaskDef = engine.updateTaskDefinition(taskId, taskDefinition);
-    return oldTaskDef!=null? new TaskInfo(taskId, oldTaskDef): null;
+    return oldTaskDef!=null? new TaskResponse(taskId, oldTaskDef): null;
   }
   
   /**
@@ -126,13 +128,13 @@ public class TaskController {
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/execute", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ProcessInfo> execute(@PathVariable UUID taskId) {
+  public ResponseEntity<ProcessResponse> execute(@PathVariable UUID taskId) {
     LOG.debug(String.format("GET /rest/harvester/tasks/%s/execute", taskId));
     TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
     try {
-      ProcessRef ref = engine.submitTaskDefinition(taskDefinition);
+      ProcessReference ref = engine.submitTaskDefinition(taskDefinition);
       ref.getProcess().begin();
-      return new ResponseEntity<>(new ProcessInfo(ref.getProcessId(), ref.getProcess().getTitle(), ref.getProcess().getStatus()), HttpStatus.OK);
+      return new ResponseEntity<>(new ProcessResponse(ref.getProcessId(), ref.getProcess().getTitle(), ref.getProcess().getStatus()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -145,12 +147,12 @@ public class TaskController {
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/schedule", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<TriggerDefinition> schedule(@RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId) {
+  public ResponseEntity<TriggerResponse> schedule(@RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId) {
     LOG.debug(String.format("GET /rest/harvester/tasks/%s/echedule <-- %s", taskId, triggerDefinition));
     TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
     try {
-      TriggerDefinition trigDef = engine.scheduleTask(taskDefinition, triggerDefinition);
-      return new ResponseEntity<>(trigDef,HttpStatus.OK);
+      TriggerReference trigDef = engine.scheduleTask(taskDefinition, triggerDefinition);
+      return new ResponseEntity<>(new TriggerResponse(trigDef.getUuid(), trigDef.getTriggerDefinition()),HttpStatus.OK);
     } catch (InvalidDefinitionException | DataProcessorException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }

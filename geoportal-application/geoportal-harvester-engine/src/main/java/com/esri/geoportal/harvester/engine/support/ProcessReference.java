@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine;
+package com.esri.geoportal.harvester.engine.support;
 
 import com.esri.geoportal.harvester.api.Processor;
 import java.util.UUID;
@@ -21,7 +21,7 @@ import java.util.UUID;
 /**
  * Process reference.
  */
-public class ProcessRef {
+public final class ProcessReference {
   private final UUID uuid;
   private final Processor.Process process;
 
@@ -30,7 +30,7 @@ public class ProcessRef {
    * @param uuid id of the process
    * @param process process
    */
-  public ProcessRef(UUID uuid, Processor.Process process) {
+  public ProcessReference(UUID uuid, Processor.Process process) {
     this.uuid = uuid;
     this.process = process;
   }
