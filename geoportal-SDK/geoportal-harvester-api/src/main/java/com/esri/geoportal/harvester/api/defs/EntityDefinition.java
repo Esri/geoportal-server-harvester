@@ -24,8 +24,9 @@ import java.util.stream.Collectors;
  * Entity definition.
  * <p>
  * It is a map of properties mean to be serializable. Based upon this information,
- * a {@link Connector} will be able to produce an instance of the {@link Broker},
- * or a {@link Processor} can be produced by a factory.
+ * a {@link com.esri.geoportal.harvester.api.Connector} will be able to produce an 
+ * instance of the {@link com.esri.geoportal.harvester.api.Broker}, or a 
+ * {@link com.esri.geoportal.harvester.api.Processor} can be produced by a factory.
  * <p>
  * This class must be extended with the class providing explicit methods translating
  * from/to the named attribute within the map. For example, a concretized class
@@ -33,8 +34,8 @@ import java.util.stream.Collectors;
  * return or accept an argument of type URL. This value will be serialized into 
  * string and stored within the map under predetermined key.
  * 
- * @see Connector
- * @see Broker
+ * @see com.esri.geoportal.harvester.api.Connector
+ * @see com.esri.geoportal.harvester.api.Broker
  */
 public final class EntityDefinition {
   private String type;

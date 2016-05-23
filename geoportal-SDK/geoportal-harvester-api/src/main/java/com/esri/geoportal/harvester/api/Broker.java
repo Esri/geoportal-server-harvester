@@ -26,7 +26,7 @@ import java.io.Closeable;
  * 
  * @see com.esri.geoportal.harvester.api.specs.InputBroker
  * @see com.esri.geoportal.harvester.api.specs.OutputBroker
- * @see EntityDefinition
+ * @see com.esri.geoportal.harvester.api.defs.EntityDefinition
  * @see Connector
  */
 public interface Broker extends Closeable {

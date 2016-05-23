@@ -21,7 +21,7 @@ import java.util.List;
  * UI template.
  * <p>
  * Connector template is used to generate information sufficient to build form UI.
- * @see Connector
+ * @see com.esri.geoportal.harvester.api.Connector
  */
 public final class UITemplate {
   private final String type;
