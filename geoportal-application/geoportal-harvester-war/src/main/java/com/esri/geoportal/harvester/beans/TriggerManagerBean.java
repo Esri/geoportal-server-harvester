@@ -20,6 +20,7 @@ import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.TriggerManager;
 import com.esri.geoportal.harvester.engine.TriggerRegistry;
+import com.esri.geoportal.harvester.engine.support.CrudsException;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.serialize;
 import java.io.IOException;
@@ -103,13 +104,13 @@ public class TriggerManagerBean implements TriggerManager {
       });
 
       LOG.info("TriggerManagerBean initialized.");
-    } catch (SQLException ex) {
+    } catch (SQLException|CrudsException ex) {
       LOG.info("Error initializing trigger definition database", ex);
     }
   }
 
   @Override
-  public UUID create(TriggerDefinition data) {
+  public UUID create(TriggerDefinition data) throws CrudsException {
     UUID id = UUID.randomUUID();
     try (
             Connection connection = dataSource.getConnection();
@@ -122,26 +123,25 @@ public class TriggerManagerBean implements TriggerManager {
       
       getInstances().put(id, instance);
     } catch (SQLException | IOException | InvalidDefinitionException ex) {
-      LOG.error("Error selecting trigger definition", ex);
+      throw new CrudsException("Error selecting trigger definition", ex);
     }
     return id;
   }
 
   @Override
-  public boolean delete(UUID id) {
+  public boolean delete(UUID id) throws CrudsException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("DELETE FROM TRIGGERS WHERE ID = ?");) {
       st.setString(1, id.toString());
       return st.executeUpdate() > 0;
     } catch (SQLException ex) {
-      LOG.error("Error deleting trigger definition", ex);
-      return false;
+      throw new CrudsException("Error deleting trigger definition", ex);
     }
   }
 
   @Override
-  public TriggerDefinition read(UUID id) {
+  public TriggerDefinition read(UUID id) throws CrudsException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("SELECT * FROM TRIGGERS WHERE ID = ?");) {
@@ -155,14 +155,14 @@ public class TriggerManagerBean implements TriggerManager {
         }
       }
     } catch (SQLException ex) {
-      LOG.error("Error selecting broker definition", ex);
+      throw new CrudsException("Error selecting broker definition", ex);
     }
 
     return null;
   }
 
   @Override
-  public Collection<Map.Entry<UUID, TriggerDefinition>> select() {
+  public Collection<Map.Entry<UUID, TriggerDefinition>> select() throws CrudsException {
     HashMap<UUID, TriggerDefinition> map = new HashMap<>();
     try (
             Connection connection = dataSource.getConnection();
@@ -178,13 +178,13 @@ public class TriggerManagerBean implements TriggerManager {
         }
       }
     } catch (SQLException ex) {
-      LOG.error("Error selecting broker definition", ex);
+      throw new CrudsException("Error selecting broker definition", ex);
     }
     return map.entrySet();
   }
 
   @Override
-  public boolean update(UUID id, TriggerDefinition data) {
+  public boolean update(UUID id, TriggerDefinition data) throws CrudsException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("UPDATE TRIGGERS SET triggerDefinition = ? WHERE ID = ?");) {
@@ -192,8 +192,7 @@ public class TriggerManagerBean implements TriggerManager {
       st.setString(2, id.toString());
       return st.executeUpdate() > 0;
     } catch (SQLException | IOException ex) {
-      LOG.error("Error selecting broker definition", ex);
-      return false;
+      throw new CrudsException("Error selecting broker definition", ex);
     }
   }
 

@@ -19,6 +19,7 @@ import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deseria
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.serialize;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.engine.TaskManager;
+import com.esri.geoportal.harvester.engine.support.CrudsException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -63,7 +64,7 @@ public class TaskManagerBean implements TaskManager {
   }
 
   @Override
-  public UUID create(TaskDefinition taskDef) {
+  public UUID create(TaskDefinition taskDef) throws CrudsException {
     UUID id = UUID.randomUUID();
     try (
             Connection connection = dataSource.getConnection();
@@ -73,13 +74,13 @@ public class TaskManagerBean implements TaskManager {
       st.setString(2, id.toString());
       st.executeUpdate();
     } catch (SQLException|IOException ex) {
-      LOG.error("Error selecting task", ex);
+      throw new CrudsException("Error selecting task", ex);
     }
     return id;
   }
 
   @Override
-  public boolean update(UUID id, TaskDefinition taskDef) {
+  public boolean update(UUID id, TaskDefinition taskDef) throws CrudsException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("UPDATE TASKS SET taskDefinition = ? WHERE ID = ?");
@@ -88,13 +89,12 @@ public class TaskManagerBean implements TaskManager {
       st.setString(2, id.toString());
       return st.executeUpdate()>0;
     } catch (SQLException|IOException ex) {
-      LOG.error("Error selecting task", ex);
-      return false;
+      throw new CrudsException("Error selecting task", ex);
     }
   }
 
   @Override
-  public TaskDefinition read(UUID id) {
+  public TaskDefinition read(UUID id) throws CrudsException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("SELECT * FROM TASKS WHERE ID = ?");
@@ -109,14 +109,14 @@ public class TaskManagerBean implements TaskManager {
         }
       }
     } catch (SQLException ex) {
-      LOG.error("Error selecting task", ex);
+      throw new CrudsException("Error selecting task", ex);
     }
     
     return null;
   }
 
   @Override
-  public boolean delete(UUID id) {
+  public boolean delete(UUID id) throws CrudsException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("DELETE * FROM TASKS WHERE ID = ?");
@@ -124,13 +124,12 @@ public class TaskManagerBean implements TaskManager {
       st.setString(1, id.toString());
       return st.executeUpdate()>0;
     } catch (SQLException ex) {
-      LOG.error("Error selecting task", ex);
-      return false;
+      throw new CrudsException("Error selecting task", ex);
     }
   }
 
   @Override
-  public Collection<Map.Entry<UUID, TaskDefinition>> select() {
+  public Collection<Map.Entry<UUID, TaskDefinition>> select() throws CrudsException {
     HashMap<UUID, TaskDefinition> map = new HashMap<>();
     try (
             Connection connection = dataSource.getConnection();
@@ -147,7 +146,7 @@ public class TaskManagerBean implements TaskManager {
         }
       }
     } catch (SQLException ex) {
-      LOG.error("Error selecting task", ex);
+      throw new CrudsException("Error selecting task", ex);
     }
     return map.entrySet();
   }

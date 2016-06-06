@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.engine.BrokerDefinitionManager;
+import com.esri.geoportal.harvester.engine.support.CrudsException;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.serialize;
 import java.io.IOException;
@@ -63,7 +64,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
   }
 
   @Override
-  public UUID create(EntityDefinition brokerDef) {
+  public UUID create(EntityDefinition brokerDef) throws CrudsException {
     UUID id = UUID.randomUUID();
     try (
             Connection connection = dataSource.getConnection();
@@ -73,13 +74,13 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
       st.setString(2, id.toString());
       st.executeUpdate();
     } catch (SQLException|IOException ex) {
-      LOG.error("Error selecting broker definition", ex);
+      throw new CrudsException("Error selecting broker definition", ex);
     }
     return id;
   }
 
   @Override
-  public boolean update(UUID id, EntityDefinition brokerDef) {
+  public boolean update(UUID id, EntityDefinition brokerDef) throws CrudsException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("UPDATE BROKERS SET brokerDefinition = ? WHERE ID = ?");
@@ -88,13 +89,12 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
       st.setString(2, id.toString());
       return st.executeUpdate()>0;
     } catch (SQLException|IOException ex) {
-      LOG.error("Error selecting broker definition", ex);
-      return false;
+      throw new CrudsException("Error selecting broker definition", ex);
     }
   }
 
   @Override
-  public EntityDefinition read(UUID id) {
+  public EntityDefinition read(UUID id) throws CrudsException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("SELECT * FROM BROKERS WHERE ID = ?");
@@ -109,14 +109,14 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
         }
       }
     } catch (SQLException ex) {
-      LOG.error("Error selecting broker definition", ex);
+      throw new CrudsException("Error selecting broker definition", ex);
     }
     
     return null;
   }
 
   @Override
-  public boolean delete(UUID id) {
+  public boolean delete(UUID id) throws CrudsException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("DELETE FROM BROKERS WHERE ID = ?");
@@ -124,13 +124,12 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
       st.setString(1, id.toString());
       return st.executeUpdate()>0;
     } catch (SQLException ex) {
-      LOG.error("Error deleting broker definition", ex);
-      return false;
+      throw new CrudsException("Error deleting broker definition", ex);
     }
   }
 
   @Override
-  public Collection<Map.Entry<UUID, EntityDefinition>> select() {
+  public Collection<Map.Entry<UUID, EntityDefinition>> select() throws CrudsException {
     HashMap<UUID, EntityDefinition> map = new HashMap<>();
     try (
             Connection connection = dataSource.getConnection();
@@ -147,7 +146,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
         }
       }
     } catch (SQLException ex) {
-      LOG.error("Error selecting broker definition", ex);
+      throw new CrudsException("Error selecting broker definition", ex);
     }
     return map.entrySet();
   }

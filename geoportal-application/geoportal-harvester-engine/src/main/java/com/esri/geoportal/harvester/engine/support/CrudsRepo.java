@@ -29,35 +29,40 @@ public interface CrudsRepo<T> {
    * Creates process.
    * @param data data
    * @return id of the data
+   * @throws CrudsException if operation performed on repository fails
    */
-  UUID create(T data);
+  UUID create(T data) throws CrudsException;
 
   /**
    * Removes data.
    * @param id data id
    * @return <code>true</code> if updated
+   * @throws CrudsException if operation performed on repository fails
    */
-  boolean delete(UUID id);
+  boolean delete(UUID id) throws CrudsException;
 
   /**
    * Reads data by id.
    * @param id data id
    * @return data or <code>null</code> if no corresponding data
+   * @throws CrudsException if operation performed on repository fails
    */
-  T read(UUID id);
+  T read(UUID id) throws CrudsException;
 
   /**
    * Lists all data.
    * @return all data
+   * @throws CrudsException if operation performed on repository fails
    */
-  Collection<Map.Entry<UUID, T>> select();
+  Collection<Map.Entry<UUID, T>> select() throws CrudsException;
 
   /**
    * Updates data.
    * @param id data id
    * @param data data
    * @return <code>true</code> if updated
+   * @throws CrudsException if operation performed on repository fails
    */
-  boolean update(UUID id, T data);
+  boolean update(UUID id, T data) throws CrudsException;
   
 }
