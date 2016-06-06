@@ -15,7 +15,6 @@
  */
 package com.esri.geoportal.harvester.api;
 
-import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
@@ -25,7 +24,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 /**
  * Trigger.
  */
-public interface Trigger {
+public interface Trigger extends AutoCloseable {
   /**
    * Gets type of the trigger.
    * @return type of the trigger

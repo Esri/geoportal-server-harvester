@@ -19,6 +19,7 @@ import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.engine.TriggerRegistry;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,17 @@ public class TriggerRegistryBean extends TriggerRegistry {
       triggers.stream().forEach(t->put(t.getType(),t));
     }
     LOG.info("TriggerRegistryBean initialized.");
+  }
+  
+  @PreDestroy
+  public void destroy() {
+    values().stream().forEach(t->{
+      try {
+        t.close();
+      } catch (Exception ex) {
+        LOG.error(String.format("Error closing trigger: %s", t.getType()), ex);
+      }
+    });
   }
  
 }

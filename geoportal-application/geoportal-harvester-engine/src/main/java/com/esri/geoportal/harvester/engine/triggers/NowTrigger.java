@@ -22,7 +22,7 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 
 /**
- * Immediate trigger.
+ * 'Now' trigger. Triggers harvesting immediately.
  */
 public class NowTrigger implements Trigger {
   public static final String TYPE = "NOW";
@@ -42,20 +42,25 @@ public class NowTrigger implements Trigger {
     if (!getType().equals(triggerDefinition.getType())) {
       throw new InvalidDefinitionException(String.format("Invalid trigger definition: %s", triggerDefinition));
     }
-    return new ImmediateTriggerInstance(triggerDefinition);
+    return new NowTriggerInstance(triggerDefinition);
+  }
+
+  @Override
+  public void close() throws Exception {
+    // Ignore
   }
   
   /**
-   * Immediate trigger instance.
+   * 'Now' trigger instance.
    */
-  private class ImmediateTriggerInstance implements Trigger.Instance {
+  private class NowTriggerInstance implements Trigger.Instance {
     private final TriggerDefinition triggerDefinition;
 
     /**
      * Creates instance of the trigger instance
      * @param triggerDefinition trigger definition
      */
-    public ImmediateTriggerInstance(TriggerDefinition triggerDefinition) {
+    public NowTriggerInstance(TriggerDefinition triggerDefinition) {
       this.triggerDefinition = triggerDefinition;
     }
     
@@ -67,6 +72,7 @@ public class NowTrigger implements Trigger {
 
     @Override
     public void activate(Trigger.Context context) throws DataProcessorException, InvalidDefinitionException {
+      // submit task definition now.
       context.submit(triggerDefinition.getTaskDefinition());
     }
 

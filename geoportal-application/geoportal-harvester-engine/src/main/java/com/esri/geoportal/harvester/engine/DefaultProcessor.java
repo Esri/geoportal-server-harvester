@@ -20,13 +20,9 @@ import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
-import com.esri.geoportal.harvester.api.specs.InputBroker;
-import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import static jdk.nashorn.internal.objects.NativeRegExp.source;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
