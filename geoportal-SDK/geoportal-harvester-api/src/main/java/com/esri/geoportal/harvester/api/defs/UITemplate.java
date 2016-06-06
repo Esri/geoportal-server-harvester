@@ -73,7 +73,9 @@ public final class UITemplate {
     /** integer type */
     integer,
     /** choice type */
-    choice
+    choice,
+    /** temporal type */
+    temporal
   }
   
   /**
@@ -279,6 +281,34 @@ public final class UITemplate {
      */
     public List<Choice<CT>> getChoices() {
       return choices;
+    }
+  }
+  
+  /**
+   * Temporal argument.
+   */
+  public static class TemporalArgument extends ArgumentBase<Integer> {
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     */
+    public TemporalArgument(String name, String label) {
+      super(name, label);
+    }
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     * @param required required
+     */
+    public TemporalArgument(String name, String label, boolean required) {
+      super(name, label, required);
+    }
+
+    @Override
+    public ArgumentType getType() {
+      return ArgumentType.temporal;
     }
   }
 }
