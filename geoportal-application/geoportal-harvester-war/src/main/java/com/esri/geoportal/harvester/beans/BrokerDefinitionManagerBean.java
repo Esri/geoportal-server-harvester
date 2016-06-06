@@ -74,7 +74,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
       st.setString(2, id.toString());
       st.executeUpdate();
     } catch (SQLException|IOException ex) {
-      throw new CrudsException("Error selecting broker definition", ex);
+      throw new CrudsException("Error creating broker definition", ex);
     }
     return id;
   }
@@ -89,7 +89,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
       st.setString(2, id.toString());
       return st.executeUpdate()>0;
     } catch (SQLException|IOException ex) {
-      throw new CrudsException("Error selecting broker definition", ex);
+      throw new CrudsException("Error updating broker definition", ex);
     }
   }
 
@@ -109,7 +109,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
         }
       }
     } catch (SQLException ex) {
-      throw new CrudsException("Error selecting broker definition", ex);
+      throw new CrudsException("Error reading broker definition", ex);
     }
     
     return null;
