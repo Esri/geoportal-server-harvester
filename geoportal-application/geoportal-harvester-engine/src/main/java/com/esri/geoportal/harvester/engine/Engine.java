@@ -127,6 +127,14 @@ public class Engine {
   }
 
   /**
+   * Lists all triggers.
+   * @return list of triggers
+   */
+  public List<Trigger> listTriggers() {
+    return new ArrayList<>(triggerRegistry.values());
+  }
+  
+  /**
    * Gets inbound connector templates.
    *
    * @return collection of inbound connector templates
