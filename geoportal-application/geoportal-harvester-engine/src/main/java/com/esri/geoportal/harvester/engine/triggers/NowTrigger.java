@@ -24,8 +24,8 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 /**
  * Immediate trigger.
  */
-public class ImmediateTrigger implements Trigger {
-  public static final String TYPE = "IMMEDIATE";
+public class NowTrigger implements Trigger {
+  public static final String TYPE = "NOW";
 
   @Override
   public String getType() {
@@ -61,7 +61,7 @@ public class ImmediateTrigger implements Trigger {
     
     @Override
     public Trigger getTrigger() {
-      return ImmediateTrigger.this;
+      return NowTrigger.this;
     }
     
 

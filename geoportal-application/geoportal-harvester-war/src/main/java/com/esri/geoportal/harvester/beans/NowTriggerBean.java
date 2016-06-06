@@ -15,13 +15,13 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.engine.triggers.ImmediateTrigger;
+import com.esri.geoportal.harvester.engine.triggers.NowTrigger;
 import org.springframework.stereotype.Service;
 
 /**
  * Immediate trigger bean.
  */
 @Service
-public class ImmediateTriggerBean extends ImmediateTrigger {
+public class NowTriggerBean extends NowTrigger {
   
 }
