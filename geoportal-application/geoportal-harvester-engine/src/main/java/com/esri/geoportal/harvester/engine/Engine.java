@@ -437,11 +437,6 @@ public class Engine {
     }
 
     @Override
-    public void removeInstance(Trigger.Instance instance) {
-      triggerManager.removeInstance(instance);
-    }
-
-    @Override
     public synchronized <T> T getEnv(String varName, Class<T> clazz) {
       try {
         return clazz.cast(env.get(varName));
