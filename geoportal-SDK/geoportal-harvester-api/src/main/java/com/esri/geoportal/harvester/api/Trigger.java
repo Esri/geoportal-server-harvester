@@ -76,10 +76,9 @@ public interface Trigger extends AutoCloseable {
     
     /**
      * Gets last harvest for task.
-     * @param uuid task id
      * @return last harvest date or <code>null</code> if no last harvest date
      * @throws DataProcessorException if getting last harvest date fails
      */
-    Date lastHarvest(UUID uuid) throws DataProcessorException;
+    Date lastHarvest() throws DataProcessorException;
   }
 }

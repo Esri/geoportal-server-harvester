@@ -130,6 +130,7 @@ public class TriggerManagerBean implements TriggerManager {
 
   @Override
   public boolean delete(UUID id) throws CrudsException {
+    getInstances().remove(id);
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("DELETE FROM TRIGGERS WHERE ID = ?");) {

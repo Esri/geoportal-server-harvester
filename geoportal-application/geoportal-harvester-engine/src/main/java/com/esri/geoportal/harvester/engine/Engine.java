@@ -45,7 +45,6 @@ import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,10 +109,10 @@ public class Engine {
    * Fire all triggers.
    */
   public void fireTriggers() {
-    triggerManager.getInstances().values().stream().forEach((inst) -> {
+    triggerManager.getInstances().entrySet().stream().forEach((inst) -> {
       try {
-        Trigger.Context context = new TriggerContext();
-        inst.activate(context);
+        Trigger.Context context = new TriggerContext(inst.getKey(),inst.getValue());
+        inst.getValue().activate(context);
       } catch (DataProcessorException|InvalidDefinitionException ex) {
         LOG.warn(String.format("Error activating trigger instance: %s", inst), ex);
       }
@@ -373,7 +372,7 @@ public class Engine {
       trigDef.setArguments(triggerDefinition.getProperties());
       
       UUID id = triggerManager.create(trigDef);
-      Trigger.Context context = new TriggerContext();
+      Trigger.Context context = new TriggerContext(id,triggerManager.getInstances().get(id));
       triggerManager.getInstances().get(id).activate(context);
       
       return new TriggerReference(id, trigDef);
@@ -500,6 +499,13 @@ public class Engine {
    * Engine-bound trigger context.
    */
   private class TriggerContext implements Trigger.Context {
+    private final UUID uuid;
+    private final Trigger.Instance instance;
+    
+    public TriggerContext(UUID uuid, Trigger.Instance instance) {
+      this.uuid = uuid;
+      this.instance = instance;
+    }
 
     @Override
     public synchronized Processor.Process submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
@@ -509,7 +515,7 @@ public class Engine {
     }
     
     @Override
-    public Date lastHarvest(UUID uuid) throws DataProcessorException {
+    public Date lastHarvest() throws DataProcessorException {
       try {
         History history = historyManager.buildHistory(uuid);
         History.Event lastEvent = history.lastEvent();
