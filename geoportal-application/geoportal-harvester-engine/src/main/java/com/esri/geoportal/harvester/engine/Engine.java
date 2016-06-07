@@ -43,7 +43,9 @@ import com.esri.geoportal.harvester.engine.support.CrudsException;
 import com.esri.geoportal.harvester.engine.support.ReportBuilderAdaptor;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -454,6 +456,17 @@ public class Engine {
         return ref != null ? ref.getProcess() : null;
       } catch (CrudsException ex) {
         throw new DataProcessorException(String.format("Error submiting task definition: %s", taskDefinition), ex);
+      }
+    }
+    
+    @Override
+    public Date lastHarvest(UUID uuid) throws DataProcessorException {
+      try {
+        History history = historyManager.buildHistory(uuid);
+        History.Event lastEvent = history.lastEvent();
+        return lastEvent!=null? lastEvent.getTimestamp(): null;
+      } catch (CrudsException ex) {
+        throw new DataProcessorException(String.format("Error getting last harvest for: %s", uuid), ex);
       }
     }
   }

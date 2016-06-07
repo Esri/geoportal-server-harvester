@@ -20,6 +20,8 @@ import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * Trigger.
@@ -71,5 +73,13 @@ public interface Trigger extends AutoCloseable {
      * @throws InvalidDefinitionException if task definition is invalid
      */
     Processor.Process submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException;
+    
+    /**
+     * Gets last harvest for task.
+     * @param uuid task id
+     * @return last harvest date or <code>null</code> if no last harvest date
+     * @throws DataProcessorException if getting last harvest date fails
+     */
+    Date lastHarvest(UUID uuid) throws DataProcessorException;
   }
 }
