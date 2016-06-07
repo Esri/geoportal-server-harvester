@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.beans;
 import com.esri.geoportal.harvester.engine.BrokerDefinitionManager;
 import com.esri.geoportal.harvester.engine.ReportBuilder;
 import com.esri.geoportal.harvester.engine.Engine;
+import com.esri.geoportal.harvester.engine.HistoryManager;
 import com.esri.geoportal.harvester.engine.ProcessManager;
 import com.esri.geoportal.harvester.engine.TaskManager;
 import com.esri.geoportal.harvester.engine.OutboundConnectorRegistry;
@@ -48,6 +49,7 @@ public class EngineBean extends Engine {
    * @param taskManager task manager
    * @param processManager process manager
    * @param triggerManager trigger manager
+   * @param historyManager history manager
    * @param reportBuilder report builder
    */
   @Autowired
@@ -60,6 +62,7 @@ public class EngineBean extends Engine {
           TaskManager taskManager, 
           ProcessManager processManager, 
           TriggerManager triggerManager,
+          HistoryManager historyManager,
           ReportBuilder reportBuilder
   ) {
     super(
@@ -71,6 +74,7 @@ public class EngineBean extends Engine {
             taskManager, 
             processManager, 
             triggerManager, 
+            historyManager,
             reportBuilder
     );
   }

@@ -59,6 +59,7 @@ public class Engine {
   private final TaskManager taskManager;
   private final ProcessManager processManager;
   private final TriggerManager triggerManager;
+  private final HistoryManager historyManager;
   private final InboundConnectorRegistry inboundConnectorRegistry;
   private final OutboundConnectorRegistry outboundConnectorRegistry;
   private final TriggerRegistry triggerRegistry;
@@ -76,6 +77,7 @@ public class Engine {
    * @param taskManager task manager
    * @param processManager process manager
    * @param triggerManager trigger manager
+   * @param historyManager history manager
    * @param reportBuilder report builder
    */
   public Engine(
@@ -87,6 +89,7 @@ public class Engine {
           TaskManager taskManager,
           ProcessManager processManager,
           TriggerManager triggerManager,
+          HistoryManager historyManager,
           ReportBuilder reportBuilder
   ) {
     this.inboundConnectorRegistry = inboundConnectorRegistry;
@@ -97,6 +100,7 @@ public class Engine {
     this.processManager = processManager;
     this.brokerDefinitionManager = brokerDefinitionManager;
     this.triggerManager = triggerManager;
+    this.historyManager = historyManager;
     this.reportBuilder = reportBuilder;
   }
 
