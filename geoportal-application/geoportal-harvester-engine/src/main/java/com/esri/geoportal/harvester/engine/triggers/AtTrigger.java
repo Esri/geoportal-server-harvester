@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AtTrigger implements Trigger {
   private static final Logger LOG = LoggerFactory.getLogger(AtTrigger.class);
-  public static final String T_AT_IME = "t-at-time";
+  public static final String T_AT_TIME = "t-at-time";
   public static final String TYPE = "AT";
   public static final ScheduledExecutorService service = Executors.newScheduledThreadPool(1000);
 
@@ -51,7 +51,7 @@ public class AtTrigger implements Trigger {
   @Override
   public UITemplate getTemplate() {
     List<UITemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new UITemplate.TemporalArgument(T_AT_IME, "Time", true));
+    arguments.add(new UITemplate.TemporalArgument(T_AT_TIME, "Time", true));
     UITemplate uiTemplate = new UITemplate(getType(), "Harvest at", arguments);
     return uiTemplate;
   }
@@ -131,7 +131,7 @@ public class AtTrigger implements Trigger {
         long delay = calcDelay();
         future = service.schedule(runnable, delay, TimeUnit.MINUTES);
       } catch (ParseException ex) {
-        LOG.error(String.format("Error activating trigger: %", getType()), ex);
+        LOG.error(String.format("Error activating trigger: %s", getType()), ex);
       }
     }
     
@@ -157,7 +157,7 @@ public class AtTrigger implements Trigger {
      * @throws ParseException if extracting minute of the day failed
      */
     private int getMinOfDay() throws ParseException {
-      return parseMinOfDay(triggerDefinition.getArguments().get(T_AT_IME));
+      return parseMinOfDay(triggerDefinition.getArguments().get(T_AT_TIME));
     }
     
     /**
