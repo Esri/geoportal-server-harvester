@@ -63,12 +63,6 @@ public class NowTrigger implements Trigger {
     public NowTriggerInstance(TriggerDefinition triggerDefinition) {
       this.triggerDefinition = triggerDefinition;
     }
-    
-    @Override
-    public Trigger getTrigger() {
-      return NowTrigger.this;
-    }
-    
 
     @Override
     public void activate(Trigger.Context context) throws DataProcessorException, InvalidDefinitionException {

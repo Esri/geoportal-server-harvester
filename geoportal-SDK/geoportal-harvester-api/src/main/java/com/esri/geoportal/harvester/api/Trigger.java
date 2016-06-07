@@ -51,12 +51,6 @@ public interface Trigger extends AutoCloseable {
   interface Instance extends AutoCloseable {
     
     /**
-     * Gets trigger.
-     * @return trigger
-     */
-    Trigger getTrigger();
-    
-    /**
      * Activates the trigger.
      * @param triggerContext trigger context
      * @throws DataProcessorException if creating process fails
@@ -77,21 +71,5 @@ public interface Trigger extends AutoCloseable {
      * @throws InvalidDefinitionException if task definition is invalid
      */
     Processor.Process submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException;
-    
-    /**
-     * Gets context variable.
-     * @param <T> type of the data
-     * @param varName variable name
-     * @param clazz class of the data
-     * @return variable value or <code>null</code> if no variable available
-     */
-    <T> T getEnv(String varName, Class<T> clazz);
-    
-    /**
-     * Sets context variable.
-     * @param varName variable name
-     * @param var variable value or <code>null</code> to remove 
-     */
-    void setEnv(String varName, Object var);
   }
 }

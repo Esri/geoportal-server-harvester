@@ -43,9 +43,7 @@ import com.esri.geoportal.harvester.engine.support.CrudsException;
 import com.esri.geoportal.harvester.engine.support.ReportBuilderAdaptor;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,9 +54,6 @@ import org.slf4j.LoggerFactory;
 public class Engine {
 
   private static final Logger LOG = LoggerFactory.getLogger(Engine.class);
-
-  private final Map<String, Object> env = new HashMap<>();
-  private final Trigger.Context triggerContext = new TriggerContext();
 
   private final ReportBuilder reportBuilder;
   private final TaskManager taskManager;
@@ -106,21 +101,12 @@ public class Engine {
   }
 
   /**
-   * Gets trigger context.
-   *
-   * @return trigger context
-   */
-  public Trigger.Context getTriggerContext() {
-    return triggerContext;
-  }
-
-  /**
    * Fire all triggers.
    */
   public void fireTriggers() {
-    Trigger.Context context = getTriggerContext();
     triggerManager.getInstances().values().stream().forEach((inst) -> {
       try {
+        Trigger.Context context = new TriggerContext();
         inst.activate(context);
       } catch (DataProcessorException|InvalidDefinitionException ex) {
         LOG.warn(String.format("Error activating trigger instance: %s", inst), ex);
@@ -159,6 +145,7 @@ public class Engine {
    *
    * @param category broker category
    * @return broker infos
+   * @throws CrudsException if accessing repository fails
    */
   public Collection<BrokerInfo> getBrokersDefinitions(Category category) throws CrudsException {
     if (category != null) {
@@ -178,6 +165,7 @@ public class Engine {
    * @param brokerId broker id
    * @return broker info or <code>null</code> if no broker corresponding to the
    * broker id can be found
+   * @throws CrudsException if accessing repository fails
    */
   public BrokerInfo findBroker(UUID brokerId) throws CrudsException {
     EntityDefinition brokerDefinition = brokerDefinitionManager.read(brokerId);
@@ -195,6 +183,7 @@ public class Engine {
    *
    * @param brokerDefinition broker definition
    * @return broker info or <code>null</code> if broker has not been created
+   * @throws CrudsException if accessing repository fails
    */
   public BrokerInfo createBroker(EntityDefinition brokerDefinition) throws CrudsException {
     Category category = getBrokerCategoryByType(brokerDefinition.getType());
@@ -216,6 +205,7 @@ public class Engine {
    * @param brokerId broker id
    * @param brokerDefinition broker definition
    * @return broker info or <code>null</code> if broker has not been created
+   * @throws CrudsException if accessing repository fails
    */
   public BrokerInfo updateBroker(UUID brokerId, EntityDefinition brokerDefinition) throws CrudsException {
     EntityDefinition oldBrokerDef = brokerDefinitionManager.read(brokerId);
@@ -233,6 +223,7 @@ public class Engine {
    *
    * @param brokerId broker id
    * @return <code>true</code> if broker has been deleted
+   * @throws CrudsException if accessing repository fails
    */
   public boolean deleteBroker(UUID brokerId) throws CrudsException {
     return brokerDefinitionManager.delete(brokerId);
@@ -244,6 +235,7 @@ public class Engine {
    * @param processId process id.
    * @return process or <code>null</code> if no process available for the given
    * process id
+   * @throws CrudsException if accessing repository fails
    */
   public Processor.Process getProcess(UUID processId) throws CrudsException {
     return processManager.read(processId);
@@ -254,6 +246,7 @@ public class Engine {
    *
    * @param predicate predicate
    * @return list of processes matching predicate
+   * @throws CrudsException if accessing repository fails
    */
   public List<Map.Entry<UUID, Processor.Process>> selectProcesses(Predicate<? super Map.Entry<UUID, Processor.Process>> predicate) throws CrudsException {
     return processManager.select().stream().filter(predicate != null ? predicate : (Map.Entry<UUID, Processor.Process> e) -> true).collect(Collectors.toList());
@@ -297,6 +290,7 @@ public class Engine {
    * @param task task for the process
    * @return process handle
    * @throws InvalidDefinitionException if processor definition is invalid
+   * @throws CrudsException if accessing repository fails
    */
   public ProcessReference createProcess(EntityDefinition processorDefinition, Task task) throws InvalidDefinitionException, CrudsException {
     Processor processor = processorDefinition == null
@@ -319,6 +313,7 @@ public class Engine {
    * @param taskDefinition task definition
    * @return process handle
    * @throws InvalidDefinitionException invalid definition exception
+   * @throws CrudsException if accessing repository fails
    */
   public ProcessReference submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException, CrudsException {
     Task task = createTask(taskDefinition);
@@ -333,6 +328,7 @@ public class Engine {
    * @return trigger definition
    * @throws InvalidDefinitionException if invalid definition
    * @throws DataProcessorException if error processing data
+   * @throws CrudsException if accessing repository fails
    */
   public TriggerReference scheduleTask(TaskDefinition taskDefinition, EntityDefinition triggerDefinition) throws InvalidDefinitionException, DataProcessorException, CrudsException {
     TriggerDefinition trigDef = new TriggerDefinition();
@@ -341,7 +337,8 @@ public class Engine {
     trigDef.setArguments(triggerDefinition.getProperties());
     
     UUID id = triggerManager.create(trigDef);
-    triggerManager.getInstances().get(id).activate(getTriggerContext());
+    Trigger.Context context = new TriggerContext();
+    triggerManager.getInstances().get(id).activate(context);
     
     return new TriggerReference(id, trigDef);
   }
@@ -351,6 +348,7 @@ public class Engine {
    *
    * @param predicate predicate
    * @return list of task definitions matching predicate
+   * @throws CrudsException if accessing repository fails
    */
   public List<Map.Entry<UUID, TaskDefinition>> selectTaskDefinitions(Predicate<? super Map.Entry<UUID, TaskDefinition>> predicate) throws CrudsException {
     return taskManager.select().stream().filter(predicate != null ? predicate : (Map.Entry<UUID, TaskDefinition> e) -> true).collect(Collectors.toList());
@@ -361,6 +359,7 @@ public class Engine {
    *
    * @param taskId task id
    * @return task definition
+   * @throws CrudsException if accessing repository fails
    */
   public TaskDefinition readTaskDefinition(UUID taskId) throws CrudsException {
     return taskManager.read(taskId);
@@ -371,6 +370,7 @@ public class Engine {
    *
    * @param taskId task id
    * @return <code>true</code> if task definition has been deleted
+   * @throws CrudsException if accessing repository fails
    */
   public boolean deleteTaskDefinition(UUID taskId) throws CrudsException {
     return taskManager.delete(taskId);
@@ -381,6 +381,7 @@ public class Engine {
    *
    * @param taskDefinition task definition
    * @return id of a new task
+   * @throws CrudsException if accessing repository fails
    */
   public UUID addTaskDefinition(TaskDefinition taskDefinition) throws CrudsException {
     return taskManager.create(taskDefinition);
@@ -392,6 +393,7 @@ public class Engine {
    * @param taskId task id
    * @param taskDefinition task definition
    * @return old task definition or <code>null</code> if no old task
+   * @throws CrudsException if accessing repository fails
    */
   public TaskDefinition updateTaskDefinition(UUID taskId, TaskDefinition taskDefinition) throws CrudsException {
     TaskDefinition oldTaskDef = taskManager.read(taskId);
@@ -448,24 +450,6 @@ public class Engine {
         return ref != null ? ref.getProcess() : null;
       } catch (CrudsException ex) {
         throw new DataProcessorException(String.format("Error submiting task definition: %s", taskDefinition), ex);
-      }
-    }
-
-    @Override
-    public synchronized <T> T getEnv(String varName, Class<T> clazz) {
-      try {
-        return clazz.cast(env.get(varName));
-      } catch (Exception ex) {
-        return null;
-      }
-    }
-
-    @Override
-    public synchronized void setEnv(String varName, Object var) {
-      if (var != null) {
-        env.put(varName, var);
-      } else {
-        env.remove(varName);
       }
     }
   }
