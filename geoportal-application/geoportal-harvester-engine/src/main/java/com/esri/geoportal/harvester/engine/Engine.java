@@ -39,11 +39,13 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import com.esri.geoportal.harvester.engine.BrokerInfo.Category;
 import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.INBOUND;
 import static com.esri.geoportal.harvester.engine.BrokerInfo.Category.OUTBOUND;
+import com.esri.geoportal.harvester.engine.support.CrudsException;
 import com.esri.geoportal.harvester.engine.support.ReportBuilderAdaptor;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -158,7 +160,7 @@ public class Engine {
    * @param category broker category
    * @return broker infos
    */
-  public Collection<BrokerInfo> getBrokersDefinitions(Category category) {
+  public Collection<BrokerInfo> getBrokersDefinitions(Category category) throws CrudsException {
     if (category != null) {
       Set<String> brokerTypes = listTypesByCategory(category);
       return brokerDefinitionManager.select().stream()
@@ -177,7 +179,7 @@ public class Engine {
    * @return broker info or <code>null</code> if no broker corresponding to the
    * broker id can be found
    */
-  public BrokerInfo findBroker(UUID brokerId) {
+  public BrokerInfo findBroker(UUID brokerId) throws CrudsException {
     EntityDefinition brokerDefinition = brokerDefinitionManager.read(brokerId);
     if (brokerDefinition != null) {
       Category category = getBrokerCategoryByType(brokerDefinition.getType());
@@ -194,7 +196,7 @@ public class Engine {
    * @param brokerDefinition broker definition
    * @return broker info or <code>null</code> if broker has not been created
    */
-  public BrokerInfo createBroker(EntityDefinition brokerDefinition) {
+  public BrokerInfo createBroker(EntityDefinition brokerDefinition) throws CrudsException {
     Category category = getBrokerCategoryByType(brokerDefinition.getType());
     if (category != null) {
       try {
@@ -215,7 +217,7 @@ public class Engine {
    * @param brokerDefinition broker definition
    * @return broker info or <code>null</code> if broker has not been created
    */
-  public BrokerInfo updateBroker(UUID brokerId, EntityDefinition brokerDefinition) {
+  public BrokerInfo updateBroker(UUID brokerId, EntityDefinition brokerDefinition) throws CrudsException {
     EntityDefinition oldBrokerDef = brokerDefinitionManager.read(brokerId);
     if (oldBrokerDef != null) {
       if (!brokerDefinitionManager.update(brokerId, brokerDefinition)) {
@@ -232,7 +234,7 @@ public class Engine {
    * @param brokerId broker id
    * @return <code>true</code> if broker has been deleted
    */
-  public boolean deleteBroker(UUID brokerId) {
+  public boolean deleteBroker(UUID brokerId) throws CrudsException {
     return brokerDefinitionManager.delete(brokerId);
   }
 
@@ -243,7 +245,7 @@ public class Engine {
    * @return process or <code>null</code> if no process available for the given
    * process id
    */
-  public Processor.Process getProcess(UUID processId) {
+  public Processor.Process getProcess(UUID processId) throws CrudsException {
     return processManager.read(processId);
   }
 
@@ -253,7 +255,7 @@ public class Engine {
    * @param predicate predicate
    * @return list of processes matching predicate
    */
-  public List<Map.Entry<UUID, Processor.Process>> selectProcesses(Predicate<? super Map.Entry<UUID, Processor.Process>> predicate) {
+  public List<Map.Entry<UUID, Processor.Process>> selectProcesses(Predicate<? super Map.Entry<UUID, Processor.Process>> predicate) throws CrudsException {
     return processManager.select().stream().filter(predicate != null ? predicate : (Map.Entry<UUID, Processor.Process> e) -> true).collect(Collectors.toList());
   }
 
@@ -296,7 +298,7 @@ public class Engine {
    * @return process handle
    * @throws InvalidDefinitionException if processor definition is invalid
    */
-  public ProcessReference createProcess(EntityDefinition processorDefinition, Task task) throws InvalidDefinitionException {
+  public ProcessReference createProcess(EntityDefinition processorDefinition, Task task) throws InvalidDefinitionException, CrudsException {
     Processor processor = processorDefinition == null
             ? processorRegistry.getDefaultProcessor()
             : processorRegistry.get(processorDefinition.getType()) != null
@@ -318,7 +320,7 @@ public class Engine {
    * @return process handle
    * @throws InvalidDefinitionException invalid definition exception
    */
-  public ProcessReference submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException {
+  public ProcessReference submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException, CrudsException {
     Task task = createTask(taskDefinition);
     ProcessReference prInfo = createProcess(taskDefinition.getProcessor(), task);
     return prInfo;
@@ -332,7 +334,7 @@ public class Engine {
    * @throws InvalidDefinitionException if invalid definition
    * @throws DataProcessorException if error processing data
    */
-  public TriggerReference scheduleTask(TaskDefinition taskDefinition, EntityDefinition triggerDefinition) throws InvalidDefinitionException, DataProcessorException {
+  public TriggerReference scheduleTask(TaskDefinition taskDefinition, EntityDefinition triggerDefinition) throws InvalidDefinitionException, DataProcessorException, CrudsException {
     TriggerDefinition trigDef = new TriggerDefinition();
     trigDef.setType(triggerDefinition.getType());
     trigDef.setTaskDefinition(taskDefinition);
@@ -350,7 +352,7 @@ public class Engine {
    * @param predicate predicate
    * @return list of task definitions matching predicate
    */
-  public List<Map.Entry<UUID, TaskDefinition>> selectTaskDefinitions(Predicate<? super Map.Entry<UUID, TaskDefinition>> predicate) {
+  public List<Map.Entry<UUID, TaskDefinition>> selectTaskDefinitions(Predicate<? super Map.Entry<UUID, TaskDefinition>> predicate) throws CrudsException {
     return taskManager.select().stream().filter(predicate != null ? predicate : (Map.Entry<UUID, TaskDefinition> e) -> true).collect(Collectors.toList());
   }
 
@@ -360,7 +362,7 @@ public class Engine {
    * @param taskId task id
    * @return task definition
    */
-  public TaskDefinition readTaskDefinition(UUID taskId) {
+  public TaskDefinition readTaskDefinition(UUID taskId) throws CrudsException {
     return taskManager.read(taskId);
   }
 
@@ -370,7 +372,7 @@ public class Engine {
    * @param taskId task id
    * @return <code>true</code> if task definition has been deleted
    */
-  public boolean deleteTaskDefinition(UUID taskId) {
+  public boolean deleteTaskDefinition(UUID taskId) throws CrudsException {
     return taskManager.delete(taskId);
   }
 
@@ -380,7 +382,7 @@ public class Engine {
    * @param taskDefinition task definition
    * @return id of a new task
    */
-  public UUID addTaskDefinition(TaskDefinition taskDefinition) {
+  public UUID addTaskDefinition(TaskDefinition taskDefinition) throws CrudsException {
     return taskManager.create(taskDefinition);
   }
 
@@ -391,7 +393,7 @@ public class Engine {
    * @param taskDefinition task definition
    * @return old task definition or <code>null</code> if no old task
    */
-  public TaskDefinition updateTaskDefinition(UUID taskId, TaskDefinition taskDefinition) {
+  public TaskDefinition updateTaskDefinition(UUID taskId, TaskDefinition taskDefinition) throws CrudsException {
     TaskDefinition oldTaskDef = taskManager.read(taskId);
     if (oldTaskDef != null) {
       if (!taskManager.update(taskId, taskDefinition)) {
@@ -440,8 +442,13 @@ public class Engine {
 
     @Override
     public synchronized Processor.Process submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
-      ProcessReference ref = submitTaskDefinition(taskDefinition);
-      return ref != null ? ref.getProcess() : null;
+      ProcessReference ref;
+      try {
+        ref = submitTaskDefinition(taskDefinition);
+        return ref != null ? ref.getProcess() : null;
+      } catch (CrudsException ex) {
+        throw new DataProcessorException(String.format("Error submiting task definition: %s", taskDefinition), ex);
+      }
     }
 
     @Override

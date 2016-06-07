@@ -20,8 +20,8 @@ import com.esri.geoportal.harvester.support.ProcessResponse;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.beans.EngineBean;
+import com.esri.geoportal.harvester.engine.support.CrudsException;
 import com.esri.geoportal.harvester.engine.support.ProcessReference;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
@@ -38,8 +38,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 
 /**
@@ -64,9 +62,14 @@ public class ProcessController {
    * @return all processes
    */
   @RequestMapping(value = "/rest/harvester/processes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ProcessResponse[] listAllProcesses() {
-    LOG.debug(String.format("GET /rest/harvester/processes"));
-    return filterProcesses(e->true);
+  public ResponseEntity<ProcessResponse[]> listAllProcesses() {
+    try {
+      LOG.debug(String.format("GET /rest/harvester/processes"));
+      return new ResponseEntity<>(filterProcesses(e->true),HttpStatus.OK);
+    } catch (CrudsException ex) {
+      LOG.error(String.format("Error listing all processes"), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
   
   /**
@@ -75,10 +78,15 @@ public class ProcessController {
    * @return process info
    */
   @RequestMapping(value = "/rest/harvester/processes/{processId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ProcessResponse getProcessInfo(@PathVariable UUID processId) {
-    LOG.debug(String.format("GET /rest/harvester/processes/%s", processId));
-    Processor.Process process = engine.getProcess(processId);
-    return process!=null? new ProcessResponse(processId, process.getTitle(), process.getStatus()): null;
+  public ResponseEntity<ProcessResponse> getProcessInfo(@PathVariable UUID processId) {
+    try {
+      LOG.debug(String.format("GET /rest/harvester/processes/%s", processId));
+      Processor.Process process = engine.getProcess(processId);
+      return new ResponseEntity<>(process!=null? new ProcessResponse(processId, process.getTitle(), process.getStatus()): null,HttpStatus.OK);
+    } catch (CrudsException ex) {
+      LOG.error(String.format("Error getting process info: %s", processId), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
   
   /**
@@ -87,17 +95,22 @@ public class ProcessController {
    * @return process info
    */
   @RequestMapping(value = "/rest/harvester/processes/{processId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ProcessResponse abortProcess(@PathVariable UUID processId) {
-    LOG.debug(String.format("DELETE /rest/harvester/processes/%s", processId));
-    Processor.Process process = engine.getProcess(processId);
-    if (process!=null) {
-      try {
-        process.abort();
-      } catch (IllegalStateException ex) {
-        LOG.warn("Unable to abort the process.", ex);
+  public ResponseEntity<ProcessResponse> abortProcess(@PathVariable UUID processId) {
+    try {
+      LOG.debug(String.format("DELETE /rest/harvester/processes/%s", processId));
+      Processor.Process process = engine.getProcess(processId);
+      if (process!=null) {
+        try {
+          process.abort();
+        } catch (IllegalStateException ex) {
+          LOG.warn("Unable to abort the process.", ex);
+        }
       }
+      return new ResponseEntity<>(process!=null? new ProcessResponse(processId, process.getTitle(), process.getStatus()): null, HttpStatus.OK);
+    } catch (CrudsException ex) {
+      LOG.error(String.format("Error aborting process: %s", processId), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return process!=null? new ProcessResponse(processId, process.getTitle(), process.getStatus()): null;
   }
   
   /**
@@ -129,15 +142,18 @@ public class ProcessController {
    */
   @RequestMapping(value = "/rest/harvester/processes", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessResponse> createProcess(@RequestBody String taskDef) {
-    LOG.debug(String.format("PUT /rest/harvester/processes <-- %s", taskDef));
-    
     try {
+      LOG.debug(String.format("PUT /rest/harvester/processes <-- %s", taskDef));
       TaskDefinition taskDefinition = deserialize(engine,taskDef);
       ProcessReference ref = engine.submitTaskDefinition(taskDefinition);
       ref.getProcess().begin();
       return new ResponseEntity<>(new ProcessResponse(ref.getProcessId(), ref.getProcess().getTitle(), ref.getProcess().getStatus()), HttpStatus.OK);
-    } catch (IOException|InvalidDefinitionException ex) {
+    } catch (InvalidDefinitionException ex) {
+      LOG.error(String.format("Error creating process: %s", taskDef), ex);
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    } catch (IOException|CrudsException ex) {
+      LOG.error(String.format("Error creating process: %s", taskDef), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -146,7 +162,7 @@ public class ProcessController {
    * @param predicate predicate
    * @return array of filtered processes
    */
-  private ProcessResponse[] filterProcesses(Predicate<? super Map.Entry<UUID, Processor.Process>> predicate) {
+  private ProcessResponse[] filterProcesses(Predicate<? super Map.Entry<UUID, Processor.Process>> predicate) throws CrudsException {
     return engine.selectProcesses(predicate).stream()
             .map(e->new ProcessResponse(e.getKey(),e.getValue().getTitle(),e.getValue().getStatus()))
             .collect(Collectors.toList()).toArray(new ProcessResponse[0]);

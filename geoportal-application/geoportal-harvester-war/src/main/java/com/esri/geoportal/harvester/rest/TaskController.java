@@ -19,9 +19,9 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.support.TaskResponse;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
-import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.engine.support.CrudsException;
 import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import com.esri.geoportal.harvester.support.ProcessResponse;
@@ -65,9 +65,14 @@ public class TaskController {
    * @return array of task informations
    */
   @RequestMapping(value = "/rest/harvester/tasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public TaskResponse[] listTasks() {
-    LOG.debug(String.format("GET /rest/harvester/tasks"));
-    return engine.selectTaskDefinitions(null).stream().map(d->new TaskResponse(d.getKey(), d.getValue())).collect(Collectors.toList()).toArray(new TaskResponse[0]);
+  public ResponseEntity<TaskResponse[]> listTasks() {
+    try {
+      LOG.debug(String.format("GET /rest/harvester/tasks"));
+      return new ResponseEntity<>(engine.selectTaskDefinitions(null).stream().map(d->new TaskResponse(d.getKey(), d.getValue())).collect(Collectors.toList()).toArray(new TaskResponse[0]),HttpStatus.OK);
+    } catch (CrudsException ex) {
+      LOG.error(String.format("Error listing tasks."), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
   
   /**
@@ -76,10 +81,15 @@ public class TaskController {
    * @return task info or <code>null</code> if no task found
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public TaskResponse getTask(@PathVariable UUID taskId) {
-    LOG.debug(String.format("GET /rest/harvester/tasks/%s", taskId));
-    TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
-    return taskDefinition!=null? new TaskResponse(taskId, taskDefinition): null;
+  public ResponseEntity<TaskResponse> getTask(@PathVariable UUID taskId) {
+    try {
+      LOG.debug(String.format("GET /rest/harvester/tasks/%s", taskId));
+      TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
+      return new ResponseEntity<>(taskDefinition!=null? new TaskResponse(taskId, taskDefinition): null,HttpStatus.OK);
+    } catch (CrudsException ex) {
+      LOG.error(String.format("Error getting task: %s", taskId), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
   
   /**
@@ -88,13 +98,18 @@ public class TaskController {
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public TaskResponse deleteTask(@PathVariable UUID taskId) {
-    LOG.debug(String.format("DELETE /rest/harvester/tasks/%s", taskId));
-    TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
-    if (taskDefinition!=null) {
-      engine.deleteTaskDefinition(taskId);
+  public ResponseEntity<TaskResponse> deleteTask(@PathVariable UUID taskId) {
+    try {
+      LOG.debug(String.format("DELETE /rest/harvester/tasks/%s", taskId));
+      TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
+      if (taskDefinition!=null) {
+        engine.deleteTaskDefinition(taskId);
+      }
+      return new ResponseEntity<>(taskDefinition!=null? new TaskResponse(taskId, taskDefinition): null,HttpStatus.OK);
+    } catch (CrudsException ex) {
+      LOG.error(String.format("Error deleting task: %s", taskId), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return taskDefinition!=null? new TaskResponse(taskId, taskDefinition): null;
   }
   
   /**
@@ -103,10 +118,15 @@ public class TaskController {
    * @return task info of the newly created task
    */
   @RequestMapping(value = "/rest/harvester/tasks", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  public TaskResponse addTask(@RequestBody TaskDefinition taskDefinition) {
-    LOG.debug(String.format("PUT /rest/harvester/tasks <-- %s", taskDefinition));
-    UUID id = engine.addTaskDefinition(taskDefinition);
-    return new TaskResponse(id, taskDefinition);
+  public ResponseEntity<TaskResponse> addTask(@RequestBody TaskDefinition taskDefinition) {
+    try {
+      LOG.debug(String.format("PUT /rest/harvester/tasks <-- %s", taskDefinition));
+      UUID id = engine.addTaskDefinition(taskDefinition);
+      return new ResponseEntity<>(new TaskResponse(id, taskDefinition),HttpStatus.OK);
+    } catch (CrudsException ex) {
+      LOG.error(String.format("Error adding task: %s", taskDefinition), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
   
   /**
@@ -116,10 +136,15 @@ public class TaskController {
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public TaskResponse updateTask(@RequestBody TaskDefinition taskDefinition, @PathVariable UUID taskId) {
-    LOG.debug(String.format("POST /rest/harvester/tasks/%s <-- %s", taskId, taskDefinition));
-    TaskDefinition oldTaskDef = engine.updateTaskDefinition(taskId, taskDefinition);
-    return oldTaskDef!=null? new TaskResponse(taskId, oldTaskDef): null;
+  public ResponseEntity<TaskResponse> updateTask(@RequestBody TaskDefinition taskDefinition, @PathVariable UUID taskId) {
+    try {
+      LOG.debug(String.format("POST /rest/harvester/tasks/%s <-- %s", taskId, taskDefinition));
+      TaskDefinition oldTaskDef = engine.updateTaskDefinition(taskId, taskDefinition);
+      return new ResponseEntity<>(oldTaskDef!=null? new TaskResponse(taskId, oldTaskDef): null, HttpStatus.OK);
+    } catch (CrudsException ex) {
+      LOG.error(String.format("Error updating task: %s <-- %s", taskId, taskDefinition), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
   
   /**
@@ -129,14 +154,16 @@ public class TaskController {
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/execute", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessResponse> execute(@PathVariable UUID taskId) {
-    LOG.debug(String.format("GET /rest/harvester/tasks/%s/execute", taskId));
-    TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
     try {
+      LOG.debug(String.format("GET /rest/harvester/tasks/%s/execute", taskId));
+      TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
       ProcessReference ref = engine.submitTaskDefinition(taskDefinition);
       ref.getProcess().begin();
       return new ResponseEntity<>(new ProcessResponse(ref.getProcessId(), ref.getProcess().getTitle(), ref.getProcess().getStatus()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    } catch (CrudsException ex) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
   
@@ -148,13 +175,15 @@ public class TaskController {
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/schedule", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TriggerResponse> schedule(@RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId) {
-    LOG.debug(String.format("GET /rest/harvester/tasks/%s/echedule <-- %s", taskId, triggerDefinition));
-    TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
     try {
+      LOG.debug(String.format("GET /rest/harvester/tasks/%s/echedule <-- %s", taskId, triggerDefinition));
+      TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
       TriggerReference trigDef = engine.scheduleTask(taskDefinition, triggerDefinition);
       return new ResponseEntity<>(new TriggerResponse(trigDef.getUuid(), trigDef.getTriggerDefinition()),HttpStatus.OK);
-    } catch (InvalidDefinitionException | DataProcessorException ex) {
+    } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    } catch (CrudsException | DataProcessorException ex) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

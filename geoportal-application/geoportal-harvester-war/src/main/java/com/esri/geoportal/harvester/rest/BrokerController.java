@@ -19,11 +19,15 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.engine.BrokerInfo;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import com.esri.geoportal.harvester.engine.BrokerInfo.Category;
+import com.esri.geoportal.harvester.engine.support.CrudsException;
 import java.util.UUID;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,15 +62,20 @@ public class BrokerController {
    * @return array of broker infos
    */
   @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public BrokerInfo[] listBrokers(@RequestParam(value = "category", required = false) String category) {
-    LOG.debug(String.format("GET /rest/harvester/brokers%s",category!=null? "&category="+category: ""));
-    Category ctg = null;
+  public ResponseEntity<BrokerInfo[]> listBrokers(@RequestParam(value = "category", required = false) String category) {
     try {
-      ctg = Category.parse(category);
-    } catch (IllegalArgumentException ex) {
-      // ignore
+      LOG.debug(String.format("GET /rest/harvester/brokers%s",category!=null? "&category="+category: ""));
+      Category ctg = null;
+      try {
+        ctg = Category.parse(category);
+      } catch (IllegalArgumentException ex) {
+        // ignore
+      }
+      return new ResponseEntity<>(engine.getBrokersDefinitions(ctg).toArray(new BrokerInfo[0]), HttpStatus.OK);
+    } catch (CrudsException ex) {
+      LOG.error(String.format("Error listing all brokers"), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return engine.getBrokersDefinitions(ctg).toArray(new BrokerInfo[0]);
   }
   
   /**
@@ -75,9 +84,14 @@ public class BrokerController {
    * @return broker info or <code>null</code> if no broker found
    */
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public BrokerInfo getBroker(@PathVariable UUID brokerId) {
-    LOG.debug(String.format("GET /rest/harvester/brokers/%s", brokerId));
-    return engine.findBroker(brokerId);
+  public ResponseEntity<BrokerInfo> getBroker(@PathVariable UUID brokerId) {
+    try {
+      LOG.debug(String.format("GET /rest/harvester/brokers/%s", brokerId));
+      return new ResponseEntity<>(engine.findBroker(brokerId), HttpStatus.OK);
+    } catch (CrudsException ex) {
+      LOG.error(String.format("Error getting broker: %s", brokerId), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
   
   /**
@@ -86,13 +100,18 @@ public class BrokerController {
    * @return broker info
    */
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public BrokerInfo deleteBroker(@PathVariable UUID brokerId) {
-    LOG.debug(String.format("DELETE /rest/harvester/brokers/%s", brokerId));
-    BrokerInfo brokerInfo = engine.findBroker(brokerId);
-    if (brokerInfo!=null) {
-      engine.deleteBroker(brokerId);
+  public ResponseEntity<BrokerInfo> deleteBroker(@PathVariable UUID brokerId) {
+    try {
+      LOG.debug(String.format("DELETE /rest/harvester/brokers/%s", brokerId));
+      BrokerInfo brokerInfo = engine.findBroker(brokerId);
+      if (brokerInfo!=null) {
+        engine.deleteBroker(brokerId);
+      }
+      return new ResponseEntity<>(brokerInfo, HttpStatus.OK);
+    } catch (CrudsException ex) {
+      LOG.error(String.format("Error deleting broker: %s", brokerId), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return brokerInfo;
   }
   
   /**
@@ -101,9 +120,14 @@ public class BrokerController {
    * @return broker info of the newly created broker
    */
   @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  public BrokerInfo createBroker(@RequestBody EntityDefinition brokerDefinition) {
-    LOG.debug(String.format("PUT /rest/harvester/brokers <-- %s", brokerDefinition));
-    return engine.createBroker(brokerDefinition);
+  public ResponseEntity<BrokerInfo> createBroker(@RequestBody EntityDefinition brokerDefinition) {
+    try {
+      LOG.debug(String.format("PUT /rest/harvester/brokers <-- %s", brokerDefinition));
+      return new ResponseEntity<>(engine.createBroker(brokerDefinition), HttpStatus.OK);
+    } catch (CrudsException ex) {
+      LOG.error(String.format("Error creating broker: %s", brokerDefinition), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
   
   /**
@@ -113,9 +137,14 @@ public class BrokerController {
    * @return broker info of the task which has been replaced
    */
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public BrokerInfo updateBroker(@RequestBody EntityDefinition brokerDefinition, @PathVariable UUID brokerId) {
-    LOG.debug(String.format("POST /rest/harvester/brokers/%s <-- %s", brokerId, brokerDefinition));
-    return engine.updateBroker(brokerId, brokerDefinition);
+  public ResponseEntity<BrokerInfo> updateBroker(@RequestBody EntityDefinition brokerDefinition, @PathVariable UUID brokerId) {
+    try {
+      LOG.debug(String.format("POST /rest/harvester/brokers/%s <-- %s", brokerId, brokerDefinition));
+      return new ResponseEntity<>(engine.updateBroker(brokerId, brokerDefinition), HttpStatus.OK);
+    } catch (CrudsException ex) {
+      LOG.error(String.format("Error updating broker: %s <-- %s", brokerId, brokerDefinition), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
   
 }
