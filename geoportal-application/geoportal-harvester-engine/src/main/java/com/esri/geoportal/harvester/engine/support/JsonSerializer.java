@@ -64,7 +64,7 @@ public class JsonSerializer {
               throw new JsonParseException(jp,String.format("Invalid uuid: %s", sUuid));
             }
             return broker.getBrokerDefinition();
-          } catch (IllegalArgumentException ex) {
+          } catch (CrudsException|IllegalArgumentException ex) {
             throw new JsonParseException(jp,String.format("Invalid uuid: %s", sUuid), ex);
           }
         } else {
