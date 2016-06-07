@@ -19,8 +19,8 @@ import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.support.ProcessResponse;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.beans.EngineBean;
-import com.esri.geoportal.harvester.engine.support.CrudsException;
 import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import java.io.IOException;
 import java.util.Map;
@@ -66,7 +66,7 @@ public class ProcessController {
     try {
       LOG.debug(String.format("GET /rest/harvester/processes"));
       return new ResponseEntity<>(filterProcesses(e->true),HttpStatus.OK);
-    } catch (CrudsException ex) {
+    } catch (DataProcessorException ex) {
       LOG.error(String.format("Error listing all processes"), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -83,7 +83,7 @@ public class ProcessController {
       LOG.debug(String.format("GET /rest/harvester/processes/%s", processId));
       Processor.Process process = engine.getProcess(processId);
       return new ResponseEntity<>(process!=null? new ProcessResponse(processId, process.getTitle(), process.getStatus()): null,HttpStatus.OK);
-    } catch (CrudsException ex) {
+    } catch (DataProcessorException ex) {
       LOG.error(String.format("Error getting process info: %s", processId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -107,7 +107,7 @@ public class ProcessController {
         }
       }
       return new ResponseEntity<>(process!=null? new ProcessResponse(processId, process.getTitle(), process.getStatus()): null, HttpStatus.OK);
-    } catch (CrudsException ex) {
+    } catch (DataProcessorException ex) {
       LOG.error(String.format("Error aborting process: %s", processId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -151,7 +151,7 @@ public class ProcessController {
     } catch (InvalidDefinitionException ex) {
       LOG.error(String.format("Error creating process: %s", taskDef), ex);
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    } catch (IOException|CrudsException ex) {
+    } catch (IOException|DataProcessorException ex) {
       LOG.error(String.format("Error creating process: %s", taskDef), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -162,7 +162,7 @@ public class ProcessController {
    * @param predicate predicate
    * @return array of filtered processes
    */
-  private ProcessResponse[] filterProcesses(Predicate<? super Map.Entry<UUID, Processor.Process>> predicate) throws CrudsException {
+  private ProcessResponse[] filterProcesses(Predicate<? super Map.Entry<UUID, Processor.Process>> predicate) throws DataProcessorException {
     return engine.selectProcesses(predicate).stream()
             .map(e->new ProcessResponse(e.getKey(),e.getValue().getTitle(),e.getValue().getStatus()))
             .collect(Collectors.toList()).toArray(new ProcessResponse[0]);

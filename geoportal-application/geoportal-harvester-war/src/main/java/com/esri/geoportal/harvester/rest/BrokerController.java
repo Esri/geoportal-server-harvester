@@ -16,12 +16,11 @@
 package com.esri.geoportal.harvester.rest;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.engine.BrokerInfo;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import com.esri.geoportal.harvester.engine.BrokerInfo.Category;
-import com.esri.geoportal.harvester.engine.support.CrudsException;
 import java.util.UUID;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +71,7 @@ public class BrokerController {
         // ignore
       }
       return new ResponseEntity<>(engine.getBrokersDefinitions(ctg).toArray(new BrokerInfo[0]), HttpStatus.OK);
-    } catch (CrudsException ex) {
+    } catch (DataProcessorException ex) {
       LOG.error(String.format("Error listing all brokers"), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -88,7 +87,7 @@ public class BrokerController {
     try {
       LOG.debug(String.format("GET /rest/harvester/brokers/%s", brokerId));
       return new ResponseEntity<>(engine.findBroker(brokerId), HttpStatus.OK);
-    } catch (CrudsException ex) {
+    } catch (DataProcessorException ex) {
       LOG.error(String.format("Error getting broker: %s", brokerId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -108,7 +107,7 @@ public class BrokerController {
         engine.deleteBroker(brokerId);
       }
       return new ResponseEntity<>(brokerInfo, HttpStatus.OK);
-    } catch (CrudsException ex) {
+    } catch (DataProcessorException ex) {
       LOG.error(String.format("Error deleting broker: %s", brokerId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -124,7 +123,7 @@ public class BrokerController {
     try {
       LOG.debug(String.format("PUT /rest/harvester/brokers <-- %s", brokerDefinition));
       return new ResponseEntity<>(engine.createBroker(brokerDefinition), HttpStatus.OK);
-    } catch (CrudsException ex) {
+    } catch (DataProcessorException ex) {
       LOG.error(String.format("Error creating broker: %s", brokerDefinition), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -141,7 +140,7 @@ public class BrokerController {
     try {
       LOG.debug(String.format("POST /rest/harvester/brokers/%s <-- %s", brokerId, brokerDefinition));
       return new ResponseEntity<>(engine.updateBroker(brokerId, brokerDefinition), HttpStatus.OK);
-    } catch (CrudsException ex) {
+    } catch (DataProcessorException ex) {
       LOG.error(String.format("Error updating broker: %s <-- %s", brokerId, brokerDefinition), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }

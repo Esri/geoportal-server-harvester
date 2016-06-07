@@ -151,15 +151,19 @@ public class Engine {
    *
    * @param category broker category
    * @return broker infos
-   * @throws CrudsException if accessing repository fails
+   * @throws DataProcessorException if accessing repository fails
    */
-  public Collection<BrokerInfo> getBrokersDefinitions(Category category) throws CrudsException {
+  public Collection<BrokerInfo> getBrokersDefinitions(Category category) throws DataProcessorException {
     if (category != null) {
-      Set<String> brokerTypes = listTypesByCategory(category);
-      return brokerDefinitionManager.select().stream()
-              .filter(e -> brokerTypes.contains(e.getValue().getType()))
-              .map(e -> new BrokerInfo(e.getKey(), category, e.getValue()))
-              .collect(Collectors.toList());
+      try {
+        Set<String> brokerTypes = listTypesByCategory(category);
+        return brokerDefinitionManager.select().stream()
+                .filter(e -> brokerTypes.contains(e.getValue().getType()))
+                .map(e -> new BrokerInfo(e.getKey(), category, e.getValue()))
+                .collect(Collectors.toList());
+      } catch (CrudsException ex) {
+        throw new DataProcessorException(String.format("Error getting brokers for category: %s", category), ex);
+      }
     } else {
       return Stream.concat(getBrokersDefinitions(INBOUND).stream(), getBrokersDefinitions(OUTBOUND).stream()).collect(Collectors.toSet());
     }
@@ -171,17 +175,21 @@ public class Engine {
    * @param brokerId broker id
    * @return broker info or <code>null</code> if no broker corresponding to the
    * broker id can be found
-   * @throws CrudsException if accessing repository fails
+   * @throws DataProcessorException if accessing repository fails
    */
-  public BrokerInfo findBroker(UUID brokerId) throws CrudsException {
-    EntityDefinition brokerDefinition = brokerDefinitionManager.read(brokerId);
-    if (brokerDefinition != null) {
-      Category category = getBrokerCategoryByType(brokerDefinition.getType());
-      if (category != null) {
-        return new BrokerInfo(brokerId, category, brokerDefinition);
+  public BrokerInfo findBroker(UUID brokerId) throws DataProcessorException {
+    try {
+      EntityDefinition brokerDefinition = brokerDefinitionManager.read(brokerId);
+      if (brokerDefinition != null) {
+        Category category = getBrokerCategoryByType(brokerDefinition.getType());
+        if (category != null) {
+          return new BrokerInfo(brokerId, category, brokerDefinition);
+        }
       }
+      return null;
+    } catch (CrudsException ex) {
+      throw new DataProcessorException(String.format("Error finding broker: %s", brokerId), ex);
     }
-    return null;
   }
 
   /**
@@ -189,14 +197,16 @@ public class Engine {
    *
    * @param brokerDefinition broker definition
    * @return broker info or <code>null</code> if broker has not been created
-   * @throws CrudsException if accessing repository fails
+   * @throws DataProcessorException if accessing repository fails
    */
-  public BrokerInfo createBroker(EntityDefinition brokerDefinition) throws CrudsException {
+  public BrokerInfo createBroker(EntityDefinition brokerDefinition) throws DataProcessorException {
     Category category = getBrokerCategoryByType(brokerDefinition.getType());
     if (category != null) {
       try {
         UUID id = brokerDefinitionManager.create(brokerDefinition);
         return new BrokerInfo(id, category, brokerDefinition);
+      } catch (CrudsException ex) {
+        throw new DataProcessorException(String.format("Error creating broker: %s", brokerDefinition), ex);
       } catch (IllegalArgumentException ex) {
         LOG.warn("Attempt to submit process based on the same task twice.", ex);
         return null;
@@ -211,17 +221,21 @@ public class Engine {
    * @param brokerId broker id
    * @param brokerDefinition broker definition
    * @return broker info or <code>null</code> if broker has not been created
-   * @throws CrudsException if accessing repository fails
+   * @throws DataProcessorException if accessing repository fails
    */
-  public BrokerInfo updateBroker(UUID brokerId, EntityDefinition brokerDefinition) throws CrudsException {
-    EntityDefinition oldBrokerDef = brokerDefinitionManager.read(brokerId);
-    if (oldBrokerDef != null) {
-      if (!brokerDefinitionManager.update(brokerId, brokerDefinition)) {
-        oldBrokerDef = null;
+  public BrokerInfo updateBroker(UUID brokerId, EntityDefinition brokerDefinition) throws DataProcessorException {
+    try {
+      EntityDefinition oldBrokerDef = brokerDefinitionManager.read(brokerId);
+      if (oldBrokerDef != null) {
+        if (!brokerDefinitionManager.update(brokerId, brokerDefinition)) {
+          oldBrokerDef = null;
+        }
       }
+      Category category = oldBrokerDef != null ? getBrokerCategoryByType(oldBrokerDef.getType()) : null;
+      return category != null ? new BrokerInfo(brokerId, category, brokerDefinition) : null;
+    } catch (CrudsException ex) {
+      throw new DataProcessorException(String.format("Error updating broker: %s <-- %s", brokerId, brokerDefinition), ex);
     }
-    Category category = oldBrokerDef != null ? getBrokerCategoryByType(oldBrokerDef.getType()) : null;
-    return category != null ? new BrokerInfo(brokerId, category, brokerDefinition) : null;
   }
 
   /**
@@ -229,10 +243,14 @@ public class Engine {
    *
    * @param brokerId broker id
    * @return <code>true</code> if broker has been deleted
-   * @throws CrudsException if accessing repository fails
+   * @throws DataProcessorException if accessing repository fails
    */
-  public boolean deleteBroker(UUID brokerId) throws CrudsException {
-    return brokerDefinitionManager.delete(brokerId);
+  public boolean deleteBroker(UUID brokerId) throws DataProcessorException {
+    try {
+      return brokerDefinitionManager.delete(brokerId);
+    } catch (CrudsException ex) {
+      throw new DataProcessorException(String.format("Error deleting broker: %s", brokerId), ex);
+    }
   }
 
   /**
@@ -241,10 +259,14 @@ public class Engine {
    * @param processId process id.
    * @return process or <code>null</code> if no process available for the given
    * process id
-   * @throws CrudsException if accessing repository fails
+   * @throws DataProcessorException if accessing repository fails
    */
-  public Processor.Process getProcess(UUID processId) throws CrudsException {
-    return processManager.read(processId);
+  public Processor.Process getProcess(UUID processId) throws DataProcessorException {
+    try {
+      return processManager.read(processId);
+    } catch (CrudsException ex) {
+      throw new DataProcessorException(String.format("Error getting process: %s", processId), ex);
+    }
   }
 
   /**
@@ -252,10 +274,14 @@ public class Engine {
    *
    * @param predicate predicate
    * @return list of processes matching predicate
-   * @throws CrudsException if accessing repository fails
+   * @throws DataProcessorException if accessing repository fails
    */
-  public List<Map.Entry<UUID, Processor.Process>> selectProcesses(Predicate<? super Map.Entry<UUID, Processor.Process>> predicate) throws CrudsException {
-    return processManager.select().stream().filter(predicate != null ? predicate : (Map.Entry<UUID, Processor.Process> e) -> true).collect(Collectors.toList());
+  public List<Map.Entry<UUID, Processor.Process>> selectProcesses(Predicate<? super Map.Entry<UUID, Processor.Process>> predicate) throws DataProcessorException {
+    try {
+      return processManager.select().stream().filter(predicate != null ? predicate : (Map.Entry<UUID, Processor.Process> e) -> true).collect(Collectors.toList());
+    } catch (CrudsException ex) {
+      throw new DataProcessorException(String.format("Error celecting processes."), ex);
+    }
   }
 
   /**
@@ -296,21 +322,25 @@ public class Engine {
    * @param task task for the process
    * @return process handle
    * @throws InvalidDefinitionException if processor definition is invalid
-   * @throws CrudsException if accessing repository fails
+   * @throws DataProcessorException if accessing repository fails
    */
-  public ProcessReference createProcess(EntityDefinition processorDefinition, Task task) throws InvalidDefinitionException, CrudsException {
-    Processor processor = processorDefinition == null
-            ? processorRegistry.getDefaultProcessor()
-            : processorRegistry.get(processorDefinition.getType()) != null
-            ? processorRegistry.get(processorDefinition.getType())
-            : null;
-    if (processor == null) {
-      throw new InvalidDefinitionException(String.format("Unable to select processor based on definition: %s", processorDefinition));
+  public ProcessReference createProcess(EntityDefinition processorDefinition, Task task) throws InvalidDefinitionException, DataProcessorException {
+    try {
+      Processor processor = processorDefinition == null
+              ? processorRegistry.getDefaultProcessor()
+              : processorRegistry.get(processorDefinition.getType()) != null
+              ? processorRegistry.get(processorDefinition.getType())
+              : null;
+      if (processor == null) {
+        throw new InvalidDefinitionException(String.format("Unable to select processor based on definition: %s", processorDefinition));
+      }
+      Processor.Process process = processor.createProcess(task);
+      process.addListener(new ReportBuilderAdaptor(process, reportBuilder));
+      UUID id = processManager.create(process);
+      return new ProcessReference(id, process);
+    } catch (CrudsException ex) {
+      throw new DataProcessorException(String.format("Error creating process: %s", task), ex);
     }
-    Processor.Process process = processor.createProcess(task);
-    process.addListener(new ReportBuilderAdaptor(process, reportBuilder));
-    UUID id = processManager.create(process);
-    return new ProcessReference(id, process);
   }
 
   /**
@@ -319,9 +349,9 @@ public class Engine {
    * @param taskDefinition task definition
    * @return process handle
    * @throws InvalidDefinitionException invalid definition exception
-   * @throws CrudsException if accessing repository fails
+   * @throws DataProcessorException if accessing repository fails
    */
-  public ProcessReference submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException, CrudsException {
+  public ProcessReference submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException, DataProcessorException {
     Task task = createTask(taskDefinition);
     ProcessReference prInfo = createProcess(taskDefinition.getProcessor(), task);
     return prInfo;
@@ -334,19 +364,22 @@ public class Engine {
    * @return trigger definition
    * @throws InvalidDefinitionException if invalid definition
    * @throws DataProcessorException if error processing data
-   * @throws CrudsException if accessing repository fails
    */
-  public TriggerReference scheduleTask(TaskDefinition taskDefinition, EntityDefinition triggerDefinition) throws InvalidDefinitionException, DataProcessorException, CrudsException {
-    TriggerDefinition trigDef = new TriggerDefinition();
-    trigDef.setType(triggerDefinition.getType());
-    trigDef.setTaskDefinition(taskDefinition);
-    trigDef.setArguments(triggerDefinition.getProperties());
-    
-    UUID id = triggerManager.create(trigDef);
-    Trigger.Context context = new TriggerContext();
-    triggerManager.getInstances().get(id).activate(context);
-    
-    return new TriggerReference(id, trigDef);
+  public TriggerReference scheduleTask(TaskDefinition taskDefinition, EntityDefinition triggerDefinition) throws InvalidDefinitionException, DataProcessorException {
+    try {
+      TriggerDefinition trigDef = new TriggerDefinition();
+      trigDef.setType(triggerDefinition.getType());
+      trigDef.setTaskDefinition(taskDefinition);
+      trigDef.setArguments(triggerDefinition.getProperties());
+      
+      UUID id = triggerManager.create(trigDef);
+      Trigger.Context context = new TriggerContext();
+      triggerManager.getInstances().get(id).activate(context);
+      
+      return new TriggerReference(id, trigDef);
+    } catch (CrudsException ex) {
+      throw new DataProcessorException(String.format("Error scheduling task: %s", taskDefinition), ex);
+    }
   }
 
   /**
@@ -354,10 +387,14 @@ public class Engine {
    *
    * @param predicate predicate
    * @return list of task definitions matching predicate
-   * @throws CrudsException if accessing repository fails
+   * @throws DataProcessorException if accessing repository fails
    */
-  public List<Map.Entry<UUID, TaskDefinition>> selectTaskDefinitions(Predicate<? super Map.Entry<UUID, TaskDefinition>> predicate) throws CrudsException {
-    return taskManager.select().stream().filter(predicate != null ? predicate : (Map.Entry<UUID, TaskDefinition> e) -> true).collect(Collectors.toList());
+  public List<Map.Entry<UUID, TaskDefinition>> selectTaskDefinitions(Predicate<? super Map.Entry<UUID, TaskDefinition>> predicate) throws DataProcessorException {
+    try {
+      return taskManager.select().stream().filter(predicate != null ? predicate : (Map.Entry<UUID, TaskDefinition> e) -> true).collect(Collectors.toList());
+    } catch (CrudsException ex) {
+      throw new DataProcessorException(String.format("Error selecting task definitions."), ex);
+    }
   }
 
   /**
@@ -365,10 +402,14 @@ public class Engine {
    *
    * @param taskId task id
    * @return task definition
-   * @throws CrudsException if accessing repository fails
+   * @throws DataProcessorException if accessing repository fails
    */
-  public TaskDefinition readTaskDefinition(UUID taskId) throws CrudsException {
-    return taskManager.read(taskId);
+  public TaskDefinition readTaskDefinition(UUID taskId) throws DataProcessorException {
+    try {
+      return taskManager.read(taskId);
+    } catch (CrudsException ex) {
+      throw new DataProcessorException(String.format("Error reading task definition: %s", taskId), ex);
+    }
   }
 
   /**
@@ -376,10 +417,14 @@ public class Engine {
    *
    * @param taskId task id
    * @return <code>true</code> if task definition has been deleted
-   * @throws CrudsException if accessing repository fails
+   * @throws DataProcessorException if accessing repository fails
    */
-  public boolean deleteTaskDefinition(UUID taskId) throws CrudsException {
-    return taskManager.delete(taskId);
+  public boolean deleteTaskDefinition(UUID taskId) throws DataProcessorException {
+    try {
+      return taskManager.delete(taskId);
+    } catch (CrudsException ex) {
+      throw new DataProcessorException(String.format("Error deleting task definition: %s", taskId), ex);
+    }
   }
 
   /**
@@ -387,10 +432,14 @@ public class Engine {
    *
    * @param taskDefinition task definition
    * @return id of a new task
-   * @throws CrudsException if accessing repository fails
+   * @throws DataProcessorException if accessing repository fails
    */
-  public UUID addTaskDefinition(TaskDefinition taskDefinition) throws CrudsException {
-    return taskManager.create(taskDefinition);
+  public UUID addTaskDefinition(TaskDefinition taskDefinition) throws DataProcessorException {
+    try {
+      return taskManager.create(taskDefinition);
+    } catch (CrudsException ex) {
+      throw new DataProcessorException(String.format("Error adding task definition: %s", taskDefinition), ex);
+    }
   }
 
   /**
@@ -399,16 +448,20 @@ public class Engine {
    * @param taskId task id
    * @param taskDefinition task definition
    * @return old task definition or <code>null</code> if no old task
-   * @throws CrudsException if accessing repository fails
+   * @throws DataProcessorException if accessing repository fails
    */
-  public TaskDefinition updateTaskDefinition(UUID taskId, TaskDefinition taskDefinition) throws CrudsException {
-    TaskDefinition oldTaskDef = taskManager.read(taskId);
-    if (oldTaskDef != null) {
-      if (!taskManager.update(taskId, taskDefinition)) {
-        oldTaskDef = null;
+  public TaskDefinition updateTaskDefinition(UUID taskId, TaskDefinition taskDefinition) throws DataProcessorException {
+    try {
+      TaskDefinition oldTaskDef = taskManager.read(taskId);
+      if (oldTaskDef != null) {
+        if (!taskManager.update(taskId, taskDefinition)) {
+          oldTaskDef = null;
+        }
       }
+      return oldTaskDef;
+    } catch (CrudsException ex) {
+      throw new DataProcessorException(String.format("Error updating task definition: %s <-- %s", taskId, taskDefinition), ex);
     }
-    return oldTaskDef;
   }
 
   /**
@@ -451,12 +504,8 @@ public class Engine {
     @Override
     public synchronized Processor.Process submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
       ProcessReference ref;
-      try {
-        ref = submitTaskDefinition(taskDefinition);
-        return ref != null ? ref.getProcess() : null;
-      } catch (CrudsException ex) {
-        throw new DataProcessorException(String.format("Error submiting task definition: %s", taskDefinition), ex);
-      }
+      ref = submitTaskDefinition(taskDefinition);
+      return ref != null ? ref.getProcess() : null;
     }
     
     @Override

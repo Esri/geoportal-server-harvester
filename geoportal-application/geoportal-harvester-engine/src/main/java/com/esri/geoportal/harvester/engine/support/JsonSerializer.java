@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.engine.support;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.engine.BrokerInfo;
 import com.esri.geoportal.harvester.engine.Engine;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -64,7 +65,7 @@ public class JsonSerializer {
               throw new JsonParseException(jp,String.format("Invalid uuid: %s", sUuid));
             }
             return broker.getBrokerDefinition();
-          } catch (CrudsException|IllegalArgumentException ex) {
+          } catch (DataProcessorException|IllegalArgumentException ex) {
             throw new JsonParseException(jp,String.format("Invalid uuid: %s", sUuid), ex);
           }
         } else {
