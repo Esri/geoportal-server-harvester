@@ -50,10 +50,10 @@ public class TriggerManagerBean implements TriggerManager {
   private final Map<UUID,Trigger.Instance> instances = Collections.synchronizedMap(new HashMap<>());
 
   @Autowired
-  private DataSource dataSource;
+  DataSource dataSource;
 
   @Autowired
-  private TriggerRegistry triggerRegistry;
+  TriggerRegistry triggerRegistry;
 
   @Override
   public Map<UUID,Trigger.Instance> getInstances() {
