@@ -23,6 +23,7 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.Period;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.WeakHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -45,7 +47,8 @@ public class PeriodTrigger implements Trigger {
   private static final Logger LOG = LoggerFactory.getLogger(PeriodTrigger.class);
   public static final String T_PERIOD = "t-period";
   public static final String TYPE = "PERIOD";
-  public static final ScheduledExecutorService service = Executors.newScheduledThreadPool(1000);
+  private static final ScheduledExecutorService service = Executors.newScheduledThreadPool(1000);
+  private static final WeakHashMap<PeriodTriggerInstance,WeakReference<PeriodTriggerInstance>> weakMap = new WeakHashMap<>();
 
   @Override
   public String getType() {
@@ -65,11 +68,20 @@ public class PeriodTrigger implements Trigger {
     if (!getType().equals(triggerDefinition.getType())) {
       throw new InvalidDefinitionException(String.format("Invalid trigger definition: %s", triggerDefinition));
     }
-    return new PeriodTriggerInstance(triggerDefinition);
+    PeriodTriggerInstance instance = new PeriodTriggerInstance(triggerDefinition);
+    weakMap.put(instance, new WeakReference<>(instance));
+    return instance;
   }
 
   @Override
   public void close() throws Exception {
+    weakMap.values().stream().map(v->v.get()).forEach(i->{
+      try {
+        i.close();
+      } catch (Exception ex) {
+        LOG.warn(String.format("Error closing instance"), ex);
+      }
+    });
     service.shutdownNow();
   }
 

@@ -23,11 +23,12 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
+import java.util.WeakHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -42,7 +43,8 @@ public class AtTrigger implements Trigger {
   private static final Logger LOG = LoggerFactory.getLogger(AtTrigger.class);
   public static final String T_AT_TIME = "t-at-time";
   public static final String TYPE = "AT";
-  public static final ScheduledExecutorService service = Executors.newScheduledThreadPool(1000);
+  private static final ScheduledExecutorService service = Executors.newScheduledThreadPool(1000);
+  private static final WeakHashMap<AtTriggerInstance,WeakReference<AtTriggerInstance>> weakMap = new WeakHashMap<>();
 
   @Override
   public String getType() {
@@ -62,11 +64,20 @@ public class AtTrigger implements Trigger {
     if (!getType().equals(triggerDefinition.getType())) {
       throw new InvalidDefinitionException(String.format("Invalid trigger definition: %s", triggerDefinition));
     }
-    return new AtTriggerInstance(triggerDefinition);
+    AtTriggerInstance instance = new AtTriggerInstance(triggerDefinition);
+    weakMap.put(instance, new WeakReference<>(instance));
+    return instance;
   }
 
   @Override
   public void close() throws Exception {
+    weakMap.values().stream().map(v->v.get()).forEach(i->{
+      try {
+        i.close();
+      } catch (Exception ex) {
+        LOG.warn(String.format("Error closing instance"), ex);
+      }
+    });
     service.shutdownNow();
   }
   
