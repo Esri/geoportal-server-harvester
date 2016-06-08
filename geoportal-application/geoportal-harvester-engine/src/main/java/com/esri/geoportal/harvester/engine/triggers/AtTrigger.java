@@ -26,6 +26,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -147,7 +148,7 @@ public class AtTrigger implements Trigger {
       int curMinOfDay = extractMinOfDay(cal);
 
       int dif = reqMinOfDay - curMinOfDay;
-      long delay = (dif>0? dif: (24*60)-curMinOfDay+reqMinOfDay)*60*1000; 
+      long delay = dif>0? dif: (24*60)-curMinOfDay+reqMinOfDay; 
 
       return delay;
     }
