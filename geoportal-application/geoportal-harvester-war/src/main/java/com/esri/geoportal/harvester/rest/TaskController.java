@@ -168,6 +168,25 @@ public class TaskController {
   }
   
   /**
+   * Executes task immediately using task definition.
+   * @param taskDefinition task definition
+   * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
+   */
+  @RequestMapping(value = "/rest/harvester/tasks/execute", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<ProcessResponse> executeTask(@RequestBody TaskDefinition taskDefinition) {
+    try {
+      LOG.debug(String.format("GET /rest/harvester/tasks/execute <-- %s", taskDefinition));
+      ProcessReference ref = engine.submitTaskDefinition(taskDefinition);
+      ref.getProcess().begin();
+      return new ResponseEntity<>(new ProcessResponse(ref.getProcessId(), ref.getProcess().getTitle(), ref.getProcess().getStatus()), HttpStatus.OK);
+    } catch (InvalidDefinitionException ex) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    } catch (DataProcessorException ex) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  
+  /**
    * Schedules task by id.
    * @param triggerDefinition trigger definition
    * @param taskId task id
@@ -176,12 +195,30 @@ public class TaskController {
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/schedule", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId) {
     try {
-      LOG.debug(String.format("GET /rest/harvester/tasks/%s/echedule <-- %s", taskId, triggerDefinition));
+      LOG.debug(String.format("GET /rest/harvester/tasks/%s/schedule <-- %s", taskId, triggerDefinition));
       TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
       TriggerDefinition trigDef = new TriggerDefinition();
       trigDef.setType(triggerDefinition.getType());
       trigDef.setTaskDefinition(taskDefinition);
       trigDef.setArguments(triggerDefinition.getProperties());
+      TriggerReference trigRef = engine.scheduleTask(trigDef);
+      return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), trigRef.getTriggerDefinition()),HttpStatus.OK);
+    } catch (InvalidDefinitionException ex) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    } catch (DataProcessorException ex) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  
+  /**
+   * Schedules task using trigger definition.
+   * @param trigDef trigger definition
+   * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
+   */
+  @RequestMapping(value = "/rest/harvester/tasks/schedule", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody TriggerDefinition trigDef) {
+    try {
+      LOG.debug(String.format("GET /rest/harvester/tasks/schedule <-- %s", trigDef));
       TriggerReference trigRef = engine.scheduleTask(trigDef);
       return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), trigRef.getTriggerDefinition()),HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
