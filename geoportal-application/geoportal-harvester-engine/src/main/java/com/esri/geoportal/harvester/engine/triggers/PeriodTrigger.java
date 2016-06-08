@@ -24,13 +24,16 @@ import com.esri.geoportal.harvester.api.ex.DataException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.text.ParseException;
+import java.time.Instant;
 import java.time.Period;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +78,7 @@ public class PeriodTrigger implements Trigger {
    */
   private class PeriodTriggerInstance implements Trigger.Instance {
     private final TriggerDefinition triggerDefinition;
-    private ScheduledFuture<?> future;
+    private Future<?> future;
 
     /**
      * Creates instance of the trigger instance
@@ -87,7 +90,7 @@ public class PeriodTrigger implements Trigger {
 
     @Override
     public void activate(Context triggerContext) throws DataProcessorException, InvalidDefinitionException {
-      schedule(newRunnable(triggerContext));
+      schedule(triggerContext, newRunnable(triggerContext));
     }
 
     @Override
@@ -106,7 +109,7 @@ public class PeriodTrigger implements Trigger {
             @Override
             public void onStatusChange(Processor.Status status) {
               if (status==Processor.Status.completed && !Thread.currentThread().isInterrupted()) {
-                schedule(newRunnable(triggerContext));
+                schedule(triggerContext,newRunnable(triggerContext));
               }
             }
 
@@ -127,35 +130,33 @@ public class PeriodTrigger implements Trigger {
       };
     }
     
-    private synchronized void schedule(Runnable runnable) {
+    private synchronized void schedule(Context triggerContext, Runnable runnable) {
       try {
-        long rate = calcRate();
-        future = service.scheduleAtFixedRate(runnable, 0, rate, TimeUnit.MINUTES);
-      } catch (ParseException ex) {
+        Date lastHarvest = triggerContext.lastHarvest();
+        if (lastHarvest==null) {
+          future = service.submit(newRunnable(triggerContext));
+        } else {
+          Period period = parsePeriod(triggerDefinition.getArguments().get(T_PERIOD));
+          Calendar cal = Calendar.getInstance();
+          Instant instant = cal.toInstant();
+          period.addTo(instant);
+          long delay = cal.getTimeInMillis()-instant.toEpochMilli();
+          future = service.schedule(newRunnable(triggerContext), delay, TimeUnit.MILLISECONDS);
+        }
+      } catch (DataProcessorException|ParseException ex) {
         LOG.error(String.format("Error activating trigger: %s", getType()), ex);
       }
     }
     
     /**
-     * Calculates rate (in minutes)
-     * @return delay
-     * @throws ParseException if extracting minute of the day failed
-     */
-    private long calcRate() throws ParseException {
-      return parsePeriod(triggerDefinition.getArguments().get(T_PERIOD));
-    }
-    
-    /**
      * Parses minute of the day. Format: HH:mm.
      * @param strPeriod period
-     * @return minute of the day.
+     * @return period
      * @throws ParseException if invalid minute of the day definition
      */
-    private int parsePeriod(String strPeriod) throws ParseException {
+    private Period parsePeriod(String strPeriod) throws ParseException {
       try {
-        Period period = Period.parse(strPeriod);
-        int days = period.getDays();
-        return days*24*60;
+        return Period.parse(strPeriod);
       } catch (DateTimeParseException ex) {
         throw new ParseException(String.format("Invalid period: %s", strPeriod), 0);
       }
