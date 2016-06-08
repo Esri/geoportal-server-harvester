@@ -358,26 +358,19 @@ public class Engine {
   
   /**
    * Schedules task with trigger.
-   * @param taskDefinition task definition
-   * @param triggerDefinition trigger definition
-   * @return trigger definition
+   * @param trigDef trigger definition
+   * @return trigger reference
    * @throws InvalidDefinitionException if invalid definition
    * @throws DataProcessorException if error processing data
    */
-  public TriggerReference scheduleTask(TaskDefinition taskDefinition, EntityDefinition triggerDefinition) throws InvalidDefinitionException, DataProcessorException {
+  public TriggerReference scheduleTask(TriggerDefinition trigDef) throws InvalidDefinitionException, DataProcessorException {
     try {
-      TriggerDefinition trigDef = new TriggerDefinition();
-      trigDef.setType(triggerDefinition.getType());
-      trigDef.setTaskDefinition(taskDefinition);
-      trigDef.setArguments(triggerDefinition.getProperties());
-      
       UUID id = triggerManager.create(trigDef);
       Trigger.Context context = new TriggerContext(id,triggerManager.getInstances().get(id));
       triggerManager.getInstances().get(id).activate(context);
-      
       return new TriggerReference(id, trigDef);
     } catch (CrudsException ex) {
-      throw new DataProcessorException(String.format("Error scheduling task: %s", taskDefinition), ex);
+      throw new DataProcessorException(String.format("Error scheduling task: %s", trigDef.getTaskDefinition()), ex);
     }
   }
 

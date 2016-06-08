@@ -19,6 +19,7 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.support.TaskResponse;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.support.ProcessReference;
@@ -49,8 +50,8 @@ import org.springframework.web.bind.annotation.RestController;
    DELETE /rest/harvester/tasks/{taskId}
    PUT /rest/harvester/tasks
    POST /rest/harvester/tasks/{taskId}
-   PUT /rest/harvester/tasks/{taskId}/execute
- * </code></pre>
+   PUT /rest/harvester/tasks/{taskId}/executeTask
+ </code></pre>
  */
 @RestController
 public class TaskController {
@@ -152,7 +153,7 @@ public class TaskController {
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/execute", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ProcessResponse> execute(@PathVariable UUID taskId) {
+  public ResponseEntity<ProcessResponse> executeTask(@PathVariable UUID taskId) {
     try {
       LOG.debug(String.format("GET /rest/harvester/tasks/%s/execute", taskId));
       TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
@@ -173,12 +174,16 @@ public class TaskController {
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/schedule", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<TriggerResponse> schedule(@RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId) {
+  public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId) {
     try {
       LOG.debug(String.format("GET /rest/harvester/tasks/%s/echedule <-- %s", taskId, triggerDefinition));
       TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
-      TriggerReference trigDef = engine.scheduleTask(taskDefinition, triggerDefinition);
-      return new ResponseEntity<>(new TriggerResponse(trigDef.getUuid(), trigDef.getTriggerDefinition()),HttpStatus.OK);
+      TriggerDefinition trigDef = new TriggerDefinition();
+      trigDef.setType(triggerDefinition.getType());
+      trigDef.setTaskDefinition(taskDefinition);
+      trigDef.setArguments(triggerDefinition.getProperties());
+      TriggerReference trigRef = engine.scheduleTask(trigDef);
+      return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), trigRef.getTriggerDefinition()),HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     } catch (DataProcessorException ex) {
