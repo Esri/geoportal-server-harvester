@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine.support;
 
-import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
 import java.util.UUID;
 
 /**
@@ -23,16 +23,16 @@ import java.util.UUID;
  */
 public final class TriggerReference {
   private final UUID uuid;
-  private final TriggerDefinition triggerDefinition;
+  private final TriggerInstanceDefinition triggerInstanceDefinition;
 
   /**
    * Creates instance of the reference.
    * @param uuid trigger uuid
-   * @param triggerDefinition trigger definition 
+   * @param triggerInstanceDefinition trigger instance definition 
    */
-  public TriggerReference(UUID uuid, TriggerDefinition triggerDefinition) {
+  public TriggerReference(UUID uuid, TriggerInstanceDefinition triggerInstanceDefinition) {
     this.uuid = uuid;
-    this.triggerDefinition = triggerDefinition;
+    this.triggerInstanceDefinition = triggerInstanceDefinition;
   }
 
   /**
@@ -44,15 +44,15 @@ public final class TriggerReference {
   }
 
   /**
-   * Gets trigger definition.
-   * @return trigger definition
+   * Gets trigger instance definition.
+   * @return trigger instance definition
    */
-  public TriggerDefinition getTriggerDefinition() {
-    return triggerDefinition;
+  public TriggerInstanceDefinition getTriggerInstanceDefinition() {
+    return triggerInstanceDefinition;
   }
   
   @Override
   public String toString() {
-    return String.format("TRIGGER REFERENCE :: uuid: %s, definition: %s", uuid, triggerDefinition);
+    return String.format("TRIGGER REFERENCE :: uuid: %s, definition: %s", uuid, triggerInstanceDefinition);
   }
 }

@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.engine.triggers;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.Trigger;
-import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -60,7 +60,7 @@ public class AtTrigger implements Trigger {
   }
 
   @Override
-  public Instance createInstance(TriggerDefinition triggerDefinition) throws InvalidDefinitionException {
+  public Instance createInstance(TriggerInstanceDefinition triggerDefinition) throws InvalidDefinitionException {
     if (!getType().equals(triggerDefinition.getType())) {
       throw new InvalidDefinitionException(String.format("Invalid trigger definition: %s", triggerDefinition));
     }
@@ -85,14 +85,14 @@ public class AtTrigger implements Trigger {
    * 'At' trigger instance.
    */
   private class AtTriggerInstance implements Trigger.Instance {
-    private final TriggerDefinition triggerDefinition;
+    private final TriggerInstanceDefinition triggerDefinition;
     private ScheduledFuture<?> future;
 
     /**
      * Creates instance of the trigger instance
      * @param triggerDefinition trigger definition
      */
-    public AtTriggerInstance(TriggerDefinition triggerDefinition) {
+    public AtTriggerInstance(TriggerInstanceDefinition triggerDefinition) {
       this.triggerDefinition = triggerDefinition;
     }
 
@@ -170,7 +170,7 @@ public class AtTrigger implements Trigger {
      * @throws ParseException if extracting minute of the day failed
      */
     private int getMinOfDay() throws ParseException {
-      return parseMinOfDay(triggerDefinition.getArguments().get(T_AT_TIME));
+      return parseMinOfDay(triggerDefinition.getProperties().get(T_AT_TIME));
     }
     
     /**

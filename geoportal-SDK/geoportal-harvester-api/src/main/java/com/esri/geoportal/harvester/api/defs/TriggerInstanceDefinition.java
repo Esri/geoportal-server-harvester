@@ -21,10 +21,10 @@ import java.util.Objects;
 /**
  * Trigger definition.
  */
-public final class TriggerDefinition {
+public final class TriggerInstanceDefinition {
   private String type;
   private TaskDefinition taskDefinition;
-  private Map<String,String> arguments;
+  private Map<String,String> properties;
 
   /**
    * Gets trigger type.
@@ -59,33 +59,33 @@ public final class TriggerDefinition {
   }
 
   /**
-   * Gets arguments.
-   * @return arguments
+   * Gets properties.
+   * @return properties
    */
-  public Map<String, String> getArguments() {
-    return arguments;
+  public Map<String, String> getProperties() {
+    return properties;
   }
 
   /**
-   * Sets arguments.
-   * @param arguments arguments
+   * Sets properties.
+   * @param properties properties
    */
-  public void setArguments(Map<String, String> arguments) {
-    this.arguments = arguments;
+  public void setProperties(Map<String, String> properties) {
+    this.properties = properties;
   }
   
   @Override
   public String toString() {
-    return String.format("TRIGGER :: type: %s, task definition: %s, arguments: %s", getType(), getTaskDefinition(), getArguments());
+    return String.format("TRIGGER :: type: %s, task definition: %s, arguments: %s", getType(), getTaskDefinition(), getProperties());
   }
   
   @Override
   public boolean equals(Object o) {
-    if (o instanceof TriggerDefinition) {
-      TriggerDefinition t = (TriggerDefinition) o;
+    if (o instanceof TriggerInstanceDefinition) {
+      TriggerInstanceDefinition t = (TriggerInstanceDefinition) o;
       return ((getType()!=null && t.getType()!=null && getType().equals(t.getType())) || (getType()==null && t.getType()==null)) &&
              ((getTaskDefinition()!=null && t.getTaskDefinition()!=null && getTaskDefinition().equals(t.getTaskDefinition())) || (getTaskDefinition()==null && t.getTaskDefinition()==null)) &&
-              ((getArguments()!=null && t.getArguments()!=null && getArguments().equals(t.getArguments())) || (getArguments()==null && t.getArguments()==null)); 
+              ((getProperties()!=null && t.getProperties()!=null && getProperties().equals(t.getProperties())) || (getProperties()==null && t.getProperties()==null)); 
     }
     return false;
   }
@@ -95,7 +95,7 @@ public final class TriggerDefinition {
     int hash = 5;
     hash = 59 * hash + Objects.hashCode(this.type);
     hash = 59 * hash + Objects.hashCode(this.taskDefinition);
-    hash = 59 * hash + Objects.hashCode(this.arguments);
+    hash = 59 * hash + Objects.hashCode(this.properties);
     return hash;
   }
 }

@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.support;
 
-import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
 import java.util.UUID;
 
 /**
@@ -23,14 +23,14 @@ import java.util.UUID;
  */
 public final class TriggerResponse {
   private final UUID uuid;
-  private final TriggerDefinition triggerDefinition;
+  private final TriggerInstanceDefinition triggerDefinition;
 
   /**
    * Creates instance of the trigger info.
    * @param uuid uuid
    * @param triggerDefinition trigger definition
    */
-  public TriggerResponse(UUID uuid, TriggerDefinition triggerDefinition) {
+  public TriggerResponse(UUID uuid, TriggerInstanceDefinition triggerDefinition) {
     this.uuid = uuid;
     this.triggerDefinition = triggerDefinition;
   }
@@ -47,7 +47,7 @@ public final class TriggerResponse {
    * Gets trigger definition.
    * @return trigger definition
    */
-  public TriggerDefinition getTriggerDefinition() {
+  public TriggerInstanceDefinition getTriggerDefinition() {
     return triggerDefinition;
   }
   

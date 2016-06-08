@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.engine;
 
 import com.esri.geoportal.harvester.api.Trigger;
-import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
 import com.esri.geoportal.harvester.engine.support.CrudsRepo;
 import java.util.Map;
 import java.util.UUID;
@@ -24,7 +24,7 @@ import java.util.UUID;
 /**
  * Trigger manager.
  */
-public interface TriggerManager extends CrudsRepo<TriggerDefinition> {
+public interface TriggerManager extends CrudsRepo<TriggerInstanceDefinition> {
   
   /**
    * Gets all active trigger instances.
