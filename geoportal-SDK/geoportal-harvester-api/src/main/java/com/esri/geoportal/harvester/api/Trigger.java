@@ -21,7 +21,6 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Trigger.

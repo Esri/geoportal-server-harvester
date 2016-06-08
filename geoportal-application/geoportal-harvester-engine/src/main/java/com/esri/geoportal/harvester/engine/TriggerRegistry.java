@@ -20,11 +20,14 @@ import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.HashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Trigger registry.
  */
-public class TriggerRegistry extends HashMap<String, Trigger> {
+public class TriggerRegistry extends HashMap<String, Trigger> implements AutoCloseable {
+  private static final Logger LOG = LoggerFactory.getLogger(TriggerRegistry.class);
   
   /**
    * Creates trigger instance.
@@ -39,5 +42,16 @@ public class TriggerRegistry extends HashMap<String, Trigger> {
       throw new InvalidDefinitionException(String.format("Invalid trigger definition: %s", triggerDefinition));
     }
     return trigger.createInstance(triggerDefinition);
+  }
+
+  @Override
+  public void close() throws Exception {
+    values().stream().forEach(trigger->{
+      try {
+        trigger.close();
+      } catch (Exception ex) {
+        LOG.warn(String.format("Error closing trigger: %s", trigger.getType()), ex);
+      }
+    });
   }
 }

@@ -45,13 +45,11 @@ public class TriggerRegistryBean extends TriggerRegistry {
   
   @PreDestroy
   public void destroy() {
-    values().stream().forEach(t->{
-      try {
-        t.close();
-      } catch (Exception ex) {
-        LOG.error(String.format("Error closing trigger: %s", t.getType()), ex);
-      }
-    });
+    try {
+      close();
+    } catch (Exception ex) {
+      LOG.warn(String.format("Error closing trigger registry bean."), ex);
+    }
   }
  
 }
