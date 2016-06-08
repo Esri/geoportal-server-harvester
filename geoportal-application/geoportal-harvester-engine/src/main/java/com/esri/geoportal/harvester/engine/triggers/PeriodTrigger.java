@@ -90,7 +90,7 @@ public class PeriodTrigger implements Trigger {
 
     @Override
     public void activate(Context triggerContext) throws DataProcessorException, InvalidDefinitionException {
-      schedule(triggerContext, newRunnable(triggerContext));
+      schedule(triggerContext.lastHarvest(), triggerContext, newRunnable(triggerContext));
     }
 
     @Override
@@ -109,7 +109,7 @@ public class PeriodTrigger implements Trigger {
             @Override
             public void onStatusChange(Processor.Status status) {
               if (status==Processor.Status.completed && !Thread.currentThread().isInterrupted()) {
-                schedule(triggerContext,newRunnable(triggerContext));
+                schedule(new Date(),triggerContext,newRunnable(triggerContext));
               }
             }
 
@@ -130,20 +130,21 @@ public class PeriodTrigger implements Trigger {
       };
     }
     
-    private synchronized void schedule(Context triggerContext, Runnable runnable) {
+    private synchronized void schedule(Date lastHarvest, Context triggerContext, Runnable runnable) {
       try {
-        Date lastHarvest = triggerContext.lastHarvest();
         if (lastHarvest==null) {
+          LOG.info(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition()));
           future = service.submit(newRunnable(triggerContext));
         } else {
           Period period = parsePeriod(triggerDefinition.getArguments().get(T_PERIOD));
           Calendar cal = Calendar.getInstance();
           Instant instant = cal.toInstant();
           period.addTo(instant);
-          long delay = cal.getTimeInMillis()-instant.toEpochMilli();
-          future = service.schedule(newRunnable(triggerContext), delay, TimeUnit.MILLISECONDS);
+          long delay = (cal.getTimeInMillis()-instant.toEpochMilli())/1000/60;
+          LOG.info(String.format("Task is scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition()));
+          future = service.schedule(newRunnable(triggerContext), delay, TimeUnit.MINUTES);
         }
-      } catch (DataProcessorException|ParseException ex) {
+      } catch (ParseException ex) {
         LOG.error(String.format("Error activating trigger: %s", getType()), ex);
       }
     }

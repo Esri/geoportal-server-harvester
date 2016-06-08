@@ -129,6 +129,7 @@ public class AtTrigger implements Trigger {
     private synchronized void schedule(Runnable runnable) {
       try {
         long delay = calcDelay();
+        LOG.info(String.format("Task is scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition()));
         future = service.schedule(runnable, delay, TimeUnit.MINUTES);
       } catch (ParseException ex) {
         LOG.error(String.format("Error activating trigger: %s", getType()), ex);

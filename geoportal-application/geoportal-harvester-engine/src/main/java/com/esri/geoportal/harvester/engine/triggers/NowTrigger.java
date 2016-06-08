@@ -20,11 +20,14 @@ import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 'Now' trigger. Triggers harvesting immediately.
  */
 public class NowTrigger implements Trigger {
+  private static final Logger LOG = LoggerFactory.getLogger(NowTrigger.class);
   public static final String TYPE = "NOW";
 
   @Override
@@ -66,7 +69,7 @@ public class NowTrigger implements Trigger {
 
     @Override
     public void activate(Trigger.Context context) throws DataProcessorException, InvalidDefinitionException {
-      // submit task definition now.
+      LOG.info(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition()));
       context.submit(triggerDefinition.getTaskDefinition());
     }
 
