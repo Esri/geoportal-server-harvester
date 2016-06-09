@@ -86,13 +86,13 @@ public class DefaultProcessor implements Processor {
               });
             }
           }
-          LOG.info(String.format("Completed harvest: %s", getTitle()));
         } catch (DataInputException ex) {
-          LOG.error(String.format("Failed harvesting of %s", getTitle()), ex);
+          LOG.error(String.format("Error harvesting of %s", getTitle()), ex);
           onError(ex);
         } finally {
           completed = true;
           aborting = false;
+          LOG.info(String.format("Completed harvest: %s", getTitle()));
         }
       }, "HARVESTING");
     }
