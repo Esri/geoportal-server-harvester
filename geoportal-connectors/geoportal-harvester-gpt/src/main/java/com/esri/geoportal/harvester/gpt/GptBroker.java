@@ -21,9 +21,7 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
-import org.apache.commons.io.IOUtils;
 
 /**
  * GPT broker.

@@ -23,8 +23,12 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import static com.esri.geoportal.harvester.gpt.GptBrokerDefinitionAdaptor.P_HOST_URL;
 import static com.esri.geoportal.harvester.gpt.GptBrokerDefinitionAdaptor.P_USER_NAME;
 import static com.esri.geoportal.harvester.gpt.GptBrokerDefinitionAdaptor.P_USER_PASSWORD;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * GPT connector.
@@ -53,8 +57,13 @@ public class GptConnector implements OutputConnector<GptBroker> {
   @Override
   public GptBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     GptBrokerDefinitionAdaptor adaptor = new GptBrokerDefinitionAdaptor(definition);
-    Client client = new Client(adaptor.getHostUrl(), adaptor.getUserName(), adaptor.getUserName());
-    return new GptBroker(this, adaptor, client);
+    try {
+      URL url = new URL(adaptor.getHostUrl().toExternalForm().replaceAll("/$", "")+"/");
+      Client client = new Client(url, adaptor.getUserName(), adaptor.getUserName());
+      return new GptBroker(this, adaptor, client);
+    } catch (MalformedURLException ex) {
+      throw new InvalidDefinitionException(String.format("Invalid url", adaptor.getHostUrl()), ex);
+    }
   }
   
 }

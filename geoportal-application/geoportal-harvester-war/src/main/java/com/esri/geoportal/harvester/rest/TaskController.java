@@ -50,7 +50,11 @@ import org.springframework.web.bind.annotation.RestController;
    DELETE /rest/harvester/tasks/{taskId}
    PUT /rest/harvester/tasks
    POST /rest/harvester/tasks/{taskId}
-   PUT /rest/harvester/tasks/{taskId}/executeTask
+   
+   PUT /rest/harvester/tasks/execute
+   PUT /rest/harvester/tasks/schedule
+   PUT /rest/harvester/tasks/{taskId}/execute
+   PUT /rest/harvester/tasks/{taskId}/schedule
  </code></pre>
  */
 @RestController

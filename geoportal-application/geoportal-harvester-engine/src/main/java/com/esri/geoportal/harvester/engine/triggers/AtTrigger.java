@@ -180,7 +180,7 @@ public class AtTrigger implements Trigger {
      * @throws ParseException if invalid minute of the day definition
      */
     private int parseMinOfDay(String strMinOfDay) throws ParseException {
-      if (strMinOfDay==null || strMinOfDay.length()!=5) {
+      if (strMinOfDay==null) {
         throw new ParseException(String.format("Invalid minute of the day: %s", strMinOfDay), 0);
       }
       String[] split = strMinOfDay.split(":");
