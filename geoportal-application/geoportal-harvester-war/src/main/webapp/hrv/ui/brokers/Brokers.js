@@ -149,7 +149,7 @@ define(["dojo/_base/declare",
       },
       
       _onRemove: function(evt) {
-        var uuid = evt.brokerDefinition.uuid;
+        var uuid = evt.data.uuid;
         var brokersApi = new BrokersApi();
         
         // use API to remove broker
