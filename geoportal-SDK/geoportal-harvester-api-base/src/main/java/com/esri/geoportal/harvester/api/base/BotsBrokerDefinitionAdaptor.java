@@ -25,11 +25,11 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Bots properties adaptor.
  */
-public abstract class BotsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
-  protected static final String P_BOTS_AGENT = "bots-config-agent";
-  protected static final String P_BOTS_ENABLED = "bots-config-enabled";
-  protected static final String P_BOTS_OVERRIDE = "bots-config-override";
-  protected static final String P_BOTS_MODE = "bots-mode";
+public final class BotsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
+  public static final String P_BOTS_AGENT = "bots-config-agent";
+  public static final String P_BOTS_ENABLED = "bots-config-enabled";
+  public static final String P_BOTS_OVERRIDE = "bots-config-override";
+  public static final String P_BOTS_MODE = "bots-mode";
 
 
   /**

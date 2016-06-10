@@ -56,4 +56,9 @@ public abstract class BrokerDefinitionAdaptor {
       def.getProperties().remove(propertyName);
     }
   }
+  
+  @Override
+  public String toString() {
+    return def.toString();
+  }
 }

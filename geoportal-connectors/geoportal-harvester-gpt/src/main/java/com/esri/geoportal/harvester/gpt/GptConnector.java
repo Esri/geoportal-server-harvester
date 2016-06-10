@@ -16,19 +16,16 @@
 package com.esri.geoportal.harvester.gpt;
 
 import com.esri.geoportal.commons.gpt.client.Client;
+import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import static com.esri.geoportal.harvester.gpt.GptBrokerDefinitionAdaptor.P_HOST_URL;
-import static com.esri.geoportal.harvester.gpt.GptBrokerDefinitionAdaptor.P_USER_NAME;
-import static com.esri.geoportal.harvester.gpt.GptBrokerDefinitionAdaptor.P_USER_PASSWORD;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * GPT connector.
@@ -45,8 +42,8 @@ public class GptConnector implements OutputConnector<GptBroker> {
   public UITemplate getTemplate() {
     List<UITemplate.Argument> arguments = new ArrayList<>();
     arguments.add(new UITemplate.StringArgument(P_HOST_URL, "URL", true));
-    arguments.add(new UITemplate.StringArgument(P_USER_NAME, "User name"));
-    arguments.add(new UITemplate.StringArgument(P_USER_PASSWORD, "User password") {
+    arguments.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_USERNAME, "User name"));
+    arguments.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_PASSWORD, "User password") {
       public boolean isPassword() {
         return true;
       }
@@ -59,7 +56,7 @@ public class GptConnector implements OutputConnector<GptBroker> {
     GptBrokerDefinitionAdaptor adaptor = new GptBrokerDefinitionAdaptor(definition);
     try {
       URL url = new URL(adaptor.getHostUrl().toExternalForm().replaceAll("/$", "")+"/");
-      Client client = new Client(url, adaptor.getUserName(), adaptor.getUserName());
+      Client client = new Client(url, adaptor.getCredentials().getUserName(), adaptor.getCredentials().getPassword());
       return new GptBroker(this, adaptor, client);
     } catch (MalformedURLException ex) {
       throw new InvalidDefinitionException(String.format("Invalid url", adaptor.getHostUrl()), ex);

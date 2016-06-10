@@ -18,8 +18,11 @@ package com.esri.geoportal.harvester.csw;
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.ObjectFactory;
+import com.esri.geoportal.commons.robots.BotsConfig;
+import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
+import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.apache.commons.lang3.StringUtils;
@@ -27,11 +30,12 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * CSW definition.
  */
-public class CswBrokerDefinitionAdaptor extends BotsBrokerDefinitionAdaptor {
+public class CswBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
 
   public static final String P_HOST_URL = "csw-host-url";
   public static final String P_PROFILE_ID = "csw-profile-id";
 
+  private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private URL hostUrl;
   private IProfile profile;
 
@@ -42,6 +46,7 @@ public class CswBrokerDefinitionAdaptor extends BotsBrokerDefinitionAdaptor {
    */
   public CswBrokerDefinitionAdaptor(EntityDefinition def) {
     super(def);
+    this.botsAdaptor = new BotsBrokerDefinitionAdaptor(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(CswConnector.TYPE);
     } else if (!CswConnector.TYPE.equals(def.getType())) {
@@ -97,6 +102,38 @@ public class CswBrokerDefinitionAdaptor extends BotsBrokerDefinitionAdaptor {
   public void setProfile(IProfile profile) {
     this.profile = profile;
     set(P_PROFILE_ID, profile.getId());
+  }
+
+  /**
+   * Gets bots mode.
+   * @return bots mode
+   */
+  public BotsMode getBotsMode() {
+    return botsAdaptor.getBotsMode();
+  }
+
+  /**
+   * Sets bots mode.
+   * @param botsMode bots mode 
+   */
+  public void setBotsMode(BotsMode botsMode) {
+    botsAdaptor.setBotsMode(botsMode);
+  }
+
+  /**
+   * Gets bots config.
+   * @return bots config
+   */
+  public BotsConfig getBotsConfig() {
+    return botsAdaptor.getBotsConfig();
+  }
+
+  /**
+   * Sets bots config.
+   * @param botsConfig bots config 
+   */
+  public void setBotsConfig(BotsConfig botsConfig) {
+    botsAdaptor.setBotsConfig(botsConfig);
   }
 
 }

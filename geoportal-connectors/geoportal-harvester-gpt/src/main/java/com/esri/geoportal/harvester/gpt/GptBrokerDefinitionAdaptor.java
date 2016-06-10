@@ -17,6 +17,8 @@ package com.esri.geoportal.harvester.gpt;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
+import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
+import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor.Credentials;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.apache.commons.lang3.StringUtils;
@@ -26,12 +28,9 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class GptBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public static final String P_HOST_URL        = "gpt-host-url";
-  public static final String P_USER_NAME       = "gpt-user-name";
-  public static final String P_USER_PASSWORD   = "gpt-user-password";
-  
+
+  private final CredentialsDefinitionAdaptor credAdaptor;
   private URL hostUrl;
-  private String userName;
-  private String password;
 
   /**
    * Creates instance of the adaptor.
@@ -39,6 +38,7 @@ public class GptBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    */
   public GptBrokerDefinitionAdaptor(EntityDefinition def) {
     super(def);
+    this.credAdaptor = new CredentialsDefinitionAdaptor(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(GptConnector.TYPE);
     } else if (!GptConnector.TYPE.equals(def.getType())) {
@@ -49,8 +49,6 @@ public class GptBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
       } catch (MalformedURLException ex) {
         throw new IllegalArgumentException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
       }
-      userName = get(P_USER_NAME);
-      password = get(P_USER_PASSWORD);
     }
   }
 
@@ -72,37 +70,19 @@ public class GptBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   }
 
   /**
-   * Gets user name.
-   * @return user name
+   * Gets credentials.
+   * @return credentials
    */
-  public String getUserName() {
-    return userName;
+  public Credentials getCredentials() {
+    return credAdaptor.getCredentials();
   }
 
   /**
-   * Sets user name.
-   * @param userName user name 
+   * Sets credentials.
+   * @param cred credentials
    */
-  public void setUserName(String userName) {
-    this.userName = userName;
-    set(P_USER_NAME, userName);
-  }
-
-  /**
-   * Gets user password.
-   * @return user password
-   */
-  public String getPassword() {
-    return password;
-  }
-
-  /**
-   * Sets user password.
-   * @param password user password
-   */
-  public void setPassword(String password) {
-    this.password = password;
-    set(P_USER_PASSWORD, password);
+  public void setCredentials(Credentials cred) {
+    credAdaptor.setCredentials(cred);
   }
   
 }

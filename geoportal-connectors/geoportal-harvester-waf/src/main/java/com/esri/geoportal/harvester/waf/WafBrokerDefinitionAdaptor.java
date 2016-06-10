@@ -15,8 +15,11 @@
  */
 package com.esri.geoportal.harvester.waf;
 
+import com.esri.geoportal.commons.robots.BotsConfig;
+import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
+import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.apache.commons.lang3.StringUtils;
@@ -24,9 +27,10 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * WAF broker definition adaptor.
  */
-public class WafBrokerDefinitionAdaptor extends BotsBrokerDefinitionAdaptor {
+public class WafBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public static final String P_HOST_URL    = "waf-host-url";
   
+  private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private URL hostUrl;
 
   /**
@@ -36,6 +40,7 @@ public class WafBrokerDefinitionAdaptor extends BotsBrokerDefinitionAdaptor {
    */
   public WafBrokerDefinitionAdaptor(EntityDefinition def) throws IllegalArgumentException {
     super(def);
+    this.botsAdaptor = new BotsBrokerDefinitionAdaptor(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(WafConnector.TYPE);
     } else if (!WafConnector.TYPE.equals(def.getType())) {
@@ -64,5 +69,37 @@ public class WafBrokerDefinitionAdaptor extends BotsBrokerDefinitionAdaptor {
   public void setHostUrl(URL url) {
     this.hostUrl = url;
     set(P_HOST_URL, url.toExternalForm());
+  }
+
+  /**
+   * Gets bots mode.
+   * @return bots mode
+   */
+  public BotsMode getBotsMode() {
+    return botsAdaptor.getBotsMode();
+  }
+
+  /**
+   * Sets bots mode.
+   * @param botsMode bots mode 
+   */
+  public void setBotsMode(BotsMode botsMode) {
+    botsAdaptor.setBotsMode(botsMode);
+  }
+
+  /**
+   * Gets bots config.
+   * @return bots config
+   */
+  public BotsConfig getBotsConfig() {
+    return botsAdaptor.getBotsConfig();
+  }
+
+  /**
+   * Sets bots config.
+   * @param botsConfig bots config 
+   */
+  public void setBotsConfig(BotsConfig botsConfig) {
+    botsAdaptor.setBotsConfig(botsConfig);
   }
 }
