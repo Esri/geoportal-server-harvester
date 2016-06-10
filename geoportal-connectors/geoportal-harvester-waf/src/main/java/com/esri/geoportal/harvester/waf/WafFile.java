@@ -17,6 +17,8 @@ package com.esri.geoportal.harvester.waf;
 
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
+import static com.esri.geoportal.commons.utils.HttpClientContextBuilder.createHttpClientContext;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +32,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.HttpClientContext;
 
 /**
  * WAF file.
@@ -38,16 +41,19 @@ public class WafFile {
 
   private final URI sourceUri;
   private final URL fileUrl;
+  private final SimpleCredentials creds;
 
   /**
    * Creates instance of the WAF file.
    *
    * @param sourceUri source URI
    * @param fileUrl file URL
+   * @param creds credentials
    */
-  public WafFile(URI sourceUri, URL fileUrl) {
+  public WafFile(URI sourceUri, URL fileUrl, SimpleCredentials creds) {
     this.sourceUri = sourceUri;
     this.fileUrl = fileUrl;
+    this.creds = creds;
   }
 
   /**
@@ -60,7 +66,8 @@ public class WafFile {
   public SimpleDataReference readContent(BotsHttpClient httpClient) throws IOException, URISyntaxException {
     HttpGet method = new HttpGet(fileUrl.toExternalForm());
     method.setConfig(DEFAULT_REQUEST_CONFIG);
-    HttpResponse response = httpClient.execute(method);
+    HttpClientContext context = creds!=null && !creds.isEmpty()? createHttpClientContext(fileUrl, creds): null;
+    HttpResponse response = httpClient.execute(method,context);
     Date lastModifiedDate = readLastModifiedDate(response);
     try (InputStream input = response.getEntity().getContent()) {
       return new SimpleDataReference(fileUrl.toExternalForm(), lastModifiedDate, sourceUri, IOUtils.toByteArray(input));

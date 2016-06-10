@@ -78,7 +78,7 @@ public class WafBroker implements InputBroker {
       
       if (subFolders==null) {
         URL startUrl = new URL(arguments.getHostUrl().toExternalForm().replaceAll("/$", "")+"/");
-        WafFolderContent content = new WafFolder(startUrl.toURI(), startUrl).readContent(httpClient);
+        WafFolderContent content = new WafFolder(startUrl.toURI(), startUrl, arguments.getCredentials()).readContent(httpClient);
         subFolders = new LinkedList<>(content.getSubFolders());
         files = new LinkedList<>(content.getFiles());
         return hasNext();

@@ -17,9 +17,11 @@ package com.esri.geoportal.harvester.waf;
 
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
+import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +33,8 @@ public class WafBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public static final String P_HOST_URL    = "waf-host-url";
   
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
+  private final CredentialsDefinitionAdaptor credAdaptor;
+  
   private URL hostUrl;
 
   /**
@@ -40,6 +44,7 @@ public class WafBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    */
   public WafBrokerDefinitionAdaptor(EntityDefinition def) throws IllegalArgumentException {
     super(def);
+    this.credAdaptor =new CredentialsDefinitionAdaptor(def);
     this.botsAdaptor = new BotsBrokerDefinitionAdaptor(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(WafConnector.TYPE);
@@ -101,5 +106,21 @@ public class WafBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    */
   public void setBotsConfig(BotsConfig botsConfig) {
     botsAdaptor.setBotsConfig(botsConfig);
+  }
+
+  /**
+   * Gets credentials.
+   * @return credentials
+   */
+  public SimpleCredentials getCredentials() {
+    return credAdaptor.getCredentials();
+  }
+
+  /**
+   * Sets credentials.
+   * @param cred credentials
+   */
+  public void setCredentials(SimpleCredentials cred) {
+    credAdaptor.setCredentials(cred);
   }
 }

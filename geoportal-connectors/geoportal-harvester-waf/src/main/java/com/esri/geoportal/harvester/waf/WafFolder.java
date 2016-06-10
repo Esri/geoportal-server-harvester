@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.waf;
 
 import com.esri.geoportal.commons.http.BotsHttpClient;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,16 +31,19 @@ public class WafFolder {
 
   private final URI sourceUri;
   private final URL folderUrl;
+  private final SimpleCredentials creds;
 
   /**
    * Creates instance of the folder.
    *
    * @param sourceUri source URI
    * @param folderUrl folder URL
+   * @param creds credentials
    */
-  public WafFolder(URI sourceUri, URL folderUrl) {
+  public WafFolder(URI sourceUri, URL folderUrl, SimpleCredentials creds) {
     this.sourceUri = sourceUri;
     this.folderUrl = folderUrl;
+    this.creds = creds;
   }
 
   /**
@@ -50,7 +54,7 @@ public class WafFolder {
    * @throws URISyntaxException if invalid URL
    */
   public WafFolderContent readContent(BotsHttpClient httpClient) throws IOException, URISyntaxException {
-    HtmlUrlScrapper scrapper = new HtmlUrlScrapper(httpClient);
+    HtmlUrlScrapper scrapper = new HtmlUrlScrapper(httpClient, creds);
     List<URL> urls = scrapper.scrap(folderUrl);
 
     List<WafFile> files = new ArrayList<>();
@@ -58,9 +62,9 @@ public class WafFolder {
 
     urls.forEach(u -> {
       if (u.toExternalForm().toLowerCase().endsWith(".xml")) {
-        files.add(new WafFile(sourceUri, u));
+        files.add(new WafFile(sourceUri, u, creds));
       } else {
-        subFolders.add(new WafFolder(sourceUri, u));
+        subFolders.add(new WafFolder(sourceUri, u, creds));
       }
     });
 

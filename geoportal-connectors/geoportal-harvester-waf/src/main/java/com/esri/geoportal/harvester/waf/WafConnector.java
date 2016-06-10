@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.waf;
 
+import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
@@ -38,6 +39,12 @@ public class WafConnector implements InputConnector<WafBroker> {
   public UITemplate getTemplate() {
     List<UITemplate.Argument> args = new ArrayList<>();
     args.add(new UITemplate.StringArgument(P_HOST_URL, "Url", true));
+    args.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_USERNAME, "User name", false));
+    args.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_PASSWORD, "User password", false) {
+      public boolean isPassword() {
+        return true;
+      }
+    });
     return new UITemplate(getType(), "Web Accessible Folder", args);
   }
 
