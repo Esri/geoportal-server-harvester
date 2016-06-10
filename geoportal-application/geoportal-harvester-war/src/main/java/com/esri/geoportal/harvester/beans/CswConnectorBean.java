@@ -16,6 +16,10 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.csw.CswConnector;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,5 +27,22 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class CswConnectorBean extends CswConnector {
+  private static final Logger LOG = LoggerFactory.getLogger(CswConnectorBean.class);
+  
+  /**
+   * Initializes bean.
+   */
+  @PostConstruct
+  public void init() {
+    LOG.info(String.format("CswConnectorBean created."));
+  }
+  
+  /**
+   * Destroys bean.
+   */
+  @PreDestroy
+  public void destroy() {
+    LOG.info(String.format("CswConnectorBean destroyed."));
+  }
   
 }

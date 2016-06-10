@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,7 @@ public class HistoryManagerBean implements HistoryManager {
   private DataSource dataSource;
 
   /**
-   * Initializes database.
+   * Initializes bean.
    */
   @PostConstruct
   public void init() {
@@ -61,6 +62,14 @@ public class HistoryManagerBean implements HistoryManager {
     } catch (SQLException ex) {
       LOG.info("Error initializing history database", ex);
     }
+  }
+  
+  /**
+   * Destroys bean.
+   */
+  @PreDestroy
+  public void destroy() {
+    LOG.info(String.format("HistoryManagerBean destroyed."));
   }
 
   @Override

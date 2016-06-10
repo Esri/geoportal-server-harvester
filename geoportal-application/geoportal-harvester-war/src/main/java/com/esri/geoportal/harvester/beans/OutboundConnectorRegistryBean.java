@@ -19,6 +19,7 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import com.esri.geoportal.harvester.engine.OutboundConnectorRegistry;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +35,20 @@ public class OutboundConnectorRegistryBean extends OutboundConnectorRegistry {
   @Autowired
   private List<OutputConnector> connectors;
   
+  /**
+   * Initializes bean.
+   */
   @PostConstruct
   public void init() {
     connectors.stream().forEach(c->put(c.getType(),c));
     LOG.info("OutboundConnectorRegistryBean initialized.");
+  }
+  
+  /**
+   * Destroys bean.
+   */
+  @PreDestroy
+  public void destroy() {
+    LOG.info(String.format("OutboundConnectorRegistryBean destroyed."));
   }
 }

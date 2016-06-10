@@ -50,7 +50,7 @@ public class ProfilesLoader {
    * @throws XPathExpressionException if invalid XPath expression
    */
   public Profiles load() throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
-    LOG.info(String.format("Loading profiles"));
+    LOG.info(String.format("Loading CSW profiles"));
     Profiles profiles = new Profiles();
     try (InputStream profilesXml = Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_FILE_PATH);) {
       DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -87,6 +87,7 @@ public class ProfilesLoader {
         profiles.add(prof);
       }
     }
+    LOG.info(String.format("CSW profiles loaded."));
     return profiles;
   }
 }

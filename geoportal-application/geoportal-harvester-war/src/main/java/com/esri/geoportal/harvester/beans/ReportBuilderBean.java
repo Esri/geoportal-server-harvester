@@ -24,6 +24,7 @@ import com.esri.geoportal.harvester.support.ReportDispatcher;
 import com.esri.geoportal.harvester.support.ReportLogger;
 import com.esri.geoportal.harvester.support.ReportStatistics;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,9 @@ public class ReportBuilderBean implements ReportBuilder {
   
   private ReportBuilder rb;
   
+  /**
+   * Initializes bean.
+   */
   @PostConstruct
   public void init () {
     ReportStatistics rs = new ReportStatistics();
@@ -45,6 +49,14 @@ public class ReportBuilderBean implements ReportBuilder {
     rb = new ReportDispatcher(rs, rl);
     
     LOG.info("ReportBuilderBean initialized.");
+  }
+  
+  /**
+   * Destroys bean.
+   */
+  @PreDestroy
+  public void destroy() {
+    LOG.info(String.format("ReportBuilderBean destroyed."));
   }
 
   @Override

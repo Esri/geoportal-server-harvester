@@ -35,6 +35,9 @@ public class TriggerRegistryBean extends TriggerRegistry {
   @Autowired(required = false)
   private List<Trigger> triggers;
   
+  /**
+   * Initializes bean.
+   */
   @PostConstruct
   public void init() {
     if (triggers!=null) {
@@ -43,10 +46,14 @@ public class TriggerRegistryBean extends TriggerRegistry {
     LOG.info("TriggerRegistryBean initialized.");
   }
   
+  /**
+   * Destroys bean.
+   */
   @PreDestroy
   public void destroy() {
     try {
       close();
+      LOG.info("TriggerRegistryBean destroyed.");
     } catch (Exception ex) {
       LOG.warn(String.format("Error closing trigger registry bean."), ex);
     }

@@ -19,6 +19,7 @@ import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.engine.InboundConnectorRegistry;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +35,21 @@ public class InboundConnectorRegistryBean extends InboundConnectorRegistry {
   @Autowired
   private List<InputConnector> connectors;
   
+  /**
+   * Initializes bean.
+   */
   @PostConstruct
   public void init() {
     connectors.stream().forEach(c->put(c.getType(),c));
     LOG.info("InboundConnectorRegistryBean initialized.");
+  }
+  
+  /**
+   * Destroys bean.
+   */
+  @PreDestroy
+  public void destroy() {
+    LOG.info(String.format("InboundConnectorRegistryBean destroyed."));
   }
   
 }

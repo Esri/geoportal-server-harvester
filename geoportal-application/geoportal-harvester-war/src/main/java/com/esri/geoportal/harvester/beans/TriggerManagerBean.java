@@ -21,7 +21,6 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.TriggerManager;
 import com.esri.geoportal.harvester.engine.TriggerRegistry;
 import com.esri.geoportal.harvester.engine.support.CrudsException;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.serialize;
 import java.io.IOException;
 import java.sql.Connection;
@@ -40,10 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
+import javax.annotation.PreDestroy;
 
 /**
  * Trigger manager bean.
@@ -92,6 +88,9 @@ public class TriggerManagerBean implements TriggerManager {
     }
   }
 
+  /**
+   * Initializes bean.
+   */
   @PostConstruct
   public void init() {
     try (
@@ -112,6 +111,14 @@ public class TriggerManagerBean implements TriggerManager {
     } catch (SQLException|CrudsException ex) {
       LOG.info("Error initializing trigger definition database", ex);
     }
+  }
+  
+  /**
+   * Destroys bean.
+   */
+  @PreDestroy
+  public void destroy() {
+    LOG.info(String.format("TriggerManagerBean destroyed."));
   }
 
   @Override

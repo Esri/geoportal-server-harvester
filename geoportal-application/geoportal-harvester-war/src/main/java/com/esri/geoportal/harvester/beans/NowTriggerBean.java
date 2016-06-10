@@ -16,6 +16,10 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.engine.triggers.NowTrigger;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,5 +27,21 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class NowTriggerBean extends NowTrigger {
+  private static final Logger LOG = LoggerFactory.getLogger(NowTriggerBean.class);
   
+  /**
+   * Initializes bean.
+   */
+  @PostConstruct
+  public void init() {
+    LOG.info(String.format("NowTriggerBean created."));
+  }
+  
+  /**
+   * Destroys bean.
+   */
+  @PreDestroy
+  public void destroy() {
+    LOG.info(String.format("NowTriggerBean destroyed."));
+  }
 }

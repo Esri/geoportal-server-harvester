@@ -16,6 +16,10 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.waf.WafConnector;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,5 +27,22 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class WafConnectorBean extends WafConnector {
+  private static final Logger LOG = LoggerFactory.getLogger(WafConnectorBean.class);
+  
+  /**
+   * Initializes bean.
+   */
+  @PostConstruct
+  public void init() {
+    LOG.info(String.format("WafConnectorBean created."));
+  }
+  
+  /**
+   * Destroys bean.
+   */
+  @PreDestroy
+  public void destroy() {
+    LOG.info(String.format("WafConnectorBean destroyed."));
+  }
   
 }

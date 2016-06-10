@@ -20,6 +20,7 @@ import com.esri.geoportal.harvester.engine.DefaultProcessor;
 import com.esri.geoportal.harvester.engine.ProcessorRegistry;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +36,23 @@ public class ProcessorRegistryBean extends ProcessorRegistry {
   @Autowired(required = false)
   private List<Processor> processors;
   
+  /**
+   * Initializes bean.
+   */
   @PostConstruct
   public void init() {
     if (processors!=null) {
       processors.stream().filter(p->!p.getType().equals(DefaultProcessor.TYPE)).forEach(p->put(p.getType(),p));
     }
     LOG.info("ProcessorRegistryBean initialized.");
+  }
+  
+  /**
+   * Destroys bean.
+   */
+  @PreDestroy
+  public void destroy() {
+    LOG.info(String.format("ProcessorRegistryBean destroyed."));
   }
   
 }

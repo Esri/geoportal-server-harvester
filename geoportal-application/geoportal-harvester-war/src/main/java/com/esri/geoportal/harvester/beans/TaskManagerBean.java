@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,7 @@ public class TaskManagerBean implements TaskManager {
   private DataSource dataSource;
 
   /**
-   * Initializes database.
+   * Initializes bean.
    */
   @PostConstruct
   public void init() {
@@ -61,6 +62,14 @@ public class TaskManagerBean implements TaskManager {
     } catch (SQLException ex) {
       LOG.info("Error initializing task database", ex);
     }
+  }
+  
+  /**
+   * Destroys bean.
+   */
+  @PreDestroy
+  public void destroy() {
+    LOG.info(String.format("TaskManagerBean destroyed."));
   }
 
   @Override

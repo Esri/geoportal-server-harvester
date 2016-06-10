@@ -27,6 +27,7 @@ import com.esri.geoportal.harvester.engine.ProcessorRegistry;
 import com.esri.geoportal.harvester.engine.TriggerManager;
 import com.esri.geoportal.harvester.engine.TriggerRegistry;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,9 +80,20 @@ public class EngineBean extends Engine {
     );
   }
   
+  /**
+   * Initializes bean.
+   */
   @PostConstruct
   public void init() {
     fireTriggers();
     LOG.info("EngineBean initialized.");
+  }
+  
+  /**
+   * Destroys bean.
+   */
+  @PreDestroy
+  public void destroy() {
+    LOG.info(String.format("EngineBean destroyed."));
   }
 }

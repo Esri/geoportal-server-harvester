@@ -16,6 +16,10 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.engine.triggers.PeriodTrigger;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,5 +27,21 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class PeriodTriggerBean extends PeriodTrigger {
+  private static final Logger LOG = LoggerFactory.getLogger(PeriodTriggerBean.class);
   
+  /**
+   * Initializes bean.
+   */
+  @PostConstruct
+  public void init() {
+    LOG.info(String.format("PeriodTriggerBean created."));
+  }
+  
+  /**
+   * Destroys bean.
+   */
+  @PreDestroy
+  public void destroy() {
+    LOG.info(String.format("PeriodTriggerBean destroyed."));
+  }
 }

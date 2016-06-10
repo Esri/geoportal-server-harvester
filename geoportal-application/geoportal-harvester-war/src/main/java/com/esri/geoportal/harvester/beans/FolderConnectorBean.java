@@ -16,6 +16,10 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.folder.FolderConnector;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,5 +27,22 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class FolderConnectorBean extends FolderConnector {
+  private static final Logger LOG = LoggerFactory.getLogger(FolderConnectorBean.class);
+  
+  /**
+   * Initializes bean.
+   */
+  @PostConstruct
+  public void init() {
+    LOG.info(String.format("FolderConnectorBean created."));
+  }
+  
+  /**
+   * Destroys bean.
+   */
+  @PreDestroy
+  public void destroy() {
+    LOG.info(String.format("FolderConnectorBean destroyed."));
+  }
   
 }

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -35,9 +36,20 @@ public class ProcessManagerBean implements ProcessManager  {
   
   private final HashMap<UUID,Processor.Process> processes = new HashMap<>();
   
+  /**
+   * Initializes bean.
+   */
   @PostConstruct
   public void init() {
     LOG.info("ProcessManagerBean initialized.");
+  }
+  
+  /**
+   * Destroys bean.
+   */
+  @PreDestroy
+  public void destroy() {
+    LOG.info(String.format("ProcessManagerBean destroyed."));
   }
 
   @Override
