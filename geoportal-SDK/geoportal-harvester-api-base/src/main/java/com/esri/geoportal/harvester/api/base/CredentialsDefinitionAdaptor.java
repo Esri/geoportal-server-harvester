@@ -15,11 +15,11 @@
  */
 package com.esri.geoportal.harvester.api.base;
 
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import org.apache.commons.lang3.StringUtils;
 
 /**
- * Credentials definition adaptor.
+ * SimpleCredentials definition adaptor.
  */
 public final class CredentialsDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public static final String P_CRED_USERNAME = "cred-username";
@@ -37,64 +37,17 @@ public final class CredentialsDefinitionAdaptor extends BrokerDefinitionAdaptor 
    * Gets credentials.
    * @return credentials
    */
-  public Credentials getCredentials() {
-    return new Credentials(get(P_CRED_USERNAME), get(P_CRED_PASSWORD));
+  public SimpleCredentials getCredentials() {
+    return new SimpleCredentials(get(P_CRED_USERNAME), get(P_CRED_PASSWORD));
   }
   
   /**
    * Sets credentials.
    * @param cred credentials
    */
-  public void setCredentials(Credentials cred) {
+  public void setCredentials(SimpleCredentials cred) {
     set(P_CRED_USERNAME, cred.getUserName());
     set(P_CRED_PASSWORD, cred.getPassword());
   }
   
-  /**
-   * Credentials.
-   */
-  public static final class Credentials {
-    private final String userName;
-    private final String password;
-
-    /**
-     * Creates instance of the credentials.
-     * @param userName user name
-     * @param password password
-     */
-    public Credentials(String userName, String password) {
-      this.userName = userName;
-      this.password = password;
-    }
-
-    /**
-     * Gets user name.
-     * @return user name
-     */
-    public String getUserName() {
-      return userName;
-    }
-
-    /**
-     * Gets password.
-     * @return password
-     */
-    public String getPassword() {
-      return password;
-    }
-    
-    /**
-     * Checks if credentials are empty.
-     * Empty credentials have user name or password or both empty.
-     * @return <code>true</code> if empty.
-     */
-    public boolean isEmpty() {
-      return StringUtils.trimToEmpty(userName).isEmpty() || StringUtils.trimToEmpty(password).isEmpty();
-    }
-    
-    @Override
-    public String toString() {
-      return String.format("%s:%s", userName, password);
-    }
-  }
 }

@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.gpt;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
-import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor.Credentials;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.apache.commons.lang3.StringUtils;
@@ -73,7 +73,7 @@ public class GptBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    * Gets credentials.
    * @return credentials
    */
-  public Credentials getCredentials() {
+  public SimpleCredentials getCredentials() {
     return credAdaptor.getCredentials();
   }
 
@@ -81,7 +81,7 @@ public class GptBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    * Sets credentials.
    * @param cred credentials
    */
-  public void setCredentials(Credentials cred) {
+  public void setCredentials(SimpleCredentials cred) {
     credAdaptor.setCredentials(cred);
   }
   

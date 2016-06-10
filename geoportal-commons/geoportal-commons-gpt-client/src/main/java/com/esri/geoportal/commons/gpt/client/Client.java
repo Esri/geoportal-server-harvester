@@ -16,6 +16,7 @@
 package com.esri.geoportal.commons.gpt.client;
 
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Closeable;
 import java.io.IOException;
@@ -44,31 +45,27 @@ import org.apache.http.impl.client.HttpClients;
 public class Client implements Closeable {
   private final HttpClient httpClient;
   private final URL url;
-  private final String userName;
-  private final String password;
+  private final SimpleCredentials cred;
   
   /**
    * Creates instance of the client.
    * @param httpClient HTTP client
    * @param url URL of the GPT REST end point
-   * @param userName user name
-   * @param password password
+   * @param cred credentials
    */
-  public Client(HttpClient httpClient, URL url, String userName, String password) {
+  public Client(HttpClient httpClient, URL url, SimpleCredentials cred) {
     this.httpClient = httpClient;
     this.url = url;
-    this.userName = userName;
-    this.password = password;
+    this.cred = cred;
   }
 
   /**
    * Creates instance of the client.
    * @param url URL of the GPT REST end point
-   * @param userName user name
-   * @param password password
+   * @param cred credentials
    */
-  public Client(URL url, String userName, String password) {
-    this(HttpClients.createDefault(), url, userName, password);
+  public Client(URL url, SimpleCredentials cred) {
+    this(HttpClients.createDefault(), url, cred);
   }
   
   /**
@@ -81,9 +78,8 @@ public class Client implements Closeable {
   public Response publish(byte [] document) throws IOException, URISyntaxException {
     HttpHost targetHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
     CredentialsProvider credsProvider = new BasicCredentialsProvider();
-    credsProvider.setCredentials(
-            new AuthScope(targetHost.getHostName(), targetHost.getPort()),
-            new UsernamePasswordCredentials(userName, password));    
+    credsProvider.setCredentials(new AuthScope(targetHost.getHostName(), targetHost.getPort()),
+            new UsernamePasswordCredentials(cred.getUserName(),cred.getPassword()));    
     
     // Create AuthCache instance
     AuthCache authCache = new BasicAuthCache();
