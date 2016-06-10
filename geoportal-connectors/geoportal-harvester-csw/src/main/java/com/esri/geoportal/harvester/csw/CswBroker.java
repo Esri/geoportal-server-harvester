@@ -106,7 +106,7 @@ public class CswBroker implements InputBroker {
       httpclient = HttpClients.createDefault();
       Bots bots = BotsUtils.readBots(attributes.getBotsConfig(), httpclient, attributes.getBotsMode(), attributes.getHostUrl());
       ObjectFactory cf = new ObjectFactory();
-      client = cf.newClient(attributes.getHostUrl().toExternalForm(), attributes.getProfile(), bots, attributes.getBotsMode());
+      client = cf.newClient(attributes.getHostUrl().toExternalForm(), attributes.getProfile(), bots, attributes.getBotsMode(), attributes.getCredentials());
     }
   }
 

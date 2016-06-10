@@ -26,6 +26,8 @@ import static com.esri.geoportal.commons.csw.client.impl.Constants.CONFIG_FOLDER
 import static com.esri.geoportal.commons.csw.client.impl.Constants.SCHEME_METADATA_DOCUMENT;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
+import static com.esri.geoportal.commons.utils.HttpClientContextBuilder.createHttpClientContext;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,6 +63,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.slf4j.Logger;
@@ -80,6 +83,8 @@ public class Client implements IClient {
   private final BotsHttpClient httpClient;
   private final URL baseUrl;
   private final IProfile profile;
+  private final SimpleCredentials cred;
+  
   private Capabilities capabilites;
 
   /**
@@ -89,10 +94,11 @@ public class Client implements IClient {
    * @param baseUrl base URL
    * @param profile CSW profile
    */
-  public Client(BotsHttpClient httpClient, URL baseUrl, IProfile profile) {
+  public Client(BotsHttpClient httpClient, URL baseUrl, IProfile profile, SimpleCredentials cred) {
     this.httpClient = httpClient;
     this.baseUrl = baseUrl;
     this.profile = profile;
+    this.cred = cred;
   }
 
   @Override
@@ -109,7 +115,8 @@ public class Client implements IClient {
     String requestBody = createGetRecordsRequest(crt);
     postRequest.setEntity(new StringEntity(requestBody, ContentType.APPLICATION_XML));
 
-    try (InputStream responseInputStream = httpClient.execute(postRequest).getEntity().getContent();) {
+    HttpClientContext context = cred!=null && !cred.isEmpty()? createHttpClientContext(baseUrl, cred): null;
+    try (InputStream responseInputStream = httpClient.execute(postRequest,context).getEntity().getContent();) {
       String response = IOUtils.toString(responseInputStream, "UTF-8");
       try (ByteArrayInputStream contentInputStream = new ByteArrayInputStream(response.getBytes("UTF-8"));) {
         Records records = new Records();

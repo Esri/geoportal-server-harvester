@@ -20,9 +20,11 @@ import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.ObjectFactory;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
+import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +38,7 @@ public class CswBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public static final String P_PROFILE_ID = "csw-profile-id";
 
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
+  private final CredentialsDefinitionAdaptor credAdaptor;
   private URL hostUrl;
   private IProfile profile;
 
@@ -46,6 +49,7 @@ public class CswBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    */
   public CswBrokerDefinitionAdaptor(EntityDefinition def) {
     super(def);
+    this.credAdaptor = new CredentialsDefinitionAdaptor(def);
     this.botsAdaptor = new BotsBrokerDefinitionAdaptor(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(CswConnector.TYPE);
@@ -134,6 +138,22 @@ public class CswBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    */
   public void setBotsConfig(BotsConfig botsConfig) {
     botsAdaptor.setBotsConfig(botsConfig);
+  }
+
+  /**
+   * Gets credentials.
+   * @return credentials
+   */
+  public SimpleCredentials getCredentials() {
+    return credAdaptor.getCredentials();
+  }
+
+  /**
+   * Sets credentials.
+   * @param cred credentials
+   */
+  public void setCredentials(SimpleCredentials cred) {
+    credAdaptor.setCredentials(cred);
   }
 
 }

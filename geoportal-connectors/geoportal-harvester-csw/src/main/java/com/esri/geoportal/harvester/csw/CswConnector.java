@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.csw;
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.ObjectFactory;
+import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.defs.UITemplate.Choice;
@@ -44,6 +45,12 @@ public class CswConnector implements InputConnector<CswBroker> {
   public UITemplate getTemplate() {
     List<UITemplate.Argument> arguments = new ArrayList<>();
     arguments.add(new UITemplate.StringArgument(P_HOST_URL, "URL", true));
+    arguments.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_USERNAME, "User name", false));
+    arguments.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_PASSWORD, "User password", false) {
+      public boolean isPassword() {
+        return true;
+      }
+    });
     ObjectFactory of = new ObjectFactory();
     IProfiles profiles = of.newProfiles();
     Choice<String>[] choices = profiles.listAll().stream().map(p->new Choice<String>(p.getId(),p.getName())).toArray(Choice[]::new);

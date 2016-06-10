@@ -20,6 +20,7 @@ import com.esri.geoportal.commons.csw.client.impl.ProfilesLoader;
 import com.esri.geoportal.commons.http.BotsHttpClientFactory;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsMode;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -50,10 +51,11 @@ public class ObjectFactory {
    * @param profile profile
    * @param bots robots
    * @param botsMode robots mode
+   * @param cred credentials
    * @return instance of the client
    * @throws java.net.MalformedURLException if unable to produce URL from string
    */
-  public IClient newClient(String baseUrl, IProfile profile, Bots bots, BotsMode botsMode) throws MalformedURLException {
-    return new Client(BotsHttpClientFactory.STD.create(bots), new URL(baseUrl), profile);
+  public IClient newClient(String baseUrl, IProfile profile, Bots bots, BotsMode botsMode, SimpleCredentials cred) throws MalformedURLException {
+    return new Client(BotsHttpClientFactory.STD.create(bots), new URL(baseUrl), profile, cred);
   }
 }
