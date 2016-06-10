@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.commons.gpt.client;
 
+import static com.esri.geoportal.commons.utils.HttpClientContextBuilder.createHttpClientContext;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,19 +25,11 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClients;
 
 /**
@@ -76,21 +69,6 @@ public class Client implements Closeable {
    * @throws URISyntaxException if URL has invalid syntax
    */
   public Response publish(byte [] document) throws IOException, URISyntaxException {
-    HttpHost targetHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
-    CredentialsProvider credsProvider = new BasicCredentialsProvider();
-    credsProvider.setCredentials(new AuthScope(targetHost.getHostName(), targetHost.getPort()),
-            new UsernamePasswordCredentials(cred.getUserName(),cred.getPassword()));    
-    
-    // Create AuthCache instance
-    AuthCache authCache = new BasicAuthCache();
-    // Generate BASIC scheme object and add it to the local auth cache
-    BasicScheme basicAuth = new BasicScheme();
-    authCache.put(targetHost, basicAuth);
-
-    // Add AuthCache to the execution context
-    HttpClientContext context = HttpClientContext.create();
-    context.setCredentialsProvider(credsProvider);
-    context.setAuthCache(authCache);
 
     ByteArrayEntity entity = new ByteArrayEntity(document);
     HttpPut put = new HttpPut(url.toURI().resolve("rest/metadata/item"));
@@ -98,6 +76,7 @@ public class Client implements Closeable {
     put.setEntity(entity);
     put.setHeader("Content-Type", "application/xml");
     
+    HttpClientContext context = createHttpClientContext(url, cred);
     HttpResponse httpResponse = httpClient.execute(put,context);
     String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
     
@@ -108,7 +87,7 @@ public class Client implements Closeable {
       return mapper.readValue(responseContent, Response.class);
     }
   }
-
+  
   @Override
   public void close() throws IOException {
     if (httpClient instanceof Closeable) {
