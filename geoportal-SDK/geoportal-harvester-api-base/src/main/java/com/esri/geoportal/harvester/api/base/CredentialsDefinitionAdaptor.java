@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Credentials definition adaptor.
@@ -80,6 +81,15 @@ public final class CredentialsDefinitionAdaptor extends BrokerDefinitionAdaptor 
      */
     public String getPassword() {
       return password;
+    }
+    
+    /**
+     * Checks if credentials are empty.
+     * Empty credentials have user name or password or both empty.
+     * @return <code>true</code> if empty.
+     */
+    public boolean isEmpty() {
+      return StringUtils.trimToEmpty(userName).isEmpty() || StringUtils.trimToEmpty(password).isEmpty();
     }
     
     @Override
