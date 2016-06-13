@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.api.Trigger;
-import com.esri.geoportal.harvester.engine.TriggerRegistry;
+import com.esri.geoportal.harvester.engine.managers.TriggerRegistry;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

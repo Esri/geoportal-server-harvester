@@ -15,8 +15,8 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.engine.History;
-import com.esri.geoportal.harvester.engine.HistoryManager;
+import com.esri.geoportal.harvester.engine.managers.History;
+import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.support.CrudsException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

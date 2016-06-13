@@ -13,18 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine;
-
-import com.esri.geoportal.harvester.api.Processor;
-import java.util.HashMap;
 
 /**
- * Processor registry.
+ * Engine default implementation.
  */
-public class ProcessorRegistry extends HashMap<String,Processor>{
-  private final Processor defaultProcessor = new DefaultProcessor();
-  
-  public Processor getDefaultProcessor() {
-    return defaultProcessor;
-  }
-}
+package com.esri.geoportal.harvester.engine.impl;

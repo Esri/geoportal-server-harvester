@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.beans;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.serialize;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
-import com.esri.geoportal.harvester.engine.TaskManager;
+import com.esri.geoportal.harvester.engine.managers.TaskManager;
 import com.esri.geoportal.harvester.engine.support.CrudsException;
 import java.io.IOException;
 import java.sql.Connection;

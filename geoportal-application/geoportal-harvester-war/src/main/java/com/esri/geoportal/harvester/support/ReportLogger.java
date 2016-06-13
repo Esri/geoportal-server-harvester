@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.support;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
-import com.esri.geoportal.harvester.engine.ReportBuilder;
+import com.esri.geoportal.harvester.engine.managers.ReportBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.esri.geoportal.harvester.api.Processor;

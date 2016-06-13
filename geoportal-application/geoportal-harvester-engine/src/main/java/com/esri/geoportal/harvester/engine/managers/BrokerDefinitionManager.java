@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Esri, Inc..
+ * Copyright 2016 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine;
+package com.esri.geoportal.harvester.engine.managers;
 
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.engine.support.CrudsRepo;
-import com.esri.geoportal.harvester.api.Processor;
 
 /**
- * DefaultProcess manager.
+ * Broker definition manager.
  */
-public interface ProcessManager extends CrudsRepo<Processor.Process> {
+public interface BrokerDefinitionManager extends CrudsRepo<EntityDefinition> {
 }

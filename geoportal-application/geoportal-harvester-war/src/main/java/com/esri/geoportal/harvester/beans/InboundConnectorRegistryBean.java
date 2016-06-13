@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.api.specs.InputConnector;
-import com.esri.geoportal.harvester.engine.InboundConnectorRegistry;
+import com.esri.geoportal.harvester.engine.managers.InboundConnectorRegistry;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

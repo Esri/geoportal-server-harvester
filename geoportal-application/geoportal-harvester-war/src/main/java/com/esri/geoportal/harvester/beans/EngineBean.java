@@ -15,17 +15,17 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.engine.BrokerDefinitionManager;
-import com.esri.geoportal.harvester.engine.ReportBuilder;
-import com.esri.geoportal.harvester.engine.Engine;
-import com.esri.geoportal.harvester.engine.HistoryManager;
-import com.esri.geoportal.harvester.engine.ProcessManager;
-import com.esri.geoportal.harvester.engine.TaskManager;
-import com.esri.geoportal.harvester.engine.OutboundConnectorRegistry;
-import com.esri.geoportal.harvester.engine.InboundConnectorRegistry;
-import com.esri.geoportal.harvester.engine.ProcessorRegistry;
-import com.esri.geoportal.harvester.engine.TriggerManager;
-import com.esri.geoportal.harvester.engine.TriggerRegistry;
+import com.esri.geoportal.harvester.engine.managers.BrokerDefinitionManager;
+import com.esri.geoportal.harvester.engine.managers.ReportBuilder;
+import com.esri.geoportal.harvester.engine.impl.DefaultEngine;
+import com.esri.geoportal.harvester.engine.managers.HistoryManager;
+import com.esri.geoportal.harvester.engine.managers.ProcessManager;
+import com.esri.geoportal.harvester.engine.managers.TaskManager;
+import com.esri.geoportal.harvester.engine.managers.OutboundConnectorRegistry;
+import com.esri.geoportal.harvester.engine.managers.InboundConnectorRegistry;
+import com.esri.geoportal.harvester.engine.managers.ProcessorRegistry;
+import com.esri.geoportal.harvester.engine.managers.TriggerManager;
+import com.esri.geoportal.harvester.engine.managers.TriggerRegistry;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
@@ -34,10 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * Engine bean.
+ * DefaultEngine bean.
  */
 @Service
-public class EngineBean extends Engine {
+public class EngineBean extends DefaultEngine {
   private static final Logger LOG = LoggerFactory.getLogger(EngineBean.class);
 
   /**

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine;
+package com.esri.geoportal.harvester.engine.managers;
 
 import com.esri.geoportal.harvester.engine.support.BaseRegistry;
-import com.esri.geoportal.harvester.api.specs.InputConnector;
+import com.esri.geoportal.harvester.api.specs.OutputConnector;
 
 /**
- * Data inbound connector registry.
+ * Data outbound connector registry.
  */
-public class InboundConnectorRegistry  extends BaseRegistry<InputConnector> {
+public class OutboundConnectorRegistry extends BaseRegistry<OutputConnector> {
 }

@@ -18,8 +18,7 @@ package com.esri.geoportal.harvester.engine.support;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.engine.BrokerInfo;
-import com.esri.geoportal.harvester.engine.Engine;
+import com.esri.geoportal.harvester.engine.impl.DefaultEngine;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -47,7 +46,7 @@ public class JsonSerializer {
    * @return task definition
    * @throws IOException if parsing task definition fails
    */
-  public static TaskDefinition deserialize(Engine engine, String taskDefinition) throws IOException {
+  public static TaskDefinition deserialize(DefaultEngine engine, String taskDefinition) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     SimpleModule module = new SimpleModule();
     JsonDeserializer<EntityDefinition> deserializer = new JsonDeserializer<EntityDefinition>() {

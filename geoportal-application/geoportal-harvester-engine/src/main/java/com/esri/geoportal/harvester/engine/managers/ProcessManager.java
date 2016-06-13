@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Esri, Inc.
+ * Copyright 2016 Esri, Inc..
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine;
+package com.esri.geoportal.harvester.engine.managers;
 
-import com.esri.geoportal.harvester.engine.support.CrudsException;
 import com.esri.geoportal.harvester.engine.support.CrudsRepo;
-import java.util.UUID;
+import com.esri.geoportal.harvester.api.Processor;
 
 /**
- * History manager.
+ * DefaultProcess manager.
  */
-public interface HistoryManager extends CrudsRepo<History.Event> {
-  /**
-   * Builds history for the task.
-   * @param uuid id of the task stored in the repo.
-   * @return history
-   * @throws CrudsException if building history fails
-   */
-  History buildHistory(UUID uuid) throws CrudsException;
+public interface ProcessManager extends CrudsRepo<Processor.Process> {
 }
