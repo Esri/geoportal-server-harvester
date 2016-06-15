@@ -18,6 +18,7 @@ package com.esri.geoportal.commons.robots;
 import java.io.IOException;
 import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
+import org.junit.After;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -35,7 +36,7 @@ public class BotsTest {
   @Rule
   public MockServerRule server = new MockServerRule(this,5000);
   
-  private static MockServerClient client;
+  private MockServerClient client;
 
   @Before
   public void setupClass() throws IOException {
@@ -51,6 +52,12 @@ public class BotsTest {
                     .withBody(readAndClose(getClass().getResourceAsStream("/robots.txt")))
             );
   }
+  
+  @After
+  public void destroy() {
+    client.stop();
+  }
+  
 
   @Test
   public void testAccessGranted() throws IOException {

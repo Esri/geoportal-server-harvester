@@ -23,6 +23,7 @@ import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.junit.After;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -40,10 +41,10 @@ public class BotsHttpClientTest {
   @Rule
   public MockServerRule server = new MockServerRule(this,5000);
   
-  private static MockServerClient client;
+  private MockServerClient client;
 
   @Before
-  public void setupClass() throws IOException {
+  public void setup() throws IOException {
     client = new MockServerClient("localhost", 5000);
     client.when(
                     request()
@@ -65,6 +66,11 @@ public class BotsHttpClientTest {
                     .withStatusCode(200)
                     .withBody("some data")
             );
+  }
+  
+  @After
+  public void destroy() {
+    client.stop();
   }
 
   @Test(expected = IOException.class)
