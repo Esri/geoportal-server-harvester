@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<csw:GetRecordByIdResponse xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcmiBox="http://dublincore.org/documents/2000/07/11/dcmi-box/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xmlns:ows="http://www.opengis.net/ows" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<csw:SummaryRecord>
+<dc:identifier scheme="urn:x-esri:specification:ServiceType:ArcIMS:Metadata:FileID">http://geo.gob.bo/geonetwork/srv/spa/csw?request=GetCapabilities&amp;service=CSW&amp;version=2.0.2</dc:identifier>
+<dc:identifier scheme="urn:x-esri:specification:ServiceType:ArcIMS:Metadata:DocID">{093CBDB1-9D7A-4602-9937-2EC89359E633}</dc:identifier>
+<dc:title>GeoBolivia</dc:title>
+<dc:type scheme="urn:x-esri:specification:ServiceType:ArcIMS:Metadata:ContentType">CSW</dc:type>
+<dc:type scheme="urn:x-esri:specification:ServiceType:ArcIMS:Metadata:ContentType">application/xml</dc:type>
+<dc:subject>CSW</dc:subject>
+<dc:subject>Bolivia</dc:subject>
+<dc:subject>imageryBaseMapsEarthCover</dc:subject>
+<dc:subject>La Paz</dc:subject>
+<dc:subject>Zonas de riesgos naturales</dc:subject>
+<dc:subject>Zonas sujetas a ordenación, a restricciones o reglamentaciones y unidades de notificación</dc:subject>
+<dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+<dc:subject>Cartografía</dc:subject>
+<dc:subject>Año 1989</dc:subject>
+<dc:subject>Aspectos geográficos de carácter meteorológico</dc:subject>
+<dc:subject>Distribución de la población — demografía</dc:subject>
+<dct:modified>2016-06-15T10:14:09-07:00</dct:modified>
+<dct:abstract>El presente catalogo contiene los metadatos de la Infraestructura de Datos Espaciales del Estado Plurinacional de Bolivia.</dct:abstract>
+<dct:references scheme="urn:x-esri:specification:ServiceType:ArcIMS:Metadata:Server">http://geo.gob.bo/geonetwork/srv/spa/csw?request=GetCapabilities&amp;service=CSW&amp;version=2.0.2</dct:references>
+<dct:references scheme="urn:x-esri:specification:ServiceType:ArcIMS:Metadata:Server">http://geo.gob.bo/geonetwork/srv/spa/csw</dct:references>
+<dct:references scheme="urn:x-esri:specification:ServiceType:ArcIMS:Metadata:Server">http://geo.gob.bo/geonetwork/srv/spa/csw</dct:references>
+<dct:references scheme="urn:x-esri:specification:ServiceType:ArcIMS:Metadata:Document">http://gptogc.esri.com/geoportal/csw?getxml=%7B093CBDB1-9D7A-4602-9937-2EC89359E633%7D</dct:references>
+</csw:SummaryRecord>
+</csw:GetRecordByIdResponse>

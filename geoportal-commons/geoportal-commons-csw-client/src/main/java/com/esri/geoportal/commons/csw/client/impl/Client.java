@@ -336,7 +336,7 @@ public class Client implements IClient {
     if (capabilites == null) {
       LOG.debug(String.format("Loading capabilities"));
       RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(5000).setSocketTimeout(2500).build();
-      HttpGet getRequest = new HttpGet(baseUrl.toExternalForm());
+      HttpGet getRequest = new HttpGet(baseUrl.toExternalForm()+"?request=GetCapabilities&service=CSW&version=2.0.2");
       getRequest.setConfig(requestConfig);
       try (InputStream stream = httpClient.execute(getRequest).getEntity().getContent();) {
         capabilites = readCapabilities(stream);
