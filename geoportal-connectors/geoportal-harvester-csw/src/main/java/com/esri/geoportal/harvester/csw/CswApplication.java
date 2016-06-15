@@ -28,9 +28,16 @@ import java.util.Arrays;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 
 /**
- * Application.
+ * CSW application.
+ * Java application designated to harvest CSW repositories and push data into the pipeline.
+ * It takes GetCapabilities URL and a profile id as arguments.
  */
-public class Application {
+public class CswApplication {
+  /**
+   * Man method
+   * @param args arguments: GetCapabilities URL and a profile id
+   * @throws Exception if any exception occurs
+   */
   public static void main(String[] args) throws Exception {
     if (args.length==2) {
       ObjectFactory of = new ObjectFactory();

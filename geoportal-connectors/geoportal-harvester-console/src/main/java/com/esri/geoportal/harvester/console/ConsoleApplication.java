@@ -20,9 +20,15 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.DataReferenceSerializer;
 
 /**
- * Application.
+ * Console application.
+ * Java application designed to read data from the pipeline and publish it into the console.
  */
-public class Application {
+public class ConsoleApplication {
+  /**
+   * Main method.
+   * @param args arguments: no arguments necessary
+   * @throws Exception if any exception occurs
+   */
   public static void main(String[] args) throws Exception {
     ConsoleConnector connector = new ConsoleConnector();
     EntityDefinition def = new EntityDefinition();

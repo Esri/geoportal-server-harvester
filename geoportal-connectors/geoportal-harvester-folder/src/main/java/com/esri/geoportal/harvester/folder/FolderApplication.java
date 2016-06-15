@@ -21,11 +21,18 @@ import com.esri.geoportal.harvester.api.base.DataReferenceSerializer;
 import java.io.File;
 
 /**
- * Application.
+ * Folder application.
+ * Java application designed to read data from the pipeline and publish it into the local folder.
+ * It takes a root folder as an argument.
  */
-public class Application {
+public class FolderApplication {
+  /**
+   * Main method.
+   * @param args arguments: a root folder
+   * @throws Exception if any exception occurs
+   */
   public static void main(String[] args) throws Exception {
-    if (args.length==2) {
+    if (args.length==1) {
       File rootFolder = new File(args[0]);
       FolderConnector connector = new FolderConnector();
       EntityDefinition def = new EntityDefinition();

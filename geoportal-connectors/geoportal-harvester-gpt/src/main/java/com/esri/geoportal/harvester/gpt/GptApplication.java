@@ -22,9 +22,16 @@ import com.esri.geoportal.harvester.api.base.DataReferenceSerializer;
 import java.net.URL;
 
 /**
- * Application.
+ * GPT application.
+ * Java application designated to read data from the pipeline and publish it into the catalog.
+ * It takes catalog URL, user name and password as arguments.
  */
-public class Application {
+public class GptApplication {
+  /**
+   * Main method.
+   * @param args arguments: catalog URL, user name and password
+   * @throws Exception 
+   */
   public static void main(String[] args) throws Exception {
     if (args.length==3) {
       URL url = new URL(args[0]+(args[0].endsWith("/")? "": "/"));

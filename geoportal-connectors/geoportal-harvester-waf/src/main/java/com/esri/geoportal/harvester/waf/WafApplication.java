@@ -25,9 +25,16 @@ import com.esri.geoportal.harvester.api.base.DataCollector;
 import com.esri.geoportal.harvester.api.base.DataPrintStreamOutput;
 
 /**
- * Application.
+ * Waf application.
+ * Java application designated to harvest WAF repositories and push data into the pipeline.
+ * It takes a list of WAF URL's to harvest as arguments.
  */
-public class Application {
+public class WafApplication {
+  /**
+   * Main method.
+   * @param args arguments - list of URL's
+   * @throws Exception if any exception occurs
+   */
   public static void main(String[] args) throws Exception {
     DataPrintStreamOutput destination = new DataPrintStreamOutput(System.out);
     
