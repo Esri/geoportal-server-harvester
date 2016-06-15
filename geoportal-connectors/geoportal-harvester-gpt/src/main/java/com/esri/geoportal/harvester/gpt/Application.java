@@ -38,7 +38,7 @@ public class Application {
       
       GptBroker broker = connector.createBroker(def);
       DataReferenceSerializer ser = new DataReferenceSerializer();
-      DataReference ref = null;
+      DataReference ref;
       while (( ref = ser.deserialize(System.in))!=null) {
         System.out.println(String.format("publishing: %s", ref.getId()));
         broker.publish(ref);

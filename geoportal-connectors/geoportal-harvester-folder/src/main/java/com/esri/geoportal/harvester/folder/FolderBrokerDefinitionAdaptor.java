@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Folder broker definition adaptor.
  */
-public class FolderBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
+/*package*/ class FolderBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
 
   public static final String P_ROOT_FOLDER = "folder-root-folder";
   

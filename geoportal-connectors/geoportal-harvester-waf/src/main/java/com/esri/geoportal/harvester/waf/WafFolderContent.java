@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * WAF folder content
  */
-public class WafFolderContent {
+/*package*/ class WafFolderContent {
   private final WafFolder rootFolder;
   private final List<WafFolder> subFolders;
   private final List<WafFile> files;

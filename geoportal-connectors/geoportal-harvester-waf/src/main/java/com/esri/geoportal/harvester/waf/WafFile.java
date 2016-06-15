@@ -37,7 +37,7 @@ import org.apache.http.client.protocol.HttpClientContext;
 /**
  * WAF file.
  */
-public class WafFile {
+/*package*/ class WafFile {
 
   private final URI sourceUri;
   private final URL fileUrl;

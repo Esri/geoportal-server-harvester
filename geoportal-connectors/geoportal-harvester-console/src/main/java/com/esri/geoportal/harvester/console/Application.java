@@ -26,7 +26,6 @@ public class Application {
   public static void main(String[] args) throws Exception {
     ConsoleConnector connector = new ConsoleConnector();
     EntityDefinition def = new EntityDefinition();
-    ConsoleBrokerDefinitionAdaptor definition = new ConsoleBrokerDefinitionAdaptor(def);
     ConsoleBroker broker = connector.createBroker(def);
     DataReferenceSerializer ser = new DataReferenceSerializer();
     DataReference ref = null;

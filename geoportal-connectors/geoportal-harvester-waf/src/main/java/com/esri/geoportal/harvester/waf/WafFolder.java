@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * WAF folder.
  */
-public class WafFolder {
+/*package*/ class WafFolder {
 
   private final URI sourceUri;
   private final URL folderUrl;

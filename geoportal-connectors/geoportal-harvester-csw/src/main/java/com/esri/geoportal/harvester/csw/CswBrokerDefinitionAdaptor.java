@@ -32,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * CSW definition.
  */
-public class CswBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
+/*package*/ class CswBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
 
   public static final String P_HOST_URL = "csw-host-url";
   public static final String P_PROFILE_ID = "csw-profile-id";

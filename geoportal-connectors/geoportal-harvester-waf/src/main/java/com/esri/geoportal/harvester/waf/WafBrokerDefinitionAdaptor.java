@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * WAF broker definition adaptor.
  */
-public class WafBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
+/*package*/ class WafBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public static final String P_HOST_URL    = "waf-host-url";
   
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
