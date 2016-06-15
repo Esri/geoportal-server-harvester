@@ -25,12 +25,13 @@ import java.io.Closeable;
  * of this interface: {@link com.esri.geoportal.harvester.api.specs.InputBroker} used to get data and {@link com.esri.geoportal.harvester.api.specs.OutputBroker}
  * used to publish data.
  * 
+ * @param <C> connector type
  * @see com.esri.geoportal.harvester.api.specs.InputBroker
  * @see com.esri.geoportal.harvester.api.specs.OutputBroker
  * @see com.esri.geoportal.harvester.api.defs.EntityDefinition
  * @see Connector
  */
-public interface Broker extends Closeable {
+public interface Broker<C extends Connector> extends Closeable {
   /**
    * Gets entity definition.
    * @return entity definition
@@ -40,5 +41,5 @@ public interface Broker extends Closeable {
    * Gets connector.
    * @return connector
    */
-  Connector getConnector();
+  C getConnector();
 }

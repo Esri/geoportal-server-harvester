@@ -14,11 +14,11 @@
  */
 package com.esri.geoportal.harvester.console;
 
-import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
+import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import java.io.IOException;
 
 /**
@@ -59,7 +59,7 @@ import java.io.IOException;
   }
 
   @Override
-  public Connector getConnector() {
+  public OutputConnector getConnector() {
     return connector;
   }
 

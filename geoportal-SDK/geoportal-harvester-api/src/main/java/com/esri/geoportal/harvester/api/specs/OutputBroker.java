@@ -26,7 +26,7 @@ import com.esri.geoportal.harvester.api.DataReference;
  * 
  * @see OutputConnector
  */
-public interface OutputBroker extends Broker {
+public interface OutputBroker extends Broker<OutputConnector> {
   
   /**
    * Publishes data.

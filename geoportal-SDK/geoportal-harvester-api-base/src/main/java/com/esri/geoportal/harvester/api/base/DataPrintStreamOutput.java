@@ -15,13 +15,13 @@
  */
 package com.esri.geoportal.harvester.api.base;
 
-import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import java.io.IOException;
 import java.io.PrintStream;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
+import com.esri.geoportal.harvester.api.specs.OutputConnector;
 
 /**
  * Data print stream output.
@@ -53,7 +53,7 @@ public class DataPrintStreamOutput implements OutputBroker {
   }
 
   @Override
-  public Connector getConnector() {
+  public OutputConnector getConnector() {
     return null;
   }
 

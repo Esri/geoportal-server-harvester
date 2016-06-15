@@ -26,7 +26,7 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
  * 
  * @see InputConnector
  */
-public interface InputBroker extends Broker {
+public interface InputBroker extends Broker<InputConnector> {
   
   /**
    * Checks if more data available.

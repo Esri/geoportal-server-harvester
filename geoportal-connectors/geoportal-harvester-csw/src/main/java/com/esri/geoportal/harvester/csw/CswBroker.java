@@ -21,12 +21,12 @@ import com.esri.geoportal.commons.csw.client.IRecords;
 import com.esri.geoportal.commons.csw.client.ObjectFactory;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
-import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.IOException;
 import java.util.Iterator;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -124,7 +124,7 @@ import org.apache.http.impl.client.HttpClients;
   }
 
   @Override
-  public Connector getConnector() {
+  public InputConnector getConnector() {
     return connector;
   }
 
