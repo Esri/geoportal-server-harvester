@@ -16,7 +16,7 @@
 package com.esri.geoportal.commons.utils;
 
 /**
- * SimpleCredentials.
+ * Simple credentials. Credentials with user name and password.
  */
 public final class SimpleCredentials {
 

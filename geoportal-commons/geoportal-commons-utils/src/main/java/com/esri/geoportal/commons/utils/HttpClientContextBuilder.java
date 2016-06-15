@@ -15,7 +15,6 @@
  */
 package com.esri.geoportal.commons.utils;
 
-import com.esri.geoportal.commons.utils.SimpleCredentials;
 import java.net.URL;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
