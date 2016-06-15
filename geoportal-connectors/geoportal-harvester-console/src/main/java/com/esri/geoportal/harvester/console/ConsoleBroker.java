@@ -24,7 +24,7 @@ import java.io.IOException;
 /**
  * Console broker.
  */
-public class ConsoleBroker implements OutputBroker  {
+/*package*/ class ConsoleBroker implements OutputBroker  {
   private long counter = 0;
   private final ConsoleConnector connector;
   private final ConsoleBrokerDefinitionAdaptor definition;

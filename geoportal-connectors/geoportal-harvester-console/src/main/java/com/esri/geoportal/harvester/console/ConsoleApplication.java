@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.console;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.DataReferenceSerializer;
+import com.esri.geoportal.harvester.api.specs.OutputBroker;
 
 /**
  * Console application.
@@ -32,7 +33,7 @@ public class ConsoleApplication {
   public static void main(String[] args) throws Exception {
     ConsoleConnector connector = new ConsoleConnector();
     EntityDefinition def = new EntityDefinition();
-    ConsoleBroker broker = connector.createBroker(def);
+    OutputBroker broker = connector.createBroker(def);
     DataReferenceSerializer ser = new DataReferenceSerializer();
     DataReference ref = null;
     while (( ref = ser.deserialize(System.in))!=null) {

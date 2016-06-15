@@ -24,6 +24,7 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.defs.UITemplate.Choice;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.specs.InputBroker;
 import static com.esri.geoportal.harvester.csw.CswBrokerDefinitionAdaptor.P_HOST_URL;
 import static com.esri.geoportal.harvester.csw.CswBrokerDefinitionAdaptor.P_PROFILE_ID;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ import java.util.List;
 /**
  * CSW connector.
  */
-public class CswConnector implements InputConnector<CswBroker> {
+public class CswConnector implements InputConnector<InputBroker> {
   public static final String TYPE = "CSW";
 
   @Override
@@ -64,7 +65,7 @@ public class CswConnector implements InputConnector<CswBroker> {
   }
 
   @Override
-  public CswBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
+  public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new CswBroker(this, new CswBrokerDefinitionAdaptor(definition));
   }
 }

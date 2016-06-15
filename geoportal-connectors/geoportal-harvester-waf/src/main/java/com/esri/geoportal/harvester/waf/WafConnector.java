@@ -20,6 +20,7 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.specs.InputBroker;
 import static com.esri.geoportal.harvester.waf.WafBrokerDefinitionAdaptor.P_HOST_URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.List;
 /**
  * Waf connector.
  */
-public class WafConnector implements InputConnector<WafBroker> {
+public class WafConnector implements InputConnector<InputBroker> {
   public static final String TYPE = "WAF";
 
   @Override
@@ -49,7 +50,7 @@ public class WafConnector implements InputConnector<WafBroker> {
   }
 
   @Override
-  public WafBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
+  public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new WafBroker(this,new WafBrokerDefinitionAdaptor(definition));
   }
 }

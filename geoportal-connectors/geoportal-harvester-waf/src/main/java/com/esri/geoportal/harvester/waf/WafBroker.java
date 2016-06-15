@@ -35,7 +35,7 @@ import org.apache.http.impl.client.HttpClients;
 /**
  * WAF broker.
  */
-public class WafBroker implements InputBroker {
+/*package*/ class WafBroker implements InputBroker {
   private final WafConnector connector;
   private final WafBrokerDefinitionAdaptor definition;
   private final Set<URL> visited = new HashSet<>();
