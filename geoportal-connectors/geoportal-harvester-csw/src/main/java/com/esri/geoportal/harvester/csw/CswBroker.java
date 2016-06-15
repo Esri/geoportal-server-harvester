@@ -35,7 +35,7 @@ import org.apache.http.impl.client.HttpClients;
 /**
  * CSW broker.
  */
-/*package*/ class CswBroker implements InputBroker {
+public class CswBroker implements InputBroker {
   private static final int PAGE_SIZE = 10;
 
   private final CswConnector connector;

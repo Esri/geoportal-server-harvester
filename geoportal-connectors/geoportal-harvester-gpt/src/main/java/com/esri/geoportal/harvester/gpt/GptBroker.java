@@ -27,7 +27,7 @@ import java.net.URISyntaxException;
 /**
  * GPT broker.
  */
-/*package*/ class GptBroker implements OutputBroker {
+public class GptBroker implements OutputBroker {
   private final GptConnector connector;
   private final GptBrokerDefinitionAdaptor definition;
   private final Client client;

@@ -36,7 +36,7 @@ import java.net.URI;
 /**
  * Folder broker.
  */
-/*package*/ class FolderBroker implements OutputBroker {
+public class FolderBroker implements OutputBroker {
   private final FolderConnector connector;
   private final FolderBrokerDefinitionAdaptor definition;
 
