@@ -59,6 +59,11 @@ public class _TestApplication {
       public Connector getConnector() {
         return null;
       }
+
+      @Override
+      public EntityDefinition getEntityDefinition() {
+        return null;
+      }
     };
 
     ObjectFactory of = new ObjectFactory();

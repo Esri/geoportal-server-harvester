@@ -26,6 +26,7 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import java.io.IOException;
 import java.util.Iterator;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -38,7 +39,7 @@ public class CswBroker implements InputBroker {
   private static final int PAGE_SIZE = 10;
 
   private final CswConnector connector;
-  private final CswBrokerDefinitionAdaptor attributes;
+  private final CswBrokerDefinitionAdaptor definition;
   private CloseableHttpClient httpclient;
   private IClient client;
   private Iterator<IRecord> recs;
@@ -48,11 +49,11 @@ public class CswBroker implements InputBroker {
   /**
    * Creates instance of the broker.
    * @param connector connector
-   * @param attributes attributes
+   * @param definition definition
    */
-  public CswBroker(CswConnector connector, CswBrokerDefinitionAdaptor attributes) {
+  public CswBroker(CswConnector connector, CswBrokerDefinitionAdaptor definition) {
     this.connector = connector;
-    this.attributes = attributes;
+    this.definition = definition;
   }
 
   @Override
@@ -91,7 +92,7 @@ public class CswBroker implements InputBroker {
     try {
       IRecord rec = recs.next();
       String metadata = client.readMetadata(rec.getId());
-      return new SimpleDataReference(rec.getId(), rec.getLastModifiedDate(), attributes.getHostUrl().toURI(), metadata.getBytes("UTF-8"));
+      return new SimpleDataReference(rec.getId(), rec.getLastModifiedDate(), definition.getHostUrl().toURI(), metadata.getBytes("UTF-8"));
     } catch (Exception ex) {
       throw new DataInputException(this, "Error reading data.", ex);
     }
@@ -104,9 +105,9 @@ public class CswBroker implements InputBroker {
   private void assertClient() throws IOException {
     if (client==null) {
       httpclient = HttpClients.createDefault();
-      Bots bots = BotsUtils.readBots(attributes.getBotsConfig(), httpclient, attributes.getBotsMode(), attributes.getHostUrl());
+      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getBotsMode(), definition.getHostUrl());
       ObjectFactory cf = new ObjectFactory();
-      client = cf.newClient(attributes.getHostUrl().toExternalForm(), attributes.getProfile(), bots, attributes.getBotsMode(), attributes.getCredentials());
+      client = cf.newClient(definition.getHostUrl().toExternalForm(), definition.getProfile(), bots, definition.getBotsMode(), definition.getCredentials());
     }
   }
 
@@ -119,12 +120,17 @@ public class CswBroker implements InputBroker {
 
   @Override
   public String toString() {
-    return String.format("CSW [%s, %s]", attributes.getHostUrl(), attributes.getProfile());
+    return String.format("CSW [%s, %s]", definition.getHostUrl(), definition.getProfile());
   }
 
   @Override
   public Connector getConnector() {
     return connector;
+  }
+
+  @Override
+  public EntityDefinition getEntityDefinition() {
+    return definition.getEntityDefinition();
   }
   
 }

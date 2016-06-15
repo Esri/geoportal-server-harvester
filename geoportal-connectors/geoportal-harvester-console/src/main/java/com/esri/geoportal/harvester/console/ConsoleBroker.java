@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.console;
 import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.io.IOException;
 
@@ -26,13 +27,16 @@ import java.io.IOException;
 public class ConsoleBroker implements OutputBroker  {
   private long counter = 0;
   private final ConsoleConnector connector;
+  private final ConsoleBrokerDefinitionAdaptor definition;
 
   /**
    * Creates instance of the broker.
    * @param connector connector
+   * @param definition definition
    */
-  public ConsoleBroker(ConsoleConnector connector) {
+  public ConsoleBroker(ConsoleConnector connector, ConsoleBrokerDefinitionAdaptor definition) {
     this.connector = connector;
+    this.definition = definition;
   }
 
   @Override
@@ -41,7 +45,7 @@ public class ConsoleBroker implements OutputBroker  {
       counter++;
       
       System.out.println(String.format("%s [%s]", ref.getId(), ref.getLastModifiedDate()));
-      System.out.println(String.format("%s", ref.getContent()));
+      System.out.println(String.format("%s", new String(ref.getContent(),"UTF-8")));
       System.out.println(String.format("--- END OF %d ---", counter));
       System.out.println();
     } catch (IOException ex) {
@@ -57,6 +61,11 @@ public class ConsoleBroker implements OutputBroker  {
   @Override
   public Connector getConnector() {
     return connector;
+  }
+
+  @Override
+  public EntityDefinition getEntityDefinition() {
+    return definition.getEntityDefinition();
   }
   
 }

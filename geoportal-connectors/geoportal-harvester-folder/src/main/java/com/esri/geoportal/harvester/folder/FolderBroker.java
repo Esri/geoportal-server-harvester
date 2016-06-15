@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.folder;
 import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import static com.esri.geoportal.harvester.folder.PathUtil.sanitizeFileName;
 import static com.esri.geoportal.harvester.folder.StringListUtil.head;
@@ -120,6 +121,11 @@ public class FolderBroker implements OutputBroker {
         return fileName;
       }
     }
+  }
+
+  @Override
+  public EntityDefinition getEntityDefinition() {
+    return definition.getEntityDefinition();
   }
   
 }

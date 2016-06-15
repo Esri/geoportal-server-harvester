@@ -31,13 +31,13 @@ public class FolderBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
 
   /**
    * Creates instance of the adaptor.
-   * @param def broker definition
+   * @param entityDefinition broker definition
    */
-  public FolderBrokerDefinitionAdaptor(EntityDefinition def) throws IllegalArgumentException {
-    super(def);
-    if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
-      def.setType(FolderConnector.TYPE);
-    } else if (!FolderConnector.TYPE.equals(def.getType())) {
+  public FolderBrokerDefinitionAdaptor(EntityDefinition entityDefinition) throws IllegalArgumentException {
+    super(entityDefinition);
+    if (StringUtils.trimToEmpty(entityDefinition.getType()).isEmpty()) {
+      entityDefinition.setType(FolderConnector.TYPE);
+    } else if (!FolderConnector.TYPE.equals(entityDefinition.getType())) {
       throw new IllegalArgumentException("Broker definition doesn't match");
     } else {
       try {

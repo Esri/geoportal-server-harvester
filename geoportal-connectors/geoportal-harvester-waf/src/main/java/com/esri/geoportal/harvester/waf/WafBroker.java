@@ -22,6 +22,7 @@ import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -36,7 +37,7 @@ import org.apache.http.impl.client.HttpClients;
  */
 public class WafBroker implements InputBroker {
   private final WafConnector connector;
-  private final WafBrokerDefinitionAdaptor arguments;
+  private final WafBrokerDefinitionAdaptor definition;
   private final Set<URL> visited = new HashSet<>();
   
   private BotsHttpClient httpClient;
@@ -47,11 +48,11 @@ public class WafBroker implements InputBroker {
   /**
    * Creates instance of the broker.
    * @param connector connector
-   * @param arguments definition
+   * @param definition definition
    */
-  public WafBroker(WafConnector connector, WafBrokerDefinitionAdaptor arguments) {
+  public WafBroker(WafConnector connector, WafBrokerDefinitionAdaptor definition) {
     this.connector = connector;
-    this.arguments = arguments;
+    this.definition = definition;
   }
 
   @Override
@@ -77,8 +78,8 @@ public class WafBroker implements InputBroker {
       }
       
       if (subFolders==null) {
-        URL startUrl = new URL(arguments.getHostUrl().toExternalForm().replaceAll("/$", "")+"/");
-        WafFolderContent content = new WafFolder(startUrl.toURI(), startUrl, arguments.getCredentials()).readContent(httpClient);
+        URL startUrl = new URL(definition.getHostUrl().toExternalForm().replaceAll("/$", "")+"/");
+        WafFolderContent content = new WafFolder(startUrl.toURI(), startUrl, definition.getCredentials()).readContent(httpClient);
         subFolders = new LinkedList<>(content.getSubFolders());
         files = new LinkedList<>(content.getFiles());
         return hasNext();
@@ -107,7 +108,7 @@ public class WafBroker implements InputBroker {
    */
   private void assertExecutor() {
     if (httpClient==null) {
-      Bots bots = BotsUtils.readBots(arguments.getBotsConfig(), HttpClients.createDefault(), arguments.getBotsMode(), arguments.getHostUrl());
+      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), HttpClients.createDefault(), definition.getBotsMode(), definition.getHostUrl());
       httpClient = BotsHttpClientFactory.STD.create(bots);
     }
   }
@@ -121,11 +122,16 @@ public class WafBroker implements InputBroker {
 
   @Override
   public String toString() {
-    return String.format("WAF [%s]", arguments.getHostUrl());
+    return String.format("WAF [%s]", definition.getHostUrl());
   }
 
   @Override
   public Connector getConnector() {
     return connector;
+  }
+
+  @Override
+  public EntityDefinition getEntityDefinition() {
+    return definition.getEntityDefinition();
   }
 }

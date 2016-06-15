@@ -22,14 +22,22 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
  */
 public abstract class BrokerDefinitionAdaptor {
   
-  private final EntityDefinition def;
+  private final EntityDefinition entityDefinition;
 
   /**
    * Creates instance of the adaptor.
-   * @param def broker definition
+   * @param entityDefinition broker definition
    */
-  public BrokerDefinitionAdaptor(EntityDefinition def) {
-    this.def = def;
+  public BrokerDefinitionAdaptor(EntityDefinition entityDefinition) {
+    this.entityDefinition = entityDefinition;
+  }
+
+  /**
+   * Gets entity definition.
+   * @return entity definition
+   */
+  public EntityDefinition getEntityDefinition() {
+    return entityDefinition;
   }
   
   /**
@@ -38,7 +46,7 @@ public abstract class BrokerDefinitionAdaptor {
    * @return property value
    */
   protected final String get(String propertyName) {
-    return def.getProperties().get(propertyName);
+    return entityDefinition.getProperties().get(propertyName);
   }
   
   /**
@@ -51,14 +59,14 @@ public abstract class BrokerDefinitionAdaptor {
    */
   protected final void set(String propertyName, String propertyValue) {
     if (propertyValue!=null) {
-      def.getProperties().put(propertyName, propertyValue);
+      entityDefinition.getProperties().put(propertyName, propertyValue);
     } else {
-      def.getProperties().remove(propertyName);
+      entityDefinition.getProperties().remove(propertyName);
     }
   }
   
   @Override
   public String toString() {
-    return def.toString();
+    return entityDefinition.toString();
   }
 }

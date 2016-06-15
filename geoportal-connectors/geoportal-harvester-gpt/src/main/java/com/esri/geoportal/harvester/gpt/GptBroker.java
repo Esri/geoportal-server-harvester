@@ -19,6 +19,7 @@ import com.esri.geoportal.commons.gpt.client.Client;
 import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -60,6 +61,11 @@ public class GptBroker implements OutputBroker {
   @Override
   public Connector getConnector() {
     return connector;
+  }
+
+  @Override
+  public EntityDefinition getEntityDefinition() {
+    return definition.getEntityDefinition();
   }
   
 }
