@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataException;
 
@@ -22,6 +23,11 @@ import com.esri.geoportal.harvester.api.ex.DataException;
  * Processor.
  */
 public interface Processor {
+  /**
+   * Gets processor definition.
+   * @return processor definition
+   */
+  EntityDefinition getEntityDefinition();
   
   /**
    * Gets type of the processor.

@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.engine.impl;
 
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Processor;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
@@ -37,6 +38,14 @@ public class DefaultProcessor implements Processor {
   @Override
   public String getType() {
     return TYPE;
+  }
+
+  @Override
+  public EntityDefinition getEntityDefinition() {
+    EntityDefinition entityDefiniton = new EntityDefinition();
+    entityDefiniton.setType(TYPE);
+    entityDefiniton.setLabel(TYPE);
+    return entityDefiniton;
   }
 
   @Override

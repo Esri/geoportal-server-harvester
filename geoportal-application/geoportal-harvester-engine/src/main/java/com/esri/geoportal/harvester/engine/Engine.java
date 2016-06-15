@@ -59,13 +59,12 @@ public interface Engine {
   /**
    * Creates process.
    *
-   * @param processorDefinition process definition
    * @param task task for the process
    * @return process handle
    * @throws InvalidDefinitionException if processor definition is invalid
    * @throws DataProcessorException if accessing repository fails
    */
-  ProcessReference createProcess(EntityDefinition processorDefinition, Task task) throws InvalidDefinitionException, DataProcessorException;
+  ProcessReference createProcess(Task task) throws InvalidDefinitionException, DataProcessorException;
 
   /**
    * Creates task to initialize.

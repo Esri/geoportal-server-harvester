@@ -335,31 +335,32 @@ public class DefaultEngine implements Engine {
       OutputBroker dataPublisher = dpFactory.createBroker(def);
       dataDestinations.add(dataPublisher);
     }
+    
+    EntityDefinition processorDefinition = taskDefinition.getProcessor();
+    Processor processor = processorDefinition == null
+            ? processorRegistry.getDefaultProcessor()
+            : processorRegistry.get(processorDefinition.getType()) != null
+            ? processorRegistry.get(processorDefinition.getType())
+            : null;
+    if (processor == null) {
+      throw new InvalidDefinitionException(String.format("Unable to select processor based on definition: %s", processorDefinition));
+    }
 
-    return new Task(taskDefinition, dataSource, dataDestinations);
+    return new Task(processor, dataSource, dataDestinations);
   }
 
   /**
    * Creates process.
    *
-   * @param processorDefinition process definition
    * @param task task for the process
-   * @return process handle
+   * @return process reference
    * @throws InvalidDefinitionException if processor definition is invalid
    * @throws DataProcessorException if accessing repository fails
    */
   @Override
-  public ProcessReference createProcess(EntityDefinition processorDefinition, Task task) throws InvalidDefinitionException, DataProcessorException {
+  public ProcessReference createProcess(Task task) throws InvalidDefinitionException, DataProcessorException {
     try {
-      Processor processor = processorDefinition == null
-              ? processorRegistry.getDefaultProcessor()
-              : processorRegistry.get(processorDefinition.getType()) != null
-              ? processorRegistry.get(processorDefinition.getType())
-              : null;
-      if (processor == null) {
-        throw new InvalidDefinitionException(String.format("Unable to select processor based on definition: %s", processorDefinition));
-      }
-      Processor.Process process = processor.createProcess(task);
+      Processor.Process process = task.getProcessor().createProcess(task);
       process.addListener(new ReportBuilderAdaptor(process, reportBuilder));
       UUID id = processManager.create(process);
       return new ProcessReference(id, process);
@@ -372,14 +373,14 @@ public class DefaultEngine implements Engine {
    * Submits task definition.
    *
    * @param taskDefinition task definition
-   * @return process handle
+   * @return process reference
    * @throws InvalidDefinitionException invalid definition exception
    * @throws DataProcessorException if accessing repository fails
    */
   @Override
   public ProcessReference submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException, DataProcessorException {
     Task task = createTask(taskDefinition);
-    ProcessReference prInfo = createProcess(taskDefinition.getProcessor(), task);
+    ProcessReference prInfo = createProcess(task);
     return prInfo;
   }
   

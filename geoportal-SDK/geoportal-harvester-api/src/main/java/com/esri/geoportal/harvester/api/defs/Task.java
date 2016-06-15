@@ -15,29 +15,31 @@
  */
 package com.esri.geoportal.harvester.api.defs;
 
+import com.esri.geoportal.harvester.api.Processor;
 import java.util.List;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Task.
  */
 public final class Task implements Closeable {
-  private final TaskDefinition taskDefinition;
+  private final Processor processor;
   private final InputBroker dataSource;
   private final List<OutputBroker> dataDestinations;
   
   /**
    * Creates instance of the task.
-   * @param taskDefiniton task definition
+   * @param processor processor
    * @param dataSource data source
    * @param dataDestinations data destination
    */
-  public Task(TaskDefinition taskDefiniton, InputBroker dataSource, List<OutputBroker> dataDestinations) {
-    this.taskDefinition = taskDefiniton;
+  public Task(Processor processor, InputBroker dataSource, List<OutputBroker> dataDestinations) {
+    this.processor = processor;
     this.dataSource = dataSource;
     this.dataDestinations = dataDestinations;
   }
@@ -47,7 +49,19 @@ public final class Task implements Closeable {
    * @return task definition
    */
   public TaskDefinition getTaskDefinition() {
+    TaskDefinition taskDefinition = new TaskDefinition();
+    taskDefinition.setProcessor(processor.getEntityDefinition());
+    taskDefinition.setSource(dataSource.getEntityDefinition());
+    taskDefinition.setDestinations(dataDestinations.stream().map(d->d.getEntityDefinition()).collect(Collectors.toList()));
     return taskDefinition;
+  }
+
+  /**
+   * Gets processor.
+   * @return processor
+   */
+  public Processor getProcessor() {
+    return processor;
   }
 
   /**
@@ -81,7 +95,7 @@ public final class Task implements Closeable {
   
   @Override
   public String toString() {
-    return String.format("TASK :: %s", taskDefinition);
+    return String.format("TASK :: %s", getTaskDefinition());
   }
   
   @Override
@@ -97,7 +111,7 @@ public final class Task implements Closeable {
   @Override
   public int hashCode() {
     int hash = 5;
-    hash = 53 * hash + Objects.hashCode(this.taskDefinition);
+    hash = 53 * hash + Objects.hashCode(this.getTaskDefinition());
     return hash;
   }
 }
