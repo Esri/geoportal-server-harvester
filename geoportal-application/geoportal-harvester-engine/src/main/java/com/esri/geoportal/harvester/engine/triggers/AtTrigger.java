@@ -97,6 +97,11 @@ public class AtTrigger implements Trigger {
     }
 
     @Override
+    public TriggerInstanceDefinition getTriggerDefinition() {
+      return triggerDefinition;
+    }
+
+    @Override
     public void activate(Context triggerContext) throws DataProcessorException, InvalidDefinitionException {
       schedule(newRunnable(triggerContext));
     }

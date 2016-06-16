@@ -52,6 +52,12 @@ public interface Trigger extends AutoCloseable {
   interface Instance extends AutoCloseable {
     
     /**
+     * Gets trigger instance definition.
+     * @return trigger instance definition
+     */
+    TriggerInstanceDefinition getTriggerDefinition();
+    
+    /**
      * Activates the trigger.
      * @param triggerContext trigger context
      * @throws DataProcessorException if creating process fails

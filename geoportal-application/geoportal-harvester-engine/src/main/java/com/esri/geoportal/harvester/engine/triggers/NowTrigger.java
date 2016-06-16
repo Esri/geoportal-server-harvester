@@ -68,6 +68,11 @@ public class NowTrigger implements Trigger {
     }
 
     @Override
+    public TriggerInstanceDefinition getTriggerDefinition() {
+      return triggerDefinition;
+    }
+
+    @Override
     public void activate(Trigger.Context context) throws DataProcessorException, InvalidDefinitionException {
       LOG.info(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition()));
       context.submit(triggerDefinition.getTaskDefinition());
