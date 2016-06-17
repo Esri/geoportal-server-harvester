@@ -49,6 +49,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import com.esri.geoportal.harvester.engine.Engine;
+import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import com.esri.geoportal.harvester.engine.support.BrokerInfo.Category;
 import static com.esri.geoportal.harvester.engine.support.BrokerInfo.Category.INBOUND;
 import static com.esri.geoportal.harvester.engine.support.BrokerInfo.Category.OUTBOUND;
@@ -73,6 +74,7 @@ public class DefaultEngine implements Engine {
   private final TaskManager taskManager;
   private final ProcessManager processManager;
   private final TriggerManager triggerManager;
+  private final TriggerInstanceManager triggerInstanceManager;
   private final HistoryManager historyManager;
   private final InboundConnectorRegistry inboundConnectorRegistry;
   private final OutboundConnectorRegistry outboundConnectorRegistry;
@@ -91,6 +93,7 @@ public class DefaultEngine implements Engine {
    * @param taskManager task manager
    * @param processManager process manager
    * @param triggerManager trigger manager
+   * @param triggerInstanceManager trigger instance manager
    * @param historyManager history manager
    * @param reportBuilder report builder
    */
@@ -103,6 +106,7 @@ public class DefaultEngine implements Engine {
           TaskManager taskManager,
           ProcessManager processManager,
           TriggerManager triggerManager,
+          TriggerInstanceManager triggerInstanceManager,
           HistoryManager historyManager,
           ReportBuilder reportBuilder
   ) {
@@ -114,6 +118,7 @@ public class DefaultEngine implements Engine {
     this.processManager = processManager;
     this.brokerDefinitionManager = brokerDefinitionManager;
     this.triggerManager = triggerManager;
+    this.triggerInstanceManager = triggerInstanceManager;
     this.historyManager = historyManager;
     this.reportBuilder = reportBuilder;
   }
