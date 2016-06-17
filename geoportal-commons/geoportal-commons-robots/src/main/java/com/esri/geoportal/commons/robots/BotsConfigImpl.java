@@ -44,5 +44,9 @@ public class BotsConfigImpl implements BotsConfig{
     return override;
   }
   
+  @Override
+  public String toString() {
+    return String.format("%s/%s/override:%b", userAgent, enabled? "enabled": "disabled", override);
+  }
   
 }

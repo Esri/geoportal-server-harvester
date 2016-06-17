@@ -49,5 +49,10 @@ public final class CredentialsDefinitionAdaptor extends BrokerDefinitionAdaptor 
     set(P_CRED_USERNAME, cred.getUserName());
     set(P_CRED_PASSWORD, cred.getPassword());
   }
+
+  @Override
+  public String toString() {
+    return String.format("%s:%s", get(P_CRED_USERNAME), get(P_CRED_PASSWORD));
+  }
   
 }

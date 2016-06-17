@@ -82,4 +82,9 @@ public final class BotsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
     set(P_BOTS_ENABLED, Boolean.toString(botsConfig.isEnabled()));
     set(P_BOTS_OVERRIDE, Boolean.toString(botsConfig.isOverride()));
   }
+  
+  @Override
+  public String toString() {
+    return String.format("%s/%s", getBotsConfig(), getBotsMode());
+  }
 }
