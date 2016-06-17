@@ -15,11 +15,8 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
-import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
-import com.esri.geoportal.harvester.engine.managers.TriggerRegistry;
 import com.esri.geoportal.harvester.engine.support.CrudsException;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.serialize;
 import java.io.IOException;
@@ -28,7 +25,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -48,45 +44,9 @@ import javax.annotation.PreDestroy;
 public class TriggerManagerBean implements TriggerManager {
 
   private static final Logger LOG = LoggerFactory.getLogger(TriggerManagerBean.class);
-  private final Map<UUID,Trigger.Instance> instances = Collections.synchronizedMap(new HashMap<>());
 
   @Autowired
   DataSource dataSource;
-
-  @Autowired
-  TriggerRegistry triggerRegistry;
-
-  @Override
-  public Map<UUID,Trigger.Instance> getInstances() {
-    return instances;
-  }
-  
-  @Override
-  public void removeInstance(Trigger.Instance instance) {
-    UUID uuid = getInstances().entrySet().stream()
-            .filter(e->e.getValue()==instance)
-            .map(e->e.getKey())
-            .findFirst()
-            .orElse(null);
-    if (uuid!=null) {
-      getInstances().remove(uuid);
-    }
-  }
-
-  /**
-   * Creates instance of the trigger instance.
-   * @param triggerDefinition trigger definition
-   * @return trigger instance
-   * @throws InvalidDefinitionException if definition is invalid
-   */
-  public Trigger.Instance createInstance(TriggerInstanceDefinition triggerDefinition) throws InvalidDefinitionException {
-    Trigger trigger = triggerRegistry.get(triggerDefinition.getType());
-    if (trigger != null) {
-      return trigger.createInstance(triggerDefinition);
-    } else {
-      throw new InvalidDefinitionException(String.format("Invalid trigger definition: %s", triggerDefinition));
-    }
-  }
 
   /**
    * Initializes bean.
@@ -97,18 +57,8 @@ public class TriggerManagerBean implements TriggerManager {
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("CREATE TABLE IF NOT EXISTS TRIGGERS ( id varchar(38) PRIMARY KEY, definition varchar(1024) NOT NULL)");) {
       st.execute();
-
-      select().stream().forEach((td)->{
-        try {
-          Trigger.Instance instance = createInstance(td.getValue());
-          getInstances().put(td.getKey(), instance);
-        } catch (InvalidDefinitionException ex) {
-          LOG.warn(String.format("Invalid trigger definiton: %s", td.getValue()), ex);
-        }
-      });
-
       LOG.info("TriggerManagerBean initialized.");
-    } catch (SQLException|CrudsException ex) {
+    } catch (SQLException ex) {
       LOG.info("Error initializing trigger definition database", ex);
     }
   }
@@ -127,14 +77,10 @@ public class TriggerManagerBean implements TriggerManager {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("INSERT INTO TRIGGERS (definition,id) VALUES (?,?)");) {
-      Trigger.Instance instance = createInstance(data);
-      
       st.setString(1, serialize(data));
       st.setString(2, id.toString());
       st.executeUpdate();
-      
-      getInstances().put(id, instance);
-    } catch (SQLException | IOException | InvalidDefinitionException ex) {
+    } catch (SQLException | IOException ex) {
       throw new CrudsException("Error selecting trigger definition", ex);
     }
     return id;
@@ -142,7 +88,6 @@ public class TriggerManagerBean implements TriggerManager {
 
   @Override
   public boolean delete(UUID id) throws CrudsException {
-    getInstances().remove(id);
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("DELETE FROM TRIGGERS WHERE ID = ?");) {

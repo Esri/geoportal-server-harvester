@@ -70,17 +70,17 @@ public class DefaultEngine implements Engine {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultEngine.class);
 
-  private final ReportBuilder reportBuilder;
-  private final TaskManager taskManager;
-  private final ProcessManager processManager;
-  private final TriggerManager triggerManager;
-  private final TriggerInstanceManager triggerInstanceManager;
-  private final HistoryManager historyManager;
-  private final InboundConnectorRegistry inboundConnectorRegistry;
-  private final OutboundConnectorRegistry outboundConnectorRegistry;
-  private final TriggerRegistry triggerRegistry;
-  private final ProcessorRegistry processorRegistry;
-  private final BrokerDefinitionManager brokerDefinitionManager;
+  protected final ReportBuilder reportBuilder;
+  protected final TaskManager taskManager;
+  protected final ProcessManager processManager;
+  protected final TriggerManager triggerManager;
+  protected final TriggerInstanceManager triggerInstanceManager;
+  protected final HistoryManager historyManager;
+  protected final InboundConnectorRegistry inboundConnectorRegistry;
+  protected final OutboundConnectorRegistry outboundConnectorRegistry;
+  protected final TriggerRegistry triggerRegistry;
+  protected final ProcessorRegistry processorRegistry;
+  protected final BrokerDefinitionManager brokerDefinitionManager;
 
   /**
    * Creates instance of the engine.
@@ -121,21 +121,6 @@ public class DefaultEngine implements Engine {
     this.triggerInstanceManager = triggerInstanceManager;
     this.historyManager = historyManager;
     this.reportBuilder = reportBuilder;
-  }
-
-  /**
-   * Fire all triggers.
-   */
-  @Override
-  public void fireTriggers() {
-    triggerManager.getInstances().entrySet().stream().forEach((inst) -> {
-      try {
-        Trigger.Context context = new TriggerContext(inst.getKey(),inst.getValue());
-        inst.getValue().activate(context);
-      } catch (DataProcessorException|InvalidDefinitionException ex) {
-        LOG.warn(String.format("Error activating trigger instance: %s", inst), ex);
-      }
-    });
   }
 
   /**
@@ -399,10 +384,13 @@ public class DefaultEngine implements Engine {
   @Override
   public TriggerReference scheduleTask(TriggerInstanceDefinition trigDef) throws InvalidDefinitionException, DataProcessorException {
     try {
-      UUID id = triggerManager.create(trigDef);
-      Trigger.Context context = new TriggerContext(id,triggerManager.getInstances().get(id));
-      triggerManager.getInstances().get(id).activate(context);
-      return new TriggerReference(id, trigDef);
+      UUID uuid = triggerManager.create(trigDef);
+      Trigger trigger = triggerRegistry.get(trigDef.getType());
+      Trigger.Instance triggerInstance = trigger.createInstance(trigDef);
+      triggerInstanceManager.put(uuid, triggerInstance);
+      Trigger.Context context = new TriggerContext(uuid,triggerInstance);
+      triggerInstance.activate(context);
+      return new TriggerReference(uuid, trigDef);
     } catch (CrudsException ex) {
       throw new DataProcessorException(String.format("Error scheduling task: %s", trigDef.getTaskDefinition()), ex);
     }
@@ -530,7 +518,7 @@ public class DefaultEngine implements Engine {
   /**
    * DefaultEngine-bound trigger context.
    */
-  private class TriggerContext implements Trigger.Context {
+  protected class TriggerContext implements Trigger.Context {
     private final UUID uuid;
     private final Trigger.Instance instance;
     

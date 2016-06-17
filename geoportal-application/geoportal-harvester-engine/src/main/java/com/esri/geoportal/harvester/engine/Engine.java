@@ -105,11 +105,6 @@ public interface Engine {
   BrokerInfo findBroker(UUID brokerId) throws DataProcessorException;
 
   /**
-   * Fire all triggers.
-   */
-  void fireTriggers();
-
-  /**
    * Gets broker definitions.
    *
    * @param category broker category

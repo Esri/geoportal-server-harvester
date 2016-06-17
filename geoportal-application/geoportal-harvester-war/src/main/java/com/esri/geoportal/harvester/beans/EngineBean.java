@@ -15,6 +15,10 @@
  */
 package com.esri.geoportal.harvester.beans;
 
+import com.esri.geoportal.harvester.api.Trigger;
+import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.managers.BrokerDefinitionManager;
 import com.esri.geoportal.harvester.engine.managers.ReportBuilder;
 import com.esri.geoportal.harvester.engine.impl.DefaultEngine;
@@ -27,11 +31,15 @@ import com.esri.geoportal.harvester.engine.managers.ProcessorRegistry;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerRegistry;
+import com.esri.geoportal.harvester.engine.support.CrudsException;
+import java.util.UUID;
+import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.TriggerContext;
 import org.springframework.stereotype.Service;
 
 /**
@@ -89,7 +97,7 @@ public class EngineBean extends DefaultEngine {
    */
   @PostConstruct
   public void init() {
-    fireTriggers();
+    activateTriggerInstances();
     LOG.info("EngineBean initialized.");
   }
   
@@ -98,6 +106,50 @@ public class EngineBean extends DefaultEngine {
    */
   @PreDestroy
   public void destroy() {
+    deactivateTriggerInstances();
     LOG.info(String.format("EngineBean destroyed."));
+  }
+  
+  /**
+   * Activates trigger instances
+   */
+  protected void activateTriggerInstances() {
+    try {
+      triggerManager.select().forEach(e->{
+        UUID uuid = e.getKey();
+        TriggerInstanceDefinition definition = e.getValue();
+        
+        try {
+          Trigger trigger = triggerRegistry.get(definition.getType());
+          if (trigger==null) {
+            throw new InvalidDefinitionException(String.format("Invalid trigger type: %s", definition.getType()));
+          }
+          Trigger.Instance triggerInstance = trigger.createInstance(definition);
+          Trigger.Context context = new TriggerContext(uuid,triggerInstance);
+          triggerInstance.activate(context);
+        } catch (DataProcessorException|InvalidDefinitionException ex) {
+          LOG.warn(String.format("Error creating and activating trigger instance: %s -> %s", uuid, definition), ex);
+        }
+      });
+    } catch (CrudsException ex) {
+      LOG.error("Error processing trigger definitions", ex);
+    }
+  }
+  
+  /**
+   * Deactivates trigger instances.
+   */
+  protected void deactivateTriggerInstances() {
+    triggerInstanceManager.listAll().stream().forEach(e->{
+      UUID uuid = e.getKey();
+      Trigger.Instance triggerInstance = e.getValue();
+      
+      try {
+        triggerInstance.close();
+      } catch (Exception ex) {
+        LOG.warn(String.format("Error deactivating trigger instance: %s --> %s", uuid, triggerInstance.getTriggerDefinition()), ex);
+      }
+    });
+    triggerInstanceManager.clear();
   }
 }

@@ -15,26 +15,11 @@
  */
 package com.esri.geoportal.harvester.engine.managers;
 
-import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
 import com.esri.geoportal.harvester.engine.support.CrudsRepo;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Trigger manager.
  */
 public interface TriggerManager extends CrudsRepo<TriggerInstanceDefinition> {
-  
-  /**
-   * Gets all active trigger instances.
-   * @return list of all active trigger instances
-   */
-  Map<UUID,Trigger.Instance>  getInstances();
-  
-  /**
-   * Removes instance from the map.
-   * @param instance instance to remove
-   */
-  void removeInstance(Trigger.Instance instance);
 }

@@ -16,6 +16,8 @@
 package com.esri.geoportal.harvester.engine.managers;
 
 import com.esri.geoportal.harvester.api.Trigger;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -43,4 +45,15 @@ public interface TriggerInstanceManager {
    * @return removed instance
    */
   Trigger.Instance remove(UUID uuid);
+  
+  /**
+   * Lists all instances.
+   * @return list of instance entries.
+   */
+  List<Map.Entry<UUID,Trigger.Instance>> listAll();
+  
+  /**
+   * Clears manager.
+   */
+  void clear();
 }
