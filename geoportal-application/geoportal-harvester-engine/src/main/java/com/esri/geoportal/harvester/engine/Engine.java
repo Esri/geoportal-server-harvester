@@ -160,6 +160,21 @@ public interface Engine {
    * @throws DataProcessorException if error processing data
    */
   TriggerReference scheduleTask(TriggerInstanceDefinition trigDef) throws InvalidDefinitionException, DataProcessorException;
+  
+  /**
+   * Deactivates trigger.
+   * @param triggerInstanceUuid trigger uuid
+   * @return trigger reference
+   * @throws InvalidDefinitionException if invalid definition
+   * @throws DataProcessorException if error processing data
+   */
+  TriggerReference deactivateTriggerInstance(UUID triggerInstanceUuid) throws InvalidDefinitionException, DataProcessorException;
+  
+  /**
+   * Lists all activated triggers.
+   * @return list of all activated triggers
+   */
+  List<TriggerReference> listActivatedTriggers();
 
   /**
    * Selects processes by predicate.

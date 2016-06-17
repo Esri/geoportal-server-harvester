@@ -59,6 +59,7 @@ import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -394,6 +395,42 @@ public class DefaultEngine implements Engine {
     } catch (CrudsException ex) {
       throw new DataProcessorException(String.format("Error scheduling task: %s", trigDef.getTaskDefinition()), ex);
     }
+  }
+  
+  /**
+   * Deactivates trigger.
+   * @param triggerInstanceUuid trigger uuid
+   * @return trigger reference
+   * @throws InvalidDefinitionException if invalid definition
+   * @throws DataProcessorException if error processing data
+   */
+  @Override
+  public TriggerReference deactivateTriggerInstance(UUID triggerInstanceUuid) throws InvalidDefinitionException, DataProcessorException {
+    Trigger.Instance triggerInstance = triggerInstanceManager.remove(triggerInstanceUuid);
+    if (triggerInstance != null) {
+      throw new InvalidDefinitionException(String.format("Invalid trigger id: %s", triggerInstanceUuid));
+    }
+    try {
+      TriggerInstanceDefinition trigDef = triggerInstance.getTriggerDefinition();
+      TriggerReference triggerReference = new TriggerReference(triggerInstanceUuid, trigDef);
+      triggerInstance.close();
+      return triggerReference;
+    } catch (Exception ex) {
+      throw new DataProcessorException(String.format("Error deactivating trigger: %s", triggerInstanceUuid), ex);
+    } finally {
+      try {
+        triggerManager.delete(triggerInstanceUuid);
+      } catch (CrudsException ex) {
+        LOG.warn(String.format("Error deleting trigger: %s", triggerInstanceUuid), ex);
+      }
+    }
+  }
+
+  @Override
+  public List<TriggerReference> listActivatedTriggers() {
+    return triggerInstanceManager.listAll().stream()
+            .map(e->new TriggerReference(e.getKey(),e.getValue().getTriggerDefinition()))
+            .collect(Collectors.toList());
   }
 
   /**

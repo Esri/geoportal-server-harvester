@@ -33,13 +33,11 @@ import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerRegistry;
 import com.esri.geoportal.harvester.engine.support.CrudsException;
 import java.util.UUID;
-import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.TriggerContext;
 import org.springframework.stereotype.Service;
 
 /**
