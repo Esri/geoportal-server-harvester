@@ -159,7 +159,7 @@ public class TaskController {
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/execute", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessResponse> executeTask(@PathVariable UUID taskId) {
     try {
-      LOG.debug(String.format("GET /rest/harvester/tasks/%s/execute", taskId));
+      LOG.debug(String.format("PUT /rest/harvester/tasks/%s/execute", taskId));
       TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
       ProcessReference ref = engine.submitTaskDefinition(taskDefinition);
       ref.getProcess().begin();
@@ -179,7 +179,7 @@ public class TaskController {
   @RequestMapping(value = "/rest/harvester/tasks/execute", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessResponse> executeTask(@RequestBody TaskDefinition taskDefinition) {
     try {
-      LOG.debug(String.format("GET /rest/harvester/tasks/execute <-- %s", taskDefinition));
+      LOG.debug(String.format("PUT /rest/harvester/tasks/execute <-- %s", taskDefinition));
       ProcessReference ref = engine.submitTaskDefinition(taskDefinition);
       ref.getProcess().begin();
       return new ResponseEntity<>(new ProcessResponse(ref.getProcessId(), ref.getProcess().getTitle(), ref.getProcess().getStatus()), HttpStatus.OK);
@@ -199,7 +199,7 @@ public class TaskController {
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/schedule", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId) {
     try {
-      LOG.debug(String.format("GET /rest/harvester/tasks/%s/schedule <-- %s", taskId, triggerDefinition));
+      LOG.debug(String.format("PUT /rest/harvester/tasks/%s/schedule <-- %s", taskId, triggerDefinition));
       TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
       TriggerInstanceDefinition triggerInstanceDefinition = new TriggerInstanceDefinition();
       triggerInstanceDefinition.setType(triggerDefinition.getType());
@@ -222,7 +222,7 @@ public class TaskController {
   @RequestMapping(value = "/rest/harvester/tasks/schedule", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody TriggerInstanceDefinition trigDef) {
     try {
-      LOG.debug(String.format("GET /rest/harvester/tasks/schedule <-- %s", trigDef));
+      LOG.debug(String.format("PUT /rest/harvester/tasks/schedule <-- %s", trigDef));
       TriggerReference trigRef = engine.scheduleTask(trigDef);
       return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), trigRef.getTriggerInstanceDefinition()),HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
