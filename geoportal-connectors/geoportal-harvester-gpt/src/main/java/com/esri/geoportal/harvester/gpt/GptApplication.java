@@ -31,7 +31,7 @@ public class GptApplication {
   /**
    * Main method.
    * @param args arguments: catalog URL, user name and password
-   * @throws Exception 
+   * @throws Exception if anything fails
    */
   public static void main(String[] args) throws Exception {
     if (args.length==3) {

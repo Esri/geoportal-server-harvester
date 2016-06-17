@@ -93,6 +93,7 @@ public class Client implements IClient {
    * @param httpClient HTTP client
    * @param baseUrl base URL
    * @param profile CSW profile
+   * @param cred credentials
    */
   public Client(BotsHttpClient httpClient, URL baseUrl, IProfile profile, SimpleCredentials cred) {
     this.httpClient = httpClient;

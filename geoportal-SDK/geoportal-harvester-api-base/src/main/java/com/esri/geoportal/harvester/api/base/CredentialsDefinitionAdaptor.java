@@ -27,7 +27,7 @@ public final class CredentialsDefinitionAdaptor extends BrokerDefinitionAdaptor 
   
   /**
    * Creates instance of the adaptor.
-   * @param def 
+   * @param def entity definition
    */
   public CredentialsDefinitionAdaptor(EntityDefinition def) {
     super(def);
