@@ -24,6 +24,7 @@ import com.esri.geoportal.harvester.engine.managers.TaskManager;
 import com.esri.geoportal.harvester.engine.managers.OutboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.managers.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.managers.ProcessorRegistry;
+import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerRegistry;
 import javax.annotation.PostConstruct;
@@ -50,6 +51,7 @@ public class EngineBean extends DefaultEngine {
    * @param taskManager task manager
    * @param processManager process manager
    * @param triggerManager trigger manager
+   * @param triggerInstanceManager trigger instance manager
    * @param historyManager history manager
    * @param reportBuilder report builder
    */
@@ -63,6 +65,7 @@ public class EngineBean extends DefaultEngine {
           TaskManager taskManager, 
           ProcessManager processManager, 
           TriggerManager triggerManager,
+          TriggerInstanceManager triggerInstanceManager,
           HistoryManager historyManager,
           ReportBuilder reportBuilder
   ) {
@@ -75,6 +78,7 @@ public class EngineBean extends DefaultEngine {
             taskManager, 
             processManager, 
             triggerManager, 
+            triggerInstanceManager,
             historyManager,
             reportBuilder
     );
