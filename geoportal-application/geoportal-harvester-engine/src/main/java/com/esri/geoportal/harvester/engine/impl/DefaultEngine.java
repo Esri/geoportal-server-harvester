@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine.impl;
 
+import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.engine.support.BrokerInfo;
 import com.esri.geoportal.harvester.engine.managers.ProcessorRegistry;
 import com.esri.geoportal.harvester.engine.managers.InboundConnectorRegistry;
@@ -274,7 +275,7 @@ public class DefaultEngine implements Engine {
    * @throws DataProcessorException if accessing repository fails
    */
   @Override
-  public Processor.Process getProcess(UUID processId) throws DataProcessorException {
+  public ProcessInstance getProcess(UUID processId) throws DataProcessorException {
     try {
       return processManager.read(processId);
     } catch (CrudsException ex) {
@@ -290,9 +291,9 @@ public class DefaultEngine implements Engine {
    * @throws DataProcessorException if accessing repository fails
    */
   @Override
-  public List<Map.Entry<UUID, Processor.Process>> selectProcesses(Predicate<? super Map.Entry<UUID, Processor.Process>> predicate) throws DataProcessorException {
+  public List<Map.Entry<UUID, ProcessInstance>> selectProcesses(Predicate<? super Map.Entry<UUID, ProcessInstance>> predicate) throws DataProcessorException {
     try {
-      return processManager.select().stream().filter(predicate != null ? predicate : (Map.Entry<UUID, Processor.Process> e) -> true).collect(Collectors.toList());
+      return processManager.select().stream().filter(predicate != null ? predicate : (Map.Entry<UUID, ProcessInstance> e) -> true).collect(Collectors.toList());
     } catch (CrudsException ex) {
       throw new DataProcessorException(String.format("Error celecting processes."), ex);
     }
@@ -351,7 +352,7 @@ public class DefaultEngine implements Engine {
   @Override
   public ProcessReference createProcess(Task task) throws InvalidDefinitionException, DataProcessorException {
     try {
-      Processor.Process process = task.getProcessor().createProcess(task);
+      ProcessInstance process = task.getProcessor().createProcess(task);
       process.addListener(new ReportBuilderAdaptor(process, reportBuilder));
       UUID id = processManager.create(process);
       return new ProcessReference(id, process);
@@ -565,7 +566,7 @@ public class DefaultEngine implements Engine {
     }
 
     @Override
-    public synchronized Processor.Process submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
+    public synchronized ProcessInstance submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
       ProcessReference ref;
       ref = submitTaskDefinition(taskDefinition);
       return ref != null ? ref.getProcess() : null;

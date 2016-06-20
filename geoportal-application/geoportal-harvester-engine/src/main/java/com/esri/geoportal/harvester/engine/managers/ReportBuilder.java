@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.engine.managers;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 
@@ -29,39 +30,39 @@ public interface ReportBuilder {
    * Called to indicate beginning of the process.
    * @param process process
    */
-  void started(Processor.Process process);
+  void started(ProcessInstance process);
   
   /**
    * Called to indicated completion of the process
    * @param process process
    */
-  void completed(Processor.Process process);
+  void completed(ProcessInstance process);
   
   /**
    * Make success entry.
    * @param process process
    * @param dataReference data reference
    */
-  void success(Processor.Process process, DataReference dataReference);
+  void success(ProcessInstance process, DataReference dataReference);
   
   /**
    * Make harvest error entry.
    * @param process process
    * @param ex exception
    */
-  void error(Processor.Process process, DataInputException ex);
+  void error(ProcessInstance process, DataInputException ex);
   
   /**
    * Make publish error entry.
    * @param process process
    * @param ex exception
    */
-  void error(Processor.Process process, DataOutputException ex);
+  void error(ProcessInstance process, DataOutputException ex);
   
   /**
    * Make error entry without associated data.
    * @param process process
    * @param ex error message
    */
-  void error(Processor.Process process, DataProcessorException ex);
+  void error(ProcessInstance process, DataProcessorException ex);
 }

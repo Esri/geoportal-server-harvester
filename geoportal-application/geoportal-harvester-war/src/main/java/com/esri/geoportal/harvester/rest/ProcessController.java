@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.rest;
 
-import com.esri.geoportal.harvester.api.Processor;
+import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.support.ProcessResponse;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
@@ -38,9 +38,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 
 /**
@@ -84,7 +81,7 @@ public class ProcessController {
   public ResponseEntity<ProcessResponse> getProcessInfo(@PathVariable UUID processId) {
     try {
       LOG.debug(String.format("GET /rest/harvester/processes/%s", processId));
-      Processor.Process process = engine.getProcess(processId);
+      ProcessInstance process = engine.getProcess(processId);
       return new ResponseEntity<>(process!=null? new ProcessResponse(processId, process.getTitle(), process.getStatus()): null,HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error getting process info: %s", processId), ex);
@@ -101,7 +98,7 @@ public class ProcessController {
   public ResponseEntity<ProcessResponse> abortProcess(@PathVariable UUID processId) {
     try {
       LOG.debug(String.format("DELETE /rest/harvester/processes/%s", processId));
-      Processor.Process process = engine.getProcess(processId);
+      ProcessInstance process = engine.getProcess(processId);
       if (process!=null) {
         try {
           process.abort();
@@ -165,7 +162,7 @@ public class ProcessController {
    * @param predicate predicate
    * @return array of filtered processes
    */
-  private ProcessResponse[] filterProcesses(Predicate<? super Map.Entry<UUID, Processor.Process>> predicate) throws DataProcessorException {
+  private ProcessResponse[] filterProcesses(Predicate<? super Map.Entry<UUID, ProcessInstance>> predicate) throws DataProcessorException {
     return engine.selectProcesses(predicate).stream()
             .map(e->new ProcessResponse(e.getKey(),e.getValue().getTitle(),e.getValue().getStatus()))
             .collect(Collectors.toList()).toArray(new ProcessResponse[0]);

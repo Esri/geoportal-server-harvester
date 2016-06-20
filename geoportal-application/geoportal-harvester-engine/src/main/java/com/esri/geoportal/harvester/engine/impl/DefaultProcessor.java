@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.engine.impl;
 
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
@@ -49,7 +50,7 @@ public class DefaultProcessor implements Processor {
   }
 
   @Override
-  public Processor.Process createProcess(Task task) {
+  public ProcessInstance createProcess(Task task) {
     LOG.info(String.format("SUBMITTING: %s", task));
     return new DefaultProcess(task);
   }
@@ -57,13 +58,13 @@ public class DefaultProcessor implements Processor {
   /**
    * Default process.
    */
-  public static class DefaultProcess implements Processor.Process {
+  public static class DefaultProcess implements ProcessInstance {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultProcess.class);
-    private final List<Processor.Listener> listeners = Collections.synchronizedList(new ArrayList<>());
+    private final List<ProcessInstance.Listener> listeners = Collections.synchronizedList(new ArrayList<>());
 
-    private final Task task;
-    private final Thread thread;
+    final Task task;
+    final Thread thread;
 
     private volatile boolean completed;
     private volatile boolean aborting;
@@ -112,7 +113,7 @@ public class DefaultProcessor implements Processor {
     }
 
     @Override
-    public void addListener(Processor.Listener listener) {
+    public void addListener(ProcessInstance.Listener listener) {
       listeners.add(listener);
     }
 
@@ -132,17 +133,17 @@ public class DefaultProcessor implements Processor {
      * @return process status
      */
     @Override
-    public synchronized Processor.Status getStatus() {
+    public synchronized ProcessInstance.Status getStatus() {
       if (completed) {
-        return Processor.Status.completed;
+        return ProcessInstance.Status.completed;
       }
       if (aborting) {
-        return Processor.Status.aborting;
+        return ProcessInstance.Status.aborting;
       }
       if (thread.isAlive()) {
-        return Processor.Status.working;
+        return ProcessInstance.Status.working;
       }
-      return Processor.Status.submitted;
+      return ProcessInstance.Status.submitted;
     }
 
     /**
@@ -150,7 +151,7 @@ public class DefaultProcessor implements Processor {
      */
     @Override
     public synchronized void begin() {
-      if (getStatus() != Processor.Status.submitted) {
+      if (getStatus() != ProcessInstance.Status.submitted) {
         throw new IllegalStateException(String.format("Error begininig the process: process is in %s state", getStatus()));
       }
       thread.start();
@@ -161,7 +162,7 @@ public class DefaultProcessor implements Processor {
      */
     @Override
     public synchronized void abort() {
-      if (getStatus() != Processor.Status.working) {
+      if (getStatus() != ProcessInstance.Status.working) {
         throw new IllegalStateException(String.format("Error aborting the process: process is in %s state", getStatus()));
       }
       LOG.info(String.format("Aborting process: %s", getTitle()));

@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.engine.triggers;
 
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.Processor;
+import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
@@ -118,11 +118,11 @@ public class AtTrigger implements Trigger {
     private Runnable newRunnable(Context triggerContext) {
       return ()->{
         try {
-          Processor.Process process = triggerContext.submit(triggerDefinition.getTaskDefinition());
-          process.addListener(new Processor.Listener() {
+          ProcessInstance process = triggerContext.submit(triggerDefinition.getTaskDefinition());
+          process.addListener(new ProcessInstance.Listener() {
             @Override
-            public void onStatusChange(Processor.Status status) {
-              if (status==Processor.Status.completed && !Thread.currentThread().isInterrupted()) {
+            public void onStatusChange(ProcessInstance.Status status) {
+              if (status==ProcessInstance.Status.completed && !Thread.currentThread().isInterrupted()) {
                 schedule(newRunnable(triggerContext));
               }
             }

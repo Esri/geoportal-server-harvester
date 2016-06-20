@@ -51,7 +51,7 @@ public interface TriggerInstance extends AutoCloseable {
      * @throws DataProcessorException if processing fails
      * @throws InvalidDefinitionException if task definition is invalid
      */
-    Processor.Process submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException;
+    ProcessInstance submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException;
     
     /**
      * Gets last harvest for task.

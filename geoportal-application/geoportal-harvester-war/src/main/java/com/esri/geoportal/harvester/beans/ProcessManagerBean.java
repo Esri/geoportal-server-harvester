@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.beans;
 
+import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.engine.managers.ProcessManager;
 import java.util.Collection;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Service;
 public class ProcessManagerBean implements ProcessManager  {
   private static final Logger LOG = LoggerFactory.getLogger(ProcessManagerBean.class);
   
-  private final HashMap<UUID,Processor.Process> processes = new HashMap<>();
+  private final HashMap<UUID, ProcessInstance> processes = new HashMap<>();
   
   /**
    * Initializes bean.
@@ -53,10 +54,10 @@ public class ProcessManagerBean implements ProcessManager  {
   }
 
   @Override
-  public UUID create(Processor.Process process) {
+  public UUID create(ProcessInstance process) {
     // this prevents submiting the same process twice
     boolean exists = select().stream()
-            .filter(p->p.getValue().getStatus()!=Processor.Status.completed)
+            .filter(p->p.getValue().getStatus()!=ProcessInstance.Status.completed)
             .map(e->e.getValue().getTask())
             .anyMatch(td->td.equals(process.getTask()));
     if (exists) {
@@ -69,12 +70,12 @@ public class ProcessManagerBean implements ProcessManager  {
   }
 
   @Override
-  public boolean update(UUID id, Processor.Process process) {
+  public boolean update(UUID id, ProcessInstance process) {
     return processes.put(id, process)!=null;
   }
 
   @Override
-  public Processor.Process read(UUID id) {
+  public ProcessInstance read(UUID id) {
     return processes.get(id);
   }
 
@@ -84,7 +85,7 @@ public class ProcessManagerBean implements ProcessManager  {
   }
 
   @Override
-  public Collection<Map.Entry<UUID, Processor.Process>> select() {
+  public Collection<Map.Entry<UUID, ProcessInstance>> select() {
     return processes.entrySet();
   }
 }

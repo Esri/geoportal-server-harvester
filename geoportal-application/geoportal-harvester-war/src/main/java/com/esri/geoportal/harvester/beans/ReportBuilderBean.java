@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.engine.managers.ReportBuilder;
@@ -60,32 +61,32 @@ public class ReportBuilderBean implements ReportBuilder {
   }
 
   @Override
-  public void started(Processor.Process process) {
+  public void started(ProcessInstance process) {
     rb.started(process);
   }
 
   @Override
-  public void completed(Processor.Process process) {
+  public void completed(ProcessInstance process) {
     rb.completed(process);
   }
 
   @Override
-  public void success(Processor.Process process, DataReference dataReference) {
+  public void success(ProcessInstance process, DataReference dataReference) {
     rb.success(process, dataReference);
   }
 
   @Override
-  public void error(Processor.Process process, DataInputException ex) {
+  public void error(ProcessInstance process, DataInputException ex) {
     rb.error(process, ex);
   }
 
   @Override
-  public void error(Processor.Process process, DataOutputException ex) {
+  public void error(ProcessInstance process, DataOutputException ex) {
     rb.error(process, ex);
   }
 
   @Override
-  public void error(Processor.Process process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
+  public void error(ProcessInstance process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
     rb.error(process, ex);
   }
 }

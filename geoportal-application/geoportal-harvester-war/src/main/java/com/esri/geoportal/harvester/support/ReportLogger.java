@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.support;
 
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.engine.managers.ReportBuilder;
 import org.slf4j.Logger;
@@ -30,32 +31,32 @@ public class ReportLogger implements ReportBuilder {
   private final Logger LOG = LoggerFactory.getLogger(ReportLogger.class);
 
   @Override
-  public void started(Processor.Process process) {
+  public void started(ProcessInstance process) {
     LOG.info(String.format("Started processing task: %s", process));
   }
 
   @Override
-  public void completed(Processor.Process process) {
+  public void completed(ProcessInstance process) {
     LOG.info(String.format("Completed processing task: %s", process));
   }
 
   @Override
-  public void success(Processor.Process process, DataReference dataReference) {
+  public void success(ProcessInstance process, DataReference dataReference) {
     LOG.info(String.format("Success harvesting data: %s during processing task: %s", dataReference, process));
   }
 
   @Override
-  public void error(Processor.Process process, DataInputException ex) {
+  public void error(ProcessInstance process, DataInputException ex) {
     LOG.error(String.format("Error processing task: %s", process), ex);
   }
 
   @Override
-  public void error(Processor.Process process, DataOutputException ex) {
+  public void error(ProcessInstance process, DataOutputException ex) {
     LOG.error(String.format("Error processing task: %s", process), ex);
   }
 
   @Override
-  public void error(Processor.Process process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
+  public void error(ProcessInstance process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
     LOG.error(String.format("Error processing task: %s", process), ex);
   }
   

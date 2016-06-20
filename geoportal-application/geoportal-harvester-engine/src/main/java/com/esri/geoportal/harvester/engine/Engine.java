@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine;
 
+import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -135,7 +136,7 @@ public interface Engine {
    * process id
    * @throws DataProcessorException if accessing repository fails
    */
-  Processor.Process getProcess(UUID processId) throws DataProcessorException;
+  ProcessInstance getProcess(UUID processId) throws DataProcessorException;
 
   /**
    * Lists all triggers.
@@ -183,7 +184,7 @@ public interface Engine {
    * @return list of processes matching predicate
    * @throws DataProcessorException if accessing repository fails
    */
-  List<Map.Entry<UUID, Processor.Process>> selectProcesses(Predicate<? super Map.Entry<UUID, Processor.Process>> predicate) throws DataProcessorException;
+  List<Map.Entry<UUID, ProcessInstance>> selectProcesses(Predicate<? super Map.Entry<UUID, ProcessInstance>> predicate) throws DataProcessorException;
 
   /**
    * Selects task definitions.
