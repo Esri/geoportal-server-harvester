@@ -23,6 +23,28 @@
           <version>2.10.3</version>
           <configuration>
             <aggregate>true</aggregate>
+            <groups>
+              <group>
+                <title>API</title>
+                <packages>com.esri.geoportal.harvester.api:com.esri.geoportal.harvester.api.*</packages>
+              </group>
+              <group>
+                <title>Engine</title>
+                <packages>com.esri.geoportal.harvester.engine:com.esri.geoportal.harvester.engine.*</packages>
+              </group>
+              <group>
+                <title>Connectors</title>
+                <packages>com.esri.geoportal.harvester.console:com.esri.geoportal.harvester.gpt:com.esri.geoportal.harvester.gpt.*:com.esri.geoportal.harvester.waf:com.esri.geoportal.harvester.csw:com.esri.geoportal.harvester.csw.*:com.esri.geoportal.harvester.folder</packages>
+              </group>
+              <group>
+                <title>WAR</title>
+                <packages>com.esri.geoportal.harvester.beans:com.esri.geoportal.harvester.rest:com.esri.geoportal.harvester.support</packages>
+              </group>
+              <group>
+                <title>Commons</title>
+                <packages>com.esri.geoportal.commons.*</packages>
+              </group>
+            </groups>
           </configuration>
         </plugin>    
       </plugins>
