@@ -108,7 +108,7 @@ public class PeriodTrigger implements Trigger {
 
     @Override
     public void activate(Context triggerContext) throws DataProcessorException, InvalidDefinitionException {
-      schedule(triggerContext.lastHarvest(), triggerContext, newRunnable(triggerContext));
+      schedule(triggerContext.lastHarvest(), newRunnable(triggerContext));
     }
 
     @Override
@@ -127,7 +127,7 @@ public class PeriodTrigger implements Trigger {
             @Override
             public void onStatusChange(Processor.Status status) {
               if (status==Processor.Status.completed && !Thread.currentThread().isInterrupted()) {
-                schedule(new Date(),triggerContext,newRunnable(triggerContext));
+                schedule(new Date(),newRunnable(triggerContext));
               }
             }
 
@@ -148,11 +148,11 @@ public class PeriodTrigger implements Trigger {
       };
     }
     
-    private synchronized void schedule(Date lastHarvest, Context triggerContext, Runnable runnable) {
+    private synchronized void schedule(Date lastHarvest, Runnable runnable) {
       try {
         if (lastHarvest==null) {
           LOG.info(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition()));
-          future = service.submit(newRunnable(triggerContext));
+          future = service.submit(runnable);
         } else {
           Period period = parsePeriod(triggerDefinition.getProperties().get(T_PERIOD));
           Calendar cal = Calendar.getInstance();
@@ -160,8 +160,13 @@ public class PeriodTrigger implements Trigger {
           Instant instant = cal.toInstant();
           period.addTo(instant);
           long delay = (cal.getTimeInMillis()-instant.toEpochMilli())/1000/60;
-          LOG.info(String.format("Task is scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition()));
-          future = service.schedule(runnable, delay, TimeUnit.MINUTES);
+          if (delay>0) {
+            LOG.info(String.format("Task is scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition()));
+            future = service.schedule(runnable, delay, TimeUnit.MINUTES);
+          } else {
+            LOG.info(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition()));
+            future = service.submit(runnable);
+          }
         }
       } catch (ParseException ex) {
         LOG.error(String.format("Error activating trigger: %s", getType()), ex);
