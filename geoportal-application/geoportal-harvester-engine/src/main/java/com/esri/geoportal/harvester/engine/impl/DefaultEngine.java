@@ -41,6 +41,7 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.Trigger;
+import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
@@ -387,9 +388,9 @@ public class DefaultEngine implements Engine {
     try {
       UUID uuid = triggerManager.create(trigDef);
       Trigger trigger = triggerRegistry.get(trigDef.getType());
-      Trigger.Instance triggerInstance = trigger.createInstance(trigDef);
+      TriggerInstance triggerInstance = trigger.createInstance(trigDef);
       triggerInstanceManager.put(uuid, triggerInstance);
-      Trigger.Context context = new TriggerContext(uuid,triggerInstance);
+      TriggerInstance.Context context = new TriggerContext(uuid,triggerInstance);
       triggerInstance.activate(context);
       return new TriggerReference(uuid, trigDef);
     } catch (CrudsException ex) {
@@ -406,7 +407,7 @@ public class DefaultEngine implements Engine {
    */
   @Override
   public TriggerReference deactivateTriggerInstance(UUID triggerInstanceUuid) throws InvalidDefinitionException, DataProcessorException {
-    Trigger.Instance triggerInstance = triggerInstanceManager.remove(triggerInstanceUuid);
+    TriggerInstance triggerInstance = triggerInstanceManager.remove(triggerInstanceUuid);
     if (triggerInstance != null) {
       throw new InvalidDefinitionException(String.format("Invalid trigger id: %s", triggerInstanceUuid));
     }
@@ -555,11 +556,11 @@ public class DefaultEngine implements Engine {
   /**
    * DefaultEngine-bound trigger context.
    */
-  protected class TriggerContext implements Trigger.Context {
+  protected class TriggerContext implements TriggerInstance.Context {
     private final UUID uuid;
-    private final Trigger.Instance instance;
+    private final TriggerInstance instance;
     
-    public TriggerContext(UUID uuid, Trigger.Instance instance) {
+    public TriggerContext(UUID uuid, TriggerInstance instance) {
       this.uuid = uuid;
       this.instance = instance;
     }

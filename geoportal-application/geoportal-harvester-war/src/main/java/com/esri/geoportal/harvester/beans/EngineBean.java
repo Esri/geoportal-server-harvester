@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.api.Trigger;
+import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -122,8 +123,8 @@ public class EngineBean extends DefaultEngine {
           if (trigger==null) {
             throw new InvalidDefinitionException(String.format("Invalid trigger type: %s", definition.getType()));
           }
-          Trigger.Instance triggerInstance = trigger.createInstance(definition);
-          Trigger.Context context = new TriggerContext(uuid,triggerInstance);
+          TriggerInstance triggerInstance = trigger.createInstance(definition);
+          TriggerInstance.Context context = new TriggerContext(uuid,triggerInstance);
           triggerInstance.activate(context);
         } catch (DataProcessorException|InvalidDefinitionException ex) {
           LOG.warn(String.format("Error creating and activating trigger instance: %s -> %s", uuid, definition), ex);
@@ -140,7 +141,7 @@ public class EngineBean extends DefaultEngine {
   protected void deactivateTriggerInstances() {
     triggerInstanceManager.listAll().stream().forEach(e->{
       UUID uuid = e.getKey();
-      Trigger.Instance triggerInstance = e.getValue();
+      TriggerInstance triggerInstance = e.getValue();
       
       try {
         triggerInstance.close();

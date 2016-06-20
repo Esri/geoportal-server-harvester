@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.engine.managers;
 
 import com.esri.geoportal.harvester.api.Trigger;
+import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
@@ -35,7 +36,7 @@ public class TriggerRegistry extends HashMap<String, Trigger> implements AutoClo
    * @return trigger instance
    * @throws InvalidDefinitionException if trigger definition is invalid.
    */
-  public Trigger.Instance createInstance(TriggerReference triggerReference) throws InvalidDefinitionException {
+  public TriggerInstance createInstance(TriggerReference triggerReference) throws InvalidDefinitionException {
     TriggerInstanceDefinition triggerInstanceDefinition = triggerReference.getTriggerInstanceDefinition();
     Trigger trigger = get(triggerInstanceDefinition.getType());
     if (trigger==null) {

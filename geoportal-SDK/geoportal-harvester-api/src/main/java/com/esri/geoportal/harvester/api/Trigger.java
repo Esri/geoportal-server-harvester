@@ -44,46 +44,5 @@ public interface Trigger extends AutoCloseable {
    * @return instance of the trigger
    * @throws InvalidDefinitionException if trigger definition is invalid
    */
-  Instance createInstance(TriggerInstanceDefinition triggerDefinition) throws InvalidDefinitionException;
-  
-  /**
-   * Trigger instance.
-   */
-  interface Instance extends AutoCloseable {
-    
-    /**
-     * Gets trigger instance definition.
-     * @return trigger instance definition
-     */
-    TriggerInstanceDefinition getTriggerDefinition();
-    
-    /**
-     * Activates the trigger.
-     * @param triggerContext trigger context
-     * @throws DataProcessorException if creating process fails
-     * @throws InvalidDefinitionException if task definition is invalid
-     */
-    void activate(Context triggerContext) throws DataProcessorException, InvalidDefinitionException;
-  }
-  
-  /**
-   * Trigger context
-   */
-  interface Context {
-    /**
-     * Submits task definition to create and start new process.
-     * @param taskDefinition task definition
-     * @return instance of the process
-     * @throws DataProcessorException if processing fails
-     * @throws InvalidDefinitionException if task definition is invalid
-     */
-    Processor.Process submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException;
-    
-    /**
-     * Gets last harvest for task.
-     * @return last harvest date or <code>null</code> if no last harvest date
-     * @throws DataProcessorException if getting last harvest date fails
-     */
-    Date lastHarvest() throws DataProcessorException;
-  }
+  TriggerInstance createInstance(TriggerInstanceDefinition triggerDefinition) throws InvalidDefinitionException;
 }

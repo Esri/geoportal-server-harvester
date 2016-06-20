@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.engine.triggers;
 
 import com.esri.geoportal.harvester.api.Trigger;
+import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -41,7 +42,7 @@ public class NowTrigger implements Trigger {
   }
 
   @Override
-  public Instance createInstance(TriggerInstanceDefinition triggerDefinition) throws InvalidDefinitionException {
+  public TriggerInstance createInstance(TriggerInstanceDefinition triggerDefinition) throws InvalidDefinitionException {
     if (!getType().equals(triggerDefinition.getType())) {
       throw new InvalidDefinitionException(String.format("Invalid trigger definition: %s", triggerDefinition));
     }
@@ -56,8 +57,8 @@ public class NowTrigger implements Trigger {
   /**
    * 'Now' trigger instance.
    */
-  private class NowTriggerInstance implements Trigger.Instance {
-    private final TriggerInstanceDefinition triggerDefinition;
+  private class NowTriggerInstance implements TriggerInstance {
+    final TriggerInstanceDefinition triggerDefinition;
 
     /**
      * Creates instance of the trigger instance
@@ -73,7 +74,7 @@ public class NowTrigger implements Trigger {
     }
 
     @Override
-    public void activate(Trigger.Context context) throws DataProcessorException, InvalidDefinitionException {
+    public void activate(TriggerInstance.Context context) throws DataProcessorException, InvalidDefinitionException {
       LOG.info(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition()));
       context.submit(triggerDefinition.getTaskDefinition());
     }

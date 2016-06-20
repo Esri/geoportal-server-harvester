@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.engine.triggers;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.Trigger;
+import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataException;
@@ -64,7 +65,7 @@ public class PeriodTrigger implements Trigger {
   }
 
   @Override
-  public Instance createInstance(TriggerInstanceDefinition triggerDefinition) throws InvalidDefinitionException {
+  public TriggerInstance createInstance(TriggerInstanceDefinition triggerDefinition) throws InvalidDefinitionException {
     if (!getType().equals(triggerDefinition.getType())) {
       throw new InvalidDefinitionException(String.format("Invalid trigger definition: %s", triggerDefinition));
     }
@@ -88,8 +89,8 @@ public class PeriodTrigger implements Trigger {
   /**
    * Period trigger instance.
    */
-  private class PeriodTriggerInstance implements Trigger.Instance {
-    private final TriggerInstanceDefinition triggerDefinition;
+  private class PeriodTriggerInstance implements TriggerInstance {
+    final TriggerInstanceDefinition triggerDefinition;
     private Future<?> future;
 
     /**
@@ -155,11 +156,12 @@ public class PeriodTrigger implements Trigger {
         } else {
           Period period = parsePeriod(triggerDefinition.getProperties().get(T_PERIOD));
           Calendar cal = Calendar.getInstance();
+          cal.setTime(lastHarvest);
           Instant instant = cal.toInstant();
           period.addTo(instant);
           long delay = (cal.getTimeInMillis()-instant.toEpochMilli())/1000/60;
           LOG.info(String.format("Task is scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition()));
-          future = service.schedule(newRunnable(triggerContext), delay, TimeUnit.MINUTES);
+          future = service.schedule(runnable, delay, TimeUnit.MINUTES);
         }
       } catch (ParseException ex) {
         LOG.error(String.format("Error activating trigger: %s", getType()), ex);
