@@ -60,7 +60,6 @@ import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -408,7 +407,7 @@ public class DefaultEngine implements Engine {
   @Override
   public TriggerReference deactivateTriggerInstance(UUID triggerInstanceUuid) throws InvalidDefinitionException, DataProcessorException {
     TriggerInstance triggerInstance = triggerInstanceManager.remove(triggerInstanceUuid);
-    if (triggerInstance != null) {
+    if (triggerInstance == null) {
       throw new InvalidDefinitionException(String.format("Invalid trigger id: %s", triggerInstanceUuid));
     }
     try {
