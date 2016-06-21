@@ -20,26 +20,31 @@ define(["dojo/_base/declare",
         "dojo/Deferred"
       ],
   function(declare,lang,xhr,Deferred){
+    var REST = "rest/harvester/brokers";
   
     return {
       output: function() {
-        return xhr("rest/harvester/brokers?category=OUTBOUND",{handleAs: "json"});
+        return xhr(REST+"?category=OUTBOUND",{handleAs: "json"});
       },
       
       input: function() {
-        return xhr("rest/harvester/brokers?category=INBOUND",{handleAs: "json"});
+        return xhr(REST+"?category=INBOUND",{handleAs: "json"});
+      },
+      
+      get: function(id) {
+        return xhr(REST+"/"+id,{handleAs: "json"});
       },
       
       delete: function(id) {
-        return xhr.del("rest/harvester/brokers/"+id,{handleAs: "json"});
+        return xhr.del(REST+"/"+id,{handleAs: "json"});
       },
       
       create: function(brokerDefinition) {
-        return xhr.put("rest/harvester/brokers",{data: brokerDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
+        return xhr.put(REST,{data: brokerDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
       },
       
       update: function(id, brokerDefinition) {
-        return xhr.post("rest/harvester/brokers/"+id,{data: brokerDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
+        return xhr.post(REST+"/"+id,{data: brokerDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
       }
     };
 });
