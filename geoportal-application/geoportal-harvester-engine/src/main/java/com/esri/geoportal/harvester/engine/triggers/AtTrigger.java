@@ -27,13 +27,16 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.WeakHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,7 +107,12 @@ public class AtTrigger implements Trigger {
 
     @Override
     public void activate(Context triggerContext) throws DataProcessorException, InvalidDefinitionException {
-      schedule(newRunnable(triggerContext));
+      try {
+        Predicate<Date> predicate = parsePredicate(triggerDefinition.getProperties().get(T_AT_TIME));
+        schedule(newRunnable(triggerContext,predicate));
+      } catch (ParseException ex) {
+        throw new InvalidDefinitionException(String.format("Invalid predicate definition: %s", triggerDefinition.getProperties().get(T_AT_TIME)), ex);
+      }
     }
 
     @Override
@@ -115,31 +123,33 @@ public class AtTrigger implements Trigger {
       }
     }
     
-    private Runnable newRunnable(Context triggerContext) {
+    private Runnable newRunnable(Context triggerContext, Predicate<Date> predicate) {
       return ()->{
-        try {
-          ProcessInstance process = triggerContext.submit(triggerDefinition.getTaskDefinition());
-          process.addListener(new ProcessInstance.Listener() {
-            @Override
-            public void onStatusChange(ProcessInstance.Status status) {
-              if (status==ProcessInstance.Status.completed && !Thread.currentThread().isInterrupted()) {
-                schedule(newRunnable(triggerContext));
+        if (predicate.test(new Date())) {
+          try {
+            ProcessInstance process = triggerContext.submit(triggerDefinition.getTaskDefinition());
+            process.addListener(new ProcessInstance.Listener() {
+              @Override
+              public void onStatusChange(ProcessInstance.Status status) {
+                if (status==ProcessInstance.Status.completed && !Thread.currentThread().isInterrupted()) {
+                  schedule(newRunnable(triggerContext, predicate));
+                }
               }
-            }
 
-            @Override
-            public void onDataProcessed(DataReference dataReference) {
-              // Ignore
-            }
+              @Override
+              public void onDataProcessed(DataReference dataReference) {
+                // Ignore
+              }
 
-            @Override
-            public void onError(DataException ex) {
-              // Ignore
-            }
-          });
-          process.begin();
-        } catch (DataProcessorException|InvalidDefinitionException ex) {
-          LOG.error(String.format("Error submitting task"), ex);
+              @Override
+              public void onError(DataException ex) {
+                // Ignore
+              }
+            });
+            process.begin();
+          } catch (DataProcessorException|InvalidDefinitionException ex) {
+            LOG.error(String.format("Error submitting task"), ex);
+          }
         }
       };
     }
@@ -190,7 +200,7 @@ public class AtTrigger implements Trigger {
         throw new ParseException(String.format("Invalid minute of the day: %s", strMinOfDay), 0);
       }
       String[] split = strMinOfDay.split(":");
-      if (split.length!=2) {
+      if (split.length<2) {
         throw new ParseException(String.format("Invalid minute of the day: %s", strMinOfDay), 0);
       }
       int hour;
@@ -206,6 +216,56 @@ public class AtTrigger implements Trigger {
         throw new ParseException(String.format("Invalid minute of the day: %s", strMinOfDay), 3);
       }
       return hour*60+min;
+    }
+    
+    private Predicate<Date> parsePredicate(String strPredicate) throws ParseException  {
+      if (strPredicate==null) {
+        throw new ParseException(String.format("Invalid predicate: %s", strPredicate), 0);
+      }
+      String[] split = strPredicate.split(":");
+      ArrayList<Predicate<Date>> predicates = new ArrayList<>();
+      
+      if (split.length>=3) {
+        String dayOfTheWeek = split[2];
+        if (!"*".equals(dayOfTheWeek)) {
+          ArrayList<Predicate<Date>> pred = new ArrayList<>();
+          Arrays.asList(dayOfTheWeek.split(",")).forEach(str->{
+            try {
+              int n = Integer.parseInt(str);
+              pred.add((d)->{
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(d);
+                return cal.get(Calendar.DAY_OF_WEEK)==n;
+              });
+            } catch (NumberFormatException ex) {
+              LOG.warn(String.format("Invalid day of the week definition", str), ex);
+            }
+          });
+          predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));
+        }
+      }
+      
+      if (split.length>=4) {
+        String monthOfyear = split[3];
+        if (!"*".equals(monthOfyear)) {
+          ArrayList<Predicate<Date>> pred = new ArrayList<>();
+          Arrays.asList(monthOfyear.split(",")).forEach(str->{
+            try {
+              int n = Integer.parseInt(str);
+              pred.add((d)->{
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(d);
+                return cal.get(Calendar.MONTH)==n;
+              });
+            } catch (NumberFormatException ex) {
+              LOG.warn(String.format("Invalid month definition", str), ex);
+            }
+          });
+          predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));
+        }
+      }
+      
+      return (d)->!predicates.stream().map(p->p.test(d)).anyMatch(b->b==false);
     }
     
     /**
