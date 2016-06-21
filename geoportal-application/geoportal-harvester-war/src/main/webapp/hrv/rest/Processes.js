@@ -26,7 +26,7 @@ define(["dojo/_base/declare",
         return xhr("rest/harvester/processes",{handleAs: "json"});
       },
       
-      read: function(processId) {
+      get: function(processId) {
         return xhr("rest/harvester/processes/"+processId,{handleAs: "json"});
       },
       
