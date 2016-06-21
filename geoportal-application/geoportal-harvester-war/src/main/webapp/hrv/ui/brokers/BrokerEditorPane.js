@@ -31,7 +31,7 @@ define(["dojo/_base/declare",
         "dijit/form/ValidationTextBox",
         "dijit/form/Form"
       ],
-  function(declare,lang,array,domConstruct,query,html,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,ConnectorsApi,Select,ValidationTextBox){
+  function(declare,lang,array,domConstruct,query,html,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,ConnectorsREST,Select,ValidationTextBox){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -43,8 +43,7 @@ define(["dojo/_base/declare",
       },
     
       postCreate: function(){
-        var connectorsApi = new ConnectorsApi();
-        connectorsApi[this.category]().then(
+        ConnectorsREST[this.category]().then(
           lang.hitch(this,this.processConnectors),
           lang.hitch(this,function(error){
             topic.publish("msg",this.i18n.brokers.editor.errors.connectorsLoadingErrors[this.category]);
