@@ -76,6 +76,7 @@ public class DefaultProcessor implements Processor {
     public DefaultProcess(Task task) {
       this.task = task;
       this.thread = new Thread(() -> {
+        onStatusChange();
         LOG.info(String.format("Started harvest: %s", getTitle()));
         try {
           if (!task.getDataDestinations().isEmpty()) {
@@ -103,8 +104,10 @@ public class DefaultProcessor implements Processor {
           completed = true;
           aborting = false;
           LOG.info(String.format("Completed harvest: %s", getTitle()));
+          onStatusChange();
         }
       }, "HARVESTING");
+      onStatusChange();
     }
 
     @Override
@@ -168,6 +171,7 @@ public class DefaultProcessor implements Processor {
       LOG.info(String.format("Aborting process: %s", getTitle()));
       aborting = true;
       thread.interrupt();
+      onStatusChange();
     }
 
     /**
@@ -185,9 +189,7 @@ public class DefaultProcessor implements Processor {
      * @param ex input exception
      */
     private void onError(DataInputException ex) {
-      listeners.forEach(l -> {
-        l.onError(ex);
-      });
+      listeners.forEach(l -> l.onError(ex));
     }
 
     /**
@@ -195,9 +197,15 @@ public class DefaultProcessor implements Processor {
      * @param dataRef data reference
      */
     private void onSuccess(DataReference dataRef) {
-      listeners.forEach(l -> {
-        l.onDataProcessed(dataRef);
-      });
+      listeners.forEach(l -> l.onDataProcessed(dataRef));
+    }
+    
+    /**
+     * Called when status has been changed.
+     */
+    private void onStatusChange() {
+      Status status = getStatus();
+      listeners.forEach(l -> l.onStatusChange(status));
     }
 
     @Override

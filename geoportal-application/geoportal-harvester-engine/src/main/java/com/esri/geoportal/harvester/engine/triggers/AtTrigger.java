@@ -150,6 +150,8 @@ public class AtTrigger implements Trigger {
           } catch (DataProcessorException|InvalidDefinitionException ex) {
             LOG.error(String.format("Error submitting task"), ex);
           }
+        } else {
+          schedule(newRunnable(triggerContext, predicate));
         }
       };
     }
