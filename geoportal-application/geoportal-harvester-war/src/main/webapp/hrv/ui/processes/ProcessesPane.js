@@ -28,7 +28,7 @@ define(["dojo/_base/declare",
         "hrv/rest/Processes",
         "hrv/ui/processes/Process"
       ],
-  function(declare,lang,array,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic,domStyle,domConstruct,Processes,Process){
+  function(declare,lang,array,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic,domStyle,domConstruct,ProcessesREST,Process){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -53,8 +53,7 @@ define(["dojo/_base/declare",
         if (evt==="processes") {
           domConstruct.empty(this.processesNode);
         
-          var rest = new Processes();
-          rest.list().then(
+          ProcessesREST.list().then(
             lang.hitch(this,this.processProcesses),
             lang.hitch(this,function(error){
               topic.publish("msg",this.i18n.processes.errors.loading);

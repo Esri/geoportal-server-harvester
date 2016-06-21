@@ -21,7 +21,7 @@ define(["dojo/_base/declare",
       ],
   function(declare,lang,xhr,Deferred){
   
-    return declare([],{
+    return {
       list: function() {
         return xhr("rest/harvester/processes",{handleAs: "json"});
       },
@@ -37,6 +37,6 @@ define(["dojo/_base/declare",
       create: function(processDefinition) {
         return xhr.put("rest/harvester/processes",{data: processDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
       }
-    });
+    };
 });
 
