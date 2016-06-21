@@ -112,21 +112,27 @@ public interface Engine {
    * @return broker infos
    * @throws DataProcessorException if accessing repository fails
    */
-  Collection<BrokerInfo> getBrokersDefinitions(BrokerInfo.Category category) throws DataProcessorException;
+  List<BrokerInfo> getBrokersDefinitions(BrokerInfo.Category category) throws DataProcessorException;
 
   /**
    * Gets inbound connector templates.
    *
    * @return collection of inbound connector templates
    */
-  Collection<UITemplate> getInboundConnectorTemplates();
+  List<UITemplate> getInboundConnectorTemplates();
 
+  /**
+   * Gets triggers templates.
+   * @return collection of trigger templates
+   */
+  List<UITemplate> getTriggers();
+  
   /**
    * Gets outbound connector templates.
    *
    * @return collection of outbound connector templates
    */
-  Collection<UITemplate> getOutboundConnectorTemplates();
+  List<UITemplate> getOutboundConnectorTemplates();
 
   /**
    * Gets process by process id.

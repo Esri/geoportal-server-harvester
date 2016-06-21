@@ -32,7 +32,6 @@ import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -140,7 +139,7 @@ public class DefaultEngine implements Engine {
    * @return collection of inbound connector templates
    */
   @Override
-  public Collection<UITemplate> getInboundConnectorTemplates() {
+  public List<UITemplate> getInboundConnectorTemplates() {
     return inboundConnectorRegistry.getTemplates();
   }
 
@@ -150,8 +149,13 @@ public class DefaultEngine implements Engine {
    * @return collection of outbound connector templates
    */
   @Override
-  public Collection<UITemplate> getOutboundConnectorTemplates() {
+  public List<UITemplate> getOutboundConnectorTemplates() {
     return outboundConnectorRegistry.getTemplates();
+  }
+
+  @Override
+  public List<UITemplate> getTriggers() {
+    return this.triggerRegistry.values().stream().map(v->v.getTemplate()).collect(Collectors.toList());
   }
 
   /**
@@ -162,7 +166,7 @@ public class DefaultEngine implements Engine {
    * @throws DataProcessorException if accessing repository fails
    */
   @Override
-  public Collection<BrokerInfo> getBrokersDefinitions(Category category) throws DataProcessorException {
+  public List<BrokerInfo> getBrokersDefinitions(Category category) throws DataProcessorException {
     if (category != null) {
       try {
         Set<String> brokerTypes = listTypesByCategory(category);
@@ -174,7 +178,7 @@ public class DefaultEngine implements Engine {
         throw new DataProcessorException(String.format("Error getting brokers for category: %s", category), ex);
       }
     } else {
-      return Stream.concat(getBrokersDefinitions(INBOUND).stream(), getBrokersDefinitions(OUTBOUND).stream()).collect(Collectors.toSet());
+      return Stream.concat(getBrokersDefinitions(INBOUND).stream(), getBrokersDefinitions(OUTBOUND).stream()).collect(Collectors.toList());
     }
   }
 
@@ -298,7 +302,7 @@ public class DefaultEngine implements Engine {
       throw new DataProcessorException(String.format("Error celecting processes."), ex);
     }
   }
-
+  
   /**
    * Creates task to initialize.
    *

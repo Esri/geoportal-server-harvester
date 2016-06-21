@@ -305,35 +305,4 @@ public class TaskController {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  
-  /**
-   * List all active triggers.
-   * @return list of all activated triggers.
-   */
-  @RequestMapping(value = "/rest/harvester/triggers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<List<TriggerResponse>> listTriggers() {
-    LOG.debug(String.format("GET /rest/harvester/triggers"));
-    List<TriggerResponse> triggerResponses = engine.listActivatedTriggers().stream()
-            .map(t->new TriggerResponse(t.getUuid(), t.getTriggerInstanceDefinition()))
-            .collect(Collectors.toList());
-    return new ResponseEntity<>(triggerResponses,HttpStatus.OK);
-  }
-  
-  /**
-   * Deactivates trigger.
-   * @param triggerId trigger id
-   * @return trigger response
-   */
-  @RequestMapping(value = "/rest/harvester/triggers/{triggerId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<TriggerResponse> deactivateTrigger(@PathVariable UUID triggerId) {
-    try {
-      LOG.debug(String.format("DELETE /rest/harvester/triggers/%s", triggerId));
-      TriggerReference trigRef = engine.deactivateTriggerInstance(triggerId);
-      return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), trigRef.getTriggerInstanceDefinition()),HttpStatus.OK);
-    } catch (InvalidDefinitionException ex) {
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    } catch (DataProcessorException ex) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
 }
