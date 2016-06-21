@@ -32,7 +32,7 @@ define(["dojo/_base/declare",
         "hrv/ui/brokers/Broker",
         "hrv/ui/brokers/BrokerEditorPane"
       ],
-  function(declare,lang,array,on,html,domConstruct,json,topic,Dialog,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,BrokersApi,Broker,BrokerEditorPane){
+  function(declare,lang,array,on,html,domConstruct,json,topic,Dialog,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,BrokersREST,Broker,BrokerEditorPane){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -45,8 +45,7 @@ define(["dojo/_base/declare",
       
       load: function() {
         domConstruct.empty(this.contentNode);
-        var rest = new BrokersApi();
-        rest[this.category]().then(
+        BrokersREST[this.category]().then(
           lang.hitch(this,this.processBrokers),
           lang.hitch(this,function(error){
             console.error(error);
@@ -87,10 +86,9 @@ define(["dojo/_base/declare",
         // listen to "submit" button click
         on(brokerEditorPane,"submit",lang.hitch(this, function(evt){
           var brokerDefinition = evt.brokerDefinition;
-          var brokersApi = new BrokersApi();
           
           // use API create new broker
-          brokersApi.create(json.stringify(brokerDefinition)).then(
+          BrokersREST.create(json.stringify(brokerDefinition)).then(
             lang.hitch({brokerEditorPane: brokerEditorPane, brokerEditorDialog: brokerEditorDialog, self: this},function(){
               this.brokerEditorDialog.destroy();
               this.brokerEditorPane.destroy();
@@ -128,11 +126,10 @@ define(["dojo/_base/declare",
         // listen to "submit" button click
         on(brokerEditorPane,"submit",lang.hitch(this, function(evt){
           var brokerDefinition = evt.brokerDefinition;
-          var brokersApi = new BrokersApi();
           
           // use API to update broker
           console.log("TODO: updating broker...", evt.brokerDefinition);
-          brokersApi.update(brokerDefinition.uuid,json.stringify(brokerDefinition)).then(
+          BrokersREST.update(brokerDefinition.uuid,json.stringify(brokerDefinition)).then(
             lang.hitch({brokerEditorPane: brokerEditorPane, brokerEditorDialog: brokerEditorDialog, self: this},function(){
               this.brokerEditorDialog.destroy();
               this.brokerEditorPane.destroy();
@@ -150,10 +147,9 @@ define(["dojo/_base/declare",
       
       _onRemove: function(evt) {
         var uuid = evt.data.uuid;
-        var brokersApi = new BrokersApi();
         
         // use API to remove broker
-        brokersApi.delete(uuid).then(
+        BrokersREST.delete(uuid).then(
           lang.hitch(this,function(){
             this.load();
           }),

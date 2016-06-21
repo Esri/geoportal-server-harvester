@@ -21,7 +21,7 @@ define(["dojo/_base/declare",
       ],
   function(declare,lang,xhr,Deferred){
   
-    return declare([],{
+    return {
       output: function() {
         return xhr("rest/harvester/brokers?category=OUTBOUND",{handleAs: "json"});
       },
@@ -41,6 +41,6 @@ define(["dojo/_base/declare",
       update: function(id, brokerDefinition) {
         return xhr.post("rest/harvester/brokers/"+id,{data: brokerDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
       }
-    });
+    };
 });
 
