@@ -52,11 +52,84 @@ import org.springframework.web.bind.annotation.RestController;
    PUT /rest/harvester/tasks                      - creates a new task (task definition in the request body)
    POST /rest/harvester/tasks/{taskId}            - updates a task by task id (task definition in the request body)
    
-   PUT /rest/harvester/tasks/execute              - executes a task (task definition in the request body)
-   PUT /rest/harvester/tasks/schedule             - schedules a task (trigger instance definition in the request body)
    PUT /rest/harvester/tasks/{taskId}/execute     - executes immediatelly a task by task id
    PUT /rest/harvester/tasks/{taskId}/schedule    - schedule a task by task id (trigger definition in the request body)
+   PUT /rest/harvester/tasks/execute              - executes a task (task definition in the request body)
+   PUT /rest/harvester/tasks/schedule             - schedules a task (trigger instance definition in the request body)
    </code></pre>
+ * Top five end points provide access to the stored task definitions (CRUD). 
+ * Remaining end points ('execute' and 'schedule') provide ability to create process
+ * instance based on either stored task definition or provided task definition.
+ * <br>
+ * Example of 'execute' request body:
+ * <pre><code>
+   
+    PUT /rest/harvester/tasks/execute
+    {
+        "processor": null,
+        "source": {
+            "type": "WAF",
+            "properties": {
+                "waf-host-url": "http://gptsrv12r2/wafMetadata/metadataSamples/"
+            }
+        },
+        "destinations": [
+            {
+                "type": "FOLDER",
+                "properties": {
+                    "folder-root-folder": "c:\\data"
+                }
+            }
+        ]
+    }
+ * </code></pre>
+ * <br>
+ * Example of 'execute' particular task request (no body expected):
+ * <pre><code>
+   
+    PUT /rest/harvester/tasks/641c741a-37f9-11e6-ac61-9e71128cae77/execute
+ * </code></pre>
+ * <br>
+ * Example of 'schedule' request body:
+ * <pre><code>
+   
+    PUT /rest/harvester/tasks/schedule
+    {
+      "type": "AT",
+      "properties": {
+        "t-at-time": "10:00"
+      },
+      "taskDefinition": {
+        "processor": null,
+        "source": {
+            "type": "WAF",
+            "properties": {
+                "waf-host-url": "http://gptsrv12r2/wafMetadata/metadataSamples/"
+            }
+        },
+        "destinations": [
+            {
+                "type": "FOLDER",
+                "properties": {
+                    "folder-root-folder": "c:\\data"
+                }
+            }
+        ]
+      }
+    }
+ * </code></pre>
+ * <br>
+ * Example of 'schedule' particular task request body:
+ * <pre><code>
+   
+    PUT /rest/harvester/tasks/31b4f880-37f9-11e6-ac61-9e71128cae77/schedule
+    {
+      "type": "AT",
+      "properties": {
+        "t-at-time": "10:00"
+      }
+    }
+ * </code></pre>
  */
 @RestController
 public class TaskController {

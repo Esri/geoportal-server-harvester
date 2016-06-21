@@ -32,10 +32,6 @@ define(["dojo/_base/declare",
       
       abort: function(processId) {
         return xhr.del("rest/harvester/processes/"+processId,{handleAs: "json"});
-      },
-      
-      create: function(processDefinition) {
-        return xhr.put("rest/harvester/processes",{data: processDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
       }
     };
 });

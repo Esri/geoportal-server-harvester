@@ -112,50 +112,6 @@ public class ProcessController {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  
-  /**
-   * Allows to define new process.
-   * <p>
-   * Newly defined process is started immediately. Example of the POST data of
-   * a process designed to harvest from WAF to a local folder:
-   * <pre><code>
-{
-    "processor": null,
-    "source": {
-        "type": "WAF",
-        "properties": {
-            "waf-host-url": "http://gptsrv12r2/wafMetadata/metadataSamples/"
-        }
-    },
-    "destinations": [
-        {
-            "type": "FOLDER",
-            "properties": {
-                "folder-root-folder": "c:\\data"
-            }
-        }
-    ]
-}
-   * </code></pre>
-   * @param taskDef task definition
-   * @return process info
-   */
-  @RequestMapping(value = "/rest/harvester/processes", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ProcessResponse> createProcess(@RequestBody String taskDef) {
-    try {
-      LOG.debug(String.format("PUT /rest/harvester/processes <-- %s", taskDef));
-      TaskDefinition taskDefinition = deserialize(engine,taskDef);
-      ProcessReference ref = engine.submitTaskDefinition(taskDefinition);
-      ref.getProcess().begin();
-      return new ResponseEntity<>(new ProcessResponse(ref.getProcessId(), ref.getProcess().getTitle(), ref.getProcess().getStatus()), HttpStatus.OK);
-    } catch (InvalidDefinitionException ex) {
-      LOG.error(String.format("Error creating process: %s", taskDef), ex);
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    } catch (IOException|DataProcessorException ex) {
-      LOG.error(String.format("Error creating process: %s", taskDef), ex);
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
 
   /**
    * Filters processes.
