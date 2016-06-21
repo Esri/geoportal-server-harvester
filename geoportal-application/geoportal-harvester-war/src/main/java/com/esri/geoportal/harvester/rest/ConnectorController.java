@@ -46,8 +46,19 @@ import org.springframework.web.bind.annotation.PathVariable;
         label: "Web accessible folder",
         arguments: [
           {
-            name: "waf.host.url",
+            name: "waf-host-url",
             label: "URL",
+            type: "string"
+          },
+          {
+            name: "cred-username",
+            label: "User name",
+            type: "string"
+          },
+          {
+            name: "cred-password",
+            label: "User password",
+            password: true,
             type: "string"
           }
         ]
@@ -56,39 +67,50 @@ import org.springframework.web.bind.annotation.PathVariable;
         name: "CSW",
         label: "Catalogue service for the web",
         arguments: [
-        {
-          name: "csw.host.url",
-          label: "URL",
-          type: "string"
-        },
-        {
-        name: "csw.profile.id",
-        label: "Profile",
-        choices: [
           {
-            name: "urn:ogc:CSW:2.0.1:HTTP:OGCCORE:GeoNetwork",
-            value: "GeoNetwork CSW 2.0.1 OGCCORE"
+            name: "csw-host-url",
+            label: "URL",
+            type: "string"
           },
           {
-            name: "urn:ogc:CSW:2.0.2:HTTP:APISO:PYCSW",
-            value: "pycsw"
+          name: "csw-profile-id",
+          label: "Profile",
+          choices: [
+            {
+              name: "urn:ogc:CSW:2.0.1:HTTP:OGCCORE:GeoNetwork",
+              value: "GeoNetwork CSW 2.0.1 OGCCORE"
+            },
+            {
+              name: "urn:ogc:CSW:2.0.2:HTTP:APISO:PYCSW",
+              value: "pycsw"
+            },
+            {
+              name: "urn:ogc:CSW:2.0.2:HTTP:OGCCORE:ESRI:GPT",
+              value: "ArcGIS Server Geoportal Extension (GPT)"
+            },
+            {
+              name: "urn:ogc:CSW:2.0.2:HTTP:APISO:GeoNetwork",
+              value: "GeoNetwork CSW 2.0.2 APISO"
+            },
+            {
+              name: "urn:ogc:CSW:2.0.2:HTTP:OGCISO:ESRI:GPT",
+              value: "ArcGIS Server Geoportal Extension (version 10) CSW ISO AP"
+            },
+          ],
+          default: "urn:ogc:CSW:2.0.2:HTTP:OGCCORE:ESRI:GPT",
+          type: "choice"
           },
           {
-            name: "urn:ogc:CSW:2.0.2:HTTP:OGCCORE:ESRI:GPT",
-            value: "ArcGIS Server Geoportal Extension (GPT)"
+            name: "cred-username",
+            label: "User name",
+            type: "string"
           },
           {
-            name: "urn:ogc:CSW:2.0.2:HTTP:APISO:GeoNetwork",
-            value: "GeoNetwork CSW 2.0.2 APISO"
-          },
-          {
-            name: "urn:ogc:CSW:2.0.2:HTTP:OGCISO:ESRI:GPT",
-            value: "ArcGIS Server Geoportal Extension (version 10) CSW ISO AP"
-          },
-        ],
-        default: "urn:ogc:CSW:2.0.2:HTTP:OGCCORE:ESRI:GPT",
-        type: "choice"
-        }
+            name: "cred-password",
+            label: "User password",
+            password: true,
+            type: "string"
+          }
         ]
         } 
    ]
@@ -101,17 +123,17 @@ import org.springframework.web.bind.annotation.PathVariable;
         label: "Geoportal Server New Generation",
         arguments: [
           {
-            name: "gpt.host.url",
+            name: "gpt-host-url",
             label: "URL",
             type: "string"
           },
           {
-            name: "gpt.user.name",
+            name: "cred-username",
             label: "User name",
             type: "string"
           },
           {
-            name: "gpt.user.password",
+            name: "cred-password",
             label: "User password",
             password: true,
             type: "string"
@@ -123,7 +145,7 @@ import org.springframework.web.bind.annotation.PathVariable;
         label: "Folder",
         arguments: [
           {
-            name: "folder.root.folder",
+            name: "folder-root-folder",
             label: "Root folder",
             type: "string"
           }
