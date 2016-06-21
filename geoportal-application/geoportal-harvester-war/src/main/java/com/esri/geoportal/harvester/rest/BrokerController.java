@@ -39,13 +39,35 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>
  * Provides access to brokers.
  * <pre><code>
-   GET /rest/harvester/brokers?category=INBOUND
-   GET /rest/harvester/brokers?category=OUTBOUND
-   GET /rest/harvester/brokers/{brokerId}
-   DELETE /rest/harvester/brokers/{brokerId}
-   PUT /rest/harvester/brokers
-   POST /rest/harvester/brokers/{brokerId}
+ 
+   GET /rest/harvester/brokers?category=INBOUND   - lists all inbound brokers (inputs)
+   GET /rest/harvester/brokers?category=OUTBOUND  - lists all outbound brokers (outputs)
+   GET /rest/harvester/brokers/{brokerId}         - gets broker by id (input or output)
+   
+   DELETE /rest/harvester/brokers/{brokerId}      - deletes broker by id (input or output)
+   PUT /rest/harvester/brokers                    - creates new broker (input or output; body of the request defines broker)
+   POST /rest/harvester/brokers/{brokerId}        - updates existing broker by id (input or output; body of the request defines broker)
  * </code></pre>
+ * Each GET request returns JSON with broker definition. It is an array of definitions when
+ * listing and a single definition when getting by id:
+ * <pre><code>
+   [
+    {
+      "uuid":"761e848d-37fc-4540-b707-298edb923156",
+      "category":"INBOUND",
+      "brokerDefinition":{
+        "type":"WAF",
+        "label":"My WAF",
+        "properties":{
+          "waf-host-url":"http://my.waf.com",
+          "cred-username":"",
+          "cred-password":""
+        }
+      }
+    }
+   ]
+ * </code></pre>
+ * Both PUT and POST require body of a single definition, similar to the one above.
  */
 @RestController
 public class BrokerController {

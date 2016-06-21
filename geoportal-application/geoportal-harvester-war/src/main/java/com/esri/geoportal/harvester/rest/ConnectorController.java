@@ -32,10 +32,11 @@ import org.springframework.web.bind.annotation.PathVariable;
  * It provides a way to obtain information about available connectors (inbound, 
  * outbound). There is a separate REST endpoint for inbound and outbound connector.
  * <pre><code>
-   GET /rest/harvester/connectors/inbound
-   GET /rest/harvester/connectors/outbound
-   GET /rest/harvester/connectors/inbound/{id}
-   GET /rest/harvester/connectors/outbound/{id}
+ 
+   GET /rest/harvester/connectors/inbound         - lists all inbound connectors
+   GET /rest/harvester/connectors/outbound        - lists all outbound connectors
+   GET /rest/harvester/connectors/inbound/{id}    - gets inbound connector by id
+   GET /rest/harvester/connectors/outbound/{id}   - gets outbound connector by id
  * </code></pre>
  * Each endpoint returns a JSON array of templates, where each template is a
  * blueprint how to build UI for each adaptor, for example:

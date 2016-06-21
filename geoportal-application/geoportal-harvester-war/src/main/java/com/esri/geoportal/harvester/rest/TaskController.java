@@ -45,7 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Task controller.
  * <p>
  * Provides access to tasks.
- * <pre><code>
+   <pre><code>
    GET /rest/harvester/tasks
    GET /rest/harvester/tasks/{taskId}
    DELETE /rest/harvester/tasks/{taskId}
@@ -56,7 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
    PUT /rest/harvester/tasks/schedule
    PUT /rest/harvester/tasks/{taskId}/execute
    PUT /rest/harvester/tasks/{taskId}/schedule
- </code></pre>
+   </code></pre>
  */
 @RestController
 public class TaskController {
