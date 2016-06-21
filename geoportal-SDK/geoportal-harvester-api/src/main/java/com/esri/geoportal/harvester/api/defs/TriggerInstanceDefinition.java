@@ -15,6 +15,8 @@
  */
 package com.esri.geoportal.harvester.api.defs;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -25,6 +27,7 @@ public final class TriggerInstanceDefinition {
   private String type;
   private TaskDefinition taskDefinition;
   private Map<String,String> properties;
+  private List<String> keywords = new ArrayList<>();
 
   /**
    * Gets trigger type.
@@ -72,6 +75,22 @@ public final class TriggerInstanceDefinition {
    */
   public void setProperties(Map<String, String> properties) {
     this.properties = properties;
+  }
+
+  /**
+   * Gets keywords.
+   * @return keywords
+   */
+  public List<String> getKeywords() {
+    return keywords;
+  }
+
+  /**
+   * Sets keywords.
+   * @param keywords keywords
+   */
+  public void setKeywords(List<String> keywords) {
+    this.keywords = keywords!=null? keywords: new ArrayList<>();
   }
   
   @Override

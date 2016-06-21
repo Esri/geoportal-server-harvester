@@ -15,7 +15,9 @@
  */
 package com.esri.geoportal.harvester.api.defs;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -41,6 +43,7 @@ public final class EntityDefinition {
   private String type;
   private String label;
   private Map<String,String> properties = new LinkedHashMap<>();
+  private List<String> keywords = new ArrayList<>();
 
   /**
    * Gets broker type.
@@ -88,6 +91,22 @@ public final class EntityDefinition {
    */
   public void setProperties(Map<String, String> properties) {
     this.properties = properties!=null? properties: new LinkedHashMap<>();
+  }
+
+  /**
+   * Gets keywords.
+   * @return keywords
+   */
+  public List<String> getKeywords() {
+    return keywords;
+  }
+
+  /**
+   * Sets keywords.
+   * @param keywords keywords
+   */
+  public void setKeywords(List<String> keywords) {
+    this.keywords = keywords!=null? keywords: new ArrayList<>();
   }
   
   @Override
