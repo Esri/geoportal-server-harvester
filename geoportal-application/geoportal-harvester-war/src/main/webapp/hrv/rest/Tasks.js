@@ -21,7 +21,7 @@ define(["dojo/_base/declare",
       ],
   function(declare,lang,xhr,Deferred){
   
-    return declare([],{
+    return {
       list: function() {
         return xhr("rest/harvester/tasks",{handleAs: "json"});
       },
@@ -37,6 +37,6 @@ define(["dojo/_base/declare",
       update: function(id, taskDefinition) {
         return xhr.post("rest/harvester/tasks/"+id,{data: taskDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
       }
-    });
+    };
 });
 

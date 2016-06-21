@@ -29,7 +29,7 @@ define(["dojo/_base/declare",
         "hrv/ui/tasks/Task",
         "hrv/ui/tasks/TaskEditorPane"
       ],
-  function(declare,lang,array,domConstruct,topic,Dialog,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,Tasks,Task,TaskEditorPane){
+  function(declare,lang,array,domConstruct,topic,Dialog,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,TasksREST,Task,TaskEditorPane){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -41,8 +41,7 @@ define(["dojo/_base/declare",
       
       load: function() {
         domConstruct.empty(this.contentNode);
-        var rest = new Tasks();
-        rest.list().then(
+        TasksREST.list().then(
           lang.hitch(this,this.processTasks),
           lang.hitch(this,function(error){
             console.error(error);
