@@ -46,16 +46,16 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>
  * Provides access to tasks.
    <pre><code>
-   GET /rest/harvester/tasks
-   GET /rest/harvester/tasks/{taskId}
-   DELETE /rest/harvester/tasks/{taskId}
-   PUT /rest/harvester/tasks
-   POST /rest/harvester/tasks/{taskId}
+   GET /rest/harvester/tasks                      - gets all the tasks
+   GET /rest/harvester/tasks/{taskId}             - gets task information by task id
+   DELETE /rest/harvester/tasks/{taskId}          - deletes existing task by task id
+   PUT /rest/harvester/tasks                      - creates a new task (task definition in the request body)
+   POST /rest/harvester/tasks/{taskId}            - updates a task by task id (task definition in the request body)
    
-   PUT /rest/harvester/tasks/execute
-   PUT /rest/harvester/tasks/schedule
-   PUT /rest/harvester/tasks/{taskId}/execute
-   PUT /rest/harvester/tasks/{taskId}/schedule
+   PUT /rest/harvester/tasks/execute              - executes a task (task definition in the request body)
+   PUT /rest/harvester/tasks/schedule             - schedules a task (trigger instance definition in the request body)
+   PUT /rest/harvester/tasks/{taskId}/execute     - executes immediatelly a task by task id
+   PUT /rest/harvester/tasks/{taskId}/schedule    - schedule a task by task id (trigger definition in the request body)
    </code></pre>
  */
 @RestController
