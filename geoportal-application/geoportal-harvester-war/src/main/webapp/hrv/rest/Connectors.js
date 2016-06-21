@@ -21,14 +21,23 @@ define(["dojo/_base/declare",
         "dojo/json"
       ],
   function(declare,lang,xhr,Deferred,json){
+    var REST = "rest/harvester/connectors";
   
     return {
       outbound: function() {
-        return xhr("rest/harvester/connectors/outbound",{handleAs: "json"});
+        return xhr(REST+"/outbound",{handleAs: "json"});
       },
       
       inbound: function() {
-        return xhr("rest/harvester/connectors/inbound",{handleAs: "json"});
+        return xhr(REST+"/inbound",{handleAs: "json"});
+      },
+      
+      getOutbound: function(id) {
+        return xhr(REST+"/outbound/"+id,{handleAs: "json"});
+      },
+      
+      getInbound: function(id) {
+        return xhr(REST+"/inbound/"+id,{handleAs: "json"});
       }
     };
 });
