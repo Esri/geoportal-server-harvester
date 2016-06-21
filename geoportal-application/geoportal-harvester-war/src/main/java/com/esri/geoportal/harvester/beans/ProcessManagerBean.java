@@ -16,8 +16,8 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.api.ProcessInstance;
-import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.engine.managers.ProcessManager;
+import com.esri.geoportal.harvester.engine.support.CrudsException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,14 +54,14 @@ public class ProcessManagerBean implements ProcessManager  {
   }
 
   @Override
-  public UUID create(ProcessInstance process) {
+  public UUID create(ProcessInstance process) throws CrudsException {
     // this prevents submiting the same process twice
     boolean exists = select().stream()
             .filter(p->p.getValue().getStatus()!=ProcessInstance.Status.completed)
             .map(e->e.getValue().getTask())
             .anyMatch(td->td.equals(process.getTask()));
     if (exists) {
-      throw new IllegalArgumentException(String.format("Process based on the task %s already exists",process.getTask()));
+      throw new CrudsException(String.format("Process based on the task %s already exists",process.getTask()));
     }
     
     UUID id = UUID.randomUUID();

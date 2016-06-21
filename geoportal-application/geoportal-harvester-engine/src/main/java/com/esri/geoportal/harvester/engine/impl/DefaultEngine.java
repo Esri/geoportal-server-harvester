@@ -222,9 +222,6 @@ public class DefaultEngine implements Engine {
         return new BrokerInfo(id, category, brokerDefinition);
       } catch (CrudsException ex) {
         throw new DataProcessorException(String.format("Error creating broker: %s", brokerDefinition), ex);
-      } catch (IllegalArgumentException ex) {
-        LOG.warn("Attempt to submit process based on the same task twice.", ex);
-        return null;
       }
     }
     return null;
