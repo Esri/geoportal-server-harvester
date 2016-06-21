@@ -225,6 +225,7 @@ public class AtTrigger implements Trigger {
       String[] split = strPredicate.split(":");
       ArrayList<Predicate<Date>> predicates = new ArrayList<>();
       
+      // day of the week
       if (split.length>=3) {
         String dayOfTheWeek = split[2];
         if (!"*".equals(dayOfTheWeek)) {
@@ -245,11 +246,12 @@ public class AtTrigger implements Trigger {
         }
       }
       
+      // month of the year
       if (split.length>=4) {
-        String monthOfyear = split[3];
-        if (!"*".equals(monthOfyear)) {
+        String monthOfTheYear = split[3];
+        if (!"*".equals(monthOfTheYear)) {
           ArrayList<Predicate<Date>> pred = new ArrayList<>();
-          Arrays.asList(monthOfyear.split(",")).forEach(str->{
+          Arrays.asList(monthOfTheYear.split(",")).forEach(str->{
             try {
               int n = Integer.parseInt(str);
               pred.add((d)->{
