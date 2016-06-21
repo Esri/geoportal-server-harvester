@@ -61,6 +61,7 @@ define(["dojo/_base/declare",
       
       processBroker: function(broker) {
         var widget = new Broker(broker).placeAt(this.contentNode);
+        widget.load = lang.hitch(this,this.load);
         on(widget,"remove",lang.hitch(this,this._onRemove));
         on(widget,"edit",lang.hitch(this,this._onEdit));
         widget.startup();
@@ -89,47 +90,6 @@ define(["dojo/_base/declare",
           
           // use API create new broker
           BrokersREST.create(json.stringify(brokerDefinition)).then(
-            lang.hitch({brokerEditorPane: brokerEditorPane, brokerEditorDialog: brokerEditorDialog, self: this},function(){
-              this.brokerEditorDialog.destroy();
-              this.brokerEditorPane.destroy();
-              this.self.load();
-            }),
-            lang.hitch(this,function(error){
-              console.error(error);
-              topic.publish("msg",new Error("Error creating broker"));
-            })
-          );
-        }));
-        
-        brokerEditorDialog.show();
-      },
-      
-      _onEdit: function(evt) {
-        console.log("TODO editing broker...", evt.data);
-        
-        // create editor pane
-        var brokerEditorPane = new BrokerEditorPane({
-          category: this.category==="input"? "inbound": this.category==="output"? "outbound": null,
-          data: evt.data
-        });
-        
-        // create editor dialog box
-        var brokerEditorDialog = new Dialog({
-          title: this.i18n.brokers.editor.caption,
-          content: brokerEditorPane,
-          onHide: function() {
-            brokerEditorDialog.destroy();
-            brokerEditorPane.destroy();
-          }
-        });
-        
-        // listen to "submit" button click
-        on(brokerEditorPane,"submit",lang.hitch(this, function(evt){
-          var brokerDefinition = evt.brokerDefinition;
-          
-          // use API to update broker
-          console.log("TODO: updating broker...", evt.brokerDefinition);
-          BrokersREST.update(brokerDefinition.uuid,json.stringify(brokerDefinition)).then(
             lang.hitch({brokerEditorPane: brokerEditorPane, brokerEditorDialog: brokerEditorDialog, self: this},function(){
               this.brokerEditorDialog.destroy();
               this.brokerEditorPane.destroy();
