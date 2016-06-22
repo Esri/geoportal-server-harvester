@@ -60,7 +60,6 @@ define({
       caption: "Tasks",
       add: "Add",
       run: "run",
-      edit: "edit",
       remove: "remove",
       editor: {
         caption: "Task",

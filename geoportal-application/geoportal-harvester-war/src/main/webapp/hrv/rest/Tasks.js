@@ -36,6 +36,10 @@ define(["dojo/_base/declare",
       
       update: function(id, taskDefinition) {
         return xhr.post("rest/harvester/tasks/"+id,{data: taskDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
+      },
+      
+      execute: function(id) {
+        return xhr.put("rest/harvester/tasks/"+id+"/execute",{handleAs: "json", headers: {"Content-Type": "application/json"}});
       }
     };
 });
