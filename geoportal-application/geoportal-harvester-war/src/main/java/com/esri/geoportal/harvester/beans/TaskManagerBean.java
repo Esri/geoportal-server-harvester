@@ -128,7 +128,7 @@ public class TaskManagerBean implements TaskManager {
   public boolean delete(UUID id) throws CrudsException {
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("DELETE * FROM TASKS WHERE ID = ?");
+            PreparedStatement st = connection.prepareStatement("DELETE FROM TASKS WHERE ID = ?");
         ) {
       st.setString(1, id.toString());
       return st.executeUpdate()>0;

@@ -53,6 +53,10 @@ define(["dojo/_base/declare",
       
       _onRemove: function() {
         this.emit("remove",{data: this.data});
+      },
+      
+      _onRun: function() {
+        this.emit("run",{data: this.data});
       }
     });
 });

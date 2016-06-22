@@ -57,8 +57,26 @@ define(["dojo/_base/declare",
       },
       
       processTask: function(task) {
-        var widget = new Task(task).placeAt(this.contentNode);
+        var widget = new Task(task);
+        widget.placeAt(this.contentNode);
+        on(widget,"remove",lang.hitch(this,this._onRemove));
+        on(widget,"run",lang.hitch(this,this._onRun));
         widget.startup();
+      },
+      
+      _onRemove: function(evt) {
+        console.log("Removing:", evt);
+        TasksREST.delete(evt.data.uuid).then(
+          lang.hitch(this,this.load),
+          lang.hitch(this,function(error){
+            console.error(error);
+            topic.publish("msg",new Error("Error removing task"));
+          })
+        );
+      },
+      
+      _onRun: function(evt) {
+        console.log("Running:", evt);
       },
       
       _onAdd: function(evt) {
