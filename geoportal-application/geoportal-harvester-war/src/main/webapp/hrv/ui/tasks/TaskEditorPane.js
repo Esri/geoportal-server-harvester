@@ -23,11 +23,11 @@ define(["dojo/_base/declare",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/TaskEditorPane.html",
-        "dijit/form/Select",
-        "dijit/form/ValidationTextBox",
-        "dijit/form/Form"
+        "hrv/rest/Brokers",
+        "dijit/form/CheckBox",
+        "dijit/form/RadioButton"
       ],
-  function(declare,lang,array,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,Select,ValidationTextBox){
+  function(declare,lang,array,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,BrokersREST,CheckBox,RadioButton){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -38,6 +38,38 @@ define(["dojo/_base/declare",
       },
     
       postCreate: function(){
+        BrokersREST.input().then(
+          lang.hitch(this,this.processInputs),
+          lang.hitch(this,function(error){
+            topic.publish("msg",this.i18n.brokers.editor.errors.connectorsLoadingErrors.inbound);
+          })
+        );
+        BrokersREST.output().then(
+          lang.hitch(this,this.processOutputs),
+          lang.hitch(this,function(error){
+            topic.publish("msg",this.i18n.brokers.editor.errors.connectorsLoadingErrors.outbound);
+          })
+        );
+      },
+      
+      processInputs: function(response) {
+        console.log("Inputs", response);
+        array.forEach(response,lang.hitch(this,this.addInput));
+      },
+      
+      addInput: function(input) {
+        /*
+        var radio = new RadioButton({
+          value: "aa",
+          name: "input"
+        });
+        radio.placeAt(this.inputsNode);
+        radio.startup();
+        */
+      },
+      
+      processOutputs: function(response) {
+        console.log("Outputs", response);
       }
     });
 });

@@ -22,7 +22,8 @@ define(["dojo/_base/declare",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/TasksPane.html",
         "dojo/topic",
-        "dojo/dom-style"
+        "dojo/dom-style",
+        "hrv/ui/tasks/Tasks"
       ],
   function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic,domStyle){
   
