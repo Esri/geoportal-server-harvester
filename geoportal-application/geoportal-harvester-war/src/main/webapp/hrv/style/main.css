@@ -190,6 +190,11 @@ html,body {
   cursor: pointer;
 }
 
+.h-task-edit {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .h-task-editor {
   
 }

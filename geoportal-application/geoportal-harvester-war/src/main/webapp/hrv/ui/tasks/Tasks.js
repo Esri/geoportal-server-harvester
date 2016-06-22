@@ -60,12 +60,12 @@ define(["dojo/_base/declare",
         var widget = new Task(task);
         widget.placeAt(this.contentNode);
         on(widget,"remove",lang.hitch(this,this._onRemove));
+        on(widget,"edit",lang.hitch(this,this._onEdit));
         on(widget,"run",lang.hitch(this,this._onRun));
         widget.startup();
       },
       
       _onRemove: function(evt) {
-        console.log("Removing:", evt);
         TasksREST.delete(evt.data.uuid).then(
           lang.hitch(this,this.load),
           lang.hitch(this,function(error){
@@ -79,6 +79,40 @@ define(["dojo/_base/declare",
         console.log("Running:", evt);
       },
       
+      _onEdit: function(evt) {
+        var taskEditorPane = new TaskEditorPane(evt.data);
+
+        // create editor dialog box
+        var taskEditorDialog = new Dialog({
+          title: this.i18n.tasks.editor.caption,
+          content: taskEditorPane,
+          onHide: function() {
+            taskEditorDialog.destroy();
+            taskEditorPane.destroy();
+          }
+        });
+        
+        // listen to "submit" button click
+        on(taskEditorPane,"submit",lang.hitch(this, function(evt){
+          var taskDefinition = evt.taskDefinition;
+          
+          // use API create new task
+          TasksREST.update(evt.uuid,json.stringify(taskDefinition)).then(
+            lang.hitch({taskEditorPane: taskEditorPane, taskEditorDialog: taskEditorDialog, self: this},function(){
+              this.taskEditorDialog.destroy();
+              this.taskEditorPane.destroy();
+              this.self.load();
+            }),
+            lang.hitch(this,function(error){
+              console.error(error);
+              topic.publish("msg",new Error("Error creating task"));
+            })
+          );
+        }));
+        
+        taskEditorDialog.show();
+      },
+      
       _onAdd: function(evt) {
         var taskEditorPane = new TaskEditorPane({});
 
@@ -87,7 +121,7 @@ define(["dojo/_base/declare",
           title: this.i18n.tasks.editor.caption,
           content: taskEditorPane,
           onHide: function() {
-            editorEditorDialog.destroy();
+            taskEditorDialog.destroy();
             taskEditorPane.destroy();
           }
         });

@@ -67,7 +67,6 @@ define(["dojo/_base/declare",
         var radioDiv = domConstruct.create("button",{class: "h-task-editor-input-radio"},div);
         var radio = new RadioButton({
           value: input.uuid,
-          id: input.uuid,
           name: "input",
           checked: count==0,
           brokerDefinition: input.brokerDefinition
@@ -86,7 +85,6 @@ define(["dojo/_base/declare",
         var checkDiv = domConstruct.create("input",{class: "h-task-editor-output-check"},div);
         var check = new CheckBox({
           value: output.uuid,
-          id: output.uuid,
           name: "output",
           brokerDefinition: output.brokerDefinition
         }, checkDiv);
