@@ -142,6 +142,11 @@ html,body {
   
 }
 
+.h-processes-caption {
+  font-size: medium;
+  font-weight: bold;
+  background-color: lightgray;
+}
 
 .h-processes-process > span {
   margin-right: 1em;
@@ -178,7 +183,6 @@ html,body {
   font-weight: bold;
   background-color: lightgray;
 }
-
 
 .h-task-remove {
   text-decoration: underline;

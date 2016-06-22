@@ -34,7 +34,7 @@ define(["dojo/_base/declare",
       },
       
       _onhome: function() {
-        topic.publish("nav","home");
+        topic.publish("nav","processes");
       },
       
       _onbrokers: function() {
@@ -43,10 +43,6 @@ define(["dojo/_base/declare",
       
       _ontasks: function() {
         topic.publish("nav","tasks");
-      },
-      
-      _onprocesses: function() {
-        topic.publish("nav","processes");
       }
     });
 });

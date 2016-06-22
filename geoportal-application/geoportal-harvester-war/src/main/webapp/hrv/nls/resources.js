@@ -32,8 +32,7 @@ define({
       home: "Home",
       connectors: "Connectors",
       brokers: "Brokers",
-      tasks: "Tasks",
-      processes: "Processes"
+      tasks: "Tasks"
     },
     
     brokers: {
@@ -70,6 +69,7 @@ define({
     },
     
     processes: {
+      caption: "Processes",
       errors: {
         loading: "Error loading processes"
       }

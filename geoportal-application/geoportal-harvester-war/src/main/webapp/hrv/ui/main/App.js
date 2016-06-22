@@ -16,6 +16,7 @@
 
 define(["dojo/_base/declare",
         "dojo/_base/lang",
+        "dojo/topic",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
@@ -29,19 +30,18 @@ define(["dojo/_base/declare",
         "hrv/ui/main/Status",
         "hrv/ui/main/Nav",
         "hrv/ui/main/Stage",
-        "hrv/ui/home/HomePane",
         "hrv/ui/brokers/BrokersPane",
         "hrv/ui/tasks/TasksPane",
         "hrv/ui/processes/ProcessesPane"
       ],
-  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
+  function(declare,lang,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
     
       postCreate: function(){
-        
+        topic.publish("nav","processes");
       }
     });
 });
