@@ -18,6 +18,8 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/dom-construct",
+        "dojo/on",
+        "dojo/json",
         "dojo/topic",
         "dijit/Dialog",
         "dijit/_WidgetBase",
@@ -29,7 +31,7 @@ define(["dojo/_base/declare",
         "hrv/ui/tasks/Task",
         "hrv/ui/tasks/TaskEditorPane"
       ],
-  function(declare,lang,array,domConstruct,topic,Dialog,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,TasksREST,Task,TaskEditorPane){
+  function(declare,lang,array,domConstruct,on,json,topic,Dialog,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,TasksREST,Task,TaskEditorPane){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -63,7 +65,7 @@ define(["dojo/_base/declare",
         var taskEditorPane = new TaskEditorPane({});
 
         // create editor dialog box
-        var editorEditorDialog = new Dialog({
+        var taskEditorDialog = new Dialog({
           title: this.i18n.tasks.editor.caption,
           content: taskEditorPane,
           onHide: function() {
@@ -72,7 +74,25 @@ define(["dojo/_base/declare",
           }
         });
         
-        editorEditorDialog.show();
+        // listen to "submit" button click
+        on(taskEditorPane,"submit",lang.hitch(this, function(evt){
+          var taskDefinition = evt.taskDefinition;
+          
+          // use API create new task
+          TasksREST.create(json.stringify(taskDefinition)).then(
+            lang.hitch({taskEditorPane: taskEditorPane, taskEditorDialog: taskEditorDialog, self: this},function(){
+              this.taskEditorDialog.destroy();
+              this.taskEditorPane.destroy();
+              this.self.load();
+            }),
+            lang.hitch(this,function(error){
+              console.error(error);
+              topic.publish("msg",new Error("Error creating task"));
+            })
+          );
+        }));
+        
+        taskEditorDialog.show();
       }
     });
 });

@@ -1,4 +1,18 @@
 <div class="h-task-editor" data-dojo-attach-point="contentNode">
-  <div data-dojo-attach-point="inputsNode"></div>
-  <div data-dojo-attach-point="outputsNode"></div>
+  <div data-dojo-type="dijit/form/Form" data-dojo-attach-point="formWidget" data-dojo-id="taskForm" encType="multipart/form-data" action="" method="">
+    <div style="display: table" class="h-task-editor-table">
+      <div style="display: table-row" class="h-task-editor-row h-task-editor-header">
+        <span style="display: table-cell" class="h-task-editor-cell h-task-editor-cell-caption">${i18n.tasks.editor.inputs}</span>
+        <span style="display: table-cell" class="h-task-editor-cell h-task-editor-cell-caption">${i18n.tasks.editor.inputs}</span>
+      </div>
+      <div style="display: table-row" class="h-task-editor-row h-task-editor-content">
+        <div style="display: table-cell" data-dojo-attach-point="inputsNode" class="h-task-editor-inputs h-task-editor-cell h-task-editor-brokers"></div>
+        <div style="display: table-cell" data-dojo-attach-point="outputsNode" class="h-task-editor-outputs h-task-editor-cell h-task-editor-brokers"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="h-task-editor-footer">
+    <button data-dojo-type="dijit/form/Button" data-dojo-attach-event="onClick:_onSubmit">${i18n.tasks.editor.submit}</button>
+  </div>
 </div>

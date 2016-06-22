@@ -62,7 +62,10 @@ define({
       run: "run",
       remove: "remove",
       editor: {
-        caption: "Task"
+        caption: "Task",
+        submit: "Submit",
+        inputs: "Inputs:",
+        outputs: "Outputs:",
       }
     },
     

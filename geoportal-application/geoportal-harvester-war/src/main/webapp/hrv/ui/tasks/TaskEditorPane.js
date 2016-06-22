@@ -17,6 +17,8 @@
 define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
+        "dojo/query",
+        "dojo/dom-construct",
         "dojo/topic",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
@@ -25,13 +27,16 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/TaskEditorPane.html",
         "hrv/rest/Brokers",
         "dijit/form/CheckBox",
-        "dijit/form/RadioButton"
+        "dijit/form/RadioButton",
+        "dijit/form/Form"
       ],
-  function(declare,lang,array,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,BrokersREST,CheckBox,RadioButton){
+  function(declare,lang,array,query,domConstruct,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,BrokersREST,CheckBox,RadioButton,Form){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
+      radios: [],
+      checks: [],
       
       constructor: function(args) {
         this.data = args;
@@ -53,23 +58,60 @@ define(["dojo/_base/declare",
       },
       
       processInputs: function(response) {
-        console.log("Inputs", response);
         array.forEach(response,lang.hitch(this,this.addInput));
       },
       
       addInput: function(input) {
-        /*
+        var count = query("> div", this.inputsNode).length;
+        var div = domConstruct.create("div",{class: "h-task-editor-input h-task-editor-broker"},this.inputsNode);
+        var radioDiv = domConstruct.create("button",{class: "h-task-editor-input-radio"},div);
         var radio = new RadioButton({
-          value: "aa",
-          name: "input"
-        });
-        radio.placeAt(this.inputsNode);
+          value: input.uuid,
+          id: input.uuid,
+          name: "input",
+          checked: count==0,
+          brokerDefinition: input.brokerDefinition
+        }, radioDiv);
         radio.startup();
-        */
+        this.radios.push(radio);
+        var label = domConstruct.create("label",{"for": input.uuid, class: "h-task-editor-input-label", innerHTML: input.brokerDefinition.label},div);
       },
       
       processOutputs: function(response) {
-        console.log("Outputs", response);
+        array.forEach(response,lang.hitch(this,this.addOutput));
+      },
+      
+      addOutput: function(output) {
+        var div = domConstruct.create("div",{class: "h-task-editor-output h-task-editor-broker"},this.outputsNode);
+        var checkDiv = domConstruct.create("input",{class: "h-task-editor-output-check"},div);
+        var check = new CheckBox({
+          value: output.uuid,
+          id: output.uuid,
+          name: "output",
+          brokerDefinition: output.brokerDefinition
+        }, checkDiv);
+        check.startup();
+        this.checks.push(check);
+        var label = domConstruct.create("label",{"for": output.uuid, class: "h-task-editor-output-label", innerHTML: output.brokerDefinition.label},div);
+      },
+      
+      _onSubmit: function() {
+        console.log("Submit");
+        var taskDefinition = {
+          source: null,
+          destinations: []
+        };
+        array.forEach(this.radios,lang.hitch(this,function(radio){
+          if (radio.checked) {
+            taskDefinition.source = radio.brokerDefinition;
+          }
+        }));
+        array.forEach(this.checks,lang.hitch(this,function(checks){
+          if (checks.checked) {
+            taskDefinition.destinations.push(checks.brokerDefinition);
+          }
+        }));
+        this.emit("submit",{taskDefinition: taskDefinition});
       }
     });
 });

@@ -189,3 +189,58 @@ html,body {
   text-decoration: underline;
   cursor: pointer;
 }
+
+.h-task-editor {
+  
+}
+
+.h-task-editor-brokers {
+  
+}
+
+.h-task-editor-cell {
+  padding: 0.5em;
+}
+
+.h-task-editor-cell-caption {
+  font-weight: bold;
+  background-color: lightgray;
+}
+
+.h-task-editor-inputs {
+  
+}
+
+.h-task-editor-outputs {
+  
+}
+
+.h-task-editor-row {
+  
+}
+
+.h-task-editor-table {
+  
+}
+
+.h-task-editor-content {
+  
+}
+
+.h-task-editor-content .h-task-editor-cell {
+  border-style: solid;
+  border-color: lightgrey;
+  border-width: 1px;
+}
+
+.h-task-editor-header {
+  
+}
+
+.h-task-editor-input-label, .h-task-editor-output-label {
+  margin-left: 0.5em;
+}
+
+.h-task-editor-footer {
+  
+}
