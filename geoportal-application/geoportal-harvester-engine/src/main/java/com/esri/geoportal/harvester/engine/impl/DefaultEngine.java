@@ -124,30 +124,16 @@ public class DefaultEngine implements Engine {
     this.reportBuilder = reportBuilder;
   }
 
-  /**
-   * Lists all triggers.
-   * @return list of triggers
-   */
   @Override
   public List<Trigger> listTriggers() {
     return new ArrayList<>(triggerRegistry.values());
   }
   
-  /**
-   * Gets inbound connector templates.
-   *
-   * @return collection of inbound connector templates
-   */
   @Override
   public List<UITemplate> getInboundConnectorTemplates() {
     return inboundConnectorRegistry.getTemplates();
   }
 
-  /**
-   * Gets outbound connector templates.
-   *
-   * @return collection of outbound connector templates
-   */
   @Override
   public List<UITemplate> getOutboundConnectorTemplates() {
     return outboundConnectorRegistry.getTemplates();
@@ -156,6 +142,14 @@ public class DefaultEngine implements Engine {
   @Override
   public List<UITemplate> getTriggers() {
     return this.triggerRegistry.values().stream().map(v->v.getTemplate()).collect(Collectors.toList());
+  }
+
+  @Override
+  public List<UITemplate> getProcessorsTemplates() {
+    List<UITemplate> templates = new ArrayList<>();
+    templates.add(processorRegistry.getDefaultProcessor().getTemplate());
+    templates.addAll(processorRegistry.values().stream().map(p->p.getTemplate()).collect(Collectors.toList()));
+    return templates;
   }
 
   /**

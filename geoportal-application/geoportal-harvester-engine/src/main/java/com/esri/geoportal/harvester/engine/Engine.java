@@ -16,7 +16,6 @@
 package com.esri.geoportal.harvester.engine;
 
 import com.esri.geoportal.harvester.api.ProcessInstance;
-import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
@@ -28,7 +27,6 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.support.BrokerInfo;
 import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -117,23 +115,29 @@ public interface Engine {
   /**
    * Gets inbound connector templates.
    *
-   * @return collection of inbound connector templates
+   * @return list of inbound connector templates
    */
   List<UITemplate> getInboundConnectorTemplates();
 
   /**
    * Gets triggers templates.
-   * @return collection of trigger templates
+   * @return list of trigger templates
    */
   List<UITemplate> getTriggers();
   
   /**
    * Gets outbound connector templates.
    *
-   * @return collection of outbound connector templates
+   * @return list of outbound connector templates
    */
   List<UITemplate> getOutboundConnectorTemplates();
 
+  /**
+   * Gets processors templates.
+   * @return list of processor templates
+   */
+  List<UITemplate> getProcessorsTemplates();
+  
   /**
    * Gets process by process id.
    *

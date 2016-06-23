@@ -20,6 +20,7 @@ import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import java.util.ArrayList;
@@ -39,6 +40,12 @@ public class DefaultProcessor implements Processor {
   @Override
   public String getType() {
     return TYPE;
+  }
+
+  @Override
+  public UITemplate getTemplate() {
+    UITemplate uiTemplate = new UITemplate(getType(), "Default processor", null);
+    return uiTemplate;
   }
 
   @Override
