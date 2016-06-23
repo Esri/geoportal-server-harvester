@@ -67,5 +67,10 @@ import java.net.URISyntaxException;
   public EntityDefinition getEntityDefinition() {
     return definition.getEntityDefinition();
   }
+
+  @Override
+  public String toString() {
+    return String.format("GPT [%s]", definition.getHostUrl());
+  }
   
 }
