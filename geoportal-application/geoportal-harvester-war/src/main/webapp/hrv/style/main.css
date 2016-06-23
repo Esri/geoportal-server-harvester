@@ -164,6 +164,12 @@ html,body {
   
 }
 
+.h-processes-process-cancel {
+  text-decoration: underline;
+  cursor: pointer;
+  color: red;
+}
+
 .h-status-completed {
   color: green;
 }

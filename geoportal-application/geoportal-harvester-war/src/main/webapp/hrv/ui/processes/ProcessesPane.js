@@ -23,12 +23,13 @@ define(["dojo/_base/declare",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/ProcessesPane.html",
         "dojo/topic",
+        "dojo/on",
         "dojo/dom-style",
         "dojo/dom-construct",
         "hrv/rest/Processes",
         "hrv/ui/processes/Process"
       ],
-  function(declare,lang,array,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic,domStyle,domConstruct,ProcessesREST,Process){
+  function(declare,lang,array,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic,on,domStyle,domConstruct,ProcessesREST,Process){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -39,27 +40,31 @@ define(["dojo/_base/declare",
       },
       
       processProcesses: function(response) {
-        console.log("TODO handle response:", response);
         array.forEach(response,lang.hitch(this,this.processSingleProcess));
       },
       
       processSingleProcess: function(info) {
         var widget = new Process(info).placeAt(this.processesNode);
+        on(widget,"reload",lang.hitch(this,this.load));
         widget.startup();
       },
       
       _onNav: function(evt) {
         domStyle.set(this.domNode,"display", evt==="processes"? "block": "none");
         if (evt==="processes") {
-          domConstruct.empty(this.processesNode);
-        
-          ProcessesREST.list().then(
-            lang.hitch(this,this.processProcesses),
-            lang.hitch(this,function(error){
-              topic.publish("msg",this.i18n.processes.errors.loading);
-            })
-          );
+          this.load();
         }
+      },
+      
+      load: function() {
+        domConstruct.empty(this.processesNode);
+
+        ProcessesREST.list().then(
+          lang.hitch(this,this.processProcesses),
+          lang.hitch(this,function(error){
+            topic.publish("msg",this.i18n.processes.errors.loading);
+          })
+        );
       }
     });
 });

@@ -16,13 +16,17 @@
 
 define(["dojo/_base/declare",
         "dojo/_base/lang",
+        "dojo/dom-construct",
+        "dojo/on",
+        "dojo/topic",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
-        "dojo/text!./templates/Process.html"
+        "dojo/text!./templates/Process.html",
+        "hrv/rest/Processes"
       ],
-  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
+  function(declare,lang,domConstruct,on,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,ProcessesREST){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -34,6 +38,23 @@ define(["dojo/_base/declare",
       },
     
       postCreate: function(){
+        if (this.data.status==="working") {
+          var a = domConstruct.create("a",{class: "h-processes-process-cancel", innerHTML: this.i18n.processes.cancel},this.domNode);
+          on(a,"click",lang.hitch(this,this._onCancel));
+        }
+      },
+      
+      _onCancel: function(evt) {
+        ProcessesREST.abort(this.data.uuid).then(
+            lang.hitch(this,this._onCanceled),
+            lang.hitch(this,function(error){
+              topic.publish("msg",this.i18n.processes.errors.canceling);
+            })
+        );
+      },
+      
+      _onCanceled: function(evt) {
+        this.emit("reload");
       }
     });
 });

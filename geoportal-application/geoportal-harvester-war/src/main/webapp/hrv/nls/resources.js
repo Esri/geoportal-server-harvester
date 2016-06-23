@@ -70,8 +70,10 @@ define({
     
     processes: {
       caption: "Processes",
+      cancel: "cancel",
       errors: {
-        loading: "Error loading processes"
+        loading: "Error loading processes",
+        canceling: "Error canceling process"
       }
     }
 
