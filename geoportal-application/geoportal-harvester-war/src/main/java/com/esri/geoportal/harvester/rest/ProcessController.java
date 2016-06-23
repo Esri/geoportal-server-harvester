@@ -38,10 +38,9 @@ import org.springframework.web.bind.annotation.RestController;
  * Process controller.
  * Provides access to processes.
  * <pre><code>
-   GET /rest/harvester/processes
-   GET /rest/harvester/processes/{processId}
-   DELETE /rest/harvester/processes/{processId}
-   PUT /rest/harvester/processes
+   GET /rest/harvester/processes                  - gets a list of all processes
+   GET /rest/harvester/processes/{processId}      - gets a single process
+   DELETE /rest/harvester/processes/{processId}   - aborts a single process
  * </code></pre>
  */
 @RestController

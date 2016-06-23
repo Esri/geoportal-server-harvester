@@ -26,7 +26,6 @@ import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import com.esri.geoportal.harvester.support.ProcessResponse;
 import com.esri.geoportal.harvester.support.TriggerResponse;
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
