@@ -37,6 +37,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Trigger controller.
+ * Provides access to triggers information.
+ * <pre><code>
+   GET /rest/harvester/triggers/types          - gets a list of all triggers
+   GET /rest/harvester/triggers                - gets a list of all active trigger instances
+   DELETE /rest/harvester/triggers/{triggerId} - deactivates a single trigger
+ * </code></pre>
  */
 @RestController
 public class TriggerController {

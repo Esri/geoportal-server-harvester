@@ -27,6 +27,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Processor controller.
+ * Provides access to processor's information.
+ * <pre><code>
+   GET /rest/harvester/processors/types      - gets a list of all processors
+ * </code></pre>
  */
 @RestController
 public class ProcessorController {
