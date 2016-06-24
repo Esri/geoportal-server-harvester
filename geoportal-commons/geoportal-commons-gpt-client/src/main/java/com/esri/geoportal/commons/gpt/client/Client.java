@@ -29,7 +29,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 
 /**
@@ -63,18 +63,20 @@ public class Client implements Closeable {
   
   /**
    * Publishes a document.
-   * @param document document to publish
+   * @param data data to publish
    * @return response information
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  public Response publish(byte [] document) throws IOException, URISyntaxException {
+  public Response publish(Data data) throws IOException, URISyntaxException {
+    ObjectMapper mapper = new ObjectMapper();
+    String json = mapper.writeValueAsString(data);
 
-    ByteArrayEntity entity = new ByteArrayEntity(document);
+    StringEntity entity = new StringEntity(json);
     HttpPut put = new HttpPut(url.toURI().resolve("rest/metadata/item"));
     put.setConfig(DEFAULT_REQUEST_CONFIG);
     put.setEntity(entity);
-    put.setHeader("Content-Type", "application/xml");
+    put.setHeader("Content-Type", "application/json");
     
     HttpClientContext context = createHttpClientContext(url, cred);
     HttpResponse httpResponse = httpClient.execute(put,context);
@@ -83,7 +85,6 @@ public class Client implements Closeable {
     try (InputStream contentStream = httpResponse.getEntity().getContent();) {
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       System.out.println(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
-      ObjectMapper mapper = new ObjectMapper();
       return mapper.readValue(responseContent, Response.class);
     }
   }

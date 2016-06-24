@@ -22,7 +22,6 @@ import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.ZonedDateTime;
@@ -39,19 +38,19 @@ import org.apache.http.client.protocol.HttpClientContext;
  */
 /*package*/ class WafFile {
 
-  private final URI sourceUri;
+  private final WafBroker broker;
   private final URL fileUrl;
   private final SimpleCredentials creds;
 
   /**
    * Creates instance of the WAF file.
    *
-   * @param sourceUri source URI
+   * @param broker broker
    * @param fileUrl file URL
    * @param creds credentials
    */
-  public WafFile(URI sourceUri, URL fileUrl, SimpleCredentials creds) {
-    this.sourceUri = sourceUri;
+  public WafFile(WafBroker broker, URL fileUrl, SimpleCredentials creds) {
+    this.broker = broker;
     this.fileUrl = fileUrl;
     this.creds = creds;
   }
@@ -70,7 +69,7 @@ import org.apache.http.client.protocol.HttpClientContext;
     HttpResponse response = httpClient.execute(method,context);
     Date lastModifiedDate = readLastModifiedDate(response);
     try (InputStream input = response.getEntity().getContent()) {
-      return new SimpleDataReference(fileUrl.toExternalForm(), lastModifiedDate, sourceUri, IOUtils.toByteArray(input));
+      return new SimpleDataReference(broker.getConnector().getType(), broker.getHostUrl().toURI(), fileUrl.toExternalForm(), lastModifiedDate, fileUrl.toURI(), IOUtils.toByteArray(input));
     }
   }
 

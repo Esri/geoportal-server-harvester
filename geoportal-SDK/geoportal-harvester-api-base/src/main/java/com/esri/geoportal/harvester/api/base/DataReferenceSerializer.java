@@ -49,11 +49,17 @@ public class DataReferenceSerializer {
    */
   public void serialize(PrintStream out, DataReference ref) throws IOException {
 
+    byte[] bBrokerType = ENCODER.encode(ref.getBrokerType().getBytes("UTF-8"));
+    byte[] bBrokerUri = ENCODER.encode(ref.getBrokerUri().toASCIIString().getBytes("UTF-8"));
     byte[] bId = ENCODER.encode(ref.getId().getBytes("UTF-8"));
     byte[] bLastModifiedDate = ENCODER.encode((ref.getLastModifiedDate() != null ? formatIsoDate(ref.getLastModifiedDate()) : "").getBytes("UTF-8"));
     byte[] bSourceUri = ENCODER.encode(ref.getSourceUri().toASCIIString().getBytes("UTF-8"));
     byte[] bContent = ENCODER.encode(ref.getContent());
 
+    out.write(bBrokerType);
+    out.write(',');
+    out.write(bBrokerUri);
+    out.write(',');
     out.write(bId);
     out.write(',');
     out.write(bLastModifiedDate);
@@ -79,19 +85,23 @@ public class DataReferenceSerializer {
     String line = reader.readLine();
     if (line != null) {
       String[] split = line.split(",");
-      if (split.length == 4) {
-        byte[] bId = DECODER.decode(split[0].getBytes("UTF-8"));
-        byte[] bLastModifiedDate = DECODER.decode(split[1].getBytes("UTF-8"));
-        byte[] bSourceUri = DECODER.decode(split[2].getBytes("UTF-8"));
-        byte[] bContent = DECODER.decode(split[3].getBytes("UTF-8"));
+      if (split.length == 6) {
+        byte[] bBrokerType = DECODER.decode(split[0].getBytes("UTF-8"));
+        byte[] bBrokerUri = DECODER.decode(split[1].getBytes("UTF-8"));
+        byte[] bId = DECODER.decode(split[2].getBytes("UTF-8"));
+        byte[] bLastModifiedDate = DECODER.decode(split[3].getBytes("UTF-8"));
+        byte[] bSourceUri = DECODER.decode(split[4].getBytes("UTF-8"));
+        byte[] bContent = DECODER.decode(split[5].getBytes("UTF-8"));
 
+        String sBrokerType = new String(bBrokerType, "UTF-8");
+        URI brokerUri = URI.create(new String(bBrokerUri, "UTF-8"));
         String sId = new String(bId, "UTF-8");
         String sLastModifiedDate = new String(bLastModifiedDate, "UTF-8");
         URI sourceUri = URI.create(new String(bSourceUri, "UTF-8"));
 
         Date lastModifiedDate = !sLastModifiedDate.isEmpty() ? Date.from(OffsetDateTime.from(FORMATTER.parse(sLastModifiedDate)).toInstant()) : null;
 
-        return new SimpleDataReference(sId, lastModifiedDate, sourceUri, bContent);
+        return new SimpleDataReference(sBrokerType, brokerUri, sId, lastModifiedDate, sourceUri, bContent);
       }
     }
     return null;

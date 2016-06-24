@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.gpt;
 
 import com.esri.geoportal.commons.gpt.client.Client;
+import com.esri.geoportal.commons.gpt.client.Data;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -23,11 +24,17 @@ import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 /**
  * GPT broker.
  */
 /*package*/ class GptBroker implements OutputBroker {
+  private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
   private final GptConnector connector;
   private final GptBrokerDefinitionAdaptor definition;
   private final Client client;
@@ -47,7 +54,13 @@ import java.net.URISyntaxException;
   @Override
   public void publish(DataReference ref) throws DataOutputException {
     try {
-      client.publish(ref.getContent());
+      Data data = new Data();
+      data.src_source_type_s = ref.getBrokerType();
+      data.src_source_uri_s = ref.getBrokerUri().toASCIIString();
+      data.src_uri_s = ref.getSourceUri().toASCIIString();
+      data.src_lastupdate_dt = ref.getLastModifiedDate()!=null? fromatDate(ref.getLastModifiedDate()): null;
+      data.xml = new String(ref.getContent(),"UTF-8");
+      client.publish(data);
     } catch (IOException|URISyntaxException ex) {
       throw new DataOutputException(this, "Error publishing data.", ex);
     }
@@ -71,6 +84,12 @@ import java.net.URISyntaxException;
   @Override
   public String toString() {
     return String.format("GPT [%s]", definition.getHostUrl());
+  }
+  
+  private String fromatDate(Date date) {
+    ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+    ZonedDateTime ofInstant = ZonedDateTime.ofInstant(zonedDateTime.toInstant(), ZoneOffset.UTC);
+    return FORMATTER.format(zonedDateTime);
   }
   
 }

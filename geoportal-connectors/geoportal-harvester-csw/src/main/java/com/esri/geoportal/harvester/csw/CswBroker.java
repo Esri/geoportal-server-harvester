@@ -28,6 +28,7 @@ import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Iterator;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -92,7 +93,7 @@ import org.apache.http.impl.client.HttpClients;
     try {
       IRecord rec = recs.next();
       String metadata = client.readMetadata(rec.getId());
-      return new SimpleDataReference(rec.getId(), rec.getLastModifiedDate(), definition.getHostUrl().toURI(), metadata.getBytes("UTF-8"));
+      return new SimpleDataReference(connector.getType(), definition.getHostUrl().toURI(), rec.getId(), rec.getLastModifiedDate(), new URI("uuid", rec.getId(), null), metadata.getBytes("UTF-8"));
     } catch (Exception ex) {
       throw new DataInputException(this, "Error reading data.", ex);
     }

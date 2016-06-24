@@ -55,6 +55,14 @@ import org.apache.http.impl.client.HttpClients;
     this.definition = definition;
   }
 
+  /**
+   * Gets host URL.
+   * @return host URL
+   */
+  public URL getHostUrl() {
+    return definition.getHostUrl();
+  }
+  
   @Override
   public boolean hasNext() throws DataInputException {
     
@@ -79,7 +87,7 @@ import org.apache.http.impl.client.HttpClients;
       
       if (subFolders==null) {
         URL startUrl = new URL(definition.getHostUrl().toExternalForm().replaceAll("/$", "")+"/");
-        WafFolderContent content = new WafFolder(startUrl.toURI(), startUrl, definition.getCredentials()).readContent(httpClient);
+        WafFolderContent content = new WafFolder(this, startUrl, definition.getCredentials()).readContent(httpClient);
         subFolders = new LinkedList<>(content.getSubFolders());
         files = new LinkedList<>(content.getFiles());
         return hasNext();

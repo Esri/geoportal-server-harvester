@@ -23,25 +23,28 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * WAF folder.
  */
 /*package*/ class WafFolder {
+  private static final Logger LOG = LoggerFactory.getLogger(WafFolder.class);
 
-  private final URI sourceUri;
+  private final WafBroker broker;
   private final URL folderUrl;
   private final SimpleCredentials creds;
 
   /**
    * Creates instance of the folder.
    *
-   * @param sourceUri source URI
+   * @param broker broker
    * @param folderUrl folder URL
    * @param creds credentials
    */
-  public WafFolder(URI sourceUri, URL folderUrl, SimpleCredentials creds) {
-    this.sourceUri = sourceUri;
+  public WafFolder(WafBroker broker, URL folderUrl, SimpleCredentials creds) {
+    this.broker = broker;
     this.folderUrl = folderUrl;
     this.creds = creds;
   }
@@ -62,9 +65,9 @@ import java.util.List;
 
     urls.forEach(u -> {
       if (u.toExternalForm().toLowerCase().endsWith(".xml")) {
-        files.add(new WafFile(sourceUri, u, creds));
+        files.add(new WafFile(broker, u, creds));
       } else {
-        subFolders.add(new WafFolder(sourceUri, u, creds));
+        subFolders.add(new WafFolder(broker, u, creds));
       }
     });
 
