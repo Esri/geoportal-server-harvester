@@ -42,6 +42,42 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 'At' trigger. Triggers harvesting at the specific time.
+ * <p>
+ * Trigger allow to schedule to run a task not only at a predetermined time, but
+ * allows to add some temporal constraints, for example: it could be trigger at
+ * a particular hour of the day, but only Mondays and Thursdays, every second 
+ * week of the month, but only in January and June. The syntax of the request: 
+   <pre><code>
+   {
+     "type": "AT",
+     "properties": {
+       "t-at-time": &lt;time definition syntax&gt;
+     },
+     taskDefinition: &lt;task definition&gt;
+   }
+   </code></pre>
+ * Time definition syntax loosely follows "crontab" syntax:<br>
+ * &lt;hour&gt;:&lt;minute&gt;[&lt;day of the week&gt;[:&lt;week of the month&gt;[:&lt;month of the year&gt;]]]
+ * <p>
+ * hour - numerical value of the hour of the day (24H clock)
+ * minute - numerical value of the minute of the hour
+ * day of the week - numerical index of the day of the week; Sunday=1, Monday=2, and so on
+ * week of the month - numerical index of the week of the month; first week of the month has value 1
+ * month of the year - numerical index of the month of the year; January=0, February=2, and so on
+ * <p>
+ * day of the week, week of the month, month of the year are optional. Any of 
+ * this parts could be substituted with asterisk (*) to skip condition.
+ * <p>
+ * Examples:<br>
+ * "04:00" - scheduled at 4:00 AM every day<br>
+ * "16:00" - scheduled at 4:00 PM every day<br>
+ * "02:30:2" - scheduled at 2:30 AM every Monday<br>
+ * "03:30:2,4:2,4" - scheduled at 3:30 AM every Monday and Wednesday, but only on second and fourth week of the month<br>
+ * "05:00:1:*:0" - scheduled at 5:00 AM every Sunday in January regardless of the week<br>
+ * "12:00:1:1:1" - scheduled at noon first day of the year<br>
+ * <p>
+ * Task definition is a JSON object describing a task to be executed. More about 
+ * task definition can be found: {@link com.esri.geoportal.harvester.rest.TaskController}.
  */
 public class AtTrigger implements Trigger {
   private static final Logger LOG = LoggerFactory.getLogger(AtTrigger.class);
@@ -248,9 +284,30 @@ public class AtTrigger implements Trigger {
         }
       }
       
-      // month of the year
+      // week of the month
       if (split.length>=4) {
-        String monthOfTheYear = split[3];
+        String weekOfTheMonth = split[3];
+        if (!"*".equals(weekOfTheMonth)) {
+          ArrayList<Predicate<Date>> pred = new ArrayList<>();
+          Arrays.asList(weekOfTheMonth.split(",")).forEach(str->{
+            try {
+              int n = Integer.parseInt(str);
+              pred.add((d)->{
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(d);
+                return cal.get(Calendar.WEEK_OF_MONTH)==n;
+              });
+            } catch (NumberFormatException ex) {
+              LOG.warn(String.format("Invalid week of the month definition", str), ex);
+            }
+          });
+          predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));
+        }
+      }
+      
+      // month of the year
+      if (split.length>=5) {
+        String monthOfTheYear = split[4];
         if (!"*".equals(monthOfTheYear)) {
           ArrayList<Predicate<Date>> pred = new ArrayList<>();
           Arrays.asList(monthOfTheYear.split(",")).forEach(str->{

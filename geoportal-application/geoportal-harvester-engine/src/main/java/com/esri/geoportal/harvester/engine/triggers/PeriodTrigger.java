@@ -42,7 +42,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Period trigger.
+ * Period trigger. Allows to schedule task periodically, for example: daily or 
+ * monthly. . The syntax of the request: 
+   <pre><code>
+   {
+     "type": "PERIOD",
+     "properties": {
+       "t-period": &lt;period syntax&gt;
+     },
+     taskDefinition: &lt;task definition&gt;
+   }
+   </code></pre>
+ * Period definition syntax is exactly as defined by {@link java.time.Period} or <a href="https://en.wikipedia.org/wiki/ISO_8601#Durations">https://en.wikipedia.org/wiki/ISO_8601#Durations</a>.
+ * <p>
+ * Examples:<br>
+ * "P1M" - monthly<br>
+ * "P1D" - daily<br>
+ * "P0.5M" - biweekly<br>
+ * <p>
+ * Task definition is a JSON object describing a task to be executed. More about 
+ * task definition can be found: {@link com.esri.geoportal.harvester.rest.TaskController}.
  */
 public class PeriodTrigger implements Trigger {
   private static final Logger LOG = LoggerFactory.getLogger(PeriodTrigger.class);

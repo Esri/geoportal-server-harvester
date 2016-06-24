@@ -25,7 +25,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 'Now' trigger. Triggers harvesting immediately.
+ * 'Now' trigger. Triggers harvesting immediately. . The syntax of the request: 
+   <pre><code>
+   {
+     "type": "NOW",
+     taskDefinition: &lt;task definition&gt;
+   }
+   </code></pre>
+ * Task definition is a JSON object describing a task to be executed. More about 
+ * task definition can be found: {@link com.esri.geoportal.harvester.rest.TaskController}.
  */
 public class NowTrigger implements Trigger {
   private static final Logger LOG = LoggerFactory.getLogger(NowTrigger.class);
