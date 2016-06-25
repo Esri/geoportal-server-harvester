@@ -75,9 +75,6 @@ import org.slf4j.LoggerFactory;
  * "03:30:2,4:2,4" - scheduled at 3:30 AM every Monday and Wednesday, but only on second and fourth week of the month<br>
  * "05:00:1:*:0" - scheduled at 5:00 AM every Sunday in January regardless of the week<br>
  * "12:00:1:1:1" - scheduled at noon first day of the year<br>
- * <p>
- * Task definition is a JSON object describing a task to be executed. More about 
- * task definition can be found: {@link com.esri.geoportal.harvester.rest.TaskController}.
  */
 public class AtTrigger implements Trigger {
   private static final Logger LOG = LoggerFactory.getLogger(AtTrigger.class);

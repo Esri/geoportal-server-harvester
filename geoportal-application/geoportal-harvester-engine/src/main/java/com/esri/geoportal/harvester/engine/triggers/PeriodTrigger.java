@@ -59,9 +59,6 @@ import org.slf4j.LoggerFactory;
  * "P1M" - monthly<br>
  * "P1D" - daily<br>
  * "P0.5M" - biweekly<br>
- * <p>
- * Task definition is a JSON object describing a task to be executed. More about 
- * task definition can be found: {@link com.esri.geoportal.harvester.rest.TaskController}.
  */
 public class PeriodTrigger implements Trigger {
   private static final Logger LOG = LoggerFactory.getLogger(PeriodTrigger.class);
