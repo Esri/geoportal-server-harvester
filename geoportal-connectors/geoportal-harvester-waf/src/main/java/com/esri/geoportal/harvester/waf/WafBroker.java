@@ -25,6 +25,7 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
@@ -55,12 +56,9 @@ import org.apache.http.impl.client.HttpClients;
     this.definition = definition;
   }
 
-  /**
-   * Gets host URL.
-   * @return host URL
-   */
-  public URL getHostUrl() {
-    return definition.getHostUrl();
+  @Override
+  public URI getBrokerUri() throws URISyntaxException {
+    return new URI("WAF",definition.getHostUrl().toExternalForm(),null);
   }
   
   @Override

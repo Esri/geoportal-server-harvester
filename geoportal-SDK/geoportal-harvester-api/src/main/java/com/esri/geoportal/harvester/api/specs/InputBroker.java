@@ -18,6 +18,8 @@ package com.esri.geoportal.harvester.api.specs;
 import com.esri.geoportal.harvester.api.Broker;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Input broker.
@@ -27,6 +29,13 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
  * @see InputConnector
  */
 public interface InputBroker extends Broker<InputConnector> {
+  
+  /**
+   * Gets broker URI.
+   * @return broker URI
+   * @throws URISyntaxException if error generating broker URI
+   */
+  URI getBrokerUri() throws URISyntaxException;
   
   /**
    * Checks if more data available.

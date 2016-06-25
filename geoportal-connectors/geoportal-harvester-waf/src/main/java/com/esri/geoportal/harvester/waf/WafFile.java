@@ -69,7 +69,7 @@ import org.apache.http.client.protocol.HttpClientContext;
     HttpResponse response = httpClient.execute(method,context);
     Date lastModifiedDate = readLastModifiedDate(response);
     try (InputStream input = response.getEntity().getContent()) {
-      return new SimpleDataReference(broker.getConnector().getType(), broker.getHostUrl().toURI(), fileUrl.toExternalForm(), lastModifiedDate, fileUrl.toURI(), IOUtils.toByteArray(input));
+      return new SimpleDataReference(broker.getBrokerUri(), fileUrl.toExternalForm(), lastModifiedDate, fileUrl.toURI(), IOUtils.toByteArray(input));
     }
   }
 

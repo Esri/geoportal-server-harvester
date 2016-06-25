@@ -24,11 +24,6 @@ import java.util.Date;
  * information.
  */
 public interface DataReference {
-  /**
-   * Gets broker type.
-   * @return broker type
-   */
-  String getBrokerType();
   
   /**
    * Gets broker URI.

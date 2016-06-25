@@ -24,7 +24,6 @@ import java.util.Date;
  * Simple data reference.
  */
 public final class SimpleDataReference implements DataReference {
-  private final String brokerType;
   private final URI brokerUri;
   private final String id;
   private final Date lastModifiedDate;
@@ -33,25 +32,18 @@ public final class SimpleDataReference implements DataReference {
 
   /**
    * Creates instance of the data reference.
-   * @param brokerType broker type
    * @param brokerUri broker URI
    * @param id record id
    * @param lastModifiedDate last modified date
    * @param sourceUri source URI
    * @param content content
    */
-  public SimpleDataReference(String brokerType, URI brokerUri, String id, Date lastModifiedDate, URI sourceUri, byte [] content) {
-    this.brokerType = brokerType;
+  public SimpleDataReference(URI brokerUri, String id, Date lastModifiedDate, URI sourceUri, byte [] content) {
     this.brokerUri = brokerUri;
     this.id = id;
     this.lastModifiedDate = lastModifiedDate;
     this.sourceUri = sourceUri;
     this.content = content;
-  }
-
-  @Override
-  public String getBrokerType() {
-    return brokerType;
   }
 
   @Override

@@ -55,7 +55,7 @@ import java.util.Date;
   public void publish(DataReference ref) throws DataOutputException {
     try {
       Data data = new Data();
-      data.src_source_type_s = ref.getBrokerType();
+      data.src_source_type_s = ref.getBrokerUri().getScheme();
       data.src_source_uri_s = ref.getBrokerUri().toASCIIString();
       data.src_uri_s = ref.getSourceUri().toASCIIString();
       data.src_lastupdate_dt = ref.getLastModifiedDate()!=null? fromatDate(ref.getLastModifiedDate()): null;
