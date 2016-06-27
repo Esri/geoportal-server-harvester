@@ -29,9 +29,10 @@ define(["dojo/_base/declare",
         "hrv/rest/Connectors",
         "dijit/form/Select",
         "dijit/form/ValidationTextBox",
+        "dijit/form/CheckBox",
         "dijit/form/Form"
       ],
-  function(declare,lang,array,domConstruct,query,html,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,ConnectorsREST,Select,ValidationTextBox){
+  function(declare,lang,array,domConstruct,query,html,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,ConnectorsREST,Select,ValidationTextBox,CheckBox,Form){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -97,6 +98,7 @@ define(["dojo/_base/declare",
         switch(arg.type) {
           case "string": this.renderString(placeholderNode,arg); break;
           case "choice": this.renderChoice(placeholderNode,arg); break;
+          case "bool": this.renderBool(placeholderNode,arg); break;
           default: console.error("Unsupported argument type:", arg.type);
         }
       },
@@ -104,6 +106,7 @@ define(["dojo/_base/declare",
       renderString: function(placeholderNode,arg) {
         var input = new ValidationTextBox({name: arg.name, required: arg.required}).placeAt(placeholderNode);
         input.name = arg.name;
+        input.startup();
       },
       
       renderChoice: function(placeholderNode,arg) {
@@ -111,6 +114,13 @@ define(["dojo/_base/declare",
         array.forEach(arg.choices,function(choice){
           select.addOption({label: choice.value, value: choice.name});
         });
+        input.startup();
+      },
+      
+      renderBool: function(placeholderNode,arg) {
+        var input = new CheckBox({name: arg.name, required: arg.required}).placeAt(placeholderNode);
+        input.name = arg.name;
+        input.startup();
       },
       
       _onTypeChanged: function(type) {

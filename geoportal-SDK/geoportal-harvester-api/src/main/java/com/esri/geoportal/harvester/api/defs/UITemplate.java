@@ -72,6 +72,8 @@ public final class UITemplate {
     string,
     /** integer type */
     integer,
+    /** boolean type */
+    bool,
     /** choice type */
     choice,
     /** temporal type */
@@ -309,6 +311,34 @@ public final class UITemplate {
     @Override
     public ArgumentType getType() {
       return ArgumentType.temporal;
+    }
+  }
+  
+  /**
+   * Temporal argument.
+   */
+  public static class BooleanArgument extends ArgumentBase<Boolean> {
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     */
+    public BooleanArgument(String name, String label) {
+      super(name, label);
+    }
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     * @param required required
+     */
+    public BooleanArgument(String name, String label, boolean required) {
+      super(name, label, required);
+    }
+
+    @Override
+    public ArgumentType getType() {
+      return ArgumentType.bool;
     }
   }
 }
