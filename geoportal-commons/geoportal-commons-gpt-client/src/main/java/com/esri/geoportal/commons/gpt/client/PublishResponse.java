@@ -16,9 +16,9 @@
 package com.esri.geoportal.commons.gpt.client;
 
 /**
- * GPT 2.0 Response.
+ * GPT 2.0 PublishResponse.
  */
-public class Response {
+public class PublishResponse {
   private boolean success;
   private String id;
   private String status;

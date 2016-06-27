@@ -68,7 +68,7 @@ public class Client implements Closeable {
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  public Response publish(Data data) throws IOException, URISyntaxException {
+  public PublishResponse publish(PublishRequest data) throws IOException, URISyntaxException {
     ObjectMapper mapper = new ObjectMapper();
     String json = mapper.writeValueAsString(data);
 
@@ -85,7 +85,7 @@ public class Client implements Closeable {
     try (InputStream contentStream = httpResponse.getEntity().getContent();) {
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       System.out.println(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
-      return mapper.readValue(responseContent, Response.class);
+      return mapper.readValue(responseContent, PublishResponse.class);
     }
   }
   

@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.gpt;
 
 import com.esri.geoportal.commons.gpt.client.Client;
-import com.esri.geoportal.commons.gpt.client.Data;
+import com.esri.geoportal.commons.gpt.client.PublishRequest;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -54,7 +54,7 @@ import java.util.Date;
   @Override
   public void publish(DataReference ref) throws DataOutputException {
     try {
-      Data data = new Data();
+      PublishRequest data = new PublishRequest();
       data.src_source_type_s = ref.getBrokerUri().getScheme();
       data.src_source_uri_s = ref.getBrokerUri().toASCIIString();
       data.src_uri_s = ref.getSourceUri().toASCIIString();

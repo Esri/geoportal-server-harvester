@@ -16,9 +16,9 @@
 package com.esri.geoportal.commons.gpt.client;
 
 /**
- * Data structure.
+ * PublishRequest structure.
  */
-public final class Data {
+public final class PublishRequest {
   public String src_source_type_s;
   public String src_source_uri_s;
   public String src_uri_s;
