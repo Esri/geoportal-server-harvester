@@ -28,9 +28,11 @@ import org.apache.commons.lang3.StringUtils;
  */
 /*package*/ class GptBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public static final String P_HOST_URL        = "gpt-host-url";
+  public static final String P_FORCE_ADD       = "gpt-force-add";
 
   private final CredentialsDefinitionAdaptor credAdaptor;
   private URL hostUrl;
+  private boolean forceAdd;
 
   /**
    * Creates instance of the adaptor.
@@ -49,6 +51,7 @@ import org.apache.commons.lang3.StringUtils;
       } catch (MalformedURLException ex) {
         throw new IllegalArgumentException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
       }
+      forceAdd = Boolean.parseBoolean(get(P_FORCE_ADD));
     }
   }
 
@@ -85,4 +88,20 @@ import org.apache.commons.lang3.StringUtils;
     credAdaptor.setCredentials(cred);
   }
   
+  /**
+   * Gets if to force add.
+   * @return <code>true</code> if to force add
+   */
+  public boolean getForceAdd() {
+    return forceAdd;
+  }
+  
+  /**
+   * Sets to force add flag.
+   * @param forceAdd <code>true</code> if to force add
+   */
+  public void setForceAdd(boolean forceAdd) {
+    this.forceAdd = forceAdd;
+    set(P_FORCE_ADD, Boolean.toString(forceAdd));
+  }
 }

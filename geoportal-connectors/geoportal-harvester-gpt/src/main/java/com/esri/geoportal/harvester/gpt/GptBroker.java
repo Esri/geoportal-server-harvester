@@ -60,7 +60,7 @@ import java.util.Date;
       data.src_uri_s = ref.getSourceUri().toASCIIString();
       data.src_lastupdate_dt = ref.getLastModifiedDate()!=null? fromatDate(ref.getLastModifiedDate()): null;
       data.xml = new String(ref.getContent(),"UTF-8");
-      client.publish(data);
+      client.publish(data, definition.getForceAdd());
     } catch (IOException|URISyntaxException ex) {
       throw new DataOutputException(this, "Error publishing data.", ex);
     }

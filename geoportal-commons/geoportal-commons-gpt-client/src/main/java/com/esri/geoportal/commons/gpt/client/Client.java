@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Esri, Inc..
+ * Copyright 2016 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,18 +71,19 @@ public class Client implements Closeable {
   /**
    * Publishes a document.
    * @param data data to publish
+   * @param forceAdd <code>true</code> to force add.
    * @return response information
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  public PublishResponse publish(PublishRequest data) throws IOException, URISyntaxException {
+  public PublishResponse publish(PublishRequest data, boolean forceAdd) throws IOException, URISyntaxException {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     String json = mapper.writeValueAsString(data);
     StringEntity entity = new StringEntity(json);
     
-    List<String> ids = queryIds(data.src_uri_s);
+    List<String> ids = !forceAdd? queryIds(data.src_uri_s): Collections.emptyList();
     HttpRequestBase request;
     switch (ids.size()) {
       case 0: {
