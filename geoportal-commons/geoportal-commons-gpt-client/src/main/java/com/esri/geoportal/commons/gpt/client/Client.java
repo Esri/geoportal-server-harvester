@@ -18,16 +18,23 @@ package com.esri.geoportal.commons.gpt.client;
 import static com.esri.geoportal.commons.utils.HttpClientContextBuilder.createHttpClientContext;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
@@ -70,16 +77,36 @@ public class Client implements Closeable {
    */
   public PublishResponse publish(PublishRequest data) throws IOException, URISyntaxException {
     ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     String json = mapper.writeValueAsString(data);
-
     StringEntity entity = new StringEntity(json);
-    HttpPut put = new HttpPut(url.toURI().resolve("rest/metadata/item"));
-    put.setConfig(DEFAULT_REQUEST_CONFIG);
-    put.setEntity(entity);
-    put.setHeader("Content-Type", "application/json");
+    
+    List<String> ids = queryIds(data.src_uri_s);
+    HttpRequestBase request;
+    switch (ids.size()) {
+      case 0: {
+          HttpPut put = new HttpPut(url.toURI().resolve("rest/metadata/item"));
+          put.setConfig(DEFAULT_REQUEST_CONFIG);
+          put.setEntity(entity);
+          put.setHeader("Content-Type", "application/json");
+          request = put;
+        }
+        break;
+      case 1: {
+          HttpPut put = new HttpPut(url.toURI().resolve("rest/metadata/item/"+ids.get(0)));
+          put.setConfig(DEFAULT_REQUEST_CONFIG);
+          put.setEntity(entity);
+          put.setHeader("Content-Type", "application/json");
+          request = put;
+        }
+        break;
+      default:
+        throw new IOException(String.format("Error updating item: %s", data.src_uri_s));
+    }
     
     HttpClientContext context = createHttpClientContext(url, cred);
-    HttpResponse httpResponse = httpClient.execute(put,context);
+    HttpResponse httpResponse = httpClient.execute(request,context);
     String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
     
     try (InputStream contentStream = httpResponse.getEntity().getContent();) {
@@ -89,10 +116,58 @@ public class Client implements Closeable {
     }
   }
   
+  /**
+   * Query items.
+   * @param query query
+   * @return query response
+   * @throws IOException if reading response fails
+   * @throws URISyntaxException if URL has invalid syntax
+   */
+  public QueryResponse query(QueryRequest query) throws IOException, URISyntaxException {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    String json = mapper.writeValueAsString(query);
+
+    StringEntity entity = new StringEntity(json);
+    HttpPost post = new HttpPost(url.toURI().resolve("elastic/metadata/item/_search"));
+    post.setConfig(DEFAULT_REQUEST_CONFIG);
+    post.setEntity(entity);
+    post.setHeader("Content-Type", "application/json");
+    
+    HttpClientContext context = createHttpClientContext(url, cred);
+    HttpResponse httpResponse = httpClient.execute(post,context);
+    String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
+    
+    try (InputStream contentStream = httpResponse.getEntity().getContent();) {
+      String responseContent = IOUtils.toString(contentStream, "UTF-8");
+      System.out.println(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
+      return mapper.readValue(responseContent, QueryResponse.class);
+    }
+  }
+  
   @Override
   public void close() throws IOException {
     if (httpClient instanceof Closeable) {
       ((Closeable)httpClient).close();
+    }
+  }
+  
+  /**
+   * Query index for existing ids.
+   * @param src_uri_s source URI
+   * @return list of ids (_id) corresponding to the source URI
+   * @throws IOException if reading response fails
+   * @throws URISyntaxException if URL has invalid syntax
+   */
+  private List<String> queryIds(String src_uri_s) throws IOException, URISyntaxException {
+    QueryRequest query = new QueryRequest();
+    query.query.term.src_uri_s = src_uri_s;
+    QueryResponse queryResponse = query(query);
+    if (queryResponse.hits!=null && queryResponse.hits.hits!=null) {
+      return queryResponse.hits.hits.stream().map(h->h._id).filter(id->id!=null).collect(Collectors.toList());
+    } else {
+      return Collections.emptyList();
     }
   }
 }
