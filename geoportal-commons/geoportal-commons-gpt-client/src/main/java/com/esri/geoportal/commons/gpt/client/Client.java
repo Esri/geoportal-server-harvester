@@ -26,13 +26,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -43,12 +44,14 @@ import org.apache.http.impl.client.HttpClients;
  * GPT 2.0 Client.
  */
 public class Client implements Closeable {
+
   private final HttpClient httpClient;
   private final URL url;
   private final SimpleCredentials cred;
-  
+
   /**
    * Creates instance of the client.
+   *
    * @param httpClient HTTP client
    * @param url URL of the GPT REST end point
    * @param cred credentials
@@ -61,15 +64,17 @@ public class Client implements Closeable {
 
   /**
    * Creates instance of the client.
+   *
    * @param url URL of the GPT REST end point
    * @param cred credentials
    */
   public Client(URL url, SimpleCredentials cred) {
     this(HttpClients.createDefault(), url, cred);
   }
-  
+
   /**
    * Publishes a document.
+   *
    * @param data data to publish
    * @param forceAdd <code>true</code> to force add.
    * @return response information
@@ -82,93 +87,78 @@ public class Client implements Closeable {
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     String json = mapper.writeValueAsString(data);
     StringEntity entity = new StringEntity(json);
-    
-    List<String> ids = !forceAdd? queryIds(data.src_uri_s): Collections.emptyList();
+
+    List<String> ids = !forceAdd ? queryIds(data.src_uri_s) : Collections.emptyList();
     HttpRequestBase request;
     switch (ids.size()) {
       case 0: {
-          HttpPut put = new HttpPut(url.toURI().resolve("rest/metadata/item"));
-          put.setConfig(DEFAULT_REQUEST_CONFIG);
-          put.setEntity(entity);
-          put.setHeader("Content-Type", "application/json");
-          request = put;
-        }
-        break;
+        HttpPut put = new HttpPut(url.toURI().resolve("rest/metadata/item"));
+        put.setConfig(DEFAULT_REQUEST_CONFIG);
+        put.setEntity(entity);
+        put.setHeader("Content-Type", "application/json");
+        request = put;
+      }
+      break;
       case 1: {
-          HttpPut put = new HttpPut(url.toURI().resolve("rest/metadata/item/"+ids.get(0)));
-          put.setConfig(DEFAULT_REQUEST_CONFIG);
-          put.setEntity(entity);
-          put.setHeader("Content-Type", "application/json");
-          request = put;
-        }
-        break;
+        HttpPut put = new HttpPut(url.toURI().resolve("rest/metadata/item/" + ids.get(0)));
+        put.setConfig(DEFAULT_REQUEST_CONFIG);
+        put.setEntity(entity);
+        put.setHeader("Content-Type", "application/json");
+        request = put;
+      }
+      break;
       default:
         throw new IOException(String.format("Error updating item: %s", data.src_uri_s));
     }
-    
+
     HttpClientContext context = createHttpClientContext(url, cred);
-    HttpResponse httpResponse = httpClient.execute(request,context);
+    HttpResponse httpResponse = httpClient.execute(request, context);
     String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
-    
+
     try (InputStream contentStream = httpResponse.getEntity().getContent();) {
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       System.out.println(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
       return mapper.readValue(responseContent, PublishResponse.class);
     }
   }
-  
+
   /**
    * Query items.
+   *
    * @param query query
    * @return query response
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  public QueryResponse query(QueryRequest query) throws IOException, URISyntaxException {
+  private List<String> queryIds(String src_uri_s) throws IOException, URISyntaxException {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    String json = mapper.writeValueAsString(query);
 
-    StringEntity entity = new StringEntity(json);
-    HttpPost post = new HttpPost(url.toURI().resolve("elastic/metadata/item/_search"));
-    post.setConfig(DEFAULT_REQUEST_CONFIG);
-    post.setEntity(entity);
-    post.setHeader("Content-Type", "application/json");
-    
+    HttpGet get = new HttpGet(url.toURI().resolve("rest/metadata/search").toASCIIString() + String.format("?q=%s", URLEncoder.encode("\""+src_uri_s+"\"", "UTF-8")));
+    get.setConfig(DEFAULT_REQUEST_CONFIG);
+    get.setHeader("Content-Type", "application/json");
+
     HttpClientContext context = createHttpClientContext(url, cred);
-    HttpResponse httpResponse = httpClient.execute(post,context);
+    HttpResponse httpResponse = httpClient.execute(get, context);
     String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
-    
+
     try (InputStream contentStream = httpResponse.getEntity().getContent();) {
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       System.out.println(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
-      return mapper.readValue(responseContent, QueryResponse.class);
+      QueryResponse queryResponse = mapper.readValue(responseContent, QueryResponse.class);
+      if (queryResponse.hits != null && queryResponse.hits.hits != null) {
+        return queryResponse.hits.hits.stream().map(h -> h._id).filter(id -> id != null).collect(Collectors.toList());
+      } else {
+        return Collections.emptyList();
+      }
     }
   }
-  
+
   @Override
   public void close() throws IOException {
     if (httpClient instanceof Closeable) {
-      ((Closeable)httpClient).close();
-    }
-  }
-  
-  /**
-   * Query index for existing ids.
-   * @param src_uri_s source URI
-   * @return list of ids (_id) corresponding to the source URI
-   * @throws IOException if reading response fails
-   * @throws URISyntaxException if URL has invalid syntax
-   */
-  private List<String> queryIds(String src_uri_s) throws IOException, URISyntaxException {
-    QueryRequest query = new QueryRequest();
-    query.query.term.src_uri_s = src_uri_s;
-    QueryResponse queryResponse = query(query);
-    if (queryResponse.hits!=null && queryResponse.hits.hits!=null) {
-      return queryResponse.hits.hits.stream().map(h->h._id).filter(id->id!=null).collect(Collectors.toList());
-    } else {
-      return Collections.emptyList();
+      ((Closeable) httpClient).close();
     }
   }
 }

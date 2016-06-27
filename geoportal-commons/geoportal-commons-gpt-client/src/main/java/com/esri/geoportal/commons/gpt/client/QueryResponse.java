@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Query response.
  */
-public class QueryResponse {
+/*package*/ final class QueryResponse {
   public Hits hits;
  
   public static final class Hits {
