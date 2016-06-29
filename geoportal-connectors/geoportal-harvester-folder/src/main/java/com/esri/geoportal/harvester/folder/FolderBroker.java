@@ -51,14 +51,16 @@ import java.net.URI;
   }
 
   @Override
-  public void publish(DataReference ref) throws DataOutputException {
+  public boolean publish(DataReference ref) throws DataOutputException {
       File f = generateFileName(ref.getSourceUri(), ref.getId());
+      boolean created = !f.exists();
       f.getParentFile().mkdirs();
       if (!f.getName().contains(".")) {
         f = f.getParentFile().toPath().resolve(f.getName()+".xml").toFile();
       }
       try (OutputStream output = new FileOutputStream(f);) {
         output.write(ref.getContent());
+        return created;
       } catch (Exception ex) {
         throw new DataOutputException(this,"Error publishing data.", ex);
       }

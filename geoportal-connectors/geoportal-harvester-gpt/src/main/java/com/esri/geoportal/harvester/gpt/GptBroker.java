@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.gpt;
 
 import com.esri.geoportal.commons.gpt.client.Client;
 import com.esri.geoportal.commons.gpt.client.PublishRequest;
+import com.esri.geoportal.commons.gpt.client.PublishResponse;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -52,7 +53,7 @@ import java.util.Date;
   }
 
   @Override
-  public void publish(DataReference ref) throws DataOutputException {
+  public boolean publish(DataReference ref) throws DataOutputException {
     try {
       PublishRequest data = new PublishRequest();
       data.src_source_type_s = ref.getBrokerUri().getScheme();
@@ -60,7 +61,14 @@ import java.util.Date;
       data.src_uri_s = ref.getSourceUri().toASCIIString();
       data.src_lastupdate_dt = ref.getLastModifiedDate()!=null? fromatDate(ref.getLastModifiedDate()): null;
       data.xml = new String(ref.getContent(),"UTF-8");
-      client.publish(data, definition.getForceAdd());
+      PublishResponse response = client.publish(data, definition.getForceAdd());
+      if (response==null) {
+        throw new DataOutputException(this, "No response received");
+      }
+      if (response.getError()!=null) {
+        throw new DataOutputException(this, response.getError().getMessage());
+      }
+      return response.getStatus().equalsIgnoreCase("created");
     } catch (IOException|URISyntaxException ex) {
       throw new DataOutputException(this, "Error publishing data.", ex);
     }

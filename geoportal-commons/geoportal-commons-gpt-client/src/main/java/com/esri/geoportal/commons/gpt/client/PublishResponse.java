@@ -19,26 +19,9 @@ package com.esri.geoportal.commons.gpt.client;
  * GPT 2.0 PublishResponse.
  */
 public class PublishResponse {
-  private boolean success;
   private String id;
   private String status;
   private Error error;
-
-  /**
-   * Checks if success.
-   * @return <code>true</code> if success
-   */
-  public boolean isSuccess() {
-    return success;
-  }
-
-  /**
-   * Sets success.
-   * @param success <code>true</code> if success
-   */
-  public void setSuccess(boolean success) {
-    this.success = success;
-  }
 
   /**
    * Gets document id.
@@ -90,7 +73,7 @@ public class PublishResponse {
   
   @Override
   public String toString() {
-    return String.format("RESPONSE :: success: %b, error: %s", success, error);
+    return String.format("RESPONSE :: status: %s, error: %s", status, error);
   }
   
   /**

@@ -31,7 +31,8 @@ public interface OutputBroker extends Broker<OutputConnector> {
   /**
    * Publishes data.
    * @param ref data reference
+   * @return <code>true</code> if data has been created as new
    * @throws DataOutputException if publishing data fails
    */
-  void publish(DataReference ref) throws DataOutputException;
+  boolean publish(DataReference ref) throws DataOutputException;
 }
