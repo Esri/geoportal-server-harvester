@@ -351,7 +351,8 @@ public class DefaultEngine implements Engine {
       ProcessInstance process = task.getProcessor().createProcess(task);
       UUID uuid = processManager.create(process);
       process.addListener(new ReportBuilderAdaptor(uuid, process, reportBuilder));
-      process.addListener(new HistoryManagerAdaptor(uuid, process, historyManager));
+      //TODO obtain task id
+      //process.addListener(new HistoryManagerAdaptor(taskId, process, historyManager));
       process.init();
       return new ProcessReference(uuid, process);
     } catch (CrudsException ex) {
