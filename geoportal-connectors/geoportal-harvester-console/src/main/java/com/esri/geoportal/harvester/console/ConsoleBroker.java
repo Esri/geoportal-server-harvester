@@ -40,7 +40,7 @@ import java.io.IOException;
   }
 
   @Override
-  public void publish(DataReference ref) throws DataOutputException {
+  public boolean publish(DataReference ref) throws DataOutputException {
     try {
       counter++;
       
@@ -48,6 +48,7 @@ import java.io.IOException;
       System.out.println(String.format("%s", new String(ref.getContent(),"UTF-8")));
       System.out.println(String.format("--- END OF %d ---", counter));
       System.out.println();
+      return true;
     } catch (IOException ex) {
       throw new DataOutputException(this, "Error publishing data.", ex);
     }
