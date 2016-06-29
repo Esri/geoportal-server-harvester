@@ -20,14 +20,9 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
-import static com.esri.geoportal.harvester.folder.PathUtil.sanitizeFileName;
-import static com.esri.geoportal.harvester.folder.StringListUtil.head;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
 import java.io.OutputStream;
@@ -81,46 +76,15 @@ import java.net.URI;
   }
   
   private File generateFileName(URI sourceUri, String id) {
-    String sUri = id;
-    
     File rootFolder = definition.getRootFolder().toPath().resolve(sourceUri.getHost()).toFile();
     List<String> subFolder = splitPath(sourceUri.getPath());
     
     File fileName = rootFolder;
-    try {
-      List<String> stock;
-      
-      URL u = new URL(sUri);
-      List<String> path = splitPath(u);
-      if (path.size()>0) {
-        if (path.size()>1) {
-          stock = StringListUtil.merge(subFolder,head(path, path.size()-1));
-          stock.add(path.get(path.size()-1));
-        } else {
-          stock = Arrays.asList(new String[0]);
-          stock.addAll(subFolder);
-          stock.addAll(path);
-        }
-      } else {
-        stock = subFolder;
-      }
-      
-      for (String t: stock) {
-        fileName = fileName.toPath().resolve(t).toFile();
-      }
-      return fileName;
-    } catch (MalformedURLException ex) {
-      if (UuidUtil.isUuid(sUri)) {
-        fileName = fileName.toPath().resolve(sanitizeFileName(sUri)+".xml").toFile();
-        return fileName;
-      } else {
-        File f = new File(sUri);
-        for (String t: StringListUtil.merge(subFolder,splitPath(f))) {
-          fileName = fileName.toPath().resolve(t).toFile();
-        }
-        return fileName;
-      }
+    for (String sf : subFolder) {
+      fileName = new File(fileName, sf);
     }
+    
+    return fileName;
   }
 
   @Override

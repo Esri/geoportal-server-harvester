@@ -55,6 +55,7 @@ import com.esri.geoportal.harvester.engine.support.BrokerInfo.Category;
 import static com.esri.geoportal.harvester.engine.support.BrokerInfo.Category.INBOUND;
 import static com.esri.geoportal.harvester.engine.support.BrokerInfo.Category.OUTBOUND;
 import com.esri.geoportal.harvester.engine.support.CrudsException;
+import com.esri.geoportal.harvester.engine.support.HistoryManagerAdaptor;
 import com.esri.geoportal.harvester.engine.support.ReportBuilderAdaptor;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.Collections;
@@ -348,9 +349,11 @@ public class DefaultEngine implements Engine {
   public ProcessReference createProcess(Task task) throws InvalidDefinitionException, DataProcessorException {
     try {
       ProcessInstance process = task.getProcessor().createProcess(task);
-      process.addListener(new ReportBuilderAdaptor(process, reportBuilder));
-      UUID id = processManager.create(process);
-      return new ProcessReference(id, process);
+      UUID uuid = processManager.create(process);
+      process.addListener(new ReportBuilderAdaptor(uuid, process, reportBuilder));
+      process.addListener(new HistoryManagerAdaptor(uuid, process, historyManager));
+      process.init();
+      return new ProcessReference(uuid, process);
     } catch (CrudsException ex) {
       throw new DataProcessorException(String.format("Error creating process: %s", task), ex);
     }

@@ -148,6 +148,11 @@ public class PeriodTrigger implements Trigger {
             }
 
             @Override
+            public void onDataAcquired(DataReference dataReference) {
+              // ignore
+            }
+
+            @Override
             public void onDataProcessed(DataReference dataReference) {
               // Ignore
             }

@@ -21,21 +21,25 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.engine.managers.ReportBuilder;
 import com.esri.geoportal.harvester.api.ex.DataException;
+import java.util.UUID;
 
 /**
  * Report builder adaptor.
  */
 public class ReportBuilderAdaptor implements ProcessInstance.Listener {
-  private final ProcessInstance process;
+  private final UUID uuid;
+  private final ProcessInstance processInstance;
   private final ReportBuilder reportBuilder;
 
   /**
    * Creates instance of the adaptor.
-   * @param process process
+   * @param uuid process instance id
+   * @param processInstance process instance
    * @param reportBuilder report builder
    */
-  public ReportBuilderAdaptor(ProcessInstance process, ReportBuilder reportBuilder) {
-    this.process = process;
+  public ReportBuilderAdaptor(UUID uuid, ProcessInstance processInstance, ReportBuilder reportBuilder) {
+    this.uuid = uuid;
+    this.processInstance = processInstance;
     this.reportBuilder = reportBuilder;
   }
 
@@ -43,26 +47,30 @@ public class ReportBuilderAdaptor implements ProcessInstance.Listener {
   public void onStatusChange(ProcessInstance.Status newStatus) {
     switch (newStatus) {
       case working:
-        reportBuilder.started(process);
+        reportBuilder.started(processInstance);
         break;
       case completed:
-        reportBuilder.completed(process);
+        reportBuilder.completed(processInstance);
         break;
     }
   }
 
   @Override
+  public void onDataAcquired(DataReference dataReference) {
+  }
+
+  @Override
   public void onDataProcessed(DataReference dataReference) {
-    reportBuilder.success(process, dataReference);
+    reportBuilder.success(processInstance, dataReference);
   }
 
   @Override
   public void onError(DataException ex) {
     if (ex instanceof DataInputException) {
-      reportBuilder.error(process, (DataInputException)ex);
+      reportBuilder.error(processInstance, (DataInputException)ex);
     }
     if (ex instanceof DataOutputException) {
-      reportBuilder.error(process, (DataOutputException)ex);
+      reportBuilder.error(processInstance, (DataOutputException)ex);
     }
   }
   

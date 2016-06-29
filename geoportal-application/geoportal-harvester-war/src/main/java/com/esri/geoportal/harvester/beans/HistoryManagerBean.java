@@ -18,6 +18,12 @@ package com.esri.geoportal.harvester.beans;
 import com.esri.geoportal.harvester.engine.managers.History;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.support.CrudsException;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -74,16 +80,21 @@ public class HistoryManagerBean implements HistoryManager {
 
   @Override
   public UUID create(History.Event data) throws CrudsException {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     UUID id = UUID.randomUUID();
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("INSERT INTO EVENTS (taskid,completed,id) VALUES (?,?,?)");
+            PreparedStatement st = connection.prepareStatement("INSERT INTO EVENTS (taskid,completed,report,id) VALUES (?,?,?,?)");
+            Reader reportReader = new StringReader(mapper.writeValueAsString(data.getReport()));
         ) {
       st.setString(1, data.getTaskId().toString());
       st.setTimestamp(2, new Timestamp(data.getTimestamp().getTime()));
-      st.setString(3, data.getUuid().toString());
+      st.setClob(3, reportReader);
+      st.setString(4, data.getUuid().toString());
       st.executeUpdate();
-    } catch (SQLException ex) {
+    } catch (IOException|SQLException ex) {
       throw new CrudsException("Error creating history event", ex);
     }
     return id;
@@ -104,6 +115,9 @@ public class HistoryManagerBean implements HistoryManager {
 
   @Override
   public History.Event read(UUID id) throws CrudsException {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("SELECT taskid,completed,id FROM EVENTS WHERE ID = ?");
@@ -111,13 +125,16 @@ public class HistoryManagerBean implements HistoryManager {
       st.setString(1, id.toString());
       ResultSet rs = st.executeQuery();
       if (rs.next()) {
-        History.Event event = new History.Event();
-        event.setTaskId(UUID.fromString(rs.getString(1)));
-        event.setTimestamp(new Date(rs.getTimestamp(2).getTime()));
-        event.setUuid(UUID.fromString(rs.getString(3)));
-        return event;
+        try (Reader reportReader = rs.getClob(3).getCharacterStream();) {
+          History.Event event = new History.Event();
+          event.setTaskId(UUID.fromString(rs.getString(1)));
+          event.setTimestamp(new Date(rs.getTimestamp(2).getTime()));
+          event.setUuid(UUID.fromString(rs.getString(3)));
+          event.setReport(mapper.readValue(reportReader, History.Report.class));
+          return event;
+        }
       }
-    } catch (SQLException ex) {
+    } catch (IOException|SQLException ex) {
       throw new CrudsException("Error reading history event", ex);
     }
     
@@ -147,15 +164,20 @@ public class HistoryManagerBean implements HistoryManager {
 
   @Override
   public boolean update(UUID id, History.Event data) throws CrudsException {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("UPDATE EVENTS SET (taskid = ?, completed = ?) WHERE ID = ?");
+            PreparedStatement st = connection.prepareStatement("UPDATE EVENTS SET (taskid = ?, completed = ?, report = ?) WHERE ID = ?");
+            Reader reportReader = new StringReader(mapper.writeValueAsString(data.getReport()));
         ) {
       st.setString(1, data.getTaskId().toString());
       st.setTimestamp(2, new Timestamp(data.getTimestamp().getTime()));
-      st.setString(3, id.toString());
+      st.setClob(3, reportReader);
+      st.setString(4, id.toString());
       return st.executeUpdate()>0;
-    } catch (SQLException ex) {
+    } catch (IOException|SQLException ex) {
       throw new CrudsException("Error updating history event", ex);
     }
   }

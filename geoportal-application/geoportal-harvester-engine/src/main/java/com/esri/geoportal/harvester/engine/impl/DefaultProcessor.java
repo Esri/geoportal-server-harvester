@@ -92,6 +92,7 @@ public class DefaultProcessor implements Processor {
                 break;
               }
               DataReference dataReference = task.getDataSource().next();
+              onAcquire(dataReference);
               task.getDataDestinations().stream().forEach((d) -> {
                 try {
                   d.publish(dataReference);
@@ -114,7 +115,6 @@ public class DefaultProcessor implements Processor {
           onStatusChange();
         }
       }, "HARVESTING");
-      onStatusChange();
     }
 
     @Override
@@ -154,6 +154,11 @@ public class DefaultProcessor implements Processor {
         return ProcessInstance.Status.working;
       }
       return ProcessInstance.Status.submitted;
+    }
+
+    @Override
+    public void init() {
+      onStatusChange();
     }
 
     /**
@@ -205,6 +210,14 @@ public class DefaultProcessor implements Processor {
      */
     private void onSuccess(DataReference dataRef) {
       listeners.forEach(l -> l.onDataProcessed(dataRef));
+    }
+
+    /**
+     * Called to handle successful data acquiring
+     * @param dataRef data reference
+     */
+    private void onAcquire(DataReference dataRef) {
+      listeners.forEach(l -> l.onDataAcquired(dataRef));
     }
     
     /**

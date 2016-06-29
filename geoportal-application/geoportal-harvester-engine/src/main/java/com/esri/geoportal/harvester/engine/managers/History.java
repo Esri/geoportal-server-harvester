@@ -15,8 +15,6 @@
  */
 package com.esri.geoportal.harvester.engine.managers;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
@@ -26,7 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  * History.
  */
-public class History extends ArrayList<History.Event> implements Closeable {
+public class History extends ArrayList<History.Event> {
   private static final Logger LOG = LoggerFactory.getLogger(History.class);
   
   /**
@@ -39,25 +37,15 @@ public class History extends ArrayList<History.Event> implements Closeable {
             .findFirst()
             .orElse(null);
   }
-
-  @Override
-  public void close() throws IOException {
-    stream().forEach(e->{
-      try {
-        e.close();
-      } catch (IOException ex) {
-        LOG.warn(String.format("Error closing event."), ex);
-      }
-    });
-  }
   
   /**
    * History event.
    */
-  public static class Event implements Closeable {
+  public static final class Event {
     private UUID uuid;
     private UUID taskId;
     private Date timestamp;
+    private Report report;
 
     public UUID getUuid() {
       return uuid;
@@ -83,9 +71,22 @@ public class History extends ArrayList<History.Event> implements Closeable {
       this.timestamp = timestamp;
     }
 
-    @Override
-    public void close() throws IOException {
-      // TODO implement CLOB close
+    public Report getReport() {
+      return report;
     }
+
+    public void setReport(Report report) {
+      this.report = report;
+    }
+  }
+  
+  /**
+   * History report.
+   */
+  public static final class Report {
+    public long acquuired;
+    public long added;
+    public long updated;
+    public long failed;
   }
 }

@@ -35,6 +35,11 @@ public interface ProcessInstance {
    * @return process title
    */
   String getTitle();
+  
+  /**
+   * Initialize process.
+   */
+  void init();
 
   /**
    * Begins the process.
@@ -95,6 +100,12 @@ public interface ProcessInstance {
      */
     void onStatusChange(Status status);
 
+    /**
+     * Called when data has been acquired.
+     * @param dataReference data reference
+     */
+    void onDataAcquired(DataReference dataReference);
+    
     /**
      * Called when data reference has been processed
      *
