@@ -21,7 +21,7 @@ import java.util.UUID;
 /**
  * Brokers information.
  */
-public final class BrokerInfo {
+public final class BrokerReference {
   private final UUID uuid;
   private final Category category;
   private final EntityDefinition brokerDefinition;
@@ -32,7 +32,7 @@ public final class BrokerInfo {
    * @param category broker category
    * @param brokerDefinition broker definition
    */
-  public BrokerInfo(UUID uuid, Category category, EntityDefinition brokerDefinition) {
+  public BrokerReference(UUID uuid, Category category, EntityDefinition brokerDefinition) {
     this.uuid = uuid;
     this.category = category;
     this.brokerDefinition = brokerDefinition;

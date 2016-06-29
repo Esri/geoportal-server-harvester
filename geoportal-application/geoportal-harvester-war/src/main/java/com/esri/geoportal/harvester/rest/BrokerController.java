@@ -17,9 +17,9 @@ package com.esri.geoportal.harvester.rest;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.engine.support.BrokerInfo;
+import com.esri.geoportal.harvester.engine.support.BrokerReference;
 import com.esri.geoportal.harvester.beans.EngineBean;
-import com.esri.geoportal.harvester.engine.support.BrokerInfo.Category;
+import com.esri.geoportal.harvester.engine.support.BrokerReference.Category;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +83,7 @@ public class BrokerController {
    * @return array of broker infos
    */
   @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<BrokerInfo[]> listBrokers(@RequestParam(value = "category", required = false) String category) {
+  public ResponseEntity<BrokerReference[]> listBrokers(@RequestParam(value = "category", required = false) String category) {
     try {
       LOG.debug(String.format("GET /rest/harvester/brokers%s",category!=null? "&category="+category: ""));
       Category ctg = null;
@@ -92,7 +92,7 @@ public class BrokerController {
       } catch (IllegalArgumentException ex) {
         // ignore
       }
-      return new ResponseEntity<>(engine.getBrokersDefinitions(ctg).toArray(new BrokerInfo[0]), HttpStatus.OK);
+      return new ResponseEntity<>(engine.getBrokersDefinitions(ctg).toArray(new BrokerReference[0]), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error listing all brokers"), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -105,7 +105,7 @@ public class BrokerController {
    * @return broker info or <code>null</code> if no broker found
    */
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<BrokerInfo> getBroker(@PathVariable UUID brokerId) {
+  public ResponseEntity<BrokerReference> getBroker(@PathVariable UUID brokerId) {
     try {
       LOG.debug(String.format("GET /rest/harvester/brokers/%s", brokerId));
       return new ResponseEntity<>(engine.findBroker(brokerId), HttpStatus.OK);
@@ -121,10 +121,10 @@ public class BrokerController {
    * @return broker info
    */
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<BrokerInfo> deleteBroker(@PathVariable UUID brokerId) {
+  public ResponseEntity<BrokerReference> deleteBroker(@PathVariable UUID brokerId) {
     try {
       LOG.debug(String.format("DELETE /rest/harvester/brokers/%s", brokerId));
-      BrokerInfo brokerInfo = engine.findBroker(brokerId);
+      BrokerReference brokerInfo = engine.findBroker(brokerId);
       if (brokerInfo!=null) {
         engine.deleteBroker(brokerId);
       }
@@ -141,7 +141,7 @@ public class BrokerController {
    * @return broker info of the newly created broker
    */
   @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<BrokerInfo> createBroker(@RequestBody EntityDefinition brokerDefinition) {
+  public ResponseEntity<BrokerReference> createBroker(@RequestBody EntityDefinition brokerDefinition) {
     try {
       LOG.debug(String.format("PUT /rest/harvester/brokers <-- %s", brokerDefinition));
       return new ResponseEntity<>(engine.createBroker(brokerDefinition), HttpStatus.OK);
@@ -158,7 +158,7 @@ public class BrokerController {
    * @return broker info of the task which has been replaced
    */
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<BrokerInfo> updateBroker(@RequestBody EntityDefinition brokerDefinition, @PathVariable UUID brokerId) {
+  public ResponseEntity<BrokerReference> updateBroker(@RequestBody EntityDefinition brokerDefinition, @PathVariable UUID brokerId) {
     try {
       LOG.debug(String.format("POST /rest/harvester/brokers/%s <-- %s", brokerId, brokerDefinition));
       return new ResponseEntity<>(engine.updateBroker(brokerId, brokerDefinition), HttpStatus.OK);

@@ -16,7 +16,6 @@
 package com.esri.geoportal.harvester.engine.support;
 
 import com.esri.geoportal.harvester.api.ProcessInstance;
-import com.esri.geoportal.harvester.api.Processor;
 import java.util.UUID;
 
 /**

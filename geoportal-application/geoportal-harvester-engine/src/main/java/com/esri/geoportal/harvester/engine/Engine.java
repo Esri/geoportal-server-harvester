@@ -24,7 +24,7 @@ import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
-import com.esri.geoportal.harvester.engine.support.BrokerInfo;
+import com.esri.geoportal.harvester.engine.support.BrokerReference;
 import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.List;
@@ -53,7 +53,7 @@ public interface Engine {
    * @return broker info or <code>null</code> if broker has not been created
    * @throws DataProcessorException if accessing repository fails
    */
-  BrokerInfo createBroker(EntityDefinition brokerDefinition) throws DataProcessorException;
+  BrokerReference createBroker(EntityDefinition brokerDefinition) throws DataProcessorException;
 
   /**
    * Creates process.
@@ -101,7 +101,7 @@ public interface Engine {
    * broker id can be found
    * @throws DataProcessorException if accessing repository fails
    */
-  BrokerInfo findBroker(UUID brokerId) throws DataProcessorException;
+  BrokerReference findBroker(UUID brokerId) throws DataProcessorException;
 
   /**
    * Gets broker definitions.
@@ -110,7 +110,7 @@ public interface Engine {
    * @return broker infos
    * @throws DataProcessorException if accessing repository fails
    */
-  List<BrokerInfo> getBrokersDefinitions(BrokerInfo.Category category) throws DataProcessorException;
+  List<BrokerReference> getBrokersDefinitions(BrokerReference.Category category) throws DataProcessorException;
 
   /**
    * Gets inbound connector templates.
@@ -223,7 +223,7 @@ public interface Engine {
    * @return broker info or <code>null</code> if broker has not been created
    * @throws DataProcessorException if accessing repository fails
    */
-  BrokerInfo updateBroker(UUID brokerId, EntityDefinition brokerDefinition) throws DataProcessorException;
+  BrokerReference updateBroker(UUID brokerId, EntityDefinition brokerDefinition) throws DataProcessorException;
 
   /**
    * Updates task.

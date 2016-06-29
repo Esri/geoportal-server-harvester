@@ -59,7 +59,7 @@ public class JsonSerializer {
           String sUuid = uuidNode.toString();
           try {
             UUID uuid = UUID.fromString(sUuid);
-            BrokerInfo broker = engine.findBroker(uuid);
+            BrokerReference broker = engine.findBroker(uuid);
             if (broker==null) {
               throw new JsonParseException(jp,String.format("Invalid uuid: %s", sUuid));
             }

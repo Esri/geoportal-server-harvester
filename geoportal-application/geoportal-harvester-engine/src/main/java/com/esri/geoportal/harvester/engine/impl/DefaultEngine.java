@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.engine.impl;
 
 import com.esri.geoportal.harvester.api.ProcessInstance;
-import com.esri.geoportal.harvester.engine.support.BrokerInfo;
+import com.esri.geoportal.harvester.engine.support.BrokerReference;
 import com.esri.geoportal.harvester.engine.managers.ProcessorRegistry;
 import com.esri.geoportal.harvester.engine.managers.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.managers.OutboundConnectorRegistry;
@@ -51,9 +51,9 @@ import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import com.esri.geoportal.harvester.engine.Engine;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
-import com.esri.geoportal.harvester.engine.support.BrokerInfo.Category;
-import static com.esri.geoportal.harvester.engine.support.BrokerInfo.Category.INBOUND;
-import static com.esri.geoportal.harvester.engine.support.BrokerInfo.Category.OUTBOUND;
+import com.esri.geoportal.harvester.engine.support.BrokerReference.Category;
+import static com.esri.geoportal.harvester.engine.support.BrokerReference.Category.INBOUND;
+import static com.esri.geoportal.harvester.engine.support.BrokerReference.Category.OUTBOUND;
 import com.esri.geoportal.harvester.engine.support.CrudsException;
 import com.esri.geoportal.harvester.engine.support.HistoryManagerAdaptor;
 import com.esri.geoportal.harvester.engine.support.ReportBuilderAdaptor;
@@ -161,13 +161,13 @@ public class DefaultEngine implements Engine {
    * @throws DataProcessorException if accessing repository fails
    */
   @Override
-  public List<BrokerInfo> getBrokersDefinitions(Category category) throws DataProcessorException {
+  public List<BrokerReference> getBrokersDefinitions(Category category) throws DataProcessorException {
     if (category != null) {
       try {
         Set<String> brokerTypes = listTypesByCategory(category);
         return brokerDefinitionManager.select().stream()
                 .filter(e -> brokerTypes.contains(e.getValue().getType()))
-                .map(e -> new BrokerInfo(e.getKey(), category, e.getValue()))
+                .map(e -> new BrokerReference(e.getKey(), category, e.getValue()))
                 .collect(Collectors.toList());
       } catch (CrudsException ex) {
         throw new DataProcessorException(String.format("Error getting brokers for category: %s", category), ex);
@@ -186,13 +186,13 @@ public class DefaultEngine implements Engine {
    * @throws DataProcessorException if accessing repository fails
    */
   @Override
-  public BrokerInfo findBroker(UUID brokerId) throws DataProcessorException {
+  public BrokerReference findBroker(UUID brokerId) throws DataProcessorException {
     try {
       EntityDefinition brokerDefinition = brokerDefinitionManager.read(brokerId);
       if (brokerDefinition != null) {
         Category category = getBrokerCategoryByType(brokerDefinition.getType());
         if (category != null) {
-          return new BrokerInfo(brokerId, category, brokerDefinition);
+          return new BrokerReference(brokerId, category, brokerDefinition);
         }
       }
       return null;
@@ -209,12 +209,12 @@ public class DefaultEngine implements Engine {
    * @throws DataProcessorException if accessing repository fails
    */
   @Override
-  public BrokerInfo createBroker(EntityDefinition brokerDefinition) throws DataProcessorException {
+  public BrokerReference createBroker(EntityDefinition brokerDefinition) throws DataProcessorException {
     Category category = getBrokerCategoryByType(brokerDefinition.getType());
     if (category != null) {
       try {
         UUID id = brokerDefinitionManager.create(brokerDefinition);
-        return new BrokerInfo(id, category, brokerDefinition);
+        return new BrokerReference(id, category, brokerDefinition);
       } catch (CrudsException ex) {
         throw new DataProcessorException(String.format("Error creating broker: %s", brokerDefinition), ex);
       }
@@ -231,7 +231,7 @@ public class DefaultEngine implements Engine {
    * @throws DataProcessorException if accessing repository fails
    */
   @Override
-  public BrokerInfo updateBroker(UUID brokerId, EntityDefinition brokerDefinition) throws DataProcessorException {
+  public BrokerReference updateBroker(UUID brokerId, EntityDefinition brokerDefinition) throws DataProcessorException {
     try {
       EntityDefinition oldBrokerDef = brokerDefinitionManager.read(brokerId);
       if (oldBrokerDef != null) {
@@ -240,7 +240,7 @@ public class DefaultEngine implements Engine {
         }
       }
       Category category = oldBrokerDef != null ? getBrokerCategoryByType(oldBrokerDef.getType()) : null;
-      return category != null ? new BrokerInfo(brokerId, category, brokerDefinition) : null;
+      return category != null ? new BrokerReference(brokerId, category, brokerDefinition) : null;
     } catch (CrudsException ex) {
       throw new DataProcessorException(String.format("Error updating broker: %s <-- %s", brokerId, brokerDefinition), ex);
     }
