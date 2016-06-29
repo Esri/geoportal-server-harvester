@@ -351,9 +351,6 @@ public class DefaultEngine implements Engine {
       ProcessInstance process = task.getProcessor().createProcess(task);
       UUID uuid = processManager.create(process);
       process.addListener(new ReportBuilderAdaptor(uuid, process, reportBuilder));
-      //TODO obtain task id
-      //process.addListener(new HistoryManagerAdaptor(taskId, process, historyManager));
-      process.init();
       return new ProcessReference(uuid, process);
     } catch (CrudsException ex) {
       throw new DataProcessorException(String.format("Error creating process: %s", task), ex);
@@ -371,8 +368,7 @@ public class DefaultEngine implements Engine {
   @Override
   public ProcessReference submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException, DataProcessorException {
     Task task = createTask(taskDefinition);
-    ProcessReference prInfo = createProcess(task);
-    return prInfo;
+    return createProcess(task);
   }
   
   /**
@@ -556,29 +552,41 @@ public class DefaultEngine implements Engine {
    * DefaultEngine-bound trigger context.
    */
   protected class TriggerContext implements TriggerInstance.Context {
-    private final UUID uuid;
+    private final UUID taskId;
     private final TriggerInstance instance;
     
-    public TriggerContext(UUID uuid, TriggerInstance instance) {
-      this.uuid = uuid;
+    public TriggerContext(TriggerInstance instance) {
+      this.taskId = null;
+      this.instance = instance;
+    }
+    
+    public TriggerContext(UUID taskId, TriggerInstance instance) {
+      this.taskId = taskId;
       this.instance = instance;
     }
 
     @Override
     public synchronized ProcessInstance submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
-      ProcessReference ref;
-      ref = submitTaskDefinition(taskDefinition);
-      return ref != null ? ref.getProcess() : null;
+      ProcessReference ref = submitTaskDefinition(taskDefinition);
+      if (taskId!=null) {
+        ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref.getProcess(), historyManager));
+      }
+      ref.getProcess().init();
+      return ref.getProcess();
     }
     
     @Override
     public Date lastHarvest() throws DataProcessorException {
       try {
-        History history = historyManager.buildHistory(uuid);
-        History.Event lastEvent = history.lastEvent();
-        return lastEvent!=null? lastEvent.getTimestamp(): null;
+        if (taskId!=null) {
+          History history = historyManager.buildHistory(taskId);
+          History.Event lastEvent = history.lastEvent();
+          return lastEvent!=null? lastEvent.getTimestamp(): null;
+        } else {
+          return null;
+        }
       } catch (CrudsException ex) {
-        throw new DataProcessorException(String.format("Error getting last harvest for: %s", uuid), ex);
+        throw new DataProcessorException(String.format("Error getting last harvest for: %s", taskId), ex);
       }
     }
   }

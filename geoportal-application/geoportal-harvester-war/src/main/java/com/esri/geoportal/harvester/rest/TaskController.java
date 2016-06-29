@@ -22,6 +22,8 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.engine.managers.HistoryManager;
+import com.esri.geoportal.harvester.engine.support.HistoryManagerAdaptor;
 import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import com.esri.geoportal.harvester.support.ProcessResponse;
@@ -137,6 +139,9 @@ public class TaskController {
   @Autowired
   private EngineBean engine;
   
+  @Autowired
+  private HistoryManager historyManager;
+  
   /**
    * Lists all available tasks.
    * @return array of task informations
@@ -235,6 +240,8 @@ public class TaskController {
       LOG.debug(String.format("PUT /rest/harvester/tasks/%s/execute", taskId));
       TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
       ProcessReference ref = engine.submitTaskDefinition(taskDefinition);
+      ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref.getProcess(), historyManager));
+      ref.getProcess().init();
       ref.getProcess().begin();
       return new ResponseEntity<>(new ProcessResponse(ref.getProcessId(), ref.getProcess().getTitle(), ref.getProcess().getStatus()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
@@ -254,6 +261,7 @@ public class TaskController {
     try {
       LOG.debug(String.format("PUT /rest/harvester/tasks/execute <-- %s", taskDefinition));
       ProcessReference ref = engine.submitTaskDefinition(taskDefinition);
+      ref.getProcess().init();
       ref.getProcess().begin();
       return new ResponseEntity<>(new ProcessResponse(ref.getProcessId(), ref.getProcess().getTitle(), ref.getProcess().getStatus()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
