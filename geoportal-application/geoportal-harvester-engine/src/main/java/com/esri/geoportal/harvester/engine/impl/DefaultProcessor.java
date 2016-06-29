@@ -95,9 +95,9 @@ public class DefaultProcessor implements Processor {
               onAcquire(dataReference);
               task.getDataDestinations().stream().forEach((d) -> {
                 try {
-                  d.publish(dataReference);
+                  boolean created = d.publish(dataReference);
                   LOG.debug(String.format("Harvested %s during %s", dataReference, getTitle()));
-                  onSuccess(dataReference);
+                  onSuccess(dataReference,created);
                 } catch (DataOutputException ex) {
                   LOG.warn(String.format("Failed harvesting %s during %s", dataReference, getTitle()));
                   onError(ex);
@@ -207,9 +207,10 @@ public class DefaultProcessor implements Processor {
     /**
      * Called to handle successful data processing
      * @param dataRef data reference
+     * @param created <code>true</code> if new resource has been created
      */
-    private void onSuccess(DataReference dataRef) {
-      listeners.forEach(l -> l.onDataProcessed(dataRef));
+    private void onSuccess(DataReference dataRef, boolean created) {
+      listeners.forEach(l -> l.onDataProcessed(dataRef,created));
     }
 
     /**

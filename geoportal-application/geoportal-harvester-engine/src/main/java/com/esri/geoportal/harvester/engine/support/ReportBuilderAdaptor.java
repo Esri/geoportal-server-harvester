@@ -60,7 +60,7 @@ public class ReportBuilderAdaptor implements ProcessInstance.Listener {
   }
 
   @Override
-  public void onDataProcessed(DataReference dataReference) {
+  public void onDataProcessed(DataReference dataReference, boolean created) {
     reportBuilder.success(processInstance, dataReference);
   }
 

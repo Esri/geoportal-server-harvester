@@ -87,8 +87,12 @@ public class HistoryManagerAdaptor implements ProcessInstance.Listener {
   }
 
   @Override
-  public void onDataProcessed(DataReference dataReference) {
-    // TODO provide implementation
+  public void onDataProcessed(DataReference dataReference, boolean created) {
+    if (created) {
+      report.added++;
+    } else {
+      report.updated++;
+    }
   }
 
   @Override

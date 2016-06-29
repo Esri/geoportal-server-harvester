@@ -110,8 +110,9 @@ public interface ProcessInstance {
      * Called when data reference has been processed
      *
      * @param dataReference data reference
+     * @param created <code>true</code> if new resource has been created
      */
-    void onDataProcessed(DataReference dataReference);
+    void onDataProcessed(DataReference dataReference, boolean created);
 
     /**
      * Called for output onError.

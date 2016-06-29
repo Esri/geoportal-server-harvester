@@ -24,6 +24,7 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.engine.support.BaseProcessInstanceListener;
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -161,27 +162,12 @@ public class AtTrigger implements Trigger {
         if (predicate.test(new Date())) {
           try {
             ProcessInstance process = triggerContext.submit(triggerDefinition.getTaskDefinition());
-            process.addListener(new ProcessInstance.Listener() {
+            process.addListener(new BaseProcessInstanceListener() {
               @Override
               public void onStatusChange(ProcessInstance.Status status) {
                 if (status==ProcessInstance.Status.completed && !Thread.currentThread().isInterrupted()) {
                   schedule(newRunnable(triggerContext, predicate));
                 }
-              }
-
-              @Override
-              public void onDataAcquired(DataReference dataReference) {
-                // ignore
-              }
-
-              @Override
-              public void onDataProcessed(DataReference dataReference) {
-                // Ignore
-              }
-
-              @Override
-              public void onError(DataException ex) {
-                // Ignore
               }
             });
             process.begin();
