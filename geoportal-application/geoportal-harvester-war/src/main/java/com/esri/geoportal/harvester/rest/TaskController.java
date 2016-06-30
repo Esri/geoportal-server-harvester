@@ -286,7 +286,7 @@ public class TaskController {
       triggerInstanceDefinition.setType(triggerDefinition.getType());
       triggerInstanceDefinition.setTaskDefinition(taskDefinition);
       triggerInstanceDefinition.setProperties(triggerDefinition.getProperties());
-      TriggerReference trigRef = engine.scheduleTask(triggerInstanceDefinition);
+      TriggerReference trigRef = engine.scheduleTask(taskId, triggerInstanceDefinition);
       return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), trigRef.getTriggerInstanceDefinition()),HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -304,7 +304,7 @@ public class TaskController {
   public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody TriggerInstanceDefinition trigDef) {
     try {
       LOG.debug(String.format("PUT /rest/harvester/tasks/schedule <-- %s", trigDef));
-      TriggerReference trigRef = engine.scheduleTask(trigDef);
+      TriggerReference trigRef = engine.scheduleTask(null,trigDef);
       return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), trigRef.getTriggerInstanceDefinition()),HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -15,7 +15,6 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import java.util.HashMap;

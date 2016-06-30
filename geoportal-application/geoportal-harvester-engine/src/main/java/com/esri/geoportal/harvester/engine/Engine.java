@@ -162,15 +162,6 @@ public interface Engine {
    * @throws DataProcessorException if accessing repository fails
    */
   TaskDefinition readTaskDefinition(UUID taskId) throws DataProcessorException;
-
-  /**
-   * Schedules task with trigger.
-   * @param trigDef trigger instance definition
-   * @return trigger reference
-   * @throws InvalidDefinitionException if invalid definition
-   * @throws DataProcessorException if error processing data
-   */
-  TriggerReference scheduleTask(TriggerInstanceDefinition trigDef) throws InvalidDefinitionException, DataProcessorException;
   
   /**
    * Deactivates trigger.
@@ -214,6 +205,16 @@ public interface Engine {
    * @throws DataProcessorException if accessing repository fails
    */
   ProcessReference submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException, DataProcessorException;
+
+  /**
+   * Schedules task with trigger.
+   * @param taskId task id or <code>null</code> if no id
+   * @param trigDef trigger instance definition
+   * @return trigger reference
+   * @throws InvalidDefinitionException if invalid definition
+   * @throws DataProcessorException if error processing data
+   */
+  TriggerReference scheduleTask(UUID taskId, TriggerInstanceDefinition trigDef) throws InvalidDefinitionException, DataProcessorException;
 
   /**
    * Creates a broker.
