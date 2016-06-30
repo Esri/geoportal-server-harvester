@@ -92,7 +92,7 @@ public class BrokerController {
       } catch (IllegalArgumentException ex) {
         // ignore
       }
-      return new ResponseEntity<>(engine.getBrokersDefinitions(ctg).toArray(new BrokerReference[0]), HttpStatus.OK);
+      return new ResponseEntity<>(engine.getBrokersService().getBrokersDefinitions(ctg).toArray(new BrokerReference[0]), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error listing all brokers"), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -108,7 +108,7 @@ public class BrokerController {
   public ResponseEntity<BrokerReference> getBroker(@PathVariable UUID brokerId) {
     try {
       LOG.debug(String.format("GET /rest/harvester/brokers/%s", brokerId));
-      return new ResponseEntity<>(engine.findBroker(brokerId), HttpStatus.OK);
+      return new ResponseEntity<>(engine.getBrokersService().findBroker(brokerId), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error getting broker: %s", brokerId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -124,9 +124,9 @@ public class BrokerController {
   public ResponseEntity<BrokerReference> deleteBroker(@PathVariable UUID brokerId) {
     try {
       LOG.debug(String.format("DELETE /rest/harvester/brokers/%s", brokerId));
-      BrokerReference brokerInfo = engine.findBroker(brokerId);
+      BrokerReference brokerInfo = engine.getBrokersService().findBroker(brokerId);
       if (brokerInfo!=null) {
-        engine.deleteBroker(brokerId);
+        engine.getBrokersService().deleteBroker(brokerId);
       }
       return new ResponseEntity<>(brokerInfo, HttpStatus.OK);
     } catch (DataProcessorException ex) {
@@ -144,7 +144,7 @@ public class BrokerController {
   public ResponseEntity<BrokerReference> createBroker(@RequestBody EntityDefinition brokerDefinition) {
     try {
       LOG.debug(String.format("PUT /rest/harvester/brokers <-- %s", brokerDefinition));
-      return new ResponseEntity<>(engine.createBroker(brokerDefinition), HttpStatus.OK);
+      return new ResponseEntity<>(engine.getBrokersService().createBroker(brokerDefinition), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error creating broker: %s", brokerDefinition), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -161,7 +161,7 @@ public class BrokerController {
   public ResponseEntity<BrokerReference> updateBroker(@RequestBody EntityDefinition brokerDefinition, @PathVariable UUID brokerId) {
     try {
       LOG.debug(String.format("POST /rest/harvester/brokers/%s <-- %s", brokerId, brokerDefinition));
-      return new ResponseEntity<>(engine.updateBroker(brokerId, brokerDefinition), HttpStatus.OK);
+      return new ResponseEntity<>(engine.getBrokersService().updateBroker(brokerId, brokerDefinition), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error updating broker: %s <-- %s", brokerId, brokerDefinition), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

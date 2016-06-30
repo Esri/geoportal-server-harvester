@@ -46,7 +46,7 @@ public class ProcessorController {
   @RequestMapping(value = "/rest/harvester/processors/types", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate[] listProcessorTypes() {
     LOG.debug(String.format("GET /rest/harvester/processors/types"));
-    return engine.getProcessorsTemplates().toArray(new UITemplate[0]);
+    return engine.getTemplatesService().getProcessorsTemplates().toArray(new UITemplate[0]);
   }
   
 }

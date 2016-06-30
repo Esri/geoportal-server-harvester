@@ -16,7 +16,6 @@
 package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.specs.InputBroker;
 import java.net.URI;
 import java.util.Date;
 

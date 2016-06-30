@@ -169,7 +169,7 @@ public class ConnectorController {
   @RequestMapping(value = "/rest/harvester/connectors/inbound", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate[] listInboundConnectors() {
     LOG.debug(String.format("GET /rest/harvester/connectors/inbound"));
-    return engine.getInboundConnectorTemplates().toArray(new UITemplate[0]);
+    return engine.getTemplatesService().getInboundConnectorTemplates().toArray(new UITemplate[0]);
   }
   
   /**
@@ -179,7 +179,7 @@ public class ConnectorController {
   @RequestMapping(value = "/rest/harvester/connectors/outbound", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate[] listOutboundConnectors() {
     LOG.debug(String.format("GET /rest/harvester/connectors/outbound"));
-    return engine.getOutboundConnectorTemplates().toArray(new UITemplate[0]);
+    return engine.getTemplatesService().getOutboundConnectorTemplates().toArray(new UITemplate[0]);
   }
   
   /**
@@ -190,7 +190,7 @@ public class ConnectorController {
   @RequestMapping(value = "/rest/harvester/connectors/inbound/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate getInboundConnector(@PathVariable String id) {
     LOG.debug(String.format("GET /rest/harvester/connectors/inbound/%s", id));
-    return engine.getInboundConnectorTemplates().stream().filter(a->a.getType().equals(id)).findFirst().orElse(null);
+    return engine.getTemplatesService().getInboundConnectorTemplates().stream().filter(a->a.getType().equals(id)).findFirst().orElse(null);
   }
   
   /**
@@ -201,6 +201,6 @@ public class ConnectorController {
   @RequestMapping(value = "/rest/harvester/connectors/outbound/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate getOutboundConnector(@PathVariable String id) {
     LOG.debug(String.format("GET /rest/harvester/connectors/outbound/%s", id));
-    return engine.getOutboundConnectorTemplates().stream().filter(a->a.getType().equals(id)).findFirst().orElse(null);
+    return engine.getTemplatesService().getOutboundConnectorTemplates().stream().filter(a->a.getType().equals(id)).findFirst().orElse(null);
   }
 }

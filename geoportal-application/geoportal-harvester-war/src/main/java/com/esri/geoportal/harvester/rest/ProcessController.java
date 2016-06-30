@@ -74,7 +74,7 @@ public class ProcessController {
   public ResponseEntity<ProcessResponse> getProcessInfo(@PathVariable UUID processId) {
     try {
       LOG.debug(String.format("GET /rest/harvester/processes/%s", processId));
-      ProcessInstance process = engine.getProcess(processId);
+      ProcessInstance process = engine.getProcessesService().getProcess(processId);
       return new ResponseEntity<>(process!=null? new ProcessResponse(processId, process.getTitle(), process.getStatus()): null,HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error getting process info: %s", processId), ex);
@@ -91,7 +91,7 @@ public class ProcessController {
   public ResponseEntity<ProcessResponse> abortProcess(@PathVariable UUID processId) {
     try {
       LOG.debug(String.format("DELETE /rest/harvester/processes/%s", processId));
-      ProcessInstance process = engine.getProcess(processId);
+      ProcessInstance process = engine.getProcessesService().getProcess(processId);
       if (process!=null) {
         try {
           process.abort();
@@ -112,7 +112,7 @@ public class ProcessController {
    * @return array of filtered processes
    */
   private ProcessResponse[] filterProcesses(Predicate<? super Map.Entry<UUID, ProcessInstance>> predicate) throws DataProcessorException {
-    return engine.selectProcesses(predicate).stream()
+    return engine.getProcessesService().selectProcesses(predicate).stream()
             .map(e->new ProcessResponse(e.getKey(),e.getValue().getTitle(),e.getValue().getStatus()))
             .collect(Collectors.toList()).toArray(new ProcessResponse[0]);
   }

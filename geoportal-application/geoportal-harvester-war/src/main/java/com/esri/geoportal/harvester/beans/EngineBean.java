@@ -15,24 +15,13 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.api.Trigger;
-import com.esri.geoportal.harvester.api.TriggerInstance;
-import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
-import com.esri.geoportal.harvester.engine.managers.BrokerDefinitionManager;
-import com.esri.geoportal.harvester.engine.managers.ReportBuilder;
+import com.esri.geoportal.harvester.engine.BrokersService;
+import com.esri.geoportal.harvester.engine.ExecutionService;
+import com.esri.geoportal.harvester.engine.ProcessesService;
+import com.esri.geoportal.harvester.engine.TasksService;
+import com.esri.geoportal.harvester.engine.TemplatesService;
+import com.esri.geoportal.harvester.engine.TriggersService;
 import com.esri.geoportal.harvester.engine.impl.DefaultEngine;
-import com.esri.geoportal.harvester.engine.managers.HistoryManager;
-import com.esri.geoportal.harvester.engine.managers.ProcessManager;
-import com.esri.geoportal.harvester.engine.managers.TaskManager;
-import com.esri.geoportal.harvester.engine.managers.OutboundConnectorRegistry;
-import com.esri.geoportal.harvester.engine.managers.InboundConnectorRegistry;
-import com.esri.geoportal.harvester.engine.managers.ProcessorRegistry;
-import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
-import com.esri.geoportal.harvester.engine.managers.TriggerManager;
-import com.esri.geoportal.harvester.engine.managers.TriggerRegistry;
-import com.esri.geoportal.harvester.engine.support.CrudsException;
-import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
@@ -63,30 +52,20 @@ public class EngineBean extends DefaultEngine {
    */
   @Autowired
   public EngineBean(
-          InboundConnectorRegistry inboundConnectorRegistry, 
-          OutboundConnectorRegistry outboundConnectorRegistry, 
-          TriggerRegistry triggerRegistry,
-          ProcessorRegistry processorRegistry,
-          BrokerDefinitionManager brokerDefinitionManager, 
-          TaskManager taskManager, 
-          ProcessManager processManager, 
-          TriggerManager triggerManager,
-          TriggerInstanceManager triggerInstanceManager,
-          HistoryManager historyManager,
-          ReportBuilder reportBuilder
+          TemplatesService templatesService,
+          BrokersService brokersService,
+          TasksService tasksService,
+          ProcessesService processesService,
+          TriggersService triggersService,
+          ExecutionService executionService
   ) {
     super(
-            inboundConnectorRegistry, 
-            outboundConnectorRegistry, 
-            triggerRegistry, 
-            processorRegistry,
-            brokerDefinitionManager, 
-            taskManager, 
-            processManager, 
-            triggerManager, 
-            triggerInstanceManager,
-            historyManager,
-            reportBuilder
+            templatesService,
+            brokersService,
+            tasksService,
+            processesService,
+            triggersService,
+            executionService
     );
   }
   
@@ -106,48 +85,5 @@ public class EngineBean extends DefaultEngine {
   public void destroy() {
     deactivateTriggerInstances();
     LOG.info(String.format("EngineBean destroyed."));
-  }
-  
-  /**
-   * Activates trigger instances
-   */
-  protected void activateTriggerInstances() {
-    try {
-      triggerManager.select().forEach(e->{
-        UUID uuid = e.getKey();
-        TriggerManager.TriggerDefinitionUuidPair definition = e.getValue();
-        
-        try {
-          Trigger trigger = triggerRegistry.get(definition.triggerDefinition.getType());
-          if (trigger==null) {
-            throw new InvalidDefinitionException(String.format("Invalid trigger type: %s", definition.triggerDefinition.getType()));
-          }
-          TriggerInstance triggerInstance = trigger.createInstance(definition.triggerDefinition);
-          TriggerInstance.Context context = new TriggerContext(definition.taskUuid);
-          triggerInstance.activate(context);
-        } catch (DataProcessorException|InvalidDefinitionException ex) {
-          LOG.warn(String.format("Error creating and activating trigger instance: %s -> %s", uuid, definition), ex);
-        }
-      });
-    } catch (CrudsException ex) {
-      LOG.error("Error processing trigger definitions", ex);
-    }
-  }
-  
-  /**
-   * Deactivates trigger instances.
-   */
-  protected void deactivateTriggerInstances() {
-    triggerInstanceManager.listAll().stream().forEach(e->{
-      UUID uuid = e.getKey();
-      TriggerInstance triggerInstance = e.getValue();
-      
-      try {
-        triggerInstance.close();
-      } catch (Exception ex) {
-        LOG.warn(String.format("Error deactivating trigger instance: %s --> %s", uuid, triggerInstance.getTriggerDefinition()), ex);
-      }
-    });
-    triggerInstanceManager.clear();
   }
 }
