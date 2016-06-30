@@ -15,12 +15,9 @@
  */
 package com.esri.geoportal.harvester.api;
 
-import com.esri.geoportal.harvester.api.defs.TaskDefinition;
-import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
-import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
-import java.util.Date;
 
 /**
  * Trigger.
@@ -44,5 +41,5 @@ public interface Trigger extends AutoCloseable {
    * @return instance of the trigger
    * @throws InvalidDefinitionException if trigger definition is invalid
    */
-  TriggerInstance createInstance(TriggerInstanceDefinition triggerDefinition) throws InvalidDefinitionException;
+  TriggerInstance createInstance(TriggerDefinition triggerDefinition) throws InvalidDefinitionException;
 }

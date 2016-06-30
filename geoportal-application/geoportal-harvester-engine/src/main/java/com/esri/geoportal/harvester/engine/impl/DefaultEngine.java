@@ -42,7 +42,7 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
-import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
@@ -296,7 +296,7 @@ public class DefaultEngine implements Engine {
   }
   
   @Override
-  public TriggerReference scheduleTask(UUID taskId, TriggerInstanceDefinition trigDef) throws InvalidDefinitionException, DataProcessorException {
+  public TriggerReference scheduleTask(UUID taskId, TriggerDefinition trigDef) throws InvalidDefinitionException, DataProcessorException {
     try {
       UUID uuid = triggerManager.create(trigDef);
       Trigger trigger = triggerRegistry.get(trigDef.getType());
@@ -317,7 +317,7 @@ public class DefaultEngine implements Engine {
       throw new InvalidDefinitionException(String.format("Invalid trigger id: %s", triggerInstanceUuid));
     }
     try {
-      TriggerInstanceDefinition trigDef = triggerInstance.getTriggerDefinition();
+      TriggerDefinition trigDef = triggerInstance.getTriggerDefinition();
       TriggerReference triggerReference = new TriggerReference(triggerInstanceUuid, trigDef);
       triggerInstance.close();
       return triggerReference;

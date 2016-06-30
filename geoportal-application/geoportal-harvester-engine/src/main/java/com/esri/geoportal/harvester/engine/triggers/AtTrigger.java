@@ -19,7 +19,7 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
-import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -98,7 +98,7 @@ public class AtTrigger implements Trigger {
   }
 
   @Override
-  public TriggerInstance createInstance(TriggerInstanceDefinition triggerDefinition) throws InvalidDefinitionException {
+  public TriggerInstance createInstance(TriggerDefinition triggerDefinition) throws InvalidDefinitionException {
     if (!getType().equals(triggerDefinition.getType())) {
       throw new InvalidDefinitionException(String.format("Invalid trigger definition: %s", triggerDefinition));
     }
@@ -123,19 +123,19 @@ public class AtTrigger implements Trigger {
    * 'At' trigger instance.
    */
   private class AtTriggerInstance implements TriggerInstance {
-    final TriggerInstanceDefinition triggerDefinition;
+    final TriggerDefinition triggerDefinition;
     private ScheduledFuture<?> future;
 
     /**
      * Creates instance of the trigger instance
      * @param triggerDefinition trigger definition
      */
-    public AtTriggerInstance(TriggerInstanceDefinition triggerDefinition) {
+    public AtTriggerInstance(TriggerDefinition triggerDefinition) {
       this.triggerDefinition = triggerDefinition;
     }
 
     @Override
-    public TriggerInstanceDefinition getTriggerDefinition() {
+    public TriggerDefinition getTriggerDefinition() {
       return triggerDefinition;
     }
 

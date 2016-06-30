@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.engine.triggers;
 
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
-import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -48,7 +48,7 @@ public class NowTrigger implements Trigger {
   }
 
   @Override
-  public TriggerInstance createInstance(TriggerInstanceDefinition triggerDefinition) throws InvalidDefinitionException {
+  public TriggerInstance createInstance(TriggerDefinition triggerDefinition) throws InvalidDefinitionException {
     if (!getType().equals(triggerDefinition.getType())) {
       throw new InvalidDefinitionException(String.format("Invalid trigger definition: %s", triggerDefinition));
     }
@@ -64,18 +64,18 @@ public class NowTrigger implements Trigger {
    * 'Now' trigger instance.
    */
   private class NowTriggerInstance implements TriggerInstance {
-    final TriggerInstanceDefinition triggerDefinition;
+    final TriggerDefinition triggerDefinition;
 
     /**
      * Creates instance of the trigger instance
      * @param triggerDefinition trigger definition
      */
-    public NowTriggerInstance(TriggerInstanceDefinition triggerDefinition) {
+    public NowTriggerInstance(TriggerDefinition triggerDefinition) {
       this.triggerDefinition = triggerDefinition;
     }
 
     @Override
-    public TriggerInstanceDefinition getTriggerDefinition() {
+    public TriggerDefinition getTriggerDefinition() {
       return triggerDefinition;
     }
 

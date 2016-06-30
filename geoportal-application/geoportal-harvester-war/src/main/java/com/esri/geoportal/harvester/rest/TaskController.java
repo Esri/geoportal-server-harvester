@@ -19,7 +19,7 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.support.TaskResponse;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
-import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
@@ -282,12 +282,12 @@ public class TaskController {
     try {
       LOG.debug(String.format("PUT /rest/harvester/tasks/%s/schedule <-- %s", taskId, triggerDefinition));
       TaskDefinition taskDefinition = engine.readTaskDefinition(taskId);
-      TriggerInstanceDefinition triggerInstanceDefinition = new TriggerInstanceDefinition();
+      TriggerDefinition triggerInstanceDefinition = new TriggerDefinition();
       triggerInstanceDefinition.setType(triggerDefinition.getType());
       triggerInstanceDefinition.setTaskDefinition(taskDefinition);
       triggerInstanceDefinition.setProperties(triggerDefinition.getProperties());
       TriggerReference trigRef = engine.scheduleTask(taskId, triggerInstanceDefinition);
-      return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), trigRef.getTriggerInstanceDefinition()),HttpStatus.OK);
+      return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), trigRef.getTriggerDefinition()),HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     } catch (DataProcessorException ex) {
@@ -301,11 +301,11 @@ public class TaskController {
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
   @RequestMapping(value = "/rest/harvester/tasks/schedule", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody TriggerInstanceDefinition trigDef) {
+  public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody TriggerDefinition trigDef) {
     try {
       LOG.debug(String.format("PUT /rest/harvester/tasks/schedule <-- %s", trigDef));
       TriggerReference trigRef = engine.scheduleTask(null,trigDef);
-      return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), trigRef.getTriggerInstanceDefinition()),HttpStatus.OK);
+      return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), trigRef.getTriggerDefinition()),HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     } catch (DataProcessorException ex) {

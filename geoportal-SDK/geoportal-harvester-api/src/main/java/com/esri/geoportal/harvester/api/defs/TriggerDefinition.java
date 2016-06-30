@@ -23,7 +23,7 @@ import java.util.Objects;
 /**
  * Trigger definition.
  */
-public final class TriggerInstanceDefinition {
+public final class TriggerDefinition {
   private String type;
   private TaskDefinition taskDefinition;
   private Map<String,String> properties;
@@ -100,8 +100,8 @@ public final class TriggerInstanceDefinition {
   
   @Override
   public boolean equals(Object o) {
-    if (o instanceof TriggerInstanceDefinition) {
-      TriggerInstanceDefinition t = (TriggerInstanceDefinition) o;
+    if (o instanceof TriggerDefinition) {
+      TriggerDefinition t = (TriggerDefinition) o;
       return ((getType()!=null && t.getType()!=null && getType().equals(t.getType())) || (getType()==null && t.getType()==null)) &&
              ((getTaskDefinition()!=null && t.getTaskDefinition()!=null && getTaskDefinition().equals(t.getTaskDefinition())) || (getTaskDefinition()==null && t.getTaskDefinition()==null)) &&
               ((getProperties()!=null && t.getProperties()!=null && getProperties().equals(t.getProperties())) || (getProperties()==null && t.getProperties()==null)); 

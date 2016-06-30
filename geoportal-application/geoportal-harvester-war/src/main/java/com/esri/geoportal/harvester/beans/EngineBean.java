@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
-import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.managers.BrokerDefinitionManager;
@@ -116,7 +116,7 @@ public class EngineBean extends DefaultEngine {
     try {
       triggerManager.select().forEach(e->{
         UUID uuid = e.getKey();
-        TriggerInstanceDefinition definition = e.getValue();
+        TriggerDefinition definition = e.getValue();
         
         try {
           Trigger trigger = triggerRegistry.get(definition.getType());

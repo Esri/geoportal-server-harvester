@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.api.defs.TriggerInstanceDefinition;
+import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.support.CrudsException;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.serialize;
@@ -34,8 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 import javax.annotation.PreDestroy;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 
 /**
  * Trigger manager bean.
@@ -72,7 +72,7 @@ public class TriggerManagerBean implements TriggerManager {
   }
 
   @Override
-  public UUID create(TriggerInstanceDefinition data) throws CrudsException {
+  public UUID create(TriggerDefinition data) throws CrudsException {
     UUID id = UUID.randomUUID();
     try (
             Connection connection = dataSource.getConnection();
@@ -99,7 +99,7 @@ public class TriggerManagerBean implements TriggerManager {
   }
 
   @Override
-  public TriggerInstanceDefinition read(UUID id) throws CrudsException {
+  public TriggerDefinition read(UUID id) throws CrudsException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("SELECT * FROM TRIGGERS WHERE ID = ?");) {
@@ -107,7 +107,7 @@ public class TriggerManagerBean implements TriggerManager {
       ResultSet rs = st.executeQuery();
       if (rs.next()) {
         try {
-          return deserialize(rs.getString("triggerDefinition"), TriggerInstanceDefinition.class);
+          return deserialize(rs.getString("triggerDefinition"), TriggerDefinition.class);
         } catch (IOException | SQLException ex) {
           LOG.warn("Error reading broker definition", ex);
         }
@@ -120,8 +120,8 @@ public class TriggerManagerBean implements TriggerManager {
   }
 
   @Override
-  public Collection<Map.Entry<UUID, TriggerInstanceDefinition>> select() throws CrudsException {
-    HashMap<UUID, TriggerInstanceDefinition> map = new HashMap<>();
+  public Collection<Map.Entry<UUID, TriggerDefinition>> select() throws CrudsException {
+    HashMap<UUID, TriggerDefinition> map = new HashMap<>();
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("SELECT * FROM TRIGGERS");) {
@@ -129,7 +129,7 @@ public class TriggerManagerBean implements TriggerManager {
       while (rs.next()) {
         try {
           UUID id = UUID.fromString(rs.getString("id"));
-          TriggerInstanceDefinition td = deserialize(rs.getString("triggerDefinition"), TriggerInstanceDefinition.class);
+          TriggerDefinition td = deserialize(rs.getString("triggerDefinition"), TriggerDefinition.class);
           map.put(id, td);
         } catch (IOException | SQLException ex) {
           LOG.warn("Error reading broker definition", ex);
@@ -142,7 +142,7 @@ public class TriggerManagerBean implements TriggerManager {
   }
 
   @Override
-  public boolean update(UUID id, TriggerInstanceDefinition data) throws CrudsException {
+  public boolean update(UUID id, TriggerDefinition data) throws CrudsException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("UPDATE TRIGGERS SET triggerDefinition = ? WHERE ID = ?");) {
