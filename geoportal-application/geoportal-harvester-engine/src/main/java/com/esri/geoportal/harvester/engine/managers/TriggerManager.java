@@ -16,10 +16,17 @@
 package com.esri.geoportal.harvester.engine.managers;
 
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
+import com.esri.geoportal.harvester.engine.managers.TriggerManager.TriggerDefinitionUuidPair;
 import com.esri.geoportal.harvester.engine.support.CrudsRepo;
+import java.util.UUID;
 
 /**
  * Trigger manager.
  */
-public interface TriggerManager extends CrudsRepo<TriggerDefinition> {
+public interface TriggerManager extends CrudsRepo<TriggerDefinitionUuidPair> {
+  
+  public static final class TriggerDefinitionUuidPair {
+    public UUID taskUuid;
+    public TriggerDefinition triggerDefinition;
+  }
 }

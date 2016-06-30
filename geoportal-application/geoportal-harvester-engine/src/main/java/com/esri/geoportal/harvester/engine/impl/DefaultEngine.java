@@ -51,6 +51,7 @@ import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import com.esri.geoportal.harvester.engine.Engine;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
+import com.esri.geoportal.harvester.engine.managers.TriggerManager.TriggerDefinitionUuidPair;
 import com.esri.geoportal.harvester.engine.support.BrokerReference.Category;
 import static com.esri.geoportal.harvester.engine.support.BrokerReference.Category.INBOUND;
 import static com.esri.geoportal.harvester.engine.support.BrokerReference.Category.OUTBOUND;
@@ -298,7 +299,10 @@ public class DefaultEngine implements Engine {
   @Override
   public TriggerReference scheduleTask(UUID taskId, TriggerDefinition trigDef) throws InvalidDefinitionException, DataProcessorException {
     try {
-      UUID uuid = triggerManager.create(trigDef);
+      TriggerDefinitionUuidPair pair = new TriggerManager.TriggerDefinitionUuidPair();
+      pair.taskUuid = taskId;
+      pair.triggerDefinition = trigDef;
+      UUID uuid = triggerManager.create(pair);
       Trigger trigger = triggerRegistry.get(trigDef.getType());
       TriggerInstance triggerInstance = trigger.createInstance(trigDef);
       triggerInstanceManager.put(uuid, triggerInstance);
