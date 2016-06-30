@@ -124,7 +124,7 @@ public class EngineBean extends DefaultEngine {
             throw new InvalidDefinitionException(String.format("Invalid trigger type: %s", definition.getType()));
           }
           TriggerInstance triggerInstance = trigger.createInstance(definition);
-          TriggerInstance.Context context = new TriggerContext(uuid,triggerInstance);
+          TriggerInstance.Context context = new TriggerContext();
           triggerInstance.activate(context);
         } catch (DataProcessorException|InvalidDefinitionException ex) {
           LOG.warn(String.format("Error creating and activating trigger instance: %s -> %s", uuid, definition), ex);

@@ -385,7 +385,7 @@ public class DefaultEngine implements Engine {
       Trigger trigger = triggerRegistry.get(trigDef.getType());
       TriggerInstance triggerInstance = trigger.createInstance(trigDef);
       triggerInstanceManager.put(uuid, triggerInstance);
-      TriggerInstance.Context context = new TriggerContext(uuid,triggerInstance);
+      TriggerInstance.Context context = new TriggerContext(uuid);
       triggerInstance.activate(context);
       return new TriggerReference(uuid, trigDef);
     } catch (CrudsException ex) {
@@ -553,16 +553,20 @@ public class DefaultEngine implements Engine {
    */
   protected class TriggerContext implements TriggerInstance.Context {
     private final UUID taskId;
-    private final TriggerInstance instance;
     
-    public TriggerContext(TriggerInstance instance) {
+    /**
+     * Creates instance of the context.
+     */
+    public TriggerContext() {
       this.taskId = null;
-      this.instance = instance;
     }
     
-    public TriggerContext(UUID taskId, TriggerInstance instance) {
+    /**
+     * Creates instance of the context.
+     * @param taskId task id
+     */
+    public TriggerContext(UUID taskId) {
       this.taskId = taskId;
-      this.instance = instance;
     }
 
     @Override
