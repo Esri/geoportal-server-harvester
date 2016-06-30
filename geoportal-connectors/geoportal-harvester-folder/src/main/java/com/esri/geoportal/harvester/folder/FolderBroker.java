@@ -52,7 +52,7 @@ import java.net.URI;
 
   @Override
   public boolean publish(DataReference ref) throws DataOutputException {
-      File f = generateFileName(ref.getSourceUri(), ref.getId());
+      File f = generateFileName(ref.getBrokerUri(), ref.getSourceUri(), ref.getId());
       boolean created = !f.exists();
       f.getParentFile().mkdirs();
       if (!f.getName().contains(".")) {
@@ -77,13 +77,18 @@ import java.net.URI;
     return String.format("FOLDER [%s]", definition.getRootFolder());
   }
   
-  private File generateFileName(URI sourceUri, String id) {
-    File rootFolder = definition.getRootFolder().toPath().resolve(sourceUri.getHost()).toFile();
-    List<String> subFolder = splitPath(sourceUri.getPath());
+  private File generateFileName(URI brokerUri, URI sourceUri, String id) {
+    String host = URI.create(brokerUri.getSchemeSpecificPart()).getHost();
+    File rootFolder = definition.getRootFolder().toPath().resolve(host).toFile();
     
     File fileName = rootFolder;
-    for (String sf : subFolder) {
-      fileName = new File(fileName, sf);
+    if (sourceUri.getPath()!=null) {
+      List<String> subFolder = splitPath(sourceUri.getPath());
+      for (String sf : subFolder) {
+        fileName = new File(fileName, sf);
+      }
+    } else {
+      fileName = new File(fileName,id+".xml");
     }
     
     return fileName;
