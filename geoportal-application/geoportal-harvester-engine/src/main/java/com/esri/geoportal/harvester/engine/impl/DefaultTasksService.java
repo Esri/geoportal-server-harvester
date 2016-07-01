@@ -18,12 +18,16 @@ package com.esri.geoportal.harvester.engine.impl;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.engine.TasksService;
+import com.esri.geoportal.harvester.engine.managers.History;
+import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.managers.TaskManager;
 import com.esri.geoportal.harvester.engine.support.CrudsException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -31,13 +35,16 @@ import java.util.stream.Collectors;
  */
 public class DefaultTasksService implements TasksService {
   protected final TaskManager taskManager;
+  protected final HistoryManager historyManager;
 
   /**
    * Creates instance of the service.
    * @param taskManager task manager
+   * @param historyManager history manager
    */
-  public DefaultTasksService(TaskManager taskManager) {
+  public DefaultTasksService(TaskManager taskManager, HistoryManager historyManager) {
     this.taskManager = taskManager;
+    this.historyManager = historyManager;
   }
 
   @Override
@@ -88,6 +95,15 @@ public class DefaultTasksService implements TasksService {
       return oldTaskDef;
     } catch (CrudsException ex) {
       throw new DataProcessorException(String.format("Error updating task definition: %s <-- %s", taskId, taskDefinition), ex);
+    }
+  }
+  
+  @Override
+  public List<History.Event> getHistory(UUID taskId) throws DataProcessorException {
+    try {
+      return historyManager.buildHistory(taskId);
+    } catch (CrudsException ex) {
+      throw new DataProcessorException(String.format("Error getting history for: %s", taskId), ex);
     }
   }
 }

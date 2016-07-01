@@ -120,7 +120,7 @@ public class HistoryManagerBean implements HistoryManager {
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("SELECT taskid,completed,id FROM EVENTS WHERE ID = ?");
+            PreparedStatement st = connection.prepareStatement("SELECT taskid,completed,report,id FROM EVENTS WHERE ID = ?");
         ) {
       st.setString(1, id.toString());
       ResultSet rs = st.executeQuery();
@@ -129,8 +129,8 @@ public class HistoryManagerBean implements HistoryManager {
           History.Event event = new History.Event();
           event.setTaskId(UUID.fromString(rs.getString(1)));
           event.setTimestamp(new Date(rs.getTimestamp(2).getTime()));
-          event.setUuid(UUID.fromString(rs.getString(3)));
           event.setReport(mapper.readValue(reportReader, History.Report.class));
+          event.setUuid(UUID.fromString(rs.getString(4)));
           return event;
         }
       }
@@ -143,20 +143,26 @@ public class HistoryManagerBean implements HistoryManager {
 
   @Override
   public Collection<Map.Entry<UUID, History.Event>> select() throws CrudsException {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     HashMap<UUID, History.Event> map = new HashMap<>();
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("SELECT taskid,completed,id FROM EVENTS");
+            PreparedStatement st = connection.prepareStatement("SELECT taskid,completed,report,id FROM EVENTS");
         ) {
       ResultSet rs = st.executeQuery();
       while (rs.next()) {
-        History.Event event = new History.Event();
-        event.setTaskId(UUID.fromString(rs.getString(1)));
-        event.setTimestamp(new Date(rs.getTimestamp(2).getTime()));
-        event.setUuid(UUID.fromString(rs.getString(3)));
-        map.put(event.getUuid(), event);
+        try (Reader reportReader = rs.getClob(3).getCharacterStream();) {
+          History.Event event = new History.Event();
+          event.setTaskId(UUID.fromString(rs.getString(1)));
+          event.setTimestamp(new Date(rs.getTimestamp(2).getTime()));
+          event.setReport(mapper.readValue(reportReader, History.Report.class));
+          event.setUuid(UUID.fromString(rs.getString(4)));
+          map.put(event.getUuid(), event);
+        }
       }
-    } catch (SQLException ex) {
+    } catch (IOException|SQLException ex) {
       throw new CrudsException("Error selecting broker definition", ex);
     }
     return map.entrySet();
@@ -184,22 +190,28 @@ public class HistoryManagerBean implements HistoryManager {
 
   @Override
   public History buildHistory(UUID taskid) throws CrudsException {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     History history = new History();
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("SELECT taskid,completed,id FROM EVENTS WHERE taskid = ?");
+            PreparedStatement st = connection.prepareStatement("SELECT taskid,completed,report,id FROM EVENTS WHERE taskid = ?");
         ) {
       st.setString(1, taskid.toString());
       ResultSet rs = st.executeQuery();
       while (rs.next()) {
-        History.Event event = new History.Event();
-        event.setTaskId(UUID.fromString(rs.getString(1)));
-        event.setTimestamp(new Date(rs.getTimestamp(2).getTime()));
-        event.setUuid(UUID.fromString(rs.getString(3)));
-        history.add(event);
+        try (Reader reportReader = rs.getClob(3).getCharacterStream();) {
+          History.Event event = new History.Event();
+          event.setTaskId(UUID.fromString(rs.getString(1)));
+          event.setTimestamp(new Date(rs.getTimestamp(2).getTime()));
+          event.setReport(mapper.readValue(reportReader, History.Report.class));
+          event.setUuid(UUID.fromString(rs.getString(4)));
+          history.add(event);
+        }
       }
       return history;
-    } catch (SQLException ex) {
+    } catch (IOException|SQLException ex) {
       throw new CrudsException("Error selecting broker definition", ex);
     }
   }

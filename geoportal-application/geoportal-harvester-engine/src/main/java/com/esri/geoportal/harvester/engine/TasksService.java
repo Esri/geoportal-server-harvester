@@ -19,6 +19,7 @@ import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.engine.managers.History;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -74,4 +75,12 @@ public interface TasksService {
    * @throws DataProcessorException if accessing repository fails
    */
   List<Map.Entry<UUID, TaskDefinition>> selectTaskDefinitions(Predicate<? super Map.Entry<UUID, TaskDefinition>> predicate) throws DataProcessorException;
+  
+  /**
+   * Gets history.
+   * @param taskId task id
+   * @return list of events.
+   * @throws DataProcessorException if accessing repository fails
+   */
+  List<History.Event> getHistory(UUID taskId) throws DataProcessorException;
 }

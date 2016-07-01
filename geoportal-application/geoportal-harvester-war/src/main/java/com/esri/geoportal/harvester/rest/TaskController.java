@@ -22,12 +22,14 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.engine.managers.History;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.support.HistoryManagerAdaptor;
 import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import com.esri.geoportal.harvester.support.ProcessResponse;
 import com.esri.geoportal.harvester.support.TriggerResponse;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -52,6 +54,7 @@ import org.springframework.web.bind.annotation.RestController;
    DELETE /rest/harvester/tasks/{taskId}          - deletes existing task by task id
    PUT /rest/harvester/tasks                      - creates a new task (task definition in the request body)
    POST /rest/harvester/tasks/{taskId}            - updates a task by task id (task definition in the request body)
+   GET /rest/harvester/tasks/{taskId}/history     - gets task harvesting history
    
    PUT /rest/harvester/tasks/{taskId}/execute     - executes immediatelly a task by task id
    PUT /rest/harvester/tasks/{taskId}/schedule    - schedule a task by task id (trigger definition in the request body)
@@ -168,6 +171,23 @@ public class TaskController {
       LOG.debug(String.format("GET /rest/harvester/tasks/%s", taskId));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
       return new ResponseEntity<>(taskDefinition!=null? new TaskResponse(taskId, taskDefinition): null,HttpStatus.OK);
+    } catch (DataProcessorException ex) {
+      LOG.error(String.format("Error getting task: %s", taskId), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  
+  /**
+   * Gets task by id.
+   * @param taskId task id
+   * @return task info or <code>null</code> if no task found
+   */
+  @RequestMapping(value = "/rest/harvester/tasks/{taskId}/history", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<History.Event>> getTaskHistory(@PathVariable UUID taskId) {
+    try {
+      LOG.debug(String.format("GET /rest/harvester/tasks/%s/history", taskId));
+      List<History.Event> history = engine.getTasksService().getHistory(taskId);
+      return new ResponseEntity<>(history,HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error getting task: %s", taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

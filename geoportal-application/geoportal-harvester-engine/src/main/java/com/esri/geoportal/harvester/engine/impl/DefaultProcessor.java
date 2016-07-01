@@ -112,6 +112,7 @@ public class DefaultProcessor implements Processor {
           completed = true;
           aborting = false;
           LOG.info(String.format("Completed harvest: %s", getTitle()));
+          Thread.interrupted();
           onStatusChange();
         }
       }, "HARVESTING");

@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.engine.impl.DefaultTasksService;
+import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.managers.TaskManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,10 +30,11 @@ public class TasksServiceBean extends DefaultTasksService {
   /**
    * Creates instance of the bean.
    * @param taskManager task manager
+   * @param historyManager history manager
    */
   @Autowired
-  public TasksServiceBean(TaskManager taskManager) {
-    super(taskManager);
+  public TasksServiceBean(TaskManager taskManager, HistoryManager historyManager) {
+    super(taskManager,historyManager);
   }
   
 }
