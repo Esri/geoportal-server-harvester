@@ -27,6 +27,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProcessesServiceBean extends DefaultProcessesService {
 
+  /**
+   * Creates instance of the bean.
+   * @param processManager process manager
+   * @param reportBuilder report builder
+   */
   @Autowired
   public ProcessesServiceBean(ProcessManager processManager, ReportBuilder reportBuilder) {
     super(processManager, reportBuilder);

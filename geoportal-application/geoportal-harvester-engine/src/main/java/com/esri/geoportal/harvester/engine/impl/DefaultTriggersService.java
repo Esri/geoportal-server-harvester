@@ -47,6 +47,13 @@ public class DefaultTriggersService implements TriggersService {
   protected final TriggerInstanceManager triggerInstanceManager;
   protected final ExecutionService executionService;
 
+  /**
+   * Creates instance of the service.
+   * @param triggerRegistry trigger registry
+   * @param triggerManager trigger manager
+   * @param triggerInstanceManager trigger instance manager
+   * @param executionService execution service
+   */
   public DefaultTriggersService(TriggerRegistry triggerRegistry, TriggerManager triggerManager, TriggerInstanceManager triggerInstanceManager, ExecutionService executionService) {
     this.triggerRegistry = triggerRegistry;
     this.triggerManager = triggerManager;

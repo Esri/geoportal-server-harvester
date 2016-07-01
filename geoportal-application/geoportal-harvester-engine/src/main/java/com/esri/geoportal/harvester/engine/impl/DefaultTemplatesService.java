@@ -35,7 +35,7 @@ public class DefaultTemplatesService implements TemplatesService {
   protected final ProcessorRegistry processorRegistry;
 
   /**
-   * Creates instance of the service
+   * Creates instance of the service.
    * @param inboundConnectorRegistry inbound connector registry
    * @param outboundConnectorRegistry outbound connector registry
    * @param triggerRegistry trigger registry

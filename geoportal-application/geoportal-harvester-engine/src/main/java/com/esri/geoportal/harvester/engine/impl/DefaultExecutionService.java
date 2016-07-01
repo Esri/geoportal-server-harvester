@@ -60,6 +60,17 @@ public class DefaultExecutionService implements ExecutionService {
   protected final HistoryManager historyManager;
   protected final ProcessesService processesService;
 
+  /**
+   * Creates instance of the service.
+   * @param inboundConnectorRegistry inbound connector registry.
+   * @param outboundConnectorRegistry outbound connector registry
+   * @param processorRegistry processor registry
+   * @param triggerRegistry trigger registry
+   * @param triggerManager trigger manager
+   * @param triggerInstanceManager trigger instance manager
+   * @param historyManager history manager
+   * @param processesService processes service
+   */
   public DefaultExecutionService(InboundConnectorRegistry inboundConnectorRegistry, OutboundConnectorRegistry outboundConnectorRegistry, ProcessorRegistry processorRegistry, TriggerRegistry triggerRegistry, TriggerManager triggerManager, TriggerInstanceManager triggerInstanceManager, HistoryManager historyManager, ProcessesService processesService) {
     this.inboundConnectorRegistry = inboundConnectorRegistry;
     this.outboundConnectorRegistry = outboundConnectorRegistry;

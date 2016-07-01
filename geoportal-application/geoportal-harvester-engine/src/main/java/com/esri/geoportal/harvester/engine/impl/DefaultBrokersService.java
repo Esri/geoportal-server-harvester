@@ -41,6 +41,12 @@ public class DefaultBrokersService implements BrokersService {
   protected final OutboundConnectorRegistry outboundConnectorRegistry;
   protected final BrokerDefinitionManager brokerDefinitionManager;
 
+  /**
+   * Creates instance of the service.
+   * @param inboundConnectorRegistry inbound connector registry.
+   * @param outboundConnectorRegistry outbound connector registry
+   * @param brokerDefinitionManager  broker definition manager
+   */
   public DefaultBrokersService(InboundConnectorRegistry inboundConnectorRegistry, OutboundConnectorRegistry outboundConnectorRegistry, BrokerDefinitionManager brokerDefinitionManager) {
     this.inboundConnectorRegistry = inboundConnectorRegistry;
     this.outboundConnectorRegistry = outboundConnectorRegistry;

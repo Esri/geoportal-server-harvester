@@ -29,6 +29,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class TemplatesServiceBean extends DefaultTemplatesService {
 
+  /**
+   * Creates instance of the bean.
+   * @param inboundConnectorRegistry inbound connector registry
+   * @param outboundConnectorRegistry outbound connector registry
+   * @param triggerRegistry trigger registry
+   * @param processorRegistry processor registry
+   */
   @Autowired
   public TemplatesServiceBean(InboundConnectorRegistry inboundConnectorRegistry, OutboundConnectorRegistry outboundConnectorRegistry, TriggerRegistry triggerRegistry, ProcessorRegistry processorRegistry) {
     super(inboundConnectorRegistry, outboundConnectorRegistry, triggerRegistry, processorRegistry);

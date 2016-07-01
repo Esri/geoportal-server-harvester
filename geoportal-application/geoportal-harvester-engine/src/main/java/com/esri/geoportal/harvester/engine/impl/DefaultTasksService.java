@@ -32,6 +32,10 @@ import java.util.stream.Collectors;
 public class DefaultTasksService implements TasksService {
   protected final TaskManager taskManager;
 
+  /**
+   * Creates instance of the service.
+   * @param taskManager task manager
+   */
   public DefaultTasksService(TaskManager taskManager) {
     this.taskManager = taskManager;
   }

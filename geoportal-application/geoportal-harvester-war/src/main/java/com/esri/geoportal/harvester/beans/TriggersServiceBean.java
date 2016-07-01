@@ -29,6 +29,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class TriggersServiceBean extends DefaultTriggersService {
 
+  /**
+   * Creates instance of the bean.
+   * @param triggerRegistry trigger registry
+   * @param triggerManager trigger manager
+   * @param triggerInstanceManager trigger instance manager
+   * @param executionService execution service
+   */
   @Autowired
   public TriggersServiceBean(TriggerRegistry triggerRegistry, TriggerManager triggerManager, TriggerInstanceManager triggerInstanceManager, ExecutionService executionService) {
     super(triggerRegistry, triggerManager, triggerInstanceManager,executionService);

@@ -28,6 +28,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class BrokersServiceBean extends DefaultBrokersService {
 
+  /**
+   * Creates instance of the bean.
+   * @param inboundConnectorRegistry inbound connector registry.
+   * @param outboundConnectorRegistry outbound connector registry
+   * @param brokerDefinitionManager  broker definition manager
+   */
   @Autowired
   public BrokersServiceBean(InboundConnectorRegistry inboundConnectorRegistry, OutboundConnectorRegistry outboundConnectorRegistry, BrokerDefinitionManager brokerDefinitionManager) {
     super(inboundConnectorRegistry, outboundConnectorRegistry, brokerDefinitionManager);

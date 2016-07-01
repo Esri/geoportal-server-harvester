@@ -38,6 +38,11 @@ public class DefaultProcessesService implements ProcessesService {
   protected final ProcessManager processManager;
   protected final ReportBuilder reportBuilder;
 
+  /**
+   * Creates instance of the service.
+   * @param processManager process manager
+   * @param reportBuilder report builder
+   */
   public DefaultProcessesService(ProcessManager processManager, ReportBuilder reportBuilder) {
     this.processManager = processManager;
     this.reportBuilder = reportBuilder;

@@ -33,6 +33,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class ExecutionServiceBean extends DefaultExecutionService {
 
+  /**
+   * Creates instance of the bean.
+   * @param inboundConnectorRegistry inbound connector registry.
+   * @param outboundConnectorRegistry outbound connector registry
+   * @param processorRegistry processor registry
+   * @param triggerRegistry trigger registry
+   * @param triggerManager trigger manager
+   * @param triggerInstanceManager trigger instance manager
+   * @param historyManager history manager
+   * @param processesService processes service
+   */
   @Autowired
   public ExecutionServiceBean(InboundConnectorRegistry inboundConnectorRegistry, OutboundConnectorRegistry outboundConnectorRegistry, ProcessorRegistry processorRegistry, TriggerRegistry triggerRegistry, TriggerManager triggerManager, TriggerInstanceManager triggerInstanceManager, HistoryManager historyManager, ProcessesService processesService) {
     super(inboundConnectorRegistry, outboundConnectorRegistry, processorRegistry, triggerRegistry, triggerManager, triggerInstanceManager, historyManager, processesService);

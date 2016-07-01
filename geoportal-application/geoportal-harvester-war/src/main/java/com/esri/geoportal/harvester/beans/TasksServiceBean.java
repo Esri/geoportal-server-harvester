@@ -26,6 +26,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class TasksServiceBean extends DefaultTasksService {
 
+  /**
+   * Creates instance of the bean.
+   * @param taskManager task manager
+   */
   @Autowired
   public TasksServiceBean(TaskManager taskManager) {
     super(taskManager);
