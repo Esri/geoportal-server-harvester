@@ -23,6 +23,9 @@ import java.util.Date;
 
 /**
  * Trigger instance.
+ * @see com.esri.geoportal.harvester.api API
+ * @see com.esri.geoportal.harvester.api.Trigger
+ * @see com.esri.geoportal.harvester.api.defs.TriggerDefinition
  */
 public interface TriggerInstance extends AutoCloseable {
 

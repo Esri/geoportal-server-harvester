@@ -46,8 +46,8 @@
  * {@link com.esri.geoportal.harvester.api.Trigger} - artifact providing a general 
  * way to launch harvesting process.
  * <p>
- * {@link com.esri.geoportal.harvester.api.Trigger} - an instance of the trigger
- * associated with the single process definition.
+ * {@link com.esri.geoportal.harvester.api.TriggerInstance} - an instance of the 
+ * trigger associated with the single process definition.
  * <p>
  * {@link com.esri.geoportal.harvester.api.defs} - package containing serialzable
  * definitions.

@@ -21,6 +21,11 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 
 /**
  * Processor.
+ * Provides a way to execute harvesting process.In the most basic implementation it will iterate
+ * through input data using {@link com.esri.geoportal.harvester.api.specs.InputConnector}
+ * iteration pattern methods and push each data to the output using 
+ * {@link com.esri.geoportal.harvester.api.specs.OutputConnector} interface.
+ * @see com.esri.geoportal.harvester.api API
  */
 public interface Processor {
   /**

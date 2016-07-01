@@ -21,6 +21,10 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 
 /**
  * Trigger.
+ * Providing general way to launch harvesting process.
+ * @see com.esri.geoportal.harvester.api API
+ * @see com.esri.geoportal.harvester.api.TriggerInstance
+ * @see com.esri.geoportal.harvester.api.defs.TriggerDefinition
  */
 public interface Trigger extends AutoCloseable {
   /**

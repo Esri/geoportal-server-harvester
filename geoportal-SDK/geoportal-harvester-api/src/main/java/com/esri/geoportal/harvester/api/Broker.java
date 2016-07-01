@@ -26,6 +26,7 @@ import java.io.Closeable;
  * used to publish data.
  * 
  * @param <C> connector type
+ * @see com.esri.geoportal.harvester.api API
  * @see com.esri.geoportal.harvester.api.specs.InputBroker
  * @see com.esri.geoportal.harvester.api.specs.OutputBroker
  * @see com.esri.geoportal.harvester.api.defs.EntityDefinition

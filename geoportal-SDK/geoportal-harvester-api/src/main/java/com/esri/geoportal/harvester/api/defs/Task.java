@@ -25,7 +25,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Task.
+ * Task. Holds all the information needed to create 
+ * {@link com.esri.geoportal.harvester.api.ProcessInstance}. Task itself can be
+ * created based on the {@link com.esri.geoportal.harvester.api.defs.TaskDefinition}.
  */
 public final class Task implements Closeable {
   private final Processor processor;

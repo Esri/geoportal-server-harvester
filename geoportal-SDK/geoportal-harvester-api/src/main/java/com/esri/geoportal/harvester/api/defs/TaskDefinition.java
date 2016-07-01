@@ -22,6 +22,8 @@ import java.util.Objects;
 
 /**
  * Task definition.
+ * Holds all the information needed to create instance of the 
+ * {@link com.esri.geoportal.harvester.api.defs.Task}.
  */
 public final class TaskDefinition implements Serializable {
   private EntityDefinition processor;

@@ -27,6 +27,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
  * 
  * @param <B> type of the broker
  * 
+ * @see com.esri.geoportal.harvester.api API
  * @see com.esri.geoportal.harvester.api.specs.InputConnector
  * @see com.esri.geoportal.harvester.api.specs.OutputConnector
  * @see Broker

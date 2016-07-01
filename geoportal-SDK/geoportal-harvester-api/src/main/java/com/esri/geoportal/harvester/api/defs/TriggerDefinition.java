@@ -22,7 +22,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Trigger definition.
+ * Trigger definition. It holds all the information needed to create 
+ * {@link com.esri.geoportal.harvester.api.TriggerInstance}.
  */
 public final class TriggerDefinition implements Serializable {
   private String type;

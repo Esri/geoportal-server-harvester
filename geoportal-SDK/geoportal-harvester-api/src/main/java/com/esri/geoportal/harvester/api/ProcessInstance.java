@@ -19,7 +19,12 @@ import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataException;
 
 /**
- * Process instance.
+ * Process instance. 
+ * Instance of the harvesting process. In the most basic implementation it allows to start harvesting
+ * and abort harvesting if needed. It is associated with a single 
+ * {@link com.esri.geoportal.harvester.api.specs.InputBroker} and one or more
+ * {@link com.esri.geoportal.harvester.api.specs.OutputBroker}'s.
+ * @see com.esri.geoportal.harvester.api API
  */
 public interface ProcessInstance {
 
