@@ -315,7 +315,7 @@ public final class UITemplate {
   }
   
   /**
-   * Temporal argument.
+   * Boolean argument.
    */
   public static class BooleanArgument extends ArgumentBase<Boolean> {
     /**
