@@ -20,7 +20,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 /**
- * Robots txt utility class/shortcut methods
+ * Robots txt utility class/shortcut methods.
+ * @see com.esri.geoportal.commons.robots API
  */
 public final class BotsUtils {
   private static final MatchingStrategy DEFAULT_MATCHING_STRATEGY = MatchingStrategy.SIMPLE_PATTERN_STRATEGY;

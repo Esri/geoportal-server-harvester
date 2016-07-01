@@ -18,6 +18,7 @@ import java.util.List;
 
 /**
  * Represents access policy from a single "robots.txt" file.
+ * @see com.esri.geoportal.commons.robots API
  * @see Access
  * @see BotsUtils
  */

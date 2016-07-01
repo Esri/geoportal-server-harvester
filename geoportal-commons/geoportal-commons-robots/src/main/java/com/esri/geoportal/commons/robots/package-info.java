@@ -25,8 +25,11 @@
  * <a href="https://en.wikipedia.org/wiki/Robots_exclusion_standard">https://en.wikipedia.org/wiki/Robots_exclusion_standard</a><br>
  * <a href="https://developers.google.com/webmasters/control-crawl-index/docs/robots_txt">https://developers.google.com/webmasters/control-crawl-index/docs/robots_txt</a><br>
  * <p>
- * Behavior of the "robots.txt" mechanism can be configured through the following 
- * parameters in the gpt.xml configuration file:
+ * The easiest way to take advantage of this package is to request robots.txt
+ * structure using {@link com.esri.geoportal.commons.robots.BotsUtils#readBots(com.esri.geoportal.commons.robots.BotsMode, java.lang.String)}
+ * method. It will return an instance of the {@link com.esri.geoportal.commons.robots.Bots} or <code>null</code>
+ * if no robots.txt available for the requested URL. If Bots are available, then the
+ * next step is to request access to the resource through {@link com.esri.geoportal.commons.robots.BotsUtils#requestAccess(com.esri.geoportal.commons.robots.Bots, java.lang.String)}.
  * 
  * @see com.esri.geoportal.commons.robots.Bots
  * @see com.esri.geoportal.commons.robots.BotsParser
