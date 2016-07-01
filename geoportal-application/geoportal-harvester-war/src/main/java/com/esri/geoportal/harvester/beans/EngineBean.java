@@ -38,17 +38,12 @@ public class EngineBean extends DefaultEngine {
 
   /**
    * Creates instance of the engine bean.
-   * @param inboundConnectorRegistry inbound connector registry
-   * @param outboundConnectorRegistry outbound connector registry
-   * @param triggerRegistry trigger registry
-   * @param processorRegistry processor registry
-   * @param brokerDefinitionManager broker definition manager
-   * @param taskManager task manager
-   * @param processManager process manager
-   * @param triggerManager trigger manager
-   * @param triggerInstanceManager trigger instance manager
-   * @param historyManager history manager
-   * @param reportBuilder report builder
+   * @param templatesService templates service
+   * @param brokersService brokers service
+   * @param tasksService tasks service
+   * @param processesService processes service
+   * @param triggersService triggers service
+   * @param executionService execution service
    */
   @Autowired
   public EngineBean(
@@ -74,7 +69,7 @@ public class EngineBean extends DefaultEngine {
    */
   @PostConstruct
   public void init() {
-    activateTriggerInstances();
+    getTriggersService().activateTriggerInstances();
     LOG.info("EngineBean initialized.");
   }
   
@@ -83,7 +78,7 @@ public class EngineBean extends DefaultEngine {
    */
   @PreDestroy
   public void destroy() {
-    deactivateTriggerInstances();
+    getTriggersService().deactivateTriggerInstances();
     LOG.info(String.format("EngineBean destroyed."));
   }
 }

@@ -16,7 +16,6 @@
 package com.esri.geoportal.harvester.engine;
 
 import com.esri.geoportal.harvester.api.Trigger;
-import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
@@ -53,13 +52,6 @@ public interface TriggersService {
   Collection<Map.Entry<UUID, TriggerManager.TriggerDefinitionUuidPair>> select() throws CrudsException;
   
   /**
-   * Clear active triggers.
-   */
-  public void clear();
-  
-  List<Map.Entry<UUID, TriggerInstance>> listAll();
-  
-  /**
    * Deactivates trigger.
    * @param triggerInstanceUuid trigger uuid
    * @return trigger reference
@@ -73,4 +65,14 @@ public interface TriggersService {
    * @return list of all activated triggers
    */
   List<TriggerReference> listActivatedTriggers();
+  
+  /**
+   * Activates trigger instances
+   */
+  void activateTriggerInstances();
+  
+  /**
+   * Deactivates trigger instances.
+   */
+  void deactivateTriggerInstances();
 }

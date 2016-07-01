@@ -20,6 +20,7 @@ import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.engine.ExecutionService;
 import com.esri.geoportal.harvester.engine.TriggersService;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
@@ -44,11 +45,13 @@ public class DefaultTriggersService implements TriggersService {
   protected final TriggerRegistry triggerRegistry;
   protected final TriggerManager triggerManager;
   protected final TriggerInstanceManager triggerInstanceManager;
+  protected final ExecutionService executionService;
 
-  public DefaultTriggersService(TriggerRegistry triggerRegistry, TriggerManager triggerManager, TriggerInstanceManager triggerInstanceManager) {
+  public DefaultTriggersService(TriggerRegistry triggerRegistry, TriggerManager triggerManager, TriggerInstanceManager triggerInstanceManager, ExecutionService executionService) {
     this.triggerRegistry = triggerRegistry;
     this.triggerManager = triggerManager;
     this.triggerInstanceManager = triggerInstanceManager;
+    this.executionService = executionService;
   }
 
   @Override
@@ -61,24 +64,8 @@ public class DefaultTriggersService implements TriggersService {
     return triggerRegistry.get(type);
   }
   
-  /**
-   * Select triggers.
-   * @return
-   * @throws CrudsException 
-   */
-  @Override
   public Collection<Map.Entry<UUID, TriggerManager.TriggerDefinitionUuidPair>> select() throws CrudsException {
     return triggerManager.select();
-  }
-  
-  @Override
-  public void clear() {
-    triggerInstanceManager.clear();
-  }
-  
-  @Override
-  public List<Map.Entry<UUID, TriggerInstance>> listAll() {
-    return triggerInstanceManager.listAll();
   }
   
   @Override
@@ -108,5 +95,45 @@ public class DefaultTriggersService implements TriggersService {
     return triggerInstanceManager.listAll().stream()
             .map(e->new TriggerReference(e.getKey(),e.getValue().getTriggerDefinition()))
             .collect(Collectors.toList());
+  }
+  
+  
+  @Override
+  public void activateTriggerInstances() {
+    try {
+      select().forEach(e->{
+        UUID uuid = e.getKey();
+        TriggerManager.TriggerDefinitionUuidPair definition = e.getValue();
+        
+        try {
+          Trigger trigger = getTrigger(definition.triggerDefinition.getType());
+          if (trigger==null) {
+            throw new InvalidDefinitionException(String.format("Invalid trigger type: %s", definition.triggerDefinition.getType()));
+          }
+          TriggerInstance triggerInstance = trigger.createInstance(definition.triggerDefinition);
+          TriggerInstance.Context context = executionService.newTriggerContext(definition.taskUuid);
+          triggerInstance.activate(context);
+        } catch (DataProcessorException|InvalidDefinitionException ex) {
+          LOG.warn(String.format("Error creating and activating trigger instance: %s -> %s", uuid, definition), ex);
+        }
+      });
+    } catch (CrudsException ex) {
+      LOG.error("Error processing trigger definitions", ex);
+    }
+  }
+  
+  @Override
+  public void deactivateTriggerInstances() {
+    triggerInstanceManager.listAll().stream().forEach(e->{
+      UUID uuid = e.getKey();
+      TriggerInstance triggerInstance = e.getValue();
+      
+      try {
+        triggerInstance.close();
+      } catch (Exception ex) {
+        LOG.warn(String.format("Error deactivating trigger instance: %s --> %s", uuid, triggerInstance.getTriggerDefinition()), ex);
+      }
+    });
+    triggerInstanceManager.clear();
   }
 }

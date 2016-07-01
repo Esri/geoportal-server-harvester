@@ -48,18 +48,12 @@ public class DefaultEngine implements Engine {
 
   /**
    * Creates instance of the engine.
-   *
-   * @param inboundConnectorRegistry inbound connector registry
-   * @param outboundConnectorRegistry outbound connector registry
-   * @param triggerRegistry trigger registry
-   * @param processorRegistry processor registry
-   * @param brokerDefinitionManager broker definition manager
-   * @param taskManager task manager
-   * @param processManager process manager
-   * @param triggerManager trigger manager
-   * @param triggerInstanceManager trigger instance manager
-   * @param historyManager history manager
-   * @param reportBuilder report builder
+   * @param templatesService templates service
+   * @param brokersService brokers service
+   * @param tasksService tasks service
+   * @param processesService processes service
+   * @param triggersService triggers service
+   * @param executionService execution service
    */
   public DefaultEngine(
           TemplatesService templatesService,
@@ -105,48 +99,5 @@ public class DefaultEngine implements Engine {
   @Override
   public ExecutionService getExecutionService() {
     return executionService;
-  }
-  
-  /**
-   * Activates trigger instances
-   */
-  protected void activateTriggerInstances() {
-    try {
-      getTriggersService().select().forEach(e->{
-        UUID uuid = e.getKey();
-        TriggerManager.TriggerDefinitionUuidPair definition = e.getValue();
-        
-        try {
-          Trigger trigger = getTriggersService().getTrigger(definition.triggerDefinition.getType());
-          if (trigger==null) {
-            throw new InvalidDefinitionException(String.format("Invalid trigger type: %s", definition.triggerDefinition.getType()));
-          }
-          TriggerInstance triggerInstance = trigger.createInstance(definition.triggerDefinition);
-          TriggerInstance.Context context = executionService.newTriggerContext(definition.taskUuid);
-          triggerInstance.activate(context);
-        } catch (DataProcessorException|InvalidDefinitionException ex) {
-          LOG.warn(String.format("Error creating and activating trigger instance: %s -> %s", uuid, definition), ex);
-        }
-      });
-    } catch (CrudsException ex) {
-      LOG.error("Error processing trigger definitions", ex);
-    }
-  }
-  
-  /**
-   * Deactivates trigger instances.
-   */
-  protected void deactivateTriggerInstances() {
-    getTriggersService().listAll().stream().forEach(e->{
-      UUID uuid = e.getKey();
-      TriggerInstance triggerInstance = e.getValue();
-      
-      try {
-        triggerInstance.close();
-      } catch (Exception ex) {
-        LOG.warn(String.format("Error deactivating trigger instance: %s --> %s", uuid, triggerInstance.getTriggerDefinition()), ex);
-      }
-    });
-    getTriggersService().clear();
   }
 }
