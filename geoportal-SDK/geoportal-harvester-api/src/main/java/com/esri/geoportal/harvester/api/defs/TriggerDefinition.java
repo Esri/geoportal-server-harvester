@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.api.defs;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,7 @@ import java.util.Objects;
 /**
  * Trigger definition.
  */
-public final class TriggerDefinition {
+public final class TriggerDefinition implements Serializable {
   private String type;
   private TaskDefinition taskDefinition;
   private Map<String,String> properties;

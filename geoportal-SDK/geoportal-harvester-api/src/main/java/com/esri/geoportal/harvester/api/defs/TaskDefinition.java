@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.api.defs;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +23,7 @@ import java.util.Objects;
 /**
  * Task definition.
  */
-public final class TaskDefinition {
+public final class TaskDefinition implements Serializable {
   private EntityDefinition processor;
   private EntityDefinition source;
   private List<EntityDefinition> destinations;

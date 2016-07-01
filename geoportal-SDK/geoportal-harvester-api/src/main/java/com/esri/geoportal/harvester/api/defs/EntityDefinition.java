@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.api.defs;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
  * @see com.esri.geoportal.harvester.api.Connector
  * @see com.esri.geoportal.harvester.api.Broker
  */
-public final class EntityDefinition {
+public final class EntityDefinition implements Serializable {
   private String type;
   private String label;
   private Map<String,String> properties = new LinkedHashMap<>();
