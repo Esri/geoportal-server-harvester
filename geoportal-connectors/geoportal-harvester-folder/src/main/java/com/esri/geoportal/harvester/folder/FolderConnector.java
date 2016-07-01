@@ -26,6 +26,7 @@ import java.util.List;
 
 /**
  * Folder connector.
+ * @see com.esri.geoportal.harvester.folder API
  */
 public class FolderConnector implements OutputConnector<OutputBroker> {
   public static final String TYPE = "FOLDER";

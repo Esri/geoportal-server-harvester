@@ -30,6 +30,7 @@ import java.util.List;
 
 /**
  * GPT connector.
+ * @see com.esri.geoportal.harvester.gpt API
  */
 public class GptConnector implements OutputConnector<OutputBroker> {
   public static final String TYPE = "GPT";

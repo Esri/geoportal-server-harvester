@@ -27,6 +27,7 @@ import java.util.List;
 
 /**
  * Waf connector.
+ * @see com.esri.geoportal.harvester.waf API
  */
 public class WafConnector implements InputConnector<InputBroker> {
   public static final String TYPE = "WAF";

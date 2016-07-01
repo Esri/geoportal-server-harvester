@@ -33,6 +33,7 @@ import java.util.List;
 
 /**
  * CSW connector.
+ * @see com.esri.geoportal.harvester.csw API
  */
 public class CswConnector implements InputConnector<InputBroker> {
   public static final String TYPE = "CSW";

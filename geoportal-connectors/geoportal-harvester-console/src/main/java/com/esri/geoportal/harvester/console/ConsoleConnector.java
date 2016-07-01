@@ -23,6 +23,7 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
 
 /**
  * Console connector.
+ * @see com.esri.geoportal.harvester.console API
  */
 public class ConsoleConnector implements OutputConnector<OutputBroker> {
   public static final String TYPE = "CONSOLE";
