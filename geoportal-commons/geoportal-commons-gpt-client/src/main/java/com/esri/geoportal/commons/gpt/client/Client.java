@@ -44,6 +44,8 @@ import org.apache.http.impl.client.HttpClients;
  * GPT 2.0 Client.
  */
 public class Client implements Closeable {
+  private static final String REST_ITEM_URL = "rest/metadata/item";
+  private static final String REST_SEARCH_URL = "rest/metadata/search";
 
   private final HttpClient httpClient;
   private final URL url;
@@ -92,7 +94,7 @@ public class Client implements Closeable {
     HttpRequestBase request;
     switch (ids.size()) {
       case 0: {
-        HttpPut put = new HttpPut(url.toURI().resolve("rest/metadata/item"));
+        HttpPut put = new HttpPut(url.toURI().resolve(REST_ITEM_URL));
         put.setConfig(DEFAULT_REQUEST_CONFIG);
         put.setEntity(entity);
         put.setHeader("Content-Type", "application/json");
@@ -100,7 +102,7 @@ public class Client implements Closeable {
       }
       break;
       case 1: {
-        HttpPut put = new HttpPut(url.toURI().resolve("rest/metadata/item/" + ids.get(0)));
+        HttpPut put = new HttpPut(url.toURI().resolve(REST_ITEM_URL + "/" + ids.get(0)));
         put.setConfig(DEFAULT_REQUEST_CONFIG);
         put.setEntity(entity);
         put.setHeader("Content-Type", "application/json");
@@ -135,7 +137,7 @@ public class Client implements Closeable {
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-    HttpGet get = new HttpGet(url.toURI().resolve("rest/metadata/search").toASCIIString() + String.format("?q=%s", URLEncoder.encode("\""+src_uri_s+"\"", "UTF-8")));
+    HttpGet get = new HttpGet(url.toURI().resolve(REST_SEARCH_URL).toASCIIString() + String.format("?q=%s", URLEncoder.encode("\""+src_uri_s+"\"", "UTF-8")));
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("Content-Type", "application/json");
 
