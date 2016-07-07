@@ -22,7 +22,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 /**
  * Filter.
  */
-public interface Filter {
+public interface Filter extends ChannelLink {
   /**
    * Gets type of the filter.
    * @return type of the filter

@@ -22,7 +22,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 /**
  * Transformer.
  */
-public interface Transformer {
+public interface Transformer extends ChannelLink {
   /**
    * Gets type of the transformer.
    * @return type of the transformer
