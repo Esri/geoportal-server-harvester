@@ -27,10 +27,11 @@ import java.util.Map;
 public interface DataReference {
   
   /**
-   * Gets broker URI.
-   * @return broker URI.
+   * Gets content.
+   * @return content
+   * @throws IOException if getting content fails
    */
-  URI getBrokerUri();
+  byte [] getContent() throws IOException;
   
   /**
    * Gets data record id.
@@ -51,11 +52,10 @@ public interface DataReference {
   URI getSourceUri();
   
   /**
-   * Gets content.
-   * @return content
-   * @throws IOException if getting content fails
+   * Gets broker URI.
+   * @return broker URI.
    */
-  byte [] getContent() throws IOException;
+  URI getBrokerUri();
   
   /**
    * Gets attributes map.
