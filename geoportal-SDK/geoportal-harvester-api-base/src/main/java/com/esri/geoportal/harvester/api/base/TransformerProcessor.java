@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.TransformerInstance;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
 
 /**
@@ -28,6 +29,11 @@ import com.esri.geoportal.harvester.api.ex.DataTransformerException;
 
   public TransformerProcessor(TransformerInstance transformer) {
     this.transformer = transformer;
+  }
+
+  @Override
+  public EntityDefinition getLinkDefinition() {
+    return transformer.getTransformerDefinition();
   }
 
   @Override

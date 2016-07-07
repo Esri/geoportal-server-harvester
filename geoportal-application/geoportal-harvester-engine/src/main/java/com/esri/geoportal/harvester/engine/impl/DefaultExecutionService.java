@@ -19,6 +19,8 @@ import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
+import com.esri.geoportal.harvester.api.base.SimpleInputChannel;
+import com.esri.geoportal.harvester.api.base.SimpleOutputChannel;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
@@ -26,8 +28,10 @@ import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
+import com.esri.geoportal.harvester.api.specs.InputChannel;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
+import com.esri.geoportal.harvester.api.specs.OutputChannel;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import com.esri.geoportal.harvester.engine.ExecutionService;
 import com.esri.geoportal.harvester.engine.ProcessesService;
@@ -45,7 +49,9 @@ import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Default execution service.
@@ -136,7 +142,10 @@ public class DefaultExecutionService implements ExecutionService {
       throw new InvalidDefinitionException(String.format("Unable to select processor based on definition: %s", processorDefinition));
     }
 
-    return new Task(processor, dataSource, dataDestinations);
+    InputChannel inputChannel = new SimpleInputChannel(dataSource);
+    List<OutputChannel> outputChannels = dataDestinations.stream().map(d->new SimpleOutputChannel(d)).collect(Collectors.toList());
+    
+    return new Task(processor, inputChannel, outputChannels);
   }
 
   @Override

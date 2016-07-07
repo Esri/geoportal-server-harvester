@@ -21,11 +21,11 @@ import com.esri.geoportal.harvester.api.Filter;
 import com.esri.geoportal.harvester.api.FilterInstance;
 import com.esri.geoportal.harvester.api.Transformer;
 import com.esri.geoportal.harvester.api.TransformerInstance;
+import com.esri.geoportal.harvester.api.defs.ChannelDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputChannel;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -81,6 +81,14 @@ public final class SimpleInputChannel implements InputChannel {
       }
     }
     return next!=null;
+  }
+
+  @Override
+  public ChannelDefinition getChannelDefinition() {
+    ChannelDefinition def = new ChannelDefinition();
+    def.add(inputBroker.getEntityDefinition());
+    def.addAll(linkProcessors.stream().map(p->p.getLinkDefinition()).collect(Collectors.toList()));
+    return def;
   }
 
   @Override

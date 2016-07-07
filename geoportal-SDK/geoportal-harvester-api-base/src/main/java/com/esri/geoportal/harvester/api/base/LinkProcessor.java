@@ -16,12 +16,15 @@
 package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
 
 /**
  * Link processor.
  */
 /*package*/ interface LinkProcessor extends AutoCloseable {
+  
+  EntityDefinition getLinkDefinition();
 
   DataReference process(DataReference dataReference) throws DataTransformerException;
   

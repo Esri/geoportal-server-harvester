@@ -17,10 +17,8 @@ package com.esri.geoportal.harvester.api.defs;
 
 import com.esri.geoportal.harvester.api.Processor;
 import java.util.List;
-import com.esri.geoportal.harvester.api.specs.InputBroker;
-import com.esri.geoportal.harvester.api.specs.OutputBroker;
-import java.io.Closeable;
-import java.io.IOException;
+import com.esri.geoportal.harvester.api.specs.InputChannel;
+import com.esri.geoportal.harvester.api.specs.OutputChannel;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -29,10 +27,10 @@ import java.util.stream.Collectors;
  * {@link com.esri.geoportal.harvester.api.ProcessInstance}. Task itself can be
  * created based on the {@link com.esri.geoportal.harvester.api.defs.TaskDefinition}.
  */
-public final class Task implements Closeable {
+public final class Task implements AutoCloseable {
   private final Processor processor;
-  private final InputBroker dataSource;
-  private final List<OutputBroker> dataDestinations;
+  private final InputChannel dataSource;
+  private final List<OutputChannel> dataDestinations;
   
   /**
    * Creates instance of the task.
@@ -40,7 +38,7 @@ public final class Task implements Closeable {
    * @param dataSource data source
    * @param dataDestinations data destination
    */
-  public Task(Processor processor, InputBroker dataSource, List<OutputBroker> dataDestinations) {
+  public Task(Processor processor, InputChannel dataSource, List<OutputChannel> dataDestinations) {
     this.processor = processor;
     this.dataSource = dataSource;
     this.dataDestinations = dataDestinations;
@@ -53,8 +51,8 @@ public final class Task implements Closeable {
   public TaskDefinition getTaskDefinition() {
     TaskDefinition taskDefinition = new TaskDefinition();
     taskDefinition.setProcessor(processor.getEntityDefinition());
-    taskDefinition.setSource(dataSource.getEntityDefinition());
-    taskDefinition.setDestinations(dataDestinations.stream().map(d->d.getEntityDefinition()).collect(Collectors.toList()));
+    taskDefinition.setSource(dataSource.getChannelDefinition().get(0));
+    taskDefinition.setDestinations(dataDestinations.stream().map(d->d.getChannelDefinition().get(d.getChannelDefinition().size()-1)).collect(Collectors.toList()));
     return taskDefinition;
   }
 
@@ -70,7 +68,7 @@ public final class Task implements Closeable {
    * Gets data source.
    * @return data source
    */
-  public InputBroker getDataSource() {
+  public InputChannel getDataSource() {
     return dataSource;
   }
 
@@ -78,12 +76,12 @@ public final class Task implements Closeable {
    * Gets data publisher.
    * @return data publisher
    */
-  public List<OutputBroker> getDataDestinations() {
+  public List<OutputChannel> getDataDestinations() {
     return dataDestinations;
   }
 
   @Override
-  public void close() throws IOException {
+  public void close() throws Exception {
     try {
       getDataSource().close();
     } finally {

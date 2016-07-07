@@ -21,6 +21,7 @@ import com.esri.geoportal.harvester.api.Filter;
 import com.esri.geoportal.harvester.api.FilterInstance;
 import com.esri.geoportal.harvester.api.Transformer;
 import com.esri.geoportal.harvester.api.TransformerInstance;
+import com.esri.geoportal.harvester.api.defs.ChannelDefinition;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
@@ -57,6 +58,14 @@ public final class SimpleOutputChannel implements OutputChannel {
             })
             .filter(instance->instance!=null)
             .collect(Collectors.toList());
+  }
+
+  @Override
+  public ChannelDefinition getChannelDefinition() {
+    ChannelDefinition def = new ChannelDefinition();
+    def.addAll(linkProcessors.stream().map(p->p.getLinkDefinition()).collect(Collectors.toList()));
+    def.add(outputBroker.getEntityDefinition());
+    return def;
   }
 
   @Override

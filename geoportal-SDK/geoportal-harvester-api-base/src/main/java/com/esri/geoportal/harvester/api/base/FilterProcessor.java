@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.FilterInstance;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
 
 /**
@@ -28,6 +29,11 @@ import com.esri.geoportal.harvester.api.ex.DataTransformerException;
 
   public FilterProcessor(FilterInstance filter) {
     this.filter = filter;
+  }
+
+  @Override
+  public EntityDefinition getLinkDefinition() {
+    return filter.getFilterDefinition();
   }
 
   @Override

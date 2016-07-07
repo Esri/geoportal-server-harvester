@@ -15,9 +15,16 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.harvester.api.defs.ChannelDefinition;
+
 /**
  * Channel.
  */
 public interface Channel extends AutoCloseable {
   
+  /**
+   * Gets channel definition.
+   * @return channel definition
+   */
+  ChannelDefinition getChannelDefinition();
 }
