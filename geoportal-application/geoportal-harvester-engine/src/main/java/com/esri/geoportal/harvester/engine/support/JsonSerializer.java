@@ -49,31 +49,7 @@ public class JsonSerializer {
   public static TaskDefinition deserialize(DefaultEngine engine, String taskDefinition) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     SimpleModule module = new SimpleModule();
-    JsonDeserializer<EntityDefinition> deserializer = new JsonDeserializer<EntityDefinition>() {
-      @Override
-      public EntityDefinition deserialize(JsonParser jp, DeserializationContext dc) throws IOException, JsonProcessingException {
-        ObjectCodec oc = jp.getCodec();
-        TreeNode treeNode = oc.readTree(jp);
-        TreeNode uuidNode = treeNode.get("uuid");
-        if (uuidNode!=null) {
-          String sUuid = uuidNode.toString();
-          try {
-            UUID uuid = UUID.fromString(sUuid);
-            BrokerReference broker = engine.getBrokersService().findBroker(uuid);
-            if (broker==null) {
-              throw new JsonParseException(jp,String.format("Invalid uuid: %s", sUuid));
-            }
-            return broker.getBrokerDefinition();
-          } catch (DataProcessorException|IllegalArgumentException ex) {
-            throw new JsonParseException(jp,String.format("Invalid uuid: %s", sUuid), ex);
-          }
-        } else {
-          ObjectMapper localMapper = new ObjectMapper();
-          EntityDefinition def = localMapper.treeToValue(treeNode, EntityDefinition.class);
-          return def;
-        }
-      }
-    };
+    JsonDeserializer<EntityDefinition> deserializer = new BrokerDefinitionDeserializer(engine);
     module.addDeserializer(EntityDefinition.class, deserializer);
     mapper.registerModule(module);
     
@@ -102,5 +78,41 @@ public class JsonSerializer {
   public static <T> T deserialize(String strDef, Class<T> clazz) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     return mapper.readValue(strDef, clazz);
+  }
+
+  /**
+   * Entity (broker) definition deserializer.
+   */
+  private static class BrokerDefinitionDeserializer extends JsonDeserializer<EntityDefinition> {
+
+    private final DefaultEngine engine;
+
+    public BrokerDefinitionDeserializer(DefaultEngine engine) {
+      this.engine = engine;
+    }
+
+    @Override
+    public EntityDefinition deserialize(JsonParser jp, DeserializationContext dc) throws IOException, JsonProcessingException {
+      ObjectCodec oc = jp.getCodec();
+      TreeNode treeNode = oc.readTree(jp);
+      TreeNode uuidNode = treeNode.get("uuid");
+      if (uuidNode!=null) {
+        String sUuid = uuidNode.toString();
+        try {
+          UUID uuid = UUID.fromString(sUuid);
+          BrokerReference broker = engine.getBrokersService().findBroker(uuid);
+          if (broker==null) {
+            throw new JsonParseException(jp,String.format("Invalid uuid: %s", sUuid));
+          }
+          return broker.getBrokerDefinition();
+        } catch (DataProcessorException|IllegalArgumentException ex) {
+          throw new JsonParseException(jp,String.format("Invalid uuid: %s", sUuid), ex);
+        }
+      } else {
+        ObjectMapper localMapper = new ObjectMapper();
+        EntityDefinition def = localMapper.treeToValue(treeNode, EntityDefinition.class);
+        return def;
+      }
+    }
   }
 }
