@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.api;
 
-import com.esri.geoportal.harvester.api.defs.TransformerDefinition;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
 
 /**
@@ -27,7 +27,7 @@ public interface TransformerInstance extends AutoCloseable {
    * Gets transformer definition.
    * @return transformer definition
    */
-  TransformerDefinition getTransformerDefinition();
+  EntityDefinition getTransformerDefinition();
   
   /**
    * Transforms data.

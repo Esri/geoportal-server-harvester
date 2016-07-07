@@ -20,12 +20,12 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 
 /**
- * Transformer.
+ * Filter.
  */
-public interface Transformer {
+public interface Filter {
   /**
-   * Gets type of the transformer.
-   * @return type of the transformer
+   * Gets type of the filter.
+   * @return type of the filter
    */
   String getType();
   
@@ -36,10 +36,11 @@ public interface Transformer {
   UITemplate getTemplate();
   
   /**
-   * Creates instance of the transformer.
-   * @param transformerDefinition transformer instance definition
-   * @return instance of the transformer
-   * @throws InvalidDefinitionException if transformer definition is invalid
+   * Creates instance of the filter.
+   * @param filterDefinition filter definition
+   * @return instance of the filter
+   * @throws InvalidDefinitionException if invalid filter definition
    */
-  TransformerInstance createInstance(EntityDefinition transformerDefinition) throws InvalidDefinitionException;
+  FilterInstance createInstance(EntityDefinition filterDefinition) throws InvalidDefinitionException;
+  
 }

@@ -16,30 +16,22 @@
 package com.esri.geoportal.harvester.api;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.UITemplate;
-import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 
 /**
- * Transformer.
+ * Filter instance.
  */
-public interface Transformer {
-  /**
-   * Gets type of the transformer.
-   * @return type of the transformer
-   */
-  String getType();
+public interface FilterInstance extends AutoCloseable {
   
   /**
-   * Gets UI template.
-   * @return template
+   * Gets filter definition.
+   * @return filter definition
    */
-  UITemplate getTemplate();
+  EntityDefinition getFilterDefinition();
   
   /**
-   * Creates instance of the transformer.
-   * @param transformerDefinition transformer instance definition
-   * @return instance of the transformer
-   * @throws InvalidDefinitionException if transformer definition is invalid
+   * Tests data if allowed by filter.
+   * @param dataReference data reference
+   * @return <code>true</code> if data allowed by filter
    */
-  TransformerInstance createInstance(EntityDefinition transformerDefinition) throws InvalidDefinitionException;
+  boolean test(DataReference dataReference);
 }
