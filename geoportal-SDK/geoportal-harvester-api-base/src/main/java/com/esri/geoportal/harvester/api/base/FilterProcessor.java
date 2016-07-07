@@ -34,5 +34,10 @@ import com.esri.geoportal.harvester.api.ex.DataTransformerException;
   public DataReference process(DataReference dataReference) throws DataTransformerException {
     return filter.test(dataReference) ? dataReference : null;
   }
+
+  @Override
+  public void close() throws Exception {
+    filter.close();
+  }
   
 }

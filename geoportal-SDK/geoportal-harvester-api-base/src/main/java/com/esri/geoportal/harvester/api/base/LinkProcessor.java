@@ -21,7 +21,7 @@ import com.esri.geoportal.harvester.api.ex.DataTransformerException;
 /**
  * Link processor.
  */
-/*package*/ interface LinkProcessor {
+/*package*/ interface LinkProcessor extends AutoCloseable {
 
   DataReference process(DataReference dataReference) throws DataTransformerException;
   

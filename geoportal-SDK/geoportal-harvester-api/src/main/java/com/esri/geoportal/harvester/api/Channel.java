@@ -18,6 +18,6 @@ package com.esri.geoportal.harvester.api;
 /**
  * Channel.
  */
-public interface Channel {
+public interface Channel extends AutoCloseable {
   
 }
