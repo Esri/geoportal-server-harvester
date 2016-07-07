@@ -53,7 +53,7 @@ import java.util.Date;
   }
 
   @Override
-  public boolean publish(DataReference ref) throws DataOutputException {
+  public PublishingStatus publish(DataReference ref) throws DataOutputException {
     try {
       PublishRequest data = new PublishRequest();
       data.src_source_type_s = ref.getBrokerUri().getScheme();
@@ -68,7 +68,7 @@ import java.util.Date;
       if (response.getError()!=null) {
         throw new DataOutputException(this, response.getError().getMessage());
       }
-      return response.getStatus().equalsIgnoreCase("created");
+      return response.getStatus().equalsIgnoreCase("created")? PublishingStatus.created: PublishingStatus.updated;
     } catch (IOException|URISyntaxException ex) {
       throw new DataOutputException(this, "Error publishing data.", ex);
     }

@@ -23,6 +23,7 @@ import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
+import com.esri.geoportal.harvester.api.specs.OutputBroker.PublishingStatus;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -95,9 +96,9 @@ public class DefaultProcessor implements Processor {
               onAcquire(dataReference);
               task.getDataDestinations().stream().forEach((d) -> {
                 try {
-                  boolean created = d.publish(dataReference);
+                  PublishingStatus status = d.publish(dataReference);
                   LOG.debug(String.format("Harvested %s during %s", dataReference, getTitle()));
-                  onSuccess(dataReference,created);
+                  onSuccess(dataReference,status);
                 } catch (DataOutputException ex) {
                   LOG.warn(String.format("Failed harvesting %s during %s", dataReference, getTitle()));
                   onError(ex);
@@ -208,10 +209,10 @@ public class DefaultProcessor implements Processor {
     /**
      * Called to handle successful data processing
      * @param dataRef data reference
-     * @param created <code>true</code> if new resource has been created
+     * @param status publishing status
      */
-    private void onSuccess(DataReference dataRef, boolean created) {
-      listeners.forEach(l -> l.onDataProcessed(dataRef,created));
+    private void onSuccess(DataReference dataRef, PublishingStatus status) {
+      listeners.forEach(l -> l.onDataProcessed(dataRef,status));
     }
 
     /**

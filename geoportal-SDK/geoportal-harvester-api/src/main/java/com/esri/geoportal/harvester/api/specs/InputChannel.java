@@ -15,36 +15,26 @@
  */
 package com.esri.geoportal.harvester.api.specs;
 
-import com.esri.geoportal.harvester.api.Broker;
-import com.esri.geoportal.harvester.api.ex.DataOutputException;
+import com.esri.geoportal.harvester.api.Channel;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.ex.DataInputException;
 
 /**
- * Output broker.
- * <p>
- * Provides mechanism to publish data.
- * 
- * @see OutputConnector
+ * Input channel.
  */
-public interface OutputBroker extends Broker<OutputConnector> {
+public interface InputChannel extends Channel {
   
   /**
-   * Publishes data.
-   * @param ref data reference
-   * @return publishing status
-   * @throws DataOutputException if publishing data fails
+   * Checks if more data available.
+   * @return <code>true</code> if more data available
+   * @throws DataInputException if checking if more data available fails
    */
-  PublishingStatus publish(DataReference ref) throws DataOutputException;
+  boolean hasNext() throws DataInputException;
   
   /**
-   *  Publishing status.
+   * Gets next available data reference.
+   * @return data reference
+   * @throws DataInputException if getting next data reference fails
    */
-  enum PublishingStatus {
-    /** new item has been created */
-    created, 
-    /** existing item has been updated */
-    updated, 
-    /** publishing item has been skipped for any reason */
-    skipped;
-  }
+  DataReference next() throws DataInputException;
 }

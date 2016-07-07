@@ -21,6 +21,7 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.engine.managers.ReportBuilder;
 import com.esri.geoportal.harvester.api.ex.DataException;
+import com.esri.geoportal.harvester.api.specs.OutputBroker.PublishingStatus;
 import java.util.UUID;
 
 /**
@@ -60,8 +61,10 @@ public class ReportBuilderAdaptor implements ProcessInstance.Listener {
   }
 
   @Override
-  public void onDataProcessed(DataReference dataReference, boolean created) {
-    reportBuilder.success(processInstance, dataReference);
+  public void onDataProcessed(DataReference dataReference, PublishingStatus status) {
+    if (status!=PublishingStatus.skipped) {
+      reportBuilder.success(processInstance, dataReference);
+    }
   }
 
   @Override

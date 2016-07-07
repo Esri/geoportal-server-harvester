@@ -39,10 +39,10 @@ public class DataPrintStreamOutput implements OutputBroker {
   }
 
   @Override
-  public boolean publish(DataReference ref) throws DataOutputException {
+  public PublishingStatus publish(DataReference ref) throws DataOutputException {
     try {
       SERIALIZER.serialize(out, ref);
-      return true;
+      return PublishingStatus.created;
     } catch (IOException ex) {
       throw new DataOutputException(this, "Error serializing data.", ex);
     }

@@ -13,32 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine.support;
+package com.esri.geoportal.harvester.api.specs;
 
+import com.esri.geoportal.harvester.api.Channel;
 import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.ProcessInstance;
-import com.esri.geoportal.harvester.api.ex.DataException;
+import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker.PublishingStatus;
 
 /**
- * Base process instance listener.
+ * Output channel.
  */
-public abstract class BaseProcessInstanceListener implements ProcessInstance.Listener {
-
-  @Override
-  public void onStatusChange(ProcessInstance.Status status) {
-  }
-
-  @Override
-  public void onDataAcquired(DataReference dataReference) {
-  }
-
-  @Override
-  public void onDataProcessed(DataReference dataReference, PublishingStatus status) {
-  }
-
-  @Override
-  public void onError(DataException ex) {
-  }
+public interface OutputChannel extends Channel {
   
+  /**
+   * Publishes data.
+   * @param ref data reference
+   * @return publishing status
+   * @throws DataOutputException if publishing data fails
+   */
+  PublishingStatus publish(DataReference ref) throws DataOutputException;
 }

@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.api;
 
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataException;
+import com.esri.geoportal.harvester.api.specs.OutputBroker.PublishingStatus;
 
 /**
  * Process instance. 
@@ -115,9 +116,9 @@ public interface ProcessInstance {
      * Called when data reference has been processed
      *
      * @param dataReference data reference
-     * @param created <code>true</code> if new resource has been created
+     * @param status publishing status
      */
-    void onDataProcessed(DataReference dataReference, boolean created);
+    void onDataProcessed(DataReference dataReference, PublishingStatus status);
 
     /**
      * Called for output onError.

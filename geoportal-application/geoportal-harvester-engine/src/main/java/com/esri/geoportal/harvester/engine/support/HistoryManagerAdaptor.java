@@ -18,6 +18,8 @@ package com.esri.geoportal.harvester.engine.support;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.ex.DataException;
+import com.esri.geoportal.harvester.api.specs.OutputBroker.PublishingStatus;
+import static com.esri.geoportal.harvester.api.specs.OutputBroker.PublishingStatus.created;
 import com.esri.geoportal.harvester.engine.managers.History;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import java.util.Date;
@@ -87,11 +89,14 @@ public class HistoryManagerAdaptor implements ProcessInstance.Listener {
   }
 
   @Override
-  public void onDataProcessed(DataReference dataReference, boolean created) {
-    if (created) {
-      report.added++;
-    } else {
-      report.updated++;
+  public void onDataProcessed(DataReference dataReference, PublishingStatus status) {
+    switch (status) {
+      case created:
+        report.added++;
+        break;
+      case updated:
+        report.updated++;
+        break;
     }
   }
 

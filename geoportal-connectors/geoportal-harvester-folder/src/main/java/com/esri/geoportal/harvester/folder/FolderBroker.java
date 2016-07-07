@@ -27,6 +27,7 @@ import java.util.List;
 import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
 import java.io.OutputStream;
 import java.net.URI;
+import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
 
 /**
  * Folder broker.
@@ -51,7 +52,7 @@ import java.net.URI;
   }
 
   @Override
-  public boolean publish(DataReference ref) throws DataOutputException {
+  public PublishingStatus publish(DataReference ref) throws DataOutputException {
       File f = generateFileName(ref.getBrokerUri(), ref.getSourceUri(), ref.getId());
       boolean created = !f.exists();
       f.getParentFile().mkdirs();
@@ -60,7 +61,7 @@ import java.net.URI;
       }
       try (OutputStream output = new FileOutputStream(f);) {
         output.write(ref.getContent());
-        return created;
+        return created? PublishingStatus.created: PublishingStatus.updated;
       } catch (Exception ex) {
         throw new DataOutputException(this,"Error publishing data.", ex);
       }
