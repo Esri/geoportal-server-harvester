@@ -70,7 +70,8 @@ public final class SimpleInputChannel implements InputChannel {
         for (LinkProcessor p: linkProcessors) {
           if (next==null) break;
           try {
-            next = p.process(next);
+            DataReference result = p.process(next);
+            next = result!=null? new DataReferenceWrapper(result, next): null;
           } catch (DataTransformerException ex) {
             throw new DataInputException(inputBroker, String.format("Error processing chain of links."), ex);
           }

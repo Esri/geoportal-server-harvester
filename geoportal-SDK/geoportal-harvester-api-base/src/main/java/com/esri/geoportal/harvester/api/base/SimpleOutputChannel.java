@@ -26,7 +26,6 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputChannel;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,7 +72,8 @@ public final class SimpleOutputChannel implements OutputChannel {
     for (LinkProcessor p: linkProcessors) {
       if (ref==null) break;
       try {
-        ref = p.process(ref);
+        DataReference result = p.process(ref);
+        ref = result!=null? new DataReferenceWrapper(result, ref): null;
       } catch (DataTransformerException ex) {
         throw new DataOutputException(outputBroker, String.format("Error processing chain of links."), ex);
       }

@@ -76,6 +76,11 @@ public final class SimpleDataReference implements DataReference {
   public HashMap<String, Object> getAttributesMap() {
     return attributesMap;
   }
+
+  @Override
+  public DataReference getOriginDataReference() {
+    return null;
+  }
   
   @Override
   public String toString() {

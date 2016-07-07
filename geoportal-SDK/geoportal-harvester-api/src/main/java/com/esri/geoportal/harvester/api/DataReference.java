@@ -62,4 +62,10 @@ public interface DataReference {
    * @return attributes map
    */
   Map<String,Object> getAttributesMap();
+  
+  /**
+   * Gets origin data reference.
+   * @return origin data reference
+   */
+  DataReference getOriginDataReference();
 }
