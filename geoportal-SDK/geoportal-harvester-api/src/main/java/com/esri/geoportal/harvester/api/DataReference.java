@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.api;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Data reference. It provides access to data itself as well as vital data 
@@ -44,8 +45,8 @@ public interface DataReference {
   Date getLastModifiedDate();
   
   /**
-   * Gets source uri.
-   * @return source uri
+   * Gets source URI.
+   * @return source URI
    */
   URI getSourceUri();
   
@@ -55,4 +56,10 @@ public interface DataReference {
    * @throws IOException if getting content fails
    */
   byte [] getContent() throws IOException;
+  
+  /**
+   * Gets attributes map.
+   * @return attributes map
+   */
+  Map<String,Object> getAttributesMap();
 }

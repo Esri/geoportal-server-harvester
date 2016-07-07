@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.api.base;
 import com.esri.geoportal.harvester.api.DataReference;
 import java.net.URI;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Simple data reference.
@@ -28,6 +29,7 @@ public final class SimpleDataReference implements DataReference {
   private final Date lastModifiedDate;
   private final URI sourceUri;
   private final byte [] content;
+  private final HashMap<String,Object> attributesMap = new HashMap<>();
 
   /**
    * Creates instance of the data reference.
@@ -68,6 +70,11 @@ public final class SimpleDataReference implements DataReference {
   @Override
   public byte [] getContent() {
     return content;
+  }
+
+  @Override
+  public HashMap<String, Object> getAttributesMap() {
+    return attributesMap;
   }
   
   @Override
