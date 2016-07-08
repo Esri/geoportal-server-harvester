@@ -25,6 +25,7 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputChannel;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -87,5 +88,13 @@ public final class SimpleOutputChannel implements OutputChannel {
     for (LinkProcessor p: linkProcessors) {
       p.close();
     }
+  }
+  
+  @Override
+  public String toString() {
+    ArrayList<String> parts = new ArrayList<>();
+    parts.addAll(linkProcessors.stream().map(LinkProcessor::toString).collect(Collectors.toList()));
+    parts.add(outputBroker.toString());
+    return parts.toString();
   }
 }
