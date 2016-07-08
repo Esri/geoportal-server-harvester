@@ -15,22 +15,9 @@
  */
 package com.esri.geoportal.harvester.api.general;
 
-import com.esri.geoportal.harvester.api.defs.UITemplate;
-
 /**
- * Entity.
+ * Channel link instance.
  */
-public interface Entity {
+public interface ChannelLinkInstance {
   
-  /**
-   * Gets entity type.
-   * @return entity type.
-   */
-  String getType();
-  
-  /**
-   * Gets entity UI template.
-   * @return entity UI template
-   */
-  UITemplate getTemplate();
 }

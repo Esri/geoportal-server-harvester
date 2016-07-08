@@ -23,10 +23,10 @@ import com.esri.geoportal.harvester.api.TransformerInstance;
 import com.esri.geoportal.harvester.api.defs.ChannelDefinition;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
+import com.esri.geoportal.harvester.api.general.ChannelLinkInstance;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputChannel;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,10 +42,10 @@ public final class SimpleOutputChannel implements OutputChannel {
    * @param outputBroker output broker
    * @param links links
    */
-  public SimpleOutputChannel(OutputBroker outputBroker, ChannelLink...links) {
+  public SimpleOutputChannel(OutputBroker outputBroker, List<ChannelLinkInstance> links) {
     this.outputBroker = outputBroker;
     
-    this.linkProcessors = Arrays.asList(links).stream()
+    this.linkProcessors = links.stream()
             .map(link->{
               if (link instanceof Filter) {
                 return new FilterProcessor((FilterInstance) link);

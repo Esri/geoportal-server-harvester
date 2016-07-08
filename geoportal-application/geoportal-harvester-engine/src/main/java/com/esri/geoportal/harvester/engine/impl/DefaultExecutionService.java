@@ -15,18 +15,22 @@
  */
 package com.esri.geoportal.harvester.engine.impl;
 
+import com.esri.geoportal.harvester.api.Filter;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Processor;
+import com.esri.geoportal.harvester.api.Transformer;
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.api.base.SimpleInputChannel;
 import com.esri.geoportal.harvester.api.base.SimpleOutputChannel;
+import com.esri.geoportal.harvester.api.defs.ChannelDefinition;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.general.ChannelLinkInstance;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputChannel;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
@@ -50,6 +54,7 @@ import com.esri.geoportal.harvester.engine.support.HistoryManagerAdaptor;
 import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -129,28 +134,41 @@ public class DefaultExecutionService implements ExecutionService {
       throw new DataProcessorException(String.format("Error scheduling task: %s", trigDef.getTaskDefinition()), ex);
     }
   }
+
+  @Override
+  public TriggerInstance.Context newTriggerContext(UUID taskId) {
+    return new TriggerContext(taskId);
+  }
   
+  /**
+   * Creates new task.
+   * @param taskDefinition task definition
+   * @return task
+   * @throws InvalidDefinitionException  if invalid definition
+   */
   private Task createTask(TaskDefinition taskDefinition) throws InvalidDefinitionException {
-    InputConnector<InputBroker> dsFactory = inboundConnectorRegistry.get(taskDefinition.getSource().getType());
-
-    if (dsFactory == null) {
-      throw new IllegalArgumentException("Invalid data source init parameters");
-    }
-
-    InputBroker dataSource = dsFactory.createBroker(taskDefinition.getSource());
+    InputBroker dataSource = newInputBroker(taskDefinition.getSource());
 
     ArrayList<OutputBroker> dataDestinations = new ArrayList<>();
     for (EntityDefinition def : taskDefinition.getDestinations()) {
-      OutputConnector<OutputBroker> dpFactory = outboundConnectorRegistry.get(def.getType());
-      if (dpFactory == null) {
-        throw new IllegalArgumentException("Invalid data publisher init parameters");
-      }
-
-      OutputBroker dataPublisher = dpFactory.createBroker(def);
-      dataDestinations.add(dataPublisher);
+      dataDestinations.add(newOutputBroker(def));
     }
     
-    EntityDefinition processorDefinition = taskDefinition.getProcessor();
+    Processor processor = newProcessor(taskDefinition.getProcessor());
+
+    InputChannel inputChannel = new SimpleInputChannel(dataSource,Collections.emptyList());
+    List<OutputChannel> outputChannels = dataDestinations.stream().map(d->new SimpleOutputChannel(d,Collections.emptyList())).collect(Collectors.toList());
+    
+    return new Task(processor, inputChannel, outputChannels);
+  }
+  
+  /**
+   * Creates new processor.
+   * @param processorDefinition processor definition
+   * @return processor
+   * @throws InvalidDefinitionException if invalid definition
+   */
+  private Processor newProcessor(EntityDefinition processorDefinition) throws InvalidDefinitionException {
     Processor processor = processorDefinition == null
             ? processorRegistry.getDefaultProcessor()
             : processorRegistry.get(processorDefinition.getType()) != null
@@ -159,16 +177,96 @@ public class DefaultExecutionService implements ExecutionService {
     if (processor == null) {
       throw new InvalidDefinitionException(String.format("Unable to select processor based on definition: %s", processorDefinition));
     }
-
-    InputChannel inputChannel = new SimpleInputChannel(dataSource);
-    List<OutputChannel> outputChannels = dataDestinations.stream().map(d->new SimpleOutputChannel(d)).collect(Collectors.toList());
+    return processor;
+  }
+  
+  /**
+   * Creates new input channel.
+   * @param channelDefinition channel definition
+   * @return channel
+   * @throws InvalidDefinitionException if invalid definition
+   */
+  private InputChannel newInputChannel(ChannelDefinition channelDefinition) throws InvalidDefinitionException {
+    if (channelDefinition.isEmpty()) {
+      throw new InvalidDefinitionException(String.format("Empty channel definition."));
+    }
+    InputBroker inputBroker = newInputBroker(channelDefinition.get(0));
+    ArrayList<ChannelLinkInstance> links = new ArrayList<>();
+    for (EntityDefinition linkDefinition: channelDefinition.subList(1, channelDefinition.size())) {
+      links.add(newChannelLinkInstance(linkDefinition));
+    }
     
-    return new Task(processor, inputChannel, outputChannels);
+    return new SimpleInputChannel(inputBroker, links);
+  }
+  
+  /**
+   * Creates new output channel.
+   * @param channelDefinition channel definition
+   * @return channel
+   * @throws InvalidDefinitionException if invalid definition
+   */
+  private OutputChannel newOutputChannel(ChannelDefinition channelDefinition) throws InvalidDefinitionException {
+    if (channelDefinition.isEmpty()) {
+      throw new InvalidDefinitionException(String.format("Empty channel definition."));
+    }
+    OutputBroker outputBroker = newOutputBroker(channelDefinition.get(channelDefinition.size()-1));
+    ArrayList<ChannelLinkInstance> links = new ArrayList<>();
+    for (EntityDefinition linkDefinition: channelDefinition.subList(0, channelDefinition.size()-1)) {
+      links.add(newChannelLinkInstance(linkDefinition));
+    }
+    
+    return new SimpleOutputChannel(outputBroker, links);
+  }
+  
+  /**
+   * Creates new input broker.
+   * @param entityDefinition input broker definition
+   * @return input broker
+   * @throws InvalidDefinitionException if invalid definition
+   */
+  private InputBroker newInputBroker(EntityDefinition entityDefinition) throws InvalidDefinitionException {
+    InputConnector<InputBroker> dsFactory = inboundConnectorRegistry.get(entityDefinition.getType());
+
+    if (dsFactory == null) {
+      throw new InvalidDefinitionException("Invalid input broker definition");
+    }
+
+    return dsFactory.createBroker(entityDefinition);
   }
 
-  @Override
-  public TriggerInstance.Context newTriggerContext(UUID taskId) {
-    return new TriggerContext(taskId);
+  /**
+   * Creates new output broker.
+   * @param entityDefinition output broker definition
+   * @return output broker
+   * @throws InvalidDefinitionException if invalid definition
+   */  
+  private OutputBroker newOutputBroker(EntityDefinition entityDefinition) throws InvalidDefinitionException {
+    OutputConnector<OutputBroker> dpFactory = outboundConnectorRegistry.get(entityDefinition.getType());
+
+    if (dpFactory == null) {
+      throw new IllegalArgumentException("Invalid output broker definition");
+    }
+
+    return dpFactory.createBroker(entityDefinition);
+  }
+  
+  /**
+   * Creates instance of channel link.
+   * @param entityDefinition channel link definition
+   * @return channel link instance
+   * @throws InvalidDefinitionException if invalid definition
+   */
+  private ChannelLinkInstance newChannelLinkInstance(EntityDefinition entityDefinition) throws InvalidDefinitionException {
+    Filter filter;
+    Transformer transformer;
+    
+    if ((filter = filterRegistry.get(entityDefinition.getType()))!=null) {
+      return filter.createInstance(entityDefinition);
+    } else if ((transformer = transformerRegistry.get(entityDefinition.getType()))!=null) {
+      return transformer.createInstance(entityDefinition);
+    } else {
+      throw new InvalidDefinitionException(String.format("Invalid channel link type: %s", entityDefinition.getType()));
+    }
   }
 
   /**

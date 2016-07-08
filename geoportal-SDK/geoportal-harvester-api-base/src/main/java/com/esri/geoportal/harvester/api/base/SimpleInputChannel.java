@@ -23,10 +23,10 @@ import com.esri.geoportal.harvester.api.TransformerInstance;
 import com.esri.geoportal.harvester.api.defs.ChannelDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
+import com.esri.geoportal.harvester.api.general.ChannelLinkInstance;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputChannel;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,10 +45,10 @@ public final class SimpleInputChannel implements InputChannel {
    * @param inputBroker input broker
    * @param links links
    */
-  public SimpleInputChannel(InputBroker inputBroker, ChannelLink...links) {
+  public SimpleInputChannel(InputBroker inputBroker, List<ChannelLinkInstance> links) {
     this.inputBroker = inputBroker;
     
-    this.linkProcessors = Arrays.asList(links).stream()
+    this.linkProcessors = links.stream()
             .map(link->{
               if (link instanceof Filter) {
                 return new FilterProcessor((FilterInstance) link);
