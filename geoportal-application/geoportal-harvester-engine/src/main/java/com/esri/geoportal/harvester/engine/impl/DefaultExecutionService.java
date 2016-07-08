@@ -112,13 +112,13 @@ public class DefaultExecutionService implements ExecutionService {
   }
 
   @Override
-  public ProcessReference submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException, DataProcessorException {
+  public ProcessReference execute(TaskDefinition taskDefinition) throws InvalidDefinitionException, DataProcessorException {
     Task task = createTask(taskDefinition);
     return processesService.createProcess(task);
   }
   
   @Override
-  public TriggerReference scheduleTask(UUID taskId, TriggerDefinition trigDef) throws InvalidDefinitionException, DataProcessorException {
+  public TriggerReference schedule(UUID taskId, TriggerDefinition trigDef) throws InvalidDefinitionException, DataProcessorException {
     try {
       TriggerManager.TriggerDefinitionUuidPair pair = new TriggerManager.TriggerDefinitionUuidPair();
       pair.taskUuid = taskId;
@@ -284,8 +284,8 @@ public class DefaultExecutionService implements ExecutionService {
     }
 
     @Override
-    public synchronized ProcessInstance submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
-      ProcessReference ref = submitTaskDefinition(taskDefinition);
+    public synchronized ProcessInstance execute(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
+      ProcessReference ref = DefaultExecutionService.this.execute(taskDefinition);
       if (taskId!=null) {
         ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref.getProcess(), historyManager));
       }

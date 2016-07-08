@@ -137,7 +137,7 @@ public class PeriodTrigger implements Trigger {
     private Runnable newRunnable(Context triggerContext) {
       return ()->{
         try {
-          ProcessInstance process = triggerContext.submit(triggerDefinition.getTaskDefinition());
+          ProcessInstance process = triggerContext.execute(triggerDefinition.getTaskDefinition());
           process.addListener(new BaseProcessInstanceListener() {
             @Override
             public void onStatusChange(ProcessInstance.Status status) {

@@ -259,7 +259,7 @@ public class TaskController {
     try {
       LOG.debug(String.format("PUT /rest/harvester/tasks/%s/execute", taskId));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
-      ProcessReference ref = engine.getExecutionService().submitTaskDefinition(taskDefinition);
+      ProcessReference ref = engine.getExecutionService().execute(taskDefinition);
       ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref.getProcess(), historyManager));
       ref.getProcess().init();
       ref.getProcess().begin();
@@ -280,7 +280,7 @@ public class TaskController {
   public ResponseEntity<ProcessResponse> executeTask(@RequestBody TaskDefinition taskDefinition) {
     try {
       LOG.debug(String.format("PUT /rest/harvester/tasks/execute <-- %s", taskDefinition));
-      ProcessReference ref = engine.getExecutionService().submitTaskDefinition(taskDefinition);
+      ProcessReference ref = engine.getExecutionService().execute(taskDefinition);
       ref.getProcess().init();
       ref.getProcess().begin();
       return new ResponseEntity<>(new ProcessResponse(ref.getProcessId(), ref.getProcess().getTitle(), ref.getProcess().getStatus()), HttpStatus.OK);
@@ -306,7 +306,7 @@ public class TaskController {
       triggerInstanceDefinition.setType(triggerDefinition.getType());
       triggerInstanceDefinition.setTaskDefinition(taskDefinition);
       triggerInstanceDefinition.setProperties(triggerDefinition.getProperties());
-      TriggerReference trigRef = engine.getExecutionService().scheduleTask(taskId, triggerInstanceDefinition);
+      TriggerReference trigRef = engine.getExecutionService().schedule(taskId, triggerInstanceDefinition);
       return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), trigRef.getTriggerDefinition()),HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -324,7 +324,7 @@ public class TaskController {
   public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody TriggerDefinition trigDef) {
     try {
       LOG.debug(String.format("PUT /rest/harvester/tasks/schedule <-- %s", trigDef));
-      TriggerReference trigRef = engine.getExecutionService().scheduleTask(null,trigDef);
+      TriggerReference trigRef = engine.getExecutionService().schedule(null,trigDef);
       return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), trigRef.getTriggerDefinition()),HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

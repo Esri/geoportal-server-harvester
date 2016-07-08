@@ -30,14 +30,14 @@ import java.util.UUID;
 public interface ExecutionService {
 
   /**
-   * Submits task definition.
+   * Executes task.
    *
    * @param taskDefinition task definition
    * @return process handle
    * @throws InvalidDefinitionException invalid definition exception
    * @throws DataProcessorException if accessing repository fails
    */
-  ProcessReference submitTaskDefinition(TaskDefinition taskDefinition) throws InvalidDefinitionException, DataProcessorException;
+  ProcessReference execute(TaskDefinition taskDefinition) throws InvalidDefinitionException, DataProcessorException;
 
   /**
    * Schedules task with trigger.
@@ -47,7 +47,7 @@ public interface ExecutionService {
    * @throws InvalidDefinitionException if invalid definition
    * @throws DataProcessorException if error processing data
    */
-  TriggerReference scheduleTask(UUID taskId, TriggerDefinition trigDef) throws InvalidDefinitionException, DataProcessorException;
+  TriggerReference schedule(UUID taskId, TriggerDefinition trigDef) throws InvalidDefinitionException, DataProcessorException;
   
   /**
    * Creates new trigger context.

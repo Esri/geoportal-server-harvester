@@ -48,13 +48,13 @@ public interface TriggerInstance extends AutoCloseable {
    */
   interface Context {
     /**
-     * Submits task definition to create and start new process.
+     * Executes task definition to create and start new process.
      * @param taskDefinition task definition
      * @return instance of the process
      * @throws DataProcessorException if processing fails
      * @throws InvalidDefinitionException if task definition is invalid
      */
-    ProcessInstance submit(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException;
+    ProcessInstance execute(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException;
     
     /**
      * Gets last harvest for task.
