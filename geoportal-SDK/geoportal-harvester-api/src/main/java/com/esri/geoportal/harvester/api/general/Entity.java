@@ -13,18 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api;
+package com.esri.geoportal.harvester.api.base;
 
-import com.esri.geoportal.harvester.api.defs.ChannelDefinition;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
 
 /**
- * Channel.
+ * Entity.
  */
-public interface Channel extends AutoCloseable {
+public interface Entity {
   
   /**
-   * Gets channel definition.
-   * @return channel definition
+   * Gets entity type.
+   * @return entity type.
    */
-  ChannelDefinition getChannelDefinition();
+  String getType();
+  
+  /**
+   * Gets entity UI template.
+   * @return entity UI template
+   */
+  UITemplate getTemplate();
 }

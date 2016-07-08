@@ -18,14 +18,14 @@ package com.esri.geoportal.harvester.engine.support;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
+import com.esri.geoportal.harvester.api.base.Entity;
 
 /**
  * Base data registry.
  * @param <F> type of the factory
  */
-public abstract class BaseRegistry<F extends Connector> extends HashMap<String,F> {
+public abstract class BaseRegistry<F extends Entity> extends HashMap<String,F> {
   /**
    * Gets all templates.
    * @return list of all templates

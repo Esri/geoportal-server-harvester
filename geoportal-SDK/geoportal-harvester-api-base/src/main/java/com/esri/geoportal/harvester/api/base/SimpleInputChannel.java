@@ -15,7 +15,6 @@
  */
 package com.esri.geoportal.harvester.api.base;
 
-import com.esri.geoportal.harvester.api.ChannelLink;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Filter;
 import com.esri.geoportal.harvester.api.FilterInstance;

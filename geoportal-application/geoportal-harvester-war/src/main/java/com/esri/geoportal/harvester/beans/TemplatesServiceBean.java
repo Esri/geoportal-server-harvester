@@ -16,9 +16,11 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.engine.impl.DefaultTemplatesService;
+import com.esri.geoportal.harvester.engine.managers.FilterRegistry;
 import com.esri.geoportal.harvester.engine.managers.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.managers.OutboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.managers.ProcessorRegistry;
+import com.esri.geoportal.harvester.engine.managers.TransformerRegistry;
 import com.esri.geoportal.harvester.engine.managers.TriggerRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,12 +35,20 @@ public class TemplatesServiceBean extends DefaultTemplatesService {
    * Creates instance of the bean.
    * @param inboundConnectorRegistry inbound connector registry
    * @param outboundConnectorRegistry outbound connector registry
+   * @param transformerRegistry transformer registry
+   * @param filterRegistry filter registry
    * @param triggerRegistry trigger registry
    * @param processorRegistry processor registry
    */
   @Autowired
-  public TemplatesServiceBean(InboundConnectorRegistry inboundConnectorRegistry, OutboundConnectorRegistry outboundConnectorRegistry, TriggerRegistry triggerRegistry, ProcessorRegistry processorRegistry) {
-    super(inboundConnectorRegistry, outboundConnectorRegistry, triggerRegistry, processorRegistry);
+  public TemplatesServiceBean(
+          InboundConnectorRegistry inboundConnectorRegistry, 
+          OutboundConnectorRegistry outboundConnectorRegistry, 
+          TransformerRegistry transformerRegistry,
+          FilterRegistry filterRegistry,
+          TriggerRegistry triggerRegistry, 
+          ProcessorRegistry processorRegistry) {
+    super(inboundConnectorRegistry, outboundConnectorRegistry, transformerRegistry, filterRegistry, triggerRegistry, processorRegistry);
   }
   
 }

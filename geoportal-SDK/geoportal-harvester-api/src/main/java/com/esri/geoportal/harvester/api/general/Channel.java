@@ -13,11 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api;
+package com.esri.geoportal.harvester.api.base;
+
+import com.esri.geoportal.harvester.api.defs.ChannelDefinition;
 
 /**
- * Channel link.
+ * Channel.
  */
-public interface ChannelLink {
+public interface Channel extends AutoCloseable {
   
+  /**
+   * Gets channel definition.
+   * @return channel definition
+   */
+  ChannelDefinition getChannelDefinition();
 }

@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.api.specs;
 
-import com.esri.geoportal.harvester.api.Channel;
+import com.esri.geoportal.harvester.api.base.Channel;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 

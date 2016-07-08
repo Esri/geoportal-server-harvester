@@ -35,11 +35,13 @@ import com.esri.geoportal.harvester.api.specs.OutputChannel;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import com.esri.geoportal.harvester.engine.ExecutionService;
 import com.esri.geoportal.harvester.engine.ProcessesService;
+import com.esri.geoportal.harvester.engine.managers.FilterRegistry;
 import com.esri.geoportal.harvester.engine.managers.History;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.managers.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.managers.OutboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.managers.ProcessorRegistry;
+import com.esri.geoportal.harvester.engine.managers.TransformerRegistry;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerRegistry;
@@ -59,6 +61,8 @@ import java.util.stream.Collectors;
 public class DefaultExecutionService implements ExecutionService {
   protected final InboundConnectorRegistry inboundConnectorRegistry;
   protected final OutboundConnectorRegistry outboundConnectorRegistry;
+  protected final TransformerRegistry transformerRegistry;
+  protected final FilterRegistry filterRegistry;
   protected final ProcessorRegistry processorRegistry;
   protected final TriggerRegistry triggerRegistry;
   protected final TriggerManager triggerManager;
@@ -70,6 +74,8 @@ public class DefaultExecutionService implements ExecutionService {
    * Creates instance of the service.
    * @param inboundConnectorRegistry inbound connector registry.
    * @param outboundConnectorRegistry outbound connector registry
+   * @param transformerRegistry transformer registry
+   * @param filterRegistry filter registry
    * @param processorRegistry processor registry
    * @param triggerRegistry trigger registry
    * @param triggerManager trigger manager
@@ -77,9 +83,21 @@ public class DefaultExecutionService implements ExecutionService {
    * @param historyManager history manager
    * @param processesService processes service
    */
-  public DefaultExecutionService(InboundConnectorRegistry inboundConnectorRegistry, OutboundConnectorRegistry outboundConnectorRegistry, ProcessorRegistry processorRegistry, TriggerRegistry triggerRegistry, TriggerManager triggerManager, TriggerInstanceManager triggerInstanceManager, HistoryManager historyManager, ProcessesService processesService) {
+  public DefaultExecutionService(
+          InboundConnectorRegistry inboundConnectorRegistry, 
+          OutboundConnectorRegistry outboundConnectorRegistry, 
+          TransformerRegistry transformerRegistry,
+          FilterRegistry filterRegistry,
+          ProcessorRegistry processorRegistry, 
+          TriggerRegistry triggerRegistry, 
+          TriggerManager triggerManager, 
+          TriggerInstanceManager triggerInstanceManager, 
+          HistoryManager historyManager, 
+          ProcessesService processesService) {
     this.inboundConnectorRegistry = inboundConnectorRegistry;
     this.outboundConnectorRegistry = outboundConnectorRegistry;
+    this.transformerRegistry = transformerRegistry;
+    this.filterRegistry = filterRegistry;
     this.processorRegistry = processorRegistry;
     this.triggerRegistry = triggerRegistry;
     this.triggerManager = triggerManager;

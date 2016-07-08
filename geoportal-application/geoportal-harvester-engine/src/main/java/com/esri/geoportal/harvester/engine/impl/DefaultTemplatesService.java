@@ -17,9 +17,11 @@ package com.esri.geoportal.harvester.engine.impl;
 
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.engine.TemplatesService;
+import com.esri.geoportal.harvester.engine.managers.FilterRegistry;
 import com.esri.geoportal.harvester.engine.managers.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.managers.OutboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.managers.ProcessorRegistry;
+import com.esri.geoportal.harvester.engine.managers.TransformerRegistry;
 import com.esri.geoportal.harvester.engine.managers.TriggerRegistry;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,8 @@ import java.util.stream.Collectors;
 public class DefaultTemplatesService implements TemplatesService {
   protected final InboundConnectorRegistry inboundConnectorRegistry;
   protected final OutboundConnectorRegistry outboundConnectorRegistry;
+  protected final TransformerRegistry transformerRegistry;
+  protected final FilterRegistry filterRegistry;
   protected final TriggerRegistry triggerRegistry;
   protected final ProcessorRegistry processorRegistry;
 
@@ -38,12 +42,22 @@ public class DefaultTemplatesService implements TemplatesService {
    * Creates instance of the service.
    * @param inboundConnectorRegistry inbound connector registry
    * @param outboundConnectorRegistry outbound connector registry
+   * @param transformerRegistry transformer registry
+   * @param filterRegistry filter registry
    * @param triggerRegistry trigger registry
    * @param processorRegistry processor registry
    */
-  public DefaultTemplatesService(InboundConnectorRegistry inboundConnectorRegistry, OutboundConnectorRegistry outboundConnectorRegistry, TriggerRegistry triggerRegistry, ProcessorRegistry processorRegistry) {
+  public DefaultTemplatesService(
+          InboundConnectorRegistry inboundConnectorRegistry, 
+          OutboundConnectorRegistry outboundConnectorRegistry, 
+          TransformerRegistry transformerRegistry,
+          FilterRegistry filterRegistry,
+          TriggerRegistry triggerRegistry, 
+          ProcessorRegistry processorRegistry) {
     this.inboundConnectorRegistry = inboundConnectorRegistry;
     this.outboundConnectorRegistry = outboundConnectorRegistry;
+    this.transformerRegistry = transformerRegistry;
+    this.filterRegistry = filterRegistry;
     this.triggerRegistry = triggerRegistry;
     this.processorRegistry = processorRegistry;
   }
@@ -56,6 +70,16 @@ public class DefaultTemplatesService implements TemplatesService {
   @Override
   public List<UITemplate> getOutboundConnectorTemplates() {
     return outboundConnectorRegistry.getTemplates();
+  }
+
+  @Override
+  public List<UITemplate> getTransformerTemplates() {
+    return transformerRegistry.getTemplates();
+  }
+
+  @Override
+  public List<UITemplate> getFilterTemplates() {
+    return filterRegistry.getTemplates();
   }
 
   @Override

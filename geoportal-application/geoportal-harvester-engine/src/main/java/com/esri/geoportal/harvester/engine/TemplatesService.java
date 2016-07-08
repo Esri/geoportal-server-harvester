@@ -29,12 +29,6 @@ public interface TemplatesService {
    * @return list of inbound connector templates
    */
   List<UITemplate> getInboundConnectorTemplates();
-
-  /**
-   * Gets triggers templates.
-   * @return list of trigger templates
-   */
-  List<UITemplate> getTriggersTemplates();
   
   /**
    * Gets outbound connector templates.
@@ -42,6 +36,24 @@ public interface TemplatesService {
    * @return list of outbound connector templates
    */
   List<UITemplate> getOutboundConnectorTemplates();
+
+  /**
+   * Gets transformer templates.
+   * @return transformer templates
+   */
+  List<UITemplate> getTransformerTemplates();
+  
+  /**
+   * Gets filter templates.
+   * @return filter templates
+   */
+  List<UITemplate> getFilterTemplates();
+  
+  /**
+   * Gets triggers templates.
+   * @return list of trigger templates
+   */
+  List<UITemplate> getTriggersTemplates();
 
   /**
    * Gets processors templates.

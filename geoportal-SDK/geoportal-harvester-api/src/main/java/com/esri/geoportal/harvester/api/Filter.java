@@ -15,25 +15,15 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.harvester.api.base.Entity;
+import com.esri.geoportal.harvester.api.base.ChannelLink;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 
 /**
  * Filter.
  */
-public interface Filter extends ChannelLink {
-  /**
-   * Gets type of the filter.
-   * @return type of the filter
-   */
-  String getType();
-  
-  /**
-   * Gets UI template.
-   * @return template
-   */
-  UITemplate getTemplate();
+public interface Filter extends ChannelLink, Entity {
   
   /**
    * Creates instance of the filter.

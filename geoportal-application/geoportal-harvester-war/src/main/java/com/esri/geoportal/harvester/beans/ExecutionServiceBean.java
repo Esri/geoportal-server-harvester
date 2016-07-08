@@ -17,10 +17,12 @@ package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.engine.ProcessesService;
 import com.esri.geoportal.harvester.engine.impl.DefaultExecutionService;
+import com.esri.geoportal.harvester.engine.managers.FilterRegistry;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.managers.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.managers.OutboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.managers.ProcessorRegistry;
+import com.esri.geoportal.harvester.engine.managers.TransformerRegistry;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerRegistry;
@@ -37,6 +39,8 @@ public class ExecutionServiceBean extends DefaultExecutionService {
    * Creates instance of the bean.
    * @param inboundConnectorRegistry inbound connector registry.
    * @param outboundConnectorRegistry outbound connector registry
+   * @param transformerRegistry transformer registry
+   * @param filterRegistry filter registry
    * @param processorRegistry processor registry
    * @param triggerRegistry trigger registry
    * @param triggerManager trigger manager
@@ -45,8 +49,18 @@ public class ExecutionServiceBean extends DefaultExecutionService {
    * @param processesService processes service
    */
   @Autowired
-  public ExecutionServiceBean(InboundConnectorRegistry inboundConnectorRegistry, OutboundConnectorRegistry outboundConnectorRegistry, ProcessorRegistry processorRegistry, TriggerRegistry triggerRegistry, TriggerManager triggerManager, TriggerInstanceManager triggerInstanceManager, HistoryManager historyManager, ProcessesService processesService) {
-    super(inboundConnectorRegistry, outboundConnectorRegistry, processorRegistry, triggerRegistry, triggerManager, triggerInstanceManager, historyManager, processesService);
+  public ExecutionServiceBean(
+          InboundConnectorRegistry inboundConnectorRegistry, 
+          OutboundConnectorRegistry outboundConnectorRegistry, 
+          TransformerRegistry transformerRegistry,
+          FilterRegistry filterRegistry,
+          ProcessorRegistry processorRegistry, 
+          TriggerRegistry triggerRegistry, 
+          TriggerManager triggerManager, 
+          TriggerInstanceManager triggerInstanceManager, 
+          HistoryManager historyManager, 
+          ProcessesService processesService) {
+    super(inboundConnectorRegistry, outboundConnectorRegistry, transformerRegistry, filterRegistry, processorRegistry, triggerRegistry, triggerManager, triggerInstanceManager, historyManager, processesService);
   }
   
 }

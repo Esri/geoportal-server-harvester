@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.harvester.api.base.Entity;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -33,16 +34,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
  * @see Broker
  * @see EntityDefinition
  */
-public interface Connector<B extends Broker> {
-  
-  /**
-   * Gets connector type.
-   * <p>
-   * Connector type is an unique string identifying connector, i.e.: WAF, CSW, etc.
-   * 
-   * @return connector type.
-   */
-  String getType();
+public interface Connector<B extends Broker> extends Entity {
   
   /**
    * Creates new broker instance based on broker definition.
@@ -51,10 +43,4 @@ public interface Connector<B extends Broker> {
    * @throws InvalidDefinitionException if provided definition is invalid
    */
   B createBroker(EntityDefinition definition) throws InvalidDefinitionException;
-  
-  /**
-   * Gets connector UI template.
-   * @return connector UI template
-   */
-  UITemplate getTemplate();
 }

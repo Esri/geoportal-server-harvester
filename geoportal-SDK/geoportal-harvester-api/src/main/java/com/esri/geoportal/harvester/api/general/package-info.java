@@ -13,23 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api.specs;
-
-import com.esri.geoportal.harvester.api.base.Channel;
-import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.ex.DataOutputException;
-import com.esri.geoportal.harvester.api.specs.OutputBroker.PublishingStatus;
 
 /**
- * Output channel.
+ * General definitions.
  */
-public interface OutputChannel extends Channel {
-  
-  /**
-   * Publishes data.
-   * @param ref data reference
-   * @return publishing status
-   * @throws DataOutputException if publishing data fails
-   */
-  PublishingStatus publish(DataReference ref) throws DataOutputException;
-}
+package com.esri.geoportal.harvester.api.general;
