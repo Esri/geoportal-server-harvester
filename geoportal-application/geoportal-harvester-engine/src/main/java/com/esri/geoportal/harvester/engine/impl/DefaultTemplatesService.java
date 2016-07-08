@@ -59,7 +59,7 @@ public class DefaultTemplatesService implements TemplatesService {
   }
 
   @Override
-  public List<UITemplate> getTriggersRegistry() {
+  public List<UITemplate> getTriggersTemplates() {
     return triggerRegistry.values().stream().map(v->v.getTemplate()).collect(Collectors.toList());
   }
 

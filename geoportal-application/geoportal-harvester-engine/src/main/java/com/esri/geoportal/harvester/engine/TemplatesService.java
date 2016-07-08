@@ -34,7 +34,7 @@ public interface TemplatesService {
    * Gets triggers templates.
    * @return list of trigger templates
    */
-  List<UITemplate> getTriggersRegistry();
+  List<UITemplate> getTriggersTemplates();
   
   /**
    * Gets outbound connector templates.

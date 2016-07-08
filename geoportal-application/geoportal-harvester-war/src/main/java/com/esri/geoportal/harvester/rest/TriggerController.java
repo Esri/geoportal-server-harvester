@@ -59,7 +59,7 @@ public class TriggerController {
   @RequestMapping(value = "/rest/harvester/triggers/types", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate[] listTriggerTypes() {
     LOG.debug(String.format("GET /rest/harvester/triggers/types"));
-    return engine.getTemplatesService().getTriggersRegistry().toArray(new UITemplate[0]);
+    return engine.getTemplatesService().getTriggersTemplates().toArray(new UITemplate[0]);
   }
   
   /**
