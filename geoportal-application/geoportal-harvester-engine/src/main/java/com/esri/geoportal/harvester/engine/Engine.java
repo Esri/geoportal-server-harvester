@@ -15,23 +15,43 @@
  */
 package com.esri.geoportal.harvester.engine;
 
-import com.esri.geoportal.harvester.api.defs.Task;
-import com.esri.geoportal.harvester.api.defs.TaskDefinition;
-import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
-import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
-import com.esri.geoportal.harvester.engine.support.ProcessReference;
-import com.esri.geoportal.harvester.engine.support.TriggerReference;
-import java.util.UUID;
-
 /**
  * Engine interface.
  */
 public interface Engine {
+  /**
+   * Gets templates service.
+   * @return templates service
+   */
   TemplatesService getTemplatesService();
+  
+  /**
+   * Gets brokers service.
+   * @return brokers service
+   */
   BrokersService getBrokersService();
+  
+  /**
+   * Gets tasks service.
+   * @return tasks service
+   */
   TasksService getTasksService();
+  
+  /**
+   * Gets processes service.
+   * @return processes service
+   */
   ProcessesService getProcessesService();
+  
+  /**
+   * Gets triggers service.
+   * @return triggers service
+   */
   TriggersService getTriggersService();
+  
+  /**
+   * Gets execution service.
+   * @return execution service
+   */
   ExecutionService getExecutionService();
 }
