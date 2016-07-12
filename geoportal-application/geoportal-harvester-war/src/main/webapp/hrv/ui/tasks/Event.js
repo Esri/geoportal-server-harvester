@@ -18,13 +18,14 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/topic",
+        "dojo/date/locale",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/Event.html"
       ],
-  function(declare,lang,array,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
+  function(declare,lang,array,topic,locale,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -34,11 +35,19 @@ define(["dojo/_base/declare",
       
       constructor: function(args) {
         this.data = args;
-        this.startTime = this.data.startTimestamp? new Date(this.data.startTimestamp).toString(): "?";
+        this.startTime = this.format(this.data.startTimestamp);
         this.endTime = this.data.endTimestamp? new Date(this.data.endTimestamp).toString(): "?";
       },
     
       postCreate: function(){
+      },
+      
+      format: function(date) {
+        if (date) {
+          return locale.format(new Date(date), {datePattern: "yyyy-MM-dd HH:mm", selector: "date"});
+        } else {
+          return "?";
+        }
       }
     });
 });
