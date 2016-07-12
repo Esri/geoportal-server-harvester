@@ -16,33 +16,29 @@
 
 define(["dojo/_base/declare",
         "dojo/_base/lang",
+        "dojo/_base/array",
         "dojo/topic",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
-        "dojo/text!./templates/Nav.html"
+        "dojo/text!./templates/Event.html"
       ],
-  function(declare,lang,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
+  function(declare,lang,array,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
+      startTime: null,
+      endTime: null,
+      
+      constructor: function(args) {
+        this.data = args;
+        this.startTime = this.data.startTimestamp? new Date(this.data.startTimestamp).toString(): "?";
+        this.endTime = this.data.endTimestamp? new Date(this.data.endTimestamp).toString(): "?";
+      },
     
       postCreate: function(){
-        
-      },
-      
-      _onhome: function() {
-        topic.publish("nav",{type: "processes"});
-      },
-      
-      _onbrokers: function() {
-        topic.publish("nav",{type: "brokers"});
-      },
-      
-      _ontasks: function() {
-        topic.publish("nav",{type: "tasks"});
       }
     });
 });

@@ -50,7 +50,7 @@ define(["dojo/_base/declare",
       },
       
       _onNav: function(evt) {
-        domStyle.set(this.domNode,"display", evt==="processes"? "block": "none");
+        domStyle.set(this.domNode,"display", evt.type==="processes"? "block": "none");
         if (evt==="processes") {
           this.load();
         }

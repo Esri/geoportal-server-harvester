@@ -36,7 +36,7 @@ define(["dojo/_base/declare",
       },
       
       _onNav: function(evt) {
-        domStyle.set(this.domNode,"display", evt==="tasks"? "block": "none");
+        domStyle.set(this.domNode,"display", evt.type==="tasks"? "block": "none");
       }
     });
 });

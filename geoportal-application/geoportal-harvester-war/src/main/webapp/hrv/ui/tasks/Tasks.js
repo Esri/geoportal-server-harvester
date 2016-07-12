@@ -61,6 +61,7 @@ define(["dojo/_base/declare",
         widget.placeAt(this.contentNode);
         on(widget,"remove",lang.hitch(this,this._onRemove));
         on(widget,"run",lang.hitch(this,this._onRun));
+        on(widget,"history",lang.hitch(this,this._onHistory));
         widget.startup();
       },
       
@@ -120,6 +121,10 @@ define(["dojo/_base/declare",
         }));
         
         taskEditorDialog.show();
+      },
+      
+      _onHistory: function(evt) {
+        topic.publish("nav",{type: "history", data: evt.data});
       }
     });
 });

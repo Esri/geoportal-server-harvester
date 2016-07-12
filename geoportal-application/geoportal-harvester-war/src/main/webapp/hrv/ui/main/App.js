@@ -32,6 +32,7 @@ define(["dojo/_base/declare",
         "hrv/ui/main/Stage",
         "hrv/ui/brokers/BrokersPane",
         "hrv/ui/tasks/TasksPane",
+        "hrv/ui/tasks/HistoryPane",
         "hrv/ui/processes/ProcessesPane"
       ],
   function(declare,lang,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
@@ -41,7 +42,7 @@ define(["dojo/_base/declare",
       templateString: template,
     
       postCreate: function(){
-        topic.publish("nav","processes");
+        topic.publish("nav",{type: "processes"});
       }
     });
 });

@@ -40,6 +40,10 @@ define(["dojo/_base/declare",
       
       execute: function(id) {
         return xhr.put("rest/harvester/tasks/"+id+"/execute",{handleAs: "json", headers: {"Content-Type": "application/json"}});
+      },
+      
+      history: function(id) {
+        return xhr("rest/harvester/tasks/"+id+"/history",{handleAs: "json"});
       }
     };
 });

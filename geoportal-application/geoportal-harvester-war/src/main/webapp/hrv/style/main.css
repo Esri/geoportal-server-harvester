@@ -190,12 +190,23 @@ html,body {
   background-color: lightgray;
 }
 
+.h-history-caption {
+  font-size: medium;
+  font-weight: bold;
+  background-color: lightgray;
+}
+
 .h-task-remove {
   text-decoration: underline;
   cursor: pointer;
 }
 
 .h-task-run {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.h-task-history {
   text-decoration: underline;
   cursor: pointer;
 }
@@ -258,4 +269,27 @@ html,body {
 
 .h-task-editor-footer {
   
+}
+
+.h-history-content {
+  display: table;
+}
+
+.h-history-header {
+  display: table-row;
+  font-weight: bold;
+}
+
+.h-event {
+  display: table-row;
+}
+
+.h-event-prop {
+  display: table-cell;
+  padding: 0.2em;
+  border-right: 1px solid grey;
+}
+
+.h-history-header .h-event-prop {
+  border-bottom: 1px solid black;
 }

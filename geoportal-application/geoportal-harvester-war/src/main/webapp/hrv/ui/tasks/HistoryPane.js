@@ -18,36 +18,56 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/topic",
+        "dojo/dom-style",
+        "dojo/html",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
-        "dojo/text!./templates/Task.html"
+        "dojo/text!./templates/HistoryPane.html",
+        "hrv/rest/Tasks",
+        "hrv/ui/tasks/Event"
       ],
-  function(declare,lang,array,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
+  function(declare,lang,array,topic,domStyle,html,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,TasksREST,Event){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
-      
-      constructor: function(args) {
-        this.data = args;
-        this.label = this.makeLabel(this.data.taskDefinition);
-      },
+      widgets: [],
     
       postCreate: function(){
+        topic.subscribe("nav",lang.hitch(this,this._onNav));
       },
       
-      _onRemove: function() {
-        this.emit("remove",{data: this.data});
+      _onNav: function(evt) {
+        if (evt.type!=="history") {
+          array.forEach(this.widgets,function(widget){
+            widget.destroy();
+          });
+        }
+        domStyle.set(this.domNode,"display", evt.type==="history"? "block": "none");
+        if (evt.data && evt.data.taskDefinition) {
+          html.set(this.labelNode, this.makeLabel(evt.data.taskDefinition));
+          TasksREST.history(evt.data.uuid).then(
+            lang.hitch(this,this.processHistory),
+            lang.hitch(this,function(error){
+              console.error(error);
+              topic.publish("msg",new Error("Unable to access history information"));
+            })
+          );
+        }
       },
       
-      _onRun: function() {
-        this.emit("run",{data: this.data});
+      processHistory: function(response) {
+        console.log(this.i18n.tasks.history.title, response);
+        array.forEach(response,lang.hitch(this,this.processEvent));
       },
       
-      _onHistory: function() {
-        this.emit("history",{data: this.data});
+      processEvent: function(event) {
+        var widget = new Event(event);
+        widget.placeAt(this.contentNode);
+        widget.startup();
+        this.widgets.push(widget);
       },
       
       makeLabel: function(taskDefinition) {

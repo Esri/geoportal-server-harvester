@@ -60,11 +60,21 @@ define({
       add: "Add",
       run: "run",
       remove: "remove",
+      history: "history",
       editor: {
         caption: "Task",
         submit: "Submit",
         inputs: "Inputs:",
         outputs: "Outputs:",
+      },
+      events: {
+        caption: "History",
+        startTime: "Start Time",
+        endTime: "End Time",
+        acquired: "Acquired",
+        created: "Created",
+        updated: "Updated",
+        failed: "Failed"
       }
     },
     
