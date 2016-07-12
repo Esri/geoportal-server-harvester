@@ -21,9 +21,6 @@ import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.Transformer;
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
-import com.esri.geoportal.harvester.api.base.SimpleInputChannel;
-import com.esri.geoportal.harvester.api.base.SimpleOutputChannel;
-import com.esri.geoportal.harvester.api.defs.ChannelDefinition;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
@@ -32,10 +29,8 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.general.ChannelLinkInstance;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
-import com.esri.geoportal.harvester.api.specs.InputChannel;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
-import com.esri.geoportal.harvester.api.specs.OutputChannel;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import com.esri.geoportal.harvester.engine.ExecutionService;
 import com.esri.geoportal.harvester.engine.ProcessesService;
@@ -155,11 +150,8 @@ public class DefaultExecutionService implements ExecutionService {
     }
     
     Processor processor = newProcessor(taskDefinition.getProcessor());
-
-    InputChannel inputChannel = new SimpleInputChannel(dataSource,Collections.emptyList());
-    List<OutputChannel> outputChannels = dataDestinations.stream().map(d->new SimpleOutputChannel(d,Collections.emptyList())).collect(Collectors.toList());
     
-    return new Task(processor, inputChannel, outputChannels);
+    return new Task(processor, dataSource, dataDestinations);
   }
   
   /**
@@ -178,44 +170,6 @@ public class DefaultExecutionService implements ExecutionService {
       throw new InvalidDefinitionException(String.format("Unable to select processor based on definition: %s", processorDefinition));
     }
     return processor;
-  }
-  
-  /**
-   * Creates new input channel.
-   * @param channelDefinition channel definition
-   * @return channel
-   * @throws InvalidDefinitionException if invalid definition
-   */
-  private InputChannel newInputChannel(ChannelDefinition channelDefinition) throws InvalidDefinitionException {
-    if (channelDefinition.isEmpty()) {
-      throw new InvalidDefinitionException(String.format("Empty channel definition."));
-    }
-    InputBroker inputBroker = newInputBroker(channelDefinition.get(0));
-    ArrayList<ChannelLinkInstance> links = new ArrayList<>();
-    for (EntityDefinition linkDefinition: channelDefinition.subList(1, channelDefinition.size())) {
-      links.add(newChannelLinkInstance(linkDefinition));
-    }
-    
-    return new SimpleInputChannel(inputBroker, links);
-  }
-  
-  /**
-   * Creates new output channel.
-   * @param channelDefinition channel definition
-   * @return channel
-   * @throws InvalidDefinitionException if invalid definition
-   */
-  private OutputChannel newOutputChannel(ChannelDefinition channelDefinition) throws InvalidDefinitionException {
-    if (channelDefinition.isEmpty()) {
-      throw new InvalidDefinitionException(String.format("Empty channel definition."));
-    }
-    OutputBroker outputBroker = newOutputBroker(channelDefinition.get(channelDefinition.size()-1));
-    ArrayList<ChannelLinkInstance> links = new ArrayList<>();
-    for (EntityDefinition linkDefinition: channelDefinition.subList(0, channelDefinition.size()-1)) {
-      links.add(newChannelLinkInstance(linkDefinition));
-    }
-    
-    return new SimpleOutputChannel(outputBroker, links);
   }
   
   /**

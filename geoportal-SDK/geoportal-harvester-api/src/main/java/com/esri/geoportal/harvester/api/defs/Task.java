@@ -16,9 +16,9 @@
 package com.esri.geoportal.harvester.api.defs;
 
 import com.esri.geoportal.harvester.api.Processor;
+import com.esri.geoportal.harvester.api.specs.InputBroker;
 import java.util.List;
-import com.esri.geoportal.harvester.api.specs.InputChannel;
-import com.esri.geoportal.harvester.api.specs.OutputChannel;
+import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
  */
 public final class Task implements AutoCloseable {
   private final Processor processor;
-  private final InputChannel dataSource;
-  private final List<OutputChannel> dataDestinations;
+  private final InputBroker dataSource;
+  private final List<OutputBroker> dataDestinations;
   
   /**
    * Creates instance of the task.
@@ -38,7 +38,7 @@ public final class Task implements AutoCloseable {
    * @param dataSource data source
    * @param dataDestinations data destination
    */
-  public Task(Processor processor, InputChannel dataSource, List<OutputChannel> dataDestinations) {
+  public Task(Processor processor, InputBroker dataSource, List<OutputBroker> dataDestinations) {
     this.processor = processor;
     this.dataSource = dataSource;
     this.dataDestinations = dataDestinations;
@@ -51,8 +51,8 @@ public final class Task implements AutoCloseable {
   public TaskDefinition getTaskDefinition() {
     TaskDefinition taskDefinition = new TaskDefinition();
     taskDefinition.setProcessor(processor.getEntityDefinition());
-    taskDefinition.setSource(dataSource.getChannelDefinition().get(0));
-    taskDefinition.setDestinations(dataDestinations.stream().map(d->d.getChannelDefinition().get(d.getChannelDefinition().size()-1)).collect(Collectors.toList()));
+    taskDefinition.setSource(dataSource.getEntityDefinition());
+    taskDefinition.setDestinations(dataDestinations.stream().map(d->d.getEntityDefinition()).collect(Collectors.toList()));
     return taskDefinition;
   }
 
@@ -68,7 +68,7 @@ public final class Task implements AutoCloseable {
    * Gets data source.
    * @return data source
    */
-  public InputChannel getDataSource() {
+  public InputBroker getDataSource() {
     return dataSource;
   }
 
@@ -76,7 +76,7 @@ public final class Task implements AutoCloseable {
    * Gets data publisher.
    * @return data publisher
    */
-  public List<OutputChannel> getDataDestinations() {
+  public List<OutputBroker> getDataDestinations() {
     return dataDestinations;
   }
 
