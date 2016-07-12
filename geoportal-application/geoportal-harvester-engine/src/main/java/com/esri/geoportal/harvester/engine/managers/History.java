@@ -33,7 +33,7 @@ public class History extends ArrayList<History.Event> {
    */
   public Event lastEvent() {
     return stream()
-            .sorted((left,right)->0-left.getTimestamp().compareTo(right.getTimestamp()))
+            .sorted((left,right)->0-left.getStartTimestamp().compareTo(right.getStartTimestamp()))
             .findFirst()
             .orElse(null);
   }
@@ -44,37 +44,86 @@ public class History extends ArrayList<History.Event> {
   public static final class Event {
     private UUID uuid;
     private UUID taskId;
-    private Date timestamp;
+    private Date startTimestamp;
+    private Date endTimestamp;
     private Report report;
 
+    /**
+     * Gest event id.
+     * @return event id
+     */
     public UUID getUuid() {
       return uuid;
     }
 
+    /**
+     * Sets event id.
+     * @param uuid event id
+     */
     public void setUuid(UUID uuid) {
       this.uuid = uuid;
     }
 
+    /**
+     * Gets task id.
+     * @return task id
+     */
     public UUID getTaskId() {
       return taskId;
     }
 
+    /**
+     * Sets task id.
+     * @param taskId task id 
+     */
     public void setTaskId(UUID taskId) {
       this.taskId = taskId;
     }
 
-    public Date getTimestamp() {
-      return timestamp;
+    /**
+     * Gets start timestamp.
+     * @return start timestamp
+     */
+    public Date getStartTimestamp() {
+      return startTimestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
-      this.timestamp = timestamp;
+    /**
+     * Sets start timestamp.
+     * @param startTimestamp start timestamp 
+     */
+    public void setStartTimestamp(Date startTimestamp) {
+      this.startTimestamp = startTimestamp;
     }
 
+    /**
+     * Gets end timestamp.
+     * @return end timestamp
+     */
+    public Date getEndTimestamp() {
+      return endTimestamp;
+    }
+
+    /**
+     * Sets end timestamp.
+     * @param endTimestamp end timestamp 
+     */
+    public void setEndTimestamp(Date endTimestamp) {
+      this.endTimestamp = endTimestamp;
+    }
+
+    /**
+     * Gets report.
+     * @return report
+     */
     public Report getReport() {
       return report;
     }
 
+    /**
+     * Sets report.
+     * @param report report
+     */
     public void setReport(Report report) {
       this.report = report;
     }
@@ -84,9 +133,13 @@ public class History extends ArrayList<History.Event> {
    * History report.
    */
   public static final class Report {
-    public long acquuired;
-    public long added;
+    /** number of records acquired. */
+    public long acquired;
+    /** number of records created. */
+    public long created;
+    /** number of records updated. */
     public long updated;
+    /** number of records failed. */
     public long failed;
   }
 }

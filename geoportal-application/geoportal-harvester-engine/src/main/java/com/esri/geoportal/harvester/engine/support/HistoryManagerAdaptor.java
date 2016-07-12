@@ -64,12 +64,13 @@ public class HistoryManagerAdaptor implements ProcessInstance.Listener {
       case working:
         if (startDate==null) {
           startDate = new Date();
-          event.setTimestamp(startDate);
+          event.setStartTimestamp(startDate);
         }
         break;
       case completed:
         if (endDate==null) {
           endDate = new Date();
+          event.setEndTimestamp(endDate);
         }
         event.setReport(report);
         {
@@ -85,14 +86,14 @@ public class HistoryManagerAdaptor implements ProcessInstance.Listener {
 
   @Override
   public void onDataAcquired(DataReference dataReference) {
-    report.acquuired++;
+    report.acquired++;
   }
 
   @Override
   public void onDataProcessed(DataReference dataReference, PublishingStatus status) {
     switch (status) {
       case created:
-        report.added++;
+        report.created++;
         break;
       case updated:
         report.updated++;

@@ -90,7 +90,7 @@ public class HistoryManagerBean implements HistoryManager {
             Reader reportReader = new StringReader(mapper.writeValueAsString(data.getReport()));
         ) {
       st.setString(1, data.getTaskId().toString());
-      st.setTimestamp(2, new Timestamp(data.getTimestamp().getTime()));
+      st.setTimestamp(2, new Timestamp(data.getStartTimestamp().getTime()));
       st.setClob(3, reportReader);
       st.setString(4, data.getUuid().toString());
       st.executeUpdate();
@@ -128,7 +128,7 @@ public class HistoryManagerBean implements HistoryManager {
         try (Reader reportReader = rs.getClob(3).getCharacterStream();) {
           History.Event event = new History.Event();
           event.setTaskId(UUID.fromString(rs.getString(1)));
-          event.setTimestamp(new Date(rs.getTimestamp(2).getTime()));
+          event.setStartTimestamp(new Date(rs.getTimestamp(2).getTime()));
           event.setReport(mapper.readValue(reportReader, History.Report.class));
           event.setUuid(UUID.fromString(rs.getString(4)));
           return event;
@@ -156,7 +156,7 @@ public class HistoryManagerBean implements HistoryManager {
         try (Reader reportReader = rs.getClob(3).getCharacterStream();) {
           History.Event event = new History.Event();
           event.setTaskId(UUID.fromString(rs.getString(1)));
-          event.setTimestamp(new Date(rs.getTimestamp(2).getTime()));
+          event.setStartTimestamp(new Date(rs.getTimestamp(2).getTime()));
           event.setReport(mapper.readValue(reportReader, History.Report.class));
           event.setUuid(UUID.fromString(rs.getString(4)));
           map.put(event.getUuid(), event);
@@ -179,7 +179,7 @@ public class HistoryManagerBean implements HistoryManager {
             Reader reportReader = new StringReader(mapper.writeValueAsString(data.getReport()));
         ) {
       st.setString(1, data.getTaskId().toString());
-      st.setTimestamp(2, new Timestamp(data.getTimestamp().getTime()));
+      st.setTimestamp(2, new Timestamp(data.getStartTimestamp().getTime()));
       st.setClob(3, reportReader);
       st.setString(4, id.toString());
       return st.executeUpdate()>0;
@@ -204,7 +204,7 @@ public class HistoryManagerBean implements HistoryManager {
         try (Reader reportReader = rs.getClob(3).getCharacterStream();) {
           History.Event event = new History.Event();
           event.setTaskId(UUID.fromString(rs.getString(1)));
-          event.setTimestamp(new Date(rs.getTimestamp(2).getTime()));
+          event.setStartTimestamp(new Date(rs.getTimestamp(2).getTime()));
           event.setReport(mapper.readValue(reportReader, History.Report.class));
           event.setUuid(UUID.fromString(rs.getString(4)));
           history.add(event);

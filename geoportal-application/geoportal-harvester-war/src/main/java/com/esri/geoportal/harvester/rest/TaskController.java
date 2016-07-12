@@ -27,6 +27,7 @@ import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.support.HistoryManagerAdaptor;
 import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
+import com.esri.geoportal.harvester.support.EventResponse;
 import com.esri.geoportal.harvester.support.ProcessResponse;
 import com.esri.geoportal.harvester.support.TriggerResponse;
 import java.util.List;
@@ -183,11 +184,11 @@ public class TaskController {
    * @return task info or <code>null</code> if no task found
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/history", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<List<History.Event>> getTaskHistory(@PathVariable UUID taskId) {
+  public ResponseEntity<List<EventResponse>> getTaskHistory(@PathVariable UUID taskId) {
     try {
       LOG.debug(String.format("GET /rest/harvester/tasks/%s/history", taskId));
       List<History.Event> history = engine.getTasksService().getHistory(taskId);
-      return new ResponseEntity<>(history,HttpStatus.OK);
+      return new ResponseEntity<>(history.stream().map(e->new EventResponse(e)).collect(Collectors.toList()),HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error getting task: %s", taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

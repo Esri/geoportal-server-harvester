@@ -253,7 +253,7 @@ public class DefaultExecutionService implements ExecutionService {
         if (taskId!=null) {
           History history = historyManager.buildHistory(taskId);
           History.Event lastEvent = history.lastEvent();
-          return lastEvent!=null? lastEvent.getTimestamp(): null;
+          return lastEvent!=null? lastEvent.getStartTimestamp(): null;
         } else {
           return null;
         }
