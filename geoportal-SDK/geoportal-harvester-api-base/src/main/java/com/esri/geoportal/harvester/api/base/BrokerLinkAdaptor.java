@@ -17,8 +17,8 @@ package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.LinkDefinition;
+import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
-import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.general.Link;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 
@@ -44,8 +44,13 @@ public class BrokerLinkAdaptor implements Link {
   }
 
   @Override
-  public void push(DataReference dataRef) throws DataProcessorException, DataOutputException {
-    broker.publish(dataRef);
+  public PublishingStatus push(DataReference dataRef) throws DataOutputException {
+    return broker.publish(dataRef);
+  }
+
+  @Override
+  public void close() throws Exception {
+    broker.close();
   }
   
   @Override

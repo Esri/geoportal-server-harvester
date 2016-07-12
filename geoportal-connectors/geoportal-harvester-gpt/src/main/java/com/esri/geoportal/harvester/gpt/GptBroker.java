@@ -21,6 +21,7 @@ import com.esri.geoportal.commons.gpt.client.PublishResponse;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import java.io.IOException;
@@ -68,7 +69,7 @@ import java.util.Date;
       if (response.getError()!=null) {
         throw new DataOutputException(this, response.getError().getMessage());
       }
-      return response.getStatus().equalsIgnoreCase("created")? PublishingStatus.created: PublishingStatus.updated;
+      return response.getStatus().equalsIgnoreCase("created")? PublishingStatus.CREATED: PublishingStatus.UPDATED;
     } catch (IOException|URISyntaxException ex) {
       throw new DataOutputException(this, "Error publishing data.", ex);
     }

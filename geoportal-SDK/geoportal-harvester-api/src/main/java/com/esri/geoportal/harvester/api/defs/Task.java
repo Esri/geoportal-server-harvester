@@ -16,9 +16,9 @@
 package com.esri.geoportal.harvester.api.defs;
 
 import com.esri.geoportal.harvester.api.Processor;
+import com.esri.geoportal.harvester.api.general.Link;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import java.util.List;
-import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public final class Task implements AutoCloseable {
   private final Processor processor;
   private final InputBroker dataSource;
-  private final List<OutputBroker> dataDestinations;
+  private final List<Link> dataDestinations;
   
   /**
    * Creates instance of the task.
@@ -38,7 +38,7 @@ public final class Task implements AutoCloseable {
    * @param dataSource data source
    * @param dataDestinations data destination
    */
-  public Task(Processor processor, InputBroker dataSource, List<OutputBroker> dataDestinations) {
+  public Task(Processor processor, InputBroker dataSource, List<Link> dataDestinations) {
     this.processor = processor;
     this.dataSource = dataSource;
     this.dataDestinations = dataDestinations;
@@ -52,7 +52,7 @@ public final class Task implements AutoCloseable {
     TaskDefinition taskDefinition = new TaskDefinition();
     taskDefinition.setProcessor(processor.getEntityDefinition());
     taskDefinition.setSource(dataSource.getEntityDefinition());
-    taskDefinition.setDestinations(dataDestinations.stream().map(d->d.getEntityDefinition()).collect(Collectors.toList()));
+    taskDefinition.setDestinations(dataDestinations.stream().map(d->d.getLinkDefinition().getAction()).collect(Collectors.toList()));
     return taskDefinition;
   }
 
@@ -76,7 +76,7 @@ public final class Task implements AutoCloseable {
    * Gets data publisher.
    * @return data publisher
    */
-  public List<OutputBroker> getDataDestinations() {
+  public List<Link> getDataDestinations() {
     return dataDestinations;
   }
 

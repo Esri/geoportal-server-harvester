@@ -19,7 +19,6 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.FilterInstance;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
-import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.general.LinkAction;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,8 +44,13 @@ public class FilterLinkActionAdaptor implements LinkAction {
   }
 
   @Override
-  public List<DataReference> execute(DataReference dataRef) throws DataProcessorException, DataOutputException {
+  public List<DataReference> execute(DataReference dataRef) throws DataOutputException {
     return filter.test(dataRef)? Arrays.asList(new DataReference[]{dataRef}): Collections.emptyList();
+  }
+
+  @Override
+  public void close() throws Exception {
+    filter.close();
   }
   
   @Override

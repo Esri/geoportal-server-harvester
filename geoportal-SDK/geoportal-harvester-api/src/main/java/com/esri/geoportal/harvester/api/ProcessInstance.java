@@ -15,9 +15,9 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataException;
-import com.esri.geoportal.harvester.api.specs.OutputBroker.PublishingStatus;
 
 /**
  * Process instance. 

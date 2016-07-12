@@ -19,6 +19,7 @@ import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
+import com.esri.geoportal.harvester.api.base.BrokerLinkAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
@@ -48,6 +49,7 @@ import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Default execution service.
@@ -145,7 +147,7 @@ public class DefaultExecutionService implements ExecutionService {
     
     Processor processor = newProcessor(taskDefinition.getProcessor());
     
-    return new Task(processor, dataSource, dataDestinations);
+    return new Task(processor, dataSource, dataDestinations.stream().map(BrokerLinkAdaptor::new).collect(Collectors.toList()));
   }
   
   /**

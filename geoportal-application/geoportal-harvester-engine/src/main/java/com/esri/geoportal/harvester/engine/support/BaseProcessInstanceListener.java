@@ -17,8 +17,8 @@ package com.esri.geoportal.harvester.engine.support;
 
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ProcessInstance;
+import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.ex.DataException;
-import com.esri.geoportal.harvester.api.specs.OutputBroker.PublishingStatus;
 
 /**
  * Base process instance listener.

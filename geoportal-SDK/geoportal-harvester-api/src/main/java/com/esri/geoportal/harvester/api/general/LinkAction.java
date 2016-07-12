@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Link action.
  */
-public interface LinkAction {
+public interface LinkAction extends AutoCloseable {
   /**
    * Gets link action definition.
    * @return link action definition

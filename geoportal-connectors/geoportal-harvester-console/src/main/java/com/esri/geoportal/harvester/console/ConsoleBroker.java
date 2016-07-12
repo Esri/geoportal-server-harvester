@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.console;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import java.io.IOException;
@@ -48,7 +49,7 @@ import java.io.IOException;
       System.out.println(String.format("%s", new String(ref.getContent(),"UTF-8")));
       System.out.println(String.format("--- END OF %d ---", counter));
       System.out.println();
-      return PublishingStatus.created;
+      return PublishingStatus.CREATED;
     } catch (IOException ex) {
       throw new DataOutputException(this, "Error publishing data.", ex);
     }

@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.api.base;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import java.io.IOException;
 import java.io.PrintStream;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
@@ -42,7 +43,7 @@ public class DataPrintStreamOutput implements OutputBroker {
   public PublishingStatus publish(DataReference ref) throws DataOutputException {
     try {
       SERIALIZER.serialize(out, ref);
-      return PublishingStatus.created;
+      return PublishingStatus.CREATED;
     } catch (IOException ex) {
       throw new DataOutputException(this, "Error serializing data.", ex);
     }

@@ -17,13 +17,14 @@ package com.esri.geoportal.harvester.api.general;
 
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.LinkDefinition;
+import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 
 /**
  * Link.
  */
-public interface Link {
+public interface Link extends AutoCloseable {
   /**
    * Gets definition.
    * @return definition
@@ -33,8 +34,9 @@ public interface Link {
   /**
    * Pushes data reference through the link.
    * @param dataRef data reference.
+   * @return publishing status
    * @throws DataProcessorException if processing fails
    * @throws DataOutputException if sending to the output fails
    */
-  void push(DataReference dataRef) throws DataProcessorException, DataOutputException;
+  PublishingStatus push(DataReference dataRef) throws DataProcessorException, DataOutputException;
 }

@@ -18,13 +18,13 @@ package com.esri.geoportal.harvester.folder;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
 import java.io.OutputStream;
 import java.net.URI;
 import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
@@ -61,7 +61,7 @@ import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
       }
       try (OutputStream output = new FileOutputStream(f);) {
         output.write(ref.getContent());
-        return created? PublishingStatus.created: PublishingStatus.updated;
+        return created? PublishingStatus.CREATED: PublishingStatus.UPDATED;
       } catch (Exception ex) {
         throw new DataOutputException(this,"Error publishing data.", ex);
       }

@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.api.specs;
 import com.esri.geoportal.harvester.api.Broker;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 
 /**
  * Output broker.
@@ -35,16 +36,4 @@ public interface OutputBroker extends Broker<OutputConnector> {
    * @throws DataOutputException if publishing data fails
    */
   PublishingStatus publish(DataReference ref) throws DataOutputException;
-  
-  /**
-   *  Publishing status.
-   */
-  enum PublishingStatus {
-    /** new item has been created */
-    created, 
-    /** existing item has been updated */
-    updated, 
-    /** publishing item has been skipped for any reason */
-    skipped;
-  }
 }

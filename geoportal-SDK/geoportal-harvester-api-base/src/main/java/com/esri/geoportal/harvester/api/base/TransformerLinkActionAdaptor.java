@@ -46,6 +46,11 @@ public class TransformerLinkActionAdaptor implements LinkAction {
   public List<DataReference> execute(DataReference dataRef) throws DataProcessorException, DataOutputException {
     return transformer.transform(dataRef);
   }
+
+  @Override
+  public void close() throws Exception {
+    transformer.close();
+  }
   
   @Override
   public String toString() {

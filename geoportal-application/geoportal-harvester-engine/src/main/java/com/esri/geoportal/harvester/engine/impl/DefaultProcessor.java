@@ -19,11 +19,12 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
-import com.esri.geoportal.harvester.api.specs.OutputBroker.PublishingStatus;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -96,9 +97,12 @@ public class DefaultProcessor implements Processor {
               onAcquire(dataReference);
               task.getDataDestinations().stream().forEach((d) -> {
                 try {
-                  PublishingStatus status = d.publish(dataReference);
+                  PublishingStatus status = d.push(dataReference);
                   LOG.debug(String.format("Harvested %s during %s", dataReference, getTitle()));
                   onSuccess(dataReference,status);
+                } catch (DataProcessorException ex) {
+                  LOG.warn(String.format("Failed harvesting %s during %s", dataReference, getTitle()));
+                  onError(ex);
                 } catch (DataOutputException ex) {
                   LOG.warn(String.format("Failed harvesting %s during %s", dataReference, getTitle()));
                   onError(ex);
@@ -193,6 +197,16 @@ public class DefaultProcessor implements Processor {
      * @param ex output exception
      */
     private void onError(DataOutputException ex) {
+      listeners.forEach(l -> {
+        l.onError(ex);
+      });
+    }
+
+    /**
+     * Called to handle processor error.
+     * @param ex processor exception
+     */
+    private void onError(DataProcessorException ex) {
       listeners.forEach(l -> {
         l.onError(ex);
       });
