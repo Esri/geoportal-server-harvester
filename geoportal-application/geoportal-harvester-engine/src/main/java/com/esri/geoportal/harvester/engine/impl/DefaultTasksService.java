@@ -104,4 +104,13 @@ public class DefaultTasksService implements TasksService {
       throw new DataProcessorException(String.format("Error getting history for: %s", taskId), ex);
     }
   }
+  
+  @Override
+  public void purgeHistory(UUID taskId) throws DataProcessorException {
+    try {
+      historyManager.purgeHistory(taskId);
+    } catch (CrudsException ex) {
+      throw new DataProcessorException(String.format("Error purging history for: %s", taskId), ex);
+    }
+  }
 }

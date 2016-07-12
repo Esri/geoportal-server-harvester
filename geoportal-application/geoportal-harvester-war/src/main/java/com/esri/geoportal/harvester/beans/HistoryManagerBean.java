@@ -215,5 +215,18 @@ public class HistoryManagerBean implements HistoryManager {
       throw new CrudsException("Error selecting broker definition", ex);
     }
   }
+
+  @Override
+  public void purgeHistory(UUID taskid) throws CrudsException {
+    try (
+            Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement("DELETE FROM EVENTS WHERE taskid = ?");
+        ) {
+      st.setString(1, taskid.toString());
+      st.executeUpdate();
+    } catch (SQLException ex) {
+      throw new CrudsException("Error selecting broker definition", ex);
+    }
+  }
   
 }

@@ -179,9 +179,9 @@ public class TaskController {
   }
   
   /**
-   * Gets task by id.
+   * Gets history by task id.
    * @param taskId task id
-   * @return task info or <code>null</code> if no task found
+   * @return list of all events for the given task
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/history", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<List<EventResponse>> getTaskHistory(@PathVariable UUID taskId) {
@@ -191,6 +191,23 @@ public class TaskController {
       return new ResponseEntity<>(history.stream().map(e->new EventResponse(e)).collect(Collectors.toList()),HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error getting task: %s", taskId), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  
+  /**
+   * Gets history by task id.
+   * @param taskId task id
+   * @return list of all events for the given task
+   */
+  @RequestMapping(value = "/rest/harvester/tasks/{taskId}/history", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<String> purgeHistory(@PathVariable UUID taskId) {
+    try {
+      LOG.debug(String.format("DELETE /rest/harvester/tasks/%s/history", taskId));
+      engine.getTasksService().purgeHistory(taskId);
+      return new ResponseEntity<>(String.format("{ \"uuid\": \"%s\" }", taskId),HttpStatus.OK);
+    } catch (DataProcessorException ex) {
+      LOG.error(String.format("Error purging history for task: %s", taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
