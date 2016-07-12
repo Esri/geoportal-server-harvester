@@ -36,7 +36,7 @@ define(["dojo/_base/declare",
       constructor: function(args) {
         this.data = args;
         this.startTime = this.format(this.data.startTimestamp);
-        this.endTime = this.data.endTimestamp? new Date(this.data.endTimestamp).toString(): "?";
+        this.endTime = this.format(this.data.endTimestamp);
       },
     
       postCreate: function(){

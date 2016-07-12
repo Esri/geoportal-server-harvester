@@ -60,7 +60,7 @@ public class HistoryManagerBean implements HistoryManager {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
-                    "CREATE TABLE IF NOT EXISTS EVENTS ( id varchar(38) PRIMARY KEY, taskid varchar(38) NOT NULL, completed TIMESTAMP NOT NULL, report CLOB ) ;"
+                    "CREATE TABLE IF NOT EXISTS EVENTS ( id varchar(38) PRIMARY KEY, taskid varchar(38) NOT NULL, started TIMESTAMP NOT NULL, completed TIMESTAMP NOT NULL, report CLOB ) ;"
                   + "CREATE INDEX IF NOT EXISTS EVENTS_TASKID_IDX ON EVENTS(taskid);");
         ) {
       st.execute();
@@ -86,13 +86,14 @@ public class HistoryManagerBean implements HistoryManager {
     UUID id = UUID.randomUUID();
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("INSERT INTO EVENTS (taskid,completed,report,id) VALUES (?,?,?,?)");
+            PreparedStatement st = connection.prepareStatement("INSERT INTO EVENTS (taskid,started,completed,report,id) VALUES (?,?,?,?,?)");
             Reader reportReader = new StringReader(mapper.writeValueAsString(data.getReport()));
         ) {
       st.setString(1, data.getTaskId().toString());
       st.setTimestamp(2, new Timestamp(data.getStartTimestamp().getTime()));
-      st.setClob(3, reportReader);
-      st.setString(4, data.getUuid().toString());
+      st.setTimestamp(3, new Timestamp(data.getEndTimestamp().getTime()));
+      st.setClob(4, reportReader);
+      st.setString(5, data.getUuid().toString());
       st.executeUpdate();
     } catch (IOException|SQLException ex) {
       throw new CrudsException("Error creating history event", ex);
@@ -120,17 +121,18 @@ public class HistoryManagerBean implements HistoryManager {
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("SELECT taskid,completed,report,id FROM EVENTS WHERE ID = ?");
+            PreparedStatement st = connection.prepareStatement("SELECT taskid,started,completed,report,id FROM EVENTS WHERE ID = ?");
         ) {
       st.setString(1, id.toString());
       ResultSet rs = st.executeQuery();
       if (rs.next()) {
-        try (Reader reportReader = rs.getClob(3).getCharacterStream();) {
+        try (Reader reportReader = rs.getClob(4).getCharacterStream();) {
           History.Event event = new History.Event();
           event.setTaskId(UUID.fromString(rs.getString(1)));
           event.setStartTimestamp(new Date(rs.getTimestamp(2).getTime()));
+          event.setEndTimestamp(new Date(rs.getTimestamp(3).getTime()));
           event.setReport(mapper.readValue(reportReader, History.Report.class));
-          event.setUuid(UUID.fromString(rs.getString(4)));
+          event.setUuid(UUID.fromString(rs.getString(5)));
           return event;
         }
       }
@@ -149,16 +151,17 @@ public class HistoryManagerBean implements HistoryManager {
     HashMap<UUID, History.Event> map = new HashMap<>();
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("SELECT taskid,completed,report,id FROM EVENTS");
+            PreparedStatement st = connection.prepareStatement("SELECT taskid,started,completed,report,id FROM EVENTS");
         ) {
       ResultSet rs = st.executeQuery();
       while (rs.next()) {
-        try (Reader reportReader = rs.getClob(3).getCharacterStream();) {
+        try (Reader reportReader = rs.getClob(4).getCharacterStream();) {
           History.Event event = new History.Event();
           event.setTaskId(UUID.fromString(rs.getString(1)));
           event.setStartTimestamp(new Date(rs.getTimestamp(2).getTime()));
+          event.setEndTimestamp(new Date(rs.getTimestamp(3).getTime()));
           event.setReport(mapper.readValue(reportReader, History.Report.class));
-          event.setUuid(UUID.fromString(rs.getString(4)));
+          event.setUuid(UUID.fromString(rs.getString(5)));
           map.put(event.getUuid(), event);
         }
       }
@@ -175,13 +178,14 @@ public class HistoryManagerBean implements HistoryManager {
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("UPDATE EVENTS SET (taskid = ?, completed = ?, report = ?) WHERE ID = ?");
+            PreparedStatement st = connection.prepareStatement("UPDATE EVENTS SET (taskid = ?, started = ?, completed = ?, report = ?) WHERE ID = ?");
             Reader reportReader = new StringReader(mapper.writeValueAsString(data.getReport()));
         ) {
       st.setString(1, data.getTaskId().toString());
       st.setTimestamp(2, new Timestamp(data.getStartTimestamp().getTime()));
-      st.setClob(3, reportReader);
-      st.setString(4, id.toString());
+      st.setTimestamp(3, new Timestamp(data.getEndTimestamp().getTime()));
+      st.setClob(4, reportReader);
+      st.setString(5, id.toString());
       return st.executeUpdate()>0;
     } catch (IOException|SQLException ex) {
       throw new CrudsException("Error updating history event", ex);
@@ -196,17 +200,18 @@ public class HistoryManagerBean implements HistoryManager {
     History history = new History();
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("SELECT taskid,completed,report,id FROM EVENTS WHERE taskid = ?");
+            PreparedStatement st = connection.prepareStatement("SELECT taskid,started,completed,report,id FROM EVENTS WHERE taskid = ?");
         ) {
       st.setString(1, taskid.toString());
       ResultSet rs = st.executeQuery();
       while (rs.next()) {
-        try (Reader reportReader = rs.getClob(3).getCharacterStream();) {
+        try (Reader reportReader = rs.getClob(4).getCharacterStream();) {
           History.Event event = new History.Event();
           event.setTaskId(UUID.fromString(rs.getString(1)));
           event.setStartTimestamp(new Date(rs.getTimestamp(2).getTime()));
+          event.setEndTimestamp(new Date(rs.getTimestamp(3).getTime()));
           event.setReport(mapper.readValue(reportReader, History.Report.class));
-          event.setUuid(UUID.fromString(rs.getString(4)));
+          event.setUuid(UUID.fromString(rs.getString(5)));
           history.add(event);
         }
       }
