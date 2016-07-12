@@ -68,12 +68,12 @@ public class HistoryManagerAdaptor implements ProcessInstance.Listener {
         }
         break;
       case completed:
-        if (endDate==null) {
-          endDate = new Date();
-          event.setEndTimestamp(endDate);
-        }
-        event.setReport(report);
         {
+          if (endDate==null) {
+            endDate = new Date();
+            event.setEndTimestamp(endDate);
+          }
+          event.setReport(report);
           try {
             historyManager.create(event);
           } catch (CrudsException ex) {
