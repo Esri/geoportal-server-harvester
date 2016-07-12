@@ -16,14 +16,13 @@
 package com.esri.geoportal.harvester.api;
 
 import com.esri.geoportal.harvester.api.general.Entity;
-import com.esri.geoportal.harvester.api.general.ChannelLink;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 
 /**
  * Transformer.
  */
-public interface Transformer extends ChannelLink, Entity {
+public interface Transformer extends Entity {
   /**
    * Gets type of the transformer.
    * @return type of the transformer

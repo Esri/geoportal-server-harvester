@@ -16,12 +16,11 @@
 package com.esri.geoportal.harvester.api;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.general.ChannelLinkInstance;
 
 /**
  * Filter instance.
  */
-public interface FilterInstance extends AutoCloseable, ChannelLinkInstance {
+public interface FilterInstance extends AutoCloseable {
   
   /**
    * Gets filter definition.

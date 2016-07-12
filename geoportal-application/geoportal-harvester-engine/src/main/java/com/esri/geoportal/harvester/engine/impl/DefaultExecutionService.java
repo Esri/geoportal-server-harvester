@@ -15,10 +15,8 @@
  */
 package com.esri.geoportal.harvester.engine.impl;
 
-import com.esri.geoportal.harvester.api.Filter;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Processor;
-import com.esri.geoportal.harvester.api.Transformer;
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -27,7 +25,6 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
-import com.esri.geoportal.harvester.api.general.ChannelLinkInstance;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
@@ -49,11 +46,8 @@ import com.esri.geoportal.harvester.engine.support.HistoryManagerAdaptor;
 import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Default execution service.
@@ -202,25 +196,6 @@ public class DefaultExecutionService implements ExecutionService {
     }
 
     return dpFactory.createBroker(entityDefinition);
-  }
-  
-  /**
-   * Creates instance of channel link.
-   * @param entityDefinition channel link definition
-   * @return channel link instance
-   * @throws InvalidDefinitionException if invalid definition
-   */
-  private ChannelLinkInstance newChannelLinkInstance(EntityDefinition entityDefinition) throws InvalidDefinitionException {
-    Filter filter;
-    Transformer transformer;
-    
-    if ((filter = filterRegistry.get(entityDefinition.getType()))!=null) {
-      return filter.createInstance(entityDefinition);
-    } else if ((transformer = transformerRegistry.get(entityDefinition.getType()))!=null) {
-      return transformer.createInstance(entityDefinition);
-    } else {
-      throw new InvalidDefinitionException(String.format("Invalid channel link type: %s", entityDefinition.getType()));
-    }
   }
 
   /**

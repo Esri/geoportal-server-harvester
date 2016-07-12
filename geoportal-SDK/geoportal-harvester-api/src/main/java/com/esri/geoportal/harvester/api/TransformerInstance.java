@@ -17,12 +17,11 @@ package com.esri.geoportal.harvester.api;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
-import com.esri.geoportal.harvester.api.general.ChannelLinkInstance;
 
 /**
  * Transformer instance.
  */
-public interface TransformerInstance extends AutoCloseable, ChannelLinkInstance {
+public interface TransformerInstance extends AutoCloseable {
   
   /**
    * Gets transformer definition.
