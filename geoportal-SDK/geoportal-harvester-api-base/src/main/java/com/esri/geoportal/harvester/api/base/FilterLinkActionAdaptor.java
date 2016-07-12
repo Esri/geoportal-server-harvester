@@ -18,32 +18,39 @@ package com.esri.geoportal.harvester.api.base;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.FilterInstance;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.ex.DataTransformerException;
+import com.esri.geoportal.harvester.api.ex.DataOutputException;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.general.LinkAction;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
- * Filter processor.
+ * Filter link action adaptor.
  */
-/*package*/ final class FilterProcessor implements LinkProcessor {
-  
-  final FilterInstance filter;
+public class FilterLinkActionAdaptor implements LinkAction {
+  private final FilterInstance filter;
 
-  public FilterProcessor(FilterInstance filter) {
+  /**
+   * Creates instance of the adaptor.
+   * @param filter filter.
+   */
+  public FilterLinkActionAdaptor(FilterInstance filter) {
     this.filter = filter;
   }
 
   @Override
-  public EntityDefinition getLinkDefinition() {
+  public EntityDefinition getLinkActionDefinition() {
     return filter.getFilterDefinition();
   }
 
   @Override
-  public DataReference process(DataReference dataReference) throws DataTransformerException {
-    return filter.test(dataReference) ? dataReference : null;
-  }
-
-  @Override
-  public void close() throws Exception {
-    filter.close();
+  public List<DataReference> execute(DataReference dataRef) throws DataProcessorException, DataOutputException {
+    return filter.test(dataRef)? Arrays.asList(new DataReference[]{dataRef}): Collections.emptyList();
   }
   
+  @Override
+  public String toString() {
+    return filter.toString();
+  }
 }

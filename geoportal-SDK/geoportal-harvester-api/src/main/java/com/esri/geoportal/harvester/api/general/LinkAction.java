@@ -13,19 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api.base;
+package com.esri.geoportal.harvester.api.general;
 
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.ex.DataTransformerException;
+import com.esri.geoportal.harvester.api.ex.DataOutputException;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import java.util.List;
 
 /**
- * Link processor.
+ * Link action.
  */
-/*package*/ interface LinkProcessor extends AutoCloseable {
-  
-  EntityDefinition getLinkDefinition();
-
-  DataReference process(DataReference dataReference) throws DataTransformerException;
-  
+public interface LinkAction {
+  /**
+   * Gets link action definition.
+   * @return link action definition
+   */
+  EntityDefinition getLinkActionDefinition();
+  /**
+   * Process actions.
+   * @param dataRef data reference to process
+   * @return result
+   * @throws DataProcessorException if processing fails
+   * @throws DataOutputException if output fails
+   */
+  List<DataReference> execute(DataReference dataRef) throws DataProcessorException, DataOutputException;
 }

@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.api;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
+import java.util.List;
 
 /**
  * Transformer instance.
@@ -35,5 +36,5 @@ public interface TransformerInstance extends AutoCloseable {
    * @return transformed data
    * @throws DataTransformerException if error transforming data
    */
-  DataReference transform(DataReference input) throws DataTransformerException;
+  List<DataReference> transform(DataReference input) throws DataTransformerException;
 }

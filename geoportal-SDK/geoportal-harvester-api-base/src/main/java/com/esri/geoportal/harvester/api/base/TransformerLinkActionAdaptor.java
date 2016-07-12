@@ -18,32 +18,37 @@ package com.esri.geoportal.harvester.api.base;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.TransformerInstance;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.ex.DataTransformerException;
+import com.esri.geoportal.harvester.api.ex.DataOutputException;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.general.LinkAction;
+import java.util.List;
 
 /**
- * Transformer processor.
+ * Transformer link action adaptor.
  */
-/*package*/ final class TransformerProcessor implements LinkProcessor {
-  
-  final TransformerInstance transformer;
+public class TransformerLinkActionAdaptor implements LinkAction {
+  private final TransformerInstance transformer;
 
-  public TransformerProcessor(TransformerInstance transformer) {
+  /**
+   * Creates instance of the adaptor.
+   * @param transformer transformer
+   */
+  public TransformerLinkActionAdaptor(TransformerInstance transformer) {
     this.transformer = transformer;
   }
 
   @Override
-  public EntityDefinition getLinkDefinition() {
+  public EntityDefinition getLinkActionDefinition() {
     return transformer.getTransformerDefinition();
   }
 
   @Override
-  public DataReference process(DataReference dataReference) throws DataTransformerException {
-    return transformer.transform(dataReference);
-  }
-
-  @Override
-  public void close() throws Exception {
-    transformer.close();
+  public List<DataReference> execute(DataReference dataRef) throws DataProcessorException, DataOutputException {
+    return transformer.transform(dataRef);
   }
   
+  @Override
+  public String toString() {
+    return transformer.toString();
+  }
 }
