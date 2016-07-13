@@ -15,9 +15,11 @@
  */
 package com.esri.geoportal.harvester.engine.support;
 
+import com.esri.geoportal.harvester.api.defs.LinkDefinition;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.IOException;
 import java.io.Reader;
 
@@ -51,6 +53,11 @@ public class JsonSerializer {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    
+    SimpleModule module = new SimpleModule();
+    module.addDeserializer(LinkDefinition.class, new LinkDefinitionDeserializer());
+    mapper.registerModule(module);
+    
     return mapper.readValue(strDef, clazz);
   }
 
@@ -66,6 +73,11 @@ public class JsonSerializer {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    
+    SimpleModule module = new SimpleModule();
+    module.addDeserializer(LinkDefinition.class, new LinkDefinitionDeserializer());
+    mapper.registerModule(module);
+    
     return mapper.readValue(reader, clazz);
   }
 }
