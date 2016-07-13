@@ -18,9 +18,8 @@ package com.esri.geoportal.harvester.beans;
 import com.esri.geoportal.harvester.engine.managers.History;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.support.CrudsException;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.serialize;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -80,14 +79,11 @@ public class HistoryManagerBean implements HistoryManager {
 
   @Override
   public UUID create(History.Event data) throws CrudsException {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     UUID id = UUID.randomUUID();
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("INSERT INTO EVENTS (taskid,started,completed,report,id) VALUES (?,?,?,?,?)");
-            Reader reportReader = new StringReader(mapper.writeValueAsString(data.getReport()));
+            Reader reportReader = new StringReader(serialize(data.getReport()));
         ) {
       st.setString(1, data.getTaskId().toString());
       st.setTimestamp(2, new Timestamp(data.getStartTimestamp().getTime()));
@@ -116,9 +112,6 @@ public class HistoryManagerBean implements HistoryManager {
 
   @Override
   public History.Event read(UUID id) throws CrudsException {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("SELECT taskid,started,completed,report,id FROM EVENTS WHERE ID = ?");
@@ -131,7 +124,7 @@ public class HistoryManagerBean implements HistoryManager {
           event.setTaskId(UUID.fromString(rs.getString(1)));
           event.setStartTimestamp(new Date(rs.getTimestamp(2).getTime()));
           event.setEndTimestamp(new Date(rs.getTimestamp(3).getTime()));
-          event.setReport(mapper.readValue(reportReader, History.Report.class));
+          event.setReport(deserialize(reportReader, History.Report.class));
           event.setUuid(UUID.fromString(rs.getString(5)));
           return event;
         }
@@ -145,9 +138,6 @@ public class HistoryManagerBean implements HistoryManager {
 
   @Override
   public Collection<Map.Entry<UUID, History.Event>> select() throws CrudsException {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     HashMap<UUID, History.Event> map = new HashMap<>();
     try (
             Connection connection = dataSource.getConnection();
@@ -160,7 +150,7 @@ public class HistoryManagerBean implements HistoryManager {
           event.setTaskId(UUID.fromString(rs.getString(1)));
           event.setStartTimestamp(new Date(rs.getTimestamp(2).getTime()));
           event.setEndTimestamp(new Date(rs.getTimestamp(3).getTime()));
-          event.setReport(mapper.readValue(reportReader, History.Report.class));
+          event.setReport(deserialize(reportReader, History.Report.class));
           event.setUuid(UUID.fromString(rs.getString(5)));
           map.put(event.getUuid(), event);
         }
@@ -173,13 +163,10 @@ public class HistoryManagerBean implements HistoryManager {
 
   @Override
   public boolean update(UUID id, History.Event data) throws CrudsException {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("UPDATE EVENTS SET (taskid = ?, started = ?, completed = ?, report = ?) WHERE ID = ?");
-            Reader reportReader = new StringReader(mapper.writeValueAsString(data.getReport()));
+            Reader reportReader = new StringReader(serialize(data.getReport()));
         ) {
       st.setString(1, data.getTaskId().toString());
       st.setTimestamp(2, new Timestamp(data.getStartTimestamp().getTime()));
@@ -194,9 +181,6 @@ public class HistoryManagerBean implements HistoryManager {
 
   @Override
   public History buildHistory(UUID taskid) throws CrudsException {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     History history = new History();
     try (
             Connection connection = dataSource.getConnection();
@@ -210,7 +194,7 @@ public class HistoryManagerBean implements HistoryManager {
           event.setTaskId(UUID.fromString(rs.getString(1)));
           event.setStartTimestamp(new Date(rs.getTimestamp(2).getTime()));
           event.setEndTimestamp(new Date(rs.getTimestamp(3).getTime()));
-          event.setReport(mapper.readValue(reportReader, History.Report.class));
+          event.setReport(deserialize(reportReader, History.Report.class));
           event.setUuid(UUID.fromString(rs.getString(5)));
           history.add(event);
         }
