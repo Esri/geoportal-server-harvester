@@ -15,17 +15,28 @@
  */
 package com.esri.geoportal.harvester.engine.impl;
 
+import com.esri.geoportal.harvester.api.Filter;
+import com.esri.geoportal.harvester.api.FilterInstance;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Processor;
+import com.esri.geoportal.harvester.api.Transformer;
+import com.esri.geoportal.harvester.api.TransformerInstance;
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
+import com.esri.geoportal.harvester.api.base.BrokerLinkActionAdaptor;
 import com.esri.geoportal.harvester.api.base.BrokerLinkAdaptor;
+import com.esri.geoportal.harvester.api.base.FilterLinkActionAdaptor;
+import com.esri.geoportal.harvester.api.base.SimpleLink;
+import com.esri.geoportal.harvester.api.base.TransformerLinkActionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.LinkDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.general.Link;
+import com.esri.geoportal.harvester.api.general.LinkAction;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
@@ -200,6 +211,49 @@ public class DefaultExecutionService implements ExecutionService {
     return dpFactory.createBroker(entityDefinition);
   }
 
+  /**
+   * Creates new link.
+   * @param linkDefinition link definition
+   * @return link
+   * @throws InvalidDefinitionException if invalid definition
+   */
+  private Link newLink(LinkDefinition linkDefinition) throws InvalidDefinitionException {
+    LinkAction linkAction = newLinkAction(linkDefinition.getAction());
+    ArrayList<Link> drains = new ArrayList<>();
+    for (LinkDefinition drainDef: linkDefinition.getDrains()) {
+      drains.add(newLink(drainDef));
+    }
+    return new SimpleLink(linkAction, drains);
+  }
+  
+  /**
+   * Creates new link action.
+   * @param actionDefinition action definition
+   * @return link action
+   * @throws InvalidDefinitionException if invalid definition.
+   */
+  private LinkAction newLinkAction(EntityDefinition actionDefinition) throws InvalidDefinitionException {
+    OutputConnector<OutputBroker> outputConnector = outboundConnectorRegistry.get(actionDefinition.getType());
+    if (outputConnector!=null) {
+      OutputBroker broker = outputConnector.createBroker(actionDefinition);
+      return new BrokerLinkActionAdaptor(broker);
+    }
+    
+    Filter filter = filterRegistry.get(actionDefinition.getType());
+    if (filter!=null) {
+      FilterInstance filterInstance = filter.createInstance(actionDefinition);
+      return new FilterLinkActionAdaptor(filterInstance);
+    }
+    
+    Transformer transformer = transformerRegistry.get(actionDefinition.getType());
+    if (transformer!=null) {
+      TransformerInstance transformerInstance = transformer.createInstance(actionDefinition);
+      return new TransformerLinkActionAdaptor(transformerInstance);
+    }
+    
+    throw new InvalidDefinitionException(String.format("Error creating link action for: %s", actionDefinition.getType()));
+  }
+  
   /**
    * DefaultEngine-bound trigger context.
    */
