@@ -201,11 +201,11 @@ public class TaskController {
    * @return list of all events for the given task
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/history", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> purgeHistory(@PathVariable UUID taskId) {
+  public ResponseEntity<Void> purgeHistory(@PathVariable UUID taskId) {
     try {
       LOG.debug(String.format("DELETE /rest/harvester/tasks/%s/history", taskId));
       engine.getTasksService().purgeHistory(taskId);
-      return new ResponseEntity<>(String.format("{ \"uuid\": \"%s\" }", taskId),HttpStatus.OK);
+      return new ResponseEntity<Void>(HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error purging history for task: %s", taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
