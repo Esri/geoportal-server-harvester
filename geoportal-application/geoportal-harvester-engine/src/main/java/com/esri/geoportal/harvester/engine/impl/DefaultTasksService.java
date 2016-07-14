@@ -66,6 +66,7 @@ public class DefaultTasksService implements TasksService {
   @Override
   public boolean deleteTaskDefinition(UUID taskId) throws DataProcessorException {
     try {
+      historyManager.purgeHistory(taskId);
       return taskManager.delete(taskId);
     } catch (CrudsException ex) {
       throw new DataProcessorException(String.format("Error deleting task definition: %s", taskId), ex);
