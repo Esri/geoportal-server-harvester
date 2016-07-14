@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.api;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
+import java.util.Map;
 
 /**
  * Processor.
@@ -49,8 +50,9 @@ public interface Processor {
   /**
    * Creates process.
    * @param task task
+   * @param attributes attributes or <code>null</code> if no attributes
    * @return instance of the process
    */
-  ProcessInstance createProcess(Task task);
+  ProcessInstance createProcess(Task task, Map<String,Object> attributes);
 
 }

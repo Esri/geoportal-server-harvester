@@ -34,11 +34,12 @@ public interface ProcessesService {
    * Creates process.
    *
    * @param task task for the process
+   * @param attributes attributes or <code>null</code> if no attributes
    * @return process handle
    * @throws InvalidDefinitionException if processor definition is invalid
    * @throws DataProcessorException if accessing repository fails
    */
-  ProcessReference createProcess(Task task) throws InvalidDefinitionException, DataProcessorException;
+  ProcessReference createProcess(Task task, Map<String,Object> attributes) throws InvalidDefinitionException, DataProcessorException;
   
   /**
    * Gets process by process id.

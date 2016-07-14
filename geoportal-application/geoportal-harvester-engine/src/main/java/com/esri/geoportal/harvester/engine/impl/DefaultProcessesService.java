@@ -67,9 +67,9 @@ public class DefaultProcessesService implements ProcessesService {
   }
 
   @Override
-  public ProcessReference createProcess(Task task) throws InvalidDefinitionException, DataProcessorException {
+  public ProcessReference createProcess(Task task, Map<String,Object> attributes) throws InvalidDefinitionException, DataProcessorException {
     try {
-      ProcessInstance process = task.getProcessor().createProcess(task);
+      ProcessInstance process = task.getProcessor().createProcess(task,attributes);
       UUID uuid = processManager.create(process);
       process.addListener(new ReportBuilderAdaptor(uuid, process, reportBuilder));
       return new ProcessReference(uuid, process);

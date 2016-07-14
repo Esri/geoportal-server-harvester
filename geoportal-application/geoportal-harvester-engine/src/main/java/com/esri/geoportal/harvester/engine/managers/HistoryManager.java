@@ -34,7 +34,7 @@ public interface HistoryManager extends CrudsRepo<History.Event> {
   /**
    * Purges history for a given task id.
    * @param taskId task id.
-   * @throws CrudsException 
+   * @throws CrudsException if purging history fails
    */
   void purgeHistory(UUID taskId) throws CrudsException;
 }

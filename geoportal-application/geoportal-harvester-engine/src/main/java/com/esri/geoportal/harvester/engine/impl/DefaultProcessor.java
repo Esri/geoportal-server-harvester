@@ -29,6 +29,7 @@ import com.esri.geoportal.harvester.api.specs.InputBroker;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,9 +61,9 @@ public class DefaultProcessor implements Processor {
   }
 
   @Override
-  public ProcessInstance createProcess(Task task) {
+  public ProcessInstance createProcess(Task task, Map<String,Object> attributes) {
     LOG.info(String.format("SUBMITTING: %s", task));
-    return new DefaultProcess(task);
+    return new DefaultProcess(task, attributes);
   }
 
   /**
@@ -82,15 +83,16 @@ public class DefaultProcessor implements Processor {
     /**
      * Creates instance of the process.
      * @param task task
+     * @param attributes attributes or <code>null</code> if no attributes
      */
-    public DefaultProcess(Task task) {
+    public DefaultProcess(Task task, Map<String,Object> attributes) {
       this.task = task;
       this.thread = new Thread(() -> {
         onStatusChange();
         LOG.info(String.format("Started harvest: %s", getTitle()));
         try {
           if (!task.getDataDestinations().isEmpty()) {
-            InputBroker.Iterator iterator = task.getDataSource().iterator(null);
+            InputBroker.Iterator iterator = task.getDataSource().iterator(attributes);
             while (iterator.hasNext()) {
               if (Thread.currentThread().isInterrupted()) {
                 break;

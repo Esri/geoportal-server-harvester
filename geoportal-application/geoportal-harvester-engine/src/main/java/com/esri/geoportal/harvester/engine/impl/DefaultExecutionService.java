@@ -58,6 +58,8 @@ import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -112,13 +114,13 @@ public class DefaultExecutionService implements ExecutionService {
   }
 
   @Override
-  public ProcessReference execute(TaskDefinition taskDefinition) throws InvalidDefinitionException, DataProcessorException {
+  public ProcessReference execute(TaskDefinition taskDefinition, Map<String,Object> attributes) throws InvalidDefinitionException, DataProcessorException {
     Task task = createTask(taskDefinition);
-    return processesService.createProcess(task);
+    return processesService.createProcess(task, attributes);
   }
   
   @Override
-  public TriggerReference schedule(UUID taskId, TriggerDefinition trigDef) throws InvalidDefinitionException, DataProcessorException {
+  public TriggerReference schedule(UUID taskId, TriggerDefinition trigDef, Map<String,Object> attributes) throws InvalidDefinitionException, DataProcessorException {
     try {
       TriggerManager.TriggerDefinitionUuidPair pair = new TriggerManager.TriggerDefinitionUuidPair();
       pair.taskUuid = taskId;
@@ -270,7 +272,12 @@ public class DefaultExecutionService implements ExecutionService {
 
     @Override
     public synchronized ProcessInstance execute(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
-      ProcessReference ref = DefaultExecutionService.this.execute(taskDefinition);
+      HashMap<String,Object> attributes = new HashMap<>();
+      Date lastHarvest = lastHarvest();
+      if (lastHarvest!=null) {
+        attributes.put("Last-Harvested", lastHarvest);
+      }
+      ProcessReference ref = DefaultExecutionService.this.execute(taskDefinition,attributes);
       if (taskId!=null) {
         ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref.getProcess(), historyManager));
       }
@@ -283,7 +290,10 @@ public class DefaultExecutionService implements ExecutionService {
       try {
         if (taskId!=null) {
           History history = historyManager.buildHistory(taskId);
-          History.Event lastEvent = history.lastEvent();
+          History.Event lastEvent = history!=null? history.stream()
+                  .sorted((left,right)->0-left.getStartTimestamp().compareTo(right.getStartTimestamp()))
+                  .findFirst()
+                  .orElse(null): null;
           return lastEvent!=null? lastEvent.getStartTimestamp(): null;
         } else {
           return null;
