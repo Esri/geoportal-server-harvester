@@ -14,10 +14,13 @@ html,body {
 
 .h-header-layout {
   height: 20px;
+  background-color: #196fa6;
 }
 
 .h-header {
-  
+  color: #ffffff;
+  font-weight: 400;
+  font-size: 16px;
 }
 
 .h-nav-layout {
@@ -30,13 +33,16 @@ html,body {
 
 .h-nav > .h-nav-button {
   cursor: pointer;
-  border: black solid thin;
+  border: #ebebeb solid thin;
   margin-bottom: 0.5em;
   margin-right: 1em;;
-}
+  padding-top: 4px;
+  padding-right: 6px;
+  padding-bottom: 4px;
+  padding-left: 6px;}
 
 .h-nav > .h-nav-button:hover {
-  background: aqua;
+  background-color: lightgray;
 }
 
 .h-stage-layout {
