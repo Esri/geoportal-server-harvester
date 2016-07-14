@@ -30,6 +30,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 import org.apache.http.impl.client.HttpClients;
 
@@ -62,7 +63,7 @@ import org.apache.http.impl.client.HttpClients;
   }
 
   @Override
-  public Iterator iterator(Criteria critera) throws DataInputException {
+  public Iterator iterator(Map<String,Object> attributes) throws DataInputException {
     return new WafIterator();
   }
 

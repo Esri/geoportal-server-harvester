@@ -20,7 +20,7 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
+import java.util.Map;
 
 /**
  * Input broker.
@@ -40,22 +40,11 @@ public interface InputBroker extends Broker<InputConnector> {
   
   /**
    * Gets iterator.
-   * @param critera criteria or <code>null</code> if no criteria
+   * @param attributes attributes or <code>null</code> if no attributes
    * @return iterator
    * @throws DataInputException if error creating iterator.
    */
-  Iterator iterator(Criteria critera) throws DataInputException;
-  
-  /**
-   * Criteria
-   */
-  interface Criteria {
-    /**
-     * Gets the 'from' date.
-     * @return 'from' date
-     */
-    Date getFromDate();
-  }
+  Iterator iterator(Map<String,Object> attributes) throws DataInputException;
   
   /**
    * Iterator.

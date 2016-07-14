@@ -30,6 +30,7 @@ import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
@@ -63,7 +64,7 @@ import org.apache.http.impl.client.HttpClients;
   }
 
   @Override
-  public Iterator iterator(Criteria critera) throws DataInputException {
+  public Iterator iterator(Map<String,Object> attributes) throws DataInputException {
     return new CswIterator();
   }
 
