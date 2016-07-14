@@ -15,12 +15,6 @@
  */
 package com.esri.geoportal.harvester.engine.impl;
 
-import com.esri.geoportal.harvester.engine.managers.TriggerManager;
-import java.util.UUID;
-import com.esri.geoportal.harvester.api.Trigger;
-import com.esri.geoportal.harvester.api.TriggerInstance;
-import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.BrokersService;
 import com.esri.geoportal.harvester.engine.Engine;
 import com.esri.geoportal.harvester.engine.ExecutionService;
@@ -28,7 +22,6 @@ import com.esri.geoportal.harvester.engine.ProcessesService;
 import com.esri.geoportal.harvester.engine.TasksService;
 import com.esri.geoportal.harvester.engine.TemplatesService;
 import com.esri.geoportal.harvester.engine.TriggersService;
-import com.esri.geoportal.harvester.engine.support.CrudsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -106,7 +106,7 @@ define(["dojo/_base/declare",
         }));
         array.forEach(this.checks,lang.hitch(this,function(checks){
           if (checks.checked) {
-            taskDefinition.destinations.push(checks.brokerDefinition);
+            taskDefinition.destinations.push({action: checks.brokerDefinition});
           }
         }));
         this.emit("submit",{taskDefinition: taskDefinition});

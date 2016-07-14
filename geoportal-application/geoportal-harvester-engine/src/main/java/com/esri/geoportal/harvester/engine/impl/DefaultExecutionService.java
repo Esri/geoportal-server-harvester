@@ -24,7 +24,6 @@ import com.esri.geoportal.harvester.api.TransformerInstance;
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.api.base.BrokerLinkActionAdaptor;
-import com.esri.geoportal.harvester.api.base.BrokerLinkAdaptor;
 import com.esri.geoportal.harvester.api.base.FilterLinkActionAdaptor;
 import com.esri.geoportal.harvester.api.base.SimpleLink;
 import com.esri.geoportal.harvester.api.base.TransformerLinkActionAdaptor;
@@ -60,7 +59,6 @@ import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Default execution service.
@@ -151,14 +149,14 @@ public class DefaultExecutionService implements ExecutionService {
   private Task createTask(TaskDefinition taskDefinition) throws InvalidDefinitionException {
     InputBroker dataSource = newInputBroker(taskDefinition.getSource());
 
-    ArrayList<OutputBroker> dataDestinations = new ArrayList<>();
-    for (EntityDefinition def : taskDefinition.getDestinations()) {
-      dataDestinations.add(newOutputBroker(def));
+    ArrayList<Link> dataDestinations = new ArrayList<>();
+    for (LinkDefinition def : taskDefinition.getDestinations()) {
+      dataDestinations.add(newLink(def));
     }
     
     Processor processor = newProcessor(taskDefinition.getProcessor());
     
-    return new Task(processor, dataSource, dataDestinations.stream().map(BrokerLinkAdaptor::new).collect(Collectors.toList()));
+    return new Task(processor, dataSource, dataDestinations);
   }
   
   /**
@@ -220,8 +218,10 @@ public class DefaultExecutionService implements ExecutionService {
   private Link newLink(LinkDefinition linkDefinition) throws InvalidDefinitionException {
     LinkAction linkAction = newLinkAction(linkDefinition.getAction());
     ArrayList<Link> drains = new ArrayList<>();
-    for (LinkDefinition drainDef: linkDefinition.getDrains()) {
-      drains.add(newLink(drainDef));
+    if (linkDefinition.getDrains()!=null) {
+      for (LinkDefinition drainDef: linkDefinition.getDrains()) {
+        drains.add(newLink(drainDef));
+      }
     }
     return new SimpleLink(linkAction, drains);
   }

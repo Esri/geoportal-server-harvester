@@ -28,7 +28,7 @@ import java.util.Objects;
 public final class TaskDefinition implements Serializable {
   private EntityDefinition processor;
   private EntityDefinition source;
-  private List<EntityDefinition> destinations;
+  private List<LinkDefinition> destinations;
   private List<String> keywords = new ArrayList<>();
 
   /**
@@ -67,7 +67,7 @@ public final class TaskDefinition implements Serializable {
    * Gets destinations.
    * @return destinations
    */
-  public List<EntityDefinition> getDestinations() {
+  public List<LinkDefinition> getDestinations() {
     return destinations;
   }
 
@@ -75,7 +75,7 @@ public final class TaskDefinition implements Serializable {
    * Sets destinations.
    * @param destinations destinations
    */
-  public void setDestinations(List<EntityDefinition> destinations) {
+  public void setDestinations(List<LinkDefinition> destinations) {
     this.destinations = destinations;
   }
 

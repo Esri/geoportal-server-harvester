@@ -54,14 +54,39 @@ define(["dojo/_base/declare",
         var sourceLabel = taskDefinition.source? taskDefinition.source.label: "";
         var destLabel = "";
         if (taskDefinition.destinations) {
-          array.forEach(taskDefinition.destinations,function(dest){
-            if (destLabel.length>0) {
-              destLabel += ", ";
+          array.forEach(taskDefinition.destinations,lang.hitch(this,function(linkDefinition){
+            var label =this.makeLinkLabel(linkDefinition);
+            if (label) {
+              if (!destLabel || destLabel.length==0) {
+                destLabel = label;
+              } else {
+                destLabel += ", "+label;
+              }
             }
-            destLabel += dest.label;
-          });
+          }));
         }
         return sourceLabel + " -> [" + destLabel + "]";
+      },
+      
+      makeLinkLabel: function(linkDefinition) {
+        if (linkDefinition.drains && linkDefinition.drains.length>0) {
+          var destLabel = null;
+          array.forEach(linkDefinition.drains,lang.hitch(this,function(linkDefinition){
+            var label = this.makeLinkLabel(linkDefinition);
+            if (label) {
+              if (!destLabel || destLabel.length==0) {
+                destLabel = label;
+              } else {
+                destLabel += ", "+label;
+              }
+            }
+          }));
+          return destLabel;
+        } else if (linkDefinition.action) {
+          return linkDefinition.action.label;
+        } else {
+          return null;
+        }
       }
     });
 });

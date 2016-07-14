@@ -52,7 +52,7 @@ public final class Task implements AutoCloseable {
     TaskDefinition taskDefinition = new TaskDefinition();
     taskDefinition.setProcessor(processor.getEntityDefinition());
     taskDefinition.setSource(dataSource.getEntityDefinition());
-    taskDefinition.setDestinations(dataDestinations.stream().map(d->d.getLinkDefinition().getAction()).collect(Collectors.toList()));
+    taskDefinition.setDestinations(dataDestinations.stream().map(d->d.getLinkDefinition()).collect(Collectors.toList()));
     return taskDefinition;
   }
 

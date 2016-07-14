@@ -59,6 +59,6 @@ public final class LinkDefinition {
   
   @Override
   public String toString() {
-    return String.format("LINK %s:[%s]", action, drains.stream().map(d->d.toString()).collect(Collectors.joining(",")));
+    return String.format("LINK %s:[%s]", action, drains!=null? drains.stream().map(d->d.toString()).collect(Collectors.joining(",")): "");
   }
 }
