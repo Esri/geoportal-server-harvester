@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.api.base;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.TransformerInstance;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.general.LinkAction;
@@ -45,6 +46,11 @@ public class TransformerLinkActionAdaptor implements LinkAction {
   @Override
   public List<DataReference> execute(DataReference dataRef) throws DataProcessorException, DataOutputException {
     return transformer.transform(dataRef);
+  }
+
+  @Override
+  public PublishingStatus push(DataReference dataRef) throws DataProcessorException, DataOutputException {
+    return PublishingStatus.EMPTY;
   }
 
   @Override

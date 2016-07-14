@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.api.general;
 
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import java.util.List;
@@ -38,4 +39,13 @@ public interface LinkAction extends AutoCloseable {
    * @throws DataOutputException if output fails
    */
   List<DataReference> execute(DataReference dataRef) throws DataProcessorException, DataOutputException;
+  
+  /**
+   * Pushes data reference through the link.
+   * @param dataRef data reference.
+   * @return publishing status
+   * @throws DataProcessorException if processing fails
+   * @throws DataOutputException if sending to the output fails
+   */
+  PublishingStatus push(DataReference dataRef) throws DataProcessorException, DataOutputException;
 }

@@ -19,6 +19,7 @@ package com.esri.geoportal.harvester.api.defs;
  * Publishing status.
  */
 public class PublishingStatus {
+  public static final PublishingStatus EMPTY   = new PublishingStatus(0, 0, 0);
   public static final PublishingStatus SKIPPED = new PublishingStatus(1, 0, 0);
   public static final PublishingStatus CREATED = new PublishingStatus(0, 1, 0);
   public static final PublishingStatus UPDATED = new PublishingStatus(0, 0, 1);
@@ -89,9 +90,30 @@ public class PublishingStatus {
     }
     return false;
   }
+
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    hash = 73 * hash + (int) (this.skipped ^ (this.skipped >>> 32));
+    hash = 73 * hash + (int) (this.created ^ (this.created >>> 32));
+    hash = 73 * hash + (int) (this.updated ^ (this.updated >>> 32));
+    return hash;
+  }
   
   @Override
   public String toString() {
+    if (equals(SKIPPED)) {
+      return String.format("STATUS::SKIPPED");
+    }
+    if (equals(CREATED)) {
+      return String.format("STATUS::CREATED");
+    }
+    if (equals(UPDATED)) {
+      return String.format("STATUS::UPDATED");
+    }
+    if (equals(EMPTY)) {
+      return String.format("STATUS::EMPTY");
+    }
     return String.format("STATUS::skipped:%d,created:%d,updated:%s", skipped,created,updated);
   }
 }

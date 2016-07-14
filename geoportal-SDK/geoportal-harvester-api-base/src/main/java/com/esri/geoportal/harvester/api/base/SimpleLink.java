@@ -52,11 +52,11 @@ public class SimpleLink implements Link {
 
   @Override
   public PublishingStatus push(DataReference dataRef) throws DataProcessorException, DataOutputException {
-    PublishingStatus status = new PublishingStatus();
+    PublishingStatus status = action.push(dataRef);
     for (DataReference dr: action.execute(dataRef)) {
       if (drains!=null) {
         for (Link l: drains) {
-          status = status.collect(l.push(dataRef));
+          status = status.collect(l.push(dr));
         }
       }
     }
