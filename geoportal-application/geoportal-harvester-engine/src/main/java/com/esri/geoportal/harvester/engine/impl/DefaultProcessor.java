@@ -25,6 +25,7 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.specs.InputBroker;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -89,11 +90,12 @@ public class DefaultProcessor implements Processor {
         LOG.info(String.format("Started harvest: %s", getTitle()));
         try {
           if (!task.getDataDestinations().isEmpty()) {
-            while (task.getDataSource().hasNext()) {
+            InputBroker.Iterator iterator = task.getDataSource().iterator(null);
+            while (iterator.hasNext()) {
               if (Thread.currentThread().isInterrupted()) {
                 break;
               }
-              DataReference dataReference = task.getDataSource().next();
+              DataReference dataReference = iterator.next();
               onAcquire(dataReference);
               task.getDataDestinations().stream().forEach((d) -> {
                 try {

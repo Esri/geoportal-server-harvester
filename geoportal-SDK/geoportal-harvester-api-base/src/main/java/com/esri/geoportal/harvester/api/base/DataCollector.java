@@ -46,9 +46,10 @@ public class DataCollector {
     onStart();
     
     try {
-      top: while (inputBroker.hasNext()) {
+      InputBroker.Iterator iterator = inputBroker.iterator(null);
+      top: while (iterator.hasNext()) {
         if (Thread.currentThread().isInterrupted()) break;
-        DataReference dataReference = inputBroker.next();
+        DataReference dataReference = iterator.next();
         for (OutputBroker d: outputBrokers) {
           if (Thread.currentThread().isInterrupted()) break top;
           try {

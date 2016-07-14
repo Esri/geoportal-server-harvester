@@ -60,52 +60,10 @@ import org.apache.http.impl.client.HttpClients;
   public URI getBrokerUri() throws URISyntaxException {
     return new URI("WAF",definition.getHostUrl().toExternalForm(),null);
   }
-  
-  @Override
-  public boolean hasNext() throws DataInputException {
-    
-    try {
-      assertExecutor();
-
-      if (files!=null && !files.isEmpty()) {
-        return true;
-      }
-
-      if (subFolders!=null && !subFolders.isEmpty()) {
-        WafFolder subFolder = subFolders.poll();
-        if (visited.contains(subFolder.getFolderUrl())) {
-          return hasNext();
-        }
-        visited.add(subFolder.getFolderUrl());
-        WafFolderContent content = subFolder.readContent(httpClient);
-        content.getSubFolders().forEach(f->subFolders.offer(f));
-        files = new LinkedList<>(content.getFiles());
-        return hasNext();
-      }
-      
-      if (subFolders==null) {
-        URL startUrl = new URL(definition.getHostUrl().toExternalForm().replaceAll("/$", "")+"/");
-        WafFolderContent content = new WafFolder(this, startUrl, definition.getCredentials()).readContent(httpClient);
-        subFolders = new LinkedList<>(content.getSubFolders());
-        files = new LinkedList<>(content.getFiles());
-        return hasNext();
-      }
-      
-      return false;
-    } catch (IOException|URISyntaxException ex) {
-      throw new DataInputException(this, "Error reading data.", ex);
-    }
-  }
 
   @Override
-  public DataReference next() throws DataInputException {
-    try {
-      assertExecutor();
-      WafFile file = files.poll();
-      return file.readContent(httpClient);
-    } catch (IOException|URISyntaxException ex) {
-      throw new DataInputException(this, "Error reading data.", ex);
-    }
+  public Iterator iterator(Criteria critera) throws DataInputException {
+    return new WafIterator();
   }
 
   /**
@@ -139,5 +97,57 @@ import org.apache.http.impl.client.HttpClients;
   @Override
   public EntityDefinition getEntityDefinition() {
     return definition.getEntityDefinition();
+  }
+
+  /**
+   * WAF iterator.
+   */
+  private class WafIterator implements InputBroker.Iterator {
+    @Override
+    public boolean hasNext() throws DataInputException {
+
+      try {
+        assertExecutor();
+
+        if (files!=null && !files.isEmpty()) {
+          return true;
+        }
+
+        if (subFolders!=null && !subFolders.isEmpty()) {
+          WafFolder subFolder = subFolders.poll();
+          if (visited.contains(subFolder.getFolderUrl())) {
+            return hasNext();
+          }
+          visited.add(subFolder.getFolderUrl());
+          WafFolderContent content = subFolder.readContent(httpClient);
+          content.getSubFolders().forEach(f->subFolders.offer(f));
+          files = new LinkedList<>(content.getFiles());
+          return hasNext();
+        }
+
+        if (subFolders==null) {
+          URL startUrl = new URL(definition.getHostUrl().toExternalForm().replaceAll("/$", "")+"/");
+          WafFolderContent content = new WafFolder(WafBroker.this, startUrl, definition.getCredentials()).readContent(httpClient);
+          subFolders = new LinkedList<>(content.getSubFolders());
+          files = new LinkedList<>(content.getFiles());
+          return hasNext();
+        }
+
+        return false;
+      } catch (IOException|URISyntaxException ex) {
+        throw new DataInputException(WafBroker.this, "Error reading data.", ex);
+      }
+    }
+
+    @Override
+    public DataReference next() throws DataInputException {
+      try {
+        assertExecutor();
+        WafFile file = files.poll();
+        return file.readContent(httpClient);
+      } catch (IOException|URISyntaxException ex) {
+        throw new DataInputException(WafBroker.this, "Error reading data.", ex);
+      }
+    }
   }
 }

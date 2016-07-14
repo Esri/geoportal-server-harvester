@@ -20,6 +20,7 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 
 /**
  * Input broker.
@@ -38,16 +39,40 @@ public interface InputBroker extends Broker<InputConnector> {
   URI getBrokerUri() throws URISyntaxException;
   
   /**
-   * Checks if more data available.
-   * @return <code>true</code> if more data available
-   * @throws DataInputException if checking if more data available fails
+   * Gets iterator.
+   * @param critera criteria or <code>null</code> if no criteria
+   * @return iterator
+   * @throws DataInputException if error creating iterator.
    */
-  boolean hasNext() throws DataInputException;
+  Iterator iterator(Criteria critera) throws DataInputException;
   
   /**
-   * Gets next available data reference.
-   * @return data reference
-   * @throws DataInputException if getting next data reference fails
+   * Criteria
    */
-  DataReference next() throws DataInputException;
+  interface Criteria {
+    /**
+     * Gets the 'from' date.
+     * @return 'from' date
+     */
+    Date getFromDate();
+  }
+  
+  /**
+   * Iterator.
+   */
+  interface Iterator {
+    /**
+     * Checks if more data available.
+     * @return <code>true</code> if more data available
+     * @throws DataInputException if checking if more data available fails
+     */
+    boolean hasNext() throws DataInputException;
+
+    /**
+     * Gets next available data reference.
+     * @return data reference
+     * @throws DataInputException if getting next data reference fails
+     */
+    DataReference next() throws DataInputException;
+  }
 }

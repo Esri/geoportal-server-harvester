@@ -30,7 +30,6 @@ import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Iterator;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
@@ -44,7 +43,7 @@ import org.apache.http.impl.client.HttpClients;
   private final CswBrokerDefinitionAdaptor definition;
   private CloseableHttpClient httpclient;
   private IClient client;
-  private Iterator<IRecord> recs;
+  private java.util.Iterator<IRecord> recs;
   private int start = 1;
   private boolean noMore;
 
@@ -64,45 +63,8 @@ import org.apache.http.impl.client.HttpClients;
   }
 
   @Override
-  public boolean hasNext() throws DataInputException {
-    try {
-      assertClient();
-      
-      if (noMore) {
-        return false;
-      }
-      
-      if (recs==null) {
-        IRecords r = client.findRecords(start, PAGE_SIZE);
-        if (r.isEmpty()) {
-          noMore = true;
-        } else {
-          recs = r.iterator();
-        }
-        return hasNext();
-      }
-      
-      if (!recs.hasNext()) {
-        recs = null;
-        start += PAGE_SIZE;
-        return hasNext();
-      }
-      
-      return true;
-    } catch (Exception ex) {
-      throw new DataInputException(this, "Error reading data.", ex);
-    }
-  }
-
-  @Override
-  public DataReference next() throws DataInputException {
-    try {
-      IRecord rec = recs.next();
-      String metadata = client.readMetadata(rec.getId());
-      return new SimpleDataReference(this.getBrokerUri(), rec.getId(), rec.getLastModifiedDate(), new URI("uuid", rec.getId(), null), metadata.getBytes("UTF-8"));
-    } catch (Exception ex) {
-      throw new DataInputException(this, "Error reading data.", ex);
-    }
+  public Iterator iterator(Criteria critera) throws DataInputException {
+    return new CswIterator();
   }
 
   /**
@@ -138,6 +100,53 @@ import org.apache.http.impl.client.HttpClients;
   @Override
   public EntityDefinition getEntityDefinition() {
     return definition.getEntityDefinition();
+  }
+
+  /**
+   * CSW iterator.
+   */
+  private class CswIterator implements InputBroker.Iterator {
+    @Override
+    public boolean hasNext() throws DataInputException {
+      try {
+        assertClient();
+
+        if (noMore) {
+          return false;
+        }
+
+        if (recs==null) {
+          IRecords r = client.findRecords(start, PAGE_SIZE);
+          if (r.isEmpty()) {
+            noMore = true;
+          } else {
+            recs = r.iterator();
+          }
+          return hasNext();
+        }
+
+        if (!recs.hasNext()) {
+          recs = null;
+          start += PAGE_SIZE;
+          return hasNext();
+        }
+
+        return true;
+      } catch (Exception ex) {
+        throw new DataInputException(CswBroker.this, "Error reading data.", ex);
+      }
+    }
+
+    @Override
+    public DataReference next() throws DataInputException {
+      try {
+        IRecord rec = recs.next();
+        String metadata = client.readMetadata(rec.getId());
+        return new SimpleDataReference(CswBroker.this.getBrokerUri(), rec.getId(), rec.getLastModifiedDate(), new URI("uuid", rec.getId(), null), metadata.getBytes("UTF-8"));
+      } catch (Exception ex) {
+        throw new DataInputException(CswBroker.this, "Error reading data.", ex);
+      }
+    }
   }
   
 }
