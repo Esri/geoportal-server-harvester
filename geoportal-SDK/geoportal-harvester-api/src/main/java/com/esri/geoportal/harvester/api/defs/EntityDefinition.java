@@ -112,7 +112,7 @@ public final class EntityDefinition implements Serializable {
   
   @Override
   public String toString() {
-    return String.format("%s/%s/[%s]", type, label, properties.entrySet().stream()
+    return String.format("%s[%s]", type, properties.entrySet().stream()
             .map(e->String.format("%s=%s", e.getKey(), e.getValue()))
             .collect(Collectors.joining(", ")));
   }
