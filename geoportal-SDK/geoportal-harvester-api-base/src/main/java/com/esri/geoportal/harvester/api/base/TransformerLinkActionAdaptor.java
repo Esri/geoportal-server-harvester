@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Transformer link action adaptor.
  */
-public class TransformerLinkActionAdaptor implements LinkAction {
+public final class TransformerLinkActionAdaptor implements LinkAction {
   private final TransformerInstance transformer;
 
   /**

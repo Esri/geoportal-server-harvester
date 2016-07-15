@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Filter link action adaptor.
  */
-public class FilterLinkActionAdaptor implements LinkAction {
+public final class FilterLinkActionAdaptor implements LinkAction {
   private final FilterInstance filter;
 
   /**

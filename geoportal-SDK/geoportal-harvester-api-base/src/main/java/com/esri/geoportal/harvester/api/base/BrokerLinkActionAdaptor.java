@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Broker link action adaptor.
  */
-public class BrokerLinkActionAdaptor implements LinkAction {
+public final class BrokerLinkActionAdaptor implements LinkAction {
   private final OutputBroker broker;
 
   /**
