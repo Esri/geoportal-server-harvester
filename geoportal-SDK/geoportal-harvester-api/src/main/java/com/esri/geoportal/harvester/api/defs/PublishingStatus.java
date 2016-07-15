@@ -19,23 +19,14 @@ package com.esri.geoportal.harvester.api.defs;
  * Publishing status.
  */
 public class PublishingStatus {
-  public static final PublishingStatus EMPTY   = new PublishingStatus(0, 0, 0);
-  public static final PublishingStatus SKIPPED = new PublishingStatus(1, 0, 0);
-  public static final PublishingStatus CREATED = new PublishingStatus(0, 1, 0);
-  public static final PublishingStatus UPDATED = new PublishingStatus(0, 0, 1);
+  public static final PublishingStatus EMPTY   = new ImmutablePublishingStatus(0, 0, 0);
+  public static final PublishingStatus SKIPPED = new ImmutablePublishingStatus(1, 0, 0);
+  public static final PublishingStatus CREATED = new ImmutablePublishingStatus(0, 1, 0);
+  public static final PublishingStatus UPDATED = new ImmutablePublishingStatus(0, 0, 1);
   
   private final long skipped;
   private final long created;
   private final long updated;
-
-  /**
-   * Creates instance of the status.
-   */
-  public PublishingStatus() {
-    skipped = 0;
-    created = 0;
-    updated = 0;
-  }
   
   /**
    * Creates instance of the status.
@@ -47,6 +38,14 @@ public class PublishingStatus {
     this.skipped = skipped;
     this.created = created;
     this.updated = updated;
+  }
+  
+  /**
+   * Creates empty status.
+   * @return empty status
+   */
+  public static PublishingStatus emptyStatus() {
+    return new PublishingStatus(0,0,0);
   }
   
   /**
@@ -115,5 +114,27 @@ public class PublishingStatus {
       return String.format("STATUS::EMPTY");
     }
     return String.format("STATUS::skipped:%d,created:%d,updated:%s", skipped,created,updated);
+  }
+  
+  /**
+   * Publishing status which would disallow to mo
+   */
+  private static final class ImmutablePublishingStatus extends PublishingStatus {
+
+    /**
+     * Creates instance of the status.
+     * @param skipped number of records skipped
+     * @param created number of created record
+     * @param updated number of updated records
+     */
+    public ImmutablePublishingStatus(long skipped, long created, long updated) {
+      super(skipped, created, updated);
+    }
+
+    @Override
+    public PublishingStatus collect(PublishingStatus ps) {
+      throw new IllegalStateException("Object is immutable.");
+    }
+    
   }
 }
