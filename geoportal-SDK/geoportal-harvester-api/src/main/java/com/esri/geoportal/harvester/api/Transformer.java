@@ -21,6 +21,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 
 /**
  * Transformer.
+ * @see TransformerInstance
  */
 public interface Transformer extends Entity {
   /**

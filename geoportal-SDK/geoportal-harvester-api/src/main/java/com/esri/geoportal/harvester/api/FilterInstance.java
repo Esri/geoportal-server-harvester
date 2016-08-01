@@ -19,6 +19,7 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 
 /**
  * Filter instance.
+ * @see Filter
  */
 public interface FilterInstance extends AutoCloseable {
   

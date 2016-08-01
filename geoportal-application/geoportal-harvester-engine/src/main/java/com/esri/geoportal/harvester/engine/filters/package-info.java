@@ -16,5 +16,6 @@
 
 /**
  * Filters implementations.
+ * @see com.esri.geoportal.harvester.api.Filter
  */
 package com.esri.geoportal.harvester.engine.filters;

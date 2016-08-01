@@ -21,6 +21,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 
 /**
  * Filter.
+ * @see FilterInstance
  */
 public interface Filter extends Entity {
   

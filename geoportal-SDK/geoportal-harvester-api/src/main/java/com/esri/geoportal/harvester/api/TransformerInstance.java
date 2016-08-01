@@ -21,6 +21,7 @@ import java.util.List;
 
 /**
  * Transformer instance.
+ * @see Transformer
  */
 public interface TransformerInstance extends AutoCloseable {
   
