@@ -70,6 +70,8 @@ public final class UITemplate {
   public static enum ArgumentType {
     /** string type */
     string,
+    /** text type */
+    text,
     /** integer type */
     integer,
     /** boolean type */
@@ -171,6 +173,34 @@ public final class UITemplate {
     @Override
     public ArgumentType getType() {
       return ArgumentType.string;
+    }
+  }
+  
+  /**
+   * String argument.
+   */
+  public static class TextArgument extends ArgumentBase<String> {
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     */
+    public TextArgument(String name, String label) {
+      super(name, label);
+    }
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     * @param required <code>true</code> if argument is required
+     */
+    public TextArgument(String name, String label, boolean required) {
+      super(name, label, required);
+    }
+
+    @Override
+    public ArgumentType getType() {
+      return ArgumentType.text;
     }
   }
   
