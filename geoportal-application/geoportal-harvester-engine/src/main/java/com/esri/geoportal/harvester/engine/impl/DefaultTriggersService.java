@@ -71,6 +71,7 @@ public class DefaultTriggersService implements TriggersService {
     return triggerRegistry.get(type);
   }
   
+  @Override
   public Collection<Map.Entry<UUID, TriggerManager.TriggerDefinitionUuidPair>> select() throws CrudsException {
     return triggerManager.select();
   }
