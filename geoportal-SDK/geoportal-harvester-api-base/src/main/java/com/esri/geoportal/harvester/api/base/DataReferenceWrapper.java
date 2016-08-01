@@ -24,23 +24,23 @@ import java.util.Map;
 /**
  * Data reference wrapper.
  */
-/*package*/ class DataReferenceWrapper implements DataReference {
+public class DataReferenceWrapper implements DataReference {
   private final DataReference baseRef;
-  private final DataReference origRef;
+  private final byte [] content;
   
   /**
    * Creates instance of the data reference.
    * @param baseRef base data reference
-   * @param origRef origin data reference
+   * @param content new content
    */
-  public DataReferenceWrapper(DataReference baseRef, DataReference origRef) {
+  public DataReferenceWrapper(DataReference baseRef, byte [] content) {
     this.baseRef = baseRef;
-    this.origRef = origRef;
+    this.content = content;
   }
 
   @Override
   public byte[] getContent() throws IOException {
-    return baseRef.getContent();
+    return content;
   }
 
   @Override
@@ -70,7 +70,7 @@ import java.util.Map;
 
   @Override
   public DataReference getOriginDataReference() {
-    return origRef;
+    return baseRef;
   }
 
   @Override
