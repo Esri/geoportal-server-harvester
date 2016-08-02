@@ -207,7 +207,7 @@ public class TaskController {
     try {
       LOG.debug(String.format("DELETE /rest/harvester/tasks/%s/history", taskId));
       engine.getTasksService().purgeHistory(taskId);
-      return new ResponseEntity<Void>(HttpStatus.OK);
+      return new ResponseEntity<>(HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error purging history for task: %s", taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
