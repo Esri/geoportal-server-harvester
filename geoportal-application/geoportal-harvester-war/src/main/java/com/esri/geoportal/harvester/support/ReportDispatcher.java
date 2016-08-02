@@ -22,7 +22,6 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.engine.managers.ReportBuilder;
 import java.util.Arrays;
 import java.util.List;
-import com.esri.geoportal.harvester.api.Processor;
 
 /**
  * Report dispatcher.

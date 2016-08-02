@@ -22,7 +22,6 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.engine.managers.ReportBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.esri.geoportal.harvester.api.Processor;
 
 /**
  * Report logger.
