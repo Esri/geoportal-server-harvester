@@ -55,7 +55,7 @@ public class TaskManagerBean implements TaskManager {
   public void init() {
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("CREATE TABLE IF NOT EXISTS TASKS ( id varchar(38) PRIMARY KEY, taskDefinition varchar(1024) NOT NULL)");
+            PreparedStatement st = connection.prepareStatement("CREATE TABLE IF NOT EXISTS TASKS ( id varchar(38) PRIMARY KEY, taskDefinition varchar(8192) NOT NULL)");
         ) {
       st.execute();
       LOG.info("TaskManagerBean initialized.");

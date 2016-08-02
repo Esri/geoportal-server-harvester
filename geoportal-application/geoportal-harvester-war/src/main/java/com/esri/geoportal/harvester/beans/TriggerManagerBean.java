@@ -54,7 +54,7 @@ public class TriggerManagerBean implements TriggerManager {
   public void init() {
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("CREATE TABLE IF NOT EXISTS TRIGGERS ( id varchar(38) PRIMARY KEY, definition varchar(1024) NOT NULL)");) {
+            PreparedStatement st = connection.prepareStatement("CREATE TABLE IF NOT EXISTS TRIGGERS ( id varchar(38) PRIMARY KEY, definition varchar(8192) NOT NULL)");) {
       st.execute();
       LOG.info("TriggerManagerBean initialized.");
     } catch (SQLException ex) {
