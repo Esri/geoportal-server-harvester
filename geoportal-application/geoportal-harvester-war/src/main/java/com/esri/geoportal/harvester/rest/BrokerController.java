@@ -17,10 +17,11 @@ package com.esri.geoportal.harvester.rest;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.engine.support.BrokerReference;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import com.esri.geoportal.harvester.engine.support.BrokerReference.Category;
+import com.esri.geoportal.harvester.support.BrokerResponse;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +84,7 @@ public class BrokerController {
    * @return array of broker infos
    */
   @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<BrokerReference[]> listBrokers(@RequestParam(value = "category", required = false) String category) {
+  public ResponseEntity<BrokerResponse[]> listBrokers(@RequestParam(value = "category", required = false) String category) {
     try {
       LOG.debug(String.format("GET /rest/harvester/brokers%s",category!=null? "&category="+category: ""));
       Category ctg = null;
@@ -92,7 +93,7 @@ public class BrokerController {
       } catch (IllegalArgumentException ex) {
         // ignore
       }
-      return new ResponseEntity<>(engine.getBrokersService().getBrokersDefinitions(ctg).toArray(new BrokerReference[0]), HttpStatus.OK);
+      return new ResponseEntity<>(engine.getBrokersService().getBrokersDefinitions(ctg).stream().map(d->BrokerResponse.createFrom(d)).collect(Collectors.toList()).toArray(new BrokerResponse[0]), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error listing all brokers"), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -105,10 +106,10 @@ public class BrokerController {
    * @return broker info or <code>null</code> if no broker found
    */
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<BrokerReference> getBroker(@PathVariable UUID brokerId) {
+  public ResponseEntity<BrokerResponse> getBroker(@PathVariable UUID brokerId) {
     try {
       LOG.debug(String.format("GET /rest/harvester/brokers/%s", brokerId));
-      return new ResponseEntity<>(engine.getBrokersService().findBroker(brokerId), HttpStatus.OK);
+      return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().findBroker(brokerId)), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error getting broker: %s", brokerId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -121,14 +122,11 @@ public class BrokerController {
    * @return broker info
    */
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<BrokerReference> deleteBroker(@PathVariable UUID brokerId) {
+  public ResponseEntity<BrokerResponse> deleteBroker(@PathVariable UUID brokerId) {
     try {
       LOG.debug(String.format("DELETE /rest/harvester/brokers/%s", brokerId));
-      BrokerReference brokerInfo = engine.getBrokersService().findBroker(brokerId);
-      if (brokerInfo!=null) {
-        engine.getBrokersService().deleteBroker(brokerId);
-      }
-      return new ResponseEntity<>(brokerInfo, HttpStatus.OK);
+      engine.getBrokersService().deleteBroker(brokerId);
+      return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().findBroker(brokerId)), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error deleting broker: %s", brokerId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -141,10 +139,10 @@ public class BrokerController {
    * @return broker info of the newly created broker
    */
   @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<BrokerReference> createBroker(@RequestBody EntityDefinition brokerDefinition) {
+  public ResponseEntity<BrokerResponse> createBroker(@RequestBody EntityDefinition brokerDefinition) {
     try {
       LOG.debug(String.format("PUT /rest/harvester/brokers <-- %s", brokerDefinition));
-      return new ResponseEntity<>(engine.getBrokersService().createBroker(brokerDefinition), HttpStatus.OK);
+      return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().createBroker(brokerDefinition)), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error creating broker: %s", brokerDefinition), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -158,10 +156,10 @@ public class BrokerController {
    * @return broker info of the task which has been replaced
    */
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<BrokerReference> updateBroker(@RequestBody EntityDefinition brokerDefinition, @PathVariable UUID brokerId) {
+  public ResponseEntity<BrokerResponse> updateBroker(@RequestBody EntityDefinition brokerDefinition, @PathVariable UUID brokerId) {
     try {
       LOG.debug(String.format("POST /rest/harvester/brokers/%s <-- %s", brokerId, brokerDefinition));
-      return new ResponseEntity<>(engine.getBrokersService().updateBroker(brokerId, brokerDefinition), HttpStatus.OK);
+      return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().updateBroker(brokerId, brokerDefinition)), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error updating broker: %s <-- %s", brokerId, brokerDefinition), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
