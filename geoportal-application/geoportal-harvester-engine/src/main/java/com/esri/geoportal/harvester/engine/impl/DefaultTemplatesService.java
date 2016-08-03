@@ -17,12 +17,12 @@ package com.esri.geoportal.harvester.engine.impl;
 
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.engine.TemplatesService;
-import com.esri.geoportal.harvester.engine.managers.FilterRegistry;
-import com.esri.geoportal.harvester.engine.managers.InboundConnectorRegistry;
-import com.esri.geoportal.harvester.engine.managers.OutboundConnectorRegistry;
-import com.esri.geoportal.harvester.engine.managers.ProcessorRegistry;
-import com.esri.geoportal.harvester.engine.managers.TransformerRegistry;
-import com.esri.geoportal.harvester.engine.managers.TriggerRegistry;
+import com.esri.geoportal.harvester.engine.registers.FilterRegistry;
+import com.esri.geoportal.harvester.engine.registers.InboundConnectorRegistry;
+import com.esri.geoportal.harvester.engine.registers.OutboundConnectorRegistry;
+import com.esri.geoportal.harvester.engine.registers.ProcessorRegistry;
+import com.esri.geoportal.harvester.engine.registers.TransformerRegistry;
+import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

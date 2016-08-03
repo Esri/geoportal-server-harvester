@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.api.Transformer;
-import com.esri.geoportal.harvester.engine.managers.TransformerRegistry;
+import com.esri.geoportal.harvester.engine.registers.TransformerRegistry;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

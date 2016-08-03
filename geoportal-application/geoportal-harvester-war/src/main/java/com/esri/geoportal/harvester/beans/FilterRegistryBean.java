@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.api.Filter;
-import com.esri.geoportal.harvester.engine.managers.FilterRegistry;
+import com.esri.geoportal.harvester.engine.registers.FilterRegistry;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

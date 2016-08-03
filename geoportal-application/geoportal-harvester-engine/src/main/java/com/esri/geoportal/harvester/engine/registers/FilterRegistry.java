@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine.managers;
+package com.esri.geoportal.harvester.engine.registers;
 
 import com.esri.geoportal.harvester.api.Filter;
-import com.esri.geoportal.harvester.engine.support.BaseRegistry;
+import com.esri.geoportal.harvester.engine.support.EntityRegistry;
 
 /**
  * Filter registry.
  */
-public class FilterRegistry extends BaseRegistry<Filter> {
+public class FilterRegistry extends EntityRegistry<Filter> {
   
 }

@@ -24,7 +24,7 @@ import com.esri.geoportal.harvester.engine.ExecutionService;
 import com.esri.geoportal.harvester.engine.TriggersService;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
-import com.esri.geoportal.harvester.engine.managers.TriggerRegistry;
+import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
 import com.esri.geoportal.harvester.engine.support.CrudsException;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.ArrayList;

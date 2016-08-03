@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Esri, Inc.
+ * Copyright 2016 Esri, Inc..
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine.managers;
+package com.esri.geoportal.harvester.engine.support;
 
-import com.esri.geoportal.harvester.api.Processor;
-import com.esri.geoportal.harvester.engine.impl.DefaultProcessor;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
+import com.esri.geoportal.harvester.api.general.Entity;
 
 /**
- * Processor registry.
+ * Entity registry.
+ * @param <F> type of the factory
  */
-public class ProcessorRegistry extends HashMap<String,Processor>{
-  private final Processor defaultProcessor = new DefaultProcessor();
-  
-  public Processor getDefaultProcessor() {
-    return defaultProcessor;
+public abstract class EntityRegistry<F extends Entity> extends HashMap<String,F> {
+  /**
+   * Gets all templates.
+   * @return list of all templates
+   */
+  public List<UITemplate> getTemplates() {
+    return Arrays.asList(values().stream().map(f->f.getTemplate()).toArray(UITemplate[]::new));
   }
 }

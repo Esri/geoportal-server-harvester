@@ -15,8 +15,8 @@
  */
 
 /**
- * Managers interfaces.
+ * Registers interfaces.
  * <p>
- * Manager is a CRUDS (create, read, update, delete, select) storage container.
+ * Registry is a container which holds predefined, read-only entities.
  */
-package com.esri.geoportal.harvester.engine.managers;
+package com.esri.geoportal.harvester.engine.registers;

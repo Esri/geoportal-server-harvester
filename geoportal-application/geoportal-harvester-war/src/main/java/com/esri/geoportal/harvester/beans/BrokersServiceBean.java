@@ -17,8 +17,8 @@ package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.engine.impl.DefaultBrokersService;
 import com.esri.geoportal.harvester.engine.managers.BrokerDefinitionManager;
-import com.esri.geoportal.harvester.engine.managers.InboundConnectorRegistry;
-import com.esri.geoportal.harvester.engine.managers.OutboundConnectorRegistry;
+import com.esri.geoportal.harvester.engine.registers.InboundConnectorRegistry;
+import com.esri.geoportal.harvester.engine.registers.OutboundConnectorRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

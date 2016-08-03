@@ -19,7 +19,7 @@ import com.esri.geoportal.harvester.engine.ExecutionService;
 import com.esri.geoportal.harvester.engine.impl.DefaultTriggersService;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
-import com.esri.geoportal.harvester.engine.managers.TriggerRegistry;
+import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

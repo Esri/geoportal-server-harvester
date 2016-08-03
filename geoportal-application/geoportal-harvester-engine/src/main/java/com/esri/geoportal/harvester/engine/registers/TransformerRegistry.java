@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Esri, Inc..
+ * Copyright 2016 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine.managers;
+package com.esri.geoportal.harvester.engine.registers;
 
-import com.esri.geoportal.harvester.engine.support.BaseRegistry;
-import com.esri.geoportal.harvester.api.specs.OutputConnector;
+import com.esri.geoportal.harvester.api.Transformer;
+import com.esri.geoportal.harvester.engine.support.EntityRegistry;
 
 /**
- * Data outbound connector registry.
+ * Transformer registry.
  */
-public class OutboundConnectorRegistry extends BaseRegistry<OutputConnector> {
+public class TransformerRegistry extends EntityRegistry<Transformer> {
+  
 }

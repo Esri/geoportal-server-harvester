@@ -22,7 +22,7 @@ import java.util.UUID;
 /**
  * Event response.
  */
-public class EventResponse {
+public final class EventResponse {
   private final UUID uuid;
   private final Date startTimestamp;
   private final Date endTimestamp;

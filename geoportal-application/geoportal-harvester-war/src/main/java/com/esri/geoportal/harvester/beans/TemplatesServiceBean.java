@@ -16,12 +16,12 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.engine.impl.DefaultTemplatesService;
-import com.esri.geoportal.harvester.engine.managers.FilterRegistry;
-import com.esri.geoportal.harvester.engine.managers.InboundConnectorRegistry;
-import com.esri.geoportal.harvester.engine.managers.OutboundConnectorRegistry;
-import com.esri.geoportal.harvester.engine.managers.ProcessorRegistry;
-import com.esri.geoportal.harvester.engine.managers.TransformerRegistry;
-import com.esri.geoportal.harvester.engine.managers.TriggerRegistry;
+import com.esri.geoportal.harvester.engine.registers.FilterRegistry;
+import com.esri.geoportal.harvester.engine.registers.InboundConnectorRegistry;
+import com.esri.geoportal.harvester.engine.registers.OutboundConnectorRegistry;
+import com.esri.geoportal.harvester.engine.registers.ProcessorRegistry;
+import com.esri.geoportal.harvester.engine.registers.TransformerRegistry;
+import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
