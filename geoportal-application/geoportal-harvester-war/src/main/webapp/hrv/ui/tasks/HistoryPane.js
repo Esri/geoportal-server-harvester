@@ -60,7 +60,7 @@ define(["dojo/_base/declare",
       
       processHistory: function(response) {
         console.log(this.i18n.tasks.history.title, response);
-        array.forEach(response,lang.hitch(this,this.processEvent));
+        array.forEach(response.sort(function(l,r){return r.startTimestamp - l.startTimestamp;}),lang.hitch(this,this.processEvent));
       },
       
       processEvent: function(event) {
