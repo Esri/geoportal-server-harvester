@@ -74,7 +74,7 @@ public class PeriodTrigger implements Trigger {
   @Override
   public UITemplate getTemplate() {
     List<UITemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new UITemplate.TemporalArgument(T_PERIOD, "Period", true));
+    arguments.add(new UITemplate.PeriodicalArgument(T_PERIOD, "Period", true));
     UITemplate uiTemplate = new UITemplate(getType(), "Harvest periodically", arguments);
     return uiTemplate;
   }

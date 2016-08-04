@@ -79,7 +79,9 @@ public final class UITemplate {
     /** choice type */
     choice,
     /** temporal type */
-    temporal
+    temporal,
+    /** periodical */
+    periodical
   }
   
   /**
@@ -317,6 +319,34 @@ public final class UITemplate {
   }
   
   /**
+   * Boolean argument.
+   */
+  public static class BooleanArgument extends ArgumentBase<Boolean> {
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     */
+    public BooleanArgument(String name, String label) {
+      super(name, label);
+    }
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     * @param required required
+     */
+    public BooleanArgument(String name, String label, boolean required) {
+      super(name, label, required);
+    }
+
+    @Override
+    public ArgumentType getType() {
+      return ArgumentType.bool;
+    }
+  }
+  
+  /**
    * Temporal argument.
    */
   public static class TemporalArgument extends ArgumentBase<Integer> {
@@ -345,15 +375,15 @@ public final class UITemplate {
   }
   
   /**
-   * Boolean argument.
+   * Periodical argument.
    */
-  public static class BooleanArgument extends ArgumentBase<Boolean> {
+  public static class PeriodicalArgument extends ArgumentBase<Integer> {
     /**
      * Creates instance of the argument.
      * @param name type
      * @param label label
      */
-    public BooleanArgument(String name, String label) {
+    public PeriodicalArgument(String name, String label) {
       super(name, label);
     }
     /**
@@ -362,13 +392,13 @@ public final class UITemplate {
      * @param label label
      * @param required required
      */
-    public BooleanArgument(String name, String label, boolean required) {
+    public PeriodicalArgument(String name, String label, boolean required) {
       super(name, label, required);
     }
 
     @Override
     public ArgumentType getType() {
-      return ArgumentType.bool;
+      return ArgumentType.periodical;
     }
   }
 }
