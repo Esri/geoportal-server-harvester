@@ -66,7 +66,7 @@ define({
         caption: "Task",
         submit: "Submit",
         inputs: "Inputs:",
-        outputs: "Outputs:",
+        outputs: "Outputs:"
       },
       events: {
         caption: "History",
@@ -76,6 +76,10 @@ define({
         created: "Created",
         updated: "Updated",
         failed: "Failed"
+      },
+      scheduler: {
+        type: "Type",
+        submit: "Submit"
       }
     },
     

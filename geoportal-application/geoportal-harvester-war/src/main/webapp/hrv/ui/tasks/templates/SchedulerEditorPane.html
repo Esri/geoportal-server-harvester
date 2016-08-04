@@ -1,0 +1,15 @@
+<div class="h-scheduler-editor" data-dojo-attach-point="contentNode">
+  <div data-dojo-type="dijit/form/Form" data-dojo-attach-point="formWidget" data-dojo-id="schedulerForm" encType="multipart/form-data" action="" method="">
+    <div class="h-editor-form" data-dojo-attach-point="formNode">
+      <div class="h-editor-line">
+        <span class="h-editor-argname">${i18n.tasks.scheduler.type}</span>
+        <span>
+          <select name="type" data-dojo-type="dijit/form/Select" data-dojo-attach-point="typeSelector" data-dojo-attach-event="onChange:_onTypeChanged"></select>
+        </span>
+      </div>
+  </div>
+  
+  <div class="h-editor-footer">
+    <button data-dojo-type="dijit/form/Button" data-dojo-attach-event="onClick:_onSubmit">${i18n.tasks.scheduler.submit}</button>
+  </div>
+</div>

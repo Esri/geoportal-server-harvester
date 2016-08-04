@@ -21,12 +21,16 @@ define(["dojo/_base/declare",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/Task.html",
         "dojo/_base/lang",
-        "dojo/_base/array"
+        "dojo/_base/array",
+        "dijit/Dialog",
+        "hrv/ui/tasks/SchedulerEditorPane"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array
+           lang,array,
+           Dialog,
+           SchedulerEditorPane
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
@@ -53,8 +57,20 @@ define(["dojo/_base/declare",
         this.emit("history",{data: this.data});
       },
       
-      _onSchedule: function() {
-        console.log("scheduling...");
+      _onSchedule: function(evt) {
+        var schedulerEditorPane = new SchedulerEditorPane({});
+
+        // create editor dialog box
+        var schedulerEditorDialog = new Dialog({
+          title: this.i18n.tasks.editor.caption,
+          content: schedulerEditorPane,
+          onHide: function() {
+            schedulerEditorDialog.destroy();
+            schedulerEditorPane.destroy();
+          }
+        });
+        
+        schedulerEditorDialog.show();
       },
       
       makeLabel: function(taskDefinition) {
