@@ -22,30 +22,57 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/SchedulerEditorPane.html",
         "dojo/_base/lang",
         "dojo/_base/array",
+        "dojo/topic",
         "dijit/form/Select",
         "dijit/form/Button",
-        "dijit/form/Form"
+        "dijit/form/Form",
+        "hrv/rest/Triggers",
+        "hrv/ui/main/UIRenderer"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,
-           Select,Button,Form
+           lang,array,topic,
+           Select,Button,Form,
+           TriggersREST,
+           Renderer
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
+      allTypes: {},
       
       constructor: function(args) {
         this.data = args;
       },
     
       postCreate: function(){
+        TriggersREST.types().then(
+          lang.hitch(this,this.processTypes),
+          lang.hitch(this,function(error){
+            topic.publish("msg",this.i18n.tasks.errors.typesLoadingError);
+          })
+        );
+      },
+      
+      processTypes: function(result) {
+        var type = {label: "None", type: "NULL"};
+        this.allTypes[type.type] = type;
+        this.typeSelector.addOption({label: type.label, value: type.type});
+        
+        array.forEach(result,lang.hitch(this,this.processType));
+        Renderer.render(this.formNode, type.arguments);
+      },
+      
+      processType: function(type) {
+        this.allTypes[type.type] = type;
+        this.typeSelector.addOption({label: type.label, value: type.type});
       },
       
       _onTypeChanged: function(evt) {
-        
+        var type = this.allTypes[evt];
+        Renderer.render(this.formNode, type.arguments);
       },
       
       _onSubmit: function(evt) {

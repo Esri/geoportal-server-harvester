@@ -80,6 +80,9 @@ define({
       scheduler: {
         type: "Type",
         submit: "Submit"
+      },
+      errors: {
+        typesLoadingError: "Unable to load trigger types."
       }
     },
     
