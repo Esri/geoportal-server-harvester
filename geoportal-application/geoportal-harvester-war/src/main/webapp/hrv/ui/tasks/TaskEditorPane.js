@@ -48,6 +48,8 @@ define(["dojo/_base/declare",
       },
     
       postCreate: function(){
+        this.radios = [];
+        this.checks = [];
         BrokersREST.input().then(
           lang.hitch(this,this.processInputs),
           lang.hitch(this,function(error){
