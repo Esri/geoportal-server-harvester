@@ -112,31 +112,31 @@ html,body {
   color: red;
 }
 
+.h-editor-line {
+  display: table-row;
+}
+
+.h-editor-argname {
+  font-weight: bold;
+}
+
+.h-editor-argctrl {
+  
+}
+
 .h-broker-editor {
 }
 
-.h-broker-editor-form {
+.h-editor-form {
   display: table;
   border-spacing: 0.5em;
 }
 
-.h-broker-editor-line {
-  display: table-row;
-}
-
-.h-broker-editor-form div > span {
+.h-editor-form div > span {
   display: table-cell;
 }
 
-.h-broker-editor-argname {
-  font-weight: bold;
-}
-
-.h-broker-editor-argctrl {
-  
-}
-
-.h-broker-editor-footer {
+.h-editor-footer {
   
 }
 

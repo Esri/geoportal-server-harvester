@@ -25,18 +25,17 @@ define(["dojo/_base/declare",
         "dojo/dom-construct",
         "dojo/query",
         "dojo/topic",
-        "dijit/form/Select",
-        "dijit/form/ValidationTextBox",
-        "dijit/form/CheckBox",
         "dijit/form/Form",
-        "hrv/rest/Connectors"
+        "hrv/rest/Connectors",
+        "hrv/ui/main/UIRenderer"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
            lang,array,domConstruct,query,topic,
-           Select,ValidationTextBox,CheckBox,Form,
-           ConnectorsREST
+           Form,
+           ConnectorsREST,
+           Renderer
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
@@ -80,9 +79,9 @@ define(["dojo/_base/declare",
         this.typeSelector.addOption({label: connectorTemplate.label, value: connectorTemplate.type});
       },
       
-      updateArgumentsForm: function(arguments) {
+      updateArgumentsForm: function(args) {
         this.resetForm();
-        array.forEach(arguments,lang.hitch(this,this.renderArgument));
+        Renderer.render(this.formNode,args);
       },
       
       resetForm: function() {
@@ -90,42 +89,6 @@ define(["dojo/_base/declare",
         array.forEach(formNodes,function(node){
           domConstruct.destroy(node);
         });
-      },
-      
-      renderArgument: function(arg) {
-        console.log("Argument:", arg);
-        
-        var argNode = domConstruct.create("div",{class: "h-broker-editor-line"},this.formNode);
-        var titleNode = domConstruct.create("span",{innerHTML: arg.label, class: "h-broker-editor-argname"},argNode);
-        var placeholderWrapper = domConstruct.create("span",{class: "h-broker-editor-argctrl"},argNode);
-        var placeholderNode = domConstruct.create("span",null,placeholderWrapper);
-        
-        switch(arg.type) {
-          case "string": this.renderString(placeholderNode,arg); break;
-          case "choice": this.renderChoice(placeholderNode,arg); break;
-          case "bool": this.renderBool(placeholderNode,arg); break;
-          default: console.error("Unsupported argument type:", arg.type);
-        }
-      },
-      
-      renderString: function(placeholderNode,arg) {
-        var input = new ValidationTextBox({name: arg.name, required: arg.required}).placeAt(placeholderNode);
-        input.name = arg.name;
-        input.startup();
-      },
-      
-      renderChoice: function(placeholderNode,arg) {
-        var select = new Select({name: arg.name, required: arg.required}).placeAt(placeholderNode);
-        array.forEach(arg.choices,function(choice){
-          select.addOption({label: choice.value, value: choice.name});
-        });
-        select.startup();
-      },
-      
-      renderBool: function(placeholderNode,arg) {
-        var input = new CheckBox({name: arg.name, required: arg.required}).placeAt(placeholderNode);
-        input.name = arg.name;
-        input.startup();
       },
       
       _onTypeChanged: function(type) {
