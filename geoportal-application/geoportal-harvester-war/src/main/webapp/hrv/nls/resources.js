@@ -61,6 +61,7 @@ define({
       run: "run",
       remove: "remove",
       history: "history",
+      schedule: "schedule",
       editor: {
         caption: "Task",
         submit: "Submit",

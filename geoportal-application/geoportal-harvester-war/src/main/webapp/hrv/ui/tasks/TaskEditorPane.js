@@ -15,22 +15,27 @@
  */
 
 define(["dojo/_base/declare",
-        "dojo/_base/lang",
-        "dojo/_base/array",
-        "dojo/query",
-        "dojo/dom-construct",
-        "dojo/topic",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/TaskEditorPane.html",
-        "hrv/rest/Brokers",
+        "dojo/_base/lang",
+        "dojo/_base/array",
+        "dojo/query",
+        "dojo/dom-construct",
+        "dojo/topic",
         "dijit/form/CheckBox",
         "dijit/form/RadioButton",
-        "dijit/form/Form"
+        "dijit/form/Form",
+        "hrv/rest/Brokers"
       ],
-  function(declare,lang,array,query,domConstruct,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,BrokersREST,CheckBox,RadioButton,Form){
+  function(declare,
+           _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
+           i18n,template,
+           lang,array,query,domConstruct,topic,
+           CheckBox,RadioButton,Form,
+           BrokersREST){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,

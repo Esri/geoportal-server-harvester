@@ -202,19 +202,18 @@ html,body {
   background-color: lightgray;
 }
 
-.h-task-remove {
+.h-link {
   text-decoration: underline;
   cursor: pointer;
+}
+
+.h-task-remove {
 }
 
 .h-task-run {
-  text-decoration: underline;
-  cursor: pointer;
 }
 
 .h-task-history {
-  text-decoration: underline;
-  cursor: pointer;
 }
 
 .h-task-edit {

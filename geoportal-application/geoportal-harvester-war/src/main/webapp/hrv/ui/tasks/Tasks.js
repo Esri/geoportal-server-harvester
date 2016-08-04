@@ -15,6 +15,11 @@
  */
 
 define(["dojo/_base/declare",
+        "dijit/_WidgetBase",
+        "dijit/_TemplatedMixin",
+        "dijit/_WidgetsInTemplateMixin",
+        "dojo/i18n!../../nls/resources",
+        "dojo/text!./templates/Tasks.html",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/dom-construct",
@@ -22,16 +27,17 @@ define(["dojo/_base/declare",
         "dojo/json",
         "dojo/topic",
         "dijit/Dialog",
-        "dijit/_WidgetBase",
-        "dijit/_TemplatedMixin",
-        "dijit/_WidgetsInTemplateMixin",
-        "dojo/i18n!../../nls/resources",
-        "dojo/text!./templates/Tasks.html",
         "hrv/rest/Tasks",
         "hrv/ui/tasks/Task",
         "hrv/ui/tasks/TaskEditorPane"
       ],
-  function(declare,lang,array,domConstruct,on,json,topic,Dialog,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,TasksREST,Task,TaskEditorPane){
+  function(declare,
+           _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
+           i18n,template,
+           lang,array,domConstruct,on,json,topic,
+           Dialog,
+           TasksREST,Task,TaskEditorPane
+          ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,

@@ -15,16 +15,19 @@
  */
 
 define(["dojo/_base/declare",
-        "dojo/_base/lang",
-        "dojo/_base/array",
-        "dojo/topic",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
-        "dojo/text!./templates/Task.html"
+        "dojo/text!./templates/Task.html",
+        "dojo/_base/lang",
+        "dojo/_base/array"
       ],
-  function(declare,lang,array,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
+  function(declare,
+           _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
+           i18n,template,
+           lang,array
+          ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -48,6 +51,10 @@ define(["dojo/_base/declare",
       
       _onHistory: function() {
         this.emit("history",{data: this.data});
+      },
+      
+      _onSchedule: function() {
+        console.log("scheduling...");
       },
       
       makeLabel: function(taskDefinition) {

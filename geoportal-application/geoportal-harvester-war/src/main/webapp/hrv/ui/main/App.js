@@ -15,13 +15,13 @@
  */
 
 define(["dojo/_base/declare",
-        "dojo/_base/lang",
-        "dojo/topic",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/App.html",
+        "dojo/_base/lang",
+        "dojo/topic",
         "dijit/form/CheckBox",
         "dijit/form/RadioButton",
         "dijit/layout/ContentPane", 
@@ -35,7 +35,13 @@ define(["dojo/_base/declare",
         "hrv/ui/tasks/HistoryPane",
         "hrv/ui/processes/ProcessesPane"
       ],
-  function(declare,lang,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
+  function(declare,
+           _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
+           i18n,template,
+           lang,topic,
+           CheckBox,RadioButton,ContentPane,LayoutContainer,
+           Header,Status,Nav,Stage,BrokersPane,TasksPane,HistoryPane,ProcessesPane
+          ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,

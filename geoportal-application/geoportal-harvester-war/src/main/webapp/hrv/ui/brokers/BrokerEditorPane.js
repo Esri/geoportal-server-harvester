@@ -15,24 +15,29 @@
  */
 
 define(["dojo/_base/declare",
-        "dojo/_base/lang",
-        "dojo/_base/array",
-        "dojo/dom-construct",
-        "dojo/query",
-        "dojo/html",
-        "dojo/topic",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/BrokerEditorPane.html",
-        "hrv/rest/Connectors",
+        "dojo/_base/lang",
+        "dojo/_base/array",
+        "dojo/dom-construct",
+        "dojo/query",
+        "dojo/topic",
         "dijit/form/Select",
         "dijit/form/ValidationTextBox",
         "dijit/form/CheckBox",
-        "dijit/form/Form"
+        "dijit/form/Form",
+        "hrv/rest/Connectors"
       ],
-  function(declare,lang,array,domConstruct,query,html,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,ConnectorsREST,Select,ValidationTextBox,CheckBox,Form){
+  function(declare,
+           _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
+           i18n,template,
+           lang,array,domConstruct,query,topic,
+           Select,ValidationTextBox,CheckBox,Form,
+           ConnectorsREST
+          ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
@@ -114,7 +119,7 @@ define(["dojo/_base/declare",
         array.forEach(arg.choices,function(choice){
           select.addOption({label: choice.value, value: choice.name});
         });
-        input.startup();
+        select.startup();
       },
       
       renderBool: function(placeholderNode,arg) {

@@ -15,18 +15,23 @@
  */
 
 define(["dojo/_base/declare",
-        "dojo/_base/lang",
-        "dojo/dom-construct",
-        "dojo/on",
-        "dojo/topic",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/Process.html",
+        "dojo/_base/lang",
+        "dojo/dom-construct",
+        "dojo/on",
+        "dojo/topic",
         "hrv/rest/Processes"
       ],
-  function(declare,lang,domConstruct,on,topic,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,ProcessesREST){
+  function(declare,
+           _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
+           i18n,template,
+           lang,domConstruct,on,topic,
+           ProcessesREST
+          ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,

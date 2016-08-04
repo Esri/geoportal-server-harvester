@@ -15,17 +15,22 @@
  */
 
 define(["dojo/_base/declare",
-        "dojo/_base/lang",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/TasksPane.html",
+        "dojo/_base/lang",
         "dojo/topic",
         "dojo/dom-style",
         "hrv/ui/tasks/Tasks"
       ],
-  function(declare,lang,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,topic,domStyle){
+  function(declare,
+           _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
+           i18n,template,
+           lang,topic,domStyle,
+           Tasks
+          ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,

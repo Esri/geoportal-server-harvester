@@ -15,20 +15,26 @@
  */
 
 define(["dojo/_base/declare",
-        "dojo/_base/lang",
-        "dojo/topic",
-        "dojo/on",
-        "dojo/json",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/Broker.html",
+        "dojo/_base/lang",
+        "dojo/topic",
+        "dojo/on",
+        "dojo/json",
         "dijit/Dialog",
         "hrv/rest/Brokers",
         "hrv/ui/brokers/BrokerEditorPane"
       ],
-  function(declare,lang,topic,on,json,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,Dialog,BrokersREST,BrokerEditorPane){
+  function(declare,
+           _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
+           i18n,template,
+           lang,topic,on,json,
+           Dialog,
+           BrokersREST,BrokerEditorPane
+          ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,

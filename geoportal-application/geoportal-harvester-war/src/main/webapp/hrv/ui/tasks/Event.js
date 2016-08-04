@@ -15,17 +15,18 @@
  */
 
 define(["dojo/_base/declare",
-        "dojo/_base/lang",
-        "dojo/_base/array",
-        "dojo/topic",
-        "dojo/date/locale",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
-        "dojo/text!./templates/Event.html"
+        "dojo/text!./templates/Event.html",
+        "dojo/date/locale"
       ],
-  function(declare,lang,array,topic,locale,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template){
+  function(declare,
+           _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
+           i18n,template,
+           locale
+          ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,

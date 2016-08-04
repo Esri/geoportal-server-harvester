@@ -15,6 +15,11 @@
  */
 
 define(["dojo/_base/declare",
+        "dijit/_WidgetBase",
+        "dijit/_TemplatedMixin",
+        "dijit/_WidgetsInTemplateMixin",
+        "dojo/i18n!../../nls/resources",
+        "dojo/text!./templates/Brokers.html",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/on",
@@ -23,16 +28,17 @@ define(["dojo/_base/declare",
         "dojo/json",
         "dojo/topic",
         "dijit/Dialog",
-        "dijit/_WidgetBase",
-        "dijit/_TemplatedMixin",
-        "dijit/_WidgetsInTemplateMixin",
-        "dojo/i18n!../../nls/resources",
-        "dojo/text!./templates/Brokers.html",
         "hrv/rest/Brokers",
         "hrv/ui/brokers/Broker",
         "hrv/ui/brokers/BrokerEditorPane"
       ],
-  function(declare,lang,array,on,html,domConstruct,json,topic,Dialog,_WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,i18n,template,BrokersREST,Broker,BrokerEditorPane){
+  function(declare,
+           _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
+           i18n,template,
+           lang,array,on,html,domConstruct,json,topic,
+           Dialog,
+           BrokersREST,Broker,BrokerEditorPane
+          ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
