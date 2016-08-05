@@ -61,7 +61,6 @@ define(["dojo/_base/declare",
       },
       
       processBrokers: function(response) {
-        console.log("Brokers ["+this.category+"]", response);
         array.forEach(response,lang.hitch(this,this.processBroker));
       },
       

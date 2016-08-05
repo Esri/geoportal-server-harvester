@@ -76,7 +76,11 @@ define(["dojo/_base/declare",
       },
       
       _onSubmit: function(evt) {
-        
+        if (this.formWidget.validate()) {
+          var values = this.formWidget.getValues();
+          console.log("Values", values);
+          this.emit("submit",{triggerDefinition: values});
+        }
       }
     });
 });

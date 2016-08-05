@@ -101,7 +101,6 @@ define(["dojo/_base/declare",
       },
       
       _onSubmit: function() {
-        console.log("Submit");
         var taskDefinition = {
           source: null,
           destinations: []

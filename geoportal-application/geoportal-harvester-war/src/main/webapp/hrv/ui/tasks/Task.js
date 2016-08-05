@@ -22,13 +22,14 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/Task.html",
         "dojo/_base/lang",
         "dojo/_base/array",
+        "dojo/on",
         "dijit/Dialog",
         "hrv/ui/tasks/SchedulerEditorPane"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,
+           lang,array,on,
            Dialog,
            SchedulerEditorPane
           ){
@@ -69,6 +70,11 @@ define(["dojo/_base/declare",
             schedulerEditorPane.destroy();
           }
         });
+        
+        on(schedulerEditorPane,"submit",lang.hitch(this, function(evt){
+          schedulerEditorDialog.destroy();
+          schedulerEditorPane.destroy();
+        }));
         
         schedulerEditorDialog.show();
       },

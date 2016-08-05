@@ -20,6 +20,7 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/dom-construct",
+        "dojo/number",
         "dijit/form/Select",
         "dijit/form/ValidationTextBox",
         "dijit/form/CheckBox",
@@ -28,7 +29,7 @@ define(["dojo/_base/declare",
         "dijit/form/Form"
       ],
   function(declare,i18n,
-           lang,array,domConstruct,
+           lang,array,domConstruct,number,
            Select,ValidationTextBox,CheckBox,TimeTextBox,RadioButton,Form
           ){
     var REST = "rest/harvester/brokers";
@@ -77,23 +78,49 @@ define(["dojo/_base/declare",
       },
       
       renderTime: function(placeholderNode,arg) {
-        var input = new TimeTextBox({
+
+        var CustomTimeTextBox = declare([TimeTextBox],{
+            lastTime: null,
+            
+            get: function(name){
+              if (name==='value') {
+                var time = this.inherited(arguments);
+                if (time) {
+                  this.lastTime = number.format(time.getHours(),{pattern: "00"})+":"+number.format(time.getMinutes(),{pattern: "00"});
+                  return this.lastTime;
+                } else {
+                  return this.lastTime;
+                }
+              } else {
+                return this.inherited(arguments);
+              }
+            },
+            set: function(name,value) {
+              if (name==='value') {
+                this.lastTime = value;
+                return this.inherited(arguments);
+              } else {
+                return this.inherited(arguments);
+              }
+            }
+        });
+        
+        var input = new CustomTimeTextBox({
           name: arg.name,
           constraints: {
-            timePattern: 'HH:mm:ss',
+            timePattern: 'HH:mm',
             clickableIncrement: 'T00:15:00',
             visibleIncrement: 'T00:15:00',
             visibleRange: 'T01:00:00'
           }
         }).placeAt(placeholderNode);
-        input.startup();
       },
       
       renderPeriod: function(placeholderNode,arg) {
         var rootNode = domConstruct.create("div",null,placeholderNode);
         this.renderRadio(rootNode,arg.name,"P1D",i18n.periodical.daily);
-        this.renderRadio(rootNode,arg.name,"P1W",i18n.periodical.weakly);
-        this.renderRadio(rootNode,arg.name,"P2W",i18n.periodical.biweakly);
+        this.renderRadio(rootNode,arg.name,"P1W",i18n.periodical.weekly);
+        this.renderRadio(rootNode,arg.name,"P2W",i18n.periodical.biweekly);
         this.renderRadio(rootNode,arg.name,"P1M",i18n.periodical.monthly);
       },
       
