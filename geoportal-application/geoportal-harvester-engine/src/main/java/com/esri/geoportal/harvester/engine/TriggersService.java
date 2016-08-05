@@ -49,7 +49,7 @@ public interface TriggersService {
    * @return collection of triggers.
    * @throws CrudsException if selecting fails
    */
-  Collection<Map.Entry<UUID, TriggerManager.TriggerDefinitionUuidPair>> select() throws CrudsException;
+  Collection<Map.Entry<UUID, TriggerManager.TaskUuidTriggerDefinitionPair>> select() throws CrudsException;
   
   /**
    * Deactivates trigger.

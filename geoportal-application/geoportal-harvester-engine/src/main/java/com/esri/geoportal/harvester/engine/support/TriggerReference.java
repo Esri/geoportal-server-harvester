@@ -23,15 +23,18 @@ import java.util.UUID;
  */
 public final class TriggerReference {
   private final UUID uuid;
+  private final UUID taskId;
   private final TriggerDefinition triggerDefinition;
 
   /**
    * Creates instance of the reference.
    * @param uuid trigger uuid
+   * @param taskId task id
    * @param triggerDefinition trigger instance definition 
    */
-  public TriggerReference(UUID uuid, TriggerDefinition triggerDefinition) {
+  public TriggerReference(UUID uuid, UUID taskId, TriggerDefinition triggerDefinition) {
     this.uuid = uuid;
+    this.taskId = taskId;
     this.triggerDefinition = triggerDefinition;
   }
 
@@ -44,6 +47,14 @@ public final class TriggerReference {
   }
 
   /**
+   * Gets task id if any.
+   * @return task id
+   */
+  public UUID getTaskId() {
+    return taskId;
+  }
+
+  /**
    * Gets trigger instance definition.
    * @return trigger instance definition
    */
@@ -53,6 +64,6 @@ public final class TriggerReference {
   
   @Override
   public String toString() {
-    return String.format("TRIGGER REFERENCE :: uuid: %s, definition: %s", uuid, triggerDefinition);
+    return String.format("TRIGGER REFERENCE :: uuid: %s, taskId: %s, definition: %s", uuid, taskId, triggerDefinition);
   }
 }

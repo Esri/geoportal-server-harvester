@@ -25,32 +25,37 @@ import java.util.UUID;
  */
 public interface TriggerInstanceManager {
   
+  static class TaskUuidTriggerInstancePair {
+    public UUID taskId;
+    public TriggerInstance triggerInstance;
+  }
+  
   /**
    * Puts trigger instance into the manager.
    * @param uuid uuid of the trigger instance
    * @param instance trigger instance
    */
-  void put(UUID uuid, TriggerInstance instance);
+  void put(UUID uuid, TaskUuidTriggerInstancePair instance);
   
   /**
    * Gets a trigger instance from the manager.
    * @param uuid uuid of the trigger instance
    * @return trigger instance
    */
-  TriggerInstance get(UUID uuid);
+  TaskUuidTriggerInstancePair get(UUID uuid);
   
   /**
    * Removes trigger instance.
    * @param uuid uuid of the trigger instance
    * @return removed instance
    */
-  TriggerInstance remove(UUID uuid);
+  TaskUuidTriggerInstancePair remove(UUID uuid);
   
   /**
    * Lists all instances.
    * @return list of instance entries.
    */
-  List<Map.Entry<UUID, TriggerInstance>> listAll();
+  List<Map.Entry<UUID, TaskUuidTriggerInstancePair>> listAll();
   
   /**
    * Clears manager.

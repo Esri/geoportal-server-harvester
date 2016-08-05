@@ -70,7 +70,7 @@ public class TriggerController {
   public ResponseEntity<List<TriggerResponse>> listTriggers() {
     LOG.debug(String.format("GET /rest/harvester/triggers"));
     List<TriggerResponse> triggerResponses = engine.getTriggersService().listActivatedTriggers().stream()
-            .map(t->new TriggerResponse(t.getUuid(), t.getTriggerDefinition()))
+            .map(t->new TriggerResponse(t.getUuid(), t.getTaskId(), t.getTriggerDefinition()))
             .collect(Collectors.toList());
     return new ResponseEntity<>(triggerResponses,HttpStatus.OK);
   }
@@ -85,7 +85,7 @@ public class TriggerController {
     try {
       LOG.debug(String.format("DELETE /rest/harvester/triggers/%s", triggerId));
       TriggerReference trigRef = engine.getTriggersService().deactivateTriggerInstance(triggerId);
-      return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), trigRef.getTriggerDefinition()),HttpStatus.OK);
+      return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), trigRef.getTaskId(), trigRef.getTriggerDefinition()),HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     } catch (DataProcessorException ex) {

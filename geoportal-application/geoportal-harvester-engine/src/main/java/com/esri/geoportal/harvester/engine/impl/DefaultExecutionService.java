@@ -50,6 +50,7 @@ import com.esri.geoportal.harvester.engine.registers.OutboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.registers.ProcessorRegistry;
 import com.esri.geoportal.harvester.engine.registers.TransformerRegistry;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
+import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager.TaskUuidTriggerInstancePair;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
 import com.esri.geoportal.harvester.engine.support.CrudsException;
@@ -122,16 +123,19 @@ public class DefaultExecutionService implements ExecutionService {
   @Override
   public TriggerReference schedule(UUID taskId, TriggerDefinition trigDef, Map<String,Object> attributes) throws InvalidDefinitionException, DataProcessorException {
     try {
-      TriggerManager.TriggerDefinitionUuidPair pair = new TriggerManager.TriggerDefinitionUuidPair();
+      TriggerManager.TaskUuidTriggerDefinitionPair pair = new TriggerManager.TaskUuidTriggerDefinitionPair();
       pair.taskUuid = taskId;
       pair.triggerDefinition = trigDef;
       UUID uuid = triggerManager.create(pair);
       Trigger trigger = triggerRegistry.get(trigDef.getType());
       TriggerInstance triggerInstance = trigger.createInstance(trigDef);
-      triggerInstanceManager.put(uuid, triggerInstance);
+      TaskUuidTriggerInstancePair pair2 = new TriggerInstanceManager.TaskUuidTriggerInstancePair();
+      pair2.taskId = taskId;
+      pair2.triggerInstance = triggerInstance;
+      triggerInstanceManager.put(uuid, pair2);
       TriggerContext context = new TriggerContext(taskId);
       triggerInstance.activate(context);
-      return new TriggerReference(uuid, trigDef);
+      return new TriggerReference(uuid, taskId, trigDef);
     } catch (CrudsException ex) {
       throw new DataProcessorException(String.format("Error scheduling task: %s", trigDef.getTaskDefinition()), ex);
     }

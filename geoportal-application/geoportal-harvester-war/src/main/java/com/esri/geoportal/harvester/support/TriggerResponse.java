@@ -23,15 +23,18 @@ import java.util.UUID;
  */
 public final class TriggerResponse {
   private final UUID uuid;
+  private final UUID taskId;
   private final TriggerDefinition triggerDefinition;
 
   /**
    * Creates instance of the trigger info.
    * @param uuid uuid
+   * @param taskId taskId or <code>null</code> if no task id
    * @param triggerDefinition trigger definition
    */
-  public TriggerResponse(UUID uuid, TriggerDefinition triggerDefinition) {
+  public TriggerResponse(UUID uuid, UUID taskId, TriggerDefinition triggerDefinition) {
     this.uuid = uuid;
+    this.taskId = taskId;
     this.triggerDefinition = triggerDefinition;
   }
 
@@ -44,6 +47,14 @@ public final class TriggerResponse {
   }
 
   /**
+   * Gets task id if any.
+   * @return task id
+   */
+  public UUID getTaskId() {
+    return taskId;
+  }
+
+  /**
    * Gets trigger definition.
    * @return trigger definition
    */
@@ -53,6 +64,6 @@ public final class TriggerResponse {
   
   @Override
   public String toString() {
-    return String.format("TRIGGER INFO :: uuid: %s, trigger definition: %s", uuid, triggerDefinition);
+    return String.format("TRIGGER INFO :: uuid: %s, taskId: %s, trigger definition: %s", uuid, taskId, triggerDefinition);
   }
 }

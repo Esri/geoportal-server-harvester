@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.annotation.PreDestroy;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 
 /**
  * Trigger manager bean.
@@ -71,7 +72,7 @@ public class TriggerManagerBean implements TriggerManager {
   }
 
   @Override
-  public UUID create(TriggerDefinitionUuidPair data) throws CrudsException {
+  public UUID create(TaskUuidTriggerDefinitionPair data) throws CrudsException {
     UUID id = UUID.randomUUID();
     try (
             Connection connection = dataSource.getConnection();
@@ -98,7 +99,7 @@ public class TriggerManagerBean implements TriggerManager {
   }
 
   @Override
-  public TriggerDefinitionUuidPair read(UUID id) throws CrudsException {
+  public TaskUuidTriggerDefinitionPair read(UUID id) throws CrudsException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("SELECT * FROM TRIGGERS WHERE ID = ?");) {
@@ -106,7 +107,7 @@ public class TriggerManagerBean implements TriggerManager {
       ResultSet rs = st.executeQuery();
       if (rs.next()) {
         try {
-          return deserialize(rs.getString("triggerDefinition"), TriggerDefinitionUuidPair.class);
+          return deserialize(rs.getString("triggerDefinition"), TaskUuidTriggerDefinitionPair.class);
         } catch (IOException | SQLException ex) {
           LOG.warn("Error reading broker definition", ex);
         }
@@ -119,8 +120,8 @@ public class TriggerManagerBean implements TriggerManager {
   }
 
   @Override
-  public Collection<Map.Entry<UUID, TriggerDefinitionUuidPair>> select() throws CrudsException {
-    HashMap<UUID, TriggerDefinitionUuidPair> map = new HashMap<>();
+  public Collection<Map.Entry<UUID, TaskUuidTriggerDefinitionPair>> select() throws CrudsException {
+    HashMap<UUID, TaskUuidTriggerDefinitionPair> map = new HashMap<>();
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("SELECT * FROM TRIGGERS");) {
@@ -128,7 +129,7 @@ public class TriggerManagerBean implements TriggerManager {
       while (rs.next()) {
         try {
           UUID id = UUID.fromString(rs.getString("id"));
-          TriggerDefinitionUuidPair td = deserialize(rs.getString("triggerDefinition"), TriggerDefinitionUuidPair.class);
+          TaskUuidTriggerDefinitionPair td = deserialize(rs.getString("triggerDefinition"), TaskUuidTriggerDefinitionPair.class);
           map.put(id, td);
         } catch (IOException | SQLException ex) {
           LOG.warn("Error reading broker definition", ex);
@@ -141,7 +142,7 @@ public class TriggerManagerBean implements TriggerManager {
   }
 
   @Override
-  public boolean update(UUID id, TriggerDefinitionUuidPair data) throws CrudsException {
+  public boolean update(UUID id, TaskUuidTriggerDefinitionPair data) throws CrudsException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("UPDATE TRIGGERS SET triggerDefinition = ? WHERE ID = ?");) {

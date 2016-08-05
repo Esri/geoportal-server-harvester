@@ -15,7 +15,6 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import java.util.HashMap;
 import java.util.List;
@@ -29,25 +28,25 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class TriggerInstanceManagerBean implements TriggerInstanceManager {
-  private final HashMap<UUID, TriggerInstance> map =new HashMap<>();
+  private final HashMap<UUID, TaskUuidTriggerInstancePair> map =new HashMap<>();
 
   @Override
-  public void put(UUID uuid, TriggerInstance instance) {
+  public void put(UUID uuid, TaskUuidTriggerInstancePair instance) {
     map.put(uuid, instance);
   }
 
   @Override
-  public TriggerInstance get(UUID uuid) {
+  public TaskUuidTriggerInstancePair get(UUID uuid) {
     return map.get(uuid);
   }
 
   @Override
-  public TriggerInstance remove(UUID uuid) {
+  public TaskUuidTriggerInstancePair remove(UUID uuid) {
     return map.remove(uuid);
   }
 
   @Override
-  public List<Map.Entry<UUID, TriggerInstance>> listAll() {
+  public List<Map.Entry<UUID, TaskUuidTriggerInstancePair>> listAll() {
     return map.entrySet().stream().collect(Collectors.toList());
   }
 

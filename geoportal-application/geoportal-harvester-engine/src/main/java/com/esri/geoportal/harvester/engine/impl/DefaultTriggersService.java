@@ -23,6 +23,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.ExecutionService;
 import com.esri.geoportal.harvester.engine.TriggersService;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
+import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager.TaskUuidTriggerInstancePair;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
 import com.esri.geoportal.harvester.engine.support.CrudsException;
@@ -72,20 +73,20 @@ public class DefaultTriggersService implements TriggersService {
   }
   
   @Override
-  public Collection<Map.Entry<UUID, TriggerManager.TriggerDefinitionUuidPair>> select() throws CrudsException {
+  public Collection<Map.Entry<UUID, TriggerManager.TaskUuidTriggerDefinitionPair>> select() throws CrudsException {
     return triggerManager.select();
   }
   
   @Override
   public TriggerReference deactivateTriggerInstance(UUID triggerInstanceUuid) throws InvalidDefinitionException, DataProcessorException {
-    TriggerInstance triggerInstance = triggerInstanceManager.remove(triggerInstanceUuid);
-    if (triggerInstance == null) {
+    TaskUuidTriggerInstancePair pair = triggerInstanceManager.remove(triggerInstanceUuid);
+    if (pair == null) {
       throw new InvalidDefinitionException(String.format("Invalid trigger id: %s", triggerInstanceUuid));
     }
     try {
-      TriggerDefinition trigDef = triggerInstance.getTriggerDefinition();
-      TriggerReference triggerReference = new TriggerReference(triggerInstanceUuid, trigDef);
-      triggerInstance.close();
+      TriggerDefinition trigDef = pair.triggerInstance.getTriggerDefinition();
+      TriggerReference triggerReference = new TriggerReference(triggerInstanceUuid, pair.taskId, trigDef);
+      pair.triggerInstance.close();
       return triggerReference;
     } catch (Exception ex) {
       throw new DataProcessorException(String.format("Error deactivating trigger: %s", triggerInstanceUuid), ex);
@@ -101,7 +102,7 @@ public class DefaultTriggersService implements TriggersService {
   @Override
   public List<TriggerReference> listActivatedTriggers() {
     return triggerInstanceManager.listAll().stream()
-            .map(e->new TriggerReference(e.getKey(),e.getValue().getTriggerDefinition()))
+            .map(e->new TriggerReference(e.getKey(),e.getValue().taskId, e.getValue().triggerInstance.getTriggerDefinition()))
             .collect(Collectors.toList());
   }
   
@@ -111,7 +112,7 @@ public class DefaultTriggersService implements TriggersService {
     try {
       select().forEach(e->{
         UUID uuid = e.getKey();
-        TriggerManager.TriggerDefinitionUuidPair definition = e.getValue();
+        TriggerManager.TaskUuidTriggerDefinitionPair definition = e.getValue();
         
         try {
           Trigger trigger = getTrigger(definition.triggerDefinition.getType());
@@ -134,7 +135,7 @@ public class DefaultTriggersService implements TriggersService {
   public void deactivateTriggerInstances() {
     triggerInstanceManager.listAll().stream().forEach(e->{
       UUID uuid = e.getKey();
-      TriggerInstance triggerInstance = e.getValue();
+      TriggerInstance triggerInstance = e.getValue().triggerInstance;
       
       try {
         triggerInstance.close();
