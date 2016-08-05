@@ -16,6 +16,7 @@
 
 
 define(["dojo/_base/declare",
+        "dojo/i18n!../../nls/resources",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/dom-construct",
@@ -23,11 +24,12 @@ define(["dojo/_base/declare",
         "dijit/form/ValidationTextBox",
         "dijit/form/CheckBox",
         "dijit/form/TimeTextBox",
+        "dijit/form/RadioButton",
         "dijit/form/Form"
       ],
-  function(declare,
+  function(declare,i18n,
            lang,array,domConstruct,
-           Select,ValidationTextBox,CheckBox,TimeTextBox,Form
+           Select,ValidationTextBox,CheckBox,TimeTextBox,RadioButton,Form
           ){
     var REST = "rest/harvester/brokers";
   
@@ -49,6 +51,7 @@ define(["dojo/_base/declare",
           case "choice": this.renderChoice(placeholderNode,arg); break;
           case "bool": this.renderBool(placeholderNode,arg); break;
           case "temporal": this.renderTime(placeholderNode,arg); break;
+          case "periodical": this.renderPeriod(placeholderNode,arg); break;
           default: console.error("Unsupported argument type:", arg.type);
         }
       },
@@ -84,6 +87,25 @@ define(["dojo/_base/declare",
           }
         }).placeAt(placeholderNode);
         input.startup();
+      },
+      
+      renderPeriod: function(placeholderNode,arg) {
+        var rootNode = domConstruct.create("div",null,placeholderNode);
+        this.renderRadio(rootNode,arg.name,"P1D",i18n.periodical.daily);
+        this.renderRadio(rootNode,arg.name,"P1W",i18n.periodical.weakly);
+        this.renderRadio(rootNode,arg.name,"P2W",i18n.periodical.biweakly);
+        this.renderRadio(rootNode,arg.name,"P1M",i18n.periodical.monthly);
+      },
+      
+      renderRadio: function(rootNode,name,value,label) {
+        var div = domConstruct.create("div",null,rootNode);
+        var radio = new RadioButton({
+          id: "_"+value,
+          value: value,
+          name: name,
+          "class": "h-period-radio"
+        }).placeAt(div).startup();
+        var div = domConstruct.create("label",{"for": "_"+value, innerHTML: label},div);
       }
     };
 });

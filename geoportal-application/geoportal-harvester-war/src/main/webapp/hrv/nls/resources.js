@@ -24,6 +24,13 @@ define({
       open: "Open"
     },
     
+    periodical: {
+      daily: "Daily",
+      weekly: "Weekly",
+      biweekly: "Bi-weekly",
+      monthly: "Monthly"
+    },
+    
     header: {
       caption: "Geoportal Server Harvester ver. 2.0"
     },

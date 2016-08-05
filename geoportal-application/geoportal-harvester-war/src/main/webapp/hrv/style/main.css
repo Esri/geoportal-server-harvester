@@ -298,3 +298,7 @@ html,body {
 .h-history-header .h-event-prop {
   border-bottom: 1px solid black;
 }
+
+.h-period-radio {
+  margin-right: 1em;
+}
