@@ -42,6 +42,7 @@ define(["dojo/_base/declare",
       i18n: i18n,
       templateString: template,
       connectorTemplates: {},
+      dstr: null,
       
       constructor: function(args) {
         this.data = args;
@@ -60,7 +61,6 @@ define(["dojo/_base/declare",
       },
       
       processConnectors: function(response) {
-        console.log("Connectors:",response);
         array.forEach(response,lang.hitch(this,this.processConnectorTemplate));
         if (this.data) {
           this.typeSelector.set('value',this.data.brokerDefinition.type);
@@ -81,10 +81,14 @@ define(["dojo/_base/declare",
       
       updateArgumentsForm: function(args) {
         this.resetForm();
-        Renderer.render(this.formNode,args);
+        this.dstr = Renderer.render(this.formNode,args);
       },
       
       resetForm: function() {
+        if (this.dstr) {
+          this.dstr();
+          this.dstr = null;
+        }
         var formNodes = query("> div", this.formNode).splice(2);
         array.forEach(formNodes,function(node){
           domConstruct.destroy(node);

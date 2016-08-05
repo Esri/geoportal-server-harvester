@@ -32,13 +32,16 @@ define(["dojo/_base/declare",
            lang,array,domConstruct,number,
            Select,ValidationTextBox,CheckBox,TimeTextBox,RadioButton,Form
           ){
-    var REST = "rest/harvester/brokers";
   
     return {
       render: function(rootNode,args) {
+        var dstr = [];
         array.forEach(args,lang.hitch({self: this, rootNode: rootNode},function(arg){
-          this.self.renderArgument(this.rootNode,arg);
+          dstr.push(this.self.renderArgument(this.rootNode,arg));
         }));
+        return function(){ 
+            array.forEach(dstr,function(dstr) {dstr();});
+        };
       },
       
       renderArgument: function(rootNode,arg) {
@@ -48,12 +51,14 @@ define(["dojo/_base/declare",
         var placeholderNode = domConstruct.create("span",null,placeholderWrapper);
         
         switch(arg.type) {
-          case "string": this.renderString(placeholderNode,arg); break;
-          case "choice": this.renderChoice(placeholderNode,arg); break;
-          case "bool": this.renderBool(placeholderNode,arg); break;
-          case "temporal": this.renderTime(placeholderNode,arg); break;
-          case "periodical": this.renderPeriod(placeholderNode,arg); break;
-          default: console.error("Unsupported argument type:", arg.type);
+          case "string": return this.renderString(placeholderNode,arg);
+          case "choice": return this.renderChoice(placeholderNode,arg);
+          case "bool": return this.renderBool(placeholderNode,arg);
+          case "temporal": return this.renderTime(placeholderNode,arg);
+          case "periodical": return this.renderPeriod(placeholderNode,arg);
+          default: 
+            console.error("Unsupported argument type:", arg.type);
+            return function(){};
         }
       },
       
@@ -61,6 +66,7 @@ define(["dojo/_base/declare",
         var input = new ValidationTextBox({name: arg.name, required: arg.required}).placeAt(placeholderNode);
         input.name = arg.name;
         input.startup();
+        return function(){ input.destroy(); };
       },
       
       renderChoice: function(placeholderNode,arg) {
@@ -69,12 +75,14 @@ define(["dojo/_base/declare",
           input.addOption({label: choice.value, value: choice.name});
         });
         input.startup();
+        return function(){ input.destroy(); };
       },
       
       renderBool: function(placeholderNode,arg) {
         var input = new CheckBox({name: arg.name, required: arg.required}).placeAt(placeholderNode);
         input.name = arg.name;
         input.startup();
+        return function(){ input.destroy(); };
       },
       
       renderTime: function(placeholderNode,arg) {
@@ -114,14 +122,20 @@ define(["dojo/_base/declare",
             visibleRange: 'T01:00:00'
           }
         }).placeAt(placeholderNode);
+        
+        return function(){ input.destroy(); };
       },
       
       renderPeriod: function(placeholderNode,arg) {
         var rootNode = domConstruct.create("div",null,placeholderNode);
-        this.renderRadio(rootNode,arg.name,"P1D",i18n.periodical.daily);
-        this.renderRadio(rootNode,arg.name,"P1W",i18n.periodical.weekly);
-        this.renderRadio(rootNode,arg.name,"P2W",i18n.periodical.biweekly);
-        this.renderRadio(rootNode,arg.name,"P1M",i18n.periodical.monthly);
+        var dstr = [];
+        dstr.push(this.renderRadio(rootNode,arg.name,"P1D",i18n.periodical.daily));
+        dstr.push(this.renderRadio(rootNode,arg.name,"P1W",i18n.periodical.weekly));
+        dstr.push(this.renderRadio(rootNode,arg.name,"P2W",i18n.periodical.biweekly));
+        dstr.push(this.renderRadio(rootNode,arg.name,"P1M",i18n.periodical.monthly));
+        return function(){ 
+            array.forEach(dstr,function(dstr) {dstr();} );
+        };
       },
       
       renderRadio: function(rootNode,name,value,label) {
@@ -131,8 +145,10 @@ define(["dojo/_base/declare",
           value: value,
           name: name,
           "class": "h-period-radio"
-        }).placeAt(div).startup();
+        }).placeAt(div);
+        radio.startup();
         var div = domConstruct.create("label",{"for": "_"+value, innerHTML: label},div);
+        return function(){radio.destroy();};
       }
     };
 });

@@ -22,6 +22,8 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/SchedulerEditorPane.html",
         "dojo/_base/lang",
         "dojo/_base/array",
+        "dojo/dom-construct",
+        "dojo/query",
         "dojo/topic",
         "dijit/form/Select",
         "dijit/form/Button",
@@ -32,7 +34,7 @@ define(["dojo/_base/declare",
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,topic,
+           lang,array,domConstruct,query,topic,
            Select,Button,Form,
            TriggersREST,
            Renderer
@@ -42,6 +44,7 @@ define(["dojo/_base/declare",
       i18n: i18n,
       templateString: template,
       allTypes: {},
+      dstr: null,
       
       constructor: function(args) {
         this.data = args;
@@ -62,17 +65,31 @@ define(["dojo/_base/declare",
         this.typeSelector.addOption({label: type.label, value: type.type});
         
         array.forEach(result,lang.hitch(this,this.processType));
-        Renderer.render(this.formNode, type.arguments);
+        this.dstr = Renderer.render(this.formNode, type.arguments);
       },
       
       processType: function(type) {
-        this.allTypes[type.type] = type;
-        this.typeSelector.addOption({label: type.label, value: type.type});
+        if (type.type!=="NOW") {
+          this.allTypes[type.type] = type;
+          this.typeSelector.addOption({label: type.label, value: type.type});
+        }
+      },
+      
+      resetForm: function() {
+        if (this.dstr) {
+          this.dstr();
+          this.dstr = null;
+        }
+        var formNodes = query("> div", this.formNode).splice(1);
+        array.forEach(formNodes,function(node){
+          domConstruct.destroy(node);
+        });
       },
       
       _onTypeChanged: function(evt) {
         var type = this.allTypes[evt];
-        Renderer.render(this.formNode, type.arguments);
+        this.resetForm();
+        this.dstr = Renderer.render(this.formNode, type.arguments);
       },
       
       _onSubmit: function(evt) {
