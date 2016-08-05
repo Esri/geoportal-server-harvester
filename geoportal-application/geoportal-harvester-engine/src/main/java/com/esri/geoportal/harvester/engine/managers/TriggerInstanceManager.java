@@ -26,8 +26,40 @@ import java.util.UUID;
 public interface TriggerInstanceManager {
   
   static class TaskUuidTriggerInstancePair {
-    public UUID taskId;
-    public TriggerInstance triggerInstance;
+    private UUID taskId;
+    private TriggerInstance triggerInstance;
+
+    /**
+     * Gets task id.
+     * @return the taskId
+     */
+    public UUID getTaskId() {
+      return taskId;
+    }
+
+    /**
+     * Sets task id.
+     * @param taskId the taskId to set
+     */
+    public void setTaskId(UUID taskId) {
+      this.taskId = taskId;
+    }
+
+    /**
+     * Gets trigger instance.
+     * @return the triggerInstance
+     */
+    public TriggerInstance getTriggerInstance() {
+      return triggerInstance;
+    }
+
+    /**
+     * Sets trigger instance.
+     * @param triggerInstance the triggerInstance to set
+     */
+    public void setTriggerInstance(TriggerInstance triggerInstance) {
+      this.triggerInstance = triggerInstance;
+    }
   }
   
   /**

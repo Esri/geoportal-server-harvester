@@ -124,14 +124,14 @@ public class DefaultExecutionService implements ExecutionService {
   public TriggerReference schedule(UUID taskId, TriggerDefinition trigDef, Map<String,Object> attributes) throws InvalidDefinitionException, DataProcessorException {
     try {
       TriggerManager.TaskUuidTriggerDefinitionPair pair = new TriggerManager.TaskUuidTriggerDefinitionPair();
-      pair.taskUuid = taskId;
-      pair.triggerDefinition = trigDef;
+      pair.setTaskUuid(taskId);
+      pair.setTriggerDefinition(trigDef);
       UUID uuid = triggerManager.create(pair);
       Trigger trigger = triggerRegistry.get(trigDef.getType());
       TriggerInstance triggerInstance = trigger.createInstance(trigDef);
       TaskUuidTriggerInstancePair pair2 = new TriggerInstanceManager.TaskUuidTriggerInstancePair();
-      pair2.taskId = taskId;
-      pair2.triggerInstance = triggerInstance;
+      pair2.setTaskId(taskId);
+      pair2.setTriggerInstance(triggerInstance);
       triggerInstanceManager.put(uuid, pair2);
       TriggerContext context = new TriggerContext(taskId);
       triggerInstance.activate(context);

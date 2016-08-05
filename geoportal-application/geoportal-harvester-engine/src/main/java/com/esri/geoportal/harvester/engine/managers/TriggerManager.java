@@ -26,7 +26,39 @@ import java.util.UUID;
 public interface TriggerManager extends CrudsRepo<TaskUuidTriggerDefinitionPair> {
   
   public static final class TaskUuidTriggerDefinitionPair {
-    public UUID taskUuid;
-    public TriggerDefinition triggerDefinition;
+    private UUID taskUuid;
+    private TriggerDefinition triggerDefinition;
+
+    /**
+     * Gets task id.
+     * @return the taskUuid
+     */
+    public UUID getTaskUuid() {
+      return taskUuid;
+    }
+
+    /**
+     * Sets task id.
+     * @param taskUuid the taskUuid to set
+     */
+    public void setTaskUuid(UUID taskUuid) {
+      this.taskUuid = taskUuid;
+    }
+
+    /**
+     * Gets trigger definition.
+     * @return the triggerDefinition
+     */
+    public TriggerDefinition getTriggerDefinition() {
+      return triggerDefinition;
+    }
+
+    /**
+     * Sets trigger definition.
+     * @param triggerDefinition the triggerDefinition to set
+     */
+    public void setTriggerDefinition(TriggerDefinition triggerDefinition) {
+      this.triggerDefinition = triggerDefinition;
+    }
   }
 }

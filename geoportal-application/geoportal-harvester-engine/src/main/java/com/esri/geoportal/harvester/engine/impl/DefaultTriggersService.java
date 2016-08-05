@@ -84,9 +84,9 @@ public class DefaultTriggersService implements TriggersService {
       throw new InvalidDefinitionException(String.format("Invalid trigger id: %s", triggerInstanceUuid));
     }
     try {
-      TriggerDefinition trigDef = pair.triggerInstance.getTriggerDefinition();
-      TriggerReference triggerReference = new TriggerReference(triggerInstanceUuid, pair.taskId, trigDef);
-      pair.triggerInstance.close();
+      TriggerDefinition trigDef = pair.getTriggerInstance().getTriggerDefinition();
+      TriggerReference triggerReference = new TriggerReference(triggerInstanceUuid, pair.getTaskId(), trigDef);
+      pair.getTriggerInstance().close();
       return triggerReference;
     } catch (Exception ex) {
       throw new DataProcessorException(String.format("Error deactivating trigger: %s", triggerInstanceUuid), ex);
@@ -102,7 +102,7 @@ public class DefaultTriggersService implements TriggersService {
   @Override
   public List<TriggerReference> listActivatedTriggers() {
     return triggerInstanceManager.listAll().stream()
-            .map(e->new TriggerReference(e.getKey(),e.getValue().taskId, e.getValue().triggerInstance.getTriggerDefinition()))
+            .map(e->new TriggerReference(e.getKey(), e.getValue().getTaskId(), e.getValue().getTriggerInstance().getTriggerDefinition()))
             .collect(Collectors.toList());
   }
   
@@ -115,12 +115,12 @@ public class DefaultTriggersService implements TriggersService {
         TriggerManager.TaskUuidTriggerDefinitionPair definition = e.getValue();
         
         try {
-          Trigger trigger = getTrigger(definition.triggerDefinition.getType());
+          Trigger trigger = getTrigger(definition.getTriggerDefinition().getType());
           if (trigger==null) {
-            throw new InvalidDefinitionException(String.format("Invalid trigger type: %s", definition.triggerDefinition.getType()));
+            throw new InvalidDefinitionException(String.format("Invalid trigger type: %s", definition.getTriggerDefinition().getType()));
           }
-          TriggerInstance triggerInstance = trigger.createInstance(definition.triggerDefinition);
-          TriggerInstance.Context context = executionService.newTriggerContext(definition.taskUuid);
+          TriggerInstance triggerInstance = trigger.createInstance(definition.getTriggerDefinition());
+          TriggerInstance.Context context = executionService.newTriggerContext(definition.getTaskUuid());
           triggerInstance.activate(context);
         } catch (DataProcessorException|InvalidDefinitionException ex) {
           LOG.warn(String.format("Error creating and activating trigger instance: %s -> %s", uuid, definition), ex);
@@ -135,7 +135,7 @@ public class DefaultTriggersService implements TriggersService {
   public void deactivateTriggerInstances() {
     triggerInstanceManager.listAll().stream().forEach(e->{
       UUID uuid = e.getKey();
-      TriggerInstance triggerInstance = e.getValue().triggerInstance;
+      TriggerInstance triggerInstance = e.getValue().getTriggerInstance();
       
       try {
         triggerInstance.close();
