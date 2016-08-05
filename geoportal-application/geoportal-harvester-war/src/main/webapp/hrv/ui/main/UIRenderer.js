@@ -22,11 +22,12 @@ define(["dojo/_base/declare",
         "dijit/form/Select",
         "dijit/form/ValidationTextBox",
         "dijit/form/CheckBox",
+        "dijit/form/TimeTextBox",
         "dijit/form/Form"
       ],
   function(declare,
            lang,array,domConstruct,
-           Select,ValidationTextBox,CheckBox,Form
+           Select,ValidationTextBox,CheckBox,TimeTextBox,Form
           ){
     var REST = "rest/harvester/brokers";
   
@@ -47,6 +48,7 @@ define(["dojo/_base/declare",
           case "string": this.renderString(placeholderNode,arg); break;
           case "choice": this.renderChoice(placeholderNode,arg); break;
           case "bool": this.renderBool(placeholderNode,arg); break;
+          case "temporal": this.renderTime(placeholderNode,arg); break;
           default: console.error("Unsupported argument type:", arg.type);
         }
       },
@@ -68,6 +70,19 @@ define(["dojo/_base/declare",
       renderBool: function(placeholderNode,arg) {
         var input = new CheckBox({name: arg.name, required: arg.required}).placeAt(placeholderNode);
         input.name = arg.name;
+        input.startup();
+      },
+      
+      renderTime: function(placeholderNode,arg) {
+        var input = new TimeTextBox({
+          name: arg.name,
+          constraints: {
+            timePattern: 'HH:mm:ss',
+            clickableIncrement: 'T00:15:00',
+            visibleIncrement: 'T00:15:00',
+            visibleRange: 'T01:00:00'
+          }
+        }).placeAt(placeholderNode);
         input.startup();
       }
     };
