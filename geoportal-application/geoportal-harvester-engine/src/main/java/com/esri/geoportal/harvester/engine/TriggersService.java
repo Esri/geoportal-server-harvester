@@ -67,6 +67,13 @@ public interface TriggersService {
   List<TriggerReference> listActivatedTriggers();
   
   /**
+   * Lists all activated triggers.
+   * @param taskId task id
+   * @return list of all activated triggers
+   */
+  List<TriggerReference> listActivatedTriggers(UUID taskId);
+  
+  /**
    * Activates trigger instances
    */
   void activateTriggerInstances();

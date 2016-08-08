@@ -105,6 +105,14 @@ public class DefaultTriggersService implements TriggersService {
             .map(e->new TriggerReference(e.getKey(), e.getValue().getTaskId(), e.getValue().getTriggerInstance().getTriggerDefinition()))
             .collect(Collectors.toList());
   }
+
+  @Override
+  public List<TriggerReference> listActivatedTriggers(UUID taskId) {
+    return triggerInstanceManager.listAll().stream()
+            .filter(e->taskId.equals(e.getValue().getTaskId()))
+            .map(e->new TriggerReference(e.getKey(), e.getValue().getTaskId(), e.getValue().getTriggerInstance().getTriggerDefinition()))
+            .collect(Collectors.toList());
+  }
   
   
   @Override
