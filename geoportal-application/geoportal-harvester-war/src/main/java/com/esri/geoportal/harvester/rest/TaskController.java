@@ -364,7 +364,7 @@ public class TaskController {
   }
   
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/triggers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<List<TriggerResponse>> listTriggers(@RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId) {
+  public ResponseEntity<List<TriggerResponse>> listTriggers(@PathVariable UUID taskId) {
     LOG.debug(String.format("GET /rest/harvester/tasks/%s/triggers", taskId));
     List<TriggerResponse> triggerResponses = engine.getTriggersService().listActivatedTriggers(taskId).stream()
             .map(t->new TriggerResponse(t.getUuid(), t.getTaskId(), t.getTriggerDefinition()))
