@@ -42,6 +42,10 @@ define(["dojo/_base/declare",
         return xhr.put("rest/harvester/tasks/"+id+"/execute",{handleAs: "json", headers: {"Content-Type": "application/json"}});
       },
       
+      schedule: function(id, triggerDefinition) {
+        return xhr.put("rest/harvester/tasks/"+id+"/schedule",{data: triggerDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
+      },
+      
       history: function(id) {
         return xhr("rest/harvester/tasks/"+id+"/history",{handleAs: "json"});
       },

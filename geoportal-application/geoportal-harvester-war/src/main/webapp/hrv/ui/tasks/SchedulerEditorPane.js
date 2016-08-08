@@ -96,7 +96,14 @@ define(["dojo/_base/declare",
         if (this.formWidget.validate()) {
           var values = this.formWidget.getValues();
           console.log("Values", values);
-          this.emit("submit",{triggerDefinition: values});
+          var triggerDefinition = {
+            type: null,
+            properties: null
+          };
+          triggerDefinition.type = values.type;
+          delete values.type;
+          triggerDefinition.properties = values;
+          this.emit("submit",{triggerDefinition: triggerDefinition});
         }
       }
     });
