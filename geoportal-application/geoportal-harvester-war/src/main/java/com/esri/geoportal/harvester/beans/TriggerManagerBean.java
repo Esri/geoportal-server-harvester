@@ -35,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.annotation.PreDestroy;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 
 /**
  * Trigger manager bean.
@@ -107,7 +106,7 @@ public class TriggerManagerBean implements TriggerManager {
       ResultSet rs = st.executeQuery();
       if (rs.next()) {
         try {
-          return deserialize(rs.getString("triggerDefinition"), TaskUuidTriggerDefinitionPair.class);
+          return deserialize(rs.getString("definition"), TaskUuidTriggerDefinitionPair.class);
         } catch (IOException | SQLException ex) {
           LOG.warn("Error reading broker definition", ex);
         }
@@ -129,7 +128,7 @@ public class TriggerManagerBean implements TriggerManager {
       while (rs.next()) {
         try {
           UUID id = UUID.fromString(rs.getString("id"));
-          TaskUuidTriggerDefinitionPair td = deserialize(rs.getString("triggerDefinition"), TaskUuidTriggerDefinitionPair.class);
+          TaskUuidTriggerDefinitionPair td = deserialize(rs.getString("definition"), TaskUuidTriggerDefinitionPair.class);
           map.put(id, td);
         } catch (IOException | SQLException ex) {
           LOG.warn("Error reading broker definition", ex);
@@ -145,7 +144,7 @@ public class TriggerManagerBean implements TriggerManager {
   public boolean update(UUID id, TaskUuidTriggerDefinitionPair data) throws CrudsException {
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("UPDATE TRIGGERS SET triggerDefinition = ? WHERE ID = ?");) {
+            PreparedStatement st = connection.prepareStatement("UPDATE TRIGGERS SET definition = ? WHERE ID = ?");) {
       st.setString(1, serialize(data));
       st.setString(2, id.toString());
       return st.executeUpdate() > 0;
