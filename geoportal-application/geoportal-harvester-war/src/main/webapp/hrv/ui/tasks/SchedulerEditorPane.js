@@ -51,6 +51,7 @@ define(["dojo/_base/declare",
       },
     
       postCreate: function(){
+        WIDGET = this.formWidget;
         TriggersREST.types().then(
           lang.hitch(this,this.processTypes),
           lang.hitch(this,function(error){
@@ -65,7 +66,13 @@ define(["dojo/_base/declare",
         this.typeSelector.addOption({label: type.label, value: type.type});
         
         array.forEach(result,lang.hitch(this,this.processType));
-        this.dstr = Renderer.render(this.formNode, type.arguments);
+        this.formWidget.setValues(this.data);
+        this.dstr = Renderer.render(this.formNode, this.data);
+        
+        setTimeout(lang.hitch(this,function(){
+          this.formWidget.setValues(this.data);
+        }),100);
+        
       },
       
       processType: function(type) {

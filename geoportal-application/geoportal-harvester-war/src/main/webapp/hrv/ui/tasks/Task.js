@@ -65,61 +65,73 @@ define(["dojo/_base/declare",
       },
       
       _onSchedule: function(evt) {
-        
-        var close = function() {
-          schedulerEditorDialog.destroy();
-          schedulerEditorPane.destroy();
-        };
-        
-        var schedulerEditorPane = new SchedulerEditorPane({});
+        TasksREST.triggers(this.data.uuid).then(
+          lang.hitch(this,function(triggers){
+            var close = function() {
+              schedulerEditorDialog.destroy();
+              schedulerEditorPane.destroy();
+            };
+            
+            var data = {};
+            if (triggers.length>0) {
+              data.type = triggers[0].triggerDefinition.type;
+              lang.mixin(data,triggers[0].triggerDefinition.properties);
+            }
+            var schedulerEditorPane = new SchedulerEditorPane(data);
 
-        // create editor dialog box
-        var schedulerEditorDialog = new Dialog({
-          title: this.i18n.tasks.editor.caption,
-          content: schedulerEditorPane,
-          onHide: close
-        });
-        
-        on(schedulerEditorPane,"submit",lang.hitch(this, function(evt){
-          TasksREST.triggers(this.data.uuid).then(
-            lang.hitch(this,function(triggers){
-              console.log("Triggers", triggers);
-              
-              var deferred = [];
-              array.forEach(triggers,lang.hitch(this,function(trigger){
-                deferred.push(TriggersREST.delete(trigger.uuid));
-              }));
-              
-              all(deferred).then(lang.hitch(this,function(response){
-                if (evt.triggerDefinition.type!=="NULL") {
-                  TasksREST.schedule(this.data.uuid,json.stringify(evt.triggerDefinition)).then(
-                    lang.hitch(this,function(response){
+            // create editor dialog box
+            var schedulerEditorDialog = new Dialog({
+              title: this.i18n.tasks.editor.caption,
+              content: schedulerEditorPane,
+              onHide: close
+            });
+
+            on(schedulerEditorPane,"submit",lang.hitch(this, function(evt){
+              TasksREST.triggers(this.data.uuid).then(
+                lang.hitch(this,function(triggers){
+                  console.log("Triggers", triggers);
+
+                  var deferred = [];
+                  array.forEach(triggers,lang.hitch(this,function(trigger){
+                    deferred.push(TriggersREST.delete(trigger.uuid));
+                  }));
+
+                  all(deferred).then(lang.hitch(this,function(response){
+                    if (evt.triggerDefinition.type!=="NULL") {
+                      TasksREST.schedule(this.data.uuid,json.stringify(evt.triggerDefinition)).then(
+                        lang.hitch(this,function(response){
+                          close();
+                        }),
+                        lang.hitch(this,function(error){
+                          console.error(error);
+                          topic.publish("msg",new Error("Unable to schedule task"));
+                          close();
+                        })
+                      );
+                    } else {
                       close();
-                    }),
-                    lang.hitch(this,function(error){
-                      console.error(error);
-                      topic.publish("msg",new Error("Unable to schedule task"));
-                      close();
-                    })
-                  );
-                } else {
+                    }
+                  }),lang.hitch(this,function(error){
+                    console.error(error);
+                    topic.publish("msg",new Error("Unable to delete current task triggers"));
+                    close();
+                  }));
+                }),
+                lang.hitch(this,function(error){
+                  console.error(error);
+                  topic.publish("msg",new Error("Unable to access tasks information"));
                   close();
-                }
-              }),lang.hitch(this,function(error){
-                console.error(error);
-                topic.publish("msg",new Error("Unable to delete current task triggers"));
-                close();
-              }));
-            }),
-            lang.hitch(this,function(error){
-              console.error(error);
-              topic.publish("msg",new Error("Unable to access tasks information"));
-              close();
-            })
-          );
-        }));
-        
-        schedulerEditorDialog.show();
+                })
+              );
+            }));
+
+            schedulerEditorDialog.show();
+          }),
+          lang.hitch(this,function(error){
+            console.error(error);
+            topic.publish("msg",new Error("Unable to read scheduling"));
+          })
+        );
       },
       
       makeLabel: function(taskDefinition) {

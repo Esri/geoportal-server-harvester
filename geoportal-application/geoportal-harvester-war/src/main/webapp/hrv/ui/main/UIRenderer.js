@@ -94,7 +94,7 @@ define(["dojo/_base/declare",
               if (name==='value') {
                 var time = this.inherited(arguments);
                 if (time) {
-                  this.lastTime = number.format(time.getHours(),{pattern: "00"})+":"+number.format(time.getMinutes(),{pattern: "00"});
+                  this.lastTime = "T"+number.format(time.getHours(),{pattern: "00"})+":"+number.format(time.getMinutes(),{pattern: "00"});
                   return this.lastTime;
                 } else {
                   return this.lastTime;
@@ -106,14 +106,20 @@ define(["dojo/_base/declare",
             set: function(name,value) {
               if (name==='value') {
                 this.lastTime = value;
+                /*
+                if (lang.isString(value)) {
+                  value = "T"+value.replace(/^T/,"");
+                }
+                */
                 return this.inherited(arguments);
               } else {
                 return this.inherited(arguments);
               }
             }
+            
         });
         
-        var input = new CustomTimeTextBox({
+        var input = new TimeTextBox({
           name: arg.name,
           constraints: {
             timePattern: 'HH:mm',
@@ -122,6 +128,8 @@ define(["dojo/_base/declare",
             visibleRange: 'T01:00:00'
           }
         }).placeAt(placeholderNode);
+        
+        input.startup();
         
         return function(){ input.destroy(); };
       },
