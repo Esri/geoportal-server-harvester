@@ -28,8 +28,8 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.Period;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -100,6 +100,11 @@ public class PeriodTrigger implements Trigger {
     });
     service.shutdownNow();
   }
+    
+  public static void main(String[] args) throws Exception {
+    Period period = parsePeriod("1W");
+    long mperiod = period.get(ChronoUnit.MILLIS);
+  }
 
   /**
    * Period trigger instance.
@@ -160,11 +165,9 @@ public class PeriodTrigger implements Trigger {
           future = service.submit(runnable);
         } else {
           Period period = parsePeriod(triggerDefinition.getProperties().get(T_PERIOD));
-          Calendar cal = Calendar.getInstance();
-          cal.setTime(lastHarvest);
-          Instant instant = cal.toInstant();
-          period.addTo(instant);
-          long delay = (cal.getTimeInMillis()-instant.toEpochMilli())/1000/60;
+          Instant due = (Instant)period.addTo(lastHarvest.toInstant());
+          
+          long delay = (due.toEpochMilli()-new Date().getTime())/1000/60;
           if (delay>0) {
             LOG.info(String.format("Task is scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition()));
             future = service.schedule(runnable, delay, TimeUnit.MINUTES);
@@ -177,19 +180,19 @@ public class PeriodTrigger implements Trigger {
         LOG.error(String.format("Error activating trigger: %s", getType()), ex);
       }
     }
+  }
     
-    /**
-     * Parses minute of the day. Format: HH:mm.
-     * @param strPeriod period
-     * @return period
-     * @throws ParseException if invalid minute of the day definition
-     */
-    private Period parsePeriod(String strPeriod) throws ParseException {
-      try {
-        return Period.parse(strPeriod);
-      } catch (DateTimeParseException ex) {
-        throw new ParseException(String.format("Invalid period: %s", strPeriod), 0);
-      }
+  /**
+   * Parses minute of the day. Format: HH:mm.
+   * @param strPeriod period
+   * @return period
+   * @throws ParseException if invalid minute of the day definition
+   */
+  private static Period parsePeriod(String strPeriod) throws ParseException {
+    try {
+      return Period.parse(strPeriod);
+    } catch (DateTimeParseException ex) {
+      throw new ParseException(String.format("Invalid period: %s", strPeriod), 0);
     }
   }
 }
