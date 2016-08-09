@@ -82,7 +82,6 @@ define(["dojo/_base/declare",
       },
       
       _onRun: function(evt) {
-        console.log("Running:", evt);
         var uuid = evt.data.uuid;
         TasksREST.execute(uuid).then(
           lang.hitch(this,function(){
