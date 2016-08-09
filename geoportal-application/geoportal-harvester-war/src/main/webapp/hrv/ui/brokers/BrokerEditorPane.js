@@ -42,7 +42,7 @@ define(["dojo/_base/declare",
       i18n: i18n,
       templateString: template,
       connectorTemplates: {},
-      dstr: null,
+      rendHandler: null,
       
       constructor: function(args) {
         this.data = args;
@@ -67,6 +67,7 @@ define(["dojo/_base/declare",
           setTimeout(lang.hitch(this,function(){
             this.formWidget.setValues(this.data.brokerDefinition);
             this.formWidget.setValues(this.data.brokerDefinition.properties);
+            this.rendHandler.init(this.data.brokerDefinition.properties);
           }),100);
         }
         if (response.length>0) {
@@ -81,13 +82,13 @@ define(["dojo/_base/declare",
       
       updateArgumentsForm: function(args) {
         this.resetForm();
-        this.dstr = Renderer.render(this.formNode,args);
+        this.rendHandler = Renderer.render(this.formNode,args);
       },
       
       resetForm: function() {
-        if (this.dstr) {
-          this.dstr();
-          this.dstr = null;
+        if (this.rendHandler) {
+          this.rendHandler.destroy();
+          this.rendHandler = null;
         }
         var formNodes = query("> div", this.formNode).splice(2);
         array.forEach(formNodes,function(node){
@@ -105,8 +106,9 @@ define(["dojo/_base/declare",
           var brokerDefinition = {
             type: values.type,
             label: values.label,
-            properties: values
+            properties: {}
           };
+          this.rendHandler.read(brokerDefinition.properties);
           if (this.data && this.data.uuid) {
             brokerDefinition.uuid = this.data.uuid;
           }
