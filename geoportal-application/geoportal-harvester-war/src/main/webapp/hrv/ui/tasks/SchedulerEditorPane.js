@@ -44,14 +44,13 @@ define(["dojo/_base/declare",
       i18n: i18n,
       templateString: template,
       allTypes: {},
-      dstr: null,
+      rendHandler: null,
       
       constructor: function(args) {
         this.data = args;
       },
     
       postCreate: function(){
-        WIDGET = this.formWidget;
         TriggersREST.types().then(
           lang.hitch(this,this.processTypes),
           lang.hitch(this,function(error){
@@ -67,10 +66,11 @@ define(["dojo/_base/declare",
         
         array.forEach(result,lang.hitch(this,this.processType));
         this.formWidget.setValues(this.data);
-        this.dstr = Renderer.render(this.formNode, this.data);
+        this.rendHandler = Renderer.render(this.formNode, this.data);
         
         setTimeout(lang.hitch(this,function(){
-          this.formWidget.setValues(this.data);
+          this.rendHandler.init(this.data);
+          //this.formWidget.setValues(this.data);
         }),100);
         
       },
@@ -83,9 +83,9 @@ define(["dojo/_base/declare",
       },
       
       resetForm: function() {
-        if (this.dstr) {
-          this.dstr();
-          this.dstr = null;
+        if (this.rendHandler) {
+          this.rendHandler.destroy();
+          this.rendHandler = null;
         }
         var formNodes = query("> div", this.formNode).splice(1);
         array.forEach(formNodes,function(node){
@@ -96,20 +96,19 @@ define(["dojo/_base/declare",
       _onTypeChanged: function(evt) {
         var type = this.allTypes[evt];
         this.resetForm();
-        this.dstr = Renderer.render(this.formNode, type.arguments);
+        this.rendHandler = Renderer.render(this.formNode, type.arguments);
       },
       
       _onSubmit: function(evt) {
         if (this.formWidget.validate()) {
           var values = this.formWidget.getValues();
-          console.log("Values", values);
           var triggerDefinition = {
             type: null,
-            properties: null
+            properties: {}
           };
           triggerDefinition.type = values.type;
-          delete values.type;
-          triggerDefinition.properties = values;
+          this.rendHandler.read(triggerDefinition.properties);
+          delete triggerDefinition.properties.type;
           this.emit("submit",{triggerDefinition: triggerDefinition});
         }
       }

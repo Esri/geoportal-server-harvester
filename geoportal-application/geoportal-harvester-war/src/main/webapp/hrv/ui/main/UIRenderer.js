@@ -35,12 +35,20 @@ define(["dojo/_base/declare",
   
     return {
       render: function(rootNode,args) {
-        var dstr = [];
+        var rendHandlers = [];
         array.forEach(args,lang.hitch({self: this, rootNode: rootNode},function(arg){
-          dstr.push(this.self.renderArgument(this.rootNode,arg));
+          rendHandlers.push(this.self.renderArgument(this.rootNode,arg));
         }));
-        return function(){ 
-            array.forEach(dstr,function(dstr) {dstr();});
+        return { 
+          init: function(values) {
+            array.forEach(rendHandlers,function(rendHandler) {rendHandler.init(values);});
+          },
+          read: function(values) {
+            array.forEach(rendHandlers,function(rendHandler) {rendHandler.read(values);});
+          },
+          destroy: function() {
+            array.forEach(rendHandlers,function(rendHandler) {rendHandler.destroy();});
+          }
         };
       },
       
@@ -58,7 +66,11 @@ define(["dojo/_base/declare",
           case "periodical": return this.renderPeriod(placeholderNode,arg);
           default: 
             console.error("Unsupported argument type:", arg.type);
-            return function(){};
+            return {
+              init: function(){},
+              read: function(){},
+              destroy: function() {}
+            };
         }
       },
       
@@ -66,7 +78,17 @@ define(["dojo/_base/declare",
         var input = new ValidationTextBox({name: arg.name, required: arg.required}).placeAt(placeholderNode);
         input.name = arg.name;
         input.startup();
-        return function(){ input.destroy(); };
+        return { 
+          init: function(values) {
+            input.set("value", values[arg.name]);
+          },
+          read: function(values) {
+            values[arg.name] = input.get("value");
+          },
+          destroy: function() {
+            input.destroy();
+          } 
+        };
       },
       
       renderChoice: function(placeholderNode,arg) {
@@ -75,49 +97,37 @@ define(["dojo/_base/declare",
           input.addOption({label: choice.value, value: choice.name});
         });
         input.startup();
-        return function(){ input.destroy(); };
+        return { 
+          init: function(values) {
+            input.set("value", values[arg.name]);
+          },
+          read: function(values) {
+            values[arg.name] = input.get("value");
+          },
+          destroy: function() {
+            input.destroy();
+          } 
+        };
       },
       
       renderBool: function(placeholderNode,arg) {
         var input = new CheckBox({name: arg.name, required: arg.required}).placeAt(placeholderNode);
         input.name = arg.name;
         input.startup();
-        return function(){ input.destroy(); };
+        return { 
+          init: function(values) {
+            input.set("value", values[arg.name]);
+          },
+          read: function(values) {
+            values[arg.name] = input.get("value");
+          },
+          destroy: function() {
+            input.destroy();
+          } 
+        };
       },
       
       renderTime: function(placeholderNode,arg) {
-
-        var CustomTimeTextBox = declare([TimeTextBox],{
-            lastTime: null,
-            
-            get: function(name){
-              if (name==='value') {
-                var time = this.inherited(arguments);
-                if (time) {
-                  this.lastTime = "T"+number.format(time.getHours(),{pattern: "00"})+":"+number.format(time.getMinutes(),{pattern: "00"});
-                  return this.lastTime;
-                } else {
-                  return this.lastTime;
-                }
-              } else {
-                return this.inherited(arguments);
-              }
-            },
-            set: function(name,value) {
-              if (name==='value') {
-                this.lastTime = value;
-                /*
-                if (lang.isString(value)) {
-                  value = "T"+value.replace(/^T/,"");
-                }
-                */
-                return this.inherited(arguments);
-              } else {
-                return this.inherited(arguments);
-              }
-            }
-            
-        });
         
         var input = new TimeTextBox({
           name: arg.name,
@@ -131,18 +141,39 @@ define(["dojo/_base/declare",
         
         input.startup();
         
-        return function(){ input.destroy(); };
+        return { 
+          init: function(values) {
+            input.set("value", "T"+values[arg.name]);
+          },
+          read: function(values) {
+            var result = input.get("value");
+            if (result) {
+              values[arg.name] = number.format(result.getHours(),{pattern:"00"})+":"+number.format(result.getMinutes(),{pattern:"00"});
+            }
+          },
+          destroy: function() {
+            input.destroy();
+          } 
+        };
       },
       
       renderPeriod: function(placeholderNode,arg) {
         var rootNode = domConstruct.create("div",null,placeholderNode);
-        var dstr = [];
-        dstr.push(this.renderRadio(rootNode,arg.name,"P1D",i18n.periodical.daily));
-        dstr.push(this.renderRadio(rootNode,arg.name,"P1W",i18n.periodical.weekly));
-        dstr.push(this.renderRadio(rootNode,arg.name,"P2W",i18n.periodical.biweekly));
-        dstr.push(this.renderRadio(rootNode,arg.name,"P1M",i18n.periodical.monthly));
-        return function(){ 
-            array.forEach(dstr,function(dstr) {dstr();} );
+        var rendHandlers = [];
+        rendHandlers.push(this.renderRadio(rootNode,arg.name,"P1D",i18n.periodical.daily));
+        rendHandlers.push(this.renderRadio(rootNode,arg.name,"P1W",i18n.periodical.weekly));
+        rendHandlers.push(this.renderRadio(rootNode,arg.name,"P2W",i18n.periodical.biweekly));
+        rendHandlers.push(this.renderRadio(rootNode,arg.name,"P1M",i18n.periodical.monthly));
+        return { 
+          init: function(values) {
+            array.forEach(rendHandlers,function(rendHandler) {rendHandler.init(values);} );
+          },
+          read: function(values) {
+            array.forEach(rendHandlers,function(rendHandler) {rendHandler.read(values);} );
+          },
+          destroy: function() {
+            array.forEach(rendHandlers,function(rendHandler) {rendHandler.destroy();} );
+          }
         };
       },
       
@@ -156,7 +187,19 @@ define(["dojo/_base/declare",
         }).placeAt(div);
         radio.startup();
         var div = domConstruct.create("label",{"for": "_"+value, innerHTML: label},div);
-        return function(){radio.destroy();};
+        return { 
+          init: function(values) {
+            input.set("checked", !!values(name));
+          },
+          read: function(values) {
+            if (radio.get("checked")) {
+              values[name] = radio.get("value");
+            }
+          },
+          destroy: function() {
+            radio.destroy();
+          } 
+        };
       }
     };
 });
