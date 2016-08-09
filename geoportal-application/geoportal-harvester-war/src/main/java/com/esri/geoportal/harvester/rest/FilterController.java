@@ -27,6 +27,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Filter controller.
+ * Provides access to filter information.
+ * <pre><code>
+   GET /rest/harvester/filters          - gets a list of all filters
+ * </code></pre>
  */
 @RestController
 public class FilterController {

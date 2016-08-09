@@ -27,6 +27,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Transformer controller.
+ * Provides access to transformer information.
+ * <pre><code>
+   GET /rest/harvester/transformers          - gets a list of all transformers
+ * </code></pre>
  */
 @RestController
 public class TransformerController {
