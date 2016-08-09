@@ -100,11 +100,6 @@ public class PeriodTrigger implements Trigger {
     });
     service.shutdownNow();
   }
-    
-  public static void main(String[] args) throws Exception {
-    Period period = parsePeriod("1W");
-    long mperiod = period.get(ChronoUnit.MILLIS);
-  }
 
   /**
    * Period trigger instance.
