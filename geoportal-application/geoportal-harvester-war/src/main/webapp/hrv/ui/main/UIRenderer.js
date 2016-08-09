@@ -189,7 +189,7 @@ define(["dojo/_base/declare",
         var div = domConstruct.create("label",{"for": "_"+value, innerHTML: label},div);
         return { 
           init: function(values) {
-            input.set("checked", !!values(name));
+            radio.set("checked", values[name]===value);
           },
           read: function(values) {
             if (radio.get("checked")) {
