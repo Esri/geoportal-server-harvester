@@ -31,19 +31,19 @@ define(["dojo/_base/declare",
       },
       
       create: function(taskDefinition) {
-        return xhr.put("rest/harvester/tasks",{data: taskDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
+        return xhr.post("rest/harvester/tasks",{data: taskDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
       },
       
       update: function(id, taskDefinition) {
-        return xhr.post("rest/harvester/tasks/"+id,{data: taskDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
+        return xhr.put("rest/harvester/tasks/"+id,{data: taskDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
       },
       
       execute: function(id) {
-        return xhr.put("rest/harvester/tasks/"+id+"/execute",{handleAs: "json", headers: {"Content-Type": "application/json"}});
+        return xhr.post("rest/harvester/tasks/"+id+"/execute",{handleAs: "json", headers: {"Content-Type": "application/json"}});
       },
       
       schedule: function(id, triggerDefinition) {
-        return xhr.put("rest/harvester/tasks/"+id+"/schedule",{data: triggerDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
+        return xhr.post("rest/harvester/tasks/"+id+"/schedule",{data: triggerDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
       },
       
       history: function(id) {

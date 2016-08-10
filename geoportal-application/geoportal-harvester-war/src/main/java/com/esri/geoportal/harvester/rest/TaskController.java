@@ -55,14 +55,14 @@ import org.springframework.web.bind.annotation.RestController;
    GET /rest/harvester/tasks                      - gets all the tasks
    GET /rest/harvester/tasks/{taskId}             - gets task information by task id
    DELETE /rest/harvester/tasks/{taskId}          - deletes existing task by task id
-   PUT /rest/harvester/tasks                      - creates a new task (task definition in the request body)
-   POST /rest/harvester/tasks/{taskId}            - updates a task by task id (task definition in the request body)
+   POST /rest/harvester/tasks                     - creates a new task (task definition in the request body)
+   PUT /rest/harvester/tasks/{taskId}             - updates a task by task id (task definition in the request body)
    GET /rest/harvester/tasks/{taskId}/history     - gets task harvesting history
    
-   PUT /rest/harvester/tasks/{taskId}/execute     - executes immediatelly a task by task id
-   PUT /rest/harvester/tasks/{taskId}/schedule    - schedule a task by task id (trigger definition in the request body)
-   PUT /rest/harvester/tasks/execute              - executes a task (task definition in the request body)
-   PUT /rest/harvester/tasks/schedule             - schedules a task (trigger instance definition in the request body)
+   POST /rest/harvester/tasks/{taskId}/execute    - executes immediatelly a task by task id
+   POST /rest/harvester/tasks/{taskId}/schedule   - schedule a task by task id (trigger definition in the request body)
+   POST /rest/harvester/tasks/execute             - executes a task (task definition in the request body)
+   POST /rest/harvester/tasks/schedule            - schedules a task (trigger instance definition in the request body)
    </code></pre>
  * Top five end points provide access to the stored task definitions (CRUD). 
  * Remaining end points ('execute' and 'schedule') provide ability to create process
@@ -94,13 +94,13 @@ import org.springframework.web.bind.annotation.RestController;
  * Example of 'execute' particular task request (no body expected):
  * <pre><code>
    
-    PUT /rest/harvester/tasks/641c741a-37f9-11e6-ac61-9e71128cae77/execute
+    POST /rest/harvester/tasks/641c741a-37f9-11e6-ac61-9e71128cae77/execute
  * </code></pre>
  * <br>
  * Example of 'schedule' request body:
  * <pre><code>
    
-    PUT /rest/harvester/tasks/schedule
+    POST /rest/harvester/tasks/schedule
     {
       "type": "AT",
       "properties": {
@@ -129,7 +129,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Example of 'schedule' particular task request body:
  * <pre><code>
    
-    PUT /rest/harvester/tasks/31b4f880-37f9-11e6-ac61-9e71128cae77/schedule
+    POST /rest/harvester/tasks/31b4f880-37f9-11e6-ac61-9e71128cae77/schedule
     {
       "type": "AT",
       "properties": {
@@ -239,10 +239,10 @@ public class TaskController {
    * @param taskDefinition task definition
    * @return task info of the newly created task
    */
-  @RequestMapping(value = "/rest/harvester/tasks", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(value = "/rest/harvester/tasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TaskResponse> addTask(@RequestBody TaskDefinition taskDefinition) {
     try {
-      LOG.debug(String.format("PUT /rest/harvester/tasks <-- %s", taskDefinition));
+      LOG.debug(String.format("POST /rest/harvester/tasks <-- %s", taskDefinition));
       UUID id = engine.getTasksService().addTaskDefinition(taskDefinition);
       return new ResponseEntity<>(new TaskResponse(id, taskDefinition),HttpStatus.OK);
     } catch (DataProcessorException ex) {
@@ -257,10 +257,10 @@ public class TaskController {
    * @param taskId task id
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
-  @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TaskResponse> updateTask(@RequestBody TaskDefinition taskDefinition, @PathVariable UUID taskId) {
     try {
-      LOG.debug(String.format("POST /rest/harvester/tasks/%s <-- %s", taskId, taskDefinition));
+      LOG.debug(String.format("PUT /rest/harvester/tasks/%s <-- %s", taskId, taskDefinition));
       TaskDefinition oldTaskDef = engine.getTasksService().updateTaskDefinition(taskId, taskDefinition);
       return new ResponseEntity<>(oldTaskDef!=null? new TaskResponse(taskId, oldTaskDef): null, HttpStatus.OK);
     } catch (DataProcessorException ex) {
@@ -274,10 +274,10 @@ public class TaskController {
    * @param taskId task id
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
-  @RequestMapping(value = "/rest/harvester/tasks/{taskId}/execute", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(value = "/rest/harvester/tasks/{taskId}/execute", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessResponse> executeTask(@PathVariable UUID taskId) {
     try {
-      LOG.debug(String.format("PUT /rest/harvester/tasks/%s/execute", taskId));
+      LOG.debug(String.format("POST /rest/harvester/tasks/%s/execute", taskId));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
       
       // obtain last harvest data
@@ -310,10 +310,10 @@ public class TaskController {
    * @param taskDefinition task definition
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
-  @RequestMapping(value = "/rest/harvester/tasks/execute", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(value = "/rest/harvester/tasks/execute", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessResponse> executeTask(@RequestBody TaskDefinition taskDefinition) {
     try {
-      LOG.debug(String.format("PUT /rest/harvester/tasks/execute <-- %s", taskDefinition));
+      LOG.debug(String.format("POST /rest/harvester/tasks/execute <-- %s", taskDefinition));
       ProcessReference ref = engine.getExecutionService().execute(taskDefinition,Collections.emptyMap());
       ref.getProcess().init();
       ref.getProcess().begin();
@@ -331,10 +331,10 @@ public class TaskController {
    * @param taskId task id
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
-  @RequestMapping(value = "/rest/harvester/tasks/{taskId}/schedule", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(value = "/rest/harvester/tasks/{taskId}/schedule", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId) {
     try {
-      LOG.debug(String.format("PUT /rest/harvester/tasks/%s/schedule <-- %s", taskId, triggerDefinition));
+      LOG.debug(String.format("POST /rest/harvester/tasks/%s/schedule <-- %s", taskId, triggerDefinition));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
       TriggerDefinition triggerInstanceDefinition = new TriggerDefinition();
       triggerInstanceDefinition.setType(triggerDefinition.getType());
@@ -377,10 +377,10 @@ public class TaskController {
    * @param trigDef trigger definition
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
-  @RequestMapping(value = "/rest/harvester/tasks/schedule", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(value = "/rest/harvester/tasks/schedule", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody TriggerDefinition trigDef) {
     try {
-      LOG.debug(String.format("PUT /rest/harvester/tasks/schedule <-- %s", trigDef));
+      LOG.debug(String.format("POST /rest/harvester/tasks/schedule <-- %s", trigDef));
       TriggerReference trigRef = engine.getExecutionService().schedule(null,trigDef,Collections.emptyMap());
       return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), null, trigRef.getTriggerDefinition()),HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {

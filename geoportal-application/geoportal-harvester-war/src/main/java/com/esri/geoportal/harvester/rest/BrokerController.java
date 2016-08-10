@@ -46,8 +46,8 @@ import org.springframework.web.bind.annotation.RestController;
    GET /rest/harvester/brokers/{brokerId}         - gets broker by id (input or output)
    
    DELETE /rest/harvester/brokers/{brokerId}      - deletes broker by id (input or output)
-   PUT /rest/harvester/brokers                    - creates new broker (input or output; body of the request defines broker)
-   POST /rest/harvester/brokers/{brokerId}        - updates existing broker by id (input or output; body of the request defines broker)
+   POST /rest/harvester/brokers                   - creates new broker (input or output; body of the request defines broker)
+   PUT /rest/harvester/brokers/{brokerId}         - updates existing broker by id (input or output; body of the request defines broker)
  * </code></pre>
  * Each GET request returns JSON with broker definition. It is an array of definitions when
  * listing and a single definition when getting by id:
@@ -138,10 +138,10 @@ public class BrokerController {
    * @param brokerDefinition broker definition
    * @return broker info of the newly created broker
    */
-  @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BrokerResponse> createBroker(@RequestBody EntityDefinition brokerDefinition) {
     try {
-      LOG.debug(String.format("PUT /rest/harvester/brokers <-- %s", brokerDefinition));
+      LOG.debug(String.format("POST /rest/harvester/brokers <-- %s", brokerDefinition));
       return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().createBroker(brokerDefinition)), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error creating broker: %s", brokerDefinition), ex);
@@ -155,10 +155,10 @@ public class BrokerController {
    * @param brokerId broker id
    * @return broker info of the task which has been replaced
    */
-  @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BrokerResponse> updateBroker(@RequestBody EntityDefinition brokerDefinition, @PathVariable UUID brokerId) {
     try {
-      LOG.debug(String.format("POST /rest/harvester/brokers/%s <-- %s", brokerId, brokerDefinition));
+      LOG.debug(String.format("PUT /rest/harvester/brokers/%s <-- %s", brokerId, brokerDefinition));
       return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().updateBroker(brokerId, brokerDefinition)), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error updating broker: %s <-- %s", brokerId, brokerDefinition), ex);

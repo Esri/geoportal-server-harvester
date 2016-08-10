@@ -69,7 +69,6 @@ define(["dojo/_base/declare",
           var brokerDefinition = evt.brokerDefinition;
           
           // use API to update broker
-          console.log("TODO: updating broker...", evt.brokerDefinition);
           BrokersREST.update(brokerDefinition.uuid,json.stringify(brokerDefinition)).then(
             lang.hitch({brokerEditorPane: brokerEditorPane, brokerEditorDialog: brokerEditorDialog, self: this},function(){
               this.brokerEditorDialog.destroy();

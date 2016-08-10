@@ -40,11 +40,11 @@ define(["dojo/_base/declare",
       },
       
       create: function(brokerDefinition) {
-        return xhr.put(REST,{data: brokerDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
+        return xhr.post(REST,{data: brokerDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
       },
       
       update: function(id, brokerDefinition) {
-        return xhr.post(REST+"/"+id,{data: brokerDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
+        return xhr.put(REST+"/"+id,{data: brokerDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
       }
     };
 });
