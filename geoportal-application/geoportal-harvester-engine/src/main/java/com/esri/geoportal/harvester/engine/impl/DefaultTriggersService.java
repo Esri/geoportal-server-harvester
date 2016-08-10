@@ -26,7 +26,7 @@ import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager.TaskUuidTriggerInstancePair;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
-import com.esri.geoportal.harvester.engine.support.CrudsException;
+import com.esri.geoportal.harvester.engine.support.CrudlException;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,8 +73,8 @@ public class DefaultTriggersService implements TriggersService {
   }
   
   @Override
-  public Collection<Map.Entry<UUID, TriggerManager.TaskUuidTriggerDefinitionPair>> select() throws CrudsException {
-    return triggerManager.select();
+  public Collection<Map.Entry<UUID, TriggerManager.TaskUuidTriggerDefinitionPair>> select() throws CrudlException {
+    return triggerManager.list();
   }
   
   @Override
@@ -93,7 +93,7 @@ public class DefaultTriggersService implements TriggersService {
     } finally {
       try {
         triggerManager.delete(triggerInstanceUuid);
-      } catch (CrudsException ex) {
+      } catch (CrudlException ex) {
         LOG.warn(String.format("Error deleting trigger: %s", triggerInstanceUuid), ex);
       }
     }
@@ -134,7 +134,7 @@ public class DefaultTriggersService implements TriggersService {
           LOG.warn(String.format("Error creating and activating trigger instance: %s -> %s", uuid, definition), ex);
         }
       });
-    } catch (CrudsException ex) {
+    } catch (CrudlException ex) {
       LOG.error("Error processing trigger definitions", ex);
     }
   }

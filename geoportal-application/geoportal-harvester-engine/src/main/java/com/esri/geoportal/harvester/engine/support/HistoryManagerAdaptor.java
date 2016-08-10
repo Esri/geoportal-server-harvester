@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine.support;
 
+import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
@@ -29,7 +30,7 @@ import org.slf4j.LoggerFactory;
 /**
  * History manager adaptor.
  */
-public class HistoryManagerAdaptor implements ProcessInstance.Listener {
+public class HistoryManagerAdaptor extends BaseProcessInstanceListener {
   private static final Logger LOG = LoggerFactory.getLogger(HistoryManagerAdaptor.class);
   
   private final UUID uuid;
@@ -75,7 +76,7 @@ public class HistoryManagerAdaptor implements ProcessInstance.Listener {
           event.setReport(report);
           try {
             historyManager.create(event);
-          } catch (CrudsException ex) {
+          } catch (CrudlException ex) {
             LOG.error(String.format("Error creating history event for: %s", uuid), ex);
           }
         }

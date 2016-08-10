@@ -53,7 +53,7 @@ import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager.TaskUuidTriggerInstancePair;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
-import com.esri.geoportal.harvester.engine.support.CrudsException;
+import com.esri.geoportal.harvester.engine.support.CrudlException;
 import com.esri.geoportal.harvester.engine.support.HistoryManagerAdaptor;
 import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
@@ -136,7 +136,7 @@ public class DefaultExecutionService implements ExecutionService {
       TriggerContext context = new TriggerContext(taskId);
       triggerInstance.activate(context);
       return new TriggerReference(uuid, taskId, trigDef);
-    } catch (CrudsException ex) {
+    } catch (CrudlException ex) {
       throw new DataProcessorException(String.format("Error scheduling task: %s", trigDef.getTaskDefinition()), ex);
     }
   }
@@ -302,7 +302,7 @@ public class DefaultExecutionService implements ExecutionService {
         } else {
           return null;
         }
-      } catch (CrudsException ex) {
+      } catch (CrudlException ex) {
         throw new DataProcessorException(String.format("Error getting last harvest for: %s", taskId), ex);
       }
     }

@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine.support;
 
+import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
@@ -27,7 +28,7 @@ import java.util.UUID;
 /**
  * Report builder adaptor.
  */
-public class ReportBuilderAdaptor implements ProcessInstance.Listener {
+public class ReportBuilderAdaptor extends BaseProcessInstanceListener {
   private final UUID uuid;
   private final ProcessInstance processInstance;
   private final ReportBuilder reportBuilder;
@@ -54,10 +55,6 @@ public class ReportBuilderAdaptor implements ProcessInstance.Listener {
         reportBuilder.completed(processInstance);
         break;
     }
-  }
-
-  @Override
-  public void onDataAcquired(DataReference dataReference) {
   }
 
   @Override

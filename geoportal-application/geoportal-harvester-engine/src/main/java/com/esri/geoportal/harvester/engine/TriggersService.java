@@ -19,7 +19,7 @@ import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
-import com.esri.geoportal.harvester.engine.support.CrudsException;
+import com.esri.geoportal.harvester.engine.support.CrudlException;
 import com.esri.geoportal.harvester.engine.support.TriggerReference;
 import java.util.Collection;
 import java.util.List;
@@ -47,9 +47,9 @@ public interface TriggersService {
   /**
    * Selects triggers.
    * @return collection of triggers.
-   * @throws CrudsException if selecting fails
+   * @throws CrudlException if selecting fails
    */
-  Collection<Map.Entry<UUID, TriggerManager.TaskUuidTriggerDefinitionPair>> select() throws CrudsException;
+  Collection<Map.Entry<UUID, TriggerManager.TaskUuidTriggerDefinitionPair>> select() throws CrudlException;
   
   /**
    * Deactivates trigger.

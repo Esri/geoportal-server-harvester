@@ -37,7 +37,7 @@ public final class ProcessReference {
   
   @Override
   public String toString() {
-    return String.format("%s, uuid: %s", process, getProcessId());
+    return String.format("PROCESS REF :: uuid: %s, %s", process, getProcessId());
   }
 
   /**

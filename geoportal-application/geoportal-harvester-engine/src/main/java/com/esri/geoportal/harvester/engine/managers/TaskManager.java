@@ -16,11 +16,11 @@
 package com.esri.geoportal.harvester.engine.managers;
 
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
-import com.esri.geoportal.harvester.engine.support.CrudsRepo;
+import com.esri.geoportal.harvester.engine.support.CrudlRepo;
 
 /**
  * Task manager.
  */
-public interface TaskManager  extends CrudsRepo<TaskDefinition> {
+public interface TaskManager  extends CrudlRepo<TaskDefinition> {
   
 }

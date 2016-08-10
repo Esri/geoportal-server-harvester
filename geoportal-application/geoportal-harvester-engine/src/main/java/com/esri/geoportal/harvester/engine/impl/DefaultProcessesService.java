@@ -22,7 +22,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.ProcessesService;
 import com.esri.geoportal.harvester.engine.managers.ProcessManager;
 import com.esri.geoportal.harvester.engine.managers.ReportBuilder;
-import com.esri.geoportal.harvester.engine.support.CrudsException;
+import com.esri.geoportal.harvester.engine.support.CrudlException;
 import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import com.esri.geoportal.harvester.engine.support.ReportBuilderAdaptor;
 import java.util.List;
@@ -52,7 +52,7 @@ public class DefaultProcessesService implements ProcessesService {
   public ProcessInstance getProcess(UUID processId) throws DataProcessorException {
     try {
       return processManager.read(processId);
-    } catch (CrudsException ex) {
+    } catch (CrudlException ex) {
       throw new DataProcessorException(String.format("Error getting process: %s", processId), ex);
     }
   }
@@ -60,8 +60,8 @@ public class DefaultProcessesService implements ProcessesService {
   @Override
   public List<Map.Entry<UUID, ProcessInstance>> selectProcesses(Predicate<? super Map.Entry<UUID, ProcessInstance>> predicate) throws DataProcessorException {
     try {
-      return processManager.select().stream().filter(predicate != null ? predicate : (Map.Entry<UUID, ProcessInstance> e) -> true).collect(Collectors.toList());
-    } catch (CrudsException ex) {
+      return processManager.list().stream().filter(predicate != null ? predicate : (Map.Entry<UUID, ProcessInstance> e) -> true).collect(Collectors.toList());
+    } catch (CrudlException ex) {
       throw new DataProcessorException(String.format("Error celecting processes."), ex);
     }
   }
@@ -73,7 +73,7 @@ public class DefaultProcessesService implements ProcessesService {
       UUID uuid = processManager.create(process);
       process.addListener(new ReportBuilderAdaptor(uuid, process, reportBuilder));
       return new ProcessReference(uuid, process);
-    } catch (CrudsException ex) {
+    } catch (CrudlException ex) {
       throw new DataProcessorException(String.format("Error creating process: %s", task), ex);
     }
   }

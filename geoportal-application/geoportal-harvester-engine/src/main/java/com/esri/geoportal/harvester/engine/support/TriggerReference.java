@@ -64,6 +64,6 @@ public final class TriggerReference {
   
   @Override
   public String toString() {
-    return String.format("TRIGGER REFERENCE :: uuid: %s, taskId: %s, definition: %s", uuid, taskId, triggerDefinition);
+    return String.format("TRIGGER REF :: uuid: %s, taskId: %s, definition: %s", uuid, taskId, triggerDefinition);
   }
 }

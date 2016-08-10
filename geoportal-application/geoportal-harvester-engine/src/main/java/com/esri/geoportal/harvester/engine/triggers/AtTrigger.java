@@ -22,7 +22,7 @@ import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
-import com.esri.geoportal.harvester.engine.support.BaseProcessInstanceListener;
+import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.util.ArrayList;

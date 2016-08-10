@@ -16,35 +16,35 @@
 package com.esri.geoportal.harvester.engine.support;
 
 /**
- * CRUDS exception.
+ * CRUDL exception.
  */
-public class CrudsException extends Exception {
+public class CrudlException extends Exception {
 
   /**
-   * Creates a new instance of <code>CrudsException</code> without detail
+   * Creates a new instance of <code>CrudlException</code> without detail
    * message.
    */
-  public CrudsException() {
+  public CrudlException() {
   }
 
   /**
-   * Constructs an instance of <code>CrudsException</code> with the specified
+   * Constructs an instance of <code>CrudlException</code> with the specified
    * detail message.
    *
    * @param msg the detail message.
    */
-  public CrudsException(String msg) {
+  public CrudlException(String msg) {
     super(msg);
   }
 
   /**
-   * Constructs an instance of <code>CrudsException</code> with the specified
+   * Constructs an instance of <code>CrudlException</code> with the specified
    * detail message.
    *
    * @param msg the detail message.
    * @param c cause
    */
-  public CrudsException(String msg, Throwable c) {
+  public CrudlException(String msg, Throwable c) {
     super(msg, c);
   }
 }

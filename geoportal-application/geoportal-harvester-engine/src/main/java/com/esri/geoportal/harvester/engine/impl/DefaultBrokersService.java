@@ -25,7 +25,7 @@ import com.esri.geoportal.harvester.engine.registers.OutboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.support.BrokerReference;
 import static com.esri.geoportal.harvester.engine.support.BrokerReference.Category.INBOUND;
 import static com.esri.geoportal.harvester.engine.support.BrokerReference.Category.OUTBOUND;
-import com.esri.geoportal.harvester.engine.support.CrudsException;
+import com.esri.geoportal.harvester.engine.support.CrudlException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -58,11 +58,11 @@ public class DefaultBrokersService implements BrokersService {
     if (category != null) {
       try {
         Set<String> brokerTypes = listTypesByCategory(category);
-        return brokerDefinitionManager.select().stream()
+        return brokerDefinitionManager.list().stream()
                 .filter(e -> brokerTypes.contains(e.getValue().getType()))
                 .map(e -> new BrokerReference(e.getKey(), category, e.getValue()))
                 .collect(Collectors.toList());
-      } catch (CrudsException ex) {
+      } catch (CrudlException ex) {
         throw new DataProcessorException(String.format("Error getting brokers for category: %s", category), ex);
       }
     } else {
@@ -81,7 +81,7 @@ public class DefaultBrokersService implements BrokersService {
         }
       }
       return null;
-    } catch (CrudsException ex) {
+    } catch (CrudlException ex) {
       throw new DataProcessorException(String.format("Error finding broker: %s", brokerId), ex);
     }
   }
@@ -93,7 +93,7 @@ public class DefaultBrokersService implements BrokersService {
       try {
         UUID id = brokerDefinitionManager.create(brokerDefinition);
         return new BrokerReference(id, category, brokerDefinition);
-      } catch (CrudsException ex) {
+      } catch (CrudlException ex) {
         throw new DataProcessorException(String.format("Error creating broker: %s", brokerDefinition), ex);
       }
     }
@@ -111,7 +111,7 @@ public class DefaultBrokersService implements BrokersService {
       }
       BrokerReference.Category category = oldBrokerDef != null ? getBrokerCategoryByType(oldBrokerDef.getType()) : null;
       return category != null ? new BrokerReference(brokerId, category, brokerDefinition) : null;
-    } catch (CrudsException ex) {
+    } catch (CrudlException ex) {
       throw new DataProcessorException(String.format("Error updating broker: %s <-- %s", brokerId, brokerDefinition), ex);
     }
   }
@@ -120,7 +120,7 @@ public class DefaultBrokersService implements BrokersService {
   public boolean deleteBroker(UUID brokerId) throws DataProcessorException {
     try {
       return brokerDefinitionManager.delete(brokerId);
-    } catch (CrudsException ex) {
+    } catch (CrudlException ex) {
       throw new DataProcessorException(String.format("Error deleting broker: %s", brokerId), ex);
     }
   }

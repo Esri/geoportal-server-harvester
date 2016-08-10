@@ -62,6 +62,11 @@ public final class BrokerReference {
     return brokerDefinition;
   }
   
+  @Override
+  public String toString() {
+    return String.format("BROKER REF :: uuid: %s, category: %s, definition: %s", uuid, category, brokerDefinition);
+  }
+  
   /**
    * Broker category.
    */

@@ -20,49 +20,49 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * CrudsRepo (create, read, update, delete, select)
+ * CrudlRepo (create, read, update, delete, list)
  * @param <T> type of the managed data
  */
-public interface CrudsRepo<T> {
+public interface CrudlRepo<T> {
 
   /**
    * Creates process.
    * @param data data
    * @return id of the data
-   * @throws CrudsException if operation performed on repository fails
+   * @throws CrudlException if operation performed on repository fails
    */
-  UUID create(T data) throws CrudsException;
+  UUID create(T data) throws CrudlException;
 
   /**
    * Removes data.
    * @param id data id
    * @return <code>true</code> if updated
-   * @throws CrudsException if operation performed on repository fails
+   * @throws CrudlException if operation performed on repository fails
    */
-  boolean delete(UUID id) throws CrudsException;
+  boolean delete(UUID id) throws CrudlException;
 
   /**
    * Reads data by id.
    * @param id data id
    * @return data or <code>null</code> if no corresponding data
-   * @throws CrudsException if operation performed on repository fails
+   * @throws CrudlException if operation performed on repository fails
    */
-  T read(UUID id) throws CrudsException;
-
-  /**
-   * Lists all data.
-   * @return all data
-   * @throws CrudsException if operation performed on repository fails
-   */
-  Collection<Map.Entry<UUID, T>> select() throws CrudsException;
+  T read(UUID id) throws CrudlException;
 
   /**
    * Updates data.
    * @param id data id
    * @param data data
    * @return <code>true</code> if updated
-   * @throws CrudsException if operation performed on repository fails
+   * @throws CrudlException if operation performed on repository fails
    */
-  boolean update(UUID id, T data) throws CrudsException;
+  boolean update(UUID id, T data) throws CrudlException;
+
+  /**
+   * Lists all data.
+   * @return all data
+   * @throws CrudlException if operation performed on repository fails
+   */
+  Collection<Map.Entry<UUID, T>> list() throws CrudlException;
   
 }

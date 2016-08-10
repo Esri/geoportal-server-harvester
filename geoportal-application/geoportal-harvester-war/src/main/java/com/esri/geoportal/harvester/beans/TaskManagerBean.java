@@ -19,7 +19,7 @@ import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deseria
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.serialize;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.engine.managers.TaskManager;
-import com.esri.geoportal.harvester.engine.support.CrudsException;
+import com.esri.geoportal.harvester.engine.support.CrudlException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -36,6 +36,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 
 /**
  * Task manager bean.
@@ -73,7 +76,7 @@ public class TaskManagerBean implements TaskManager {
   }
 
   @Override
-  public UUID create(TaskDefinition taskDef) throws CrudsException {
+  public UUID create(TaskDefinition taskDef) throws CrudlException {
     UUID id = UUID.randomUUID();
     try (
             Connection connection = dataSource.getConnection();
@@ -83,13 +86,13 @@ public class TaskManagerBean implements TaskManager {
       st.setString(2, id.toString());
       st.executeUpdate();
     } catch (SQLException|IOException ex) {
-      throw new CrudsException("Error selecting task", ex);
+      throw new CrudlException("Error selecting task", ex);
     }
     return id;
   }
 
   @Override
-  public boolean update(UUID id, TaskDefinition taskDef) throws CrudsException {
+  public boolean update(UUID id, TaskDefinition taskDef) throws CrudlException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("UPDATE TASKS SET taskDefinition = ? WHERE ID = ?");
@@ -98,12 +101,12 @@ public class TaskManagerBean implements TaskManager {
       st.setString(2, id.toString());
       return st.executeUpdate()>0;
     } catch (SQLException|IOException ex) {
-      throw new CrudsException("Error selecting task", ex);
+      throw new CrudlException("Error selecting task", ex);
     }
   }
 
   @Override
-  public TaskDefinition read(UUID id) throws CrudsException {
+  public TaskDefinition read(UUID id) throws CrudlException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("SELECT * FROM TASKS WHERE ID = ?");
@@ -118,14 +121,14 @@ public class TaskManagerBean implements TaskManager {
         }
       }
     } catch (SQLException ex) {
-      throw new CrudsException("Error selecting task", ex);
+      throw new CrudlException("Error selecting task", ex);
     }
     
     return null;
   }
 
   @Override
-  public boolean delete(UUID id) throws CrudsException {
+  public boolean delete(UUID id) throws CrudlException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("DELETE FROM TASKS WHERE ID = ?");
@@ -133,12 +136,12 @@ public class TaskManagerBean implements TaskManager {
       st.setString(1, id.toString());
       return st.executeUpdate()>0;
     } catch (SQLException ex) {
-      throw new CrudsException("Error selecting task", ex);
+      throw new CrudlException("Error selecting task", ex);
     }
   }
 
   @Override
-  public Collection<Map.Entry<UUID, TaskDefinition>> select() throws CrudsException {
+  public Collection<Map.Entry<UUID, TaskDefinition>> list() throws CrudlException {
     HashMap<UUID, TaskDefinition> map = new HashMap<>();
     try (
             Connection connection = dataSource.getConnection();
@@ -155,7 +158,7 @@ public class TaskManagerBean implements TaskManager {
         }
       }
     } catch (SQLException ex) {
-      throw new CrudsException("Error selecting task", ex);
+      throw new CrudlException("Error selecting task", ex);
     }
     return map.entrySet();
   }

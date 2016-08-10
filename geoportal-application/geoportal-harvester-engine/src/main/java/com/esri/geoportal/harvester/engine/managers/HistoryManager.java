@@ -15,26 +15,26 @@
  */
 package com.esri.geoportal.harvester.engine.managers;
 
-import com.esri.geoportal.harvester.engine.support.CrudsException;
-import com.esri.geoportal.harvester.engine.support.CrudsRepo;
+import com.esri.geoportal.harvester.engine.support.CrudlException;
 import java.util.UUID;
+import com.esri.geoportal.harvester.engine.support.CrudlRepo;
 
 /**
  * History manager.
  */
-public interface HistoryManager extends CrudsRepo<History.Event> {
+public interface HistoryManager extends CrudlRepo<History.Event> {
   /**
    * Builds history for the task.
    * @param uuid id of the task stored in the repo.
    * @return history
-   * @throws CrudsException if building history fails
+   * @throws CrudlException if building history fails
    */
-  History buildHistory(UUID uuid) throws CrudsException;
+  History buildHistory(UUID uuid) throws CrudlException;
   
   /**
    * Purges history for a given task id.
    * @param taskId task id.
-   * @throws CrudsException if purging history fails
+   * @throws CrudlException if purging history fails
    */
-  void purgeHistory(UUID taskId) throws CrudsException;
+  void purgeHistory(UUID taskId) throws CrudlException;
 }

@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.engine.managers.History;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
-import com.esri.geoportal.harvester.engine.support.CrudsException;
+import com.esri.geoportal.harvester.engine.support.CrudlException;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.serialize;
 import java.io.IOException;
@@ -40,6 +40,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 
 /**
  * History manager bean.
@@ -78,7 +81,7 @@ public class HistoryManagerBean implements HistoryManager {
   }
 
   @Override
-  public UUID create(History.Event data) throws CrudsException {
+  public UUID create(History.Event data) throws CrudlException {
     UUID id = UUID.randomUUID();
     try (
             Connection connection = dataSource.getConnection();
@@ -92,13 +95,13 @@ public class HistoryManagerBean implements HistoryManager {
       st.setString(5, data.getUuid().toString());
       st.executeUpdate();
     } catch (IOException|SQLException ex) {
-      throw new CrudsException("Error creating history event", ex);
+      throw new CrudlException("Error creating history event", ex);
     }
     return id;
   }
 
   @Override
-  public boolean delete(UUID id) throws CrudsException {
+  public boolean delete(UUID id) throws CrudlException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("DELETE FROM EVENTS WHERE ID = ?");
@@ -106,12 +109,12 @@ public class HistoryManagerBean implements HistoryManager {
       st.setString(1, id.toString());
       return st.executeUpdate()>0;
     } catch (SQLException ex) {
-      throw new CrudsException("Error deleting history event definition", ex);
+      throw new CrudlException("Error deleting history event definition", ex);
     }
   }
 
   @Override
-  public History.Event read(UUID id) throws CrudsException {
+  public History.Event read(UUID id) throws CrudlException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("SELECT taskid,started,completed,report,id FROM EVENTS WHERE ID = ?");
@@ -130,14 +133,14 @@ public class HistoryManagerBean implements HistoryManager {
         }
       }
     } catch (IOException|SQLException ex) {
-      throw new CrudsException("Error reading history event", ex);
+      throw new CrudlException("Error reading history event", ex);
     }
     
     return null;
   }
 
   @Override
-  public Collection<Map.Entry<UUID, History.Event>> select() throws CrudsException {
+  public Collection<Map.Entry<UUID, History.Event>> list() throws CrudlException {
     HashMap<UUID, History.Event> map = new HashMap<>();
     try (
             Connection connection = dataSource.getConnection();
@@ -156,13 +159,13 @@ public class HistoryManagerBean implements HistoryManager {
         }
       }
     } catch (IOException|SQLException ex) {
-      throw new CrudsException("Error selecting broker definition", ex);
+      throw new CrudlException("Error selecting broker definition", ex);
     }
     return map.entrySet();
   }
 
   @Override
-  public boolean update(UUID id, History.Event data) throws CrudsException {
+  public boolean update(UUID id, History.Event data) throws CrudlException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("UPDATE EVENTS SET (taskid = ?, started = ?, completed = ?, report = ?) WHERE ID = ?");
@@ -175,12 +178,12 @@ public class HistoryManagerBean implements HistoryManager {
       st.setString(5, id.toString());
       return st.executeUpdate()>0;
     } catch (IOException|SQLException ex) {
-      throw new CrudsException("Error updating history event", ex);
+      throw new CrudlException("Error updating history event", ex);
     }
   }
 
   @Override
-  public History buildHistory(UUID taskid) throws CrudsException {
+  public History buildHistory(UUID taskid) throws CrudlException {
     History history = new History();
     try (
             Connection connection = dataSource.getConnection();
@@ -201,12 +204,12 @@ public class HistoryManagerBean implements HistoryManager {
       }
       return history;
     } catch (IOException|SQLException ex) {
-      throw new CrudsException("Error selecting broker definition", ex);
+      throw new CrudlException("Error selecting broker definition", ex);
     }
   }
 
   @Override
-  public void purgeHistory(UUID taskid) throws CrudsException {
+  public void purgeHistory(UUID taskid) throws CrudlException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("DELETE FROM EVENTS WHERE taskid = ?");
@@ -214,7 +217,7 @@ public class HistoryManagerBean implements HistoryManager {
       st.setString(1, taskid.toString());
       st.executeUpdate();
     } catch (SQLException ex) {
-      throw new CrudsException("Error selecting broker definition", ex);
+      throw new CrudlException("Error selecting broker definition", ex);
     }
   }
   

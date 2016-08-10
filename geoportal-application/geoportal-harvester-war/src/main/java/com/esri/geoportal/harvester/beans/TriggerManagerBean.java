@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
-import com.esri.geoportal.harvester.engine.support.CrudsException;
+import com.esri.geoportal.harvester.engine.support.CrudlException;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.serialize;
 import java.io.IOException;
 import java.sql.Connection;
@@ -34,6 +34,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.annotation.PreDestroy;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
 
 /**
@@ -71,7 +74,7 @@ public class TriggerManagerBean implements TriggerManager {
   }
 
   @Override
-  public UUID create(TaskUuidTriggerDefinitionPair data) throws CrudsException {
+  public UUID create(TaskUuidTriggerDefinitionPair data) throws CrudlException {
     UUID id = UUID.randomUUID();
     try (
             Connection connection = dataSource.getConnection();
@@ -80,25 +83,25 @@ public class TriggerManagerBean implements TriggerManager {
       st.setString(2, id.toString());
       st.executeUpdate();
     } catch (SQLException | IOException ex) {
-      throw new CrudsException("Error selecting trigger definition", ex);
+      throw new CrudlException("Error selecting trigger definition", ex);
     }
     return id;
   }
 
   @Override
-  public boolean delete(UUID id) throws CrudsException {
+  public boolean delete(UUID id) throws CrudlException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("DELETE FROM TRIGGERS WHERE ID = ?");) {
       st.setString(1, id.toString());
       return st.executeUpdate() > 0;
     } catch (SQLException ex) {
-      throw new CrudsException("Error deleting trigger definition", ex);
+      throw new CrudlException("Error deleting trigger definition", ex);
     }
   }
 
   @Override
-  public TaskUuidTriggerDefinitionPair read(UUID id) throws CrudsException {
+  public TaskUuidTriggerDefinitionPair read(UUID id) throws CrudlException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("SELECT * FROM TRIGGERS WHERE ID = ?");) {
@@ -112,14 +115,14 @@ public class TriggerManagerBean implements TriggerManager {
         }
       }
     } catch (SQLException ex) {
-      throw new CrudsException("Error selecting broker definition", ex);
+      throw new CrudlException("Error selecting broker definition", ex);
     }
 
     return null;
   }
 
   @Override
-  public Collection<Map.Entry<UUID, TaskUuidTriggerDefinitionPair>> select() throws CrudsException {
+  public Collection<Map.Entry<UUID, TaskUuidTriggerDefinitionPair>> list() throws CrudlException {
     HashMap<UUID, TaskUuidTriggerDefinitionPair> map = new HashMap<>();
     try (
             Connection connection = dataSource.getConnection();
@@ -135,13 +138,13 @@ public class TriggerManagerBean implements TriggerManager {
         }
       }
     } catch (SQLException ex) {
-      throw new CrudsException("Error selecting broker definition", ex);
+      throw new CrudlException("Error selecting broker definition", ex);
     }
     return map.entrySet();
   }
 
   @Override
-  public boolean update(UUID id, TaskUuidTriggerDefinitionPair data) throws CrudsException {
+  public boolean update(UUID id, TaskUuidTriggerDefinitionPair data) throws CrudlException {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("UPDATE TRIGGERS SET definition = ? WHERE ID = ?");) {
@@ -149,7 +152,7 @@ public class TriggerManagerBean implements TriggerManager {
       st.setString(2, id.toString());
       return st.executeUpdate() > 0;
     } catch (SQLException | IOException ex) {
-      throw new CrudsException("Error selecting broker definition", ex);
+      throw new CrudlException("Error selecting broker definition", ex);
     }
   }
 
