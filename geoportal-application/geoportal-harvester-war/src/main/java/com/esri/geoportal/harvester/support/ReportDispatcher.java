@@ -19,6 +19,7 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.engine.managers.ReportBuilder;
 import java.util.Arrays;
 import java.util.List;
@@ -63,7 +64,7 @@ public class ReportDispatcher implements ReportBuilder {
   }
 
   @Override
-  public void error(ProcessInstance process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
+  public void error(ProcessInstance process, DataProcessorException ex) {
     builders.forEach(b->b.error(process, ex));
   }
 }
