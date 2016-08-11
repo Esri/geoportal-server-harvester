@@ -72,12 +72,11 @@ html,body {
 }
 
 .h-broker-type {
-  font-size: medium;
-  font-weight: bold;
-  background-color: lightgray;
 }
 
 .h-broker-label {
+  font-weight: bold;
+  background-color: lightgray;
 }
 
 .h-broker-edit {
