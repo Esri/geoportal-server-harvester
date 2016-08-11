@@ -44,13 +44,13 @@ public class GptConnector implements OutputConnector<OutputBroker> {
   public UITemplate getTemplate() {
     List<UITemplate.Argument> arguments = new ArrayList<>();
     arguments.add(new UITemplate.StringArgument(P_HOST_URL, "URL", true));
-    arguments.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_USERNAME, "User name"));
-    arguments.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_PASSWORD, "User password") {
+    arguments.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_USERNAME, "User name", true));
+    arguments.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_PASSWORD, "User password", true) {
       public boolean isPassword() {
         return true;
       }
     });
-    return new UITemplate(getType(), "Geoportal Server New Generation", arguments);
+    return new UITemplate(getType(), "Geoportal Server 2.0", arguments);
   }
 
   @Override
