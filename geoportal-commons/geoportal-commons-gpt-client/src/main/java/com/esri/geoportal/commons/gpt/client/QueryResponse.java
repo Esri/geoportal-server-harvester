@@ -21,6 +21,7 @@ import java.util.List;
  * Query response.
  */
 /*package*/ final class QueryResponse {
+  public long total;
   public Hits hits;
  
   public static final class Hits {

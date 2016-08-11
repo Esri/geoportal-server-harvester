@@ -111,6 +111,7 @@ public class DefaultProcessor implements Processor {
             for (Link link: task.getDataDestinations()) {
               link.initialize(outputCtx);
             }
+            
             InputBroker.Iterator iterator = task.getDataSource().iterator(attributes);
             while (iterator.hasNext()) {
               if (Thread.currentThread().isInterrupted()) {
@@ -132,6 +133,12 @@ public class DefaultProcessor implements Processor {
                 }
               });
             }
+            if (!Thread.currentThread().isInterrupted()) {
+              for (Link link: task.getDataDestinations()) {
+                link.terminate();
+              }
+              task.getDataSource().terminate();
+            }
           } catch (DataInputException ex) {
             LOG.error(String.format("Error harvesting of %s", getTitle()), ex);
             onError(ex);
@@ -143,16 +150,6 @@ public class DefaultProcessor implements Processor {
             aborting = false;
             Thread.interrupted();
             onStatusChange();
-            
-            try {
-              for (Link link: task.getDataDestinations()) {
-                link.terminate();
-              }
-              task.getDataSource().terminate();
-              LOG.info(String.format("Completed harvest: %s", getTitle()));
-            } catch (DataProcessorException ex) {
-              LOG.error(String.format("Error completing harvest: %s", getTitle()));
-            }
           }
         }
       }, "HARVESTING");

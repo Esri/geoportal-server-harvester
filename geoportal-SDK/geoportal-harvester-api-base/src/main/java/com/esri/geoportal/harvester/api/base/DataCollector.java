@@ -18,9 +18,12 @@ package com.esri.geoportal.harvester.api.base;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import java.util.List;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Data collector.
@@ -46,6 +49,20 @@ public class DataCollector {
     onStart();
     
     try {
+      InputBroker.InputBrokerContext inputCtx = new InputBroker.InputBrokerContext() {
+      };
+      OutputBroker.OutputBrokerContext outputCtx = new OutputBroker.OutputBrokerContext() {
+        @Override
+        public URI getSourceUri() throws URISyntaxException {
+          return inputBroker.getBrokerUri();
+        }
+      };
+      
+      inputBroker.initialize(inputCtx);
+      for (OutputBroker br : outputBrokers) {
+        br.initialize(outputCtx);
+      }
+      
       InputBroker.Iterator iterator = inputBroker.iterator(null);
       top: while (iterator.hasNext()) {
         if (Thread.currentThread().isInterrupted()) break;
@@ -59,6 +76,15 @@ public class DataCollector {
           }
         }
       }
+      
+      if (!Thread.currentThread().isInterrupted()) {
+        inputBroker.terminate();
+        for (OutputBroker br : outputBrokers) {
+          br.terminate();
+        }
+      }
+    } catch (DataProcessorException ex) {
+      onProcessorException(ex);
     } catch (DataInputException ex) {
       onSourceException(ex);
     } finally {
@@ -70,4 +96,5 @@ public class DataCollector {
   protected void onComplete() {}
   protected void onSourceException(DataInputException ex) {}
   protected void onDestinationException(DataOutputException ex) {}
+  protected void onProcessorException(DataProcessorException ex) {}
 }

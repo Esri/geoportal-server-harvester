@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -135,7 +136,7 @@ public class Client implements Closeable {
    * @throws URISyntaxException if URL has invalid syntax
    */
   public List<String> queryBySource(String src_source_uri_s) throws IOException, URISyntaxException {
-    return query("src_source_uri_s", src_source_uri_s);
+    return queryIds("src_source_uri_s", src_source_uri_s, 200);
   }
 
   /**
@@ -171,23 +172,59 @@ public class Client implements Closeable {
    * @throws URISyntaxException if URL has invalid syntax
    */
   private List<String> queryIds(String src_uri_s) throws IOException, URISyntaxException {
-    return query("src_uri_s", src_uri_s);
+    return queryIds("src_uri_s", src_uri_s, 5);
+  }
+  
+  /**
+   * Query ids.
+   * @param term term to query
+   * @param value value of the term
+   * @param size size of the chunk
+   * @return list of ids
+   * @throws IOException if reading response fails
+   * @throws URISyntaxException if URL has invalid syntax
+   */
+  private List<String> queryIds(String term, String value, long size) throws IOException, URISyntaxException {
+    ArrayList<String> ids = new ArrayList<>();
+    
+    long from = 0;
+    
+    while (true) {
+      QueryResponse response = query(term, value, from, size);
+      if (Thread.currentThread().isInterrupted()) {
+        break;
+      }
+      if (response.hits == null || response.hits.hits == null || response.hits.hits.isEmpty()) {
+        break;
+      }
+      ids.addAll(response.hits.hits.stream()
+              .map(h -> h._id)
+              .filter(id -> id != null)
+              .collect(Collectors.toList()));
+      from += response.hits.hits.size();
+    }
+    
+    return ids;
   }
 
   /**
    * Query items.
    *
-   * @param query query
+   * @param term term name
+   * @param value value of the term
+   * @param from starting record
+   * @param size number of records to return
    * @return query response
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  private List<String> query(String term, String value) throws IOException, URISyntaxException {
+  private QueryResponse query(String term, String value, long from, long size) throws IOException, URISyntaxException {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-    HttpGet get = new HttpGet(url.toURI().resolve(REST_SEARCH_URL).toASCIIString() + String.format("?q=%s:%s", term, URLEncoder.encode("\"" + value + "\"", "UTF-8")));
+    HttpGet get = new HttpGet(url.toURI().resolve(REST_SEARCH_URL).toASCIIString() + 
+            String.format("?q=%s:%s&from=%d", term, URLEncoder.encode("\"" + value + "\"", "UTF-8"), from));
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("Content-Type", "application/json");
 
@@ -199,11 +236,7 @@ public class Client implements Closeable {
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       System.out.println(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
       QueryResponse queryResponse = mapper.readValue(responseContent, QueryResponse.class);
-      if (queryResponse.hits != null && queryResponse.hits.hits != null) {
-        return queryResponse.hits.hits.stream().map(h -> h._id).filter(id -> id != null).collect(Collectors.toList());
-      } else {
-        return Collections.emptyList();
-      }
+      return queryResponse;
     }
   }
 
