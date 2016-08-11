@@ -26,6 +26,7 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.IOException;
 import java.net.URI;
@@ -56,6 +57,16 @@ import org.apache.http.impl.client.HttpClients;
   public CswBroker(CswConnector connector, CswBrokerDefinitionAdaptor definition) {
     this.connector = connector;
     this.definition = definition;
+  }
+
+  @Override
+  public void initialize() throws DataProcessorException {
+    // nothing to initialize
+  }
+
+  @Override
+  public void terminate() throws DataProcessorException {
+    // nothing to terminate
   }
 
   @Override

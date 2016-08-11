@@ -26,6 +26,19 @@ import java.util.List;
  * Link action.
  */
 public interface LinkAction extends AutoCloseable {
+  
+  /**
+   * Initialize link action
+   * @throws DataProcessorException if initialization fails.
+   */
+  void initialize() throws DataProcessorException;
+  
+  /**
+   * Terminates link action
+   * @throws DataProcessorException if termination fails.
+   */
+  void terminate() throws DataProcessorException;
+  
   /**
    * Gets link action definition.
    * @return link action definition

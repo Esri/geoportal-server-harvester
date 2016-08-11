@@ -43,6 +43,22 @@ public class SimpleLink implements Link {
   }
 
   @Override
+  public void initialize() throws DataProcessorException {
+    action.initialize();
+    for (Link l: drains) {
+      l.initialize();
+    }
+  }
+
+  @Override
+  public void terminate() throws DataProcessorException {
+    action.terminate();
+    for (Link l: drains) {
+      l.terminate();
+    }
+  }
+
+  @Override
   public LinkDefinition getLinkDefinition() {
     LinkDefinition linkDef = new LinkDefinition();
     linkDef.setAction(action.getLinkActionDefinition());

@@ -16,12 +16,25 @@
 package com.esri.geoportal.harvester.api;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 
 /**
  * Filter instance.
  * @see Filter
  */
 public interface FilterInstance extends AutoCloseable {
+  
+  /**
+   * Initialize instance.
+   * @throws DataProcessorException if initialization fails.
+   */
+  void initialize() throws DataProcessorException;
+  
+  /**
+   * Terminates instance
+   * @throws DataProcessorException if termination fails.
+   */
+  void terminate() throws DataProcessorException;
   
   /**
    * Gets filter definition.

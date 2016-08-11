@@ -20,6 +20,7 @@ import com.esri.geoportal.harvester.api.Filter;
 import com.esri.geoportal.harvester.api.FilterInstance;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +78,16 @@ public class RegExFilter implements Filter {
       } catch (PatternSyntaxException ex) {
         throw new InvalidDefinitionException(String.format("Invalid pattern: %s", strPattern), ex);
       }
+    }
+
+    @Override
+    public void initialize() throws DataProcessorException {
+      // empty initialization
+    }
+
+    @Override
+    public void terminate() throws DataProcessorException {
+      // empty termination
     }
 
     @Override

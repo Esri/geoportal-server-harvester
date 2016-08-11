@@ -25,6 +25,7 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.general.Link;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
  * DefaultProcessor.
  */
 public class DefaultProcessor implements Processor {
+
   public static final String TYPE = "DEFAULT";
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultProcessor.class);
@@ -61,7 +63,7 @@ public class DefaultProcessor implements Processor {
   }
 
   @Override
-  public ProcessInstance createProcess(Task task, Map<String,Object> attributes) {
+  public ProcessInstance createProcess(Task task, Map<String, Object> attributes) {
     LOG.info(String.format("SUBMITTING: %s", task));
     return new DefaultProcess(task, attributes);
   }
@@ -82,16 +84,21 @@ public class DefaultProcessor implements Processor {
 
     /**
      * Creates instance of the process.
+     *
      * @param task task
      * @param attributes attributes or <code>null</code> if no attributes
      */
-    public DefaultProcess(Task task, Map<String,Object> attributes) {
+    public DefaultProcess(Task task, Map<String, Object> attributes) {
       this.task = task;
       this.thread = new Thread(() -> {
         onStatusChange();
         LOG.info(String.format("Started harvest: %s", getTitle()));
-        try {
-          if (!task.getDataDestinations().isEmpty()) {
+        if (!task.getDataDestinations().isEmpty()) {
+          try {
+            task.getDataSource().initialize();
+            for (Link link: task.getDataDestinations()) {
+              link.initialize();
+            }
             InputBroker.Iterator iterator = task.getDataSource().iterator(attributes);
             while (iterator.hasNext()) {
               if (Thread.currentThread().isInterrupted()) {
@@ -103,7 +110,7 @@ public class DefaultProcessor implements Processor {
                 try {
                   PublishingStatus status = d.push(dataReference);
                   LOG.debug(String.format("Harvested %s during %s", dataReference, getTitle()));
-                  onSuccess(dataReference,status);
+                  onSuccess(dataReference, status);
                 } catch (DataProcessorException ex) {
                   LOG.warn(String.format("Failed harvesting %s during %s", dataReference, getTitle()));
                   onError(ex);
@@ -113,16 +120,28 @@ public class DefaultProcessor implements Processor {
                 }
               });
             }
+          } catch (DataInputException ex) {
+            LOG.error(String.format("Error harvesting of %s", getTitle()), ex);
+            onError(ex);
+          } catch (DataProcessorException ex) {
+            LOG.error(String.format("Error harvesting of %s", getTitle()), ex);
+            onError(ex);
+          } finally {
+            completed = true;
+            aborting = false;
+            Thread.interrupted();
+            onStatusChange();
+            
+            try {
+              for (Link link: task.getDataDestinations()) {
+                link.terminate();
+              }
+              task.getDataSource().terminate();
+              LOG.info(String.format("Completed harvest: %s", getTitle()));
+            } catch (DataProcessorException ex) {
+              LOG.error(String.format("Error completing harvest: %s", getTitle()));
+            }
           }
-        } catch (DataInputException ex) {
-          LOG.error(String.format("Error harvesting of %s", getTitle()), ex);
-          onError(ex);
-        } finally {
-          completed = true;
-          aborting = false;
-          LOG.info(String.format("Completed harvest: %s", getTitle()));
-          Thread.interrupted();
-          onStatusChange();
         }
       }, "HARVESTING");
     }
@@ -198,6 +217,7 @@ public class DefaultProcessor implements Processor {
 
     /**
      * Called to handle output error.
+     *
      * @param ex output exception
      */
     private void onError(DataOutputException ex) {
@@ -208,6 +228,7 @@ public class DefaultProcessor implements Processor {
 
     /**
      * Called to handle processor error.
+     *
      * @param ex processor exception
      */
     private void onError(DataProcessorException ex) {
@@ -218,6 +239,7 @@ public class DefaultProcessor implements Processor {
 
     /**
      * Called to handle input error.
+     *
      * @param ex input exception
      */
     private void onError(DataInputException ex) {
@@ -226,21 +248,23 @@ public class DefaultProcessor implements Processor {
 
     /**
      * Called to handle successful data processing
+     *
      * @param dataRef data reference
      * @param status publishing status
      */
     private void onSuccess(DataReference dataRef, PublishingStatus status) {
-      listeners.forEach(l -> l.onDataProcessed(dataRef,status));
+      listeners.forEach(l -> l.onDataProcessed(dataRef, status));
     }
 
     /**
      * Called to handle successful data acquiring
+     *
      * @param dataRef data reference
      */
     private void onAcquire(DataReference dataRef) {
       listeners.forEach(l -> l.onDataAcquired(dataRef));
     }
-    
+
     /**
      * Called when status has been changed.
      */

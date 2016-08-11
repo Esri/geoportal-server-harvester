@@ -39,6 +39,16 @@ public final class TransformerLinkActionAdaptor implements LinkAction {
   }
 
   @Override
+  public void initialize() throws DataProcessorException {
+    transformer.initialize();
+  }
+
+  @Override
+  public void terminate() throws DataProcessorException {
+    transformer.terminate();
+  }
+
+  @Override
   public EntityDefinition getLinkActionDefinition() {
     return transformer.getTransformerDefinition();
   }

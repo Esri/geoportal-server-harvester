@@ -22,6 +22,7 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import java.io.IOException;
@@ -51,6 +52,16 @@ import java.util.Date;
     this.connector = connector;
     this.definition = definition;
     this.client = client;
+  }
+
+  @Override
+  public void initialize() throws DataProcessorException {
+    // nothing to initialize
+  }
+
+  @Override
+  public void terminate() throws DataProcessorException {
+    // nothing to terminate
   }
 
   @Override

@@ -41,6 +41,16 @@ public final class FilterLinkActionAdaptor implements LinkAction {
   }
 
   @Override
+  public void initialize() throws DataProcessorException {
+    filter.initialize();
+  }
+
+  @Override
+  public void terminate() throws DataProcessorException {
+    filter.terminate();
+  }
+
+  @Override
   public EntityDefinition getLinkActionDefinition() {
     return filter.getFilterDefinition();
   }

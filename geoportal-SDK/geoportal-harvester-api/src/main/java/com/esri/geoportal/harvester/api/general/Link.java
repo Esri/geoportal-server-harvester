@@ -25,6 +25,19 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
  * Link.
  */
 public interface Link extends AutoCloseable {
+  
+  /**
+   * Initialize link
+   * @throws DataProcessorException if initialization fails.
+   */
+  void initialize() throws DataProcessorException;
+  
+  /**
+   * Terminates link.
+   * @throws DataProcessorException if termination fails.
+   */
+  void terminate() throws DataProcessorException;
+  
   /**
    * Gets definition.
    * @return definition

@@ -40,6 +40,16 @@ public final class BrokerLinkActionAdaptor implements LinkAction {
   }
 
   @Override
+  public void initialize() throws DataProcessorException {
+    broker.initialize();
+  }
+
+  @Override
+  public void terminate() throws DataProcessorException {
+    broker.terminate();
+  }
+
+  @Override
   public EntityDefinition getLinkActionDefinition() {
     return broker.getEntityDefinition();
   }

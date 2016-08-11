@@ -21,6 +21,7 @@ import com.esri.geoportal.harvester.api.TransformerInstance;
 import com.esri.geoportal.harvester.api.base.DataReferenceWrapper;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.io.ByteArrayInputStream;
@@ -46,6 +47,7 @@ import org.slf4j.LoggerFactory;
  * Transforms data based on xslt.
  */
 public class XsltTransformer implements Transformer {
+
   private static final Logger LOG = LoggerFactory.getLogger(XsltTransformer.class);
   public static final String X_XSLT_XSLT = "x-xslt-xslt";
   public static final String X_XSLT_PROPS = "x-xslt-props";
@@ -58,7 +60,7 @@ public class XsltTransformer implements Transformer {
 
   @Override
   public TransformerInstance createInstance(EntityDefinition transformerDefinition) throws InvalidDefinitionException {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return new XsltTransformerInstance(transformerDefinition);
   }
 
   @Override
@@ -69,37 +71,49 @@ public class XsltTransformer implements Transformer {
     UITemplate uiTemplate = new UITemplate(getType(), "XSLT transformer", arguments);
     return uiTemplate;
   }
-  
+
   /**
    * XSLT transformer instance.
    */
   private class XsltTransformerInstance implements TransformerInstance {
+
     private final EntityDefinition definition;
     private final javax.xml.transform.Transformer xsltTransformer;
 
     /**
      * Creates instance of the transformer instance.
+     *
      * @param definition definition
      */
     public XsltTransformerInstance(EntityDefinition definition) throws InvalidDefinitionException {
       this.definition = definition;
-      
+
       String strXslt = definition.getProperties().get(X_XSLT_XSLT);
-      if (strXslt==null) {
+      if (strXslt == null) {
         throw new InvalidDefinitionException(String.format("No transformation defined"));
       }
       try {
         xsltTransformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new ByteArrayInputStream(strXslt.getBytes("UTF-8"))));
         String strProps = definition.getProperties().get(X_XSLT_PROPS);
-        if (strProps!=null) {
+        if (strProps != null) {
           Properties props = new Properties();
           props.load(new ByteArrayInputStream(strProps.getBytes("UTF-8")));
-          props.entrySet().stream().forEach(e->xsltTransformer.setParameter(e.getKey().toString(), e.getValue()));
+          props.entrySet().stream().forEach(e -> xsltTransformer.setParameter(e.getKey().toString(), e.getValue()));
         }
-      } catch (IOException|TransformerConfigurationException ex) {
+      } catch (IOException | TransformerConfigurationException ex) {
         throw new InvalidDefinitionException(String.format("Invalid transformation: %s", strXslt), ex);
       }
-   }
+    }
+
+    @Override
+    public void initialize() throws DataProcessorException {
+      // empty initialization
+    }
+
+    @Override
+    public void terminate() throws DataProcessorException {
+      // empty termination
+    }
 
     @Override
     public EntityDefinition getTransformerDefinition() {
@@ -113,7 +127,7 @@ public class XsltTransformer implements Transformer {
         xsltTransformer.transform(new StreamSource(new InputStreamReader(new ByteArrayInputStream(input.getContent()), "UTF-8")), new StreamResult(new OutputStreamWriter(result, "UTF-8")));
         DataReference dataRef = new DataReferenceWrapper(input, result.toByteArray());
         return Arrays.asList(new DataReference[]{dataRef});
-      } catch (IOException|TransformerException ex) {
+      } catch (IOException | TransformerException ex) {
         throw new DataTransformerException(String.format("Error transforming input: %s", input.getSourceUri()), ex);
       }
     }
