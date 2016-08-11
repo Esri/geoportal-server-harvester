@@ -20,6 +20,7 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.specs.OutputBroker.OutputBrokerContext;
 import java.util.List;
 
 /**
@@ -29,9 +30,10 @@ public interface LinkAction extends AutoCloseable {
   
   /**
    * Initialize link action
+   * @param context context
    * @throws DataProcessorException if initialization fails.
    */
-  void initialize() throws DataProcessorException;
+  void initialize(OutputBrokerContext context) throws DataProcessorException;
   
   /**
    * Terminates link action

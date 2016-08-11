@@ -41,7 +41,7 @@ public class DataPrintStreamOutput implements OutputBroker {
   }
 
   @Override
-  public void initialize() throws DataProcessorException {
+  public void initialize(OutputBrokerContext context) throws DataProcessorException {
     // nothing to initialize
   }
 

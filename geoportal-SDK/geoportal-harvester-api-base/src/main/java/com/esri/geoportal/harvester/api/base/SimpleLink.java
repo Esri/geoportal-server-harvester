@@ -22,6 +22,7 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.general.Link;
 import com.esri.geoportal.harvester.api.general.LinkAction;
+import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,10 +44,10 @@ public class SimpleLink implements Link {
   }
 
   @Override
-  public void initialize() throws DataProcessorException {
-    action.initialize();
+  public void initialize(OutputBroker.OutputBrokerContext context) throws DataProcessorException {
+    action.initialize(context);
     for (Link l: drains) {
-      l.initialize();
+      l.initialize(context);
     }
   }
 

@@ -20,6 +20,7 @@ import com.esri.geoportal.harvester.api.defs.LinkDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.specs.OutputBroker.OutputBrokerContext;
 
 /**
  * Link.
@@ -28,9 +29,10 @@ public interface Link extends AutoCloseable {
   
   /**
    * Initialize link
+   * @param context output broker context
    * @throws DataProcessorException if initialization fails.
    */
-  void initialize() throws DataProcessorException;
+  void initialize(OutputBrokerContext context) throws DataProcessorException;
   
   /**
    * Terminates link.

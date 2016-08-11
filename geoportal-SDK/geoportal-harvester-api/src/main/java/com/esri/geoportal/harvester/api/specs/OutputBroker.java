@@ -19,6 +19,9 @@ import com.esri.geoportal.harvester.api.Broker;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Output broker.
@@ -30,10 +33,27 @@ import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 public interface OutputBroker extends Broker<OutputConnector> {
   
   /**
+   * Initialize broker.
+   * @param context context
+   * @throws DataProcessorException if initialization fails.
+   */
+  void initialize(OutputBrokerContext context) throws DataProcessorException;
+  
+  /**
+   * Terminates broker.
+   * @throws DataProcessorException if termination fails.
+   */
+  void terminate() throws DataProcessorException;
+  
+  /**
    * Publishes data.
    * @param ref data reference
    * @return publishing status
    * @throws DataOutputException if publishing data fails
    */
   PublishingStatus publish(DataReference ref) throws DataOutputException;
+  
+  interface OutputBrokerContext {
+    URI getSourceUri() throws URISyntaxException;
+  }
 }

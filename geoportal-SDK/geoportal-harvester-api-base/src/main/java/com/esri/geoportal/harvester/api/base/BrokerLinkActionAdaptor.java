@@ -22,6 +22,7 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.general.LinkAction;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
+import com.esri.geoportal.harvester.api.specs.OutputBroker.OutputBrokerContext;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,8 +41,8 @@ public final class BrokerLinkActionAdaptor implements LinkAction {
   }
 
   @Override
-  public void initialize() throws DataProcessorException {
-    broker.initialize();
+  public void initialize(OutputBrokerContext context) throws DataProcessorException {
+    broker.initialize(context);
   }
 
   @Override

@@ -51,7 +51,7 @@ public class GptConnector implements OutputConnector<OutputBroker> {
         return true;
       }
     });
-    arguments.add(new UITemplate.StringArgument(P_CLEANUP, "Perform cleanup"));
+    arguments.add(new UITemplate.BooleanArgument(P_CLEANUP, "Perform cleanup"));
     return new UITemplate(getType(), "Geoportal Server 2.0", arguments);
   }
 

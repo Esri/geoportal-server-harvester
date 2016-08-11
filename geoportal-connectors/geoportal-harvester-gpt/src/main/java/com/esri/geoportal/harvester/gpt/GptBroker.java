@@ -32,6 +32,9 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * GPT broker.
@@ -41,6 +44,7 @@ import java.util.Date;
   private final GptConnector connector;
   private final GptBrokerDefinitionAdaptor definition;
   private final Client client;
+  private final Set<String> existing = new HashSet<>();
 
   /**
    * Creates instance of the broker.
@@ -55,13 +59,30 @@ import java.util.Date;
   }
 
   @Override
-  public void initialize() throws DataProcessorException {
+  public void initialize(OutputBrokerContext context) throws DataProcessorException {
     // nothing to initialize
+    if (definition.getCleanup()) {
+      try {
+        List<String> existingIds = client.queryBySource(context.getSourceUri().toASCIIString());
+        existing.addAll(existingIds);
+      } catch (IOException|URISyntaxException ex) {
+        throw new DataProcessorException(String.format("Error getting published records for: %s", client), ex);
+      }
+    }
   }
 
   @Override
   public void terminate() throws DataProcessorException {
     // nothing to terminate
+    if (definition.getCleanup()) {
+      for (String id: existing) {
+        try {
+          client.delete(id);
+        } catch (URISyntaxException|IOException ex) {
+          throw new DataProcessorException(String.format("Error terminating broker."), ex);
+        }
+      }
+    }
   }
 
   @Override
@@ -80,6 +101,7 @@ import java.util.Date;
       if (response.getError()!=null) {
         throw new DataOutputException(this, response.getError().getMessage());
       }
+      existing.remove(response.getId());
       return response.getStatus().equalsIgnoreCase("created")? PublishingStatus.CREATED: PublishingStatus.UPDATED;
     } catch (IOException|URISyntaxException ex) {
       throw new DataOutputException(this, "Error publishing data.", ex);

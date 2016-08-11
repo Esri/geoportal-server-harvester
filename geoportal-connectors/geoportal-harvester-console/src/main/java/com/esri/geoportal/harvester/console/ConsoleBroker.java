@@ -42,7 +42,7 @@ import java.io.IOException;
   }
 
   @Override
-  public void initialize() throws DataProcessorException {
+  public void initialize(OutputBrokerContext context) throws DataProcessorException {
     // nothing to initialize
   }
 

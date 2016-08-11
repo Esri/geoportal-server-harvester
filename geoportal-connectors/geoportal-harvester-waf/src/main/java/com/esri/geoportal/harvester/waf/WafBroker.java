@@ -59,7 +59,7 @@ import org.apache.http.impl.client.HttpClients;
   }
 
   @Override
-  public void initialize() throws DataProcessorException {
+  public void initialize(InputBrokerContext context) throws DataProcessorException {
     // nothing to initialize
   }
 

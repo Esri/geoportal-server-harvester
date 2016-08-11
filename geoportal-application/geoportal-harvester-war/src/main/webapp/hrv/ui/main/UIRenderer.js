@@ -116,10 +116,10 @@ define(["dojo/_base/declare",
         input.startup();
         return { 
           init: function(values) {
-            input.set("value", values[arg.name]);
+            input.set("checked", values[arg.name]=="true");
           },
           read: function(values) {
-            values[arg.name] = input.get("value");
+            values[arg.name] = input.get("checked")? "true": "false";
           },
           destroy: function() {
             input.destroy();

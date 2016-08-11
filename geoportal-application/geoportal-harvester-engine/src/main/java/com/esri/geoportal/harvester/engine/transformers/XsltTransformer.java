@@ -24,6 +24,7 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.specs.OutputBroker.OutputBrokerContext;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -106,7 +107,7 @@ public class XsltTransformer implements Transformer {
     }
 
     @Override
-    public void initialize() throws DataProcessorException {
+    public void initialize(OutputBrokerContext context) throws DataProcessorException {
       // empty initialization
     }
 

@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -44,6 +45,7 @@ import org.apache.http.impl.client.HttpClients;
  * GPT 2.0 Client.
  */
 public class Client implements Closeable {
+
   private static final String REST_ITEM_URL = "rest/metadata/item";
   private static final String REST_SEARCH_URL = "rest/metadata/search";
 
@@ -137,6 +139,30 @@ public class Client implements Closeable {
   }
 
   /**
+   * Deletes record by id.
+   * @param id record id
+   * @return publish response
+   * @throws IOException if reading response fails
+   * @throws URISyntaxException if URL has invalid syntax
+   */
+  public PublishResponse delete(String id) throws URISyntaxException, IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    HttpDelete del = new HttpDelete(url.toURI().resolve(REST_ITEM_URL + "/" + id));
+    del.setConfig(DEFAULT_REQUEST_CONFIG);
+    HttpClientContext context = createHttpClientContext(url, cred);
+    HttpResponse httpResponse = httpClient.execute(del, context);
+    String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
+
+    try (InputStream contentStream = httpResponse.getEntity().getContent();) {
+      String responseContent = IOUtils.toString(contentStream, "UTF-8");
+      System.out.println(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
+      return mapper.readValue(responseContent, PublishResponse.class);
+    }
+  }
+
+  /**
    * Query items by src_uri_s.
    *
    * @param src_uri_s query
@@ -147,7 +173,7 @@ public class Client implements Closeable {
   private List<String> queryIds(String src_uri_s) throws IOException, URISyntaxException {
     return query("src_uri_s", src_uri_s);
   }
-  
+
   /**
    * Query items.
    *
@@ -161,7 +187,7 @@ public class Client implements Closeable {
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-    HttpGet get = new HttpGet(url.toURI().resolve(REST_SEARCH_URL).toASCIIString() + String.format("?q=%s:%s", term, URLEncoder.encode("\""+value+"\"", "UTF-8")));
+    HttpGet get = new HttpGet(url.toURI().resolve(REST_SEARCH_URL).toASCIIString() + String.format("?q=%s:%s", term, URLEncoder.encode("\"" + value + "\"", "UTF-8")));
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("Content-Type", "application/json");
 

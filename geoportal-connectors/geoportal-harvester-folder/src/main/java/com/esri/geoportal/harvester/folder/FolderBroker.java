@@ -48,7 +48,7 @@ import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
   }
 
   @Override
-  public void initialize() throws DataProcessorException {
+  public void initialize(OutputBrokerContext context) throws DataProcessorException {
     // nothing to initialize
   }
 
