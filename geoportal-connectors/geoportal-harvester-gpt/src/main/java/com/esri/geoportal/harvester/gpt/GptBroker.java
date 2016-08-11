@@ -101,4 +101,7 @@ import java.util.Date;
     return FORMATTER.format(zonedDateTime);
   }
   
+  private boolean getCleanup() {
+    return definition.getCleanup();
+  }
 }

@@ -29,10 +29,12 @@ import org.apache.commons.lang3.StringUtils;
 /*package*/ class GptBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public static final String P_HOST_URL        = "gpt-host-url";
   public static final String P_FORCE_ADD       = "gpt-force-add";
+  public static final String P_CLEANUP         = "gpt-cleanup";
 
   private final CredentialsDefinitionAdaptor credAdaptor;
   private URL hostUrl;
   private boolean forceAdd;
+  private boolean cleanup;
 
   /**
    * Creates instance of the adaptor.
@@ -52,6 +54,7 @@ import org.apache.commons.lang3.StringUtils;
         throw new IllegalArgumentException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
       }
       forceAdd = Boolean.parseBoolean(get(P_FORCE_ADD));
+      cleanup  = Boolean.parseBoolean(get(P_CLEANUP));
     }
   }
 
@@ -103,5 +106,22 @@ import org.apache.commons.lang3.StringUtils;
   public void setForceAdd(boolean forceAdd) {
     this.forceAdd = forceAdd;
     set(P_FORCE_ADD, Boolean.toString(forceAdd));
+  }
+
+  /**
+   * Gets permission to cleanup.
+   * @return <code>true</code> if cleanup permitted
+   */
+  public boolean getCleanup() {
+    return cleanup;
+  }
+
+  /**
+   * Sets permission to cleanup.
+   * @param cleanup <code>true</code> to permit cleanup
+   */
+  public void setCleanup(boolean cleanup) {
+    this.cleanup = cleanup;
+    set(P_CLEANUP, Boolean.toString(cleanup));
   }
 }
