@@ -125,6 +125,30 @@ public class Client implements Closeable {
   }
 
   /**
+   * Query items by src_source_uri_s.
+   *
+   * @param src_source_uri_s query
+   * @return query response
+   * @throws IOException if reading response fails
+   * @throws URISyntaxException if URL has invalid syntax
+   */
+  public List<String> queryBySource(String src_source_uri_s) throws IOException, URISyntaxException {
+    return query("src_source_uri_s", src_source_uri_s);
+  }
+
+  /**
+   * Query items by src_uri_s.
+   *
+   * @param src_uri_s query
+   * @return query response
+   * @throws IOException if reading response fails
+   * @throws URISyntaxException if URL has invalid syntax
+   */
+  private List<String> queryIds(String src_uri_s) throws IOException, URISyntaxException {
+    return query("src_uri_s", src_uri_s);
+  }
+  
+  /**
    * Query items.
    *
    * @param query query
@@ -132,12 +156,12 @@ public class Client implements Closeable {
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  private List<String> queryIds(String src_uri_s) throws IOException, URISyntaxException {
+  private List<String> query(String term, String value) throws IOException, URISyntaxException {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-    HttpGet get = new HttpGet(url.toURI().resolve(REST_SEARCH_URL).toASCIIString() + String.format("?q=%s", URLEncoder.encode("\""+src_uri_s+"\"", "UTF-8")));
+    HttpGet get = new HttpGet(url.toURI().resolve(REST_SEARCH_URL).toASCIIString() + String.format("?q=%s:%s", term, URLEncoder.encode("\""+value+"\"", "UTF-8")));
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("Content-Type", "application/json");
 
