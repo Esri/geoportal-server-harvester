@@ -26,6 +26,7 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -44,11 +45,21 @@ import org.slf4j.LoggerFactory;
 /*package*/ class GptBroker implements OutputBroker {
   private final static Logger LOG = LoggerFactory.getLogger(GptBroker.class);
   private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+  private final static String SBOM = generateSBOM();
   private final GptConnector connector;
   private final GptBrokerDefinitionAdaptor definition;
   private final Client client;
   private final Set<String> existing = new HashSet<>();
 
+  private static String generateSBOM() {
+    try {
+      return new String(new byte[]{(byte)0xEF,(byte)0xBB,(byte)0xBF},"UTF-8");
+    } catch (UnsupportedEncodingException ex) {
+      LOG.error(String.format("Error creating BOM."), ex);
+      return "";
+    }
+  }
+  
   /**
    * Creates instance of the broker.
    * @param connector connector
@@ -96,6 +107,9 @@ import org.slf4j.LoggerFactory;
       data.src_uri_s = ref.getSourceUri().toASCIIString();
       data.src_lastupdate_dt = ref.getLastModifiedDate()!=null? fromatDate(ref.getLastModifiedDate()): null;
       data.xml = new String(ref.getContent(),"UTF-8");
+      if (data.xml.startsWith(SBOM)) {
+        data.xml = data.xml.substring(1);
+      }
       PublishResponse response = client.publish(data, definition.getForceAdd());
       if (response==null) {
         throw new DataOutputException(this, "No response received");
