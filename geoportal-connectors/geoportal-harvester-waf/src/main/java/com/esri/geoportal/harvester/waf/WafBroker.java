@@ -139,7 +139,7 @@ import org.apache.http.impl.client.HttpClients;
 
         if (subFolders==null) {
           URL startUrl = new URL(definition.getHostUrl().toExternalForm().replaceAll("/$", "")+"/");
-          WafFolderContent content = new WafFolder(WafBroker.this, startUrl, definition.getCredentials()).readContent(httpClient);
+          WafFolderContent content = new WafFolder(WafBroker.this, startUrl, definition.getPattern(), definition.getCredentials()).readContent(httpClient);
           subFolders = new LinkedList<>(content.getSubFolders());
           files = new LinkedList<>(content.getFiles());
           return hasNext();

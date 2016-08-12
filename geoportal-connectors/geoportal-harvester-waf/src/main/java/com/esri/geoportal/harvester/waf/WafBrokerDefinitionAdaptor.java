@@ -31,11 +31,13 @@ import org.apache.commons.lang3.StringUtils;
  */
 /*package*/ class WafBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public static final String P_HOST_URL    = "waf-host-url";
+  public static final String P_PATTERN     = "waf-pattern";
   
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private final CredentialsDefinitionAdaptor credAdaptor;
   
   private URL hostUrl;
+  private String pattern;
 
   /**
    * Creates instance of the adaptor.
@@ -56,6 +58,7 @@ import org.apache.commons.lang3.StringUtils;
       } catch (MalformedURLException ex) {
         throw new IllegalArgumentException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
       }
+      pattern = get(P_PATTERN);
     }
   }
   
@@ -74,6 +77,23 @@ import org.apache.commons.lang3.StringUtils;
   public void setHostUrl(URL url) {
     this.hostUrl = url;
     set(P_HOST_URL, url.toExternalForm());
+  }
+
+  /**
+   * Gets pattern.
+   * @return pattern
+   */
+  public String getPattern() {
+    return pattern;
+  }
+
+  /**
+   * Sets pattern.
+   * @param pattern pattern
+   */
+  public void setPattern(String pattern) {
+    this.pattern = pattern;
+    set(P_HOST_URL, pattern);
   }
 
   /**

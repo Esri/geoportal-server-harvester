@@ -22,6 +22,7 @@ import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import static com.esri.geoportal.harvester.waf.WafBrokerDefinitionAdaptor.P_HOST_URL;
+import static com.esri.geoportal.harvester.waf.WafBrokerDefinitionAdaptor.P_PATTERN;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class WafConnector implements InputConnector<InputBroker> {
   public UITemplate getTemplate() {
     List<UITemplate.Argument> args = new ArrayList<>();
     args.add(new UITemplate.StringArgument(P_HOST_URL, "Url", true));
+    args.add(new UITemplate.StringArgument(P_PATTERN, "Pattern"));
     args.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_USERNAME, "User name", false));
     args.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_PASSWORD, "User password", false) {
       public boolean isPassword() {
