@@ -21,9 +21,11 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.ProcessesService;
 import com.esri.geoportal.harvester.engine.managers.ProcessManager;
-import com.esri.geoportal.harvester.engine.managers.ReportBuilder;
+import com.esri.geoportal.harvester.engine.managers.ReportManager;
+import com.esri.geoportal.harvester.engine.registers.StatisticsRegistry;
 import com.esri.geoportal.harvester.engine.support.CrudlException;
 import com.esri.geoportal.harvester.engine.support.ProcessReference;
+import com.esri.geoportal.harvester.engine.support.ReportBuilder;
 import com.esri.geoportal.harvester.engine.support.ReportBuilderAdaptor;
 import java.util.List;
 import java.util.Map;
@@ -36,16 +38,19 @@ import java.util.stream.Collectors;
  */
 public class DefaultProcessesService implements ProcessesService {
   protected final ProcessManager processManager;
-  protected final ReportBuilder reportBuilder;
+  protected final ReportManager reportManager;
+  protected final StatisticsRegistry statisticsRegistry;
 
   /**
    * Creates instance of the service.
    * @param processManager process manager
-   * @param reportBuilder report builder
+   * @param reportManager report manager
+   * @param statisticsRegistry statistics registry
    */
-  public DefaultProcessesService(ProcessManager processManager, ReportBuilder reportBuilder) {
+  public DefaultProcessesService(ProcessManager processManager, ReportManager reportManager, StatisticsRegistry statisticsRegistry) {
     this.processManager = processManager;
-    this.reportBuilder = reportBuilder;
+    this.reportManager = reportManager;
+    this.statisticsRegistry = statisticsRegistry;
   }
 
   @Override
@@ -71,6 +76,7 @@ public class DefaultProcessesService implements ProcessesService {
     try {
       ProcessInstance process = task.getProcessor().createProcess(task,attributes);
       UUID uuid = processManager.create(process);
+      ReportBuilder reportBuilder = reportManager.createReportBuilder(uuid, process);
       process.addListener(new ReportBuilderAdaptor(uuid, process, reportBuilder));
       return new ProcessReference(uuid, process);
     } catch (CrudlException ex) {

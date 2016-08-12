@@ -20,7 +20,7 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.engine.managers.ReportBuilder;
+import com.esri.geoportal.harvester.engine.support.ReportBuilder;
 import java.util.Arrays;
 import java.util.List;
 

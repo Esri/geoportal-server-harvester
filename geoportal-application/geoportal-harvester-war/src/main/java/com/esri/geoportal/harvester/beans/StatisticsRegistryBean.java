@@ -15,28 +15,34 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.engine.impl.DefaultProcessesService;
-import com.esri.geoportal.harvester.engine.managers.ProcessManager;
-import com.esri.geoportal.harvester.engine.managers.ReportManager;
 import com.esri.geoportal.harvester.engine.registers.StatisticsRegistry;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * Processes service bean.
+ * Statistics registry bean.
  */
 @Service
-public class ProcessesServiceBean extends DefaultProcessesService {
-
+public class StatisticsRegistryBean extends StatisticsRegistry {
+  private static final Logger LOG = LoggerFactory.getLogger(StatisticsRegistryBean.class);
+  
   /**
-   * Creates instance of the bean.
-   * @param processManager process manager
-   * @param reportManager report manager
-   * @param statisticsRegistry statistics registry
+   * Initializes bean.
    */
-  @Autowired
-  public ProcessesServiceBean(ProcessManager processManager, ReportManager reportManager, StatisticsRegistry statisticsRegistry) {
-    super(processManager, reportManager, statisticsRegistry);
+  @PostConstruct
+  public void init() {
+    LOG.info(String.format("StatisticsRegistryBean created."));
+  }
+  
+  /**
+   * Destroys bean.
+   */
+  @PreDestroy
+  public void destroy() {
+    LOG.info(String.format("StatisticsRegistryBean destroyed."));
   }
   
 }

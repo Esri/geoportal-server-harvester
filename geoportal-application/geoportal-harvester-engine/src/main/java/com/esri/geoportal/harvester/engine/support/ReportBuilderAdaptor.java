@@ -21,7 +21,6 @@ import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
-import com.esri.geoportal.harvester.engine.managers.ReportBuilder;
 import com.esri.geoportal.harvester.api.ex.DataException;
 import java.util.UUID;
 

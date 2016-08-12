@@ -15,11 +15,12 @@
  */
 package com.esri.geoportal.harvester.support;
 
+import com.esri.geoportal.harvester.engine.support.Statistics;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
-import com.esri.geoportal.harvester.engine.managers.ReportBuilder;
+import com.esri.geoportal.harvester.engine.support.ReportBuilder;
 import java.util.Calendar;
 import java.util.Date;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Report statistics.
  */
-public class ReportStatistics implements ReportBuilder {
+public class ReportStatistics implements ReportBuilder, Statistics {
   private final Logger LOG = LoggerFactory.getLogger(ReportStatistics.class);
   
   private Date startDate;
@@ -40,50 +41,32 @@ public class ReportStatistics implements ReportBuilder {
   
   private boolean failure;
 
-  /**
-   * Gets start date.
-   * @return start date
-   */
+  @Override
   public Date getStartDate() {
     return startDate;
   }
 
-  /**
-   * Gets end date.
-   * @return end date
-   */
+  @Override
   public Date getEndDate() {
     return endDate;
   }
 
-  /**
-   * Gets number of successfully processed records.
-   * @return number of successfully processed records
-   */
+  @Override
   public long getSucceeded() {
     return succeeded;
   }
 
-  /**
-   * Gets number of records which failed to be harvested.
-   * @return number of harvestFailed records
-   */
+  @Override
   public long getHarvestFailed() {
     return harvestFailed;
   }
 
-  /**
-   * Gets number of records which failed to be published.
-   * @return number of records which failed to be published
-   */
+  @Override
   public long getPublishFailed() {
     return publishFailed;
   }
 
-  /**
-   * Checks if there was a general error.
-   * @return <code>true</code> if there was a general error
-   */
+  @Override
   public boolean isFailure() {
     return failure;
   }
