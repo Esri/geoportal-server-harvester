@@ -41,7 +41,7 @@ public class ReportLogger implements ReportBuilder {
 
   @Override
   public void success(ProcessInstance process, DataReference dataReference) {
-    LOG.info(String.format("Success harvesting data: %s during processing task: %s", dataReference, process));
+    LOG.debug(String.format("Success harvesting data: %s during processing task: %s", dataReference, process));
   }
 
   @Override

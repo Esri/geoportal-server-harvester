@@ -41,11 +41,14 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * GPT 2.0 Client.
  */
 public class Client implements Closeable {
+  private final Logger LOG = LoggerFactory.getLogger(Client.class);
 
   private static final String REST_ITEM_URL = "rest/metadata/item";
   private static final String REST_SEARCH_URL = "rest/metadata/search";
@@ -122,7 +125,7 @@ public class Client implements Closeable {
 
     try (InputStream contentStream = httpResponse.getEntity().getContent();) {
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
-      System.out.println(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
+      LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
       return mapper.readValue(responseContent, PublishResponse.class);
     }
   }
@@ -158,7 +161,7 @@ public class Client implements Closeable {
 
     try (InputStream contentStream = httpResponse.getEntity().getContent();) {
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
-      System.out.println(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
+      LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
       return mapper.readValue(responseContent, PublishResponse.class);
     }
   }
@@ -234,7 +237,7 @@ public class Client implements Closeable {
 
     try (InputStream contentStream = httpResponse.getEntity().getContent();) {
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
-      System.out.println(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
+      LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
       QueryResponse queryResponse = mapper.readValue(responseContent, QueryResponse.class);
       return queryResponse;
     }

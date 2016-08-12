@@ -35,11 +35,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * GPT broker.
  */
 /*package*/ class GptBroker implements OutputBroker {
+  private final static Logger LOG = LoggerFactory.getLogger(GptBroker.class);
   private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
   private final GptConnector connector;
   private final GptBrokerDefinitionAdaptor definition;
@@ -60,7 +63,6 @@ import java.util.Set;
 
   @Override
   public void initialize(OutputBrokerContext context) throws DataProcessorException {
-    // nothing to initialize
     if (definition.getCleanup()) {
       try {
         List<String> existingIds = client.queryBySource(context.getSourceUri().toASCIIString());
@@ -73,7 +75,6 @@ import java.util.Set;
 
   @Override
   public void terminate() throws DataProcessorException {
-    // nothing to terminate
     if (definition.getCleanup()) {
       for (String id: existing) {
         try {
@@ -82,6 +83,7 @@ import java.util.Set;
           throw new DataProcessorException(String.format("Error terminating broker."), ex);
         }
       }
+      LOG.info(String.format("%d records has been removed during cleanup.", existing.size()));
     }
   }
 
