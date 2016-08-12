@@ -19,6 +19,8 @@ import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.support.ProcessResponse;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.beans.EngineBean;
+import com.esri.geoportal.harvester.engine.support.Statistics;
+import com.esri.geoportal.harvester.support.ProcessStatisticsResponse;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -71,11 +73,12 @@ public class ProcessController {
    * @return process info
    */
   @RequestMapping(value = "/rest/harvester/processes/{processId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ProcessResponse> getProcessInfo(@PathVariable UUID processId) {
+  public ResponseEntity<ProcessStatisticsResponse> getProcessInfo(@PathVariable UUID processId) {
     try {
       LOG.debug(String.format("GET /rest/harvester/processes/%s", processId));
       ProcessInstance process = engine.getProcessesService().getProcess(processId);
-      return new ResponseEntity<>(process!=null? new ProcessResponse(processId, process.getTitle(), process.getStatus()): null,HttpStatus.OK);
+      Statistics statistics = engine.getProcessesService().getStatistics(processId);
+      return new ResponseEntity<>(process!=null? new ProcessStatisticsResponse(processId, process.getTitle(), process.getStatus(), statistics): null,HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error getting process info: %s", processId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

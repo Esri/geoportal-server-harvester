@@ -20,6 +20,7 @@ import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.support.ProcessReference;
+import com.esri.geoportal.harvester.engine.support.Statistics;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -50,6 +51,14 @@ public interface ProcessesService {
    * @throws DataProcessorException if accessing repository fails
    */
   ProcessInstance getProcess(UUID processId) throws DataProcessorException;
+  
+  /**
+   * Gets process statistics.
+   * @param processId process id
+   * @return process statistics or <code>null</code> if no statistics available
+   * @throws DataProcessorException if getting statistics fails
+   */
+  Statistics getStatistics(UUID processId) throws DataProcessorException;
 
   /**
    * Selects processes by predicate.

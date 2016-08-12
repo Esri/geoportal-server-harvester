@@ -27,6 +27,7 @@ import com.esri.geoportal.harvester.engine.support.CrudlException;
 import com.esri.geoportal.harvester.engine.support.ProcessReference;
 import com.esri.geoportal.harvester.engine.support.ReportBuilder;
 import com.esri.geoportal.harvester.engine.support.ReportBuilderAdaptor;
+import com.esri.geoportal.harvester.engine.support.Statistics;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -60,6 +61,11 @@ public class DefaultProcessesService implements ProcessesService {
     } catch (CrudlException ex) {
       throw new DataProcessorException(String.format("Error getting process: %s", processId), ex);
     }
+  }
+
+  @Override
+  public Statistics getStatistics(UUID processId) throws DataProcessorException {
+    return statisticsRegistry.get(processId);
   }
 
   @Override

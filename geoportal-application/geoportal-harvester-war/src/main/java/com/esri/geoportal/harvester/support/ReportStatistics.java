@@ -40,7 +40,7 @@ public class ReportStatistics implements ReportBuilder, Statistics {
   private long publishFailed;
   
   private boolean failure;
-
+  
   @Override
   public Date getStartDate() {
     return startDate;
@@ -102,5 +102,9 @@ public class ReportStatistics implements ReportBuilder, Statistics {
   public void error(ProcessInstance process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
     failure = true;
   }
-  
+
+  @Override
+  public String toString() {
+    return String.format("STATISTICS :: start: %s, end: %s, succeeded: %d, harvested failed: %d, published failed: %d, failure: %b", startDate, endDate, succeeded, harvestFailed, publishFailed, failure);
+  }
 }
