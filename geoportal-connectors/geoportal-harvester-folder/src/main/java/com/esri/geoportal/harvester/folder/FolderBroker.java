@@ -29,13 +29,19 @@ import java.util.List;
 import java.io.OutputStream;
 import java.net.URI;
 import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
+import java.util.HashSet;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Folder broker.
  */
 /*package*/ class FolderBroker implements OutputBroker {
+  private final static Logger LOG = LoggerFactory.getLogger(FolderBroker.class);
   private final FolderConnector connector;
   private final FolderBrokerDefinitionAdaptor definition;
+  private final Set<String> existing = new HashSet<>();
 
   /**
    * Creates instance of the broker.
@@ -49,12 +55,28 @@ import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
 
   @Override
   public void initialize(OutputBrokerContext context) throws DataProcessorException {
-    // nothing to initialize
+    if (definition.getCleanup()) {
+      File rootFolder = definition.getRootFolder();
+      fetchExisting(rootFolder);
+    }
+  }
+  
+  private void fetchExisting(File folder) {
+    for (File f: folder.listFiles()) {
+      if (f.isFile()) {
+        existing.add(f.getAbsolutePath());
+      } else if (f.isDirectory()) {
+        fetchExisting(f);
+      }
+    }
   }
 
   @Override
   public void terminate() throws DataProcessorException {
-    // nothing to terminate
+    if (definition.getCleanup()) {
+      existing.forEach(f->new File(f).delete());
+      LOG.info(String.format("%d records has been removed during cleanup.", existing.size()));
+    }
   }
 
   @Override
@@ -67,11 +89,9 @@ import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
       File f = generateFileName(ref.getBrokerUri(), ref.getSourceUri(), ref.getId());
       boolean created = !f.exists();
       f.getParentFile().mkdirs();
-      if (!f.getName().contains(".")) {
-        f = f.getParentFile().toPath().resolve(f.getName()+".xml").toFile();
-      }
       try (OutputStream output = new FileOutputStream(f);) {
         output.write(ref.getContent());
+        existing.remove(f.getAbsolutePath());
         return created? PublishingStatus.CREATED: PublishingStatus.UPDATED;
       } catch (Exception ex) {
         throw new DataOutputException(this,"Error publishing data.", ex);
@@ -98,6 +118,9 @@ import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
       List<String> subFolder = splitPath(sourceUri.getPath());
       for (String sf : subFolder) {
         fileName = new File(fileName, sf);
+      }
+      if (!fileName.getName().contains(".")) {
+        fileName = fileName.getParentFile().toPath().resolve(fileName.getName()+".xml").toFile();
       }
     } else {
       fileName = new File(fileName,id+".xml");

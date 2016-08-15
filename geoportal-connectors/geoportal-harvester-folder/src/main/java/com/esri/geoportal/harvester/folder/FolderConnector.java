@@ -20,6 +20,7 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
+import static com.esri.geoportal.harvester.folder.FolderBrokerDefinitionAdaptor.P_FOLDER_CLEANUP;
 import static com.esri.geoportal.harvester.folder.FolderBrokerDefinitionAdaptor.P_ROOT_FOLDER;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,7 @@ public class FolderConnector implements OutputConnector<OutputBroker> {
   public UITemplate getTemplate() {
     List<UITemplate.Argument> arguments = new ArrayList<>();
     arguments.add(new UITemplate.StringArgument(P_ROOT_FOLDER, "Root folder", true));
+    arguments.add(new UITemplate.BooleanArgument(P_FOLDER_CLEANUP, "Perform cleanup"));
     return new UITemplate(getType(), "Folder", arguments);
   }
 

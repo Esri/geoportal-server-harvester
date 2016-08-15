@@ -26,8 +26,10 @@ import org.apache.commons.lang3.StringUtils;
 /*package*/ class FolderBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
 
   public static final String P_ROOT_FOLDER = "folder-root-folder";
+  public static final String P_FOLDER_CLEANUP = "folder-cleanup";
   
   private File rootFolder;
+  private boolean cleanup;
 
   /**
    * Creates instance of the adaptor.
@@ -45,6 +47,7 @@ import org.apache.commons.lang3.StringUtils;
       } catch (NullPointerException ex) {
         throw new IllegalArgumentException(String.format("Invalid %s: %s",P_ROOT_FOLDER,get(P_ROOT_FOLDER)), ex);
       }
+      cleanup  = Boolean.parseBoolean(get(P_FOLDER_CLEANUP));
     }
   }
 
@@ -65,5 +68,22 @@ import org.apache.commons.lang3.StringUtils;
   public void setRootFolder(File rootFolder) {
     this.rootFolder = rootFolder;
     set(P_ROOT_FOLDER, rootFolder.toString());
+  }
+
+  /**
+   * Gets permission to cleanup.
+   * @return <code>true</code> if cleanup permitted
+   */
+  public boolean getCleanup() {
+    return cleanup;
+  }
+
+  /**
+   * Sets permission to cleanup.
+   * @param cleanup <code>true</code> to permit cleanup
+   */
+  public void setCleanup(boolean cleanup) {
+    this.cleanup = cleanup;
+    set(P_FOLDER_CLEANUP, Boolean.toString(cleanup));
   }
 }
