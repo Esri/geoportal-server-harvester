@@ -21,15 +21,16 @@ define(["dojo/_base/declare",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/Process.html",
         "dojo/_base/lang",
-        "dojo/dom-construct",
-        "dojo/on",
+        "dojo/dom-class",
+        "dojo/dom-style",
+        "dojo/html",
         "dojo/topic",
         "hrv/rest/Processes"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,domConstruct,on,topic,
+           lang,domClass,domStyle,html,topic,
            ProcessesREST
           ){
   
@@ -43,9 +44,34 @@ define(["dojo/_base/declare",
       },
     
       postCreate: function(){
+        var update = lang.hitch(this,function(){
+          ProcessesREST.get(this.data.uuid).then(
+            lang.hitch(this,function(result){
+              html.set(this.statusNode, result.status);
+              domClass.remove(this.statusNode,"h-status-submitted");
+              domClass.remove(this.statusNode,"h-status-working");
+              domClass.remove(this.statusNode,"h-status-aborting");
+              domClass.remove(this.statusNode,"h-status-completed");
+              domClass.add(this.statusNode,"h-status-"+result.status);
+              domStyle.set(this.cancelNode,"display",result.status==="working"? "inline": "none");
+              domStyle.set(this.progressNode,"display",result.status==="working"? "inline": "none");
+              if (result.status==="working") {
+                if (result.statistics) {
+                  html.set(this.progressNode, ""+result.statistics.succeeded);
+                }
+                setTimeout(update,2000);
+              }
+            }),
+            lang.hitch(this,function(error){
+              topic.publish("msg",this.i18n.processes.errors.canceling);
+            })
+        );
+        });
         if (this.data.status==="working") {
-          var a = domConstruct.create("a",{class: "h-processes-process-cancel", innerHTML: this.i18n.processes.cancel},this.domNode);
-          on(a,"click",lang.hitch(this,this._onCancel));
+          domStyle.set(this.cancelNode,"display","inline");
+        }
+        if (this.data.status!=="completed") {
+          update();
         }
       },
       

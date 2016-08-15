@@ -1,3 +1,7 @@
 <div class="h-processes-process" data-dojo-attach-point="contentNode">
-  <span class="h-processes-process-uuid">${data.uuid}</span><span class="h-processes-process-title">${data.description}</span><span class="h-processes-process-ststus h-status-${data.status}">${data.status}</span>
+  <span class="h-processes-process-uuid">${data.uuid}</span>
+  <span class="h-processes-process-title">${data.description}</span>
+  <span class="h-processes-process-status h-status-${data.status}" data-dojo-attach-point="statusNode">${data.status}</span>
+  <span class="h-processes-process-progress" data-dojo-attach-point="progressNode"></span>
+  <span class="h-processes-process-cancel" style="display: none;" data-dojo-attach-point="cancelNode" data-dojo-attach-event="onclick: _onCancel">${i18n.processes.cancel}</span>
 </div>
