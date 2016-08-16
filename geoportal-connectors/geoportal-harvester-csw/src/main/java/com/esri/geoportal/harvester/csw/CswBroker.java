@@ -27,6 +27,7 @@ import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.mime.MimeType;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.IOException;
 import java.net.URI;
@@ -154,7 +155,7 @@ import org.apache.http.impl.client.HttpClients;
       try {
         IRecord rec = recs.next();
         String metadata = client.readMetadata(rec.getId());
-        return new SimpleDataReference(CswBroker.this.getBrokerUri(), rec.getId(), rec.getLastModifiedDate(), new URI("uuid", rec.getId(), null), metadata.getBytes("UTF-8"));
+        return new SimpleDataReference(CswBroker.this.getBrokerUri(), rec.getId(), rec.getLastModifiedDate(), new URI("uuid", rec.getId(), null), metadata.getBytes("UTF-8"), MimeType.APPLICATION_XML);
       } catch (Exception ex) {
         throw new DataInputException(CswBroker.this, "Error reading data.", ex);
       }

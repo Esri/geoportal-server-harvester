@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.mime.MimeType;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
@@ -27,20 +28,28 @@ import java.util.Map;
 public class DataReferenceWrapper implements DataReference {
   private final DataReference baseRef;
   private final byte [] content;
+  private final MimeType contentType;
   
   /**
    * Creates instance of the data reference.
    * @param baseRef base data reference
    * @param content new content
+   * @param contentType content type
    */
-  public DataReferenceWrapper(DataReference baseRef, byte [] content) {
+  public DataReferenceWrapper(DataReference baseRef, byte [] content, MimeType contentType) {
     this.baseRef = baseRef;
     this.content = content;
+    this.contentType = contentType;
   }
 
   @Override
   public byte[] getContent() throws IOException {
     return content;
+  }
+
+  @Override
+  public MimeType getContentType() {
+    return contentType;
   }
 
   @Override

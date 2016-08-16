@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.mime.MimeType;
 import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ public final class SimpleDataReference implements DataReference {
   private final Date lastModifiedDate;
   private final URI sourceUri;
   private final byte [] content;
+  private final MimeType contentType;
   private final HashMap<String,Object> attributesMap = new HashMap<>();
 
   /**
@@ -38,13 +40,15 @@ public final class SimpleDataReference implements DataReference {
    * @param lastModifiedDate last modified date
    * @param sourceUri source URI
    * @param content content
+   * @param contentType content type
    */
-  public SimpleDataReference(URI brokerUri, String id, Date lastModifiedDate, URI sourceUri, byte [] content) {
+  public SimpleDataReference(URI brokerUri, String id, Date lastModifiedDate, URI sourceUri, byte [] content, MimeType contentType) {
     this.brokerUri = brokerUri;
     this.id = id;
     this.lastModifiedDate = lastModifiedDate;
     this.sourceUri = sourceUri;
     this.content = content;
+    this.contentType = contentType;
   }
 
   @Override
@@ -70,6 +74,11 @@ public final class SimpleDataReference implements DataReference {
   @Override
   public byte [] getContent() {
     return content;
+  }
+
+  @Override
+  public MimeType getContentType() {
+    return contentType;
   }
 
   @Override

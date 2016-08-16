@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.mime.MimeType;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,6 +55,7 @@ public class DataReferenceSerializer {
     byte[] bLastModifiedDate = ENCODER.encode((ref.getLastModifiedDate() != null ? formatIsoDate(ref.getLastModifiedDate()) : "").getBytes("UTF-8"));
     byte[] bSourceUri = ENCODER.encode(ref.getSourceUri().toASCIIString().getBytes("UTF-8"));
     byte[] bContent = ENCODER.encode(ref.getContent());
+    byte[] bContentType = ENCODER.encode(ref.getContentType()!=null? ref.getContentType().toString().getBytes("UTF-8"): new byte[0]);
 
     out.write(bBrokerUri);
     out.write(',');
@@ -62,6 +64,8 @@ public class DataReferenceSerializer {
     out.write(bLastModifiedDate);
     out.write(',');
     out.write(bSourceUri);
+    out.write(',');
+    out.write(bContentType);
     out.write(',');
     out.write(bContent);
     out.write('\r');
@@ -82,12 +86,13 @@ public class DataReferenceSerializer {
     String line = reader.readLine();
     if (line != null) {
       String[] split = line.split(",");
-      if (split.length == 5) {
+      if (split.length == 6) {
         int i = 0;
         byte[] bBrokerUri = DECODER.decode(split[i++].getBytes("UTF-8"));
         byte[] bId = DECODER.decode(split[i++].getBytes("UTF-8"));
         byte[] bLastModifiedDate = DECODER.decode(split[i++].getBytes("UTF-8"));
         byte[] bSourceUri = DECODER.decode(split[i++].getBytes("UTF-8"));
+        byte[] bContentType = DECODER.decode(split[i++].getBytes("UTF-8"));
         byte[] bContent = DECODER.decode(split[i++].getBytes("UTF-8"));
 
         URI brokerUri = URI.create(new String(bBrokerUri, "UTF-8"));
@@ -96,8 +101,9 @@ public class DataReferenceSerializer {
         URI sourceUri = URI.create(new String(bSourceUri, "UTF-8"));
 
         Date lastModifiedDate = !sLastModifiedDate.isEmpty() ? Date.from(OffsetDateTime.from(FORMATTER.parse(sLastModifiedDate)).toInstant()) : null;
+        MimeType contentType = MimeType.parse(new String(bContentType, "UTF-8"));
 
-        return new SimpleDataReference(brokerUri, sId, lastModifiedDate, sourceUri, bContent);
+        return new SimpleDataReference(brokerUri, sId, lastModifiedDate, sourceUri, bContent, contentType);
       }
     }
     return null;

@@ -20,6 +20,8 @@ import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import static com.esri.geoportal.commons.utils.HttpClientContextBuilder.createHttpClientContext;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
+import com.esri.geoportal.harvester.api.mime.MimeType;
+import com.esri.geoportal.harvester.api.mime.MimeTypeUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -68,8 +70,9 @@ import org.apache.http.client.protocol.HttpClientContext;
     HttpClientContext context = creds!=null && !creds.isEmpty()? createHttpClientContext(fileUrl, creds): null;
     HttpResponse response = httpClient.execute(method,context);
     Date lastModifiedDate = readLastModifiedDate(response);
+    MimeType contentType = readContentType(response);
     try (InputStream input = response.getEntity().getContent()) {
-      return new SimpleDataReference(broker.getBrokerUri(), fileUrl.toExternalForm(), lastModifiedDate, fileUrl.toURI(), IOUtils.toByteArray(input));
+      return new SimpleDataReference(broker.getBrokerUri(), fileUrl.toExternalForm(), lastModifiedDate, fileUrl.toURI(), IOUtils.toByteArray(input), contentType);
     }
   }
 
@@ -84,6 +87,30 @@ import org.apache.http.client.protocol.HttpClientContext;
       return lastModifedHeader != null
               ? Date.from(ZonedDateTime.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(lastModifedHeader.getValue())).toInstant())
               : null;
+    } catch (Exception ex) {
+      return null;
+    }
+  }
+  
+  /**
+   * Reads content type.
+   * @param response HTTP response
+   * @return content type or <code>null</code> if unable to read content type
+   */
+  private MimeType readContentType(HttpResponse response) {
+    try {
+      Header contentTypeHeader = response.getFirstHeader("Content-Type");
+      MimeType contentType = null;
+      if (contentTypeHeader!=null) {
+        contentType = MimeType.parse(contentTypeHeader.getValue());
+      }
+      if (contentType==null) {
+        String strFileUrl = fileUrl.toExternalForm();
+        int lastDotIndex = strFileUrl.lastIndexOf(".");
+        String ext = lastDotIndex>=0? strFileUrl.substring(lastDotIndex+1): "";
+        contentType = MimeTypeUtils.mapExtension(ext);
+      }
+      return contentType;
     } catch (Exception ex) {
       return null;
     }

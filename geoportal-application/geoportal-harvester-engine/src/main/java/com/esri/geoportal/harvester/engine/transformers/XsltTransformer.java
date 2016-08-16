@@ -24,6 +24,7 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.mime.MimeType;
 import com.esri.geoportal.harvester.api.specs.OutputBroker.OutputBrokerContext;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -126,7 +127,7 @@ public class XsltTransformer implements Transformer {
       ByteArrayOutputStream result = new ByteArrayOutputStream();
       try {
         xsltTransformer.transform(new StreamSource(new InputStreamReader(new ByteArrayInputStream(input.getContent()), "UTF-8")), new StreamResult(new OutputStreamWriter(result, "UTF-8")));
-        DataReference dataRef = new DataReferenceWrapper(input, result.toByteArray());
+        DataReference dataRef = new DataReferenceWrapper(input, result.toByteArray(), MimeType.APPLICATION_XML);
         return Arrays.asList(new DataReference[]{dataRef});
       } catch (IOException | TransformerException ex) {
         throw new DataTransformerException(String.format("Error transforming input: %s", input.getSourceUri()), ex);

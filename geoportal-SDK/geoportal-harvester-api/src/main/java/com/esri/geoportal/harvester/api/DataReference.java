@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.harvester.api.mime.MimeType;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
@@ -32,6 +33,12 @@ public interface DataReference {
    * @throws IOException if getting content fails
    */
   byte [] getContent() throws IOException;
+  
+  /**
+   * Gets content type.
+   * @return content type
+   */
+  MimeType getContentType();
   
   /**
    * Gets data record id.
