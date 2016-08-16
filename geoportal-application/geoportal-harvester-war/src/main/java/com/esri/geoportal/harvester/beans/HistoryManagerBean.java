@@ -17,9 +17,9 @@ package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.engine.managers.History;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
-import com.esri.geoportal.harvester.engine.support.CrudlException;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.serialize;
+import com.esri.geoportal.harvester.engine.utils.CrudlException;
+import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.serialize;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -40,9 +40,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
 
 /**
  * History manager bean.

@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine.impl;
+package com.esri.geoportal.harvester.engine.defaults;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.engine.BrokersService;
+import com.esri.geoportal.harvester.engine.services.BrokersService;
 import com.esri.geoportal.harvester.engine.managers.BrokerDefinitionManager;
 import com.esri.geoportal.harvester.engine.registers.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.registers.OutboundConnectorRegistry;
-import com.esri.geoportal.harvester.engine.support.BrokerReference;
-import static com.esri.geoportal.harvester.engine.support.BrokerReference.Category.INBOUND;
-import static com.esri.geoportal.harvester.engine.support.BrokerReference.Category.OUTBOUND;
-import com.esri.geoportal.harvester.engine.support.CrudlException;
+import com.esri.geoportal.harvester.engine.utils.BrokerReference;
+import static com.esri.geoportal.harvester.engine.utils.BrokerReference.Category.INBOUND;
+import static com.esri.geoportal.harvester.engine.utils.BrokerReference.Category.OUTBOUND;
+import com.esri.geoportal.harvester.engine.utils.CrudlException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;

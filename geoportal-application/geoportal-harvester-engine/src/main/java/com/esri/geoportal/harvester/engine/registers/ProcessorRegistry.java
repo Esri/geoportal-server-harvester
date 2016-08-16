@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.engine.registers;
 
 import com.esri.geoportal.harvester.api.Processor;
-import com.esri.geoportal.harvester.engine.impl.DefaultProcessor;
+import com.esri.geoportal.harvester.engine.defaults.DefaultProcessor;
 import java.util.HashMap;
 
 /**

@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.engine.managers;
 
 import com.esri.geoportal.harvester.api.ProcessInstance;
-import com.esri.geoportal.harvester.engine.support.CrudlRepo;
+import com.esri.geoportal.harvester.engine.utils.CrudlRepo;
 
 /**
  * DefaultProcess manager.

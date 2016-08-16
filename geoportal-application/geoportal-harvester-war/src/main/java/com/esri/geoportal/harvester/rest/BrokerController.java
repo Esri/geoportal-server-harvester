@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.rest;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.beans.EngineBean;
-import com.esri.geoportal.harvester.engine.support.BrokerReference.Category;
+import com.esri.geoportal.harvester.engine.utils.BrokerReference.Category;
 import com.esri.geoportal.harvester.support.BrokerResponse;
 import java.util.UUID;
 import java.util.stream.Collectors;

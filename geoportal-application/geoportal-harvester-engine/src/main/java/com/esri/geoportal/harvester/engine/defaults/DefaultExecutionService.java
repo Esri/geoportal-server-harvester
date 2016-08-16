@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine.impl;
+package com.esri.geoportal.harvester.engine.defaults;
 
 import com.esri.geoportal.harvester.api.Filter;
 import com.esri.geoportal.harvester.api.FilterInstance;
@@ -40,8 +40,8 @@ import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
-import com.esri.geoportal.harvester.engine.ExecutionService;
-import com.esri.geoportal.harvester.engine.ProcessesService;
+import com.esri.geoportal.harvester.engine.services.ExecutionService;
+import com.esri.geoportal.harvester.engine.services.ProcessesService;
 import com.esri.geoportal.harvester.engine.registers.FilterRegistry;
 import com.esri.geoportal.harvester.engine.managers.History;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
@@ -53,10 +53,10 @@ import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager.TaskUuidTriggerInstancePair;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
-import com.esri.geoportal.harvester.engine.support.CrudlException;
-import com.esri.geoportal.harvester.engine.support.HistoryManagerAdaptor;
-import com.esri.geoportal.harvester.engine.support.ProcessReference;
-import com.esri.geoportal.harvester.engine.support.TriggerReference;
+import com.esri.geoportal.harvester.engine.utils.CrudlException;
+import com.esri.geoportal.harvester.engine.utils.HistoryManagerAdaptor;
+import com.esri.geoportal.harvester.engine.utils.ProcessReference;
+import com.esri.geoportal.harvester.engine.utils.TriggerReference;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;

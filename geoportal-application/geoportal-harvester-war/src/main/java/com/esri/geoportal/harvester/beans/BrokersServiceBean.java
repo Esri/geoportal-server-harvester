@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.engine.impl.DefaultBrokersService;
+import com.esri.geoportal.harvester.engine.defaults.DefaultBrokersService;
 import com.esri.geoportal.harvester.engine.managers.BrokerDefinitionManager;
 import com.esri.geoportal.harvester.engine.registers.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.registers.OutboundConnectorRegistry;

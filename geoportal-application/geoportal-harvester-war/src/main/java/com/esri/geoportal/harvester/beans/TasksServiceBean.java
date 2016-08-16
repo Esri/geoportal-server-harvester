@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.engine.impl.DefaultTasksService;
+import com.esri.geoportal.harvester.engine.defaults.DefaultTasksService;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.managers.TaskManager;
 import org.springframework.beans.factory.annotation.Autowired;

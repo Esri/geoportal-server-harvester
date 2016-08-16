@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.engine.registers;
 
 import com.esri.geoportal.harvester.api.Transformer;
-import com.esri.geoportal.harvester.engine.support.EntityRegistry;
+import com.esri.geoportal.harvester.engine.utils.EntityRegistry;
 
 /**
  * Transformer registry.

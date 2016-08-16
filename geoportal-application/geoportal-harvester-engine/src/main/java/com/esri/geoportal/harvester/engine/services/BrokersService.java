@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine;
+package com.esri.geoportal.harvester.engine.services;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.engine.support.BrokerReference;
+import com.esri.geoportal.harvester.engine.utils.BrokerReference;
 import java.util.List;
 import java.util.UUID;
 

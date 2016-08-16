@@ -15,11 +15,11 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.serialize;
+import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.serialize;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.engine.managers.TaskManager;
-import com.esri.geoportal.harvester.engine.support.CrudlException;
+import com.esri.geoportal.harvester.engine.utils.CrudlException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -36,9 +36,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.support.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
+import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
 
 /**
  * Task manager bean.

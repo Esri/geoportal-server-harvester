@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.engine.managers;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.engine.support.CrudlRepo;
+import com.esri.geoportal.harvester.engine.utils.CrudlRepo;
 
 /**
  * Broker definition manager.

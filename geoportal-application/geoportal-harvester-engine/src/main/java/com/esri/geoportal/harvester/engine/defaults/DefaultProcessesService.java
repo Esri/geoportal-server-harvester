@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine.impl;
+package com.esri.geoportal.harvester.engine.defaults;
 
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
-import com.esri.geoportal.harvester.engine.ProcessesService;
+import com.esri.geoportal.harvester.engine.services.ProcessesService;
 import com.esri.geoportal.harvester.engine.managers.ProcessManager;
 import com.esri.geoportal.harvester.engine.managers.ReportManager;
 import com.esri.geoportal.harvester.engine.registers.StatisticsRegistry;
-import com.esri.geoportal.harvester.engine.support.CrudlException;
-import com.esri.geoportal.harvester.engine.support.ProcessReference;
-import com.esri.geoportal.harvester.engine.support.ReportBuilder;
-import com.esri.geoportal.harvester.engine.support.ReportBuilderAdaptor;
-import com.esri.geoportal.harvester.engine.support.Statistics;
+import com.esri.geoportal.harvester.engine.utils.CrudlException;
+import com.esri.geoportal.harvester.engine.utils.ProcessReference;
+import com.esri.geoportal.harvester.engine.utils.ReportBuilder;
+import com.esri.geoportal.harvester.engine.utils.ReportBuilderAdaptor;
+import com.esri.geoportal.harvester.engine.utils.Statistics;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;

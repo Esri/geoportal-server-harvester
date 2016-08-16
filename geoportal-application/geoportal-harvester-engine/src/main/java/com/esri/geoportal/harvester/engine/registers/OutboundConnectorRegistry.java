@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine.registers;
 
-import com.esri.geoportal.harvester.engine.support.EntityRegistry;
+import com.esri.geoportal.harvester.engine.utils.EntityRegistry;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 
 /**

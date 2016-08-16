@@ -16,8 +16,8 @@
 package com.esri.geoportal.harvester.support;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.engine.support.BrokerReference;
-import com.esri.geoportal.harvester.engine.support.BrokerReference.Category;
+import com.esri.geoportal.harvester.engine.utils.BrokerReference;
+import com.esri.geoportal.harvester.engine.utils.BrokerReference.Category;
 import java.util.UUID;
 
 /**

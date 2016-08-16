@@ -17,4 +17,4 @@
 /**
  * Engine default implementation.
  */
-package com.esri.geoportal.harvester.engine.impl;
+package com.esri.geoportal.harvester.engine.defaults;

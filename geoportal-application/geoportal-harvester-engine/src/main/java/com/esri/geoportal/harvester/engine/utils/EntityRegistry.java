@@ -13,13 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine.registers;
+package com.esri.geoportal.harvester.engine.utils;
 
-import com.esri.geoportal.harvester.engine.utils.EntityRegistry;
-import com.esri.geoportal.harvester.api.specs.InputConnector;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
+import com.esri.geoportal.harvester.api.general.Entity;
 
 /**
- * Data inbound connector registry.
+ * Entity registry.
+ * @param <F> type of the factory
  */
-public class InboundConnectorRegistry  extends EntityRegistry<InputConnector> {
+public abstract class EntityRegistry<F extends Entity> extends HashMap<String,F> {
+  /**
+   * Gets all templates.
+   * @return list of all templates
+   */
+  public List<UITemplate> getTemplates() {
+    return Arrays.asList(values().stream().map(f->f.getTemplate()).toArray(UITemplate[]::new));
+  }
 }

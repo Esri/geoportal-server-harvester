@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine.registers;
 
-import com.esri.geoportal.harvester.engine.support.Statistics;
+import com.esri.geoportal.harvester.engine.utils.Statistics;
 import java.util.HashMap;
 import java.util.UUID;
 

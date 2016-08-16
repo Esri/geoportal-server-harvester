@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.engine.managers.ProcessManager;
-import com.esri.geoportal.harvester.engine.support.CrudlException;
+import com.esri.geoportal.harvester.engine.utils.CrudlException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

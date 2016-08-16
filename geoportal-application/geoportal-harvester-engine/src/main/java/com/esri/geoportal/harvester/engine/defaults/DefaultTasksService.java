@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine.impl;
+package com.esri.geoportal.harvester.engine.defaults;
 
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.engine.TasksService;
+import com.esri.geoportal.harvester.engine.services.TasksService;
 import com.esri.geoportal.harvester.engine.managers.History;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.managers.TaskManager;
-import com.esri.geoportal.harvester.engine.support.CrudlException;
+import com.esri.geoportal.harvester.engine.utils.CrudlException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;

@@ -15,9 +15,9 @@
  */
 package com.esri.geoportal.harvester.engine.managers;
 
-import com.esri.geoportal.harvester.engine.support.CrudlException;
+import com.esri.geoportal.harvester.engine.utils.CrudlException;
 import java.util.UUID;
-import com.esri.geoportal.harvester.engine.support.CrudlRepo;
+import com.esri.geoportal.harvester.engine.utils.CrudlRepo;
 
 /**
  * History manager.

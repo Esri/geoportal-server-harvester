@@ -15,12 +15,12 @@
  */
 package com.esri.geoportal.harvester.support;
 
-import com.esri.geoportal.harvester.engine.support.Statistics;
+import com.esri.geoportal.harvester.engine.utils.Statistics;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
-import com.esri.geoportal.harvester.engine.support.ReportBuilder;
+import com.esri.geoportal.harvester.engine.utils.ReportBuilder;
 import java.util.Calendar;
 import java.util.Date;
 import org.slf4j.Logger;

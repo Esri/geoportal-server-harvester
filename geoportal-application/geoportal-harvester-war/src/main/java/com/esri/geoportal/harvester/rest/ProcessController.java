@@ -19,7 +19,7 @@ import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.support.ProcessResponse;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.beans.EngineBean;
-import com.esri.geoportal.harvester.engine.support.Statistics;
+import com.esri.geoportal.harvester.engine.utils.Statistics;
 import com.esri.geoportal.harvester.support.ProcessStatisticsResponse;
 import java.util.Map;
 import java.util.UUID;

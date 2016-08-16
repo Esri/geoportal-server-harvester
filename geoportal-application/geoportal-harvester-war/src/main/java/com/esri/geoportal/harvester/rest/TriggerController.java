@@ -19,7 +19,7 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.beans.EngineBean;
-import com.esri.geoportal.harvester.engine.support.TriggerReference;
+import com.esri.geoportal.harvester.engine.utils.TriggerReference;
 import com.esri.geoportal.harvester.support.TriggerResponse;
 import java.util.List;
 import java.util.UUID;

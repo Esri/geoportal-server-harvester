@@ -15,13 +15,13 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.engine.BrokersService;
-import com.esri.geoportal.harvester.engine.ExecutionService;
-import com.esri.geoportal.harvester.engine.ProcessesService;
-import com.esri.geoportal.harvester.engine.TasksService;
-import com.esri.geoportal.harvester.engine.TemplatesService;
-import com.esri.geoportal.harvester.engine.TriggersService;
-import com.esri.geoportal.harvester.engine.impl.DefaultEngine;
+import com.esri.geoportal.harvester.engine.services.BrokersService;
+import com.esri.geoportal.harvester.engine.services.ExecutionService;
+import com.esri.geoportal.harvester.engine.services.ProcessesService;
+import com.esri.geoportal.harvester.engine.services.TasksService;
+import com.esri.geoportal.harvester.engine.services.TemplatesService;
+import com.esri.geoportal.harvester.engine.services.TriggersService;
+import com.esri.geoportal.harvester.engine.defaults.DefaultEngine;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;

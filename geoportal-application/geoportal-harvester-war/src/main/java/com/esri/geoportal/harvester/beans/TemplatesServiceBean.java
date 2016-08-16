@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.engine.impl.DefaultTemplatesService;
+import com.esri.geoportal.harvester.engine.defaults.DefaultTemplatesService;
 import com.esri.geoportal.harvester.engine.registers.FilterRegistry;
 import com.esri.geoportal.harvester.engine.registers.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.registers.OutboundConnectorRegistry;

@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.engine.impl.DefaultProcessesService;
+import com.esri.geoportal.harvester.engine.defaults.DefaultProcessesService;
 import com.esri.geoportal.harvester.engine.managers.ProcessManager;
 import com.esri.geoportal.harvester.engine.managers.ReportManager;
 import com.esri.geoportal.harvester.engine.registers.StatisticsRegistry;

@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine.impl;
+package com.esri.geoportal.harvester.engine.defaults;
 
-import com.esri.geoportal.harvester.engine.BrokersService;
-import com.esri.geoportal.harvester.engine.Engine;
-import com.esri.geoportal.harvester.engine.ExecutionService;
-import com.esri.geoportal.harvester.engine.ProcessesService;
-import com.esri.geoportal.harvester.engine.TasksService;
-import com.esri.geoportal.harvester.engine.TemplatesService;
-import com.esri.geoportal.harvester.engine.TriggersService;
+import com.esri.geoportal.harvester.engine.services.BrokersService;
+import com.esri.geoportal.harvester.engine.services.Engine;
+import com.esri.geoportal.harvester.engine.services.ExecutionService;
+import com.esri.geoportal.harvester.engine.services.ProcessesService;
+import com.esri.geoportal.harvester.engine.services.TasksService;
+import com.esri.geoportal.harvester.engine.services.TemplatesService;
+import com.esri.geoportal.harvester.engine.services.TriggersService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

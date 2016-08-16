@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine;
+package com.esri.geoportal.harvester.engine.services;
 
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
-import com.esri.geoportal.harvester.engine.support.CrudlException;
-import com.esri.geoportal.harvester.engine.support.TriggerReference;
+import com.esri.geoportal.harvester.engine.utils.CrudlException;
+import com.esri.geoportal.harvester.engine.utils.TriggerReference;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

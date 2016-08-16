@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.beans;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.engine.managers.ReportManager;
 import com.esri.geoportal.harvester.engine.registers.StatisticsRegistry;
-import com.esri.geoportal.harvester.engine.support.ReportBuilder;
+import com.esri.geoportal.harvester.engine.utils.ReportBuilder;
 import com.esri.geoportal.harvester.support.ReportDispatcher;
 import com.esri.geoportal.harvester.support.ReportLogger;
 import com.esri.geoportal.harvester.support.ReportStatistics;

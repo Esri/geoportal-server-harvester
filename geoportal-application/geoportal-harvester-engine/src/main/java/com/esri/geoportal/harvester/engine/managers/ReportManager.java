@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.engine.managers;
 
 import com.esri.geoportal.harvester.api.ProcessInstance;
-import com.esri.geoportal.harvester.engine.support.ReportBuilder;
+import com.esri.geoportal.harvester.engine.utils.ReportBuilder;
 import java.util.UUID;
 
 /**

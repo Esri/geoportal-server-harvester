@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.engine.managers;
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager.TaskUuidTriggerDefinitionPair;
 import java.util.UUID;
-import com.esri.geoportal.harvester.engine.support.CrudlRepo;
+import com.esri.geoportal.harvester.engine.utils.CrudlRepo;
 
 /**
  * Trigger manager.

@@ -15,8 +15,8 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.engine.ExecutionService;
-import com.esri.geoportal.harvester.engine.impl.DefaultTriggersService;
+import com.esri.geoportal.harvester.engine.services.ExecutionService;
+import com.esri.geoportal.harvester.engine.defaults.DefaultTriggersService;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
