@@ -31,6 +31,7 @@ import java.net.URI;
 import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
 import java.util.HashSet;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,12 +111,16 @@ import org.slf4j.LoggerFactory;
   }
   
   private File generateFileName(URI brokerUri, URI sourceUri, String id) {
-    String host = URI.create(brokerUri.getSchemeSpecificPart()).getHost();
-    File rootFolder = definition.getRootFolder().toPath().resolve(host).toFile();
+    URI ssp = URI.create(brokerUri.getSchemeSpecificPart());
+    String root = StringUtils.defaultIfEmpty(ssp.getHost(), ssp.getPath());
+    File rootFolder = definition.getRootFolder().toPath().resolve(root).toFile();
     
     File fileName = rootFolder;
     if (sourceUri.getPath()!=null) {
-      List<String> subFolder = splitPath(sourceUri.getPath());
+      List<String> subFolder = splitPath(sourceUri.getPath().replaceAll("/[a-zA-Z]:/|/$", ""));
+      if (!subFolder.isEmpty() && subFolder.get(0).equals(root)) {
+        subFolder.remove(0);
+      }
       for (String sf : subFolder) {
         fileName = new File(fileName, sf);
       }
