@@ -30,7 +30,7 @@
           <configuration>
             <archive>
               <manifest>
-                <mainClass>com.esri.geoportal.harvester.waf.Application</mainClass>
+                <mainClass>com.esri.geoportal.harvester.waf.WafApplication</mainClass>
               </manifest>
             </archive>
             <descriptorRefs>

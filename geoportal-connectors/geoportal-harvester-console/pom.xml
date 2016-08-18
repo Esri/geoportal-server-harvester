@@ -30,7 +30,7 @@
           <configuration>
             <archive>
               <manifest>
-                <mainClass>com.esri.geoportal.harvester.console.Application</mainClass>
+                <mainClass>com.esri.geoportal.harvester.console.ConsoleApplication</mainClass>
               </manifest>
             </archive>
             <descriptorRefs>

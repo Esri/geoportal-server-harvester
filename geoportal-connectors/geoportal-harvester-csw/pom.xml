@@ -35,7 +35,7 @@
           <configuration>
             <archive>
               <manifest>
-                <mainClass>com.esri.geoportal.harvester.csw.Application</mainClass>
+                <mainClass>com.esri.geoportal.harvester.csw.CswApplication</mainClass>
               </manifest>
             </archive>
             <descriptorRefs>

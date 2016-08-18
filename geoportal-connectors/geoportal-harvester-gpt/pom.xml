@@ -35,7 +35,7 @@
           <configuration>
             <archive>
               <manifest>
-                <mainClass>com.esri.geoportal.harvester.gpt.Application</mainClass>
+                <mainClass>com.esri.geoportal.harvester.gpt.GptApplication</mainClass>
               </manifest>
             </archive>
             <descriptorRefs>

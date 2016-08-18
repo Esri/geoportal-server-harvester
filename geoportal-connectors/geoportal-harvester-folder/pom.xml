@@ -42,7 +42,7 @@
           <configuration>
             <archive>
               <manifest>
-                <mainClass>com.esri.geoportal.harvester.folder.Application</mainClass>
+                <mainClass>com.esri.geoportal.harvester.folder.FolderApplication</mainClass>
               </manifest>
             </archive>
             <descriptorRefs>
