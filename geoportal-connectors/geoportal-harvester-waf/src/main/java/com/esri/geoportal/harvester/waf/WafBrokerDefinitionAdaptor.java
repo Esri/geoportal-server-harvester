@@ -93,7 +93,7 @@ import org.apache.commons.lang3.StringUtils;
    */
   public void setPattern(String pattern) {
     this.pattern = pattern;
-    set(P_HOST_URL, pattern);
+    set(P_PATTERN, pattern);
   }
 
   /**
