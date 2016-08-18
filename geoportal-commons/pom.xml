@@ -11,6 +11,9 @@
         <module>geoportal-commons-gpt-client</module>
         <module>geoportal-commons-robots</module>
         <module>geoportal-commons-utils</module>
+        <module>geoportal-commons-meta</module>
+        <module>geoportal-commons-ags-client</module>
+        <module>geoportal-commons-agp-client</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

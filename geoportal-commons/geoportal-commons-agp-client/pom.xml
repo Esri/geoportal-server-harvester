@@ -6,10 +6,20 @@
         <artifactId>geoportal-commons</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>geoportal-commons-gpt-client</artifactId>
-    <name>Esri :: Geoportal Server :: Commons :: Geoportal Rest Client</name>
+    <artifactId>geoportal-commons-agp-client</artifactId>
+    <name>Esri :: Geoportal Server :: Commons :: ArcGIS Portal Client</name>
     <packaging>jar</packaging>
     <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>geoportal-commons-meta</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>commons-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
@@ -40,14 +50,8 @@
             <artifactId>slf4j-jdk14</artifactId>
             <version>1.7.20</version>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>commons-utils</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>

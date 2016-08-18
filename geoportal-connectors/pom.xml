@@ -13,6 +13,9 @@
         <module>geoportal-harvester-gpt</module>
         <module>geoportal-harvester-waf</module>
         <module>geoportal-harvester-unc</module>
+        <module>geoportal-harvester-ags</module>
+        <module>geoportal-harvester-agp-publisher</module>
+        <module>geoportal-harvester-agp-source</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

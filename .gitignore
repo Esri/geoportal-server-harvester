@@ -26,3 +26,9 @@
 /geoportal-commons/geoportal-commons-robots/nbproject/
 /geoportal-commons/geoportal-commons-csw-client/nbproject/
 /geoportal-connectors/geoportal-harvester-unc/target/
+/geoportal-connectors/geoportal-harvester-agp-publisher/target/
+/geoportal-connectors/geoportal-harvester-ags/target/
+/geoportal-connectors/geoportal-harvester-agp-source/target/
+/geoportal-commons/geoportal-commons-meta/target/
+/geoportal-commons/geoportal-commons-agp-client/target/
+/geoportal-commons/geoportal-commons-ags-client/target/
