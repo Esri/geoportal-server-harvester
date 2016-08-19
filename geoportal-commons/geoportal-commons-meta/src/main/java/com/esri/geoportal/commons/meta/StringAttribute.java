@@ -15,23 +15,27 @@
  */
 package com.esri.geoportal.commons.meta;
 
-import org.w3c.dom.Document;
-
 /**
- * Metadata handler.
+ * String attribute.
  */
-public interface MetaHandler {
-  /**
-   * Creates document based on properties.
-   * @param wellKnowsAttributes attributes
-   * @return document
-   */
-  Document create(ObjectAttribute wellKnowsAttributes);
+public class StringAttribute implements Attribute {
+  private final String value;
+
+  public StringAttribute(String value) {
+    this.value = value;
+  }
+
+  @Override
+  public boolean isString() {
+    return true;
+  }
+
+  public String getValue() {
+    return value;
+  }
   
-  /**
-   * Extracts attributes from the document.
-   * @param doc document.
-   * @return attributes
-   */
-  ObjectAttribute extract(Document doc);
+  @Override
+  public String toString() {
+    return String.format("%s", value);
+  }
 }

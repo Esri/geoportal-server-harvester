@@ -15,23 +15,30 @@
  */
 package com.esri.geoportal.commons.meta;
 
-import org.w3c.dom.Document;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
- * Metadata handler.
+ * Array attribute.
  */
-public interface MetaHandler {
-  /**
-   * Creates document based on properties.
-   * @param wellKnowsAttributes attributes
-   * @return document
-   */
-  Document create(ObjectAttribute wellKnowsAttributes);
+public final class ArrayAttribute implements Attribute {
+  private final Attribute [] attributes;
+
+  public ArrayAttribute(Attribute[] attributes) {
+    this.attributes = attributes;
+  }
+
+  @Override
+  public boolean isArray() {
+    return true;
+  }
+
+  public Attribute[] getAttributes() {
+    return attributes;
+  }
   
-  /**
-   * Extracts attributes from the document.
-   * @param doc document.
-   * @return attributes
-   */
-  ObjectAttribute extract(Document doc);
+  @Override
+  public String toString() {
+    return String.format("[ %s ]", Arrays.asList(attributes).stream().map(Object::toString).collect(Collectors.joining(", ")));
+  }
 }
