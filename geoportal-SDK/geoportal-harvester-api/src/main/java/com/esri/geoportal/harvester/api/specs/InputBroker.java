@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.api.specs;
 
 import com.esri.geoportal.harvester.api.Broker;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import java.net.URI;
@@ -34,10 +35,10 @@ public interface InputBroker extends Broker<InputConnector> {
   
   /**
    * Initialize broker.
-   * @param context context
+   * @param task task for witch the broker will be used
    * @throws DataProcessorException if initialization fails.
    */
-  void initialize(InputBrokerContext context) throws DataProcessorException;
+  void initialize(Task task) throws DataProcessorException;
   
   /**
    * Terminates broker.
@@ -77,12 +78,5 @@ public interface InputBroker extends Broker<InputConnector> {
      * @throws DataInputException if getting next data reference fails
      */
     DataReference next() throws DataInputException;
-  }
-  
-  /**
-   * Input broker context.
-   */
-  interface InputBrokerContext {
-    
   }
 }

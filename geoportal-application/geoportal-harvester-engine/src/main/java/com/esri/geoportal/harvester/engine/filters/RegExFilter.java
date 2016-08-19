@@ -19,10 +19,10 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Filter;
 import com.esri.geoportal.harvester.api.FilterInstance;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
-import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -82,7 +82,7 @@ public class RegExFilter implements Filter {
     }
 
     @Override
-    public void initialize(OutputBroker.OutputBrokerContext context) throws DataProcessorException {
+    public void initialize(Task task) throws DataProcessorException {
       // empty initialization
     }
 

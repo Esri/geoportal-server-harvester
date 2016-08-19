@@ -22,6 +22,7 @@ import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
@@ -59,7 +60,7 @@ import org.apache.http.impl.client.HttpClients;
   }
 
   @Override
-  public void initialize(InputBrokerContext context) throws DataProcessorException {
+  public void initialize(Task task) throws DataProcessorException {
     // nothing to initialize
   }
 

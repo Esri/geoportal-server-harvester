@@ -27,10 +27,6 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.general.Link;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
-import com.esri.geoportal.harvester.api.specs.InputBroker.InputBrokerContext;
-import com.esri.geoportal.harvester.api.specs.OutputBroker.OutputBrokerContext;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -99,17 +95,9 @@ public class DefaultProcessor implements Processor {
         LOG.info(String.format("Started harvest: %s", getTitle()));
         if (!task.getDataDestinations().isEmpty()) {
           try {
-            InputBrokerContext inputCtx = new InputBrokerContext() {
-            };
-            OutputBrokerContext outputCtx = new OutputBrokerContext() {
-              @Override
-              public URI getSourceUri() throws URISyntaxException {
-                return task.getDataSource().getBrokerUri();
-              }
-            };
-            task.getDataSource().initialize(inputCtx);
+            task.getDataSource().initialize(task);
             for (Link link: task.getDataDestinations()) {
-              link.initialize(outputCtx);
+              link.initialize(task);
             }
             
             InputBroker.Iterator iterator = task.getDataSource().iterator(attributes);

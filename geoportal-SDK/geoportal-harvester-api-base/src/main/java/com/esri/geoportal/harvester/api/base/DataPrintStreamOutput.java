@@ -19,6 +19,7 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
+import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -41,7 +42,7 @@ public class DataPrintStreamOutput implements OutputBroker {
   }
 
   @Override
-  public void initialize(OutputBrokerContext context) throws DataProcessorException {
+  public void initialize(Task task) throws DataProcessorException {
     // nothing to initialize
   }
 

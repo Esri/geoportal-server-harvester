@@ -18,11 +18,11 @@ package com.esri.geoportal.harvester.api.base;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
+import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.general.LinkAction;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
-import com.esri.geoportal.harvester.api.specs.OutputBroker.OutputBrokerContext;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,8 +41,8 @@ public final class BrokerLinkActionAdaptor implements LinkAction {
   }
 
   @Override
-  public void initialize(OutputBrokerContext context) throws DataProcessorException {
-    broker.initialize(context);
+  public void initialize(Task task) throws DataProcessorException {
+    broker.initialize(task);
   }
 
   @Override

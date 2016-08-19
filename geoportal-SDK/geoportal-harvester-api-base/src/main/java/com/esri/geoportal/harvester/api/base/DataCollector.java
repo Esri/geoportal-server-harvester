@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import java.util.List;
@@ -24,6 +25,7 @@ import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.stream.Collectors;
 
 /**
  * Data collector.
@@ -49,18 +51,12 @@ public class DataCollector {
     onStart();
     
     try {
-      InputBroker.InputBrokerContext inputCtx = new InputBroker.InputBrokerContext() {
-      };
-      OutputBroker.OutputBrokerContext outputCtx = new OutputBroker.OutputBrokerContext() {
-        @Override
-        public URI getSourceUri() throws URISyntaxException {
-          return inputBroker.getBrokerUri();
-        }
-      };
+      outputBrokers.stream().map(b->new SimpleLink(new BrokerLinkActionAdaptor(b), null)).collect(Collectors.toList());
+      Task task = new Task(null, inputBroker, outputBrokers.stream().map(b->new SimpleLink(new BrokerLinkActionAdaptor(b), null)).collect(Collectors.toList()));
       
-      inputBroker.initialize(inputCtx);
+      inputBroker.initialize(task);
       for (OutputBroker br : outputBrokers) {
-        br.initialize(outputCtx);
+        br.initialize(task);
       }
       
       InputBroker.Iterator iterator = inputBroker.iterator(null);

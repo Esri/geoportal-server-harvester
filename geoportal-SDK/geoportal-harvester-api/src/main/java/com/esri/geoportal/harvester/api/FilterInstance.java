@@ -16,8 +16,8 @@
 package com.esri.geoportal.harvester.api;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.api.specs.OutputBroker.OutputBrokerContext;
 
 /**
  * Filter instance.
@@ -27,10 +27,10 @@ public interface FilterInstance extends AutoCloseable {
   
   /**
    * Initialize instance.
-   * @param context context
+   * @param task task for which the filter will be used
    * @throws DataProcessorException if initialization fails.
    */
-  void initialize(OutputBrokerContext context) throws DataProcessorException;
+  void initialize(Task task) throws DataProcessorException;
   
   /**
    * Terminates instance

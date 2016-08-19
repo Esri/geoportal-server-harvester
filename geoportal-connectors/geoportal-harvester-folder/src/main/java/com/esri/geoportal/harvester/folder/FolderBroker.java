@@ -19,6 +19,7 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
+import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
@@ -55,7 +56,7 @@ import org.slf4j.LoggerFactory;
   }
 
   @Override
-  public void initialize(OutputBrokerContext context) throws DataProcessorException {
+  public void initialize(Task task) throws DataProcessorException {
     if (definition.getCleanup()) {
       File rootFolder = definition.getRootFolder();
       fetchExisting(rootFolder);

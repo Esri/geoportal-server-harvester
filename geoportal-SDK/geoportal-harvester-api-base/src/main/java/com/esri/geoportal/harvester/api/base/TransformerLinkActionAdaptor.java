@@ -19,10 +19,10 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.TransformerInstance;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
+import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.general.LinkAction;
-import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import java.util.List;
 
 /**
@@ -40,8 +40,8 @@ public final class TransformerLinkActionAdaptor implements LinkAction {
   }
 
   @Override
-  public void initialize(OutputBroker.OutputBrokerContext context) throws DataProcessorException {
-    transformer.initialize(context);
+  public void initialize(Task task) throws DataProcessorException {
+    transformer.initialize(task);
   }
 
   @Override
