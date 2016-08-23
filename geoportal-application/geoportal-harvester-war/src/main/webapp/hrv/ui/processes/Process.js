@@ -55,10 +55,10 @@ define(["dojo/_base/declare",
               domClass.add(this.statusNode,"h-status-"+result.status);
               domStyle.set(this.cancelNode,"display",result.status==="working"? "inline": "none");
               domStyle.set(this.progressNode,"display",result.status==="working"? "inline": "none");
-              if (result.status==="working") {
-                if (result.statistics) {
-                  html.set(this.progressNode, ""+result.statistics.succeeded);
-                }
+              if (result.status==="working" && result.statistics) {
+                html.set(this.progressNode, ""+result.statistics.succeeded);
+              }
+              if (result.status==="working" || result.status==="aborting") {
                 setTimeout(update,2000);
               }
             }),
