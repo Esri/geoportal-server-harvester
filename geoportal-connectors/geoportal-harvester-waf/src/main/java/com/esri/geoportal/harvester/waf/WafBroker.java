@@ -16,7 +16,6 @@
 package com.esri.geoportal.harvester.waf;
 
 import com.esri.geoportal.commons.http.BotsHttpClient;
-import com.esri.geoportal.commons.http.BotsHttpClientFactory;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
@@ -34,6 +33,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 /**
@@ -85,8 +85,9 @@ import org.apache.http.impl.client.HttpClients;
    */
   private void assertExecutor() {
     if (httpClient==null) {
-      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), HttpClients.createDefault(), definition.getBotsMode(), definition.getHostUrl());
-      httpClient = BotsHttpClientFactory.STD.create(bots);
+      CloseableHttpClient client = HttpClients.createDefault();
+      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), client, definition.getBotsMode(), definition.getHostUrl());
+      httpClient = new BotsHttpClient(client,bots);
     }
   }
 
