@@ -90,7 +90,7 @@ import org.apache.http.impl.client.HttpClients;
       httpclient = HttpClients.createDefault();
       Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getBotsMode(), definition.getHostUrl());
       ObjectFactory cf = new ObjectFactory();
-      client = cf.newClient(definition.getHostUrl().toExternalForm(), definition.getProfile(), bots, definition.getBotsMode(), definition.getCredentials());
+      client = cf.newClient(httpclient, definition.getHostUrl().toExternalForm(), definition.getProfile(), bots, definition.getBotsMode(), definition.getCredentials());
     }
   }
 

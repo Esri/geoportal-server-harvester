@@ -16,11 +16,11 @@
 package com.esri.geoportal.commons.http;
 
 import com.esri.geoportal.commons.robots.Bots;
+import org.apache.http.client.HttpClient;
 
 /**
  * Bots HTTP client factory.
  */
-@FunctionalInterface
 public interface BotsHttpClientFactory {
   /**
    * Creates new instance of the client.
@@ -30,7 +30,25 @@ public interface BotsHttpClientFactory {
   BotsHttpClient create(Bots bots);
   
   /**
+   * Creates new instance of the client.
+   * @param client HTTP client
+   * @param bots robots.txt
+   * @return HTTP client instance
+   */
+  BotsHttpClient create(HttpClient client, Bots bots);
+  
+  /**
    * Standard factory
    */
-  BotsHttpClientFactory STD = (bots)->new BotsHttpClient(bots);
+  BotsHttpClientFactory STD = new BotsHttpClientFactory() {
+    @Override
+    public BotsHttpClient create(Bots bots) {
+      return new BotsHttpClient(bots);
+    }
+
+    @Override
+    public BotsHttpClient create(HttpClient client, Bots bots) {
+      return new BotsHttpClient(client, bots);
+    }
+  };
 }
