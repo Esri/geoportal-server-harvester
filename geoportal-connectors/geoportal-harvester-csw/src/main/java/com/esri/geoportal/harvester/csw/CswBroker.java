@@ -18,7 +18,8 @@ package com.esri.geoportal.harvester.csw;
 import com.esri.geoportal.commons.csw.client.IClient;
 import com.esri.geoportal.commons.csw.client.IRecord;
 import com.esri.geoportal.commons.csw.client.IRecords;
-import com.esri.geoportal.commons.csw.client.ObjectFactory;
+import com.esri.geoportal.commons.csw.client.impl.Client;
+import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
@@ -89,8 +90,7 @@ import org.apache.http.impl.client.HttpClients;
     if (client==null) {
       httpclient = HttpClients.createDefault();
       Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getBotsMode(), definition.getHostUrl());
-      ObjectFactory cf = new ObjectFactory();
-      client = cf.newClient(httpclient, definition.getHostUrl().toExternalForm(), definition.getProfile(), bots, definition.getBotsMode(), definition.getCredentials());
+      client = new Client(new BotsHttpClient(httpclient,bots), definition.getHostUrl(), definition.getProfile(), definition.getCredentials());
     }
   }
 

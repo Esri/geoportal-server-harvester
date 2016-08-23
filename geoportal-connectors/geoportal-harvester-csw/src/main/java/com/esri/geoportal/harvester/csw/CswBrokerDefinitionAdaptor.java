@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.csw;
 
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
-import com.esri.geoportal.commons.csw.client.ObjectFactory;
+import com.esri.geoportal.commons.csw.client.impl.ProfilesProvider;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
@@ -61,7 +61,7 @@ import org.apache.commons.lang3.StringUtils;
       } catch (MalformedURLException ex) {
         throw new IllegalArgumentException(String.format("Invalid %s: %s", P_HOST_URL, get(P_HOST_URL)), ex);
       }
-      ObjectFactory of = new ObjectFactory();
+      ProfilesProvider of = new ProfilesProvider();
       IProfiles profiles = of.newProfiles();
       profile = profiles.getProfileById(this.get(P_PROFILE_ID));
       if (profile == null) {

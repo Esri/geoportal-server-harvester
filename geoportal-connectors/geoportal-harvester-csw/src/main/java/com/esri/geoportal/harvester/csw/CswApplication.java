@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.csw;
 
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
-import com.esri.geoportal.commons.csw.client.ObjectFactory;
+import com.esri.geoportal.commons.csw.client.impl.ProfilesProvider;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -40,7 +40,7 @@ public class CswApplication {
    */
   public static void main(String[] args) throws Exception {
     if (args.length==2) {
-      ObjectFactory of = new ObjectFactory();
+      ProfilesProvider of = new ProfilesProvider();
       IProfiles profiles = of.newProfiles();
       IProfile profile = profiles.getProfileById(args[1]);
       DataPrintStreamOutput destination = new DataPrintStreamOutput(System.out);
