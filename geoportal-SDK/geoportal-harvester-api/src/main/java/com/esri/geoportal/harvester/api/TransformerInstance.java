@@ -16,8 +16,6 @@
 package com.esri.geoportal.harvester.api;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.Task;
-import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
 import java.util.List;
 
@@ -25,20 +23,7 @@ import java.util.List;
  * Transformer instance.
  * @see Transformer
  */
-public interface TransformerInstance extends AutoCloseable {
-  
-  /**
-   * Initialize instance.
-   * @param task task for which the transformer will be used
-   * @throws DataProcessorException if initialization fails.
-   */
-  void initialize(Task task) throws DataProcessorException;
-  
-  /**
-   * Terminates instance
-   * @throws DataProcessorException if termination fails.
-   */
-  void terminate() throws DataProcessorException;
+public interface TransformerInstance extends Initializable {
   
   /**
    * Gets transformer definition.

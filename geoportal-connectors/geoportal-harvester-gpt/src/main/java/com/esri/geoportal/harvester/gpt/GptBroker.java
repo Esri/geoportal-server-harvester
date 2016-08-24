@@ -22,7 +22,6 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
-import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
@@ -44,58 +43,66 @@ import org.slf4j.LoggerFactory;
  * GPT broker.
  */
 /*package*/ class GptBroker implements OutputBroker {
+
   private final static Logger LOG = LoggerFactory.getLogger(GptBroker.class);
   private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
   private final static String SBOM = generateSBOM();
   private final GptConnector connector;
   private final GptBrokerDefinitionAdaptor definition;
-  private final Client client;
   private final Set<String> existing = new HashSet<>();
+  private Client client;
 
   private static String generateSBOM() {
     try {
-      return new String(new byte[]{(byte)0xEF,(byte)0xBB,(byte)0xBF},"UTF-8");
+      return new String(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}, "UTF-8");
     } catch (UnsupportedEncodingException ex) {
       LOG.error(String.format("Error creating BOM."), ex);
       return "";
     }
   }
-  
+
   /**
    * Creates instance of the broker.
+   *
    * @param connector connector
    * @param definition definition
    * @param client client
    */
-  public GptBroker(GptConnector connector, GptBrokerDefinitionAdaptor definition, Client client) {
+  public GptBroker(GptConnector connector, GptBrokerDefinitionAdaptor definition) {
     this.connector = connector;
     this.definition = definition;
-    this.client = client;
   }
 
   @Override
-  public void initialize(Task task) throws DataProcessorException {
+  public void initialize(InitContext context) throws DataProcessorException {
+    client = new Client(definition.getHostUrl(), definition.getCredentials());
+    
     if (definition.getCleanup()) {
       try {
-        List<String> existingIds = client.queryBySource(task.getDataSource().getBrokerUri().toASCIIString());
+        List<String> existingIds = client.queryBySource(context.getTask().getDataSource().getBrokerUri().toASCIIString());
         existing.addAll(existingIds);
-      } catch (IOException|URISyntaxException ex) {
+      } catch (IOException | URISyntaxException ex) {
         throw new DataProcessorException(String.format("Error getting published records for: %s", client), ex);
       }
     }
   }
 
   @Override
-  public void terminate() throws DataProcessorException {
+  public void terminate() {
+    try {
+      client.close();
+    } catch (IOException ex) {
+      LOG.error(String.format("Error terminating broker.", ex));
+    }
     if (definition.getCleanup()) {
-      for (String id: existing) {
-        try {
+      try {
+        for (String id : existing) {
           client.delete(id);
-        } catch (URISyntaxException|IOException ex) {
-          throw new DataProcessorException(String.format("Error terminating broker."), ex);
         }
+        LOG.info(String.format("%d records has been removed during cleanup.", existing.size()));
+      } catch (URISyntaxException | IOException ex) {
+        LOG.error(String.format("Error terminating broker."), ex);
       }
-      LOG.info(String.format("%d records has been removed during cleanup.", existing.size()));
     }
   }
 
@@ -106,28 +113,23 @@ import org.slf4j.LoggerFactory;
       data.src_source_type_s = ref.getBrokerUri().getScheme();
       data.src_source_uri_s = ref.getBrokerUri().toASCIIString();
       data.src_uri_s = ref.getSourceUri().toASCIIString();
-      data.src_lastupdate_dt = ref.getLastModifiedDate()!=null? fromatDate(ref.getLastModifiedDate()): null;
-      data.xml = new String(ref.getContent(),"UTF-8");
+      data.src_lastupdate_dt = ref.getLastModifiedDate() != null ? fromatDate(ref.getLastModifiedDate()) : null;
+      data.xml = new String(ref.getContent(), "UTF-8");
       if (data.xml.startsWith(SBOM)) {
         data.xml = data.xml.substring(1);
       }
       PublishResponse response = client.publish(data, definition.getForceAdd());
-      if (response==null) {
+      if (response == null) {
         throw new DataOutputException(this, "No response received");
       }
-      if (response.getError()!=null) {
+      if (response.getError() != null) {
         throw new DataOutputException(this, response.getError().getMessage());
       }
       existing.remove(response.getId());
-      return response.getStatus().equalsIgnoreCase("created")? PublishingStatus.CREATED: PublishingStatus.UPDATED;
-    } catch (IOException|URISyntaxException ex) {
+      return response.getStatus().equalsIgnoreCase("created") ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
+    } catch (IOException | URISyntaxException ex) {
       throw new DataOutputException(this, "Error publishing data.", ex);
     }
-  }
-
-  @Override
-  public void close() throws IOException {
-    client.close();
   }
 
   @Override
@@ -144,13 +146,13 @@ import org.slf4j.LoggerFactory;
   public String toString() {
     return String.format("GPT [%s]", definition.getHostUrl());
   }
-  
+
   private String fromatDate(Date date) {
     ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     ZonedDateTime ofInstant = ZonedDateTime.ofInstant(zonedDateTime.toInstant(), ZoneOffset.UTC);
     return FORMATTER.format(zonedDateTime);
   }
-  
+
   private boolean getCleanup() {
     return definition.getCleanup();
   }

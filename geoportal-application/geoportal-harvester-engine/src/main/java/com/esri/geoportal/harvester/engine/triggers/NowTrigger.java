@@ -57,7 +57,7 @@ public class NowTrigger implements Trigger {
 
   @Override
   public void close() throws Exception {
-    // Ignore
+    // nothing to close
   }
   
   /**
@@ -85,15 +85,15 @@ public class NowTrigger implements Trigger {
       context.execute(triggerDefinition.getTaskDefinition());
     }
 
+    @Override
+    public void deactivate() {
+      // nothing to deactivate
+    }
+
     
     @Override
     public String toString() {
       return String.format("IMMEDIATE TRIGGER FOR : %s", triggerDefinition);
-    }
-    
-    @Override
-    public void close() throws Exception {
-      // nothing to close (yet)
     }
   }
 }

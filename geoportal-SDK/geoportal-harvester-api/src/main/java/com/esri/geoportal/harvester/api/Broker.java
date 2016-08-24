@@ -16,7 +16,6 @@
 package com.esri.geoportal.harvester.api;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import java.io.Closeable;
 
 /**
  * Broker.
@@ -32,7 +31,7 @@ import java.io.Closeable;
  * @see com.esri.geoportal.harvester.api.defs.EntityDefinition
  * @see Connector
  */
-public interface Broker<C extends Connector> extends Closeable {
+public interface Broker<C extends Connector> extends Initializable {
   
   /**
    * Gets entity definition.

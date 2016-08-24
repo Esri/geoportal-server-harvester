@@ -15,24 +15,34 @@
  */
 package com.esri.geoportal.harvester.api;
 
-import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.Task;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 
 /**
- * Filter instance.
- * @see Filter
+ * Initializable.
  */
-public interface FilterInstance extends Initializable {
+public interface Initializable {
+
+  /**
+   * Initialize broker.
+   * @param context broker context
+   * @throws DataProcessorException if initialization fails.
+   */
+  void initialize(InitContext context) throws DataProcessorException;
+
+  /**
+   * Terminates broker.
+   */
+  void terminate();
   
   /**
-   * Gets filter definition.
-   * @return filter definition
+   * Broker initialization context.
    */
-  EntityDefinition getFilterDefinition();
-  
-  /**
-   * Tests data if allowed by filter.
-   * @param dataReference data reference
-   * @return <code>true</code> if data allowed by filter
-   */
-  boolean test(DataReference dataReference);
+  interface InitContext {
+    /**
+     * Gets task.
+     * @return task
+     */
+    Task getTask();
+  }
 }

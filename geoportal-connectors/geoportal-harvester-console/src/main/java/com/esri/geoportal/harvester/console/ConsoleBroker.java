@@ -18,7 +18,6 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
-import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
@@ -43,12 +42,12 @@ import java.io.IOException;
   }
 
   @Override
-  public void initialize(Task task) throws DataProcessorException {
+  public void initialize(InitContext context) throws DataProcessorException {
     // nothing to initialize
   }
 
   @Override
-  public void terminate() throws DataProcessorException {
+  public void terminate() {
     // nothing to terminate
   }
 
@@ -65,11 +64,6 @@ import java.io.IOException;
     } catch (IOException ex) {
       throw new DataOutputException(this, "Error publishing data.", ex);
     }
-  }
-
-  @Override
-  public void close() throws IOException {
-    // no closing neccessary
   }
 
   @Override

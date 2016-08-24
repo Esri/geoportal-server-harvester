@@ -13,26 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api;
+package com.esri.geoportal.harvester.api.base;
 
-import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.Broker;
+import com.esri.geoportal.harvester.api.defs.Task;
 
 /**
- * Filter instance.
- * @see Filter
+ * Simple broker context.
  */
-public interface FilterInstance extends Initializable {
-  
+public class SimpleInitContext implements Broker.InitContext{
+  private final Task task;
+
   /**
-   * Gets filter definition.
-   * @return filter definition
+   * Creates instance of the context.
+   * @param task task.
    */
-  EntityDefinition getFilterDefinition();
+  public SimpleInitContext(Task task) {
+    this.task = task;
+  }
+
+  @Override
+  public Task getTask() {
+    return task;
+  }
+
+  @Override
+  public String toString() {
+    return String.format("%s", task);
+  }
   
-  /**
-   * Tests data if allowed by filter.
-   * @param dataReference data reference
-   * @return <code>true</code> if data allowed by filter
-   */
-  boolean test(DataReference dataReference);
 }

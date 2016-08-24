@@ -19,7 +19,6 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Filter;
 import com.esri.geoportal.harvester.api.FilterInstance;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -82,12 +81,12 @@ public class RegExFilter implements Filter {
     }
 
     @Override
-    public void initialize(Task task) throws DataProcessorException {
+    public void initialize(InitContext context) throws DataProcessorException {
       // empty initialization
     }
 
     @Override
-    public void terminate() throws DataProcessorException {
+    public void terminate() {
       // empty termination
     }
 
@@ -105,10 +104,6 @@ public class RegExFilter implements Filter {
         LOG.debug(String.format("Source URI: %s does not match pattern: %s", sourceUri, pattern.pattern()));
       }
       return result;
-    }
-
-    @Override
-    public void close() throws Exception {
     }
   }
 }

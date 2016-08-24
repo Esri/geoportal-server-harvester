@@ -26,7 +26,6 @@ import com.esri.geoportal.commons.meta.StringAttribute;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.mime.MimeType;
@@ -83,23 +82,18 @@ import org.w3c.dom.Document;
   }
 
   @Override
-  public void initialize(Task task) throws DataProcessorException {
+  public void initialize(InitContext context) throws DataProcessorException {
     // nothing to initialize
   }
 
   @Override
-  public void terminate() throws DataProcessorException {
+  public void terminate() {
     // nothing to terminate
   }
 
   @Override
   public URI getBrokerUri() throws URISyntaxException {
     return new URI("AGS", definition.getHostUrl().toExternalForm(), null);
-  }
-
-  @Override
-  public void close() throws IOException {
-    // nothing to close
   }
 
   @Override

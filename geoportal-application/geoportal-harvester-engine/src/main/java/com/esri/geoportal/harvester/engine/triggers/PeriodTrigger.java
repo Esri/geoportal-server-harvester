@@ -28,7 +28,6 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.Period;
 import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -92,11 +91,7 @@ public class PeriodTrigger implements Trigger {
   @Override
   public void close() throws Exception {
     weakMap.values().stream().map(v->v.get()).forEach(i->{
-      try {
-        i.close();
-      } catch (Exception ex) {
-        LOG.warn(String.format("Error closing instance"), ex);
-      }
+        i.deactivate();
     });
     service.shutdownNow();
   }
@@ -127,7 +122,7 @@ public class PeriodTrigger implements Trigger {
     }
 
     @Override
-    public synchronized void close() throws Exception {
+    public synchronized void deactivate() {
       if (future!=null) {
         future.cancel(true);
         future = null;

@@ -25,6 +25,7 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.apache.commons.lang3.StringUtils;
@@ -46,26 +47,27 @@ import org.apache.commons.lang3.StringUtils;
    * Creates instance of the adaptor.
    *
    * @param def broker definition
+   * @throws InvalidDefinitionException if invalid definition
    */
-  public CswBrokerDefinitionAdaptor(EntityDefinition def) {
+  public CswBrokerDefinitionAdaptor(EntityDefinition def) throws InvalidDefinitionException {
     super(def);
     this.credAdaptor = new CredentialsDefinitionAdaptor(def);
     this.botsAdaptor = new BotsBrokerDefinitionAdaptor(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(CswConnector.TYPE);
     } else if (!CswConnector.TYPE.equals(def.getType())) {
-      throw new IllegalArgumentException("Broker definition doesn't match");
+      throw new InvalidDefinitionException("Broker definition doesn't match");
     } else {
       try {
         hostUrl = new URL(get(P_HOST_URL));
       } catch (MalformedURLException ex) {
-        throw new IllegalArgumentException(String.format("Invalid %s: %s", P_HOST_URL, get(P_HOST_URL)), ex);
+        throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL, get(P_HOST_URL)), ex);
       }
       ProfilesProvider of = new ProfilesProvider();
       IProfiles profiles = of.newProfiles();
       profile = profiles.getProfileById(this.get(P_PROFILE_ID));
       if (profile == null) {
-        throw new IllegalArgumentException(String.format("Invalid %s: %s", P_PROFILE_ID, get(P_PROFILE_ID)));
+        throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_PROFILE_ID, get(P_PROFILE_ID)));
       }
     }
   }

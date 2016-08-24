@@ -21,7 +21,6 @@ import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
@@ -35,11 +34,14 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * WAF broker.
  */
 /*package*/ class WafBroker implements InputBroker {
+  private static final Logger LOG = LoggerFactory.getLogger(WafBroker.class);
   private final WafConnector connector;
   private final WafBrokerDefinitionAdaptor definition;
   private final Set<URL> visited = new HashSet<>();
@@ -60,13 +62,21 @@ import org.apache.http.impl.client.HttpClients;
   }
 
   @Override
-  public void initialize(Task task) throws DataProcessorException {
-    // nothing to initialize
+  public void initialize(InitContext context) throws DataProcessorException {
+    CloseableHttpClient client = HttpClients.createDefault();
+    Bots bots = BotsUtils.readBots(definition.getBotsConfig(), client, definition.getBotsMode(), definition.getHostUrl());
+    httpClient = new BotsHttpClient(client,bots);
   }
 
   @Override
-  public void terminate() throws DataProcessorException {
-    // nothing to terminate
+  public void terminate() {
+    if (httpClient!=null) {
+      try {
+        httpClient.close();
+      } catch (IOException ex) {
+        LOG.error(String.format("Error terminating broker."), ex);
+      }
+    }
   }
 
   @Override
@@ -77,25 +87,6 @@ import org.apache.http.impl.client.HttpClients;
   @Override
   public Iterator iterator(Map<String,Object> attributes) throws DataInputException {
     return new WafIterator();
-  }
-
-  /**
-   * Asserts executor.
-   * @throws IOException if creating executor fails
-   */
-  private void assertExecutor() {
-    if (httpClient==null) {
-      CloseableHttpClient client = HttpClients.createDefault();
-      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), client, definition.getBotsMode(), definition.getHostUrl());
-      httpClient = new BotsHttpClient(client,bots);
-    }
-  }
-
-  @Override
-  public void close() throws IOException {
-    if (httpClient!=null) {
-      httpClient.close();
-    }
   }
 
   @Override
@@ -121,8 +112,6 @@ import org.apache.http.impl.client.HttpClients;
     public boolean hasNext() throws DataInputException {
 
       try {
-        assertExecutor();
-
         if (files!=null && !files.isEmpty()) {
           return true;
         }
@@ -156,7 +145,6 @@ import org.apache.http.impl.client.HttpClients;
     @Override
     public DataReference next() throws DataInputException {
       try {
-        assertExecutor();
         WafFile file = files.poll();
         return file.readContent(httpClient);
       } catch (IOException|URISyntaxException ex) {

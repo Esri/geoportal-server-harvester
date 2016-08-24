@@ -18,28 +18,15 @@ package com.esri.geoportal.harvester.api.general;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
-import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import java.util.List;
+import com.esri.geoportal.harvester.api.Initializable;
 
 /**
  * Link action.
  */
-public interface LinkAction extends AutoCloseable {
-  
-  /**
-   * Initialize link action
-   * @param task task for which the link action will be used
-   * @throws DataProcessorException if initialization fails.
-   */
-  void initialize(Task task) throws DataProcessorException;
-  
-  /**
-   * Terminates link action
-   * @throws DataProcessorException if termination fails.
-   */
-  void terminate() throws DataProcessorException;
+public interface LinkAction extends Initializable {
   
   /**
    * Gets link action definition.

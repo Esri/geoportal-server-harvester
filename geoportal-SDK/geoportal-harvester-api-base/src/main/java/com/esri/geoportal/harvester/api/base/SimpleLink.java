@@ -18,7 +18,6 @@ package com.esri.geoportal.harvester.api.base;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.LinkDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
-import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.general.Link;
@@ -44,15 +43,15 @@ public class SimpleLink implements Link {
   }
 
   @Override
-  public void initialize(Task task) throws DataProcessorException {
-    action.initialize(task);
+  public void initialize(InitContext context) throws DataProcessorException {
+    action.initialize(context);
     for (Link l: drains) {
-      l.initialize(task);
+      l.initialize(context);
     }
   }
 
   @Override
-  public void terminate() throws DataProcessorException {
+  public void terminate() {
     action.terminate();
     for (Link l: drains) {
       l.terminate();
@@ -78,14 +77,6 @@ public class SimpleLink implements Link {
       }
     }
     return status;
-  }
-
-  @Override
-  public void close() throws Exception {
-    action.close();
-    for (Link l: drains) {
-      l.close();
-    }
   }
   
   @Override

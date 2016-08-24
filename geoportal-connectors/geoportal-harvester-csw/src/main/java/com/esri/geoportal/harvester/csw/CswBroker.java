@@ -27,7 +27,6 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.mime.MimeType;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
@@ -37,11 +36,14 @@ import java.net.URISyntaxException;
 import java.util.Map;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * CSW broker.
  */
 /*package*/ class CswBroker implements InputBroker {
+  private static final Logger LOG = LoggerFactory.getLogger(CswBroker.class);
   private static final int PAGE_SIZE = 10;
 
   private final CswConnector connector;
@@ -63,13 +65,21 @@ import org.apache.http.impl.client.HttpClients;
   }
 
   @Override
-  public void initialize(Task task) throws DataProcessorException {
-    // nothing to initialize
+  public void initialize(InitContext context) throws DataProcessorException {
+    httpclient = HttpClients.createDefault();
+    Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getBotsMode(), definition.getHostUrl());
+    client = new Client(new BotsHttpClient(httpclient,bots), definition.getHostUrl(), definition.getProfile(), definition.getCredentials());
   }
 
   @Override
-  public void terminate() throws DataProcessorException {
-    // nothing to terminate
+  public void terminate() {
+    if (httpclient!=null) {
+      try {
+        httpclient.close();
+      } catch (IOException ex) {
+        LOG.error(String.format("Error terminating CswBroker."), ex);
+      }
+    }
   }
 
   @Override
@@ -80,25 +90,6 @@ import org.apache.http.impl.client.HttpClients;
   @Override
   public Iterator iterator(Map<String,Object> attributes) throws DataInputException {
     return new CswIterator();
-  }
-
-  /**
-   * Asserts executor.
-   * @throws IOException if creating executor fails
-   */
-  private void assertClient() throws IOException {
-    if (client==null) {
-      httpclient = HttpClients.createDefault();
-      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getBotsMode(), definition.getHostUrl());
-      client = new Client(new BotsHttpClient(httpclient,bots), definition.getHostUrl(), definition.getProfile(), definition.getCredentials());
-    }
-  }
-
-  @Override
-  public void close() throws IOException {
-    if (httpclient!=null) {
-      httpclient.close();
-    }
   }
 
   @Override
@@ -123,8 +114,6 @@ import org.apache.http.impl.client.HttpClients;
     @Override
     public boolean hasNext() throws DataInputException {
       try {
-        assertClient();
-
         if (noMore) {
           return false;
         }

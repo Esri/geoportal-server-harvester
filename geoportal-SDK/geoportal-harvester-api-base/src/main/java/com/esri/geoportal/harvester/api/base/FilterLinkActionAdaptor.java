@@ -19,7 +19,6 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.FilterInstance;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
-import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.general.LinkAction;
@@ -42,12 +41,12 @@ public final class FilterLinkActionAdaptor implements LinkAction {
   }
 
   @Override
-  public void initialize(Task task) throws DataProcessorException {
-    filter.initialize(task);
+  public void initialize(InitContext context) throws DataProcessorException {
+    filter.initialize(context);
   }
 
   @Override
-  public void terminate() throws DataProcessorException {
+  public void terminate() {
     filter.terminate();
   }
 
@@ -64,11 +63,6 @@ public final class FilterLinkActionAdaptor implements LinkAction {
   @Override
   public PublishingStatus push(DataReference dataRef) throws DataProcessorException, DataOutputException {
     return PublishingStatus.EMPTY;
-  }
-
-  @Override
-  public void close() throws Exception {
-    filter.close();
   }
   
   @Override

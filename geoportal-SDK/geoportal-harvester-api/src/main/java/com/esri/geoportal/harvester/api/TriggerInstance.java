@@ -27,7 +27,7 @@ import java.util.Date;
  * @see com.esri.geoportal.harvester.api.Trigger
  * @see com.esri.geoportal.harvester.api.defs.TriggerDefinition
  */
-public interface TriggerInstance extends AutoCloseable {
+public interface TriggerInstance {
 
   /**
    * Gets trigger instance definition.
@@ -42,6 +42,11 @@ public interface TriggerInstance extends AutoCloseable {
    * @throws InvalidDefinitionException if task definition is invalid
    */
   void activate(Context triggerContext) throws DataProcessorException, InvalidDefinitionException;
+  
+  /**
+   * Deactivates trigger.
+   */
+  void deactivate();
   
   /**
    * Trigger context

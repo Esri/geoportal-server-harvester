@@ -42,10 +42,10 @@ public class UncApplication {
       EntityDefinition def = new EntityDefinition();
       UncBrokerDefinitionAdaptor adaptor = new UncBrokerDefinitionAdaptor(def);
       adaptor.setRootFolder(start);
-      try (InputBroker hv = connector.createBroker(def)) {
-        DataCollector dataCollector = new DataCollector(hv, Arrays.asList(new DataPrintStreamOutput[]{destination}));
-        dataCollector.collect();
-      }
+      
+      InputBroker hv = connector.createBroker(def);
+      DataCollector dataCollector = new DataCollector(hv, Arrays.asList(new DataPrintStreamOutput[]{destination}));
+      dataCollector.collect();
     }
   }
 }

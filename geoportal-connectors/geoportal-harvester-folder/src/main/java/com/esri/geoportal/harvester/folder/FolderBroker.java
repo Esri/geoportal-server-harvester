@@ -19,13 +19,11 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
-import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 import java.io.OutputStream;
 import java.net.URI;
@@ -56,7 +54,7 @@ import org.slf4j.LoggerFactory;
   }
 
   @Override
-  public void initialize(Task task) throws DataProcessorException {
+  public void initialize(InitContext context) throws DataProcessorException {
     if (definition.getCleanup()) {
       File rootFolder = definition.getRootFolder();
       fetchExisting(rootFolder);
@@ -74,7 +72,7 @@ import org.slf4j.LoggerFactory;
   }
 
   @Override
-  public void terminate() throws DataProcessorException {
+  public void terminate() {
     if (definition.getCleanup()) {
       existing.forEach(f->new File(f).delete());
       LOG.info(String.format("%d records has been removed during cleanup.", existing.size()));
@@ -99,12 +97,6 @@ import org.slf4j.LoggerFactory;
         throw new DataOutputException(this,"Error publishing data.", ex);
       }
   }
-
-  @Override
-  public void close() throws IOException {
-    // no need to close
-  }
-  
 
   @Override
   public String toString() {

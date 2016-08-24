@@ -190,6 +190,6 @@ public class Profile implements IProfile {
 
   @Override
   public String toString() {
-    return String.format("PROFILE :: id: %s, name: %s", id, name);
+    return String.format("PROFILE :: %s, %s", id, name);
   }
 }

@@ -23,6 +23,8 @@ import java.util.Arrays;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.base.DataCollector;
 import com.esri.geoportal.harvester.api.base.DataPrintStreamOutput;
+import com.esri.geoportal.harvester.api.base.SimpleInitContext;
+import com.esri.geoportal.harvester.api.defs.Task;
 
 /**
  * Waf application.
@@ -46,10 +48,10 @@ public class WafApplication {
       adaptor.setHostUrl(start);
       adaptor.setBotsConfig(BotsConfig.DEFAULT);
       adaptor.setBotsMode(BotsMode.inherit);
-      try (InputBroker hv = connector.createBroker(def)) {
-        DataCollector dataCollector = new DataCollector(hv, Arrays.asList(new DataPrintStreamOutput[]{destination}));
-        dataCollector.collect();
-      }
+      InputBroker hv = connector.createBroker(def);
+      hv.initialize(new SimpleInitContext(new Task(null,hv,null)));
+      DataCollector dataCollector = new DataCollector(hv, Arrays.asList(new DataPrintStreamOutput[]{destination}));
+      dataCollector.collect();
     }
   }
 }

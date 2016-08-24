@@ -16,8 +16,10 @@
 package com.esri.geoportal.harvester.engine.defaults;
 
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.Initializable.InitContext;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Processor;
+import com.esri.geoportal.harvester.api.base.SimpleInitContext;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.defs.Task;
@@ -83,6 +85,30 @@ public class DefaultProcessor implements Processor {
     private volatile boolean aborting;
 
     /**
+     * Initializes all elements.
+     * @param context init context
+     * @throws DataProcessorException if initialization fails
+     */
+    private void initialize(InitContext context) throws DataProcessorException {
+      task.getDataSource().initialize(context);
+      for (Link link: task.getDataDestinations()) {
+        link.initialize(context);
+      }
+    }
+    
+    /**
+     * Terminates all tasks
+     */
+    private void terminate() {
+      if (!Thread.currentThread().isInterrupted()) {
+        for (Link link: task.getDataDestinations()) {
+          link.terminate();
+        }
+        task.getDataSource().terminate();
+      }
+    }
+    
+    /**
      * Creates instance of the process.
      *
      * @param task task
@@ -95,10 +121,7 @@ public class DefaultProcessor implements Processor {
         LOG.info(String.format("Started harvest: %s", getTitle()));
         if (!task.getDataDestinations().isEmpty()) {
           try {
-            task.getDataSource().initialize(task);
-            for (Link link: task.getDataDestinations()) {
-              link.initialize(task);
-            }
+            initialize(new SimpleInitContext(task));
             
             InputBroker.Iterator iterator = task.getDataSource().iterator(attributes);
             while (iterator.hasNext()) {
@@ -121,12 +144,7 @@ public class DefaultProcessor implements Processor {
                 }
               });
             }
-            if (!Thread.currentThread().isInterrupted()) {
-              for (Link link: task.getDataDestinations()) {
-                link.terminate();
-              }
-              task.getDataSource().terminate();
-            }
+            
           } catch (DataInputException ex) {
             LOG.error(String.format("Error harvesting of %s", getTitle()), ex);
             onError(ex);
@@ -134,6 +152,7 @@ public class DefaultProcessor implements Processor {
             LOG.error(String.format("Error harvesting of %s", getTitle()), ex);
             onError(ex);
           } finally {
+            terminate();
             completed = true;
             aborting = false;
             Thread.interrupted();

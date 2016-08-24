@@ -17,7 +17,6 @@ package com.esri.geoportal.geoportal.harvester.unc;
 
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
@@ -49,12 +48,12 @@ import java.util.Map;
   }
 
   @Override
-  public void initialize(Task task) throws DataProcessorException {
+  public void initialize(InitContext context) throws DataProcessorException {
     // nothing to initialize
   }
 
   @Override
-  public void terminate() throws DataProcessorException {
+  public void terminate() {
     // nothing to terminate
   }
 
@@ -66,11 +65,6 @@ import java.util.Map;
   @Override
   public InputConnector getConnector() {
     return connector;
-  }
-
-  @Override
-  public void close() throws IOException {
-    // nothing to close
   }
 
   @Override

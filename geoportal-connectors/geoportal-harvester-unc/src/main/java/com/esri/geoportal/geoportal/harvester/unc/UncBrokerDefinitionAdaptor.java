@@ -17,8 +17,8 @@ package com.esri.geoportal.geoportal.harvester.unc;
 
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.io.File;
-import java.net.URL;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -34,19 +34,19 @@ public class UncBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   /**
    * Creates instance of the adaptor.
    * @param def broker definition
-   * @throws IllegalArgumentException if invalid broker definition
+   * @throws InvalidDefinitionException if invalid broker definition
    */
-  public UncBrokerDefinitionAdaptor(EntityDefinition def) throws IllegalArgumentException {
+  public UncBrokerDefinitionAdaptor(EntityDefinition def) throws InvalidDefinitionException {
     super(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(UncConnector.TYPE);
     } else if (!UncConnector.TYPE.equals(def.getType())) {
-      throw new IllegalArgumentException("Broker definition doesn't match");
+      throw new InvalidDefinitionException("Broker definition doesn't match");
     } else {
       try {
         rootFolder = new File(get(P_ROOT_FOLDER));
       } catch (Exception ex) {
-        throw new IllegalArgumentException(String.format("Invalid %s: %s", P_ROOT_FOLDER, get(P_ROOT_FOLDER)), ex);
+        throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_ROOT_FOLDER, get(P_ROOT_FOLDER)), ex);
       }
       pattern = get(P_PATTERN);
     }

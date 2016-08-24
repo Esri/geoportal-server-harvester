@@ -19,8 +19,6 @@ import com.esri.geoportal.harvester.api.Broker;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
-import com.esri.geoportal.harvester.api.defs.Task;
-import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 
 /**
  * Output broker.
@@ -30,19 +28,6 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
  * @see OutputConnector
  */
 public interface OutputBroker extends Broker<OutputConnector> {
-  
-  /**
-   * Initialize broker.
-   * @param task task for which the broker will be used
-   * @throws DataProcessorException if initialization fails.
-   */
-  void initialize(Task task) throws DataProcessorException;
-  
-  /**
-   * Terminates broker.
-   * @throws DataProcessorException if termination fails.
-   */
-  void terminate() throws DataProcessorException;
   
   /**
    * Publishes data.

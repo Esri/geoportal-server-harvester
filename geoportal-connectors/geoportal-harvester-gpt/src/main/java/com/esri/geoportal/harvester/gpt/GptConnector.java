@@ -57,14 +57,7 @@ public class GptConnector implements OutputConnector<OutputBroker> {
 
   @Override
   public OutputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
-    GptBrokerDefinitionAdaptor adaptor = new GptBrokerDefinitionAdaptor(definition);
-    try {
-      URL url = new URL(adaptor.getHostUrl().toExternalForm().replaceAll("/$", "")+"/");
-      Client client = new Client(url, adaptor.getCredentials());
-      return new GptBroker(this, adaptor, client);
-    } catch (MalformedURLException ex) {
-      throw new InvalidDefinitionException(String.format("Invalid url", adaptor.getHostUrl()), ex);
-    }
+    return new GptBroker(this, new GptBrokerDefinitionAdaptor(definition));
   }
   
 }

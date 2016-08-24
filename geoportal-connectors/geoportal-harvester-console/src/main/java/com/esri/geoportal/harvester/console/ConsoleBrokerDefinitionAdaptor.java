@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.console;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -27,13 +28,14 @@ public class ConsoleBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   /**
    * Creates instance of the adaptor.
    * @param def broker definition
+   * @throws InvalidDefinitionException if invalid definition
    */
-  public ConsoleBrokerDefinitionAdaptor(EntityDefinition def) {
+  public ConsoleBrokerDefinitionAdaptor(EntityDefinition def) throws InvalidDefinitionException {
     super(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(ConsoleConnector.TYPE);
     } else if (!ConsoleConnector.TYPE.equals(def.getType())) {
-      throw new IllegalArgumentException("Broker definition doesn't match");
+      throw new InvalidDefinitionException("Broker definition doesn't match");
     }
   }
 }

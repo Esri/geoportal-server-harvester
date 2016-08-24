@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.folder;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.io.File;
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,18 +35,19 @@ import org.apache.commons.lang3.StringUtils;
   /**
    * Creates instance of the adaptor.
    * @param entityDefinition broker definition
+   * @throws InvalidDefinitionException if invalid definition
    */
-  public FolderBrokerDefinitionAdaptor(EntityDefinition entityDefinition) throws IllegalArgumentException {
+  public FolderBrokerDefinitionAdaptor(EntityDefinition entityDefinition) throws InvalidDefinitionException {
     super(entityDefinition);
     if (StringUtils.trimToEmpty(entityDefinition.getType()).isEmpty()) {
       entityDefinition.setType(FolderConnector.TYPE);
     } else if (!FolderConnector.TYPE.equals(entityDefinition.getType())) {
-      throw new IllegalArgumentException("Broker definition doesn't match");
+      throw new InvalidDefinitionException("Broker definition doesn't match");
     } else {
       try {
         this.rootFolder = new File(get(P_ROOT_FOLDER));
       } catch (NullPointerException ex) {
-        throw new IllegalArgumentException(String.format("Invalid %s: %s",P_ROOT_FOLDER,get(P_ROOT_FOLDER)), ex);
+        throw new InvalidDefinitionException(String.format("Invalid %s: %s",P_ROOT_FOLDER,get(P_ROOT_FOLDER)), ex);
       }
       cleanup  = Boolean.parseBoolean(get(P_FOLDER_CLEANUP));
     }

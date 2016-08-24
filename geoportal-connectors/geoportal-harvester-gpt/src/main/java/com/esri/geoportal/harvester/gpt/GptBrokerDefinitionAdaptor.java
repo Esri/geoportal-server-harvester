@@ -19,6 +19,7 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.apache.commons.lang3.StringUtils;
@@ -40,18 +41,22 @@ import org.apache.commons.lang3.StringUtils;
    * Creates instance of the adaptor.
    * @param def broker definition
    */
-  public GptBrokerDefinitionAdaptor(EntityDefinition def) {
+  public GptBrokerDefinitionAdaptor(EntityDefinition def) throws InvalidDefinitionException {
     super(def);
     this.credAdaptor = new CredentialsDefinitionAdaptor(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(GptConnector.TYPE);
     } else if (!GptConnector.TYPE.equals(def.getType())) {
-      throw new IllegalArgumentException("Broker definition doesn't match");
+      throw new InvalidDefinitionException("Broker definition doesn't match");
     } else {
       try {
-        hostUrl = new URL(get(P_HOST_URL));
+        String sHostUrl = get(P_HOST_URL);
+        if (sHostUrl!=null) {
+          sHostUrl = sHostUrl.replaceAll("/*$", "/");
+        }
+        hostUrl = new URL(sHostUrl);
       } catch (MalformedURLException ex) {
-        throw new IllegalArgumentException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
+        throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
       }
       forceAdd = Boolean.parseBoolean(get(P_FORCE_ADD));
       cleanup  = Boolean.parseBoolean(get(P_CLEANUP));

@@ -19,7 +19,6 @@ import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.general.Link;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -27,7 +26,7 @@ import java.util.stream.Collectors;
  * {@link com.esri.geoportal.harvester.api.ProcessInstance}. Task itself can be
  * created based on the {@link com.esri.geoportal.harvester.api.defs.TaskDefinition}.
  */
-public final class Task implements AutoCloseable {
+public final class Task {
   private final Processor processor;
   private final InputBroker dataSource;
   private final List<Link> dataDestinations;
@@ -79,39 +78,9 @@ public final class Task implements AutoCloseable {
   public List<Link> getDataDestinations() {
     return dataDestinations;
   }
-
-  @Override
-  public void close() throws Exception {
-    try {
-      getDataSource().close();
-    } finally {
-      getDataDestinations().stream().forEach(d -> {
-        try {
-          d.close();
-        } catch (Exception ex) {}
-      });
-    }
-  }
   
   @Override
   public String toString() {
     return String.format("TASK :: %s", getTaskDefinition());
-  }
-  
-  @Override
-  public boolean equals(Object o) {
-    if (o instanceof Task) {
-      Task t = (Task)o;
-      return getTaskDefinition().equals(t.getTaskDefinition());
-    }
-
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = 5;
-    hash = 53 * hash + Objects.hashCode(this.getTaskDefinition());
-    return hash;
   }
 }

@@ -20,7 +20,6 @@ import com.esri.geoportal.harvester.api.Transformer;
 import com.esri.geoportal.harvester.api.TransformerInstance;
 import com.esri.geoportal.harvester.api.base.DataReferenceWrapper;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
@@ -108,12 +107,12 @@ public class XsltTransformer implements Transformer {
     }
 
     @Override
-    public void initialize(Task task) throws DataProcessorException {
+    public void initialize(InitContext context) throws DataProcessorException {
       // empty initialization
     }
 
     @Override
-    public void terminate() throws DataProcessorException {
+    public void terminate() {
       // empty termination
     }
 
@@ -132,10 +131,6 @@ public class XsltTransformer implements Transformer {
       } catch (IOException | TransformerException ex) {
         throw new DataTransformerException(String.format("Error transforming input: %s", input.getSourceUri()), ex);
       }
-    }
-
-    @Override
-    public void close() throws Exception {
     }
   }
 }

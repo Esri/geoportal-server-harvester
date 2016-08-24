@@ -86,7 +86,7 @@ public class DefaultTriggersService implements TriggersService {
     try {
       TriggerDefinition trigDef = pair.getTriggerInstance().getTriggerDefinition();
       TriggerReference triggerReference = new TriggerReference(triggerInstanceUuid, pair.getTaskId(), trigDef);
-      pair.getTriggerInstance().close();
+      pair.getTriggerInstance().deactivate();
       return triggerReference;
     } catch (Exception ex) {
       throw new DataProcessorException(String.format("Error deactivating trigger: %s", triggerInstanceUuid), ex);
@@ -142,14 +142,8 @@ public class DefaultTriggersService implements TriggersService {
   @Override
   public void deactivateTriggerInstances() {
     triggerInstanceManager.listAll().stream().forEach(e->{
-      UUID uuid = e.getKey();
       TriggerInstance triggerInstance = e.getValue().getTriggerInstance();
-      
-      try {
-        triggerInstance.close();
-      } catch (Exception ex) {
-        LOG.warn(String.format("Error deactivating trigger instance: %s --> %s", uuid, triggerInstance.getTriggerDefinition()), ex);
-      }
+      triggerInstance.deactivate();
     });
     triggerInstanceManager.clear();
   }
