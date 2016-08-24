@@ -81,6 +81,10 @@ public class SimpleLink implements Link {
   
   @Override
   public String toString() {
-    return getLinkDefinition().toString();
+    if (drains!=null && !drains.isEmpty()) {
+      return String.format("%s --> [%s]", action, drains.stream().map(Object::toString).collect(Collectors.joining(", ")));
+    } else {
+      return String.format("%s", action);
+    }
   }
 }
