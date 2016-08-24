@@ -227,7 +227,7 @@ public class Client implements Closeable {
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
     HttpGet get = new HttpGet(url.toURI().resolve(REST_SEARCH_URL).toASCIIString() + 
-            String.format("?q=%s:%s&from=%d", term, URLEncoder.encode("\"" + value + "\"", "UTF-8"), from));
+            String.format("?q=%s:%s&from=%d&size=%d", term, URLEncoder.encode("\"" + value + "\"", "UTF-8"), from, size));
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("Content-Type", "application/json");
 
