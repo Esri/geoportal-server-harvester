@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ReportStatistics implements ReportBuilder, Statistics {
   private final Logger LOG = LoggerFactory.getLogger(ReportStatistics.class);
+  private final long STATUS_LOG_MODULO = 100;
   
   private Date startDate;
   private Date endDate;
@@ -86,11 +87,13 @@ public class ReportStatistics implements ReportBuilder, Statistics {
   @Override
   public void success(ProcessInstance process, DataReference dataReference) {
     ++succeeded;
+    printStatusLog();
   }
 
   @Override
   public void error(ProcessInstance process, DataInputException ex) {
     ++harvestFailed;
+    printStatusLog();;
   }
 
   @Override
@@ -103,6 +106,15 @@ public class ReportStatistics implements ReportBuilder, Statistics {
     failure = true;
   }
 
+  /**
+   * Prints status log.
+   */
+  private void printStatusLog() {
+    if ((succeeded+harvestFailed) % STATUS_LOG_MODULO == 0) {
+      LOG.debug(String.format("Progress: %d", succeeded+harvestFailed));
+    }
+  }
+  
   @Override
   public String toString() {
     return String.format("STATISTICS :: start: %s, end: %s, succeeded: %d, harvested failed: %d, published failed: %d, failure: %b", startDate, endDate, succeeded, harvestFailed, publishFailed, failure);
