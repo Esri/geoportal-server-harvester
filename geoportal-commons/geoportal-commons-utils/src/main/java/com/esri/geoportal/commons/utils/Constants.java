@@ -21,10 +21,10 @@ import org.apache.http.client.config.RequestConfig;
  * Various constants used by harvester.
  */
 public class Constants {
-  /** default connection timeout (5000 milliseconds) */
-  public static final int CONNECTION_TIMEOUT = 5000;
-  /** default socket connection (3000 milliseconds) */
-  public static final int SOCKET_TIMEOUT = 3000;
+  /** default connection timeout (120000 milliseconds) */
+  public static final int CONNECTION_TIMEOUT = 120000;
+  /** default socket timeout (30000 milliseconds) */
+  public static final int SOCKET_TIMEOUT = 30000;
   
   /**
    * HTTP Request configuration with timeouts.
