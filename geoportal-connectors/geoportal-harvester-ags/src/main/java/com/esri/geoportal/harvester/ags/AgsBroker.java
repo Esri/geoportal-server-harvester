@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -46,12 +47,15 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
  * Ags broker.
  */
 /*package*/ class AgsBroker implements InputBroker {
+  private static final Logger LOG = LoggerFactory.getLogger(AgsBroker.class);
 
   private final AgsConnector connector;
   private final AgsBrokerDefinitionAdaptor definition;
@@ -83,12 +87,16 @@ import org.w3c.dom.Document;
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
-    // nothing to initialize
+    client = new AgsClient(definition.getHostUrl());
   }
 
   @Override
   public void terminate() {
-    // nothing to terminate
+    try {
+      client.close();
+    } catch (IOException ex) {
+      LOG.error(String.format("Error terminating broker."), ex);
+    }
   }
 
   @Override
@@ -98,7 +106,12 @@ import org.w3c.dom.Document;
 
   @Override
   public Iterator iterator(Map<String, Object> attributes) throws DataInputException {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    try {
+      List<ServerResponse> responses = listResponses(null);
+      return new AgsIterator(responses.iterator());
+    } catch (URISyntaxException|IOException ex) {
+      throw new DataInputException(this, String.format("Error listing server content."), ex);
+    }
   }
 
   private List<ServerResponse> listResponses(String rootFolder) throws URISyntaxException, IOException {
@@ -122,6 +135,9 @@ import org.w3c.dom.Document;
     return responses;
   }
 
+  /**
+   * ArcGIS content iterator.
+   */
   private class AgsIterator implements InputBroker.Iterator {
 
     private final java.util.Iterator<ServerResponse> iterator;
