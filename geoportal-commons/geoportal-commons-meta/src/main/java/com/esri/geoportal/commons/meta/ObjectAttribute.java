@@ -33,7 +33,8 @@ public class ObjectAttribute implements Attribute {
     return true;
   }
 
-  public Map<String, Attribute> getNamesAttributes() {
+  @Override
+  public Map<String, Attribute> getNamedAttributes() {
     return attributes;
   }
   

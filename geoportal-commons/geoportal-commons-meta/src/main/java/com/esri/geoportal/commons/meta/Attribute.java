@@ -26,6 +26,6 @@ public interface Attribute {
   default boolean isArray() { return false; }
   
   default String getValue() { return null; }
+  default Map<String, Attribute> getNamedAttributes() { return null; }
   default Attribute[] getAttributes() { return null; }
-  default Map<String, Attribute> getNamesAttributes() { return null; }
 }
