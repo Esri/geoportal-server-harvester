@@ -15,25 +15,36 @@
  */
 package com.esri.geoportal.commons.meta;
 
-import org.w3c.dom.Document;
-
 /**
- * Metadata handler.
+ * Meta exception.
  */
-public interface MetaHandler {
+public class MetaException extends Exception {
+
   /**
-   * Creates document based on properties.
-   * @param wellKnowsAttributes attributes
-   * @return document
-   * @throws MetaException if metadata creation failed
+   * Creates a new instance of <code>MetaException</code> without detail
+   * message.
    */
-  Document create(ObjectAttribute wellKnowsAttributes) throws MetaException;
-  
+  public MetaException() {
+  }
+
   /**
-   * Extracts attributes from the document.
-   * @param doc document.
-   * @return attributes
-   * @throws MetaException if metadata extraction failed
+   * Constructs an instance of <code>MetaException</code> with the specified
+   * detail message.
+   *
+   * @param msg the detail message.
    */
-  ObjectAttribute extract(Document doc) throws MetaException;
+  public MetaException(String msg) {
+    super(msg);
+  }
+
+  /**
+   * Constructs an instance of <code>MetaException</code> with the specified
+   * detail message.
+   *
+   * @param msg the detail message.
+   * @param t cause
+   */
+  public MetaException(String msg, Throwable t) {
+    super(msg,t);
+  }
 }

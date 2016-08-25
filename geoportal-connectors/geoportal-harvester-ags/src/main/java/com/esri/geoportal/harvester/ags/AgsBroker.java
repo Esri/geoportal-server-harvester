@@ -20,6 +20,7 @@ import com.esri.geoportal.commons.ags.client.ContentResponse;
 import com.esri.geoportal.commons.ags.client.ServerResponse;
 import com.esri.geoportal.commons.ags.client.ServiceInfo;
 import com.esri.geoportal.commons.meta.Attribute;
+import com.esri.geoportal.commons.meta.MetaException;
 import com.esri.geoportal.commons.meta.MetaHandler;
 import com.esri.geoportal.commons.meta.ObjectAttribute;
 import com.esri.geoportal.commons.meta.StringAttribute;
@@ -155,9 +156,13 @@ import org.w3c.dom.Document;
       try {
         ServerResponse next = iterator.next();
         HashMap<String, Attribute> attributes = new HashMap<>();
+        attributes.put("identifier", new StringAttribute(StringUtils.defaultString(next.mapName, next.name)));
         attributes.put("title", new StringAttribute(StringUtils.defaultString(next.mapName, next.name)));
         attributes.put("description", new StringAttribute(StringUtils.defaultString(next.description, next.serviceDescription)));
         attributes.put("resource.url", new StringAttribute(next.url));
+        
+        String serviceType = getServiceType(next.url);
+        attributes.put("resource.url.scheme", new StringAttribute("urn:x-esri:specification:ServiceType:ArcGIS:" + (serviceType!=null? serviceType: "Unknown")));
 
         Document document = metaHandler.create(new ObjectAttribute(attributes));
 
@@ -171,9 +176,17 @@ import org.w3c.dom.Document;
         byte [] bytes = writer.toString().getBytes("UTF-8");
         
         return new SimpleDataReference(getBrokerUri(), next.url, null, URI.create(next.url), bytes, MimeType.APPLICATION_JSON);
-      } catch (TransformerException|TransformerFactoryConfigurationError|IOException|URISyntaxException ex) {
+      } catch (TransformerException|TransformerFactoryConfigurationError|IOException|URISyntaxException|MetaException ex) {
         throw new DataInputException(AgsBroker.this, String.format("Error creating data reference for ArcGIS Server service"), ex);
       }
+    }
+    
+    private String getServiceType(String url) {
+      if (url!=null && url.endsWith("Server")) {
+        int slashIndex = url.lastIndexOf("/");
+        return slashIndex>=0? url.substring(slashIndex+1): url;
+      }
+      return null;
     }
 
   }
