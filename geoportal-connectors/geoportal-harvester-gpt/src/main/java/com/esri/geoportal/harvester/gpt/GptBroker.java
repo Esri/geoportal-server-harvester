@@ -76,7 +76,7 @@ import org.slf4j.LoggerFactory;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     client = new Client(definition.getHostUrl(), definition.getCredentials());
-    
+
     if (definition.getCleanup()) {
       try {
         List<String> existingIds = client.queryBySource(context.getTask().getDataSource().getBrokerUri().toASCIIString());
@@ -90,18 +90,19 @@ import org.slf4j.LoggerFactory;
   @Override
   public void terminate() {
     try {
-      client.close();
-    } catch (IOException ex) {
-      LOG.error(String.format("Error terminating broker.", ex));
-    }
-    if (definition.getCleanup()) {
-      try {
+      if (definition.getCleanup()) {
         for (String id : existing) {
           client.delete(id);
         }
         LOG.info(String.format("%d records has been removed during cleanup.", existing.size()));
-      } catch (URISyntaxException | IOException ex) {
-        LOG.error(String.format("Error terminating broker."), ex);
+      }
+    } catch (URISyntaxException | IOException ex) {
+      LOG.error(String.format("Error terminating broker."), ex);
+    } finally {
+      try {
+        client.close();
+      } catch (IOException ex) {
+        LOG.error(String.format("Error terminating broker.", ex));
       }
     }
   }
