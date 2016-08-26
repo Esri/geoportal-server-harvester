@@ -30,7 +30,7 @@ import java.util.List;
  * ArcGIS server connector.
  */
 public class AgsConnector implements InputConnector<InputBroker> {
-  public static final String TYPE = "WAF";
+  public static final String TYPE = "AGS";
   private final MetaHandler metaHandler;
 
   /**
