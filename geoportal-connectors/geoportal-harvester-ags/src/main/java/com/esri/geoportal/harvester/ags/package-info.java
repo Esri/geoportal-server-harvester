@@ -15,6 +15,6 @@
  */
 
 /**
- * Metadata operations related classes.
+ * ArcGIS server services connector.
  */
-package com.esri.geoportal.harvester.engine.meta;
+package com.esri.geoportal.harvester.ags;

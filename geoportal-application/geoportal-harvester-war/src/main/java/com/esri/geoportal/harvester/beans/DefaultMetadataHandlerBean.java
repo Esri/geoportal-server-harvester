@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.engine.meta.SimpleDcMetaHandler;
+import com.esri.geoportal.harvester.api.base.SimpleDcMetaHandler;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;

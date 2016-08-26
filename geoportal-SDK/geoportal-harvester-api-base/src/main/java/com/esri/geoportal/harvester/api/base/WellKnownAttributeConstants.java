@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine.meta;
+package com.esri.geoportal.harvester.api.base;
 
 import java.util.Arrays;
 import java.util.HashSet;

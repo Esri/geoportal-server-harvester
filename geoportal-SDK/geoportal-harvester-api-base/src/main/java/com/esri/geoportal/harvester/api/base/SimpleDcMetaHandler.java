@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine.meta;
+package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.commons.meta.AttributeUtils;
 import static com.esri.geoportal.commons.meta.AttributeUtils.fromProperties;
