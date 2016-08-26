@@ -155,13 +155,14 @@ import org.w3c.dom.Document;
     public DataReference next() throws DataInputException {
       try {
         ServerResponse next = iterator.next();
+        String serviceType = getServiceType(next.url);
+        
         HashMap<String, Attribute> attributes = new HashMap<>();
-        attributes.put("identifier", new StringAttribute(StringUtils.defaultString(next.mapName, next.name)));
-        attributes.put("title", new StringAttribute(StringUtils.defaultString(next.mapName, next.name)));
-        attributes.put("description", new StringAttribute(StringUtils.defaultString(next.description, next.serviceDescription)));
+        attributes.put("identifier", new StringAttribute(next.url));
+        attributes.put("title", new StringAttribute(StringUtils.defaultString(StringUtils.defaultString(next.mapName, next.name),StringUtils.defaultString(serviceType, next.url))));
+        attributes.put("description", new StringAttribute(StringUtils.defaultString(StringUtils.defaultString(StringUtils.defaultString(next.description, next.serviceDescription)))));
         attributes.put("resource.url", new StringAttribute(next.url));
         
-        String serviceType = getServiceType(next.url);
         attributes.put("resource.url.scheme", new StringAttribute("urn:x-esri:specification:ServiceType:ArcGIS:" + (serviceType!=null? serviceType: "Unknown")));
 
         Document document = metaHandler.create(new ObjectAttribute(attributes));
