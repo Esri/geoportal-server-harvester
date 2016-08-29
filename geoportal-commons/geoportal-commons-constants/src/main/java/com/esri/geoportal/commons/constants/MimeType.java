@@ -19,69 +19,77 @@ package com.esri.geoportal.commons.constants;
  * Mime type.
  */
 public enum MimeType {
-  APPLICATION_ESRI_MXD("application/vnd.esri.mxd"),
-  APPLICATION_ESRI_MPK("application/vnd.esri.mpk"),
-  APPLICATION_ESRI_BPK("application/vnd.esri.bpk"),
-  APPLICATION_ESRI_MMPK("application/vnd.esri.mmpk"),
-  APPLICATION_ESRI_TPK("application/vnd.esri.tpk"),
-  APPLICATION_ESRI_PPKX("application/vnd.esri.ppkx"),
-  APPLICATION_ESRI_NMF("application/vnd.esri.nmf"),
-  APPLICATION_ESRI_3DD("application/vnd.esri.3dd"),
-  APPLICATION_ESRI_SXD("application/vnd.esri.sxd"),
-  APPLICATION_ESRI_PMF("application/vnd.esri.pmf"),
-  APPLICATION_ESRI_MAPX("application/vnd.esri.mapx"),
-  APPLICATION_ESRI_PAGX("application/vnd.esri.pagx"),
-  APPLICATION_ESRI_APTX("application/vnd.esri.aptx"),
-  APPLICATION_ESRI_LYR("application/vnd.esri.lyr"),
-  APPLICATION_ESRI_LYRX("application/vnd.esri.lyrx"),
-  APPLICATION_ESRI_LPK("application/vnd.esri.lpk"),
-  APPLICATION_ESRI_NMC("application/vnd.esri.nmc"),
-  APPLICATION_ESRI_SPK("application/vnd.esri.spk"),
-  APPLICATION_ESRI_STYLX("application/vnd.esri.stylx"),
-  APPLICATION_ESRI_GCPK("application/vnd.esri.gcpk"),
-  APPLICATION_ESRI_RPK("application/vnd.esri.rpk"),
-  APPLICATION_ESRI_WPK("application/vnd.esri.wpk"),
-  APPLICATION_ESRI_ADDIN("application/vnd.esri.addin"),
-  APPLICATION_ESRI_ADDINX("application/vnd.esri.addinx"),
-  APPLICATION_ESRI_EAZ("application/vnd.esri.eaz"),
+  APPLICATION_ESRI_MXD("application/vnd.esri.mxd","mxd"),
+  APPLICATION_ESRI_SD("application/vnd.esri.sd","sd"),
+  APPLICATION_ESRI_MPK("application/vnd.esri.mpk","mpk"),
+  APPLICATION_ESRI_BPK("application/vnd.esri.bpk","bpj"),
+  APPLICATION_ESRI_MMPK("application/vnd.esri.mmpk","nmpk"),
+  APPLICATION_ESRI_TPK("application/vnd.esri.tpk","tpk"),
+  APPLICATION_ESRI_PPKX("application/vnd.esri.ppkx","ppkx"),
+  APPLICATION_ESRI_NMF("application/vnd.esri.nmf","nmf"),
+  APPLICATION_ESRI_3DD("application/vnd.esri.3dd","3dd"),
+  APPLICATION_ESRI_SXD("application/vnd.esri.sxd","sxd"),
+  APPLICATION_ESRI_PMF("application/vnd.esri.pmf","pmf"),
+  APPLICATION_ESRI_MAPX("application/vnd.esri.mapx","mapx"),
+  APPLICATION_ESRI_PAGX("application/vnd.esri.pagx","pagx"),
+  APPLICATION_ESRI_APTX("application/vnd.esri.aptx","aptx"),
+  APPLICATION_ESRI_LYR("application/vnd.esri.lyr","lyr"),
+  APPLICATION_ESRI_LYRX("application/vnd.esri.lyrx","lyrx"),
+  APPLICATION_ESRI_LPK("application/vnd.esri.lpk","lpk"),
+  APPLICATION_ESRI_NMC("application/vnd.esri.nmc","nmc"),
+  APPLICATION_ESRI_SPK("application/vnd.esri.spk","spk"),
+  APPLICATION_ESRI_STYLX("application/vnd.esri.stylx","stylx"),
+  APPLICATION_ESRI_GCPK("application/vnd.esri.gcpk","gcpk"),
+  APPLICATION_ESRI_RPK("application/vnd.esri.rpk","rpk"),
+  APPLICATION_ESRI_WPK("application/vnd.esri.wpk","wpk"),
+  APPLICATION_ESRI_ADDIN("application/vnd.esri.addin","esriAddin"),
+  APPLICATION_ESRI_ADDINX("application/vnd.esri.addinx","esriAddinx"),
+  APPLICATION_ESRI_EAZ("application/vnd.esri.eaz","eaz"),
+  APPLICATION_ESRI_TASKS("application/vnd.esri.tasks"),
+  APPLICATION_ESRI_GPK("application/vnd.esri.gpk","gpk"),
+  APPLICATION_ESRI_GPKX("application/vnd.esri.gpkx","gpkx"),
   
-  APPLICATION_ATOM_XML("application/atom+xml"),
+  APPLICATION_ATOM_XML("application/atom+xml","xml"),
   APPLICATION_FORM_URLENCODED("application/x-www-form-urlencoded"),
-  APPLICATION_JSON("application/json"),
+  APPLICATION_JSON("application/json","json"),
   APPLICATION_OCTET_STREAM("application/octet-stream"),
-  APPLICATION_XHTML_XML("application/xhtml+xml"),
-  APPLICATION_XML("application/xml"),
-  APPLICATION_PDF("application/pdf"),
-  APPLICATION_MSWORD("application/msword"),
-  APPLICATION_DOCUMENT("application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
-  APPLICATION_MSEXCEL("application/vnd.ms-excel"),
-  APPLICATION_POWERPOINT("application/vnd.ms-powerpoint"),
-  APPLICATION_PRESENTATION("application/vnd.openxmlformats-officedocument.presentationml.presentation"),
-  APPLICATION_KML("application/vnd.google-earth.kml+xml"),
-  APPLICATION_KMZ("application/vnd.google-earth.kmz"),
-  APPLICATION_ZIP("application/zip"),
+  APPLICATION_XHTML_XML("application/xhtml+xml","xhtml"),
+  APPLICATION_XML("application/xml","xml"),
+  APPLICATION_PDF("application/pdf","pdf"),
+  APPLICATION_MSWORD("application/msword","doc"),
+  APPLICATION_DOCUMENT("application/vnd.openxmlformats-officedocument.wordprocessingml.document","docx"),
+  APPLICATION_MSEXCEL("application/vnd.ms-excel","xls"),
+  APPLICATION_POWERPOINT("application/vnd.ms-powerpoint","ppt"),
+  APPLICATION_PRESENTATION("application/vnd.openxmlformats-officedocument.presentationml.presentation","pptx"),
+  APPLICATION_KML("application/vnd.google-earth.kml+xml","kml"),
+  APPLICATION_KMZ("application/vnd.google-earth.kmz","kmz"),
+  APPLICATION_ZIP("application/zip","zip"),
+  APPLICATION_VISIO("application/x-visio"),
   
-  IMAGE_GIF("image/gif"),
-  IMAGE_JPEG("image/jpeg"),
-  IMAGE_PNG("image/png"),
-  IMAGE_TIFF("image/tiff"),
+  IMAGE_GIF("image/gif","gif"),
+  IMAGE_JPEG("image/jpeg","jpg","jpeg"),
+  IMAGE_PNG("image/png","png"),
+  IMAGE_TIFF("image/tiff","tiff","tif"),
   
   MULTIPART_FORM_DATA("multipart/form-data"),
   
-  TEXT_HTML("text/html"),
-  TEXT_CSS("text/css"),
-  TEXT_PLAIN("text/plain"),
-  TEXT_CSV("text/csv"),
-  TEXT_XML("text/xml");
+  TEXT_HTML("text/html","html","htm","xhtml","xhtm"),
+  TEXT_CSS("text/css","css"),
+  TEXT_PLAIN("text/plain","txt"),
+  TEXT_CSV("text/csv","csv"),
+  TEXT_XML("text/xml","xml");
   
   private final String name;
+  private final String [] exts;
   
   /**
    * Creates instance of the enum.
    * @param name name
+   * @param exts extensions
    */
-  MimeType(String name) {
+  MimeType(String name,String...exts) {
     this.name = name;
+    this.exts = exts;
   }
   
   /**
@@ -90,6 +98,14 @@ public enum MimeType {
    */
   public String getName() {
     return name;
+  }
+
+  /**
+   * Gets extensions.
+   * @return extensions
+   */
+  public String[] getExts() {
+    return exts;
   }
   
   @Override
