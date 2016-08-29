@@ -48,7 +48,7 @@ public class AgpClient implements Closeable {
   
   private final URL rootUrl;
   private final CloseableHttpClient httpClient;
-
+  
   /**
    * Creates instance of the client.
    * @param rootUrl root URL
@@ -64,6 +64,37 @@ public class AgpClient implements Closeable {
   }
 
   /**
+   * Deletes item.
+   * @param username user name
+   * @param folderId folder id
+   * @param itemId item id
+   * @param token token
+   * @return delete response
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public DeleteResponse delete(String username, String folderId, String itemId, String token)  throws URISyntaxException, IOException {
+    URIBuilder builder = new URIBuilder();
+    builder.setScheme(rootUrl.toURI().getScheme())
+           .setHost(rootUrl.toURI().getHost())
+           .setPort(rootUrl.toURI().getPort())
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folderId!=null? "/" +folderId: "") +"/items/" + itemId + "/delete");
+    builder.setParameter("f", "json");
+    if (token!=null) {
+      builder.setParameter("token", token);
+    }
+    HttpPost req = new HttpPost(builder.build());
+
+    try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
+      String responseContent = IOUtils.toString(contentStream, "UTF-8");
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+      return mapper.readValue(responseContent, DeleteResponse.class);
+    }
+  }
+  
+  /**
    * Lists content.
    * @param username user name
    * @param folder folder (optional)
@@ -72,7 +103,7 @@ public class AgpClient implements Closeable {
    * @param token token (optional)
    * @return content response
    * @throws URISyntaxException if invalid URL
-   * @throws IOException if accessing token fails
+   * @throws IOException if operation fails
    */
   public ContentResponse listContent(String username, String folder, long num, long start, String token) throws URISyntaxException, IOException {
     URIBuilder builder = new URIBuilder();
@@ -103,7 +134,7 @@ public class AgpClient implements Closeable {
    * @param token token (optional)
    * @return query response
    * @throws URISyntaxException if invalid URL
-   * @throws IOException if accessing token fails
+   * @throws IOException if operation fails
    */
   public QueryResponse search(String query, long num, long start, String token) throws URISyntaxException, IOException {
     URIBuilder builder = new URIBuilder();
