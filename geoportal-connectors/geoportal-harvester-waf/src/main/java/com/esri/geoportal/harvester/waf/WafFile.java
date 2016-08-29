@@ -15,13 +15,13 @@
  */
 package com.esri.geoportal.harvester.waf;
 
+import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.constants.MimeTypeUtils;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import static com.esri.geoportal.commons.utils.HttpClientContextBuilder.createHttpClientContext;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
-import com.esri.geoportal.harvester.api.mime.MimeType;
-import com.esri.geoportal.harvester.api.mime.MimeTypeUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;

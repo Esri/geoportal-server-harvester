@@ -14,6 +14,7 @@
         <module>geoportal-commons-meta</module>
         <module>geoportal-commons-ags-client</module>
         <module>geoportal-commons-agp-client</module>
+        <module>geoportal-commons-constants</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine.transformers;
 
+import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Transformer;
 import com.esri.geoportal.harvester.api.TransformerInstance;
@@ -24,7 +25,6 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.DataTransformerException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
-import com.esri.geoportal.harvester.api.mime.MimeType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

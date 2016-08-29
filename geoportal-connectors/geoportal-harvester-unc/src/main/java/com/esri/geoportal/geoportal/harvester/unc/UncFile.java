@@ -16,8 +16,8 @@
 package com.esri.geoportal.geoportal.harvester.unc;
 
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
-import com.esri.geoportal.harvester.api.mime.MimeType;
-import com.esri.geoportal.harvester.api.mime.MimeTypeUtils;
+import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.constants.MimeTypeUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api.mime;
+package com.esri.geoportal.commons.constants;
 
 import java.io.InputStream;
 import java.util.Arrays;
