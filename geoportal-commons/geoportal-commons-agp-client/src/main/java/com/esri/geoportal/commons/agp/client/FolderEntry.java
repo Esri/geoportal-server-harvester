@@ -15,24 +15,17 @@
  */
 package com.esri.geoportal.commons.agp.client;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 /**
- * Query response.
+ * Folder entry.
  */
-public final class QueryResponse {
-  public long total;
-  public long start;
-  public long num;
-  public long nextStart;
-  
-  public ItemEntry [] results;
+public final class FolderEntry {
+  public String username;
+  public String id;
+  public String title;
+  public long created;
   
   @Override
   public String toString() {
-    return String.format("result: [%s]", 
-            results!=null? Arrays.asList(results).stream().map(Object::toString).collect(Collectors.joining(", ")):""
-          );
+    return String.format("id:%s, title:%s", id, title);
   }
 }

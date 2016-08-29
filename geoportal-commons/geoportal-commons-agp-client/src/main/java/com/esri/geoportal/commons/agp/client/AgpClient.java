@@ -48,7 +48,7 @@ public class AgpClient implements Closeable {
   
   private final URL rootUrl;
   private final CloseableHttpClient httpClient;
-  
+
   /**
    * Creates instance of the client.
    * @param rootUrl root URL
@@ -64,11 +64,43 @@ public class AgpClient implements Closeable {
   }
 
   /**
+   * Lists content.
+   * @param username user name
+   * @param folder folder (optional)
+   * @param num number items to return
+   * @param start start item
+   * @param token token (optional)
+   * @return content response
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if accessing token fails
+   */
+  public ContentResponse listContent(String username, String folder, long num, long start, String token) throws URISyntaxException, IOException {
+    URIBuilder builder = new URIBuilder();
+    builder.setScheme(rootUrl.toURI().getScheme())
+           .setHost(rootUrl.toURI().getHost())
+           .setPort(rootUrl.toURI().getPort())
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folder!=null? "/"+folder: ""));
+    builder.setParameter("f", "json");
+    if (token!=null) {
+      builder.setParameter("token", token);
+    }
+    HttpGet req = new HttpGet(builder.build());
+
+    try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
+      String responseContent = IOUtils.toString(contentStream, "UTF-8");
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+      return mapper.readValue(responseContent, ContentResponse.class);
+    }
+  }
+  
+  /**
    * Searches for items.
    * @param query query
    * @param num max number of items
    * @param start start item
-   * @param token token
+   * @param token token (optional)
    * @return query response
    * @throws URISyntaxException if invalid URL
    * @throws IOException if accessing token fails

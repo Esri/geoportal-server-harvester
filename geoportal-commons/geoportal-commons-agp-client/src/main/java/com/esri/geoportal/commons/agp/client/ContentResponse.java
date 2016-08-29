@@ -19,20 +19,23 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 /**
- * Query response.
+ * Content response.
  */
-public final class QueryResponse {
+public final class ContentResponse {
   public long total;
   public long start;
   public long num;
   public long nextStart;
   
-  public ItemEntry [] results;
+  public ItemEntry [] items;
+  public FolderEntry [] folders;
+  public FolderEntry currentFolder;
   
   @Override
   public String toString() {
-    return String.format("result: [%s]", 
-            results!=null? Arrays.asList(results).stream().map(Object::toString).collect(Collectors.joining(", ")):""
+    return String.format("items: [%s], folders: [%s]", 
+            items!=null? Arrays.asList(items).stream().map(Object::toString).collect(Collectors.joining(", ")):"",
+            folders!=null? Arrays.asList(folders).stream().map(Object::toString).collect(Collectors.joining(", ")):""
           );
   }
 }
