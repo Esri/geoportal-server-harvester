@@ -26,6 +26,7 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
@@ -63,6 +64,46 @@ public class AgpClient implements Closeable {
     httpClient.close();
   }
 
+  /**
+   * Sharing item.
+   * @param username user name
+   * @param folderId folder id
+   * @param itemId item id
+   * @param everyone <code>true</code> to share with everyone
+   * @param org <code>true</code> to share with group
+   * @param groups list of groups to share with
+   * @param token token
+   * @return share response
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public ShareResponse share(String username, String folderId, String itemId, boolean everyone, boolean org, String [] groups, String token)  throws URISyntaxException, IOException {
+    URIBuilder builder = new URIBuilder();
+    builder.setScheme(rootUrl.toURI().getScheme())
+           .setHost(rootUrl.toURI().getHost())
+           .setPort(rootUrl.toURI().getPort())
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folderId!=null? "/" +folderId: "") +"/items/" + itemId + "/share");
+    HttpPost req = new HttpPost(builder.build());
+    HashMap<String, String> params = new HashMap<>();
+    params.put("f", "json");
+    params.put("everyone", Boolean.toString(everyone));
+    params.put("org", Boolean.toString(org));
+    params.put("groups", groups!=null? Arrays.asList(groups).stream().collect(Collectors.joining(",")): "");
+    if (token!=null) {
+      params.put("token", token);
+    }
+    HttpEntity entity = new UrlEncodedFormEntity(params.entrySet().stream()
+            .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()));
+    req.setEntity(entity);
+
+    try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
+      String responseContent = IOUtils.toString(contentStream, "UTF-8");
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+      return mapper.readValue(responseContent, ShareResponse.class);
+    }
+  }
   /**
    * Deletes item.
    * @param username user name
