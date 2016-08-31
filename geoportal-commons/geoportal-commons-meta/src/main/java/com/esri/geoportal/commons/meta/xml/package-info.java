@@ -13,24 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.commons.meta.xml;
-
-import java.io.IOException;
-import javax.xml.transform.TransformerConfigurationException;
 
 /**
- * Simple DC meta handler.
+ * Basic XML-type metadata handlers.
  */
-public class SimpleDcMetaHandler extends BaseXmlMetaHandler {
-  
-  /**
-   * Creates instance of the handler.
-   * @throws java.io.IOException if reading xslt fails
-   * @throws javax.xml.transform.TransformerConfigurationException if compiling xslt fails
-   */
-  public SimpleDcMetaHandler() throws IOException, TransformerConfigurationException {
-    super("meta/decodedc.xslt","meta/encodedc.xslt");
-  }
-  
-  
-}
+package com.esri.geoportal.commons.meta.xml;
