@@ -31,6 +31,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Data reference serializer.
@@ -51,7 +52,7 @@ public class DataReferenceSerializer {
   public void serialize(PrintStream out, DataReference ref) throws IOException {
 
     byte[] bBrokerUri = ENCODER.encode(ref.getBrokerUri().toASCIIString().getBytes("UTF-8"));
-    byte[] bBrokerName = ENCODER.encode(ref.getBrokerName().getBytes("UTF-8"));
+    byte[] bBrokerName = ENCODER.encode(StringUtils.trimToEmpty(ref.getBrokerName()).getBytes("UTF-8"));
     byte[] bId = ENCODER.encode(ref.getId().getBytes("UTF-8"));
     byte[] bLastModifiedDate = ENCODER.encode((ref.getLastModifiedDate() != null ? formatIsoDate(ref.getLastModifiedDate()) : "").getBytes("UTF-8"));
     byte[] bSourceUri = ENCODER.encode(ref.getSourceUri().toASCIIString().getBytes("UTF-8"));

@@ -66,7 +66,7 @@ public interface DataReference {
   
   /**
    * Gets broker name if any.
-   * @return broker name
+   * @return broker name or <code>null</code> if no broker name
    */
   String getBrokerName();
   
