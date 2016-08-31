@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.ags;
 
 import com.esri.geoportal.harvester.api.base.DataCollector;
 import com.esri.geoportal.harvester.api.base.DataPrintStreamOutput;
-import com.esri.geoportal.harvester.api.base.SimpleDcMetaHandler;
+import com.esri.geoportal.commons.meta.xml.SimpleDcMetaHandler;
 import com.esri.geoportal.harvester.api.base.SimpleInitContext;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;

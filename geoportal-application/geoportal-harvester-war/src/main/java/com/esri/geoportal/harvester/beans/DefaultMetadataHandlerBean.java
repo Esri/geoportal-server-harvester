@@ -15,26 +15,49 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.harvester.api.base.SimpleDcMetaHandler;
+import com.esri.geoportal.commons.meta.MetaException;
+import com.esri.geoportal.commons.meta.MetaHandler;
+import com.esri.geoportal.commons.meta.ObjectAttribute;
+import com.esri.geoportal.commons.meta.xml.BaseXmlMetaHandler;
+import com.esri.geoportal.commons.meta.xml.SimpleDcMetaHandler;
+import java.io.IOException;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.xml.transform.TransformerConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
 
 /**
  * Default metadata handler.
  */
 @Service
-public class DefaultMetadataHandlerBean extends SimpleDcMetaHandler {
+public class DefaultMetadataHandlerBean implements MetaHandler {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultMetadataHandlerBean.class);
+  private BaseXmlMetaHandler xmlMetaHandler;
   
   /**
    * Initializes bean.
    */
   @PostConstruct
   public void init() {
-    LOG.info("DefaultMetadataHandlerBean initialized.");
+    try {
+      xmlMetaHandler = new SimpleDcMetaHandler();
+      LOG.info("DefaultMetadataHandlerBean initialized.");
+    } catch (IOException|TransformerConfigurationException ex) {
+      LOG.error(String.format("Error creating DefaultMetadataHandlerBean"), ex);
+    }
+  }
+
+  @Override
+  public Document create(ObjectAttribute wellKnowsAttributes) throws MetaException {
+    return xmlMetaHandler.create(wellKnowsAttributes);
+  }
+
+  @Override
+  public ObjectAttribute extract(Document doc) throws MetaException {
+    return xmlMetaHandler.extract(doc);
   }
   
   /**

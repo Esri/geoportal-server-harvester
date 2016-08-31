@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api.base;
+package com.esri.geoportal.commons.meta.xml;
 
 import com.esri.geoportal.commons.meta.AttributeUtils;
 import static com.esri.geoportal.commons.meta.AttributeUtils.fromProperties;
@@ -39,33 +39,26 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
- * Simple DC meta handler.
+ * Base xml meta handler.
  */
-public class SimpleDcMetaHandler implements MetaHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(SimpleDcMetaHandler.class);
+public abstract class BaseXmlMetaHandler implements MetaHandler {
 
-  private Templates xsltDecodeDC;
-  private Templates xsltEncodeDC;
+  private final Templates xsltDecodeDC;
+  private final Templates xsltEncodeDC;
   
   /**
    * Creates instance of the handler.
+   * @param decoderXslt decoder xslt
+   * @param encoderXslt encoder xslt
+   * @throws java.io.IOException if error reading xslt
+   * @throws javax.xml.transform.TransformerConfigurationException if error compiling xslt
    */
-  public SimpleDcMetaHandler() {
-    try (InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream("meta/decodedc.xslt")) {
-      xsltDecodeDC = loadTransformer(input);
-    } catch (IOException|TransformerConfigurationException ex) {
-      LOG.error(String.format("Error loading xslt template: %s", "meta/decodedc.xslt"), ex);
-    }
-    try (InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream("meta/encodedc.xslt")) {
-      xsltEncodeDC = loadTransformer(input);
-    } catch (IOException|TransformerConfigurationException ex) {
-      LOG.error(String.format("Error loading xslt template: %s", "meta/encodedc.xslt"), ex);
-    }
+  public BaseXmlMetaHandler(String decoderXslt, String encoderXslt) throws IOException, TransformerConfigurationException {
+    xsltDecodeDC = loadTransformer(decoderXslt);
+    xsltEncodeDC = loadTransformer(encoderXslt);
   }
 
   @Override
@@ -74,16 +67,14 @@ public class SimpleDcMetaHandler implements MetaHandler {
       Document inputDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
       Document outputDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
       Transformer transformer = xsltEncodeDC.newTransformer();
-      
       Properties props = AttributeUtils.toProperties(wellKnowsAttributes);
-      props.keySet().stream().map(Object::toString).forEach(key->{
+      props.keySet().stream().map(Object::toString).forEach((String key) -> {
         transformer.setParameter(key, props.getProperty(key));
       });
-      
       Result result = new DOMResult(outputDoc);
       transformer.transform(new DOMSource(inputDoc), result);
       return outputDoc;
-    } catch (ParserConfigurationException|TransformerException ex) {
+    } catch (ParserConfigurationException | TransformerException ex) {
       throw new MetaException(String.format("Error creating document."), ex);
     }
   }
@@ -96,21 +87,21 @@ public class SimpleDcMetaHandler implements MetaHandler {
       StringWriter writer = new StringWriter();
       StreamResult result = new StreamResult(writer);
       transformer.transform(domSource, result);
-
       Reader reader = new StringReader(writer.toString());
       Properties props = new Properties();
       props.load(reader);
-      
       return fromProperties(props);
-    } catch (TransformerException|IOException ex) {
+    } catch (TransformerException | IOException ex) {
       throw new MetaException(String.format("Error extracting attributes."), ex);
     }
   }
-  
-  private static Templates loadTransformer(InputStream input) throws TransformerConfigurationException {
-    TransformerFactory transFact = TransformerFactory.newInstance();
-    Source source = new StreamSource(input);
-    return transFact.newTemplates(source);
+
+  private static Templates loadTransformer(String sourceName) throws IOException, TransformerConfigurationException {
+    try (final InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(sourceName)) {
+      TransformerFactory transFact = TransformerFactory.newInstance();
+      Source source = new StreamSource(input);
+      return transFact.newTemplates(source);
+    }
   }
   
 }
