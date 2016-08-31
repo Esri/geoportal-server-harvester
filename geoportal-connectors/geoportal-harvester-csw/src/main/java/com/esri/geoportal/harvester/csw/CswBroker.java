@@ -145,7 +145,7 @@ import org.slf4j.LoggerFactory;
       try {
         IRecord rec = recs.next();
         String metadata = client.readMetadata(rec.getId());
-        return new SimpleDataReference(CswBroker.this.getBrokerUri(), rec.getId(), rec.getLastModifiedDate(), new URI("uuid", rec.getId(), null), metadata.getBytes("UTF-8"), MimeType.APPLICATION_XML);
+        return new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), rec.getId(), rec.getLastModifiedDate(), new URI("uuid", rec.getId(), null), metadata.getBytes("UTF-8"), MimeType.APPLICATION_XML);
       } catch (Exception ex) {
         throw new DataInputException(CswBroker.this, "Error reading data.", ex);
       }

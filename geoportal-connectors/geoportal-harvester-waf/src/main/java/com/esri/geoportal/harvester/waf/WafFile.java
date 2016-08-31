@@ -72,7 +72,7 @@ import org.apache.http.client.protocol.HttpClientContext;
     Date lastModifiedDate = readLastModifiedDate(response);
     MimeType contentType = readContentType(response);
     try (InputStream input = response.getEntity().getContent()) {
-      return new SimpleDataReference(broker.getBrokerUri(), fileUrl.toExternalForm(), lastModifiedDate, fileUrl.toURI(), IOUtils.toByteArray(input), contentType);
+      return new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), fileUrl.toExternalForm(), lastModifiedDate, fileUrl.toURI(), IOUtils.toByteArray(input), contentType);
     }
   }
 

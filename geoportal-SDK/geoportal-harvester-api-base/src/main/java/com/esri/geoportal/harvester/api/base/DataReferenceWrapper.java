@@ -73,6 +73,11 @@ public class DataReferenceWrapper implements DataReference {
   }
 
   @Override
+  public String getBrokerName() {
+    return baseRef.getBrokerName();
+  }
+
+  @Override
   public Map<String, Object> getAttributesMap() {
     return baseRef.getAttributesMap();
   }

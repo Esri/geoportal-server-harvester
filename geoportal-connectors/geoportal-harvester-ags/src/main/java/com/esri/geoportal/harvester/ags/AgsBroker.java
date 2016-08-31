@@ -176,7 +176,7 @@ import org.w3c.dom.Document;
         
         byte [] bytes = writer.toString().getBytes("UTF-8");
         
-        return new SimpleDataReference(getBrokerUri(), next.url, null, URI.create(next.url), bytes, MimeType.APPLICATION_JSON);
+        return new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(),  next.url, null, URI.create(next.url), bytes, MimeType.APPLICATION_JSON);
       } catch (TransformerException|TransformerFactoryConfigurationError|IOException|URISyntaxException|MetaException ex) {
         throw new DataInputException(AgsBroker.this, String.format("Error creating data reference for ArcGIS Server service"), ex);
       }

@@ -28,6 +28,18 @@ import java.util.Map;
 public interface DataReference {
   
   /**
+   * Gets data record id.
+   * @return data record id
+   */
+  String getId();
+  
+  /**
+   * Gets last modified date.
+   * @return last modified date or <code>null</code> if no date information available
+   */
+  Date getLastModifiedDate();
+  
+  /**
    * Gets content.
    * @return content
    * @throws IOException if getting content fails
@@ -41,18 +53,6 @@ public interface DataReference {
   MimeType getContentType();
   
   /**
-   * Gets data record id.
-   * @return data record id
-   */
-  String getId();
-  
-  /**
-   * Gets last modified date.
-   * @return last modified date or <code>null</code> if no date information available
-   */
-  Date getLastModifiedDate();
-  
-  /**
    * Gets source URI.
    * @return source URI
    */
@@ -63,6 +63,12 @@ public interface DataReference {
    * @return broker URI.
    */
   URI getBrokerUri();
+  
+  /**
+   * Gets broker name if any.
+   * @return broker name
+   */
+  String getBrokerName();
   
   /**
    * Gets attributes map.

@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.harvester.api.specs.InputBroker;
 import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import java.util.HashMap;
  */
 public final class SimpleDataReference implements DataReference {
   private final URI brokerUri;
+  private final String brokerName;
   private final String id;
   private final Date lastModifiedDate;
   private final URI sourceUri;
@@ -36,14 +38,16 @@ public final class SimpleDataReference implements DataReference {
   /**
    * Creates instance of the data reference.
    * @param brokerUri broker URI
+   * @param brokerName broker name
    * @param id record id
    * @param lastModifiedDate last modified date
    * @param sourceUri source URI
    * @param content content
    * @param contentType content type
    */
-  public SimpleDataReference(URI brokerUri, String id, Date lastModifiedDate, URI sourceUri, byte [] content, MimeType contentType) {
+  public SimpleDataReference(URI brokerUri, String brokerName, String id, Date lastModifiedDate, URI sourceUri, byte [] content, MimeType contentType) {
     this.brokerUri = brokerUri;
+    this.brokerName = brokerName;
     this.id = id;
     this.lastModifiedDate = lastModifiedDate;
     this.sourceUri = sourceUri;
@@ -54,6 +58,11 @@ public final class SimpleDataReference implements DataReference {
   @Override
   public URI getBrokerUri() {
     return brokerUri;
+  }
+
+  @Override
+  public String getBrokerName() {
+    return brokerName;
   }
 
   @Override
