@@ -21,6 +21,7 @@ package com.esri.geoportal.commons.gpt.client;
 public final class PublishRequest {
   public String src_source_type_s;
   public String src_source_uri_s;
+  public String src_source_name_s;
   public String src_uri_s;
   public String src_lastupdate_dt;
   public String xml;
