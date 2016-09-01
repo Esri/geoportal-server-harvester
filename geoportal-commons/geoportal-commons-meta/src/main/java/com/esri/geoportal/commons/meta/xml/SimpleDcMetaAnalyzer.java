@@ -16,7 +16,9 @@
 package com.esri.geoportal.commons.meta.xml;
 
 import java.io.IOException;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 
 /**
  * Simple DC meta analyzer.
@@ -27,9 +29,15 @@ public class SimpleDcMetaAnalyzer extends BaseXmlMetaAnalyzer {
    * Creates instance of the analyzer.
    * @throws java.io.IOException if error reading xslt
    * @throws javax.xml.transform.TransformerConfigurationException if error compiling xslt
+   * @throws javax.xml.xpath.XPathExpressionException if invalid xpath
    */
-  public SimpleDcMetaAnalyzer() throws IOException, TransformerConfigurationException {
-    super("meta/decodedc.xslt");
+  public SimpleDcMetaAnalyzer() throws IOException, TransformerConfigurationException, XPathExpressionException {
+    super("meta/decodedc.xslt","count(/rdf:RDF/rdf:Description/@rdf:about)>0");
+  }
+
+  @Override
+  protected NamespaceContext getNamespaceContext() {
+    return NamespaceContextImpl.DC;
   }
   
 }
