@@ -4,14 +4,14 @@
     <parent>
       <artifactId>geoportal-harvester</artifactId>
       <groupId>com.esri.geoportal</groupId>
-      <version>2.0.0-SNAPSHOT</version>
+      <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>geoportal-SDK</artifactId>
+    <artifactId>geoportal-application</artifactId>
     <packaging>pom</packaging>
-    <name>Esri :: Geoportal Server :: Harvester :: SDK</name>
+    <name>Esri :: Geoportal Server :: Harvester :: Application</name>
     <modules>
-        <module>geoportal-harvester-api</module>
-        <module>geoportal-harvester-api-base</module>
+        <module>geoportal-harvester-engine</module>
+        <module>geoportal-harvester-war</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

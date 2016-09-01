@@ -3,19 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.esri.geoportal</groupId>
-        <artifactId>geoportal-connectors</artifactId>
-        <version>2.0.0-SNAPSHOT</version>
+        <artifactId>geoportal-commons</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>geoportal-harvester-agp-source</artifactId>
-    <name>Esri :: Geoportal Server :: Harvester :: Data Source :: ArcGIS Portal</name>
+    <artifactId>geoportal-commons-constants</artifactId>
     <packaging>jar</packaging>
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>geoportal-commons-agp-client</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
+    <name>Esri :: Geoportal Server :: Commons :: Constants</name>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>

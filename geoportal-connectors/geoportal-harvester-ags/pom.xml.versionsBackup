@@ -4,12 +4,22 @@
     <parent>
         <groupId>com.esri.geoportal</groupId>
         <artifactId>geoportal-connectors</artifactId>
-        <version>2.0.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>geoportal-harvester-csw</artifactId>
-    <name>Esri :: Geoportal Server :: Harvester :: Data Source :: Csw</name>
+    <artifactId>geoportal-harvester-ags</artifactId>
+    <name>Esri :: Geoportal Server :: Harvester :: Data Source :: ArcGIS Server</name>
     <packaging>jar</packaging>
     <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>geoportal-commons-ags-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>harvester-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>harvester-api-base</artifactId>
@@ -17,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>geoportal-commons-csw-client</artifactId>
+            <artifactId>geoportal-commons-meta</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -27,36 +37,7 @@
         </dependency>
     </dependencies>
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
-    <build>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.6</version>
-          <configuration>
-            <archive>
-              <manifest>
-                <mainClass>com.esri.geoportal.harvester.csw.CswApplication</mainClass>
-              </manifest>
-            </archive>
-            <descriptorRefs>
-              <descriptorRef>jar-with-dependencies</descriptorRef>
-            </descriptorRefs>
-          </configuration>
-          <executions>
-            <execution>
-              <id>make-assembly</id>
-              <phase>package</phase>
-              <goals>
-                <goal>single</goal>
-              </goals>
-            </execution>
-          </executions>          
-        </plugin>
-      </plugins>
-    </build>
 </project>
