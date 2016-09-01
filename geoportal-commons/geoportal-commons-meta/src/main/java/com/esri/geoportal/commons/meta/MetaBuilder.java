@@ -27,5 +27,5 @@ public interface MetaBuilder {
    * @return document
    * @throws MetaException if metadata creation failed
    */
-  Document create(ObjectAttribute wellKnowsAttributes) throws MetaException;
+  Document create(MapAttribute wellKnowsAttributes) throws MetaException;
 }

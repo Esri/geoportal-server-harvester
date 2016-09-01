@@ -28,5 +28,5 @@ public interface MetaAnalyzer {
    * @return attributes
    * @throws MetaException if metadata extraction failed
    */
-  ObjectAttribute extract(Document doc) throws MetaException;
+  MapAttribute extract(Document doc) throws MetaException;
 }

@@ -18,7 +18,7 @@ package com.esri.geoportal.commons.meta.xml;
 import com.esri.geoportal.commons.meta.AttributeUtils;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.commons.meta.MetaException;
-import com.esri.geoportal.commons.meta.ObjectAttribute;
+import com.esri.geoportal.commons.meta.MapAttribute;
 import static com.esri.geoportal.commons.meta.xml.TransformerLoader.loadTransformer;
 import java.io.IOException;
 import java.util.Properties;
@@ -51,7 +51,7 @@ public abstract class BaseXmlMetaBuilder implements MetaBuilder {
   }
 
   @Override
-  public Document create(ObjectAttribute wellKnowsAttributes) throws MetaException {
+  public Document create(MapAttribute wellKnowsAttributes) throws MetaException {
     try {
       Document inputDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
       Document outputDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();

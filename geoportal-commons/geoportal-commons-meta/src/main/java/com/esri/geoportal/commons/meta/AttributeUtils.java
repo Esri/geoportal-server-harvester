@@ -28,12 +28,12 @@ public class AttributeUtils {
    * @param props properties
    * @return attribute
    */
-  public static ObjectAttribute fromProperties(Properties props) {
+  public static MapAttribute fromProperties(Properties props) {
     HashMap<String,Attribute> attrMap =  new HashMap<>();
     props.keySet().stream().map(Object::toString).forEach(key->{
       attrMap.put(key, new StringAttribute(props.getProperty(key)));
     });
-    return new ObjectAttribute(attrMap);
+    return new MapAttribute(attrMap);
   }
   
   /**
@@ -41,7 +41,7 @@ public class AttributeUtils {
    * @param attr object attribute
    * @return properties
    */
-  public static Properties toProperties(ObjectAttribute attr) {
+  public static Properties toProperties(MapAttribute attr) {
     Properties props = new Properties();
     
     attr.getNamedAttributes().entrySet().stream().forEach(na->{
@@ -49,7 +49,7 @@ public class AttributeUtils {
         props.setProperty(na.getKey(), na.getValue().getValue());
       } else if (na.getValue().isArray()) {
         // skip arrays
-      } else if (na.getValue().isObject()) {
+      } else if (na.getValue().isMap()) {
         // skip objects
       }
     });

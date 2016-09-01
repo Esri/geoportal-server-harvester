@@ -23,7 +23,7 @@ import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.meta.Attribute;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.commons.meta.MetaException;
-import com.esri.geoportal.commons.meta.ObjectAttribute;
+import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.StringAttribute;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
@@ -165,7 +165,7 @@ import org.w3c.dom.Document;
         
         attributes.put("resource.url.scheme", new StringAttribute("urn:x-esri:specification:ServiceType:ArcGIS:" + (serviceType!=null? serviceType: "Unknown")));
 
-        Document document = metaBuilder.create(new ObjectAttribute(attributes));
+        Document document = metaBuilder.create(new MapAttribute(attributes));
 
         DOMSource domSource = new DOMSource(document);
         StringWriter writer = new StringWriter();

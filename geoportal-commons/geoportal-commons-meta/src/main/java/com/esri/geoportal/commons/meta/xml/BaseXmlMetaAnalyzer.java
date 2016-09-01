@@ -18,7 +18,7 @@ package com.esri.geoportal.commons.meta.xml;
 import static com.esri.geoportal.commons.meta.AttributeUtils.fromProperties;
 import com.esri.geoportal.commons.meta.MetaAnalyzer;
 import com.esri.geoportal.commons.meta.MetaException;
-import com.esri.geoportal.commons.meta.ObjectAttribute;
+import com.esri.geoportal.commons.meta.MapAttribute;
 import static com.esri.geoportal.commons.meta.xml.TransformerLoader.loadTransformer;
 import java.io.IOException;
 import java.io.Reader;
@@ -51,7 +51,7 @@ public class BaseXmlMetaAnalyzer implements MetaAnalyzer {
   }
 
   @Override
-  public ObjectAttribute extract(Document doc) throws MetaException {
+  public MapAttribute extract(Document doc) throws MetaException {
     try {
       Transformer transformer = xsltDecodeDC.newTransformer();
       DOMSource domSource = new DOMSource(doc);

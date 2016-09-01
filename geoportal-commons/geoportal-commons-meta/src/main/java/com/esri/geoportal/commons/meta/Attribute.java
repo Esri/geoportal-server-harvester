@@ -19,13 +19,39 @@ import java.util.Map;
 
 /**
  * Attribute.
+ * <p>
+ * Attribute can hold a string, an array of attributes or a map of named attributes.
  */
 public interface Attribute {
+  /**
+   * Is attribute a string.
+   * @return <code>true</code> if an attributes is a string
+   */
   default boolean isString() { return false; }
-  default boolean isObject() { return false; }
+  /**
+   * Is attribute a map.
+   * @return <code>true</code> if an attributes is a map
+   */
+  default boolean isMap() { return false; }
+  /**
+   * Is attribute an array.
+   * @return <code>true</code> if an attributes is an array
+   */
   default boolean isArray() { return false; }
   
+  /**
+   * Gets value.
+   * @return value or <code>null</code>
+   */
   default String getValue() { return null; }
+  /**
+   * Gets named attributes.
+   * @return named attributes or <code>null</code>
+   */
   default Map<String, Attribute> getNamedAttributes() { return null; }
+  /**
+   * Gets an array of attributes.
+   * @return array of attributes
+   */
   default Attribute[] getAttributes() { return null; }
 }

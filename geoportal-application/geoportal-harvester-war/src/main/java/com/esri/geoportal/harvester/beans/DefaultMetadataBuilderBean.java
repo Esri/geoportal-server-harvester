@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.commons.meta.MetaException;
-import com.esri.geoportal.commons.meta.ObjectAttribute;
+import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.xml.BaseXmlMetaBuilder;
 import com.esri.geoportal.commons.meta.xml.SimpleDcMetaBuilder;
 import java.io.IOException;
@@ -51,7 +51,7 @@ public class DefaultMetadataBuilderBean implements MetaBuilder {
   }
 
   @Override
-  public Document create(ObjectAttribute wellKnowsAttributes) throws MetaException {
+  public Document create(MapAttribute wellKnowsAttributes) throws MetaException {
     return xmlMetaBuilder.create(wellKnowsAttributes);
   }
   

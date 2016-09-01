@@ -21,15 +21,15 @@ import java.util.stream.Collectors;
 /**
  * Object attribute.
  */
-public class ObjectAttribute implements Attribute {
+public class MapAttribute implements Attribute {
   private final Map<String,Attribute> attributes;
 
-  public ObjectAttribute(Map<String, Attribute> attributes) {
+  public MapAttribute(Map<String, Attribute> attributes) {
     this.attributes = attributes;
   }
 
   @Override
-  public boolean isObject() {
+  public boolean isMap() {
     return true;
   }
 
