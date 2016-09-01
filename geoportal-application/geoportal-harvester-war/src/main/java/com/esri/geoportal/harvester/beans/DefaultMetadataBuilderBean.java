@@ -15,11 +15,11 @@
  */
 package com.esri.geoportal.harvester.beans;
 
+import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.commons.meta.MetaException;
-import com.esri.geoportal.commons.meta.MetaHandler;
 import com.esri.geoportal.commons.meta.ObjectAttribute;
-import com.esri.geoportal.commons.meta.xml.BaseXmlMetaHandler;
-import com.esri.geoportal.commons.meta.xml.SimpleDcMetaHandler;
+import com.esri.geoportal.commons.meta.xml.BaseXmlMetaBuilder;
+import com.esri.geoportal.commons.meta.xml.SimpleDcMetaBuilder;
 import java.io.IOException;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -33,9 +33,9 @@ import org.w3c.dom.Document;
  * Default metadata handler.
  */
 @Service
-public class DefaultMetadataHandlerBean implements MetaHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(DefaultMetadataHandlerBean.class);
-  private BaseXmlMetaHandler xmlMetaHandler;
+public class DefaultMetadataBuilderBean implements MetaBuilder {
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultMetadataBuilderBean.class);
+  private BaseXmlMetaBuilder xmlMetaBuilder;
   
   /**
    * Initializes bean.
@@ -43,8 +43,8 @@ public class DefaultMetadataHandlerBean implements MetaHandler {
   @PostConstruct
   public void init() {
     try {
-      xmlMetaHandler = new SimpleDcMetaHandler();
-      LOG.info("DefaultMetadataHandlerBean initialized.");
+      xmlMetaBuilder = new SimpleDcMetaBuilder();
+      LOG.info("DefaultMetadataBuilderBean initialized.");
     } catch (IOException|TransformerConfigurationException ex) {
       LOG.error(String.format("Error creating DefaultMetadataHandlerBean"), ex);
     }
@@ -52,12 +52,7 @@ public class DefaultMetadataHandlerBean implements MetaHandler {
 
   @Override
   public Document create(ObjectAttribute wellKnowsAttributes) throws MetaException {
-    return xmlMetaHandler.create(wellKnowsAttributes);
-  }
-
-  @Override
-  public ObjectAttribute extract(Document doc) throws MetaException {
-    return xmlMetaHandler.extract(doc);
+    return xmlMetaBuilder.create(wellKnowsAttributes);
   }
   
   /**
@@ -65,7 +60,7 @@ public class DefaultMetadataHandlerBean implements MetaHandler {
    */
   @PreDestroy
   public void destroy() {
-    LOG.info(String.format("DefaultMetadataHandlerBean destroyed."));
+    LOG.info(String.format("DefaultMetadataBuilderBean destroyed."));
   }
   
 }

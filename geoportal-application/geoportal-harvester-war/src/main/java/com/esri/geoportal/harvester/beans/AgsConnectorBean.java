@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import com.esri.geoportal.commons.meta.MetaHandler;
+import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.harvester.ags.AgsConnector;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -32,8 +32,8 @@ public class AgsConnectorBean extends AgsConnector {
   private static final Logger LOG = LoggerFactory.getLogger(AgsConnectorBean.class);
 
   @Autowired
-  public AgsConnectorBean(MetaHandler metaHandler) {
-    super(metaHandler);
+  public AgsConnectorBean(MetaBuilder metaBuilder) {
+    super(metaBuilder);
   }
   
   /**

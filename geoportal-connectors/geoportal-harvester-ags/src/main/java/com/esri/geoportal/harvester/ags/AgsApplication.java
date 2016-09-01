@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.ags;
 
 import com.esri.geoportal.harvester.api.base.DataCollector;
 import com.esri.geoportal.harvester.api.base.DataPrintStreamOutput;
-import com.esri.geoportal.commons.meta.xml.SimpleDcMetaHandler;
+import com.esri.geoportal.commons.meta.xml.SimpleDcMetaBuilder;
 import com.esri.geoportal.harvester.api.base.SimpleInitContext;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
@@ -33,8 +33,8 @@ public class AgsApplication {
     DataPrintStreamOutput destination = new DataPrintStreamOutput(System.out);
     
     for (String sUrl: args) {
-      SimpleDcMetaHandler metaHandler = new SimpleDcMetaHandler();
-      AgsConnector connector = new AgsConnector(metaHandler);
+      SimpleDcMetaBuilder metaBuilder = new SimpleDcMetaBuilder();
+      AgsConnector connector = new AgsConnector(metaBuilder);
       URL start = new URL(sUrl);
       EntityDefinition def = new EntityDefinition();
       AgsBrokerDefinitionAdaptor adaptor = new AgsBrokerDefinitionAdaptor(def);

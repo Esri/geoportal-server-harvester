@@ -21,8 +21,8 @@ import com.esri.geoportal.commons.ags.client.ServerResponse;
 import com.esri.geoportal.commons.ags.client.ServiceInfo;
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.meta.Attribute;
+import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.commons.meta.MetaException;
-import com.esri.geoportal.commons.meta.MetaHandler;
 import com.esri.geoportal.commons.meta.ObjectAttribute;
 import com.esri.geoportal.commons.meta.StringAttribute;
 import com.esri.geoportal.harvester.api.DataReference;
@@ -59,7 +59,7 @@ import org.w3c.dom.Document;
 
   private final AgsConnector connector;
   private final AgsBrokerDefinitionAdaptor definition;
-  private final MetaHandler metaHandler;
+  private final MetaBuilder metaBuilder;
   private AgsClient client;
 
   /**
@@ -67,12 +67,12 @@ import org.w3c.dom.Document;
    *
    * @param connector connector
    * @param definition definition
-   * @param metaHandler meta handler
+   * @param metaBuilder meta builder
    */
-  public AgsBroker(AgsConnector connector, AgsBrokerDefinitionAdaptor definition, MetaHandler metaHandler) {
+  public AgsBroker(AgsConnector connector, AgsBrokerDefinitionAdaptor definition, MetaBuilder metaBuilder) {
     this.connector = connector;
     this.definition = definition;
-    this.metaHandler = metaHandler;
+    this.metaBuilder = metaBuilder;
   }
 
   @Override
@@ -165,7 +165,7 @@ import org.w3c.dom.Document;
         
         attributes.put("resource.url.scheme", new StringAttribute("urn:x-esri:specification:ServiceType:ArcGIS:" + (serviceType!=null? serviceType: "Unknown")));
 
-        Document document = metaHandler.create(new ObjectAttribute(attributes));
+        Document document = metaBuilder.create(new ObjectAttribute(attributes));
 
         DOMSource domSource = new DOMSource(document);
         StringWriter writer = new StringWriter();

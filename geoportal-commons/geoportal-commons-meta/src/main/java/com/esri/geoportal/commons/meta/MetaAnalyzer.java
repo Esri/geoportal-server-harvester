@@ -18,16 +18,9 @@ package com.esri.geoportal.commons.meta;
 import org.w3c.dom.Document;
 
 /**
- * Metadata handler.
+ * Meta analyzer.
  */
-public interface MetaHandler {
-  /**
-   * Creates document based on properties.
-   * @param wellKnowsAttributes attributes
-   * @return document
-   * @throws MetaException if metadata creation failed
-   */
-  Document create(ObjectAttribute wellKnowsAttributes) throws MetaException;
+public interface MetaAnalyzer {
   
   /**
    * Extracts attributes from the document.

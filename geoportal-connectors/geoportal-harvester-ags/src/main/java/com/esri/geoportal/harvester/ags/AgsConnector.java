@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.ags;
 
-import com.esri.geoportal.commons.meta.MetaHandler;
+import com.esri.geoportal.commons.meta.MetaBuilder;
 import static com.esri.geoportal.harvester.ags.AgsBrokerDefinitionAdaptor.P_HOST_URL;
 import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -31,14 +31,14 @@ import java.util.List;
  */
 public class AgsConnector implements InputConnector<InputBroker> {
   public static final String TYPE = "AGS";
-  private final MetaHandler metaHandler;
+  private final MetaBuilder metaBuilder;
 
   /**
    * Creates instance of the connector.
-   * @param metaHandler meta handler
+   * @param metaBuilder meta builder
    */
-  public AgsConnector(MetaHandler metaHandler) {
-    this.metaHandler = metaHandler;
+  public AgsConnector(MetaBuilder metaBuilder) {
+    this.metaBuilder = metaBuilder;
   }
 
   @Override
@@ -61,6 +61,6 @@ public class AgsConnector implements InputConnector<InputBroker> {
 
   @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
-    return new AgsBroker(this, new AgsBrokerDefinitionAdaptor(definition), metaHandler);
+    return new AgsBroker(this, new AgsBrokerDefinitionAdaptor(definition), metaBuilder);
   }
 }
