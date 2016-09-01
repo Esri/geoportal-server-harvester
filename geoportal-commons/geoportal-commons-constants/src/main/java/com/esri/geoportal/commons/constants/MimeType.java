@@ -131,7 +131,7 @@ public enum MimeType {
   /**
    * Parses string representation of the mime type.
    * @param strMimeType string representation of the mime type
-   * @return mime type or default mime type or <code>null<code> if invalid mime
+   * @return mime type or default mime type or <code>null</code> if invalid mime
    */
   public static MimeType parse(String strMimeType) {
     return parse(strMimeType, null);

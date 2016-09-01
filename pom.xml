@@ -32,7 +32,7 @@
               </group>
               <group>
                 <title>Connectors</title>
-                <packages>com.esri.geoportal.harvester.console:com.esri.geoportal.harvester.gpt:com.esri.geoportal.harvester.gpt.*:com.esri.geoportal.harvester.waf:com.esri.geoportal.harvester.csw:com.esri.geoportal.harvester.csw.*:com.esri.geoportal.harvester.folder</packages>
+                <packages>com.esri.geoportal.harvester.console:com.esri.geoportal.harvester.gpt:com.esri.geoportal.harvester.gpt.*:com.esri.geoportal.harvester.waf:com.esri.geoportal.harvester.csw:com.esri.geoportal.harvester.csw.*:com.esri.geoportal.harvester.folder:com.esri.geoportal.harvester.unc:com.esri.geoportal.harvester.ags</packages>
               </group>
               <group>
                 <title>Engine</title>

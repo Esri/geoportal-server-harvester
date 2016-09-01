@@ -20,7 +20,7 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.esri.geoportal.geoportal.harvester.unc.UncConnector;
+import com.esri.geoportal.harvester.unc.UncConnector;
 import org.springframework.stereotype.Service;
 
 /**

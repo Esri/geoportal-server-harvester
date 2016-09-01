@@ -17,4 +17,4 @@
 /**
  * UNC input broker.
  */
-package com.esri.geoportal.geoportal.harvester.unc;
+package com.esri.geoportal.harvester.unc;

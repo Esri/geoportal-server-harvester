@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.harvester.unc;
+package com.esri.geoportal.harvester.unc;
 
-import static com.esri.geoportal.geoportal.harvester.unc.UncBrokerDefinitionAdaptor.P_PATTERN;
-import static com.esri.geoportal.geoportal.harvester.unc.UncBrokerDefinitionAdaptor.P_ROOT_FOLDER;
+import static com.esri.geoportal.harvester.unc.UncBrokerDefinitionAdaptor.P_PATTERN;
+import static com.esri.geoportal.harvester.unc.UncBrokerDefinitionAdaptor.P_ROOT_FOLDER;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
