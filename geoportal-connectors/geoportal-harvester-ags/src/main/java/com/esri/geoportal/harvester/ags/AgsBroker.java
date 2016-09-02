@@ -162,10 +162,10 @@ import org.w3c.dom.Document;
         attributes.put("title", new StringAttribute(StringUtils.defaultString(StringUtils.defaultString(next.mapName, next.name),StringUtils.defaultString(serviceType, next.url))));
         attributes.put("description", new StringAttribute(StringUtils.defaultString(StringUtils.defaultString(StringUtils.defaultString(next.description, next.serviceDescription)))));
         attributes.put("resource.url", new StringAttribute(next.url));
-        
         attributes.put("resource.url.scheme", new StringAttribute("urn:x-esri:specification:ServiceType:ArcGIS:" + (serviceType!=null? serviceType: "Unknown")));
 
-        Document document = metaBuilder.create(new MapAttribute(attributes));
+        MapAttribute attrs = new MapAttribute(attributes);
+        Document document = metaBuilder.create(attrs);
 
         DOMSource domSource = new DOMSource(document);
         StringWriter writer = new StringWriter();
@@ -176,7 +176,10 @@ import org.w3c.dom.Document;
         
         byte [] bytes = writer.toString().getBytes("UTF-8");
         
-        return new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(),  next.url, null, URI.create(next.url), bytes, MimeType.APPLICATION_JSON);
+        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(),  next.url, null, URI.create(next.url), bytes, MimeType.APPLICATION_JSON);
+        ref.getAttributesMap().put("attributes", attrs);
+        
+        return ref;
       } catch (TransformerException|TransformerFactoryConfigurationError|IOException|URISyntaxException|MetaException ex) {
         throw new DataInputException(AgsBroker.this, String.format("Error creating data reference for ArcGIS Server service"), ex);
       }
