@@ -53,7 +53,8 @@ public abstract class BaseXmlMetaAnalyzer implements MetaAnalyzer {
           "gmd","http://www.isotc211.org/2005/gmd",
           "gco","http://www.isotc211.org/2005/gco",
           "srv","http://www.isotc211.org/2005/srv",
-          "gml","http://www.opengis.net/gml"
+          "gml","http://www.opengis.net/gml",
+          "gmi","http://www.isotc211.org/2005/gmi"
   );
 
   private final Templates xsltDecodeDC;
