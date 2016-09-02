@@ -24,14 +24,6 @@ import javax.xml.namespace.NamespaceContext;
  */
 public class NamespaceContextImpl implements NamespaceContext {
   
-  public static final NamespaceContext DC = new NamespaceContextImpl(
-          "rdf","http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-          "dc","http://purl.org/dc/elements/1.1/",
-          "dct","http://purl.org/dc/terms/",
-          "dcmiBox","http://dublincore.org/documents/2000/07/11/dcmi-box/",
-          "ows","http://www.opengis.net/ows"
-  );
-  
   private final HashMap<String,String> prefs = new HashMap<>();
   private final HashMap<String,String> uris = new HashMap<>();
   
