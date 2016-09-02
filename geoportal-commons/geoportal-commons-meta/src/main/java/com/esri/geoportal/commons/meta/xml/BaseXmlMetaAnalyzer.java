@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Properties;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.transform.Templates;
@@ -45,6 +43,18 @@ import org.w3c.dom.Document;
  * Base xml meta analyzer.
  */
 public abstract class BaseXmlMetaAnalyzer implements MetaAnalyzer {
+  
+  private static final NamespaceContext NAMESPACE_CONTEXT = new NamespaceContextImpl(
+          "rdf","http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+          "dc","http://purl.org/dc/elements/1.1/",
+          "dct","http://purl.org/dc/terms/",
+          "dcmiBox","http://dublincore.org/documents/2000/07/11/dcmi-box/",
+          "ows","http://www.opengis.net/ows",
+          "gmd","http://www.isotc211.org/2005/gmd",
+          "gco","http://www.isotc211.org/2005/gco",
+          "srv","http://www.isotc211.org/2005/srv",
+          "gml","http://www.opengis.net/gml"
+  );
 
   private final Templates xsltDecodeDC;
   private final XPathExpression xPath;
@@ -80,13 +90,24 @@ public abstract class BaseXmlMetaAnalyzer implements MetaAnalyzer {
       throw new MetaException(String.format("Error extracting attributes."), ex);
     }
   }
-  
-  
-  protected final XPathExpression createExpression(String interogator) throws XPathExpressionException {
+
+  /**
+   * Creates XPath expression based on string definition.
+   * @param definition string definition
+   * @return XPath expression
+   * @throws XPathExpressionException if creating expression fails
+   */
+  protected final XPathExpression createExpression(String definition) throws XPathExpressionException {
       XPath xp = XPathFactory.newInstance().newXPath();
       xp.setNamespaceContext(getNamespaceContext());
-      return xp.compile(interogator);
+      return xp.compile(definition);
   }
   
-  protected abstract NamespaceContext getNamespaceContext();
+  /**
+   * Gets name context.
+   * @return name context
+   */
+  protected  NamespaceContext getNamespaceContext() {
+    return NAMESPACE_CONTEXT;
+  };
 }

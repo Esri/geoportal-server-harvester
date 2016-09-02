@@ -25,14 +25,6 @@ import javax.xml.xpath.XPathExpressionException;
  */
 public class SimpleDcMetaAnalyzer extends BaseXmlMetaAnalyzer {
   
-  private static final NamespaceContext DC = new NamespaceContextImpl(
-          "rdf","http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-          "dc","http://purl.org/dc/elements/1.1/",
-          "dct","http://purl.org/dc/terms/",
-          "dcmiBox","http://dublincore.org/documents/2000/07/11/dcmi-box/",
-          "ows","http://www.opengis.net/ows"
-  );
-  
   /**
    * Creates instance of the analyzer.
    * @throws java.io.IOException if error reading xslt
@@ -41,11 +33,6 @@ public class SimpleDcMetaAnalyzer extends BaseXmlMetaAnalyzer {
    */
   public SimpleDcMetaAnalyzer() throws IOException, TransformerConfigurationException, XPathExpressionException {
     super("meta/decodedc.xslt","count(/rdf:RDF/rdf:Description/@rdf:about)>0");
-  }
-
-  @Override
-  protected NamespaceContext getNamespaceContext() {
-    return DC;
   }
   
 }

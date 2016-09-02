@@ -16,7 +16,6 @@
 package com.esri.geoportal.commons.meta.xml;
 
 import java.io.IOException;
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
@@ -24,8 +23,6 @@ import javax.xml.xpath.XPathExpressionException;
  * Simple FGDC meta analyzer.
  */
 public class SimpleFgdcMetaAnalyzer extends BaseXmlMetaAnalyzer {
-  
-  private static final NamespaceContext FGDC = new NamespaceContextImpl();
   
   /**
    * Creates instance of the analyzer.
@@ -35,11 +32,6 @@ public class SimpleFgdcMetaAnalyzer extends BaseXmlMetaAnalyzer {
    */
   public SimpleFgdcMetaAnalyzer() throws IOException, TransformerConfigurationException, XPathExpressionException {
     super("meta/decodefgdc.xslt","count(/metadata/idinfo/citation/*[name()='citeinfo'])>0");
-  }
-
-  @Override
-  protected NamespaceContext getNamespaceContext() {
-    return FGDC;
   }
   
 }
