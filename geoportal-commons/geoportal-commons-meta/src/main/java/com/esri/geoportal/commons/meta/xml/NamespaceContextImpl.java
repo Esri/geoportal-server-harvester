@@ -20,9 +20,9 @@ import java.util.Iterator;
 import javax.xml.namespace.NamespaceContext;
 
 /**
- * Namespace context impl.
+ * Namespace context implementation.
  */
-public class NamespaceContextImpl implements NamespaceContext {
+/*package*/ class NamespaceContextImpl implements NamespaceContext {
   
   private final HashMap<String,String> prefs = new HashMap<>();
   private final HashMap<String,String> uris = new HashMap<>();
