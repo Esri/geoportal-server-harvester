@@ -22,12 +22,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +39,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -65,6 +69,136 @@ public class AgpClient implements Closeable {
   }
 
   /**
+   * Adds item.
+   * @param username user name
+   * @param folderId folder id
+   * @param title title
+   * @param description description
+   * @param text text
+   * @param itemType item type (must be a URL type)
+   * @param typeKeywords type keywords
+   * @param token token
+   * @return add item response
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public ItemResponse addItem(String username, String folderId, String title, String description, String text, ItemType itemType, String [] typeKeywords, String token) throws IOException, URISyntaxException {
+    URIBuilder builder = new URIBuilder(addItemUri(username, folderId));
+    
+    HttpPost req = new HttpPost(builder.build());
+    HashMap<String, String> params = new HashMap<>();
+    params.put("f", "json");
+    params.put("title", title);
+    params.put("description", description);
+    params.put("type", itemType.getTypeName());
+    params.put("text", text);
+    params.put("typeKeywords", typeKeywords!=null? Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")):"");
+    params.put("token", token);
+    
+    req.setEntity(createEntity(params));
+
+    return execute(req,ItemResponse.class);
+  }
+
+  /**
+   * Adds item.
+   * @param username user name
+   * @param folderId folder id
+   * @param title title
+   * @param description description
+   * @param url URL
+   * @param itemType item type (must be a URL type)
+   * @param typeKeywords type keywords
+   * @param token token
+   * @return add item response
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public ItemResponse addItem(String username, String folderId, String title, String description, URL url, ItemType itemType, String [] typeKeywords, String token) throws IOException, URISyntaxException {
+    URIBuilder builder = new URIBuilder(addItemUri(username, folderId));
+    
+    HttpPost req = new HttpPost(builder.build());
+    HashMap<String, String> params = new HashMap<>();
+    params.put("f", "json");
+    params.put("title", title);
+    params.put("description", description);
+    params.put("type", itemType.getTypeName());
+    params.put("url", url.toExternalForm());
+    params.put("typeKeywords", typeKeywords!=null? Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")):"");
+    params.put("token", token);
+    
+    req.setEntity(createEntity(params));
+
+    return execute(req,ItemResponse.class);
+  }
+
+  /**
+   * Updates item item.
+   * @param username user name
+   * @param folderId folder id
+   * @param itemId item id
+   * @param title title
+   * @param description description
+   * @param text text
+   * @param itemType item type (must be a URL type)
+   * @param typeKeywords type keywords
+   * @param token token
+   * @return add item response
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public ItemResponse updateItem(String username, String folderId, String itemId, String title, String description, String text, ItemType itemType, String [] typeKeywords, String token) throws IOException, URISyntaxException {
+    URIBuilder builder = new URIBuilder(updateItemUri(username, folderId, itemId));
+    
+    HttpPost req = new HttpPost(builder.build());
+    HashMap<String, String> params = new HashMap<>();
+    params.put("f", "json");
+    params.put("title", title);
+    params.put("description", description);
+    params.put("type", itemType.getTypeName());
+    params.put("text", text);
+    params.put("typeKeywords", typeKeywords!=null? Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")):"");
+    params.put("token", token);
+    
+    req.setEntity(createEntity(params));
+
+    return execute(req,ItemResponse.class);
+  }
+
+  /**
+   * Adds item.
+   * @param username user name
+   * @param folderId folder id
+   * @param itemId item id
+   * @param title title
+   * @param description description
+   * @param url URL
+   * @param itemType item type (must be a URL type)
+   * @param typeKeywords type keywords
+   * @param token token
+   * @return add item response
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public ItemResponse updateItem(String username, String folderId, String itemId, String title, String description, URL url, ItemType itemType, String [] typeKeywords, String token) throws IOException, URISyntaxException {
+    URIBuilder builder = new URIBuilder(updateItemUri(username, folderId, itemId));
+    
+    HttpPost req = new HttpPost(builder.build());
+    HashMap<String, String> params = new HashMap<>();
+    params.put("f", "json");
+    params.put("title", title);
+    params.put("description", description);
+    params.put("type", itemType.getTypeName());
+    params.put("url", url.toExternalForm());
+    params.put("typeKeywords", typeKeywords!=null? Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")):"");
+    params.put("token", token);
+    
+    req.setEntity(createEntity(params));
+
+    return execute(req,ItemResponse.class);
+  }
+  
+  /**
    * Sharing item.
    * @param username user name
    * @param folderId folder id
@@ -78,32 +212,21 @@ public class AgpClient implements Closeable {
    * @throws IOException if operation fails
    */
   public ShareResponse share(String username, String folderId, String itemId, boolean everyone, boolean org, String [] groups, String token)  throws URISyntaxException, IOException {
-    URIBuilder builder = new URIBuilder();
-    builder.setScheme(rootUrl.toURI().getScheme())
-           .setHost(rootUrl.toURI().getHost())
-           .setPort(rootUrl.toURI().getPort())
-           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folderId!=null? "/" +folderId: "") +"/items/" + itemId + "/share");
+    URIBuilder builder = new URIBuilder(shareUri(username, folderId, itemId));
+    
     HttpPost req = new HttpPost(builder.build());
     HashMap<String, String> params = new HashMap<>();
     params.put("f", "json");
     params.put("everyone", Boolean.toString(everyone));
     params.put("org", Boolean.toString(org));
     params.put("groups", groups!=null? Arrays.asList(groups).stream().collect(Collectors.joining(",")): "");
-    if (token!=null) {
-      params.put("token", token);
-    }
-    HttpEntity entity = new UrlEncodedFormEntity(params.entrySet().stream()
-            .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()));
-    req.setEntity(entity);
+    params.put("token", token);
+    
+    req.setEntity(createEntity(params));
 
-    try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
-      String responseContent = IOUtils.toString(contentStream, "UTF-8");
-      ObjectMapper mapper = new ObjectMapper();
-      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-      return mapper.readValue(responseContent, ShareResponse.class);
-    }
+    return execute(req,ShareResponse.class);
   }
+  
   /**
    * Deletes item.
    * @param username user name
@@ -115,24 +238,14 @@ public class AgpClient implements Closeable {
    * @throws IOException if operation fails
    */
   public DeleteResponse delete(String username, String folderId, String itemId, String token)  throws URISyntaxException, IOException {
-    URIBuilder builder = new URIBuilder();
-    builder.setScheme(rootUrl.toURI().getScheme())
-           .setHost(rootUrl.toURI().getHost())
-           .setPort(rootUrl.toURI().getPort())
-           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folderId!=null? "/" +folderId: "") +"/items/" + itemId + "/delete");
+    URIBuilder builder = new URIBuilder(deleteUri(username, folderId, itemId));
+    
     builder.setParameter("f", "json");
-    if (token!=null) {
-      builder.setParameter("token", token);
-    }
+    builder.setParameter("token", token);
+    
     HttpPost req = new HttpPost(builder.build());
 
-    try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
-      String responseContent = IOUtils.toString(contentStream, "UTF-8");
-      ObjectMapper mapper = new ObjectMapper();
-      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-      return mapper.readValue(responseContent, DeleteResponse.class);
-    }
+    return execute(req,DeleteResponse.class);
   }
   
   /**
@@ -147,24 +260,15 @@ public class AgpClient implements Closeable {
    * @throws IOException if operation fails
    */
   public ContentResponse listContent(String username, String folder, long num, long start, String token) throws URISyntaxException, IOException {
-    URIBuilder builder = new URIBuilder();
-    builder.setScheme(rootUrl.toURI().getScheme())
-           .setHost(rootUrl.toURI().getHost())
-           .setPort(rootUrl.toURI().getPort())
-           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folder!=null? "/"+folder: ""));
+    URIBuilder builder = new URIBuilder(userUri(username, folder));
+    
     builder.setParameter("f", "json");
     if (token!=null) {
       builder.setParameter("token", token);
     }
     HttpGet req = new HttpGet(builder.build());
-
-    try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
-      String responseContent = IOUtils.toString(contentStream, "UTF-8");
-      ObjectMapper mapper = new ObjectMapper();
-      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-      return mapper.readValue(responseContent, ContentResponse.class);
-    }
+    
+    return execute(req,ContentResponse.class);
   }
   
   /**
@@ -178,25 +282,16 @@ public class AgpClient implements Closeable {
    * @throws IOException if operation fails
    */
   public QueryResponse search(String query, long num, long start, String token) throws URISyntaxException, IOException {
-    URIBuilder builder = new URIBuilder();
-    builder.setScheme(rootUrl.toURI().getScheme())
-           .setHost(rootUrl.toURI().getHost())
-           .setPort(rootUrl.toURI().getPort())
-           .setPath(rootUrl.toURI().getPath() + "sharing/rest/search");
+    URIBuilder builder = new URIBuilder(searchUri());
+    
     builder.setParameter("f", "json");
     builder.setParameter("q", String.format("%s %s", query, QUERY_EXTRAS));
     if (token!=null) {
       builder.setParameter("token", token);
     }
     HttpGet req = new HttpGet(builder.build());
-
-    try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
-      String responseContent = IOUtils.toString(contentStream, "UTF-8");
-      ObjectMapper mapper = new ObjectMapper();
-      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-      return mapper.readValue(responseContent, QueryResponse.class);
-    }
+    
+    return execute(req,QueryResponse.class);
   }
   
   /**
@@ -209,7 +304,8 @@ public class AgpClient implements Closeable {
    * @throws IOException if accessing token fails
    */
   public TokenResponse generateToken(int minutes, SimpleCredentials credentials) throws URISyntaxException, IOException {
-    HttpPost req = new HttpPost(rootUrl.toURI().resolve("sharing/generateToken"));
+    HttpPost req = new HttpPost(generateTokenUri());
+    
     HashMap<String, String> params = new HashMap<>();
     params.put("f", "json");
     if (credentials != null) {
@@ -219,19 +315,85 @@ public class AgpClient implements Closeable {
     params.put("client", "referer");
     params.put("referer", InetAddress.getLocalHost().getHostAddress());
     params.put("expiration", Integer.toString(minutes));
-    HttpEntity entity = new UrlEncodedFormEntity(params.entrySet().stream()
+    
+    req.setEntity(createEntity(params));
+
+    return execute(req,TokenResponse.class);
+  }
+  
+  private URI updateItemUri(String username, String folderId, String itemId) throws URISyntaxException {
+    URIBuilder builder = new URIBuilder();
+    builder.setScheme(rootUrl.toURI().getScheme())
+           .setHost(rootUrl.toURI().getHost())
+           .setPort(rootUrl.toURI().getPort())
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folderId!=null? "/" +folderId: "") +"/content/" + itemId + "/update");
+    return builder.build();
+  }
+
+  private URI addItemUri(String username, String folderId) throws URISyntaxException {
+    URIBuilder builder = new URIBuilder();
+    builder.setScheme(rootUrl.toURI().getScheme())
+           .setHost(rootUrl.toURI().getHost())
+           .setPort(rootUrl.toURI().getPort())
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folderId!=null? "/" +folderId: "") +"/addItem");
+    return builder.build();
+  }
+  
+  private URI shareUri(String username, String folderId, String itemId) throws URISyntaxException {
+    URIBuilder builder = new URIBuilder();
+    builder.setScheme(rootUrl.toURI().getScheme())
+           .setHost(rootUrl.toURI().getHost())
+           .setPort(rootUrl.toURI().getPort())
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folderId!=null? "/" +folderId: "") +"/items/" + itemId + "/share");
+    return builder.build();
+  }
+  
+  private URI deleteUri(String username, String folderId, String itemId) throws URISyntaxException {
+    URIBuilder builder = new URIBuilder();
+    builder.setScheme(rootUrl.toURI().getScheme())
+           .setHost(rootUrl.toURI().getHost())
+           .setPort(rootUrl.toURI().getPort())
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folderId!=null? "/" +folderId: "") +"/items/" + itemId + "/delete");
+    return builder.build();
+  }
+  
+  private URI userUri(String username, String folderId) throws URISyntaxException {
+    URIBuilder builder = new URIBuilder();
+    builder.setScheme(rootUrl.toURI().getScheme())
+           .setHost(rootUrl.toURI().getHost())
+           .setPort(rootUrl.toURI().getPort())
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folderId!=null? "/"+folderId: ""));
+    return builder.build();
+  }
+  
+  private URI searchUri() throws URISyntaxException {
+    URIBuilder builder = new URIBuilder();
+    builder.setScheme(rootUrl.toURI().getScheme())
+           .setHost(rootUrl.toURI().getHost())
+           .setPort(rootUrl.toURI().getPort())
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/search");
+    return builder.build();
+  }
+  
+  private URI generateTokenUri() throws URISyntaxException {
+    return rootUrl.toURI().resolve("sharing/generateToken");
+  }
+  
+  private HttpEntity createEntity(Map<String, String> params) throws UnsupportedEncodingException {
+    return  new UrlEncodedFormEntity(params.entrySet().stream()
             .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()));
-    req.setEntity(entity);
+  }
+  
+  private <T> T execute(HttpUriRequest req, Class<T> clazz) throws IOException {
 
     try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       ObjectMapper mapper = new ObjectMapper();
       mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-      return mapper.readValue(responseContent, TokenResponse.class);
+      return mapper.readValue(responseContent, clazz);
     }
   }
-  
 
   private URL adjustUrl(URL rootUrl) {
     try {
