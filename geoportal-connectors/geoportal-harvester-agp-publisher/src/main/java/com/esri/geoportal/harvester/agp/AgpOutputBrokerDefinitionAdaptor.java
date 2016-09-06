@@ -29,10 +29,12 @@ import org.apache.commons.lang3.StringUtils;
  */
 /*package*/ class AgpOutputBrokerDefinitionAdaptor  extends BrokerDefinitionAdaptor {
   public static final String P_HOST_URL    = "agp-host-url";
+  public static final String P_FOLDER_ID   = "agp-folder-id";
   
   private final CredentialsDefinitionAdaptor credAdaptor;
   
   private URL hostUrl;
+  private String folderId;
 
   /**
    * Creates instance of the adaptor.
@@ -52,6 +54,7 @@ import org.apache.commons.lang3.StringUtils;
       } catch (MalformedURLException ex) {
         throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
       }
+      folderId = get(P_FOLDER_ID);
     }
   }
   
@@ -70,6 +73,23 @@ import org.apache.commons.lang3.StringUtils;
   public void setHostUrl(URL url) {
     this.hostUrl = url;
     set(P_HOST_URL, url.toExternalForm());
+  }
+
+  /**
+   * Gets folder id.
+   * @return folder id
+   */
+  public String getFolderId() {
+    return folderId;
+  }
+
+  /**
+   * Sets folder id.
+   * @param folderId folder id 
+   */
+  public void setFolderId(String folderId) {
+    this.folderId = folderId;
+    set(P_FOLDER_ID, folderId);
   }
 
   /**

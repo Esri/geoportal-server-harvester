@@ -151,7 +151,6 @@ import org.slf4j.LoggerFactory;
 
   private String fromatDate(Date date) {
     ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-    ZonedDateTime ofInstant = ZonedDateTime.ofInstant(zonedDateTime.toInstant(), ZoneOffset.UTC);
     return FORMATTER.format(zonedDateTime);
   }
 
