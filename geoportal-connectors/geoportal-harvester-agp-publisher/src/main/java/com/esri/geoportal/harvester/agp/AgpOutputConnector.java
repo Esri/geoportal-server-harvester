@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.agp;
 
 import com.esri.geoportal.commons.meta.MetaAnalyzer;
+import static com.esri.geoportal.harvester.agp.AgpOutputBrokerDefinitionAdaptor.P_FOLDER_ID;
 import static com.esri.geoportal.harvester.agp.AgpOutputBrokerDefinitionAdaptor.P_HOST_URL;
 import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -56,8 +57,9 @@ public class AgpOutputConnector implements OutputConnector<OutputBroker> {
   public UITemplate getTemplate() {
     List<UITemplate.Argument> args = new ArrayList<>();
     args.add(new UITemplate.StringArgument(P_HOST_URL, "Url", true));
-    args.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_USERNAME, "User name", false));
-    args.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_PASSWORD, "User password", false) {
+    args.add(new UITemplate.StringArgument(P_FOLDER_ID, "Folder Id", false));
+    args.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_USERNAME, "User name", true));
+    args.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_PASSWORD, "User password", true) {
       public boolean isPassword() {
         return true;
       }
