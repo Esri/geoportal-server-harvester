@@ -19,6 +19,11 @@ import static com.esri.geoportal.commons.agp.client.DataType.Text;
 import static com.esri.geoportal.commons.agp.client.DataType.File;
 import static com.esri.geoportal.commons.agp.client.DataType.URL;
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.constants.MimeTypeUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Item types.
@@ -28,21 +33,21 @@ public enum ItemType {
   CITYENGINE_WEB_SCENE("CityEngine Web Scene", File),
   WEB_SCENE("Web Scene", Text, MimeType.APPLICATION_JSON),
   PRO_MAP("Pro Map", File, MimeType.APPLICATION_ESRI_MAPX),
-  FEATURE_SERVICE("Feature Service", Text, MimeType.APPLICATION_JSON),
-  MAP_SERVICE("Map Service", Text, MimeType.APPLICATION_JSON),
-  IMAGE_SERVICE("Image Service", Text, MimeType.APPLICATION_JSON),
+  FEATURE_SERVICE("Feature Service", URL, Pattern.compile(".+/FeatureServer$", Pattern.CASE_INSENSITIVE)),
+  MAP_SERVICE("Map Service", URL, Pattern.compile(".+/MapServer$", Pattern.CASE_INSENSITIVE)),
+  IMAGE_SERVICE("Image Service", URL, Pattern.compile(".+/ImageServer$", Pattern.CASE_INSENSITIVE)),
   KML("KML", URL, MimeType.APPLICATION_KML, MimeType.APPLICATION_KMZ),
   WMS("WMS", URL),
   WPS("WPS", URL),
   WMTS("WMTS", URL),
   FEATURE_COLLECTION("Feature Collection", Text, MimeType.APPLICATION_JSON),
   FEATURE_COLLECTION_TEMPLATE("Feature Collection Template", Text, MimeType.APPLICATION_JSON),
-  GEODATA_SERVICE("Geodata Service", URL),
-  GLOBE_SERVICE("Globe Service", URL),
-  GEOMETRY_SERVICE("Geometry Service", URL),
-  GEOCODING_SERVICE("Geocoding Service", URL),
-  NETWORK_ANALYSIS_SERVICE("Network Analysis Service", URL),
-  GEOPROCESSING_SERVICE("Geoprocessing Service", URL),
+  GEODATA_SERVICE("Geodata Service", URL, Pattern.compile(".+/GeoDataServer$", Pattern.CASE_INSENSITIVE)),
+  GLOBE_SERVICE("Globe Service", URL, Pattern.compile(".+/GlobeServer$", Pattern.CASE_INSENSITIVE)),
+  GEOMETRY_SERVICE("Geometry Service", URL, Pattern.compile(".+/GeometryServer$", Pattern.CASE_INSENSITIVE)),
+  GEOCODING_SERVICE("Geocoding Service", URL, Pattern.compile(".+/GeocodeServer$", Pattern.CASE_INSENSITIVE)),
+  NETWORK_ANALYSIS_SERVICE("Network Analysis Service", URL, Pattern.compile(".+/NAServer$", Pattern.CASE_INSENSITIVE)),
+  GEOPROCESSING_SERVICE("Geoprocessing Service", URL, Pattern.compile(".+/GPServer$", Pattern.CASE_INSENSITIVE)),
   WORKFLOW_MANAGER_SERVICE("Workflow Manager Service", URL),
   WEB_MAPPING_APPLICATION("Web Mapping Application", Text, MimeType.APPLICATION_JSON),
   MOBILE_APPLICATION("Mobile Application", Text, MimeType.APPLICATION_JSON),
@@ -77,7 +82,7 @@ public enum ItemType {
   MAP_DOCUMENT("Map Document", File, MimeType.APPLICATION_ESRI_MXD),
   MAP_PACKAGE("Map Package", File, MimeType.APPLICATION_ESRI_MPK),
   MOBILE_BASEMAP_PACKAGE("Mobile Basemap Package", File, MimeType.APPLICATION_ESRI_BPK),
-  MOBILE_MAP_PACKAGE("Mobile Map Package", File, MimeType.APPLICATION_ESRI_MMPK),
+  MOBILE_MAP_PACKAGE("Mobile Map Package", File, MimeType.APPLICATION_ESRI_NMPK),
   TILE_PACKAGE("Tile Package", File, MimeType.APPLICATION_ESRI_TPK),
   PROJECT_PACKAGE("Project Package", File, MimeType.APPLICATION_ESRI_PPKX),
   TASK_PACKAGE("Task Package", File, MimeType.APPLICATION_ESRI_TASKS),
@@ -112,11 +117,17 @@ public enum ItemType {
   private final String typeName;
   private final DataType dataType;
   private final MimeType[] mimeTypes;
+  private final Pattern pattern;
 
-  ItemType(String typeName, DataType dataType, MimeType... mimeTypes) {
+  ItemType(String typeName, DataType dataType, Pattern pattern, MimeType... mimeTypes) {
     this.typeName = typeName;
     this.dataType = dataType;
     this.mimeTypes = mimeTypes;
+    this.pattern = pattern;
+  }
+
+  ItemType(String typeName, DataType dataType, MimeType... mimeTypes) {
+    this(typeName, dataType, null, mimeTypes);
   }
 
   /**
@@ -144,5 +155,57 @@ public enum ItemType {
    */
   public MimeType[] getMimeTypes() {
     return mimeTypes;
+  }
+
+  /**
+   * Gets pattern.
+   * @return pattern
+   */
+  public Pattern getPattern() {
+    return pattern;
+  }
+  
+  /**
+   * Match item types by pattern.
+   * @param value value to match
+   * @return list of matching item types
+   */
+  public static List<ItemType> matchPattern(String value) {
+    ArrayList<ItemType> matches = new ArrayList<>();
+    for (ItemType it: ItemType.values()) {
+      if (it.getPattern()!=null && it.getPattern().matcher(value).matches()) {
+        matches.add(it);
+      }
+    }
+    return matches;
+  }
+  
+  /**
+   * Match item types by mime type.
+   * @param mimeType mime type
+   * @return list of matching item types
+   */
+  public static List<ItemType> matchMimeType(MimeType mimeType) {
+    ArrayList<ItemType> matches = new ArrayList<>();
+    for (ItemType it: ItemType.values()) {
+      if (it.getMimeTypes()!=null && Arrays.asList(it.getMimeTypes()).contains(mimeType)) {
+        matches.add(it);
+      }
+    }
+    return matches;
+  }
+  
+  /**
+   * Match item types by file name extension.
+   * @param ext file name extension
+   * @return list of matching item types
+   */
+  public static List<ItemType> matchExt(String ext) {
+    ArrayList<ItemType> matches = new ArrayList<>();
+    MimeType mimeType = MimeTypeUtils.mapExtension(ext);
+    if (mimeType!=null) {
+      return matchMimeType(mimeType);
+    }
+    return matches;
   }
 }
