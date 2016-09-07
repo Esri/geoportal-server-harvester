@@ -16,7 +16,6 @@
 package com.esri.geoportal.commons.meta.xml;
 
 import java.io.IOException;
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 

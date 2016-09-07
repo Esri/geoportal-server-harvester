@@ -64,7 +64,7 @@ public class AgpOutputConnector implements OutputConnector<OutputBroker> {
         return true;
       }
     });
-    return new UITemplate(getType(), "ArcGIS Server Services", args);
+    return new UITemplate(getType(), "ArcGIS Portal", args);
   }
   
 }

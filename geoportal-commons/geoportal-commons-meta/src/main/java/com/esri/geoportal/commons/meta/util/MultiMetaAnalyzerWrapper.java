@@ -46,10 +46,12 @@ public class MultiMetaAnalyzerWrapper implements MetaAnalyzer {
 
   @Override
   public MapAttribute extract(Document doc) throws MetaException {
-    for (MetaAnalyzer a: analyzers) {
-      MapAttribute extract = a.extract(doc);
-      if (extract!=null) {
-        return extract;
+    if (analyzers!=null) {
+      for (MetaAnalyzer a: analyzers) {
+        MapAttribute extract = a.extract(doc);
+        if (extract!=null) {
+          return extract;
+        }
       }
     }
     return null;
