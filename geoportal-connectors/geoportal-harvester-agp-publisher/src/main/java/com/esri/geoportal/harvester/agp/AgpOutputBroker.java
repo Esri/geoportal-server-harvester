@@ -16,9 +16,11 @@
 package com.esri.geoportal.harvester.agp;
 
 import com.esri.geoportal.commons.agp.client.AgpClient;
+import com.esri.geoportal.commons.agp.client.DataType;
 import com.esri.geoportal.commons.agp.client.ItemResponse;
 import com.esri.geoportal.commons.agp.client.ItemType;
 import com.esri.geoportal.commons.agp.client.QueryResponse;
+import com.esri.geoportal.commons.meta.Attribute;
 import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaAnalyzer;
 import com.esri.geoportal.commons.meta.MetaException;
@@ -34,6 +36,7 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -51,6 +54,7 @@ import org.xml.sax.SAXException;
  * ArcGIS Portal output broker.
  */
 /*package*/ class AgpOutputBroker implements OutputBroker {
+
   private static final Logger LOG = LoggerFactory.getLogger(AgpOutputBroker.class);
   private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
@@ -62,89 +66,179 @@ import org.xml.sax.SAXException;
 
   /**
    * Creates instance of the broker.
+   *
    * @param connector connector
    * @param definition
-   * @param metaAnalyzer 
+   * @param metaAnalyzer
    */
   public AgpOutputBroker(AgpOutputConnector connector, AgpOutputBrokerDefinitionAdaptor definition, MetaAnalyzer metaAnalyzer) {
     this.connector = connector;
     this.definition = definition;
     this.metaAnalyzer = metaAnalyzer;
   }
-
+  
   @Override
   public PublishingStatus publish(DataReference ref) throws DataOutputException {
     try {
-      MapAttribute attributes = ref.getAttributesMap().values().stream().filter(o->o instanceof MapAttribute).map(o->(MapAttribute)o).findFirst().get();
-      if (attributes==null) {
-        Document doc = ref.getAttributesMap().values().stream().filter(o->o instanceof Document).map(o->(Document)o).findFirst().get();
-        if (doc!=null) {
-          attributes = metaAnalyzer.extract(doc);
-        } else {
-          String sXml = new String(ref.getContent(),"UTF-8");
-          DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-          DocumentBuilder builder = factory.newDocumentBuilder();
-          doc = builder.parse(new InputSource(new StringReader(sXml))); 
-          attributes = metaAnalyzer.extract(doc);
-        }
-      }
-      
-      if (attributes==null) {
+      // extract map of attributes (normalized names)
+      MapAttribute attributes = extractMapAttributes(ref);
+
+      if (attributes == null) {
         throw new DataOutputException(this, String.format("Error extracting attributes from data."));
       }
-      
-      String src_source_type_s = ref.getBrokerUri().getScheme();
-      String src_source_uri_s = ref.getBrokerUri().toASCIIString();
-      String src_source_name_s = ref.getBrokerName();
-      String src_uri_s = ref.getSourceUri().toASCIIString();
-      String src_lastupdate_dt = ref.getLastModifiedDate() != null ? fromatDate(ref.getLastModifiedDate()) : null;
 
-      String [] typeKeywords = {
-        String.format("src_source_type_s_%s", src_source_type_s),
-        String.format("src_source_uri_s_%s", src_source_uri_s),
-        String.format("src_source_name_s_%s", src_source_name_s),
-        String.format("src_uri_s_%s", src_uri_s),
-        String.format("src_lastupdate_dt_%s", src_lastupdate_dt)
+      // build typeKeywords array
+      String src_source_type_s = URLEncoder.encode(ref.getBrokerUri().getScheme(), "UTF-8");
+      String src_source_uri_s = URLEncoder.encode(ref.getBrokerUri().toASCIIString(), "UTF-8");
+      String src_source_name_s = URLEncoder.encode(ref.getBrokerName(), "UTF-8");
+      String src_uri_s = URLEncoder.encode(ref.getSourceUri().toASCIIString(), "UTF-8");
+      String src_lastupdate_dt = ref.getLastModifiedDate() != null ? URLEncoder.encode(fromatDate(ref.getLastModifiedDate()), "UTF-8") : null;
+
+      String[] typeKeywords = {
+        String.format("src_source_type_s=%s", src_source_type_s),
+        String.format("src_source_uri_s=%s", src_source_uri_s),
+        String.format("src_source_name_s=%s", src_source_name_s),
+        String.format("src_uri_s=%s", src_uri_s),
+        String.format("src_lastupdate_dt=%s", src_lastupdate_dt)
       };
       
-      if (token==null) {
-        token = client.generateToken(0, definition.getCredentials()).token;
-      }
       try {
-        URL url = new URL(attributes.getNamedAttributes().get("resource.url").getValue());
-        ItemType itemType = ItemType.matchPattern(url.toExternalForm()).stream().findFirst().get();
-        if (itemType==null) {
+
+        // generate token
+        if (token == null) {
+          token = generateToken();
+        }
+        
+        // find resource URL
+        URL resourceUrl = new URL(getAttributeValue(attributes, "resource.url", null));
+        ItemType itemType = ItemType.matchPattern(resourceUrl.toExternalForm()).stream().findFirst().orElse(null);
+        if (itemType == null || itemType.getDataType()!=DataType.URL) {
           return PublishingStatus.SKIPPED;
         }
-      
-        QueryResponse search = client.search(String.format("typeKeywords:%s", String.format("src_uri_s_%s", src_uri_s)), 0, 0, token);
-        if (search.results==null || search.results.length==0) {
-          ItemResponse response = client.addItem(
-                  definition.getCredentials().getUserName(),
-                  definition.getFolderId(),
-                  attributes.getNamedAttributes().get("title").getValue(),
-                  attributes.getNamedAttributes().get("description").getValue(),
-                  new URL(attributes.getNamedAttributes().get("resource.url").getValue()), 
-                  itemType, typeKeywords, token);
-          return response!=null && response.success? PublishingStatus.CREATED: PublishingStatus.SKIPPED;
-        } else {
-          ItemResponse response = client.updateItem(
-                  definition.getCredentials().getUserName(),
-                  definition.getFolderId(),
+
+        // check if item exists
+        QueryResponse search = client.search(String.format("typekeywords:%s", String.format("src_uri_s=%s", src_uri_s)), 0, 0, token);
+        
+        
+        if (search.results == null || search.results.length == 0) {
+          // add item if doesn't exist
+          ItemResponse response = addItem(
+                  getAttributeValue(attributes, "title", null),
+                  getAttributeValue(attributes, "description", null),
+                  resourceUrl, itemType, typeKeywords);
+
+          if (response == null || !response.success) {
+            throw new DataOutputException(this, String.format("Error adding item: %s", ref.getSourceUri()));
+          }
+
+          return PublishingStatus.CREATED;
+        } else if (search.results[0].owner.equals(definition.getCredentials().getUserName())) {
+          // update item if does exist
+          ItemResponse response = updateItem(
                   search.results[0].id,
-                  attributes.getNamedAttributes().get("title").getValue(),
-                  attributes.getNamedAttributes().get("description").getValue(),
-                  new URL(attributes.getNamedAttributes().get("resource.url").getValue()), 
-                  itemType, typeKeywords, token);
-          return response!=null && response.success? PublishingStatus.UPDATED: PublishingStatus.SKIPPED;
+                  getAttributeValue(attributes, "title", null),
+                  getAttributeValue(attributes, "description", null),
+                  resourceUrl, itemType, typeKeywords);
+          if (response == null || !response.success) {
+            throw new DataOutputException(this, String.format("Error updating item: %s", ref.getSourceUri()));
+          }
+          return PublishingStatus.UPDATED;
+        } else {
+          return PublishingStatus.SKIPPED;
         }
       } catch (MalformedURLException ex) {
         return PublishingStatus.SKIPPED;
       }
-      
-    } catch (MetaException|IOException|ParserConfigurationException|SAXException|URISyntaxException ex) {
+
+    } catch (MetaException | IOException | ParserConfigurationException | SAXException | URISyntaxException ex) {
       throw new DataOutputException(this, String.format("Error publishing data"), ex);
     }
+  }
+
+  private String getAttributeValue(MapAttribute attributes, String attributeName, String defaultValue) {
+    Attribute attr = attributes.getNamedAttributes().get(attributeName);
+    return attr != null ? attr.getValue() : defaultValue;
+  }
+
+  private MapAttribute extractMapAttributes(DataReference ref) throws MetaException, IOException, ParserConfigurationException, SAXException {
+      MapAttribute attributes = ref.getAttributesMap().values().stream()
+              .filter(o -> o instanceof MapAttribute)
+              .map(o -> (MapAttribute) o)
+              .findFirst()
+              .orElse(null);
+      if (attributes == null) {
+        Document doc = ref.getAttributesMap().values().stream()
+                .filter(o -> o instanceof Document)
+                .map(o -> (Document) o)
+                .findFirst()
+                .orElse(null);
+        if (doc != null) {
+          attributes = metaAnalyzer.extract(doc);
+        } else {
+          String sXml = new String(ref.getContent(), "UTF-8");
+          DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+          factory.setNamespaceAware(true);
+          DocumentBuilder builder = factory.newDocumentBuilder();
+          doc = builder.parse(new InputSource(new StringReader(sXml)));
+          attributes = metaAnalyzer.extract(doc);
+        }
+      }
+      return attributes;
+  }
+
+  private ItemResponse addItem(String title, String description, URL url, ItemType itemType, String[] typeKeywords) throws IOException, URISyntaxException {
+    ItemResponse response = addItem(
+            title,
+            description,
+            url, itemType, typeKeywords, token);
+    if (!response.success && response.error != null && response.error.code == 498) {
+      token = generateToken();
+      response = addItem(
+              title,
+              description,
+              url, itemType, typeKeywords, token);
+    }
+    return response;
+  }
+
+  private ItemResponse addItem(String title, String description, URL url, ItemType itemType, String[] typeKeywords, String token) throws IOException, URISyntaxException {
+    return client.addItem(
+            definition.getCredentials().getUserName(),
+            definition.getFolderId(),
+            title,
+            description,
+            url, itemType, typeKeywords, token);
+  }
+
+  private ItemResponse updateItem(String id, String title, String description, URL url, ItemType itemType, String[] typeKeywords) throws IOException, URISyntaxException {
+    ItemResponse response = updateItem(
+            id,
+            title,
+            description,
+            url, itemType, typeKeywords, token);
+    if (!response.success && response.error != null && response.error.code == 498) {
+      token = generateToken();
+      response = updateItem(
+              id,
+              title,
+              description,
+              url, itemType, typeKeywords, token);
+    }
+    return response;
+  }
+
+  private ItemResponse updateItem(String id, String title, String description, URL url, ItemType itemType, String[] typeKeywords, String token) throws IOException, URISyntaxException {
+    return client.updateItem(
+            definition.getCredentials().getUserName(),
+            definition.getFolderId(),
+            id,
+            title,
+            description,
+            url, itemType, typeKeywords, token);
+  }
+
+  private String generateToken() throws URISyntaxException, IOException {
+    return client.generateToken(60, definition.getCredentials()).token;
   }
 
   @Override
@@ -175,5 +269,5 @@ import org.xml.sax.SAXException;
     ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     return FORMATTER.format(zonedDateTime);
   }
-  
+
 }

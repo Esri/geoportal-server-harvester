@@ -20,12 +20,12 @@ package com.esri.geoportal.commons.agp.client;
  */
 public final class ItemResponse {
   public boolean success;
-  public String itemId;
+  public String id;
   public String folder;
   public ErrorInfo error;
   
   @Override
   public String toString() {
-    return String.format("success: %b, itemId: %s, folder: %s, error: %s", success, itemId, folder, error);
+    return String.format("success: %b, itemId: %s, folder: %s, error: %s", success, id, folder, error);
   }
 }

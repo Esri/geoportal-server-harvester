@@ -83,7 +83,7 @@ public class AgpClient implements Closeable {
    * @throws IOException if operation fails
    */
   public ItemResponse addItem(String username, String folderId, String title, String description, String text, ItemType itemType, String [] typeKeywords, String token) throws IOException, URISyntaxException {
-    URIBuilder builder = new URIBuilder(addItemUri(username, folderId));
+    URIBuilder builder = new URIBuilder(addItemUri(username, StringUtils.trimToNull(folderId)));
     
     HttpPost req = new HttpPost(builder.build());
     HashMap<String, String> params = new HashMap<>();
@@ -115,7 +115,7 @@ public class AgpClient implements Closeable {
    * @throws IOException if operation fails
    */
   public ItemResponse addItem(String username, String folderId, String title, String description, URL url, ItemType itemType, String [] typeKeywords, String token) throws IOException, URISyntaxException {
-    URIBuilder builder = new URIBuilder(addItemUri(username, folderId));
+    URIBuilder builder = new URIBuilder(addItemUri(username, StringUtils.trimToNull(folderId)));
     
     HttpPost req = new HttpPost(builder.build());
     HashMap<String, String> params = new HashMap<>();
@@ -148,7 +148,7 @@ public class AgpClient implements Closeable {
    * @throws IOException if operation fails
    */
   public ItemResponse updateItem(String username, String folderId, String itemId, String title, String description, String text, ItemType itemType, String [] typeKeywords, String token) throws IOException, URISyntaxException {
-    URIBuilder builder = new URIBuilder(updateItemUri(username, folderId, itemId));
+    URIBuilder builder = new URIBuilder(updateItemUri(username, StringUtils.trimToNull(folderId), itemId));
     
     HttpPost req = new HttpPost(builder.build());
     HashMap<String, String> params = new HashMap<>();
@@ -181,7 +181,7 @@ public class AgpClient implements Closeable {
    * @throws IOException if operation fails
    */
   public ItemResponse updateItem(String username, String folderId, String itemId, String title, String description, URL url, ItemType itemType, String [] typeKeywords, String token) throws IOException, URISyntaxException {
-    URIBuilder builder = new URIBuilder(updateItemUri(username, folderId, itemId));
+    URIBuilder builder = new URIBuilder(updateItemUri(username, StringUtils.trimToNull(folderId), itemId));
     
     HttpPost req = new HttpPost(builder.build());
     HashMap<String, String> params = new HashMap<>();
@@ -326,7 +326,7 @@ public class AgpClient implements Closeable {
     builder.setScheme(rootUrl.toURI().getScheme())
            .setHost(rootUrl.toURI().getHost())
            .setPort(rootUrl.toURI().getPort())
-           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folderId!=null? "/" +folderId: "") +"/content/" + itemId + "/update");
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folderId!=null? "/" +folderId: "") +"/items/" + itemId + "/update");
     return builder.build();
   }
 

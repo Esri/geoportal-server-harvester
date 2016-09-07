@@ -33,7 +33,7 @@ public enum ItemType {
   CITYENGINE_WEB_SCENE("CityEngine Web Scene", File),
   WEB_SCENE("Web Scene", Text, MimeType.APPLICATION_JSON),
   PRO_MAP("Pro Map", File, MimeType.APPLICATION_ESRI_MAPX),
-  FEATURE_SERVICE("Feature Service", URL, Pattern.compile(".+/FeatureServer$", Pattern.CASE_INSENSITIVE)),
+  FEATURE_SERVICE("Feature Service", URL, Pattern.compile(".+/FeatureServer$|.+/MapServer/\\d+$", Pattern.CASE_INSENSITIVE)),
   MAP_SERVICE("Map Service", URL, Pattern.compile(".+/MapServer$", Pattern.CASE_INSENSITIVE)),
   IMAGE_SERVICE("Image Service", URL, Pattern.compile(".+/ImageServer$", Pattern.CASE_INSENSITIVE)),
   KML("KML", URL, MimeType.APPLICATION_KML, MimeType.APPLICATION_KMZ),
