@@ -41,7 +41,11 @@ import java.net.URLEncoder;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -64,6 +68,7 @@ import org.xml.sax.SAXException;
   private final MetaAnalyzer metaAnalyzer;
   private AgpClient client;
   private String token;
+  private final Set<String> existing = new HashSet<>();
 
   /**
    * Creates instance of the broker.
@@ -119,9 +124,10 @@ import org.xml.sax.SAXException;
 
         // check if item exists
         QueryResponse search = client.search(String.format("typekeywords:%s", String.format("src_uri_s=%s", src_uri_s)), 0, 0, token);
+        ItemEntry itemEntry = search!=null && search.results!=null && search.results.length>0? search.results[0]: null;
         
         
-        if (search.results == null || search.results.length == 0) {
+        if (itemEntry==null) {
           // add item if doesn't exist
           ItemResponse response = addItem(
                   getAttributeValue(attributes, "title", null),
@@ -133,14 +139,14 @@ import org.xml.sax.SAXException;
           }
 
           return PublishingStatus.CREATED;
-        } else if (search.results[0].owner.equals(definition.getCredentials().getUserName())) {
-          ItemEntry itemEntry = client.readItem(search.results[0].id, token);
+        } else if (itemEntry.owner.equals(definition.getCredentials().getUserName())) {
+          itemEntry = client.readItem(itemEntry.id, token);
           if (itemEntry==null) {
             throw new DataOutputException(this, String.format("Unable to read item entry."));
           }
           // update item if does exist
           ItemResponse response = updateItem(
-                  search.results[0].id,
+                  itemEntry.id,
                   itemEntry.owner,
                   itemEntry.ownerFolder,
                   getAttributeValue(attributes, "title", null),
@@ -149,6 +155,7 @@ import org.xml.sax.SAXException;
           if (response == null || !response.success) {
             throw new DataOutputException(this, String.format("Error updating item: %s", ref.getSourceUri()));
           }
+          existing.remove(itemEntry.id);
           return PublishingStatus.UPDATED;
         } else {
           return PublishingStatus.SKIPPED;
@@ -161,7 +168,7 @@ import org.xml.sax.SAXException;
       throw new DataOutputException(this, String.format("Error publishing data"), ex);
     }
   }
-
+  
   private String getAttributeValue(MapAttribute attributes, String attributeName, String defaultValue) {
     Attribute attr = attributes.getNamedAttributes().get(attributeName);
     return attr != null ? attr.getValue() : defaultValue;
@@ -248,6 +255,10 @@ import org.xml.sax.SAXException;
             url, itemType, typeKeywords, null, token);
   }
 
+  private String generateToken(int minutes) throws URISyntaxException, IOException {
+    return client.generateToken(minutes, definition.getCredentials()).token;
+  }
+
   private String generateToken() throws URISyntaxException, IOException {
     return client.generateToken(60, definition.getCredentials()).token;
   }
@@ -265,11 +276,32 @@ import org.xml.sax.SAXException;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     this.client = new AgpClient(definition.getHostUrl());
+    if(definition.getCleanup()) {
+      try {
+        String src_source_uri_s = URLEncoder.encode(context.getTask().getDataSource().getBrokerUri().toASCIIString(), "UTF-8");
+        QueryResponse search = client.search(String.format("typekeywords:%s", String.format("src_source_uri_s=%s", src_source_uri_s)), 0, 0, generateToken(1));
+        while (search!=null && search.results!=null && search.results.length>0) {
+          existing.addAll(Arrays.asList(search.results).stream().map(i->i.id).collect(Collectors.toList()));
+          if (search.nextStart>0) {
+            search = client.search(String.format("typekeywords:%s", String.format("src_source_uri_s=%s", src_source_uri_s)), 0, search.nextStart, generateToken(1));
+          } else {
+            break;
+          }
+        }
+      } catch (URISyntaxException|IOException ex) {
+        throw new DataProcessorException(String.format("Error collecting ids of existing items."), ex);
+      }
+    }
   }
 
   @Override
   public void terminate() {
     try {
+      if(definition.getCleanup()) {
+        for (String id: existing) {
+          // TODO: delete existing items
+        }
+      }
       client.close();
     } catch (IOException ex) {
       LOG.error(String.format("Error terminating broker."), ex);
