@@ -207,7 +207,7 @@ import org.xml.sax.SAXException;
             definition.getFolderId(),
             title,
             description,
-            url, itemType, typeKeywords, token);
+            url, itemType, typeKeywords, null, token);
   }
 
   private ItemResponse updateItem(String id, String title, String description, URL url, ItemType itemType, String[] typeKeywords) throws IOException, URISyntaxException {
@@ -234,7 +234,7 @@ import org.xml.sax.SAXException;
             id,
             title,
             description,
-            url, itemType, typeKeywords, token);
+            url, itemType, typeKeywords, null, token);
   }
 
   private String generateToken() throws URISyntaxException, IOException {

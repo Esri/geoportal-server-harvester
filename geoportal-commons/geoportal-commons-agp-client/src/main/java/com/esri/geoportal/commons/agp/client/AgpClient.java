@@ -77,12 +77,13 @@ public class AgpClient implements Closeable {
    * @param text text
    * @param itemType item type (must be a URL type)
    * @param typeKeywords type keywords
+   * @param tags tags tags
    * @param token token
    * @return add item response
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse addItem(String username, String folderId, String title, String description, String text, ItemType itemType, String [] typeKeywords, String token) throws IOException, URISyntaxException {
+  public ItemResponse addItem(String username, String folderId, String title, String description, String text, ItemType itemType, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(addItemUri(username, StringUtils.trimToNull(folderId)));
     
     HttpPost req = new HttpPost(builder.build());
@@ -94,6 +95,9 @@ public class AgpClient implements Closeable {
     params.put("text", text);
     if (typeKeywords!=null) {
       params.put("typeKeywords", Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")));
+    }
+    if (tags!=null) {
+      params.put("tags", Arrays.asList(tags).stream().collect(Collectors.joining(",")));
     }
     params.put("token", token);
     
@@ -111,12 +115,13 @@ public class AgpClient implements Closeable {
    * @param url URL
    * @param itemType item type (must be a URL type)
    * @param typeKeywords type keywords
+   * @param tags tags tags
    * @param token token
    * @return add item response
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse addItem(String username, String folderId, String title, String description, URL url, ItemType itemType, String [] typeKeywords, String token) throws IOException, URISyntaxException {
+  public ItemResponse addItem(String username, String folderId, String title, String description, URL url, ItemType itemType, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(addItemUri(username, StringUtils.trimToNull(folderId)));
     
     HttpPost req = new HttpPost(builder.build());
@@ -128,6 +133,9 @@ public class AgpClient implements Closeable {
     params.put("url", url.toExternalForm());
     if (typeKeywords!=null) {
       params.put("typeKeywords", Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")));
+    }
+    if (tags!=null) {
+      params.put("tags", Arrays.asList(tags).stream().collect(Collectors.joining(",")));
     }
     params.put("token", token);
     
@@ -146,12 +154,13 @@ public class AgpClient implements Closeable {
    * @param text text
    * @param itemType item type (must be a URL type)
    * @param typeKeywords type keywords
+   * @param tags tags tags
    * @param token token
    * @return add item response
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse updateItem(String username, String folderId, String itemId, String title, String description, String text, ItemType itemType, String [] typeKeywords, String token) throws IOException, URISyntaxException {
+  public ItemResponse updateItem(String username, String folderId, String itemId, String title, String description, String text, ItemType itemType, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(updateItemUri(username, StringUtils.trimToNull(folderId), itemId));
     
     HttpPost req = new HttpPost(builder.build());
@@ -163,6 +172,9 @@ public class AgpClient implements Closeable {
     params.put("text", text);
     if (typeKeywords!=null) {
       params.put("typeKeywords", Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")));
+    }
+    if (tags!=null) {
+      params.put("tags", Arrays.asList(tags).stream().collect(Collectors.joining(",")));
     }
     params.put("token", token);
     
@@ -181,12 +193,13 @@ public class AgpClient implements Closeable {
    * @param url URL
    * @param itemType item type (must be a URL type)
    * @param typeKeywords type keywords
+   * @param tags tags tags
    * @param token token
    * @return add item response
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse updateItem(String username, String folderId, String itemId, String title, String description, URL url, ItemType itemType, String [] typeKeywords, String token) throws IOException, URISyntaxException {
+  public ItemResponse updateItem(String username, String folderId, String itemId, String title, String description, URL url, ItemType itemType, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(updateItemUri(username, StringUtils.trimToNull(folderId), itemId));
     
     HttpPost req = new HttpPost(builder.build());
@@ -198,6 +211,9 @@ public class AgpClient implements Closeable {
     params.put("url", url.toExternalForm());
     if (typeKeywords!=null) {
       params.put("typeKeywords", Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")));
+    }
+    if (tags!=null) {
+      params.put("tags", Arrays.asList(tags).stream().collect(Collectors.joining(",")));
     }
     params.put("token", token);
     
