@@ -92,7 +92,9 @@ public class AgpClient implements Closeable {
     params.put("description", description);
     params.put("type", itemType.getTypeName());
     params.put("text", text);
-    params.put("typeKeywords", typeKeywords!=null? Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")):"");
+    if (typeKeywords!=null) {
+      params.put("typeKeywords", Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")));
+    }
     params.put("token", token);
     
     req.setEntity(createEntity(params));
@@ -124,7 +126,9 @@ public class AgpClient implements Closeable {
     params.put("description", description);
     params.put("type", itemType.getTypeName());
     params.put("url", url.toExternalForm());
-    params.put("typeKeywords", typeKeywords!=null? Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")):"");
+    if (typeKeywords!=null) {
+      params.put("typeKeywords", Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")));
+    }
     params.put("token", token);
     
     req.setEntity(createEntity(params));
@@ -157,7 +161,9 @@ public class AgpClient implements Closeable {
     params.put("description", description);
     params.put("type", itemType.getTypeName());
     params.put("text", text);
-    params.put("typeKeywords", typeKeywords!=null? Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")):"");
+    if (typeKeywords!=null) {
+      params.put("typeKeywords", Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")));
+    }
     params.put("token", token);
     
     req.setEntity(createEntity(params));
@@ -190,7 +196,9 @@ public class AgpClient implements Closeable {
     params.put("description", description);
     params.put("type", itemType.getTypeName());
     params.put("url", url.toExternalForm());
-    params.put("typeKeywords", typeKeywords!=null? Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")):"");
+    if (typeKeywords!=null) {
+      params.put("typeKeywords", Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")));
+    }
     params.put("token", token);
     
     req.setEntity(createEntity(params));
