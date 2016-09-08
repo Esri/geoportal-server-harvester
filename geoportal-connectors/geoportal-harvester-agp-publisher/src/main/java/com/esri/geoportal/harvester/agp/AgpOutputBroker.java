@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.agp;
 
 import com.esri.geoportal.commons.agp.client.AgpClient;
 import com.esri.geoportal.commons.agp.client.DataType;
+import com.esri.geoportal.commons.agp.client.ItemEntry;
 import com.esri.geoportal.commons.agp.client.ItemResponse;
 import com.esri.geoportal.commons.agp.client.ItemType;
 import com.esri.geoportal.commons.agp.client.QueryResponse;
@@ -133,9 +134,15 @@ import org.xml.sax.SAXException;
 
           return PublishingStatus.CREATED;
         } else if (search.results[0].owner.equals(definition.getCredentials().getUserName())) {
+          ItemEntry itemEntry = client.readItem(search.results[0].id, token);
+          if (itemEntry==null) {
+            throw new DataOutputException(this, String.format("Unable to read item entry."));
+          }
           // update item if does exist
           ItemResponse response = updateItem(
                   search.results[0].id,
+                  itemEntry.owner,
+                  itemEntry.ownerFolder,
                   getAttributeValue(attributes, "title", null),
                   getAttributeValue(attributes, "description", null),
                   resourceUrl, itemType, typeKeywords);
@@ -210,9 +217,11 @@ import org.xml.sax.SAXException;
             url, itemType, typeKeywords, null, token);
   }
 
-  private ItemResponse updateItem(String id, String title, String description, URL url, ItemType itemType, String[] typeKeywords) throws IOException, URISyntaxException {
+  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, ItemType itemType, String[] typeKeywords) throws IOException, URISyntaxException {
     ItemResponse response = updateItem(
             id,
+            owner,
+            folderId,
             title,
             description,
             url, itemType, typeKeywords, token);
@@ -220,6 +229,8 @@ import org.xml.sax.SAXException;
       token = generateToken();
       response = updateItem(
               id,
+              owner,
+              folderId,
               title,
               description,
               url, itemType, typeKeywords, token);
@@ -227,10 +238,10 @@ import org.xml.sax.SAXException;
     return response;
   }
 
-  private ItemResponse updateItem(String id, String title, String description, URL url, ItemType itemType, String[] typeKeywords, String token) throws IOException, URISyntaxException {
+  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, ItemType itemType, String[] typeKeywords, String token) throws IOException, URISyntaxException {
     return client.updateItem(
-            definition.getCredentials().getUserName(),
-            definition.getFolderId(),
+            owner,
+            folderId,
             id,
             title,
             description,

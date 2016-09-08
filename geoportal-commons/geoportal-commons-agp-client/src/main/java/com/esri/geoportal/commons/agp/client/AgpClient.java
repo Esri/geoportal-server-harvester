@@ -184,6 +184,27 @@ public class AgpClient implements Closeable {
   }
 
   /**
+   * Reads item information.
+   * @param itemId item id
+   * @param token token
+   * @return item entry
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public ItemEntry readItem(String itemId, String token) throws IOException, URISyntaxException {
+    URIBuilder builder = new URIBuilder(itemInfoUri(itemId));
+    
+    
+    builder.setParameter("f", "json");
+    if (token!=null) {
+      builder.setParameter("token", token);
+    }
+    HttpGet req = new HttpGet(builder.build());
+    
+    return execute(req,ItemEntry.class);
+  }
+  
+  /**
    * Adds item.
    * @param username user name
    * @param folderId folder id
@@ -343,6 +364,15 @@ public class AgpClient implements Closeable {
     req.setEntity(createEntity(params));
 
     return execute(req,TokenResponse.class);
+  }
+  
+  private URI itemInfoUri(String itemId) throws URISyntaxException {
+    URIBuilder builder = new URIBuilder();
+    builder.setScheme(rootUrl.toURI().getScheme())
+           .setHost(rootUrl.toURI().getHost())
+           .setPort(rootUrl.toURI().getPort())
+           .setPath(rootUrl.toURI().getPath() + "sharing/content/items/" + itemId);
+    return builder.build();
   }
   
   private URI updateItemUri(String username, String folderId, String itemId) throws URISyntaxException {
