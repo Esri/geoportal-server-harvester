@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.agp;
 
 import com.esri.geoportal.commons.meta.MetaAnalyzer;
+import static com.esri.geoportal.harvester.agp.AgpOutputBrokerDefinitionAdaptor.P_FOLDER_CLEANUP;
 import static com.esri.geoportal.harvester.agp.AgpOutputBrokerDefinitionAdaptor.P_FOLDER_ID;
 import static com.esri.geoportal.harvester.agp.AgpOutputBrokerDefinitionAdaptor.P_HOST_URL;
 import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
@@ -64,6 +65,7 @@ public class AgpOutputConnector implements OutputConnector<OutputBroker> {
         return true;
       }
     });
+    args.add(new UITemplate.BooleanArgument(P_FOLDER_CLEANUP, "Perform cleanup"));
     return new UITemplate(getType(), "ArcGIS Portal", args);
   }
   

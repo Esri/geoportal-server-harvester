@@ -30,11 +30,13 @@ import org.apache.commons.lang3.StringUtils;
 /*package*/ class AgpOutputBrokerDefinitionAdaptor  extends BrokerDefinitionAdaptor {
   public static final String P_HOST_URL    = "agp-host-url";
   public static final String P_FOLDER_ID   = "agp-folder-id";
-  
+  public static final String P_FOLDER_CLEANUP = "agp-folder-cleanup";
+
   private final CredentialsDefinitionAdaptor credAdaptor;
   
   private URL hostUrl;
   private String folderId;
+  private boolean cleanup;
 
   /**
    * Creates instance of the adaptor.
@@ -55,6 +57,7 @@ import org.apache.commons.lang3.StringUtils;
         throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
       }
       folderId = get(P_FOLDER_ID);
+      cleanup  = Boolean.parseBoolean(get(P_FOLDER_CLEANUP));
     }
   }
   
@@ -106,6 +109,23 @@ import org.apache.commons.lang3.StringUtils;
    */
   public void setCredentials(SimpleCredentials cred) {
     credAdaptor.setCredentials(cred);
+  }
+
+  /**
+   * Gets permission to cleanup.
+   * @return <code>true</code> if cleanup permitted
+   */
+  public boolean getCleanup() {
+    return cleanup;
+  }
+
+  /**
+   * Sets permission to cleanup.
+   * @param cleanup <code>true</code> to permit cleanup
+   */
+  public void setCleanup(boolean cleanup) {
+    this.cleanup = cleanup;
+    set(P_FOLDER_CLEANUP, Boolean.toString(cleanup));
   }
   
   
