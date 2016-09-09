@@ -256,11 +256,11 @@ import org.xml.sax.SAXException;
   }
 
   private String generateToken(int minutes) throws URISyntaxException, IOException {
-    return client.generateToken(minutes, definition.getCredentials()).token;
+    return client.generateToken(minutes).token;
   }
 
   private String generateToken() throws URISyntaxException, IOException {
-    return client.generateToken(60, definition.getCredentials()).token;
+    return client.generateToken(60).token;
   }
 
   @Override
@@ -275,7 +275,7 @@ import org.xml.sax.SAXException;
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
-    this.client = new AgpClient(definition.getHostUrl());
+    this.client = new AgpClient(definition.getHostUrl(),definition.getCredentials());
     if(definition.getCleanup()) {
       try {
         String src_source_uri_s = URLEncoder.encode(context.getTask().getDataSource().getBrokerUri().toASCIIString(), "UTF-8");

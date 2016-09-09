@@ -52,14 +52,17 @@ public class AgpClient implements Closeable {
   private static final String QUERY_EXTRAS = "-type:\"Layer\" -type: \"Map Document\" -type:\"Map Package\" -type:\"Basemap Package\" -type:\"Mobile Basemap Package\" -type:\"Mobile Map Package\" -type:\"ArcPad Package\" -type:\"Project Package\" -type:\"Project Template\" -type:\"Desktop Style\" -type:\"Pro Map\" -type:\"Layout\" -type:\"Explorer Map\" -type:\"Globe Document\" -type:\"Scene Document\" -type:\"Published Map\" -type:\"Map Template\" -type:\"Windows Mobile Package\" -type:\"Layer Package\" -type:\"Explorer Layer\" -type:\"Geoprocessing Package\" -type:\"Desktop Application Template\" -type:\"Code Sample\" -type:\"Geoprocessing Package\" -type:\"Geoprocessing Sample\" -type:\"Locator Package\" -type:\"Workflow Manager Package\" -type:\"Windows Mobile Package\" -type:\"Explorer Add In\" -type:\"Desktop Add In\" -type:\"File Geodatabase\" -type:\"Feature Collection Template\" -type:\"Code Attachment\" -type:\"Featured Items\" -type:\"Symbol Set\" -type:\"Color Set\" -type:\"Windows Viewer Add In\" -type:\"Windows Viewer Configuration\"";
   
   private final URL rootUrl;
+  private final SimpleCredentials credentials;
   private final CloseableHttpClient httpClient;
   
   /**
    * Creates instance of the client.
    * @param rootUrl root URL
+   * @param credentials credentials
    */
-  public AgpClient(URL rootUrl) {
+  public AgpClient(URL rootUrl, SimpleCredentials credentials) {
     this.rootUrl = adjustUrl(rootUrl);
+    this.credentials = credentials;
     this.httpClient = HttpClients.createDefault();
   }
 
@@ -70,8 +73,8 @@ public class AgpClient implements Closeable {
 
   /**
    * Adds item.
-   * @param username user name
-   * @param folderId folder id
+   * @param owner owner
+   * @param folderId folder id (optional)
    * @param title title
    * @param description description
    * @param text text
@@ -83,8 +86,8 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse addItem(String username, String folderId, String title, String description, String text, ItemType itemType, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
-    URIBuilder builder = new URIBuilder(addItemUri(username, StringUtils.trimToNull(folderId)));
+  public ItemResponse addItem(String owner, String folderId, String title, String description, String text, ItemType itemType, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+    URIBuilder builder = new URIBuilder(addItemUri(owner, StringUtils.trimToNull(folderId)));
     
     HttpPost req = new HttpPost(builder.build());
     HashMap<String, String> params = new HashMap<>();
@@ -108,8 +111,8 @@ public class AgpClient implements Closeable {
 
   /**
    * Adds item.
-   * @param username user name
-   * @param folderId folder id
+   * @param owner user name
+   * @param folderId folder id (optional)
    * @param title title
    * @param description description
    * @param url URL
@@ -121,8 +124,8 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse addItem(String username, String folderId, String title, String description, URL url, ItemType itemType, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
-    URIBuilder builder = new URIBuilder(addItemUri(username, StringUtils.trimToNull(folderId)));
+  public ItemResponse addItem(String owner, String folderId, String title, String description, URL url, ItemType itemType, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+    URIBuilder builder = new URIBuilder(addItemUri(owner, StringUtils.trimToNull(folderId)));
     
     HttpPost req = new HttpPost(builder.build());
     HashMap<String, String> params = new HashMap<>();
@@ -146,8 +149,8 @@ public class AgpClient implements Closeable {
 
   /**
    * Updates item item.
-   * @param username user name
-   * @param folderId folder id
+   * @param owner user name
+   * @param folderId folder id (optional)
    * @param itemId item id
    * @param title title
    * @param description description
@@ -160,8 +163,8 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse updateItem(String username, String folderId, String itemId, String title, String description, String text, ItemType itemType, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
-    URIBuilder builder = new URIBuilder(updateItemUri(username, StringUtils.trimToNull(folderId), itemId));
+  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, String text, ItemType itemType, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+    URIBuilder builder = new URIBuilder(updateItemUri(owner, StringUtils.trimToNull(folderId), itemId));
     
     HttpPost req = new HttpPost(builder.build());
     HashMap<String, String> params = new HashMap<>();
@@ -206,8 +209,8 @@ public class AgpClient implements Closeable {
   
   /**
    * Adds item.
-   * @param username user name
-   * @param folderId folder id
+   * @param owner user name
+   * @param folderId folder id (optional)
    * @param itemId item id
    * @param title title
    * @param description description
@@ -220,8 +223,8 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse updateItem(String username, String folderId, String itemId, String title, String description, URL url, ItemType itemType, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
-    URIBuilder builder = new URIBuilder(updateItemUri(username, StringUtils.trimToNull(folderId), itemId));
+  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, URL url, ItemType itemType, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+    URIBuilder builder = new URIBuilder(updateItemUri(owner, StringUtils.trimToNull(folderId), itemId));
     
     HttpPost req = new HttpPost(builder.build());
     HashMap<String, String> params = new HashMap<>();
@@ -245,8 +248,8 @@ public class AgpClient implements Closeable {
   
   /**
    * Sharing item.
-   * @param username user name
-   * @param folderId folder id
+   * @param owner user name
+   * @param folderId folder id (optional)
    * @param itemId item id
    * @param everyone <code>true</code> to share with everyone
    * @param org <code>true</code> to share with group
@@ -256,8 +259,8 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ShareResponse share(String username, String folderId, String itemId, boolean everyone, boolean org, String [] groups, String token)  throws URISyntaxException, IOException {
-    URIBuilder builder = new URIBuilder(shareUri(username, folderId, itemId));
+  public ShareResponse share(String owner, String folderId, String itemId, boolean everyone, boolean org, String [] groups, String token)  throws URISyntaxException, IOException {
+    URIBuilder builder = new URIBuilder(shareUri(owner, folderId, itemId));
     
     HttpPost req = new HttpPost(builder.build());
     HashMap<String, String> params = new HashMap<>();
@@ -274,7 +277,7 @@ public class AgpClient implements Closeable {
   
   /**
    * Deletes item.
-   * @param username user name
+   * @param owner owner
    * @param folderId folder id
    * @param itemId item id
    * @param token token
@@ -282,8 +285,8 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public DeleteResponse delete(String username, String folderId, String itemId, String token)  throws URISyntaxException, IOException {
-    URIBuilder builder = new URIBuilder(deleteUri(username, folderId, itemId));
+  public DeleteResponse delete(String owner, String folderId, String itemId, String token)  throws URISyntaxException, IOException {
+    URIBuilder builder = new URIBuilder(deleteUri(owner, folderId, itemId));
     
     builder.setParameter("f", "json");
     builder.setParameter("token", token);
@@ -295,8 +298,8 @@ public class AgpClient implements Closeable {
   
   /**
    * Lists content.
-   * @param username user name
-   * @param folder folder (optional)
+   * @param owner owner
+   * @param folderId folder id (optional)
    * @param num number items to return
    * @param start start item
    * @param token token (optional)
@@ -304,8 +307,8 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ContentResponse listContent(String username, String folder, long num, long start, String token) throws URISyntaxException, IOException {
-    URIBuilder builder = new URIBuilder(userUri(username, folder));
+  public ContentResponse listContent(String owner, String folderId, long num, long start, String token) throws URISyntaxException, IOException {
+    URIBuilder builder = new URIBuilder(userUri(owner, folderId));
     
     builder.setParameter("f", "json");
     if (token!=null) {
@@ -343,18 +346,17 @@ public class AgpClient implements Closeable {
    * Generates token.
    *
    * @param minutes expiration in minutes.
-   * @param credentials credentials.
    * @return token response
    * @throws URISyntaxException if invalid URL
    * @throws IOException if accessing token fails
    */
-  public TokenResponse generateToken(int minutes, SimpleCredentials credentials) throws URISyntaxException, IOException {
+  public TokenResponse generateToken(int minutes) throws URISyntaxException, IOException {
     HttpPost req = new HttpPost(generateTokenUri());
     
     HashMap<String, String> params = new HashMap<>();
     params.put("f", "json");
     if (credentials != null) {
-      params.put("username", StringUtils.trimToEmpty(credentials.getUserName()));
+      params.put("owner", StringUtils.trimToEmpty(credentials.getUserName()));
       params.put("password", StringUtils.trimToEmpty(credentials.getPassword()));
     }
     params.put("client", "referer");
@@ -375,48 +377,48 @@ public class AgpClient implements Closeable {
     return builder.build();
   }
   
-  private URI updateItemUri(String username, String folderId, String itemId) throws URISyntaxException {
+  private URI updateItemUri(String owner, String folderId, String itemId) throws URISyntaxException {
     URIBuilder builder = new URIBuilder();
     builder.setScheme(rootUrl.toURI().getScheme())
            .setHost(rootUrl.toURI().getHost())
            .setPort(rootUrl.toURI().getPort())
-           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folderId!=null? "/" +folderId: "") +"/items/" + itemId + "/update");
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + owner + (folderId!=null? "/" +folderId: "") +"/items/" + itemId + "/update");
     return builder.build();
   }
 
-  private URI addItemUri(String username, String folderId) throws URISyntaxException {
+  private URI addItemUri(String owner, String folderId) throws URISyntaxException {
     URIBuilder builder = new URIBuilder();
     builder.setScheme(rootUrl.toURI().getScheme())
            .setHost(rootUrl.toURI().getHost())
            .setPort(rootUrl.toURI().getPort())
-           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folderId!=null? "/" +folderId: "") +"/addItem");
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + owner + (folderId!=null? "/" +folderId: "") +"/addItem");
     return builder.build();
   }
   
-  private URI shareUri(String username, String folderId, String itemId) throws URISyntaxException {
+  private URI shareUri(String owner, String folderId, String itemId) throws URISyntaxException {
     URIBuilder builder = new URIBuilder();
     builder.setScheme(rootUrl.toURI().getScheme())
            .setHost(rootUrl.toURI().getHost())
            .setPort(rootUrl.toURI().getPort())
-           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folderId!=null? "/" +folderId: "") +"/items/" + itemId + "/share");
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + owner + (folderId!=null? "/" +folderId: "") +"/items/" + itemId + "/share");
     return builder.build();
   }
   
-  private URI deleteUri(String username, String folderId, String itemId) throws URISyntaxException {
+  private URI deleteUri(String owner, String folderId, String itemId) throws URISyntaxException {
     URIBuilder builder = new URIBuilder();
     builder.setScheme(rootUrl.toURI().getScheme())
            .setHost(rootUrl.toURI().getHost())
            .setPort(rootUrl.toURI().getPort())
-           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folderId!=null? "/" +folderId: "") +"/items/" + itemId + "/delete");
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + owner + (folderId!=null? "/" +folderId: "") +"/items/" + itemId + "/delete");
     return builder.build();
   }
   
-  private URI userUri(String username, String folderId) throws URISyntaxException {
+  private URI userUri(String owner, String folderId) throws URISyntaxException {
     URIBuilder builder = new URIBuilder();
     builder.setScheme(rootUrl.toURI().getScheme())
            .setHost(rootUrl.toURI().getHost())
            .setPort(rootUrl.toURI().getPort())
-           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + username + (folderId!=null? "/"+folderId: ""));
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + owner + (folderId!=null? "/"+folderId: ""));
     return builder.build();
   }
   
