@@ -356,7 +356,7 @@ public class AgpClient implements Closeable {
     HashMap<String, String> params = new HashMap<>();
     params.put("f", "json");
     if (credentials != null) {
-      params.put("owner", StringUtils.trimToEmpty(credentials.getUserName()));
+      params.put("username", StringUtils.trimToEmpty(credentials.getUserName()));
       params.put("password", StringUtils.trimToEmpty(credentials.getPassword()));
     }
     params.put("client", "referer");
@@ -432,7 +432,8 @@ public class AgpClient implements Closeable {
   }
   
   private URI generateTokenUri() throws URISyntaxException {
-    return rootUrl.toURI().resolve("sharing/generateToken");
+    URI uri = rootUrl.toURI().resolve("sharing/rest/generateToken");
+    return new URI("https", uri.getSchemeSpecificPart(), uri.getFragment());
   }
   
   private HttpEntity createEntity(Map<String, String> params) throws UnsupportedEncodingException {
