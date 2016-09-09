@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.agp;
 
 import com.esri.geoportal.commons.agp.client.AgpClient;
 import com.esri.geoportal.commons.agp.client.DataType;
+import com.esri.geoportal.commons.agp.client.DeleteResponse;
 import com.esri.geoportal.commons.agp.client.ItemEntry;
 import com.esri.geoportal.commons.agp.client.ItemResponse;
 import com.esri.geoportal.commons.agp.client.ItemType;
@@ -201,11 +202,14 @@ import org.xml.sax.SAXException;
   }
 
   private ItemResponse addItem(String title, String description, URL url, ItemType itemType, String[] typeKeywords) throws IOException, URISyntaxException {
+    if (token==null) {
+      token = generateToken();
+    }
     ItemResponse response = addItem(
             title,
             description,
             url, itemType, typeKeywords, token);
-    if (!response.success && response.error != null && response.error.code == 498) {
+    if (response.error != null && response.error.code == 498) {
       token = generateToken();
       response = addItem(
               title,
@@ -225,6 +229,9 @@ import org.xml.sax.SAXException;
   }
 
   private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, ItemType itemType, String[] typeKeywords) throws IOException, URISyntaxException {
+    if (token==null) {
+      token = generateToken();
+    }
     ItemResponse response = updateItem(
             id,
             owner,
@@ -232,7 +239,7 @@ import org.xml.sax.SAXException;
             title,
             description,
             url, itemType, typeKeywords, token);
-    if (!response.success && response.error != null && response.error.code == 498) {
+    if (response.error != null && response.error.code == 498) {
       token = generateToken();
       response = updateItem(
               id,
@@ -253,6 +260,22 @@ import org.xml.sax.SAXException;
             title,
             description,
             url, itemType, typeKeywords, null, token);
+  }
+  
+  private DeleteResponse deleteItem(String id, String owner, String folderId) throws URISyntaxException, IOException {
+    if (token==null) {
+      token = generateToken();
+    }
+    DeleteResponse response = deleteItem(id, owner, folderId, token);
+    if (response.error != null && response.error.code == 498) {
+      token = generateToken();
+      response = deleteItem(id, owner, folderId, token);
+    }
+    return response;
+  }
+  
+  private DeleteResponse deleteItem(String id, String owner, String folderId, String token) throws URISyntaxException, IOException {
+    return client.delete(id, owner, folderId, token);
   }
 
   private String generateToken(int minutes) throws URISyntaxException, IOException {
@@ -298,12 +321,14 @@ import org.xml.sax.SAXException;
   public void terminate() {
     try {
       if(definition.getCleanup()) {
+        token = generateToken();
         for (String id: existing) {
-          // TODO: delete existing items
+          ItemEntry item = client.readItem(id, token);
+          deleteItem(item.id, item.owner, item.ownerFolder);
         }
       }
       client.close();
-    } catch (IOException ex) {
+    } catch (IOException|URISyntaxException ex) {
       LOG.error(String.format("Error terminating broker."), ex);
     }
   }

@@ -21,6 +21,7 @@ package com.esri.geoportal.commons.agp.client;
 public class DeleteResponse {
   public String itemId;
   public boolean success;
+  public ErrorInfo error;
   
   @Override
   public String toString() {
