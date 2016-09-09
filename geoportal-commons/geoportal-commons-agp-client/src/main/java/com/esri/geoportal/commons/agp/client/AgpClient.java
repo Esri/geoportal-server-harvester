@@ -356,7 +356,7 @@ public class AgpClient implements Closeable {
     HashMap<String, String> params = new HashMap<>();
     params.put("f", "json");
     if (credentials != null) {
-      params.put("owner", StringUtils.trimToEmpty(credentials.getUserName()));
+      params.put("username", StringUtils.trimToEmpty(credentials.getUserName()));
       params.put("password", StringUtils.trimToEmpty(credentials.getPassword()));
     }
     params.put("client", "referer");
