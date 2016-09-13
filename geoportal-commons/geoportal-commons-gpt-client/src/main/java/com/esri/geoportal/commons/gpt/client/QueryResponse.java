@@ -30,5 +30,11 @@ import java.util.List;
   
   public static final class Hit {
     public String _id;
+    public Source _source;
+  }
+  
+  public static final class Source {
+    public String src_uri_s;
+    public String src_lastupdate_dt;
   }
 }

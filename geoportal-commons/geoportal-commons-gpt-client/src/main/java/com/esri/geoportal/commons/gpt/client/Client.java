@@ -24,11 +24,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
@@ -157,9 +161,29 @@ public class Client implements Closeable {
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  public List<String> list(long from, long size)  throws URISyntaxException, IOException {
+  public List<EntryRef> list(long from, long size)  throws URISyntaxException, IOException {
     QueryResponse result = query(null,null,from,size);
-    return result!=null && result.hits!=null && result.hits.hits!=null && !result.hits.hits.isEmpty()? result.hits.hits.stream().map(h->h._id).collect(Collectors.toList()): null;
+    return result!=null && result.hits!=null && result.hits.hits!=null && !result.hits.hits.isEmpty()? 
+            result.hits.hits.stream().map(h->new EntryRef(h._id, readUri(h._source), readLastUpdated(h._source))).collect(Collectors.toList()): 
+            null;
+  }
+  
+  private URI readUri(QueryResponse.Source source) {
+    if (source!=null && source.src_uri_s!=null) {
+      try {
+        return new URI(source.src_uri_s);
+      } catch (Exception ex) {}
+    }
+    return null;
+  }
+  
+  private Date readLastUpdated(QueryResponse.Source source) {
+    if (source!=null && source.src_lastupdate_dt!=null) {
+      try {
+        return Date.from(ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(source.src_lastupdate_dt)).toInstant());
+      } catch (Exception ex) {}
+    }
+    return null;
   }
 
   /**
