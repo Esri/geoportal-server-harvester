@@ -19,6 +19,7 @@
         <module>geoportal-harvester-ags</module>
         <module>geoportal-harvester-agp-publisher</module>
         <module>geoportal-harvester-agp-source</module>
+        <module>geoportal-harvester-gptsrc</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
