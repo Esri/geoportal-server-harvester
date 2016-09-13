@@ -129,6 +129,38 @@ public class Client implements Closeable {
       return mapper.readValue(responseContent, PublishResponse.class);
     }
   }
+  
+  /**
+   * Reads metadata.
+   * @param id id of the metadata
+   * @return string representing metadata
+   * @throws URISyntaxException if invalid URI
+   * @throws IOException if reading metadata fails
+   */
+  public String read(String id) throws URISyntaxException, IOException {
+    HttpGet get = new HttpGet(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/xml"));
+    HttpClientContext context = createHttpClientContext(url, cred);
+    HttpResponse httpResponse = httpClient.execute(get, context);
+    String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
+    try (InputStream contentStream = httpResponse.getEntity().getContent();) {
+      String responseContent = IOUtils.toString(contentStream, "UTF-8");
+      LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
+      return responseContent;
+    }
+  }
+  
+  /**
+   * Returns list of ids.
+   * @param from starting from the particular index (0-based)
+   * @param size size of the returned set
+   * @return list of ids or <code>null</code> if no more ids.
+   * @throws IOException if reading response fails
+   * @throws URISyntaxException if URL has invalid syntax
+   */
+  public List<String> list(long from, long size)  throws URISyntaxException, IOException {
+    QueryResponse result = query(null,null,from,size);
+    return result!=null && result.hits!=null && result.hits.hits!=null && !result.hits.hits.isEmpty()? result.hits.hits.stream().map(h->h._id).collect(Collectors.toList()): null;
+  }
 
   /**
    * Query items by src_source_uri_s.
@@ -227,7 +259,9 @@ public class Client implements Closeable {
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
     HttpGet get = new HttpGet(url.toURI().resolve(REST_SEARCH_URL).toASCIIString() + 
-            String.format("?q=%s:%s&from=%d&size=%d", term, URLEncoder.encode("\"" + value + "\"", "UTF-8"), from, size));
+            String.format("?from=%d&size=%d", from, size) +
+            (term!=null && value!=null? String.format("&q=%s:%s", term, URLEncoder.encode("\"" + value + "\"", "UTF-8")): ""));
+    
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("Content-Type", "application/json");
 
