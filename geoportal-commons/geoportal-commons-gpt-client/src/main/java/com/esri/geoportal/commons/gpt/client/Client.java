@@ -42,7 +42,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
@@ -123,8 +123,7 @@ public class Client implements Closeable {
         throw new IOException(String.format("Error updating item: %s", data.src_uri_s));
     }
 
-    HttpClientContext context = createHttpClientContext(url, cred);
-    HttpResponse httpResponse = httpClient.execute(request, context);
+    HttpResponse httpResponse = execute(request);
     String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
 
     try (InputStream contentStream = httpResponse.getEntity().getContent();) {
@@ -143,8 +142,7 @@ public class Client implements Closeable {
    */
   public String read(String id) throws URISyntaxException, IOException {
     HttpGet get = new HttpGet(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/xml"));
-    HttpClientContext context = createHttpClientContext(url, cred);
-    HttpResponse httpResponse = httpClient.execute(get, context);
+    HttpResponse httpResponse = execute(get);
     String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
     try (InputStream contentStream = httpResponse.getEntity().getContent();) {
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
@@ -166,6 +164,10 @@ public class Client implements Closeable {
     return result!=null && result.hits!=null && result.hits.hits!=null && !result.hits.hits.isEmpty()? 
             result.hits.hits.stream().map(h->new EntryRef(h._id, readUri(h._source), readLastUpdated(h._source))).collect(Collectors.toList()): 
             null;
+  }
+  
+  private HttpResponse execute(HttpUriRequest request) throws IOException {
+    return cred!=null? httpClient.execute(request, createHttpClientContext(url, cred)): httpClient.execute(request);
   }
   
   private URI readUri(QueryResponse.Source source) {
@@ -211,8 +213,7 @@ public class Client implements Closeable {
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     HttpDelete del = new HttpDelete(url.toURI().resolve(REST_ITEM_URL + "/" + id));
     del.setConfig(DEFAULT_REQUEST_CONFIG);
-    HttpClientContext context = createHttpClientContext(url, cred);
-    HttpResponse httpResponse = httpClient.execute(del, context);
+    HttpResponse httpResponse = execute(del);
     String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
 
     try (InputStream contentStream = httpResponse.getEntity().getContent();) {
@@ -289,8 +290,7 @@ public class Client implements Closeable {
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("Content-Type", "application/json");
 
-    HttpClientContext context = createHttpClientContext(url, cred);
-    HttpResponse httpResponse = httpClient.execute(get, context);
+    HttpResponse httpResponse = execute(get);
     String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
 
     try (InputStream contentStream = httpResponse.getEntity().getContent();) {
