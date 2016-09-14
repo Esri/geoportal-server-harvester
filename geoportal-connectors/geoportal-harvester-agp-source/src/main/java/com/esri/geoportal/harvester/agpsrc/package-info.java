@@ -16,4 +16,4 @@
 /**
  * ArcGIS Portal input broker.
  */
-package com.esri.geoportal.harvester.agp;
+package com.esri.geoportal.harvester.agpsrc;

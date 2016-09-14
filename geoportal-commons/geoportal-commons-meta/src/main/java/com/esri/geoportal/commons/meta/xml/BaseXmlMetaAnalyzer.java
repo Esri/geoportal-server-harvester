@@ -63,13 +63,14 @@ public abstract class BaseXmlMetaAnalyzer implements MetaAnalyzer {
   /**
    * Creates instance of the handler.
    * @param decoderXslt decoder xslt
+   * @param interrogator XPath for interrogation
    * @throws java.io.IOException if error reading xslt
    * @throws javax.xml.transform.TransformerConfigurationException if error compiling xslt
    * @throws XPathExpressionException if invalid xpath.
    */
-  public BaseXmlMetaAnalyzer(String decoderXslt, String intergoator) throws IOException, TransformerConfigurationException, XPathExpressionException {
+  public BaseXmlMetaAnalyzer(String decoderXslt, String interrogator) throws IOException, TransformerConfigurationException, XPathExpressionException {
     xsltDecodeDC = loadTransformer(decoderXslt);
-    this.xPath = createExpression(intergoator);
+    this.xPath = createExpression(interrogator);
   }
 
   @Override
