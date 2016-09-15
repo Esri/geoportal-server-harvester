@@ -78,12 +78,17 @@ import java.util.Date;
 
   @Override
   public Iterator iterator(Map<String, Object> attributes) throws DataInputException {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return new AgpIterator();
   }
 
   @Override
   public URI getBrokerUri() throws URISyntaxException {
     return new URI("AGP", definition.getHostUrl().toExternalForm(), null);
+  }
+
+  @Override
+  public String toString() {
+    return String.format("AGPSRC [%s]", definition.getHostUrl());
   }
 
   private String generateToken(int minutes) throws URISyntaxException, IOException {
