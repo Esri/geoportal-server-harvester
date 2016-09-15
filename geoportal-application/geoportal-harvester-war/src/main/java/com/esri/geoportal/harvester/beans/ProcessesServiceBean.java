@@ -15,10 +15,17 @@
  */
 package com.esri.geoportal.harvester.beans;
 
+import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.engine.defaults.DefaultProcessesService;
 import com.esri.geoportal.harvester.engine.managers.ProcessManager;
 import com.esri.geoportal.harvester.engine.managers.ReportManager;
 import com.esri.geoportal.harvester.engine.registers.StatisticsRegistry;
+import com.esri.geoportal.harvester.engine.utils.CrudlException;
+import java.util.Map;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +34,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ProcessesServiceBean extends DefaultProcessesService {
+  private static final Logger LOG = LoggerFactory.getLogger(ProcessesServiceBean.class);
 
   /**
    * Creates instance of the bean.
@@ -37,6 +45,26 @@ public class ProcessesServiceBean extends DefaultProcessesService {
   @Autowired
   public ProcessesServiceBean(ProcessManager processManager, ReportManager reportManager, StatisticsRegistry statisticsRegistry) {
     super(processManager, reportManager, statisticsRegistry);
+  }
+  
+  /**
+   * Initializes bean.
+   */
+  @PostConstruct
+  public void init() {
+    LOG.info("ProcessesServiceBean initialized.");
+  }
+  
+  /**
+   * Destroys bean.
+   */
+  @PreDestroy
+  public void destroy() {
+    try {
+      processManager.list().stream().map(Map.Entry::getValue).forEach(ProcessInstance::abort);
+    } catch (CrudlException ex) {
+    }
+    LOG.info(String.format("ProcessesServiceBean destroyed."));
   }
   
 }
