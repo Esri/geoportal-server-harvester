@@ -74,7 +74,7 @@ import org.apache.commons.lang3.StringUtils;
 
         case Disallow:
           if (currentSection != null) {
-            boolean access = entry.getValue().isEmpty();
+            boolean access = !entry.getValue().isEmpty()? false: true;
             currentSection.addAccess(new AccessImpl(new AccessPath(entry.getValue()), access));
             startSection = false;
           }
@@ -82,7 +82,7 @@ import org.apache.commons.lang3.StringUtils;
 
         case Allow:
           if (currentSection != null) {
-            boolean access = !entry.getValue().isEmpty();
+            boolean access = !entry.getValue().isEmpty()? true: false;
             currentSection.addAccess(new AccessImpl(new AccessPath(entry.getValue()), access));
             startSection = false;
           }
