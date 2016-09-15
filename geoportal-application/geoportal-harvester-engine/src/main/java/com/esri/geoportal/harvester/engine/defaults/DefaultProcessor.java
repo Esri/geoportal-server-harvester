@@ -101,7 +101,9 @@ public class DefaultProcessor implements Processor {
      */
     private void terminate() {
       if (!Thread.currentThread().isInterrupted()) {
-        task.getDataDestinations().stream().forEach(Link::terminate);
+        for (Link link: task.getDataDestinations()) {
+          link.terminate();
+        }
         task.getDataSource().terminate();
       }
     }
@@ -153,6 +155,7 @@ public class DefaultProcessor implements Processor {
             terminate();
             completed = true;
             aborting = false;
+            Thread.interrupted();
             onStatusChange();
           }
         }
@@ -234,7 +237,9 @@ public class DefaultProcessor implements Processor {
      * @param ex output exception
      */
     private void onError(DataOutputException ex) {
-      listeners.forEach(l -> l.onError(ex));
+      listeners.forEach(l -> {
+        l.onError(ex);
+      });
     }
 
     /**
@@ -243,7 +248,9 @@ public class DefaultProcessor implements Processor {
      * @param ex processor exception
      */
     private void onError(DataProcessorException ex) {
-      listeners.forEach(l -> l.onError(ex));
+      listeners.forEach(l -> {
+        l.onError(ex);
+      });
     }
 
     /**
