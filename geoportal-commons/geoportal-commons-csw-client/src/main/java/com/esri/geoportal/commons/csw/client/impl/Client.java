@@ -61,6 +61,7 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -117,7 +118,7 @@ public class Client implements IClient {
     postRequest.setEntity(new StringEntity(requestBody, ContentType.APPLICATION_XML));
 
     HttpClientContext context = cred!=null && !cred.isEmpty()? createHttpClientContext(baseUrl, cred): null;
-    try (InputStream responseInputStream = httpClient.execute(postRequest,context).getEntity().getContent();) {
+    try (CloseableHttpResponse httpResponse = httpClient.execute(postRequest,context); InputStream responseInputStream = httpResponse.getEntity().getContent();) {
       String response = IOUtils.toString(responseInputStream, "UTF-8");
       try (ByteArrayInputStream contentInputStream = new ByteArrayInputStream(response.getBytes("UTF-8"));) {
         Records records = new Records();
@@ -136,7 +137,7 @@ public class Client implements IClient {
     String getRecordByIdUrl = createGetMetadataByIdUrl(capabilites.get_getRecordByIDGetURL(), URLEncoder.encode(id, "UTF-8"));
     HttpGet getMethod = new HttpGet(getRecordByIdUrl);
     getMethod.setConfig(DEFAULT_REQUEST_CONFIG);
-    try (InputStream responseStream = httpClient.execute(getMethod).getEntity().getContent();) {
+    try (CloseableHttpResponse httpResponse = httpClient.execute(getMethod); InputStream responseStream = httpResponse.getEntity().getContent();) {
       String response = IOUtils.toString(responseStream, "UTF-8");
 
       if (CONFIG_FOLDER_PATH.equals(profile.getMetadataxslt())) {
@@ -166,7 +167,7 @@ public class Client implements IClient {
         // use URL to get meta data
         if (!xmlUrl.isEmpty()) {
           HttpGet getRequest = new HttpGet(xmlUrl);
-          try (InputStream metadataStream = httpClient.execute(getRequest).getEntity().getContent();) {
+          try (CloseableHttpResponse httpResp = httpClient.execute(getRequest); InputStream metadataStream = httpResp.getEntity().getContent();) {
             return IOUtils.toString(metadataStream, "UTF-8");
           }
         }

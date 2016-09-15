@@ -224,8 +224,8 @@ public class DefaultProcessor implements Processor {
       }
       LOG.info(String.format("Aborting process: %s", getTitle()));
       aborting = true;
-      thread.interrupt();
       onStatusChange();
+      thread.interrupt();
     }
 
     /**

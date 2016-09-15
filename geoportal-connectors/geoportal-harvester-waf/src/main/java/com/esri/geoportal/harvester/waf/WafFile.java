@@ -32,6 +32,7 @@ import java.util.Date;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.HttpClientContext;
 
@@ -68,10 +69,10 @@ import org.apache.http.client.protocol.HttpClientContext;
     HttpGet method = new HttpGet(fileUrl.toExternalForm());
     method.setConfig(DEFAULT_REQUEST_CONFIG);
     HttpClientContext context = creds!=null && !creds.isEmpty()? createHttpClientContext(fileUrl, creds): null;
-    HttpResponse response = httpClient.execute(method,context);
-    Date lastModifiedDate = readLastModifiedDate(response);
-    MimeType contentType = readContentType(response);
-    try (InputStream input = response.getEntity().getContent()) {
+    
+    try (CloseableHttpResponse response = httpClient.execute(method,context); InputStream input = response.getEntity().getContent();) {
+      Date lastModifiedDate = readLastModifiedDate(response);
+      MimeType contentType = readContentType(response);
       return new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), fileUrl.toExternalForm(), lastModifiedDate, fileUrl.toURI(), IOUtils.toByteArray(input), contentType);
     }
   }

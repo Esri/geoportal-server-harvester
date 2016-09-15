@@ -36,14 +36,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +57,7 @@ public class Client implements Closeable {
   private static final String REST_ITEM_URL = "rest/metadata/item";
   private static final String REST_SEARCH_URL = "rest/metadata/search";
 
-  private final HttpClient httpClient;
+  private final CloseableHttpClient httpClient;
   private final URL url;
   private final SimpleCredentials cred;
 
@@ -68,7 +68,7 @@ public class Client implements Closeable {
    * @param url URL of the GPT REST end point
    * @param cred credentials
    */
-  public Client(HttpClient httpClient, URL url, SimpleCredentials cred) {
+  public Client(CloseableHttpClient httpClient, URL url, SimpleCredentials cred) {
     this.httpClient = httpClient;
     this.url = url;
     this.cred = cred;
@@ -123,10 +123,8 @@ public class Client implements Closeable {
         throw new IOException(String.format("Error updating item: %s", data.src_uri_s));
     }
 
-    HttpResponse httpResponse = execute(request);
-    String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
-
-    try (InputStream contentStream = httpResponse.getEntity().getContent();) {
+    try (CloseableHttpResponse httpResponse = execute(request); InputStream contentStream = httpResponse.getEntity().getContent();) {
+      String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
       return mapper.readValue(responseContent, PublishResponse.class);
@@ -142,9 +140,9 @@ public class Client implements Closeable {
    */
   public String read(String id) throws URISyntaxException, IOException {
     HttpGet get = new HttpGet(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/xml"));
-    HttpResponse httpResponse = execute(get);
-    String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
-    try (InputStream contentStream = httpResponse.getEntity().getContent();) {
+    
+    try (CloseableHttpResponse httpResponse = execute(get); InputStream contentStream = httpResponse.getEntity().getContent();) {
+      String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
       return responseContent;
@@ -166,7 +164,7 @@ public class Client implements Closeable {
             null;
   }
   
-  private HttpResponse execute(HttpUriRequest request) throws IOException {
+  private CloseableHttpResponse execute(HttpUriRequest request) throws IOException {
     return cred!=null? httpClient.execute(request, createHttpClientContext(url, cred)): httpClient.execute(request);
   }
   
@@ -213,10 +211,9 @@ public class Client implements Closeable {
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     HttpDelete del = new HttpDelete(url.toURI().resolve(REST_ITEM_URL + "/" + id));
     del.setConfig(DEFAULT_REQUEST_CONFIG);
-    HttpResponse httpResponse = execute(del);
-    String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
 
-    try (InputStream contentStream = httpResponse.getEntity().getContent();) {
+    try (CloseableHttpResponse httpResponse = execute(del); InputStream contentStream = httpResponse.getEntity().getContent();) {
+      String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
       return mapper.readValue(responseContent, PublishResponse.class);
@@ -290,10 +287,8 @@ public class Client implements Closeable {
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("Content-Type", "application/json");
 
-    HttpResponse httpResponse = execute(get);
-    String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
-
-    try (InputStream contentStream = httpResponse.getEntity().getContent();) {
+    try (CloseableHttpResponse httpResponse = execute(get); InputStream contentStream = httpResponse.getEntity().getContent();) {
+      String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
       QueryResponse queryResponse = mapper.readValue(responseContent, QueryResponse.class);

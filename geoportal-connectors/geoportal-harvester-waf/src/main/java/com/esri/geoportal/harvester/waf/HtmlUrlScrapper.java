@@ -25,7 +25,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.HttpClientContext;
 
@@ -58,8 +58,8 @@ import org.apache.http.client.protocol.HttpClientContext;
     HttpGet method = new HttpGet(root.toExternalForm());
     method.setConfig(DEFAULT_REQUEST_CONFIG);
     HttpClientContext context = creds!=null && !creds.isEmpty()? createHttpClientContext(root, creds): null;
-    HttpResponse response = httpClient.execute(method, context);
-    try (InputStream input = response.getEntity().getContent();) {
+    
+    try (CloseableHttpResponse response = httpClient.execute(method, context); InputStream input = response.getEntity().getContent();) {
       String content = IOUtils.toString(input, "UTF-8");
       return analyzer.analyze(content);
     }
