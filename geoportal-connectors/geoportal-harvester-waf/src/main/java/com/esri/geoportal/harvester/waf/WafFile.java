@@ -32,6 +32,7 @@ import java.util.Date;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -70,9 +71,12 @@ import org.apache.http.client.protocol.HttpClientContext;
     method.setConfig(DEFAULT_REQUEST_CONFIG);
     HttpClientContext context = creds!=null && !creds.isEmpty()? createHttpClientContext(fileUrl, creds): null;
     
-    try (CloseableHttpResponse response = httpClient.execute(method,context); InputStream input = response.getEntity().getContent();) {
-      Date lastModifiedDate = readLastModifiedDate(response);
-      MimeType contentType = readContentType(response);
+    try (CloseableHttpResponse httpResponse = httpClient.execute(method,context); InputStream input = httpResponse.getEntity().getContent();) {
+      if (httpResponse.getStatusLine().getStatusCode()>=400) {
+        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+      }
+      Date lastModifiedDate = readLastModifiedDate(httpResponse);
+      MimeType contentType = readContentType(httpResponse);
       return new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), fileUrl.toExternalForm(), lastModifiedDate, fileUrl.toURI(), IOUtils.toByteArray(input), contentType);
     }
   }

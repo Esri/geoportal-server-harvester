@@ -60,6 +60,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -119,6 +120,9 @@ public class Client implements IClient {
 
     HttpClientContext context = cred!=null && !cred.isEmpty()? createHttpClientContext(baseUrl, cred): null;
     try (CloseableHttpResponse httpResponse = httpClient.execute(postRequest,context); InputStream responseInputStream = httpResponse.getEntity().getContent();) {
+      if (httpResponse.getStatusLine().getStatusCode()>=400) {
+        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+      }
       String response = IOUtils.toString(responseInputStream, "UTF-8");
       try (ByteArrayInputStream contentInputStream = new ByteArrayInputStream(response.getBytes("UTF-8"));) {
         Records records = new Records();
@@ -138,8 +142,10 @@ public class Client implements IClient {
     HttpGet getMethod = new HttpGet(getRecordByIdUrl);
     getMethod.setConfig(DEFAULT_REQUEST_CONFIG);
     try (CloseableHttpResponse httpResponse = httpClient.execute(getMethod); InputStream responseStream = httpResponse.getEntity().getContent();) {
+      if (httpResponse.getStatusLine().getStatusCode()>=400) {
+        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+      }
       String response = IOUtils.toString(responseStream, "UTF-8");
-
       if (CONFIG_FOLDER_PATH.equals(profile.getMetadataxslt())) {
         return response;
       }
@@ -340,7 +346,10 @@ public class Client implements IClient {
       RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(5000).setSocketTimeout(2500).build();
       HttpGet getRequest = new HttpGet(baseUrl.toExternalForm()+"?request=GetCapabilities&service=CSW&version=2.0.2");
       getRequest.setConfig(requestConfig);
-      try (InputStream stream = httpClient.execute(getRequest).getEntity().getContent();) {
+      try (CloseableHttpResponse httpResponse = httpClient.execute(getRequest); InputStream stream = httpResponse.getEntity().getContent();) {
+        if (httpResponse.getStatusLine().getStatusCode()>=400) {
+          throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+        }
         capabilites = readCapabilities(stream);
       }
     }
