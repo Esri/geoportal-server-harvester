@@ -20,8 +20,10 @@ import com.esri.geoportal.commons.gpt.client.PublishRequest;
 import com.esri.geoportal.commons.gpt.client.PublishResponse;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
+import com.esri.geoportal.harvester.api.ex.DataException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
@@ -50,6 +52,7 @@ import org.slf4j.LoggerFactory;
   private final GptBrokerDefinitionAdaptor definition;
   private final Set<String> existing = new HashSet<>();
   private Client client;
+  private volatile boolean preventCleanup;
 
   private static String generateSBOM() {
     try {
@@ -77,6 +80,12 @@ import org.slf4j.LoggerFactory;
     client = new Client(definition.getHostUrl(), definition.getCredentials());
 
     if (definition.getCleanup()) {
+      context.addListener(new BaseProcessInstanceListener() {
+        @Override
+        public void onError(DataException ex) {
+          preventCleanup = true;
+        }
+      });
       try {
         List<String> existingIds = client.queryBySource(context.getTask().getDataSource().getBrokerUri().toASCIIString());
         existing.addAll(existingIds);
@@ -89,7 +98,7 @@ import org.slf4j.LoggerFactory;
   @Override
   public void terminate() {
     try {
-      if (definition.getCleanup()) {
+      if (definition.getCleanup() && !preventCleanup) {
         for (String id : existing) {
           client.delete(id);
         }

@@ -17,8 +17,10 @@ package com.esri.geoportal.harvester.folder;
 
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
+import com.esri.geoportal.harvester.api.ex.DataException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
@@ -42,6 +44,7 @@ import org.slf4j.LoggerFactory;
   private final FolderConnector connector;
   private final FolderBrokerDefinitionAdaptor definition;
   private final Set<String> existing = new HashSet<>();
+  private volatile boolean preventCleanup;
 
   /**
    * Creates instance of the broker.
@@ -56,6 +59,12 @@ import org.slf4j.LoggerFactory;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     if (definition.getCleanup()) {
+      context.addListener(new BaseProcessInstanceListener() {
+        @Override
+        public void onError(DataException ex) {
+          preventCleanup = true;
+        }
+      });
       File rootFolder = definition.getRootFolder();
       fetchExisting(rootFolder);
     }
@@ -73,7 +82,7 @@ import org.slf4j.LoggerFactory;
 
   @Override
   public void terminate() {
-    if (definition.getCleanup()) {
+    if (definition.getCleanup() && !preventCleanup) {
       existing.forEach(f->new File(f).delete());
       LOG.info(String.format("%d records has been removed during cleanup.", existing.size()));
     }

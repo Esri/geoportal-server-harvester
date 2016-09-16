@@ -27,8 +27,10 @@ import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaAnalyzer;
 import com.esri.geoportal.commons.meta.MetaException;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
+import com.esri.geoportal.harvester.api.ex.DataException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
@@ -70,6 +72,7 @@ import org.xml.sax.SAXException;
   private AgpClient client;
   private String token;
   private final Set<String> existing = new HashSet<>();
+  private volatile boolean preventCleanup;
 
   /**
    * Creates instance of the broker.
@@ -300,6 +303,12 @@ import org.xml.sax.SAXException;
   public void initialize(InitContext context) throws DataProcessorException {
     this.client = new AgpClient(definition.getHostUrl(),definition.getCredentials());
     if(definition.getCleanup()) {
+      context.addListener(new BaseProcessInstanceListener() {
+        @Override
+        public void onError(DataException ex) {
+          preventCleanup = true;
+        }
+      });
       try {
         String src_source_uri_s = URLEncoder.encode(context.getTask().getDataSource().getBrokerUri().toASCIIString(), "UTF-8");
         QueryResponse search = client.search(String.format("typekeywords:%s", String.format("src_source_uri_s=%s", src_source_uri_s)), 0, 0, generateToken(1));
@@ -320,7 +329,7 @@ import org.xml.sax.SAXException;
   @Override
   public void terminate() {
     try {
-      if(definition.getCleanup()) {
+      if(definition.getCleanup() && !preventCleanup) {
         token = generateToken();
         for (String id: existing) {
           ItemEntry item = client.readItem(id, token);
