@@ -116,7 +116,7 @@ public class Client implements IClient {
     HttpPost postRequest = new HttpPost(capabilites.get_getRecordsPostURL());
     postRequest.setConfig(DEFAULT_REQUEST_CONFIG);
     String requestBody = createGetRecordsRequest(crt);
-    postRequest.setEntity(new StringEntity(requestBody, ContentType.APPLICATION_XML));
+    postRequest.setEntity(new StringEntity(requestBody, ContentType.TEXT_XML));
 
     HttpClientContext context = cred!=null && !cred.isEmpty()? createHttpClientContext(baseUrl, cred): null;
     try (CloseableHttpResponse httpResponse = httpClient.execute(postRequest,context); InputStream responseInputStream = httpResponse.getEntity().getContent();) {
