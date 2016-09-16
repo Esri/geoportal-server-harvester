@@ -30,6 +30,10 @@ import com.esri.geoportal.harvester.engine.utils.TriggerReference;
 import com.esri.geoportal.harvester.support.EventResponse;
 import com.esri.geoportal.harvester.support.ProcessResponse;
 import com.esri.geoportal.harvester.support.TriggerResponse;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +45,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -175,6 +181,29 @@ public class TaskController {
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
       return new ResponseEntity<>(taskDefinition!=null? new TaskResponse(taskId, taskDefinition): null,HttpStatus.OK);
     } catch (DataProcessorException ex) {
+      LOG.error(String.format("Error getting task: %s", taskId), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  
+  /**
+   * Gets task by id.
+   * @param taskId task id
+   * @return task info or <code>null</code> if no task found
+   */
+  @RequestMapping(value = "/rest/harvester/tasks/{taskId}/export", method = RequestMethod.GET)
+  public ResponseEntity<String> export(@PathVariable UUID taskId) {
+    try {
+      LOG.debug(String.format("GET /rest/harvester/tasks/%s", taskId));
+      TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
+      MultiValueMap<String,String> headers = new LinkedMultiValueMap<>();
+      headers.add("Content-disposition", String.format("attachment; filename=\"%s.json\"", taskId));
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+      ResponseEntity<String> responseEntity = new ResponseEntity<>(mapper.writeValueAsString(taskDefinition),headers,HttpStatus.OK);
+      return responseEntity;
+    } catch (DataProcessorException|JsonProcessingException ex) {
       LOG.error(String.format("Error getting task: %s", taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }

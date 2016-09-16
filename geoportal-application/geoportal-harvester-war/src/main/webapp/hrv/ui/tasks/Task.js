@@ -22,6 +22,7 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/Task.html",
         "dojo/_base/lang",
         "dojo/_base/array",
+        "dojo/dom-attr",
         "dojo/topic",
         "dojo/on",
         "dojo/json",
@@ -34,7 +35,7 @@ define(["dojo/_base/declare",
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,topic,on,json,all,
+           lang,array,domAttr,topic,on,json,all,
            Dialog,
            TasksREST, TriggersREST,
            SchedulerEditorPane
@@ -50,6 +51,7 @@ define(["dojo/_base/declare",
       },
     
       postCreate: function(){
+        domAttr.set(this.exportNode,"href",TasksREST.export(this.data.uuid));
       },
       
       _onRemove: function() {

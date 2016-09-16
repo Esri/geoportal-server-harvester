@@ -66,6 +66,7 @@ define({
       caption: "Tasks",
       add: "Add",
       run: "run",
+      export: "export",
       remove: "remove",
       history: "history",
       schedule: "schedule",

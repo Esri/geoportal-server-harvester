@@ -56,6 +56,10 @@ define(["dojo/_base/declare",
       
       purge: function(id) {
         return xhr.del("rest/harvester/tasks/"+id+"/history",{handleAs: "json"});
+      },
+      
+      export: function(id) {
+        return "rest/harvester/tasks/"+id+"/export";
       }
     };
 });
