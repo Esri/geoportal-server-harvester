@@ -15,11 +15,15 @@
  */
 package com.esri.geoportal.harvester.unc;
 
+import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.base.DataCollector;
 import com.esri.geoportal.harvester.api.base.DataPrintStreamOutput;
+import com.esri.geoportal.harvester.api.base.SimpleInitContext;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -37,6 +41,7 @@ public class UncApplication {
     DataPrintStreamOutput destination = new DataPrintStreamOutput(System.out);
     
     for (String sFile: args) {
+      ArrayList<ProcessInstance.Listener> listeners = new ArrayList<>();
       UncConnector connector = new UncConnector();
       File start = new File(sFile);
       EntityDefinition def = new EntityDefinition();
@@ -44,7 +49,8 @@ public class UncApplication {
       adaptor.setRootFolder(start);
       
       InputBroker hv = connector.createBroker(def);
-      DataCollector dataCollector = new DataCollector(hv, Arrays.asList(new DataPrintStreamOutput[]{destination}));
+      hv.initialize(new SimpleInitContext(new Task(null,hv,null),listeners));
+      DataCollector dataCollector = new DataCollector(hv, Arrays.asList(new DataPrintStreamOutput[]{destination}),listeners);
       dataCollector.collect();
     }
   }

@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.waf;
 
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
+import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import java.net.URL;
 import java.util.Arrays;
@@ -25,6 +26,7 @@ import com.esri.geoportal.harvester.api.base.DataCollector;
 import com.esri.geoportal.harvester.api.base.DataPrintStreamOutput;
 import com.esri.geoportal.harvester.api.base.SimpleInitContext;
 import com.esri.geoportal.harvester.api.defs.Task;
+import java.util.ArrayList;
 
 /**
  * Waf application.
@@ -41,6 +43,7 @@ public class WafApplication {
     DataPrintStreamOutput destination = new DataPrintStreamOutput(System.out);
     
     for (String sUrl: args) {
+      ArrayList<ProcessInstance.Listener> listeners = new ArrayList<>();
       WafConnector connector = new WafConnector();
       URL start = new URL(sUrl);
       EntityDefinition def = new EntityDefinition();
@@ -49,8 +52,8 @@ public class WafApplication {
       adaptor.setBotsConfig(BotsConfig.DEFAULT);
       adaptor.setBotsMode(BotsMode.inherit);
       InputBroker hv = connector.createBroker(def);
-      hv.initialize(new SimpleInitContext(new Task(null,hv,null)));
-      DataCollector dataCollector = new DataCollector(hv, Arrays.asList(new DataPrintStreamOutput[]{destination}));
+      hv.initialize(new SimpleInitContext(new Task(null,hv,null),listeners));
+      DataCollector dataCollector = new DataCollector(hv, Arrays.asList(new DataPrintStreamOutput[]{destination}),listeners);
       dataCollector.collect();
     }
   }

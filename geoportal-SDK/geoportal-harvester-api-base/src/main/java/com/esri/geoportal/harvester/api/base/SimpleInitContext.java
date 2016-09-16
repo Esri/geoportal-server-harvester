@@ -16,20 +16,25 @@
 package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.harvester.api.Broker;
+import com.esri.geoportal.harvester.api.ProcessInstance.Listener;
 import com.esri.geoportal.harvester.api.defs.Task;
+import java.util.List;
 
 /**
  * Simple broker context.
  */
-public class SimpleInitContext implements Broker.InitContext{
+public class SimpleInitContext implements Broker.InitContext {
   private final Task task;
+  private final List<Listener> listeners;
 
   /**
    * Creates instance of the context.
    * @param task task.
+   * @param listeners listeners
    */
-  public SimpleInitContext(Task task) {
+  public SimpleInitContext(Task task, List<Listener> listeners) {
     this.task = task;
+    this.listeners = listeners;
   }
 
   @Override
@@ -38,8 +43,8 @@ public class SimpleInitContext implements Broker.InitContext{
   }
 
   @Override
-  public String toString() {
-    return String.format("%s", task);
+  public void addListener(Listener listener) {
+    listeners.add(listener);
   }
   
 }

@@ -117,11 +117,13 @@ public class DefaultProcessor implements Processor {
     public DefaultProcess(Task task, Map<String, Object> attributes) {
       this.task = task;
       this.thread = new Thread(() -> {
-        onStatusChange();
+        InitContext initContext = new SimpleInitContext(task,listeners);
         LOG.info(String.format("Started harvest: %s", getTitle()));
+        
         if (!task.getDataDestinations().isEmpty()) {
           try {
-            initialize(new SimpleInitContext(task));
+            initialize(initContext);
+            onStatusChange();
             
             InputBroker.Iterator iterator = task.getDataSource().iterator(attributes);
             while (iterator.hasNext()) {

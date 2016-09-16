@@ -18,6 +18,8 @@ package com.esri.geoportal.harvester.api.base;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Initializable.InitContext;
+import com.esri.geoportal.harvester.api.ProcessInstance;
+import com.esri.geoportal.harvester.api.ProcessInstance.Listener;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -32,15 +34,18 @@ import java.util.stream.Collectors;
 public class DataCollector {
   private final InputBroker inputBroker;
   private final List<OutputBroker> outputBrokers;
+  private final List<Listener> listeners;
 
   /**
    * Creates instance of the collector.
    * @param source data source
    * @param outputBrokers data destinations
+   * @param listeners listeners
    */
-  public DataCollector(InputBroker source, List<OutputBroker> outputBrokers) {
+  public DataCollector(InputBroker source, List<OutputBroker> outputBrokers, List<Listener> listeners) {
     this.inputBroker = source;
     this.outputBrokers = outputBrokers;
+    this.listeners = listeners;
   }
   
   /**
@@ -52,7 +57,7 @@ public class DataCollector {
     try {
       outputBrokers.stream().map(b->new SimpleLink(new BrokerLinkActionAdaptor(b), null)).collect(Collectors.toList());
       Task task = new Task(null, inputBroker, outputBrokers.stream().map(b->new SimpleLink(new BrokerLinkActionAdaptor(b), null)).collect(Collectors.toList()));
-      InitContext context = new SimpleInitContext(task);
+      InitContext context = new SimpleInitContext(task,listeners);
       
       inputBroker.initialize(context);
       for (OutputBroker br : outputBrokers) {
@@ -88,9 +93,19 @@ public class DataCollector {
     }
   }
   
-  protected void onStart() {}
-  protected void onComplete() {}
-  protected void onSourceException(DataInputException ex) {}
-  protected void onDestinationException(DataOutputException ex) {}
-  protected void onProcessorException(DataProcessorException ex) {}
+  protected void onStart() {
+    listeners.stream().forEach(l->l.onStatusChange(ProcessInstance.Status.working));
+  }
+  protected void onComplete() {
+    listeners.stream().forEach(l->l.onStatusChange(ProcessInstance.Status.completed));
+  }
+  protected void onSourceException(DataInputException ex) {
+    listeners.stream().forEach(l->l.onError(ex));
+  }
+  protected void onDestinationException(DataOutputException ex) {
+    listeners.stream().forEach(l->l.onError(ex));
+  }
+  protected void onProcessorException(DataProcessorException ex) {
+    listeners.stream().forEach(l->l.onError(ex));
+  }
 }

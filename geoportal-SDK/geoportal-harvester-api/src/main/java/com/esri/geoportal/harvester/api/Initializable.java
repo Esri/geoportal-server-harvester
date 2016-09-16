@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.harvester.api.ProcessInstance.Listener;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 
@@ -44,5 +45,11 @@ public interface Initializable {
      * @return task
      */
     Task getTask();
+    
+    /**
+     * Adds process listener.
+     * @param listener listener
+     */
+    void addListener(Listener listener);
   }
 }

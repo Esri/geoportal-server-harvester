@@ -20,6 +20,7 @@ import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.impl.ProfilesProvider;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
+import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.DataCollector;
 import com.esri.geoportal.harvester.api.base.DataPrintStreamOutput;
@@ -28,6 +29,7 @@ import com.esri.geoportal.harvester.api.defs.Task;
 import java.net.URL;
 import java.util.Arrays;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
+import java.util.ArrayList;
 
 /**
  * CSW application.
@@ -59,9 +61,10 @@ public class CswApplication {
         
         InputBroker csw = null;
         try {
+          ArrayList<ProcessInstance.Listener> listeners = new ArrayList<>();
           csw = connector.createBroker(def);
-          csw.initialize(new SimpleInitContext(new Task(null, csw, null)));
-          DataCollector dataCollector = new DataCollector(csw, Arrays.asList(new DataPrintStreamOutput[]{destination}));
+          csw.initialize(new SimpleInitContext(new Task(null, csw, null),listeners));
+          DataCollector dataCollector = new DataCollector(csw, Arrays.asList(new DataPrintStreamOutput[]{destination}),listeners);
           dataCollector.collect();
         } finally {
           if (csw!=null) {

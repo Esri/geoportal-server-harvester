@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.gptsrc;
 
+import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.base.DataCollector;
 import com.esri.geoportal.harvester.api.base.DataPrintStreamOutput;
 import com.esri.geoportal.harvester.api.base.SimpleInitContext;
@@ -22,6 +23,7 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -33,14 +35,15 @@ public class GptApplication {
     DataPrintStreamOutput destination = new DataPrintStreamOutput(System.out);
     
     for (String sUrl: args) {
+      ArrayList<ProcessInstance.Listener> listeners = new ArrayList<>();
       GptConnector connector = new GptConnector();
       URL start = new URL(sUrl);
       EntityDefinition def = new EntityDefinition();
       GptBrokerDefinitionAdaptor adaptor = new GptBrokerDefinitionAdaptor(def);
       adaptor.setHostUrl(start);
       InputBroker hv = connector.createBroker(def);
-      hv.initialize(new SimpleInitContext(new Task(null,hv,null)));
-      DataCollector dataCollector = new DataCollector(hv, Arrays.asList(new DataPrintStreamOutput[]{destination}));
+      hv.initialize(new SimpleInitContext(new Task(null,hv,null),listeners));
+      DataCollector dataCollector = new DataCollector(hv, Arrays.asList(new DataPrintStreamOutput[]{destination}),listeners);
       dataCollector.collect();
     }
   }
