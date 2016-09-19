@@ -30,7 +30,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Set;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -85,7 +84,7 @@ import org.slf4j.LoggerFactory;
   }
 
   @Override
-  public Iterator iterator(Map<String,Object> attributes) throws DataInputException {
+  public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
     return new WafIterator();
   }
 

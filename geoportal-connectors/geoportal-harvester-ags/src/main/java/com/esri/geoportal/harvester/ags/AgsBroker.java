@@ -39,7 +39,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -105,7 +104,7 @@ import org.w3c.dom.Document;
   }
 
   @Override
-  public Iterator iterator(Map<String, Object> attributes) throws DataInputException {
+  public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
     try {
       List<ServerResponse> responses = listResponses(null);
       return new AgsIterator(responses.iterator());

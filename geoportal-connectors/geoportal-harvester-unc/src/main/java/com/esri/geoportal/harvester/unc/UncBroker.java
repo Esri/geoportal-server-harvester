@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
-import java.util.Map;
 
 /**
  * UNC broker.
@@ -74,7 +73,7 @@ import java.util.Map;
   }
 
   @Override
-  public Iterator iterator(Map<String,Object> attributes) throws DataInputException {
+  public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
     return new UncIterator();
   }
 

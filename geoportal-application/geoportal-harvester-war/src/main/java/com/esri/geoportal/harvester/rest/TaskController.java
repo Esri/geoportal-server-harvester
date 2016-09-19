@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.rest;
 
+import com.esri.geoportal.harvester.api.base.SimpleIteratorContext;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.support.TaskResponse;
 import com.esri.geoportal.harvester.beans.EngineBean;
@@ -34,8 +35,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -313,13 +312,11 @@ public class TaskController {
       History history = engine.getTasksService().getHistory(taskId);
       History.Event lastEvent = history!=null? history.getLastEvent(): null;
       
-      // make attributes
-      HashMap<String,Object> attributes = new HashMap<>();
-      if (lastEvent!=null) {
-        attributes.put("Last-Harvested", lastEvent.getStartTimestamp());
-      }
+      // make iterator context
+      SimpleIteratorContext iteratorContext = new SimpleIteratorContext();
+      iteratorContext.setLastHarvest(lastEvent!=null? lastEvent.getStartTimestamp(): null);
       
-      ProcessReference ref = engine.getExecutionService().execute(taskDefinition, attributes);
+      ProcessReference ref = engine.getExecutionService().execute(taskDefinition, iteratorContext);
       ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref.getProcess(), historyManager));
       ref.getProcess().init();
       ref.getProcess().begin();
@@ -340,7 +337,7 @@ public class TaskController {
   public ResponseEntity<ProcessResponse> executeTask(@RequestBody TaskDefinition taskDefinition) {
     try {
       LOG.debug(String.format("POST /rest/harvester/tasks/execute <-- %s", taskDefinition));
-      ProcessReference ref = engine.getExecutionService().execute(taskDefinition,Collections.emptyMap());
+      ProcessReference ref = engine.getExecutionService().execute(taskDefinition,new SimpleIteratorContext());
       ref.getProcess().init();
       ref.getProcess().begin();
       return new ResponseEntity<>(new ProcessResponse(ref.getProcessId(), ref.getProcess().getTitle(), ref.getProcess().getStatus()), HttpStatus.OK);
@@ -371,13 +368,11 @@ public class TaskController {
       History history = engine.getTasksService().getHistory(taskId);
       History.Event lastEvent = history!=null? history.getLastEvent(): null;
       
-      // make attributes
-      HashMap<String,Object> attributes = new HashMap<>();
-      if (lastEvent!=null) {
-        attributes.put("Last-Harvested", lastEvent.getStartTimestamp());
-      }
+      // make iterator context
+      SimpleIteratorContext iteratorContext = new SimpleIteratorContext();
+      iteratorContext.setLastHarvest(lastEvent!=null? lastEvent.getStartTimestamp(): null);
       
-      TriggerReference trigRef = engine.getExecutionService().schedule(taskId, triggerInstanceDefinition, attributes);
+      TriggerReference trigRef = engine.getExecutionService().schedule(taskId, triggerInstanceDefinition, iteratorContext);
       return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), taskId, trigRef.getTriggerDefinition()),HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -404,7 +399,7 @@ public class TaskController {
   public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody TriggerDefinition trigDef) {
     try {
       LOG.debug(String.format("POST /rest/harvester/tasks/schedule <-- %s", trigDef));
-      TriggerReference trigRef = engine.getExecutionService().schedule(null,trigDef,Collections.emptyMap());
+      TriggerReference trigRef = engine.getExecutionService().schedule(null,trigDef,new SimpleIteratorContext());
       return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), null, trigRef.getTriggerDefinition()),HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

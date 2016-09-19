@@ -38,7 +38,6 @@ import java.net.URISyntaxException;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -77,7 +76,7 @@ import java.util.Date;
   }
 
   @Override
-  public Iterator iterator(Map<String, Object> attributes) throws DataInputException {
+  public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
     return new AgpIterator();
   }
 

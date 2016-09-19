@@ -29,6 +29,7 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.general.Link;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
+import com.esri.geoportal.harvester.api.specs.InputBroker.IteratorContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -65,9 +66,9 @@ public class DefaultProcessor implements Processor {
   }
 
   @Override
-  public ProcessInstance createProcess(Task task, Map<String, Object> attributes) {
+  public ProcessInstance createProcess(Task task, IteratorContext iteratorContext) {
     LOG.info(String.format("SUBMITTING: %s", task));
-    return new DefaultProcess(task, attributes);
+    return new DefaultProcess(task, iteratorContext);
   }
 
   /**
@@ -112,7 +113,7 @@ public class DefaultProcessor implements Processor {
      * @param task task
      * @param attributes attributes or <code>null</code> if no attributes
      */
-    public DefaultProcess(Task task, Map<String, Object> attributes) {
+    public DefaultProcess(Task task, IteratorContext iteratorContext) {
       this.task = task;
       this.thread = new Thread(() -> {
         InitContext initContext = new SimpleInitContext(task,listeners);
@@ -123,7 +124,7 @@ public class DefaultProcessor implements Processor {
             initialize(initContext);
             onStatusChange();
             
-            InputBroker.Iterator iterator = task.getDataSource().iterator(attributes);
+            InputBroker.Iterator iterator = task.getDataSource().iterator(iteratorContext);
             while (iterator.hasNext()) {
               if (Thread.currentThread().isInterrupted()) {
                 break;

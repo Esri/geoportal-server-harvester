@@ -19,6 +19,7 @@ import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.specs.InputBroker.IteratorContext;
 import com.esri.geoportal.harvester.engine.utils.ProcessReference;
 import com.esri.geoportal.harvester.engine.utils.Statistics;
 import java.util.List;
@@ -35,12 +36,12 @@ public interface ProcessesService {
    * Creates process.
    *
    * @param task task for the process
-   * @param attributes attributes or <code>null</code> if no attributes
+   * @param iteratorContext iterator context
    * @return process handle
    * @throws InvalidDefinitionException if processor definition is invalid
    * @throws DataProcessorException if accessing repository fails
    */
-  ProcessReference createProcess(Task task, Map<String,Object> attributes) throws InvalidDefinitionException, DataProcessorException;
+  ProcessReference createProcess(Task task, IteratorContext iteratorContext) throws InvalidDefinitionException, DataProcessorException;
   
   /**
    * Gets process by process id.

@@ -25,6 +25,7 @@ import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.api.base.BrokerLinkActionAdaptor;
 import com.esri.geoportal.harvester.api.base.FilterLinkActionAdaptor;
+import com.esri.geoportal.harvester.api.base.SimpleIteratorContext;
 import com.esri.geoportal.harvester.api.base.SimpleLink;
 import com.esri.geoportal.harvester.api.base.TransformerLinkActionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -37,6 +38,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.general.Link;
 import com.esri.geoportal.harvester.api.general.LinkAction;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
+import com.esri.geoportal.harvester.api.specs.InputBroker.IteratorContext;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
@@ -59,8 +61,6 @@ import com.esri.geoportal.harvester.engine.utils.ProcessReference;
 import com.esri.geoportal.harvester.engine.utils.TriggerReference;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -115,13 +115,13 @@ public class DefaultExecutionService implements ExecutionService {
   }
 
   @Override
-  public ProcessReference execute(TaskDefinition taskDefinition, Map<String,Object> attributes) throws InvalidDefinitionException, DataProcessorException {
+  public ProcessReference execute(TaskDefinition taskDefinition, IteratorContext iteratorContext) throws InvalidDefinitionException, DataProcessorException {
     Task task = createTask(taskDefinition);
-    return processesService.createProcess(task, attributes);
+    return processesService.createProcess(task, iteratorContext);
   }
   
   @Override
-  public TriggerReference schedule(UUID taskId, TriggerDefinition trigDef, Map<String,Object> attributes) throws InvalidDefinitionException, DataProcessorException {
+  public TriggerReference schedule(UUID taskId, TriggerDefinition trigDef, IteratorContext iteratorContext) throws InvalidDefinitionException, DataProcessorException {
     try {
       TriggerManager.TaskUuidTriggerDefinitionPair pair = new TriggerManager.TaskUuidTriggerDefinitionPair();
       pair.setTaskUuid(taskId);
@@ -276,12 +276,9 @@ public class DefaultExecutionService implements ExecutionService {
 
     @Override
     public synchronized ProcessInstance execute(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
-      HashMap<String,Object> attributes = new HashMap<>();
-      Date lastHarvest = lastHarvest();
-      if (lastHarvest!=null) {
-        attributes.put("Last-Harvested", lastHarvest);
-      }
-      ProcessReference ref = DefaultExecutionService.this.execute(taskDefinition,attributes);
+      SimpleIteratorContext iteratorContext = new SimpleIteratorContext();
+      iteratorContext.setLastHarvest(lastHarvest());
+      ProcessReference ref = DefaultExecutionService.this.execute(taskDefinition,iteratorContext);
       if (taskId!=null) {
         ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref.getProcess(), historyManager));
       }

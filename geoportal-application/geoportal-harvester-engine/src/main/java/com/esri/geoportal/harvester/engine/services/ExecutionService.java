@@ -20,9 +20,9 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.specs.InputBroker.IteratorContext;
 import com.esri.geoportal.harvester.engine.utils.ProcessReference;
 import com.esri.geoportal.harvester.engine.utils.TriggerReference;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -34,23 +34,23 @@ public interface ExecutionService {
    * Executes task.
    *
    * @param taskDefinition task definition
-   * @param attributes attributes or <code>null</code> if no attributes
+   * @param iteratorContext iterator context
    * @return process handle
    * @throws InvalidDefinitionException invalid definition exception
    * @throws DataProcessorException if accessing repository fails
    */
-  ProcessReference execute(TaskDefinition taskDefinition, Map<String,Object> attributes) throws InvalidDefinitionException, DataProcessorException;
+  ProcessReference execute(TaskDefinition taskDefinition, IteratorContext iteratorContext) throws InvalidDefinitionException, DataProcessorException;
 
   /**
    * Schedules task with trigger.
    * @param taskId task id or <code>null</code> if no id
    * @param trigDef trigger instance definition
-   * @param attributes attributes or <code>null</code> if no attributes
+   * @param iteratorContext iterator context
    * @return trigger reference
    * @throws InvalidDefinitionException if invalid definition
    * @throws DataProcessorException if error processing data
    */
-  TriggerReference schedule(UUID taskId, TriggerDefinition trigDef, Map<String,Object> attributes) throws InvalidDefinitionException, DataProcessorException;
+  TriggerReference schedule(UUID taskId, TriggerDefinition trigDef, IteratorContext iteratorContext) throws InvalidDefinitionException, DataProcessorException;
   
   /**
    * Creates new trigger context.
