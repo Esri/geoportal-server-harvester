@@ -199,7 +199,7 @@ import java.util.Date;
     private List<ItemEntry> list() throws URISyntaxException, IOException {
       ContentResponse content = client.listContent(definition.getCredentials().getUserName(), definition.getFolderId(), size, from, generateToken(1));
       from += size;
-      return content!=null && content.items!=null? Arrays.asList(content.items): null;
+      return content!=null && content.items!=null && content.items.length>0? Arrays.asList(content.items): null;
     }
     
   }
