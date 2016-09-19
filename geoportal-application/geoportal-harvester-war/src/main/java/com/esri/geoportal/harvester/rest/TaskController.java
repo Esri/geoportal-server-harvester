@@ -319,7 +319,7 @@ public class TaskController {
       // make attributes
       HashMap<String,Object> attributes = new HashMap<>();
       if (lastEvent!=null) {
-        attributes.put("Last-Harvested", lastEvent.getEndTimestamp());
+        attributes.put("Last-Harvested", lastEvent.getStartTimestamp());
       }
       
       ProcessReference ref = engine.getExecutionService().execute(taskDefinition, attributes);
@@ -380,7 +380,7 @@ public class TaskController {
       // make attributes
       HashMap<String,Object> attributes = new HashMap<>();
       if (lastEvent!=null) {
-        attributes.put("Last-Harvested", lastEvent.getEndTimestamp());
+        attributes.put("Last-Harvested", lastEvent.getStartTimestamp());
       }
       
       TriggerReference trigRef = engine.getExecutionService().schedule(taskId, triggerInstanceDefinition, attributes);
