@@ -126,7 +126,7 @@ import java.util.Date;
   private class AgpIterator implements InputBroker.Iterator {
     private final TransformerFactory tf = TransformerFactory.newInstance();
     private final long size = 10;
-    private long from;
+    private long from = 1;
     private java.util.Iterator<ItemEntry> iter;
     private boolean done;
 
@@ -138,7 +138,7 @@ import java.util.Date;
       if (iter==null) {
         try {
           List<ItemEntry> list = list();
-          if (list==null || !list.isEmpty()) {
+          if (list==null || list.isEmpty()) {
             done = true;
             return false;
           }
@@ -164,10 +164,18 @@ import java.util.Date;
         ItemEntry next = iter.next();
         
         Properties props = new Properties();
-        props.put("identifier", next.id);
-        props.put("title", next.title);
-        props.put("description", next.description);
-        props.put("resource.url", next.url);
+        if (next.id!=null) {
+          props.put("identifier", next.id);
+        }
+        if (next.title!=null) {
+          props.put("title", next.title);
+        }
+        if (next.description!=null) {
+          props.put("description", next.description);
+        }
+        if (next.url!=null) {
+          props.put("resource.url", next.url);
+        }
         
         if (next.extent!=null && next.extent.length==2 && next.extent[0]!=null && next.extent[0].length==2 && next.extent[1]!=null && next.extent[1].length==2) {
           String sBox = String.format("%f %f,%f %f", next.extent[0][0], next.extent[0][1], next.extent[1][0], next.extent[1][1]);
@@ -190,6 +198,7 @@ import java.util.Date;
     
     private List<ItemEntry> list() throws URISyntaxException, IOException {
       ContentResponse content = client.listContent(definition.getCredentials().getUserName(), definition.getFolderId(), size, from, generateToken(1));
+      from += size;
       return content!=null && content.items!=null? Arrays.asList(content.items): null;
     }
     

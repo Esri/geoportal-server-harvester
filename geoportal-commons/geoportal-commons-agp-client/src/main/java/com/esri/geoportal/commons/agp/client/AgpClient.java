@@ -327,6 +327,8 @@ public class AgpClient implements Closeable {
     URIBuilder builder = new URIBuilder(userUri(owner, folderId));
     
     builder.setParameter("f", "json");
+    builder.setParameter("num", Long.toString(num));
+    builder.setParameter("start", Long.toString(start));
     if (token!=null) {
       builder.setParameter("token", token);
     }
