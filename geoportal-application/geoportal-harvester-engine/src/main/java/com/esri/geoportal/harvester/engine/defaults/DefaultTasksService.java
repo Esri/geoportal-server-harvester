@@ -98,7 +98,7 @@ public class DefaultTasksService implements TasksService {
   }
   
   @Override
-  public List<History.Event> getHistory(UUID taskId) throws DataProcessorException {
+  public History getHistory(UUID taskId) throws DataProcessorException {
     try {
       return historyManager.buildHistory(taskId);
     } catch (CrudlException ex) {

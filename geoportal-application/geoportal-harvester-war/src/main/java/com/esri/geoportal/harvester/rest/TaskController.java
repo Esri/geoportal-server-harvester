@@ -310,11 +310,8 @@ public class TaskController {
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
       
       // obtain last harvest data
-      List<History.Event> history = engine.getTasksService().getHistory(taskId);
-      History.Event lastEvent = history!=null? history.stream()
-              .sorted((left,right)->0-left.getStartTimestamp().compareTo(right.getStartTimestamp()))
-              .findFirst()
-              .orElse(null): null;
+      History history = engine.getTasksService().getHistory(taskId);
+      History.Event lastEvent = history!=null? history.getLastEvent(): null;
       
       // make attributes
       HashMap<String,Object> attributes = new HashMap<>();
@@ -371,11 +368,8 @@ public class TaskController {
       triggerInstanceDefinition.setProperties(triggerDefinition.getProperties());
       
       // obtain last harvest data
-      List<History.Event> history = engine.getTasksService().getHistory(taskId);
-      History.Event lastEvent = history!=null? history.stream()
-              .sorted((left,right)->0-left.getStartTimestamp().compareTo(right.getStartTimestamp()))
-              .findFirst()
-              .orElse(null): null;
+      History history = engine.getTasksService().getHistory(taskId);
+      History.Event lastEvent = history!=null? history.getLastEvent(): null;
       
       // make attributes
       HashMap<String,Object> attributes = new HashMap<>();

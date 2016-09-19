@@ -28,6 +28,17 @@ public class History extends ArrayList<History.Event> {
   private static final Logger LOG = LoggerFactory.getLogger(History.class);
   
   /**
+   * Gets last event.
+   * @return last event
+   */
+  public History.Event getLastEvent() {
+    return stream()
+              .sorted((left,right)->0-left.getStartTimestamp().compareTo(right.getStartTimestamp()))
+              .findFirst()
+              .orElse(null);
+  }
+  
+  /**
    * History event.
    */
   public static final class Event {

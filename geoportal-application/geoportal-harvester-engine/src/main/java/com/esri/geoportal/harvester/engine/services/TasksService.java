@@ -80,7 +80,7 @@ public interface TasksService {
    * @return list of events.
    * @throws DataProcessorException if accessing repository fails
    */
-  List<History.Event> getHistory(UUID taskId) throws DataProcessorException;
+  History getHistory(UUID taskId) throws DataProcessorException;
   
   /**
    * Purges history for a given task.
