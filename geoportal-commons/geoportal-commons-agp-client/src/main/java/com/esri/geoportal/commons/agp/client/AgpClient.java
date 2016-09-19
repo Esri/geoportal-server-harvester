@@ -79,6 +79,7 @@ public class AgpClient implements Closeable {
    * @param description description
    * @param text text
    * @param itemType item type (must be a URL type)
+   * @param extent extent
    * @param typeKeywords type keywords
    * @param tags tags tags
    * @param token token
@@ -86,7 +87,7 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse addItem(String owner, String folderId, String title, String description, String text, ItemType itemType, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+  public ItemResponse addItem(String owner, String folderId, String title, String description, String text, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(addItemUri(owner, StringUtils.trimToNull(folderId)));
     
     HttpPost req = new HttpPost(builder.build());
@@ -96,6 +97,9 @@ public class AgpClient implements Closeable {
     params.put("description", description);
     params.put("type", itemType.getTypeName());
     params.put("text", text);
+    if (extent!=null && extent.length==4) {
+      params.put("extent",Arrays.asList(extent).stream().map(Object::toString).collect(Collectors.joining(",")));
+    }
     if (typeKeywords!=null) {
       params.put("typeKeywords", Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")));
     }
@@ -117,6 +121,7 @@ public class AgpClient implements Closeable {
    * @param description description
    * @param url URL
    * @param itemType item type (must be a URL type)
+   * @param extent extent
    * @param typeKeywords type keywords
    * @param tags tags tags
    * @param token token
@@ -124,7 +129,7 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse addItem(String owner, String folderId, String title, String description, URL url, ItemType itemType, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+  public ItemResponse addItem(String owner, String folderId, String title, String description, URL url, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(addItemUri(owner, StringUtils.trimToNull(folderId)));
     
     HttpPost req = new HttpPost(builder.build());
@@ -134,6 +139,9 @@ public class AgpClient implements Closeable {
     params.put("description", description);
     params.put("type", itemType.getTypeName());
     params.put("url", url.toExternalForm());
+    if (extent!=null && extent.length==4) {
+      params.put("extent",Arrays.asList(extent).stream().map(Object::toString).collect(Collectors.joining(",")));
+    }
     if (typeKeywords!=null) {
       params.put("typeKeywords", Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")));
     }
@@ -156,6 +164,7 @@ public class AgpClient implements Closeable {
    * @param description description
    * @param text text
    * @param itemType item type (must be a URL type)
+   * @param extent extent
    * @param typeKeywords type keywords
    * @param tags tags tags
    * @param token token
@@ -163,7 +172,7 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, String text, ItemType itemType, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, String text, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(updateItemUri(owner, StringUtils.trimToNull(folderId), itemId));
     
     HttpPost req = new HttpPost(builder.build());
@@ -173,6 +182,9 @@ public class AgpClient implements Closeable {
     params.put("description", description);
     params.put("type", itemType.getTypeName());
     params.put("text", text);
+    if (extent!=null && extent.length==4) {
+      params.put("extent",Arrays.asList(extent).stream().map(Object::toString).collect(Collectors.joining(",")));
+    }
     if (typeKeywords!=null) {
       params.put("typeKeywords", Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")));
     }
@@ -216,6 +228,7 @@ public class AgpClient implements Closeable {
    * @param description description
    * @param url URL
    * @param itemType item type (must be a URL type)
+   * @param extent extent
    * @param typeKeywords type keywords
    * @param tags tags tags
    * @param token token
@@ -223,7 +236,7 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, URL url, ItemType itemType, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, URL url, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(updateItemUri(owner, StringUtils.trimToNull(folderId), itemId));
     
     HttpPost req = new HttpPost(builder.build());
@@ -233,6 +246,9 @@ public class AgpClient implements Closeable {
     params.put("description", description);
     params.put("type", itemType.getTypeName());
     params.put("url", url.toExternalForm());
+    if (extent!=null && extent.length==4) {
+      params.put("extent",Arrays.asList(extent).stream().map(Object::toString).collect(Collectors.joining(",")));
+    }
     if (typeKeywords!=null) {
       params.put("typeKeywords", Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")));
     }

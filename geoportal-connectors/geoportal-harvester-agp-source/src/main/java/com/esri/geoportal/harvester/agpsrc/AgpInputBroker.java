@@ -169,6 +169,11 @@ import java.util.Date;
         props.put("description", next.description);
         props.put("resource.url", next.url);
         
+        if (next.extent!=null && next.extent.length==2 && next.extent[0]!=null && next.extent[0].length==2 && next.extent[1]!=null && next.extent[1].length==2) {
+          String sBox = String.format("%f %f,%f %f", next.extent[0][0], next.extent[0][1], next.extent[1][0], next.extent[1][1]);
+          props.put("bbox", sBox);
+        }
+        
         MapAttribute attr = AttributeUtils.fromProperties(props);
         Document doc = metaBuilder.create(attr);
         DOMSource domSource = new DOMSource(doc);

@@ -52,6 +52,8 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -130,13 +132,12 @@ import org.xml.sax.SAXException;
         QueryResponse search = client.search(String.format("typekeywords:%s", String.format("src_uri_s=%s", src_uri_s)), 0, 0, token);
         ItemEntry itemEntry = search!=null && search.results!=null && search.results.length>0? search.results[0]: null;
         
-        
         if (itemEntry==null) {
           // add item if doesn't exist
           ItemResponse response = addItem(
                   getAttributeValue(attributes, "title", null),
                   getAttributeValue(attributes, "description", null),
-                  resourceUrl, itemType, typeKeywords);
+                  resourceUrl, itemType, extractEnvelope(getAttributeValue(attributes, "bbox", null)), typeKeywords);
 
           if (response == null || !response.success) {
             throw new DataOutputException(this, String.format("Error adding item: %s", ref.getSourceUri()));
@@ -155,7 +156,7 @@ import org.xml.sax.SAXException;
                   itemEntry.ownerFolder,
                   getAttributeValue(attributes, "title", null),
                   getAttributeValue(attributes, "description", null),
-                  resourceUrl, itemType, typeKeywords);
+                  resourceUrl, itemType, extractEnvelope(getAttributeValue(attributes, "bbox", null)), typeKeywords);
           if (response == null || !response.success) {
             throw new DataOutputException(this, String.format("Error updating item: %s", ref.getSourceUri()));
           }
@@ -171,6 +172,33 @@ import org.xml.sax.SAXException;
     } catch (MetaException | IOException | ParserConfigurationException | SAXException | URISyntaxException ex) {
       throw new DataOutputException(this, String.format("Error publishing data"), ex);
     }
+  }
+  
+  private Double [] extractEnvelope(String sBbox) {
+    Double [] envelope = null;
+    if (sBbox!=null) {
+      String[] corners = sBbox.split(",");
+      if (corners!=null && corners.length==2) {
+        String [] minXminY = corners[0].split(" ");
+        String [] maxXmaxY = corners[1].split(" ");
+        if (minXminY!=null && minXminY.length==2 && maxXmaxY!=null && maxXmaxY.length==2) {
+          minXminY[0] = StringUtils.trimToEmpty(minXminY[0]);
+          minXminY[1] = StringUtils.trimToEmpty(minXminY[1]);
+          maxXmaxY[0] = StringUtils.trimToEmpty(maxXmaxY[0]);
+          maxXmaxY[1] = StringUtils.trimToEmpty(maxXmaxY[1]);
+
+          Double minX = NumberUtils.isNumber(minXminY[0])? NumberUtils.createDouble(minXminY[0]): null;
+          Double minY = NumberUtils.isNumber(minXminY[1])? NumberUtils.createDouble(minXminY[1]): null;
+          Double maxX = NumberUtils.isNumber(maxXmaxY[0])? NumberUtils.createDouble(maxXmaxY[0]): null;
+          Double maxY = NumberUtils.isNumber(maxXmaxY[1])? NumberUtils.createDouble(maxXmaxY[1]): null;
+
+          if (minX!=null && minY!=null && maxX!=null && maxY!=null) {
+            envelope = new Double[]{minX,minY,maxX,maxY};
+          }
+        }
+      }
+    }
+    return envelope;
   }
   
   private String getAttributeValue(MapAttribute attributes, String attributeName, String defaultValue) {
@@ -204,34 +232,34 @@ import org.xml.sax.SAXException;
       return attributes;
   }
 
-  private ItemResponse addItem(String title, String description, URL url, ItemType itemType, String[] typeKeywords) throws IOException, URISyntaxException {
+  private ItemResponse addItem(String title, String description, URL url, ItemType itemType, Double [] envelope, String[] typeKeywords) throws IOException, URISyntaxException {
     if (token==null) {
       token = generateToken();
     }
     ItemResponse response = addItem(
             title,
             description,
-            url, itemType, typeKeywords, token);
+            url, itemType, envelope, typeKeywords, token);
     if (response.error != null && response.error.code == 498) {
       token = generateToken();
       response = addItem(
               title,
               description,
-              url, itemType, typeKeywords, token);
+              url, itemType, envelope, typeKeywords, token);
     }
     return response;
   }
 
-  private ItemResponse addItem(String title, String description, URL url, ItemType itemType, String[] typeKeywords, String token) throws IOException, URISyntaxException {
+  private ItemResponse addItem(String title, String description, URL url, ItemType itemType, Double [] envelope, String[] typeKeywords, String token) throws IOException, URISyntaxException {
     return client.addItem(
             definition.getCredentials().getUserName(),
             definition.getFolderId(),
             title,
             description,
-            url, itemType, typeKeywords, null, token);
+            url, itemType, envelope, typeKeywords, null, token);
   }
 
-  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, ItemType itemType, String[] typeKeywords) throws IOException, URISyntaxException {
+  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, ItemType itemType, Double [] envelope, String[] typeKeywords) throws IOException, URISyntaxException {
     if (token==null) {
       token = generateToken();
     }
@@ -241,7 +269,7 @@ import org.xml.sax.SAXException;
             folderId,
             title,
             description,
-            url, itemType, typeKeywords, token);
+            url, itemType, envelope, typeKeywords, token);
     if (response.error != null && response.error.code == 498) {
       token = generateToken();
       response = updateItem(
@@ -250,19 +278,19 @@ import org.xml.sax.SAXException;
               folderId,
               title,
               description,
-              url, itemType, typeKeywords, token);
+              url, itemType, envelope, typeKeywords, token);
     }
     return response;
   }
 
-  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, ItemType itemType, String[] typeKeywords, String token) throws IOException, URISyntaxException {
+  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, ItemType itemType, Double [] envelope, String[] typeKeywords, String token) throws IOException, URISyntaxException {
     return client.updateItem(
             owner,
             folderId,
             id,
             title,
             description,
-            url, itemType, typeKeywords, null, token);
+            url, itemType, envelope, typeKeywords, null, token);
   }
   
   private DeleteResponse deleteItem(String id, String owner, String folderId) throws URISyntaxException, IOException {
