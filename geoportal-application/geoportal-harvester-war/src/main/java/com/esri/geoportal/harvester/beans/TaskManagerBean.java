@@ -15,7 +15,6 @@
  */
 package com.esri.geoportal.harvester.beans;
 
-import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
 import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.serialize;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.engine.managers.TaskManager;
@@ -36,8 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
 import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
 
 /**
