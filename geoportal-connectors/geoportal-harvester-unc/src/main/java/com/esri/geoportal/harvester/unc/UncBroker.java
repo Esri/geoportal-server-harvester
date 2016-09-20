@@ -74,7 +74,7 @@ import java.util.LinkedList;
 
   @Override
   public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
-    return new UncIterator();
+    return new UncIterator(iteratorContext);
   }
 
   @Override
@@ -86,6 +86,17 @@ import java.util.LinkedList;
    * UNC iterator.
    */
   private class UncIterator implements InputBroker.Iterator {
+    private final IteratorContext iteratorContext;
+
+    /**
+     * Creates instance of the iterator.
+     * @param iteratorContext iterator context
+     */
+    public UncIterator(IteratorContext iteratorContext) {
+      this.iteratorContext = iteratorContext;
+    }
+    
+    
     @Override
     public boolean hasNext() throws DataInputException {
 
@@ -103,7 +114,7 @@ import java.util.LinkedList;
         }
 
         if (subFolders==null) {
-          UncFolderContent content = new UncFolder(UncBroker.this, definition.getRootFolder(), definition.getPattern()).readContent();
+          UncFolderContent content = new UncFolder(UncBroker.this, definition.getRootFolder(), definition.getPattern(), iteratorContext.getLastHarvestDate()).readContent();
           subFolders = new LinkedList<>(content.getSubFolders());
           files = new LinkedList<>(content.getFiles());
           return hasNext();

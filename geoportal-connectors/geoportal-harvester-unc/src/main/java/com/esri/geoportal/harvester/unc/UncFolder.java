@@ -18,15 +18,14 @@ package com.esri.geoportal.harvester.unc;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -39,17 +38,20 @@ import org.apache.commons.lang3.StringUtils;
   private final UncBroker broker;
   private final File folder;
   private final String matchPattern;
+  private final Date since;
 
   /**
    * Creates instance of the UNC folder.
    * @param broker broker
    * @param folder folder
    * @param matchPattern match pattern
+   * @param since since date
    */
-  public UncFolder(UncBroker broker, File folder, String matchPattern) {
+  public UncFolder(UncBroker broker, File folder, String matchPattern, Date since) {
     this.broker = broker;
     this.folder = folder;
     this.matchPattern = StringUtils.defaultIfBlank(matchPattern, DEFAULT_MATCH_PATTERN);
+    this.since = since;
   }
 
   /**
@@ -64,8 +66,8 @@ import org.apache.commons.lang3.StringUtils;
 
     Arrays.asList(folder.listFiles()).forEach(f->{
       if (f.isDirectory()) {
-        subFolders.add(new UncFolder(broker, f, matchPattern));
-      } else if (f.isFile() && matchFileName(f, matchPattern)) {
+        subFolders.add(new UncFolder(broker, f, matchPattern, since));
+      } else if (f.isFile() && matchFileName(f, matchPattern) && (since==null || f.lastModified()>=since.getTime())) {
         files.add(new UncFile(broker, f));
       }
     });
