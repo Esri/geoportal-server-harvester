@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.http.client.HttpResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +90,13 @@ import org.slf4j.LoggerFactory;
       try {
         List<String> existingIds = client.queryBySource(context.getTask().getDataSource().getBrokerUri().toASCIIString());
         existing.addAll(existingIds);
+      } catch (HttpResponseException ex) {
+        if (ex.getStatusCode()==500) {
+          LOG.warn(String.format("GPT client failed to provide existing ids. Disabling cleanup."), ex);
+          definition.setCleanup(false);
+        } else {
+          throw new DataProcessorException(String.format("Error getting published records for: %s", client), ex);
+        }
       } catch (IOException | URISyntaxException ex) {
         throw new DataProcessorException(String.format("Error getting published records for: %s", client), ex);
       }

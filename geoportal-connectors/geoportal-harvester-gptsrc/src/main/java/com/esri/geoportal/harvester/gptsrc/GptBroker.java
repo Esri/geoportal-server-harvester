@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import org.apache.http.client.HttpResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,6 +109,14 @@ import org.slf4j.LoggerFactory;
           iter = list.iterator();
         }
         return true;
+      } catch (HttpResponseException ex) {
+        if (ex.getStatusCode()==500) {
+          LOG.warn(String.format("GPT client failed to provide more id. Iteration completed."), ex);
+          done = true;
+          return false;
+        } else {
+          throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records."), ex);
+        }
       } catch (IOException|URISyntaxException ex) {
         throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records."), ex);
       }
