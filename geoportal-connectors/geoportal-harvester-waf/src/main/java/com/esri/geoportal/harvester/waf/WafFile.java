@@ -62,11 +62,12 @@ import org.apache.http.client.protocol.HttpClientContext;
   /**
    * Reads content.
    * @param httpClient HTTP client
+   * @param since since date
    * @return content reference
    * @throws IOException if reading content fails
    * @throws URISyntaxException if file url is an invalid URI
    */
-  public SimpleDataReference readContent(BotsHttpClient httpClient) throws IOException, URISyntaxException {
+  public SimpleDataReference readContent(BotsHttpClient httpClient, Date since) throws IOException, URISyntaxException {
     HttpGet method = new HttpGet(fileUrl.toExternalForm());
     method.setConfig(DEFAULT_REQUEST_CONFIG);
     HttpClientContext context = creds!=null && !creds.isEmpty()? createHttpClientContext(fileUrl, creds): null;
@@ -77,7 +78,8 @@ import org.apache.http.client.protocol.HttpClientContext;
       }
       Date lastModifiedDate = readLastModifiedDate(httpResponse);
       MimeType contentType = readContentType(httpResponse);
-      return new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), fileUrl.toExternalForm(), lastModifiedDate, fileUrl.toURI(), IOUtils.toByteArray(input), contentType);
+      boolean readBody = since==null || lastModifiedDate==null || lastModifiedDate.getTime()>=since.getTime();
+      return new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), fileUrl.toExternalForm(), lastModifiedDate, fileUrl.toURI(), readBody? IOUtils.toByteArray(input): null, contentType);
     }
   }
 

@@ -85,7 +85,7 @@ import org.slf4j.LoggerFactory;
 
   @Override
   public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
-    return new WafIterator();
+    return new WafIterator(iteratorContext);
   }
 
   @Override
@@ -107,11 +107,28 @@ import org.slf4j.LoggerFactory;
    * WAF iterator.
    */
   private class WafIterator implements InputBroker.Iterator {
+    private final IteratorContext iteratorContext;
+    private DataReference nextFile;
+
+    /**
+     * Creates instance of the iterator.
+     * @param iteratorContext iterator context
+     */
+    public WafIterator(IteratorContext iteratorContext) {
+      this.iteratorContext = iteratorContext;
+    }
+    
+    
     @Override
     public boolean hasNext() throws DataInputException {
 
       try {
         if (files!=null && !files.isEmpty()) {
+          nextFile = readContent();
+          if (nextFile.getContent()==null) {
+            nextFile = null;
+            return hasNext();
+          }
           return true;
         }
 
@@ -143,12 +160,17 @@ import org.slf4j.LoggerFactory;
 
     @Override
     public DataReference next() throws DataInputException {
-      try {
-        WafFile file = files.poll();
-        return file.readContent(httpClient);
-      } catch (IOException|URISyntaxException ex) {
-        throw new DataInputException(WafBroker.this, "Error reading data.", ex);
+      if (nextFile==null) {
+        throw new DataInputException(WafBroker.this, String.format("No more files."));
       }
+      DataReference result = nextFile;
+      nextFile=null;
+      return result;
+    }
+    
+    private DataReference readContent() throws IOException, URISyntaxException {
+      WafFile file = files.poll();
+      return file.readContent(httpClient, iteratorContext.getLastHarvestDate());
     }
   }
 }
