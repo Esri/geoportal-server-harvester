@@ -69,6 +69,10 @@ public class HistoryManagerAdaptor extends BaseProcessInstanceListener {
         break;
       case completed:
         {
+          if (startDate==null) {
+            startDate = new Date();
+            event.setStartTimestamp(startDate);
+          }
           if (endDate==null) {
             endDate = new Date();
             event.setEndTimestamp(endDate);
