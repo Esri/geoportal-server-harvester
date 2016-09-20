@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
   private CloseableHttpClient httpclient;
   private IClient client;
   private java.util.Iterator<IRecord> recs;
+  private IRecord nextRecord;
   private int start = 1;
   private boolean noMore;
 
@@ -88,7 +89,7 @@ import org.slf4j.LoggerFactory;
 
   @Override
   public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
-    return new CswIterator();
+    return new CswIterator(iteratorContext);
   }
 
   @Override
@@ -110,6 +111,17 @@ import org.slf4j.LoggerFactory;
    * CSW iterator.
    */
   private class CswIterator implements InputBroker.Iterator {
+    private final IteratorContext iteratorContext;
+
+    /**
+     * Creates instance of the iterator.
+     * @param iteratorContext iterator context
+     */
+    public CswIterator(IteratorContext iteratorContext) {
+      this.iteratorContext = iteratorContext;
+    }
+    
+    
     @Override
     public boolean hasNext() throws DataInputException {
       try {
@@ -132,7 +144,13 @@ import org.slf4j.LoggerFactory;
           start += PAGE_SIZE;
           return hasNext();
         }
+        
+        IRecord rec = recs.next();
+        if (rec.getLastModifiedDate()!=null && iteratorContext.getLastHarvestDate()!=null && !(rec.getLastModifiedDate().getTime()>=iteratorContext.getLastHarvestDate().getTime())) {
+          return hasNext();
+        }
 
+        nextRecord = rec;
         return true;
       } catch (Exception ex) {
         throw new DataInputException(CswBroker.this, "Error reading data.", ex);
@@ -142,7 +160,11 @@ import org.slf4j.LoggerFactory;
     @Override
     public DataReference next() throws DataInputException {
       try {
-        IRecord rec = recs.next();
+        if (nextRecord==null) {
+          throw new DataInputException(CswBroker.this, String.format("No more records."));
+        }
+        IRecord rec = nextRecord;
+        nextRecord=null;
         String metadata = client.readMetadata(rec.getId());
         return new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), rec.getId(), rec.getLastModifiedDate(), new URI("uuid", rec.getId(), null), metadata.getBytes("UTF-8"), MimeType.APPLICATION_XML);
       } catch (Exception ex) {
