@@ -161,7 +161,7 @@ import org.slf4j.LoggerFactory;
     @Override
     public DataReference next() throws DataInputException {
       if (nextFile==null) {
-        throw new DataInputException(WafBroker.this, String.format("No more files."));
+        throw new DataInputException(WafBroker.this, String.format("No more records."));
       }
       DataReference result = nextFile;
       nextFile=null;
