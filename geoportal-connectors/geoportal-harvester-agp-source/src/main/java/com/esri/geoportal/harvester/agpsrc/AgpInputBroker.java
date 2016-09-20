@@ -77,7 +77,7 @@ import java.util.Date;
 
   @Override
   public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
-    return new AgpIterator();
+    return new AgpIterator(iteratorContext);
   }
 
   @Override
@@ -123,11 +123,17 @@ import java.util.Date;
   }
 
   private class AgpIterator implements InputBroker.Iterator {
+    private final IteratorContext iteratorContext;
     private final TransformerFactory tf = TransformerFactory.newInstance();
     private final long size = 10;
     private long from = 1;
     private java.util.Iterator<ItemEntry> iter;
+    private ItemEntry nextEntry;
     private boolean done;
+
+    public AgpIterator(IteratorContext iteratorContext) {
+      this.iteratorContext = iteratorContext;
+    }
 
     @Override
     public boolean hasNext() throws DataInputException {
@@ -151,33 +157,39 @@ import java.util.Date;
         iter = null;
         return hasNext();
       }
+      
+      nextEntry = iter.next();
+      if (iteratorContext.getLastHarvestDate()!=null && nextEntry.modified<iteratorContext.getLastHarvestDate().getTime()) {
+        nextEntry = null;
+        return hasNext();
+      }
+      
       return true;
     }
 
     @Override
     public DataReference next() throws DataInputException {
       try {
-        if (iter==null || !iter.hasNext()) {
+        if (nextEntry==null) {
             throw new DataInputException(AgpInputBroker.this, String.format("Error reading content."));
         }
-        ItemEntry next = iter.next();
         
         Properties props = new Properties();
-        if (next.id!=null) {
-          props.put("identifier", next.id);
+        if (nextEntry.id!=null) {
+          props.put("identifier", nextEntry.id);
         }
-        if (next.title!=null) {
-          props.put("title", next.title);
+        if (nextEntry.title!=null) {
+          props.put("title", nextEntry.title);
         }
-        if (next.description!=null) {
-          props.put("description", next.description);
+        if (nextEntry.description!=null) {
+          props.put("description", nextEntry.description);
         }
-        if (next.url!=null) {
-          props.put("resource.url", next.url);
+        if (nextEntry.url!=null) {
+          props.put("resource.url", nextEntry.url);
         }
         
-        if (next.extent!=null && next.extent.length==2 && next.extent[0]!=null && next.extent[0].length==2 && next.extent[1]!=null && next.extent[1].length==2) {
-          String sBox = String.format("%f %f,%f %f", next.extent[0][0], next.extent[0][1], next.extent[1][0], next.extent[1][1]);
+        if (nextEntry.extent!=null && nextEntry.extent.length==2 && nextEntry.extent[0]!=null && nextEntry.extent[0].length==2 && nextEntry.extent[1]!=null && nextEntry.extent[1].length==2) {
+          String sBox = String.format("%f %f,%f %f", nextEntry.extent[0][0], nextEntry.extent[0][1], nextEntry.extent[1][0], nextEntry.extent[1][1]);
           props.put("bbox", sBox);
         }
         
@@ -189,7 +201,7 @@ import java.util.Date;
         Transformer transformer = tf.newTransformer();
         transformer.transform(domSource, result);
 
-        return new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), next.id, new Date(next.modified), URI.create(next.id), writer.toString().getBytes("UTF-8"), MimeType.APPLICATION_XML);
+        return new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), nextEntry.id, new Date(nextEntry.modified), URI.create(nextEntry.id), writer.toString().getBytes("UTF-8"), MimeType.APPLICATION_XML);
       } catch (MetaException|TransformerException|URISyntaxException|IOException ex) {
         throw new DataInputException(AgpInputBroker.this, String.format("Error reading next data reference."), ex);
       }
