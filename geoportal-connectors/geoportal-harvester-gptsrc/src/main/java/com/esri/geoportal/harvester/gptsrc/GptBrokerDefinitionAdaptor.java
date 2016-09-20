@@ -15,8 +15,10 @@
  */
 package com.esri.geoportal.harvester.gptsrc;
 
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
+import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 /*package*/ class GptBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public static final String P_HOST_URL        = "gpt-host-url";
 
+  private final CredentialsDefinitionAdaptor credAdaptor;
   private URL hostUrl;
 
   /**
@@ -36,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
    */
   public GptBrokerDefinitionAdaptor(EntityDefinition def) throws InvalidDefinitionException {
     super(def);
+    this.credAdaptor = new CredentialsDefinitionAdaptor(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(GptConnector.TYPE);
     } else if (!GptConnector.TYPE.equals(def.getType())) {
@@ -68,5 +72,21 @@ import org.apache.commons.lang3.StringUtils;
   public void setHostUrl(URL url) {
     this.hostUrl = url;
     set(P_HOST_URL, url.toExternalForm());
+  }
+
+  /**
+   * Gets credentials.
+   * @return credentials
+   */
+  public SimpleCredentials getCredentials() {
+    return credAdaptor.getCredentials();
+  }
+
+  /**
+   * Sets credentials.
+   * @param cred credentials
+   */
+  public void setCredentials(SimpleCredentials cred) {
+    credAdaptor.setCredentials(cred);
   }
 }

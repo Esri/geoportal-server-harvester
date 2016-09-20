@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.commons.gpt.client;
 
+import com.esri.geoportal.commons.gpt.client.QueryResponse.Hit;
 import static com.esri.geoportal.commons.utils.HttpClientContextBuilder.createHttpClientContext;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
@@ -56,7 +57,8 @@ public class Client implements Closeable {
   private final Logger LOG = LoggerFactory.getLogger(Client.class);
 
   private static final String REST_ITEM_URL = "rest/metadata/item";
-  private static final String REST_SEARCH_URL = "rest/metadata/search";
+  private static final String ELASTIC_SEARCH_URL = "elastic/metadata/item/_search";
+  private static final String ELASTIC_SCROLL_URL = "elastic/_search/scroll";
 
   private final CloseableHttpClient httpClient;
   private final URL url;
@@ -142,7 +144,7 @@ public class Client implements Closeable {
    * @throws URISyntaxException if invalid URI
    * @throws IOException if reading metadata fails
    */
-  public String read(String id) throws URISyntaxException, IOException {
+  public String readXml(String id) throws URISyntaxException, IOException {
     HttpGet get = new HttpGet(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/xml"));
     
     try (CloseableHttpResponse httpResponse = execute(get); InputStream contentStream = httpResponse.getEntity().getContent();) {
@@ -157,18 +159,26 @@ public class Client implements Closeable {
   }
   
   /**
-   * Returns list of ids.
-   * @param from starting from the particular index (0-based)
-   * @param size size of the returned set
-   * @return list of ids or <code>null</code> if no more ids.
+   * Reads metadata.
+   * @param id id of the metadata
+   * @return string representing metadata
+   * @throws URISyntaxException if invalid URI
+   * @throws IOException if reading metadata fails
+   */
+  public EntryRef readItem(String id) throws URISyntaxException, IOException {
+    HttpGet get = new HttpGet(url.toURI().resolve(REST_ITEM_URL + "/" + id ));
+    Hit hit =  execute(get,Hit.class);
+    return new EntryRef(hit._id, readUri(hit._source), readLastUpdated(hit._source));
+  }
+  
+  /**
+   * Returns listIds of ids.
+   * @return listIds of ids or <code>null</code> if no more ids.
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  public List<EntryRef> list(long from, long size)  throws URISyntaxException, IOException {
-    QueryResponse result = query(null,null,from,size);
-    return result!=null && result.hits!=null && result.hits.hits!=null && !result.hits.hits.isEmpty()? 
-            result.hits.hits.stream().map(h->new EntryRef(h._id, readUri(h._source), readLastUpdated(h._source))).collect(Collectors.toList()): 
-            null;
+  public List<String> listIds()  throws URISyntaxException, IOException {
+    return queryIds(null, null, 200);
   }
   
   private CloseableHttpResponse execute(HttpUriRequest request) throws IOException {
@@ -213,21 +223,10 @@ public class Client implements Closeable {
    * @throws URISyntaxException if URL has invalid syntax
    */
   public PublishResponse delete(String id) throws URISyntaxException, IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     HttpDelete del = new HttpDelete(url.toURI().resolve(REST_ITEM_URL + "/" + id));
     del.setConfig(DEFAULT_REQUEST_CONFIG);
 
-    try (CloseableHttpResponse httpResponse = execute(del); InputStream contentStream = httpResponse.getEntity().getContent();) {
-      if (httpResponse.getStatusLine().getStatusCode()>=400) {
-        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
-      }
-      String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
-      String responseContent = IOUtils.toString(contentStream, "UTF-8");
-      LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
-      return mapper.readValue(responseContent, PublishResponse.class);
-    }
+    return execute(del, PublishResponse.class);
   }
 
   /**
@@ -246,18 +245,16 @@ public class Client implements Closeable {
    * Query ids.
    * @param term term to query
    * @param value value of the term
-   * @param size size of the chunk
-   * @return list of ids
+   * @return listIds of ids
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
   private List<String> queryIds(String term, String value, long size) throws IOException, URISyntaxException {
     ArrayList<String> ids = new ArrayList<>();
-    
-    long from = 0;
+    SearchContext searchContext = new SearchContext();
     
     while (true) {
-      QueryResponse response = query(term, value, from, size);
+      QueryResponse response = query(term, value, size, searchContext);
       if (Thread.currentThread().isInterrupted()) {
         break;
       }
@@ -268,7 +265,6 @@ public class Client implements Closeable {
               .map(h -> h._id)
               .filter(id -> id != null)
               .collect(Collectors.toList()));
-      from += response.hits.hits.size();
     }
     
     return ids;
@@ -279,33 +275,39 @@ public class Client implements Closeable {
    *
    * @param term term name
    * @param value value of the term
-   * @param from starting record
-   * @param size number of records to return
+   * @param size size
    * @return query response
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  private QueryResponse query(String term, String value, long from, long size) throws IOException, URISyntaxException {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
-    HttpGet get = new HttpGet(url.toURI().resolve(REST_SEARCH_URL).toASCIIString() + 
-            String.format("?from=%d&size=%d", from, size) +
-            (term!=null && value!=null? String.format("&q=%s:%s", term, URLEncoder.encode("\"" + value + "\"", "UTF-8")): ""));
+  private QueryResponse query(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
+    HttpGet get = searchContext._scroll_id==null?
+            new HttpGet(url.toURI().resolve(ELASTIC_SEARCH_URL).toASCIIString() + 
+            (term!=null && value!=null
+                    ? String.format("?q=%s:%s&size=%d&scroll=1m", term, URLEncoder.encode("\"" + value + "\"", "UTF-8"), size)
+                    : String.format("?q=*:*&size=%d&scroll=1m", size))):
+            new HttpGet(url.toURI().resolve(ELASTIC_SCROLL_URL).toASCIIString() + 
+            String.format("?scroll=1m&scroll_id=%s", searchContext._scroll_id));
     
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("Content-Type", "application/json");
+    
+    QueryResponse respone =  execute(get, QueryResponse.class);
+    searchContext._scroll_id = respone._scroll_id;
+    return respone;
+  }
+  
+  private <T> T execute(HttpUriRequest req, Class<T> clazz) throws IOException {
 
-    try (CloseableHttpResponse httpResponse = execute(get); InputStream contentStream = httpResponse.getEntity().getContent();) {
+    try (CloseableHttpResponse httpResponse = execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
       if (httpResponse.getStatusLine().getStatusCode()>=400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
-      String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
-      LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
-      QueryResponse queryResponse = mapper.readValue(responseContent, QueryResponse.class);
-      return queryResponse;
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+      return mapper.readValue(responseContent, clazz);
     }
   }
 
@@ -314,5 +316,9 @@ public class Client implements Closeable {
     if (httpClient instanceof Closeable) {
       ((Closeable) httpClient).close();
     }
+  }
+  
+  public static class SearchContext {
+    public String _scroll_id;
   }
 }

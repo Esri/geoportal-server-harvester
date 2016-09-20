@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.gptsrc;
 
+import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -40,6 +41,12 @@ public class GptConnector implements InputConnector<InputBroker> {
   public UITemplate getTemplate() {
     List<UITemplate.Argument> arguments = new ArrayList<>();
     arguments.add(new UITemplate.StringArgument(P_HOST_URL, "URL", true));
+    arguments.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_USERNAME, "User name", true));
+    arguments.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_PASSWORD, "User password", true) {
+      public boolean isPassword() {
+        return true;
+      }
+    });
     return new UITemplate(getType(), "Geoportal Server 2.0", arguments);
   }
 

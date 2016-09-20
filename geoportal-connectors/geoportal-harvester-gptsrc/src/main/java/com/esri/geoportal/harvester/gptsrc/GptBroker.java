@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import org.apache.http.client.HttpResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +50,7 @@ import org.slf4j.LoggerFactory;
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
-    client = new Client(definition.getHostUrl(), null);
+    client = new Client(definition.getHostUrl(), definition.getCredentials());
   }
 
   @Override
@@ -89,34 +88,20 @@ import org.slf4j.LoggerFactory;
   }
   
   private class GptIterator implements InputBroker.Iterator {
-    private long from = 0;
-    private final long size = 100;
-    private java.util.Iterator<EntryRef> iter;
-    private boolean done;
+    private java.util.Iterator<String> iter;
 
     @Override
     public boolean hasNext() throws DataInputException {
       try {
-        if (done) return false;
-        if (iter==null || !iter.hasNext()) {
+        if (iter==null) {
           iter = null;
-          List<EntryRef> list = client.list(from, size);
-          from += size;
+          List<String> list = client.listIds();
           if (list==null || list.isEmpty()) {
-            done = true;
             return false;
           }
           iter = list.iterator();
         }
-        return true;
-      } catch (HttpResponseException ex) {
-        if (ex.getStatusCode()==500) {
-          LOG.warn(String.format("GPT client failed to provide more id. Iteration completed."), ex);
-          done = true;
-          return false;
-        } else {
-          throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records."), ex);
-        }
+        return iter.hasNext();
       } catch (IOException|URISyntaxException ex) {
         throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records."), ex);
       }
@@ -127,9 +112,10 @@ import org.slf4j.LoggerFactory;
       if (iter==null || !iter.hasNext()) {
         throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records."));
       }
-      EntryRef ref = iter.next();
+      String id = iter.next();
       try {
-        String xml = client.read(ref.getId());
+        String xml = client.readXml(id);
+        EntryRef ref = client.readItem(id);
         return new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), ref.getId(), ref.getLastModified(), ref.getSourceUri(), xml.getBytes("UTF-8"), MimeType.APPLICATION_XML);
       } catch (URISyntaxException|IOException ex) {
         throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records."), ex);

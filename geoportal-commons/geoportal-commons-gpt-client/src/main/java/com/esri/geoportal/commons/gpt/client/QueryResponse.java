@@ -21,6 +21,7 @@ import java.util.List;
  * Query response.
  */
 /*package*/ final class QueryResponse {
+  public String _scroll_id;
   public long total;
   public Hits hits;
  
