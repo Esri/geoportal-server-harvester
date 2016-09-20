@@ -111,7 +111,7 @@ public class DefaultProcessor implements Processor {
      * Creates instance of the process.
      *
      * @param task task
-     * @param attributes attributes or <code>null</code> if no attributes
+     * @param iteratorContext iteration context
      */
     public DefaultProcess(Task task, IteratorContext iteratorContext) {
       this.task = task;

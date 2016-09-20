@@ -18,7 +18,6 @@ package com.esri.geoportal.harvester.api.defs;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Task definition.
@@ -30,6 +29,7 @@ public final class TaskDefinition implements Serializable {
   private EntityDefinition source;
   private List<LinkDefinition> destinations;
   private List<String> keywords = new ArrayList<>();
+  private boolean incremental;
 
   /**
    * Gets processor definition.
@@ -94,30 +94,25 @@ public final class TaskDefinition implements Serializable {
   public void setKeywords(List<String> keywords) {
     this.keywords = keywords!=null? keywords: new ArrayList<>();
   }
+
+  /**
+   * Checks if is incremental harvest.
+   * @return <code>true</code> for incremental
+   */
+  public boolean isIncremental() {
+    return incremental;
+  }
+
+  /**
+   * Sets incremental harvest.
+   * @param incremental <code>true</code> for incremental
+   */
+  public void setIncremental(boolean incremental) {
+    this.incremental = incremental;
+  }
   
   @Override
   public String toString() {
-    return String.format("PROCESSOR: %s, SOURCE: %s, DESTINATIONS: %s", processor, source, destinations!=null? destinations: null);
-  }
-  
-  @Override
-  public boolean equals(Object o) {
-    if (o instanceof TaskDefinition) {
-      TaskDefinition td = (TaskDefinition)o;
-      return ((getProcessor()!=null && td.getProcessor()!=null && getProcessor().equals(td.getProcessor())) || (getProcessor()==null && td.getProcessor()==null)) &&
-             ((getSource()!=null && td.getSource()!=null && getSource().equals(td.getSource())) || (getSource()==null && td.getSource()==null)) &&
-             ((getDestinations()!=null && td.getDestinations()!=null && getDestinations().equals(td.getDestinations())) || (getDestinations()==null && td.getDestinations()==null)) ;
-    }
-    
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = 3;
-    hash = 79 * hash + Objects.hashCode(this.processor);
-    hash = 79 * hash + Objects.hashCode(this.source);
-    hash = 79 * hash + Objects.hashCode(this.destinations);
-    return hash;
+    return String.format("PROCESSOR: %s, SOURCE: %s, DESTINATIONS: %s, INCREMENTAL: %b", processor, source, destinations!=null? destinations: null, incremental);
   }
 }

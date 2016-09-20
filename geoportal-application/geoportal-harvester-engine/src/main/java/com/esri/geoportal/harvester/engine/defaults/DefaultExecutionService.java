@@ -277,7 +277,7 @@ public class DefaultExecutionService implements ExecutionService {
     @Override
     public synchronized ProcessInstance execute(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
       SimpleIteratorContext iteratorContext = new SimpleIteratorContext();
-      iteratorContext.setLastHarvest(lastHarvest());
+      iteratorContext.setLastHarvest(taskDefinition.isIncremental()? lastHarvest(): null);
       ProcessReference ref = DefaultExecutionService.this.execute(taskDefinition,iteratorContext);
       if (taskId!=null) {
         ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref.getProcess(), historyManager));

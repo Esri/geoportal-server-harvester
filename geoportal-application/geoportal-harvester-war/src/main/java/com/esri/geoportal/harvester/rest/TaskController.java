@@ -314,7 +314,7 @@ public class TaskController {
       
       // make iterator context
       SimpleIteratorContext iteratorContext = new SimpleIteratorContext();
-      iteratorContext.setLastHarvest(lastEvent!=null? lastEvent.getStartTimestamp(): null);
+      iteratorContext.setLastHarvest(taskDefinition.isIncremental() && lastEvent!=null? lastEvent.getStartTimestamp(): null);
       
       ProcessReference ref = engine.getExecutionService().execute(taskDefinition, iteratorContext);
       ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref.getProcess(), historyManager));
@@ -370,7 +370,7 @@ public class TaskController {
       
       // make iterator context
       SimpleIteratorContext iteratorContext = new SimpleIteratorContext();
-      iteratorContext.setLastHarvest(lastEvent!=null? lastEvent.getStartTimestamp(): null);
+      iteratorContext.setLastHarvest(taskDefinition.isIncremental() && lastEvent!=null? lastEvent.getStartTimestamp(): null);
       
       TriggerReference trigRef = engine.getExecutionService().schedule(taskId, triggerInstanceDefinition, iteratorContext);
       return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), taskId, trigRef.getTriggerDefinition()),HttpStatus.OK);
