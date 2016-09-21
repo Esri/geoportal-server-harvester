@@ -5,6 +5,7 @@
 identifier=<xsl:value-of select="/rdf:RDF/rdf:Description/dc:identifier"/>
 title=<xsl:value-of select="/rdf:RDF/rdf:Description/dc:title"/>
 description=<xsl:value-of select="/rdf:RDF/rdf:Description/dc:description"/>
+modified=<xsl:value-of select="/rdf:RDF/rdf:Description/dc:date"/>
 resource.url=<xsl:value-of select="/rdf:RDF/rdf:Description/dct:references"/>
 resource.url.scheme=<xsl:value-of select="/rdf:RDF/rdf:Description/dct:references/@scheme"/>
 bbox=<xsl:value-of select="/rdf:RDF/rdf:Description/ows:WGS84BoundingBox/ows:LowerCorner"/>,<xsl:value-of select="/rdf:RDF/rdf:Description/ows:WGS84BoundingBox/ows:UpperCorner"/>

@@ -5,6 +5,7 @@
 	<xsl:param name="identifier"/>
 	<xsl:param name="title"/>
 	<xsl:param name="description"/>
+	<xsl:param name="modified"/>
 	<xsl:param name="resource.url"/>
 	<xsl:param name="resource.url.scheme"/>
 	<xsl:param name="bbox"/>
@@ -16,6 +17,7 @@
 		<dc:identifier><xsl:value-of select="$identifier"/></dc:identifier>
 		<dc:title><xsl:value-of select="$title"/></dc:title>
 		<dc:description><xsl:value-of select="$description"/></dc:description>
+		<dc:date><xsl:value-of select="$modified"/></dc:date>
 		<dct:references>
 			<xsl:attribute name="scheme"><xsl:value-of select="$resource.url.scheme"/></xsl:attribute>
 			<xsl:value-of select="$resource.url"/>
