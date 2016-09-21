@@ -50,6 +50,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -178,7 +179,10 @@ public class TaskController {
     try {
       LOG.debug(String.format("GET /rest/harvester/tasks/%s", taskId));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
-      return new ResponseEntity<>(taskDefinition!=null? new TaskResponse(taskId, taskDefinition): null,HttpStatus.OK);
+      if (taskDefinition==null) {
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }
+      return new ResponseEntity<>(new TaskResponse(taskId, taskDefinition),HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error getting task: %s", taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -195,6 +199,9 @@ public class TaskController {
     try {
       LOG.debug(String.format("GET /rest/harvester/tasks/%s", taskId));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
+      if (taskDefinition==null) {
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }
       MultiValueMap<String,String> headers = new LinkedMultiValueMap<>();
       headers.add("Content-disposition", String.format("attachment; filename=\"%s.json\"", taskId));
       ObjectMapper mapper = new ObjectMapper();
@@ -255,7 +262,7 @@ public class TaskController {
       if (taskDefinition!=null) {
         engine.getTasksService().deleteTaskDefinition(taskId);
       }
-      return new ResponseEntity<>(taskDefinition!=null? new TaskResponse(taskId, taskDefinition): null,HttpStatus.OK);
+      return new ResponseEntity<>(new TaskResponse(taskId, taskDefinition),HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error deleting task: %s", taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -300,13 +307,20 @@ public class TaskController {
   /**
    * Executes task by id.
    * @param taskId task id
+   * @param incremental optional incremental harvest flag
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/execute", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ProcessResponse> executeTask(@PathVariable UUID taskId) {
+  public ResponseEntity<ProcessResponse> executeTask(@PathVariable UUID taskId, @RequestParam(required = false) Boolean incremental) {
     try {
       LOG.debug(String.format("POST /rest/harvester/tasks/%s/execute", taskId));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
+      if (taskDefinition==null) {
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }
+      if (incremental==null) {
+        incremental = taskDefinition.isIncremental();
+      }
       
       // obtain last harvest data
       History history = engine.getTasksService().getHistory(taskId);
@@ -314,7 +328,7 @@ public class TaskController {
       
       // make iterator context
       SimpleIteratorContext iteratorContext = new SimpleIteratorContext();
-      iteratorContext.setLastHarvest(taskDefinition.isIncremental() && lastEvent!=null? lastEvent.getStartTimestamp(): null);
+      iteratorContext.setLastHarvest(incremental && lastEvent!=null? lastEvent.getStartTimestamp(): null);
       
       ProcessReference ref = engine.getExecutionService().execute(taskDefinition, iteratorContext);
       ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref.getProcess(), historyManager));
@@ -352,13 +366,21 @@ public class TaskController {
    * Schedules task by id.
    * @param triggerDefinition trigger definition
    * @param taskId task id
+   * @param incremental optional incremental harvest flag
    * @return task info of the deleted task or <code>null</code> if no tasks have been deleted
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/schedule", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId) {
+  public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId, @RequestParam(required = false) Boolean incremental) {
     try {
       LOG.debug(String.format("POST /rest/harvester/tasks/%s/schedule <-- %s", taskId, triggerDefinition));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
+      if (taskDefinition==null) {
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }
+      if (incremental==null) {
+        incremental = taskDefinition.isIncremental();
+      }
+      
       TriggerDefinition triggerInstanceDefinition = new TriggerDefinition();
       triggerInstanceDefinition.setType(triggerDefinition.getType());
       triggerInstanceDefinition.setTaskDefinition(taskDefinition);
@@ -370,7 +392,7 @@ public class TaskController {
       
       // make iterator context
       SimpleIteratorContext iteratorContext = new SimpleIteratorContext();
-      iteratorContext.setLastHarvest(taskDefinition.isIncremental() && lastEvent!=null? lastEvent.getStartTimestamp(): null);
+      iteratorContext.setLastHarvest(incremental && lastEvent!=null? lastEvent.getStartTimestamp(): null);
       
       TriggerReference trigRef = engine.getExecutionService().schedule(taskId, triggerInstanceDefinition, iteratorContext);
       return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), taskId, trigRef.getTriggerDefinition()),HttpStatus.OK);

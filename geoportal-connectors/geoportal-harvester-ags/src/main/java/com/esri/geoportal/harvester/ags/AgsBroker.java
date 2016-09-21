@@ -106,6 +106,9 @@ import org.w3c.dom.Document;
   @Override
   public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
     try {
+      if (iteratorContext.getLastHarvestDate()!=null) {
+        LOG.info(String.format("Incremental harvest is not supported by Server for ArcGIS connector. Full harvest will be performed instead."));
+      }
       List<ServerResponse> responses = listResponses(null);
       return new AgsIterator(responses.iterator());
     } catch (URISyntaxException|IOException ex) {
