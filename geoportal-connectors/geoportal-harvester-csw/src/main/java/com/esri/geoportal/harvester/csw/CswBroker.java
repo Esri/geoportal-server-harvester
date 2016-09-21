@@ -130,7 +130,7 @@ import org.slf4j.LoggerFactory;
         }
 
         if (recs==null) {
-          IRecords r = client.findRecords(start, PAGE_SIZE);
+          IRecords r = client.findRecords(start, PAGE_SIZE, iteratorContext.getLastHarvestDate(), null);
           if (r.isEmpty()) {
             noMore = true;
           } else {
@@ -146,6 +146,7 @@ import org.slf4j.LoggerFactory;
         }
         
         IRecord rec = recs.next();
+        
         if (rec.getLastModifiedDate()!=null && iteratorContext.getLastHarvestDate()!=null && !(rec.getLastModifiedDate().getTime()>=iteratorContext.getLastHarvestDate().getTime())) {
           return hasNext();
         }

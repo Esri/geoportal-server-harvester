@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -105,7 +106,7 @@ public class Client implements IClient {
   }
 
   @Override
-  public IRecords findRecords(int start, int max) throws Exception {
+  public IRecords findRecords(int start, int max, Date from, Date to) throws Exception {
     LOG.debug(String.format("Executing findRecords(start=%d,max=%d)", start, max));
     
     loadCapabilities();
@@ -113,6 +114,8 @@ public class Client implements IClient {
     Criteria crt = new Criteria();
     crt.setStartPosition(start);
     crt.setMaxRecords(max);
+    crt.setFromDate(from);
+    crt.setToDate(to);
     HttpPost postRequest = new HttpPost(capabilites.get_getRecordsPostURL());
     postRequest.setConfig(DEFAULT_REQUEST_CONFIG);
     String requestBody = createGetRecordsRequest(crt);
@@ -392,9 +395,14 @@ public class Client implements IClient {
       request += "<MaxX>" + criteria.getEnvelope().getXMax() + "</MaxX>";
       request += "<MaxY>" + criteria.getEnvelope().getYMax() + "</MaxY>";
       request += "</Envelope>";
-      request += "<RecordsFullyWithinEnvelope>" + criteria.getOperation() == Contains + "</RecordsFullyWithinEnvelope>";
-      request += "<RecordsIntersectWithEnvelope>" + criteria.getOperation() == Intersects + "</RecordsIntersectWithEnvelope>";
-
+      request += "<RecordsFullyWithinEnvelope>" + (criteria.getOperation() == Contains) + "</RecordsFullyWithinEnvelope>";
+      request += "<RecordsIntersectWithEnvelope>" + (criteria.getOperation() == Intersects) + "</RecordsIntersectWithEnvelope>";
+    }
+    if (criteria.getFromDate()!=null) {
+      request += "<FromDate>" + formatIsoDate(criteria.getFromDate()) + "</FromDate>";
+    }
+    if (criteria.getToDate()!=null) {
+      request += "<ToDate>" + formatIsoDate(criteria.getToDate()) + "</ToDate>";
     }
     request += "</GetRecords>";
 
@@ -407,14 +415,24 @@ public class Client implements IClient {
    * @param strDate ISO date as string
    * @return date object or <code>null</code> if unable to parse date
    */
-  private Date parseIsoDate(String strDate) {
+  private static Date parseIsoDate(String strDate) {
     try {
       return Date.from(ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(strDate)).toInstant());
     } catch (Exception ex) {
       return null;
     }
   }
-
+  
+  /**
+   * Formats ISO date.
+   * @param date date to format
+   * @return ISO date
+   */
+  private static String formatIsoDate(Date date) {
+    ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+    return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(zonedDateTime);
+  }
+  
   @Override
   public String toString() {
     return String.format("CSW :: URL: %s [%s]", baseUrl, profile.getId());

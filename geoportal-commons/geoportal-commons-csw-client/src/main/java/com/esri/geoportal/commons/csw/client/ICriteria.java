@@ -17,6 +17,7 @@ package com.esri.geoportal.commons.csw.client;
 
 import com.esri.core.geometry.Envelope;
 import com.esri.core.geometry.Operator;
+import java.util.Date;
 
 /**
  * Search criteria.
@@ -57,4 +58,16 @@ public interface ICriteria {
    * @return <code>true</code> if live data expected only
    */
   boolean isLiveDataAndMapsOnly();
+  
+  /**
+   * Gets from date.
+   * @return from date
+   */
+  Date getFromDate();
+  
+  /**
+   * Gets to date.
+   * @return to date
+   */
+  Date getToDate();
 }

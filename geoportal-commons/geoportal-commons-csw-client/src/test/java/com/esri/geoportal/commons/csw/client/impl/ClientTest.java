@@ -114,7 +114,7 @@ public class ClientTest {
     BotsHttpClient httpClient = new BotsHttpClient(bots);
     
     Client cswClient = new Client(httpClient, new URL("http://localhost:5000/csw"), defaultProfile, null);
-    IRecords records = cswClient.findRecords(1, 10);
+    IRecords records = cswClient.findRecords(1, 10, null, null);
     
     assertNotNull("No records", records);
   }

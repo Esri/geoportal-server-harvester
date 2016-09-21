@@ -18,6 +18,7 @@ package com.esri.geoportal.commons.csw.client.impl;
 import com.esri.core.geometry.Envelope;
 import com.esri.core.geometry.Operator;
 import com.esri.geoportal.commons.csw.client.ICriteria;
+import java.util.Date;
 
 /**
  * Criteria implementation.
@@ -29,6 +30,8 @@ public class Criteria implements ICriteria {
   private Envelope envelope;
   private Operator.Type operation;
   private boolean liveDataAndMapsOnly;
+  private Date fromDate;
+  private Date toDate;
 
   @Override
   public int getStartPosition() {
@@ -106,5 +109,31 @@ public class Criteria implements ICriteria {
    */
   public void setLiveDataAndMapsOnly(boolean liveDataAndMapsOnly) {
     this.liveDataAndMapsOnly = liveDataAndMapsOnly;
+  }
+
+  @Override
+  public Date getFromDate() {
+    return fromDate;
+  }
+
+  /**
+   * Sets from date.
+   * @param fromDate from date
+   */
+  public void setFromDate(Date fromDate) {
+    this.fromDate = fromDate;
+  }
+
+  @Override
+  public Date getToDate() {
+    return toDate;
+  }
+
+  /**
+   * Sets to date.
+   * @param toDate to date 
+   */
+  public void setToDate(Date toDate) {
+    this.toDate = toDate;
   }
 }

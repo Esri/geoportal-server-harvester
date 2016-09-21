@@ -15,6 +15,8 @@
  */
 package com.esri.geoportal.commons.csw.client;
 
+import java.util.Date;
+
 /**
  * Client interface.
  */
@@ -23,10 +25,12 @@ public interface IClient {
    * Finds all records.
    * @param start start record
    * @param max number of records to return
+   * @param from optional from date
+   * @param to optional to date
    * @return records
    * @throws Exception if finding records fails
    */
-  IRecords findRecords(int start, int max) throws Exception;
+  IRecords findRecords(int start, int max, Date from, Date to) throws Exception;
   
   /**
    * Reads metadata.
