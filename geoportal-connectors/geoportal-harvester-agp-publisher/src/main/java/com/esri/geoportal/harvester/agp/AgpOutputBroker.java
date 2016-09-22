@@ -146,6 +146,8 @@ import org.xml.sax.SAXException;
           if (response == null || !response.success) {
             throw new DataOutputException(this, String.format("Error adding item: %s", ref.getSourceUri()));
           }
+          
+          client.share(definition.getCredentials().getUserName(), definition.getFolderId(), response.id, true, true, null, token);
 
           return PublishingStatus.CREATED;
         } else if (itemEntry.owner.equals(definition.getCredentials().getUserName())) {
