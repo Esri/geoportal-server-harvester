@@ -79,6 +79,7 @@ public class AgpClient implements Closeable {
    * @param title title
    * @param description description
    * @param text text
+   * @param thumbnailUrl thumbnail url
    * @param itemType item type (must be a URL type)
    * @param extent extent
    * @param typeKeywords type keywords
@@ -88,7 +89,7 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse addItem(String owner, String folderId, String title, String description, String text, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+  public ItemResponse addItem(String owner, String folderId, String title, String description, String text, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(addItemUri(owner, StringUtils.trimToNull(folderId)));
     
     HttpPost req = new HttpPost(builder.build());
@@ -98,6 +99,9 @@ public class AgpClient implements Closeable {
     params.put("description", description);
     params.put("type", itemType.getTypeName());
     params.put("text", text);
+    if (thumbnailUrl!=null) {
+      params.put("thumbnailurl", thumbnailUrl.toExternalForm());
+    }
     if (extent!=null && extent.length==4) {
       params.put("extent",Arrays.asList(extent).stream().map(Object::toString).collect(Collectors.joining(",")));
     }
@@ -121,6 +125,7 @@ public class AgpClient implements Closeable {
    * @param title title
    * @param description description
    * @param url URL
+   * @param thumbnailUrl thumbnail url
    * @param itemType item type (must be a URL type)
    * @param extent extent
    * @param typeKeywords type keywords
@@ -130,7 +135,7 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse addItem(String owner, String folderId, String title, String description, URL url, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+  public ItemResponse addItem(String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(addItemUri(owner, StringUtils.trimToNull(folderId)));
     
     HttpPost req = new HttpPost(builder.build());
@@ -140,6 +145,9 @@ public class AgpClient implements Closeable {
     params.put("description", description);
     params.put("type", itemType.getTypeName());
     params.put("url", url.toExternalForm());
+    if (thumbnailUrl!=null) {
+      params.put("thumbnailurl", thumbnailUrl.toExternalForm());
+    }
     if (extent!=null && extent.length==4) {
       params.put("extent",Arrays.asList(extent).stream().map(Object::toString).collect(Collectors.joining(",")));
     }
@@ -164,6 +172,7 @@ public class AgpClient implements Closeable {
    * @param title title
    * @param description description
    * @param text text
+   * @param thumbnailUrl thumbnail URL
    * @param itemType item type (must be a URL type)
    * @param extent extent
    * @param typeKeywords type keywords
@@ -173,7 +182,7 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, String text, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, String text, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(updateItemUri(owner, StringUtils.trimToNull(folderId), itemId));
     
     HttpPost req = new HttpPost(builder.build());
@@ -183,6 +192,9 @@ public class AgpClient implements Closeable {
     params.put("description", description);
     params.put("type", itemType.getTypeName());
     params.put("text", text);
+    if (thumbnailUrl!=null) {
+      params.put("thumbnailurl", thumbnailUrl.toExternalForm());
+    }
     if (extent!=null && extent.length==4) {
       params.put("extent",Arrays.asList(extent).stream().map(Object::toString).collect(Collectors.joining(",")));
     }
@@ -228,6 +240,7 @@ public class AgpClient implements Closeable {
    * @param title title
    * @param description description
    * @param url URL
+   * @param thumbnailUrl thumbnail URL
    * @param itemType item type (must be a URL type)
    * @param extent extent
    * @param typeKeywords type keywords
@@ -237,7 +250,7 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, URL url, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(updateItemUri(owner, StringUtils.trimToNull(folderId), itemId));
     
     HttpPost req = new HttpPost(builder.build());
@@ -247,6 +260,9 @@ public class AgpClient implements Closeable {
     params.put("description", description);
     params.put("type", itemType.getTypeName());
     params.put("url", url.toExternalForm());
+    if (thumbnailUrl!=null) {
+      params.put("thumbnailurl", thumbnailUrl.toExternalForm());
+    }
     if (extent!=null && extent.length==4) {
       params.put("extent",Arrays.asList(extent).stream().map(Object::toString).collect(Collectors.joining(",")));
     }
