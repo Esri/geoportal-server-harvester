@@ -38,6 +38,13 @@ public interface ReportBuilder {
   void completed(ProcessInstance process);
   
   /**
+   * Indicates data has been acquired.
+   * @param process process
+   * @param dataReference data reference
+   */
+  void acquire(ProcessInstance process, DataReference dataReference);
+  
+  /**
    * Make success entry.
    * @param process process
    * @param dataReference data reference

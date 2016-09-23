@@ -57,6 +57,11 @@ public class ReportBuilderAdaptor extends BaseProcessInstanceListener {
   }
 
   @Override
+  public void onDataAcquired(DataReference dataReference) {
+    reportBuilder.acquire(processInstance, dataReference);
+  }
+
+  @Override
   public void onDataProcessed(DataReference dataReference, PublishingStatus status) {
     if (!status.equals(PublishingStatus.SKIPPED)) {
       reportBuilder.success(processInstance, dataReference);

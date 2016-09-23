@@ -47,6 +47,12 @@ public interface Statistics {
   Date getStartDate();
 
   /**
+   * Gets number of acquired metadata.
+   * @return number of acquired metadata
+   */
+  long getAcquired();
+  
+  /**
    * Gets number of successfully processed records.
    * @return number of successfully processed records
    */

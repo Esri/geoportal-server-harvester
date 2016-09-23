@@ -36,6 +36,7 @@ public class ReportStatistics implements ReportBuilder, Statistics {
   private Date startDate;
   private Date endDate;
   
+  private long acquired;
   private long succeeded;
   private long harvestFailed;
   private long publishFailed;
@@ -79,9 +80,19 @@ public class ReportStatistics implements ReportBuilder, Statistics {
   }
 
   @Override
+  public void acquire(ProcessInstance process, DataReference dataReference) {
+    acquired++;
+  }
+
+  @Override
   public void completed(ProcessInstance process) {
     endDate = Calendar.getInstance().getTime();
     LOG.info(String.format("Harvesting of %s completed at %s. No. succeded: %d, no. failed: %d", process, endDate, succeeded, harvestFailed+publishFailed));
+  }
+
+  @Override
+  public long getAcquired() {
+    return acquired;
   }
 
   @Override

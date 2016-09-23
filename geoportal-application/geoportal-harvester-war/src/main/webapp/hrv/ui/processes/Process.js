@@ -56,7 +56,7 @@ define(["dojo/_base/declare",
               domStyle.set(this.cancelNode,"display",result.status==="working"? "inline": "none");
               domStyle.set(this.progressNode,"display",result.status==="working"? "inline": "none");
               if (result.status==="working" && result.statistics) {
-                html.set(this.progressNode, ""+result.statistics.succeeded);
+                html.set(this.progressNode, ""+result.statistics.acquired);
               }
               if (result.status==="working" || result.status==="aborting") {
                 setTimeout(update,2000);

@@ -44,6 +44,11 @@ public class ReportDispatcher implements ReportBuilder {
   }
 
   @Override
+  public void acquire(ProcessInstance process, DataReference dataReference) {
+    builders.forEach(b->b.acquire(process, dataReference));
+  }
+
+  @Override
   public void completed(ProcessInstance process) {
     builders.forEach(b->b.completed(process));
   }
