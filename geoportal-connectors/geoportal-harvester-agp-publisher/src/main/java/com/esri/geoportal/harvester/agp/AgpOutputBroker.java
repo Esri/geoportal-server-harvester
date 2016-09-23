@@ -129,7 +129,8 @@ import org.xml.sax.SAXException;
         }
         
         // find thumbnail URL
-        URL thumbnailUrl = new URL(getAttributeValue(attributes, "thumbnail.url", null));
+        String sThumbnailUrl = StringUtils.trimToNull(getAttributeValue(attributes, "thumbnail.url", null));
+        URL thumbnailUrl = sThumbnailUrl!=null? new URL(sThumbnailUrl): null;
 
         // check if item exists
         QueryResponse search = client.search(String.format("typekeywords:%s", String.format("src_uri_s=%s", src_uri_s)), 0, 0, token);
