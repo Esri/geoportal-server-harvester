@@ -33,6 +33,7 @@ public class StringAttribute implements Attribute {
     return true;
   }
 
+  @Override
   public String getValue() {
     return value;
   }

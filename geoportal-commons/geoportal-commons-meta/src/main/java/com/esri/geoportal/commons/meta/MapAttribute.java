@@ -43,7 +43,7 @@ public class MapAttribute implements Attribute {
   public Map<String, String> flatten(String prefix) {
     HashMap<String,String> flat = new HashMap<>();
     attributes.entrySet().forEach(entry->{
-      Map<String, String> f = entry.getValue().flatten(String.format("%s.%s", prefix, entry.getKey()));
+      Map<String, String> f = entry.getValue().flatten(prefix!=null? String.format("%s.%s", prefix, entry.getKey()): String.format("%s", entry.getKey()));
       flat.putAll(f);
     });
     return flat;
