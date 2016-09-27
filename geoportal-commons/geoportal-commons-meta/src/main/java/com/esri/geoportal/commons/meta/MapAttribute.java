@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.commons.meta;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,16 @@ public class MapAttribute implements Attribute {
   @Override
   public Map<String, Attribute> getNamedAttributes() {
     return attributes;
+  }
+
+  @Override
+  public Map<String, String> flatten(String prefix) {
+    HashMap<String,String> flat = new HashMap<>();
+    attributes.entrySet().forEach(entry->{
+      Map<String, String> f = entry.getValue().flatten(String.format("%s.%s", prefix, entry.getKey()));
+      flat.putAll(f);
+    });
+    return flat;
   }
   
   @Override

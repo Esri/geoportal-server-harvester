@@ -54,4 +54,11 @@ public interface Attribute {
    * @return array of attributes
    */
   default Attribute[] getAttributes() { return null; }
+  
+  /**
+   * Flattens attribute.
+   * @param prefix prefix
+   * @return map of flattened attribute values.
+   */
+  Map<String,String> flatten(String prefix);
 }
