@@ -28,11 +28,14 @@ public final class WellKnownAttributeConstants {
   public static final String WKA_TITLE = "title";
   public static final String WKA_DESCRIPTION = "description";
   public static final String WKA_RESOURCE_URL = "resource.url";
+  public static final String WKA_THUMBNAIL_URL = "thumbnail.url";
   public static final String WKA_RESOURCE_URL_SCHEME = "resource.url.scheme";
   public static final String WKA_BBOX = "bbox";
+  public static final String WKA_MODIFIED = "modified";
   
   private static final Set<String> all = new HashSet(Arrays.asList(new String[]{
-    WKA_IDENTIFIER, WKA_TITLE, WKA_DESCRIPTION, WKA_RESOURCE_URL, WKA_RESOURCE_URL_SCHEME, WKA_BBOX
+    WKA_IDENTIFIER, WKA_TITLE, WKA_DESCRIPTION, WKA_RESOURCE_URL, 
+    WKA_RESOURCE_URL_SCHEME, WKA_BBOX, WKA_THUMBNAIL_URL, WKA_MODIFIED
   }));
   
   /**
