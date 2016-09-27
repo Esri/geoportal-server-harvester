@@ -28,7 +28,7 @@ import com.esri.geoportal.commons.meta.MetaAnalyzer;
 import com.esri.geoportal.commons.meta.MetaException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
-import com.esri.geoportal.harvester.api.base.WellKnownAttributeConstants;
+import com.esri.geoportal.commons.meta.util.WKAConstants;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.ex.DataException;
@@ -123,14 +123,14 @@ import org.xml.sax.SAXException;
         }
         
         // find resource URL
-        URL resourceUrl = new URL(getAttributeValue(attributes, WellKnownAttributeConstants.WKA_RESOURCE_URL, null));
+        URL resourceUrl = new URL(getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null));
         ItemType itemType = ItemType.matchPattern(resourceUrl.toExternalForm()).stream().findFirst().orElse(null);
         if (itemType == null || itemType.getDataType()!=DataType.URL) {
           return PublishingStatus.SKIPPED;
         }
         
         // find thumbnail URL
-        String sThumbnailUrl = StringUtils.trimToNull(getAttributeValue(attributes, WellKnownAttributeConstants.WKA_THUMBNAIL_URL, null));
+        String sThumbnailUrl = StringUtils.trimToNull(getAttributeValue(attributes, WKAConstants.WKA_THUMBNAIL_URL, null));
         URL thumbnailUrl = sThumbnailUrl!=null? new URL(sThumbnailUrl): null;
 
         // check if item exists
@@ -139,11 +139,10 @@ import org.xml.sax.SAXException;
         
         if (itemEntry==null) {
           // add item if doesn't exist
-          ItemResponse response = addItem(
-                  getAttributeValue(attributes, WellKnownAttributeConstants.WKA_TITLE, null),
-                  getAttributeValue(attributes, WellKnownAttributeConstants.WKA_DESCRIPTION, null),
+          ItemResponse response = addItem(getAttributeValue(attributes, WKAConstants.WKA_TITLE, null),
+                  getAttributeValue(attributes, WKAConstants.WKA_DESCRIPTION, null),
                   resourceUrl, thumbnailUrl, 
-                  itemType, extractEnvelope(getAttributeValue(attributes, WellKnownAttributeConstants.WKA_BBOX, null)), typeKeywords);
+                  itemType, extractEnvelope(getAttributeValue(attributes, WKAConstants.WKA_BBOX, null)), typeKeywords);
 
           if (response == null || !response.success) {
             throw new DataOutputException(this, String.format("Error adding item: %s", ref.getSourceUri()));
@@ -158,14 +157,13 @@ import org.xml.sax.SAXException;
             throw new DataOutputException(this, String.format("Unable to read item entry."));
           }
           // update item if does exist
-          ItemResponse response = updateItem(
-                  itemEntry.id,
+          ItemResponse response = updateItem(itemEntry.id,
                   itemEntry.owner,
                   itemEntry.ownerFolder,
-                  getAttributeValue(attributes, WellKnownAttributeConstants.WKA_TITLE, null),
-                  getAttributeValue(attributes, WellKnownAttributeConstants.WKA_DESCRIPTION, null),
+                  getAttributeValue(attributes, WKAConstants.WKA_TITLE, null),
+                  getAttributeValue(attributes, WKAConstants.WKA_DESCRIPTION, null),
                   resourceUrl, thumbnailUrl,
-                  itemType, extractEnvelope(getAttributeValue(attributes, WellKnownAttributeConstants.WKA_BBOX, null)), typeKeywords);
+                  itemType, extractEnvelope(getAttributeValue(attributes, WKAConstants.WKA_BBOX, null)), typeKeywords);
           if (response == null || !response.success) {
             throw new DataOutputException(this, String.format("Error updating item: %s", ref.getSourceUri()));
           }

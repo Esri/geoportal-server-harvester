@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.api.base;
+package com.esri.geoportal.commons.meta.util;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * Well known attribute constants.
  */
-public final class WellKnownAttributeConstants {
+public final class WKAConstants {
   
   public static final String WKA_IDENTIFIER = "identifier";
   public static final String WKA_TITLE = "title";

@@ -27,7 +27,7 @@ import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.StringAttribute;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
-import com.esri.geoportal.harvester.api.base.WellKnownAttributeConstants;
+import com.esri.geoportal.commons.meta.util.WKAConstants;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -162,11 +162,11 @@ import org.w3c.dom.Document;
         String serviceRoor = getServiceRoot(next.url);
         
         HashMap<String, Attribute> attributes = new HashMap<>();
-        attributes.put(WellKnownAttributeConstants.WKA_IDENTIFIER, new StringAttribute(next.url));
-        attributes.put(WellKnownAttributeConstants.WKA_TITLE, new StringAttribute(String.format("%s/%s", serviceRoor, StringUtils.defaultString(StringUtils.defaultString(next.mapName, next.name),StringUtils.defaultString(serviceType, next.url)))));
-        attributes.put(WellKnownAttributeConstants.WKA_DESCRIPTION, new StringAttribute(StringUtils.defaultString(StringUtils.defaultString(StringUtils.defaultString(next.description, next.serviceDescription)))));
-        attributes.put(WellKnownAttributeConstants.WKA_RESOURCE_URL, new StringAttribute(next.url));
-        attributes.put(WellKnownAttributeConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute("urn:x-esri:specification:ServiceType:ArcGIS:" + (serviceType!=null? serviceType: "Unknown")));
+        attributes.put(WKAConstants.WKA_IDENTIFIER, new StringAttribute(next.url));
+        attributes.put(WKAConstants.WKA_TITLE, new StringAttribute(String.format("%s/%s", serviceRoor, StringUtils.defaultString(StringUtils.defaultString(next.mapName, next.name),StringUtils.defaultString(serviceType, next.url)))));
+        attributes.put(WKAConstants.WKA_DESCRIPTION, new StringAttribute(StringUtils.defaultString(StringUtils.defaultString(StringUtils.defaultString(next.description, next.serviceDescription)))));
+        attributes.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(next.url));
+        attributes.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute("urn:x-esri:specification:ServiceType:ArcGIS:" + (serviceType!=null? serviceType: "Unknown")));
 
         MapAttribute attrs = new MapAttribute(attributes);
         Document document = metaBuilder.create(attrs);

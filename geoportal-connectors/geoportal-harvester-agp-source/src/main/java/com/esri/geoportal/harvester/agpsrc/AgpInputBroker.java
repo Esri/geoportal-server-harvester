@@ -26,7 +26,7 @@ import com.esri.geoportal.commons.meta.MetaException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Initializable.InitContext;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
-import com.esri.geoportal.harvester.api.base.WellKnownAttributeConstants;
+import com.esri.geoportal.commons.meta.util.WKAConstants;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -177,16 +177,16 @@ import java.util.Date;
         
         Properties props = new Properties();
         if (nextEntry.id!=null) {
-          props.put(WellKnownAttributeConstants.WKA_IDENTIFIER, nextEntry.id);
+          props.put(WKAConstants.WKA_IDENTIFIER, nextEntry.id);
         }
         if (nextEntry.title!=null) {
-          props.put(WellKnownAttributeConstants.WKA_TITLE, nextEntry.title);
+          props.put(WKAConstants.WKA_TITLE, nextEntry.title);
         }
         if (nextEntry.description!=null) {
-          props.put(WellKnownAttributeConstants.WKA_DESCRIPTION, nextEntry.description);
+          props.put(WKAConstants.WKA_DESCRIPTION, nextEntry.description);
         }
         if (nextEntry.url!=null) {
-          props.put(WellKnownAttributeConstants.WKA_RESOURCE_URL, nextEntry.url);
+          props.put(WKAConstants.WKA_RESOURCE_URL, nextEntry.url);
         }
         
         if (nextEntry.extent!=null && nextEntry.extent.length==2 && nextEntry.extent[0]!=null && nextEntry.extent[0].length==2 && nextEntry.extent[1]!=null && nextEntry.extent[1].length==2) {
