@@ -101,7 +101,7 @@ public class Client implements Closeable {
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     String json = mapper.writeValueAsString(data);
-    StringEntity entity = new StringEntity(json);
+    StringEntity entity = new StringEntity(json,"UTF-8");
 
     List<String> ids = !forceAdd ? queryIds(data.src_uri_s) : Collections.emptyList();
     HttpRequestBase request;
@@ -110,7 +110,7 @@ public class Client implements Closeable {
         HttpPut put = new HttpPut(url.toURI().resolve(REST_ITEM_URL));
         put.setConfig(DEFAULT_REQUEST_CONFIG);
         put.setEntity(entity);
-        put.setHeader("Content-Type", "application/json");
+        put.setHeader("Content-Type", "application/json; charset=UTF-8");
         request = put;
       }
       break;
@@ -118,7 +118,7 @@ public class Client implements Closeable {
         HttpPut put = new HttpPut(url.toURI().resolve(REST_ITEM_URL + "/" + ids.get(0)));
         put.setConfig(DEFAULT_REQUEST_CONFIG);
         put.setEntity(entity);
-        put.setHeader("Content-Type", "application/json");
+        put.setHeader("Content-Type", "application/json; charset=UTF-8");
         request = put;
       }
       break;
