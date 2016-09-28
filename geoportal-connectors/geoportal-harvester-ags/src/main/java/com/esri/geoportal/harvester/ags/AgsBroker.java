@@ -138,6 +138,11 @@ import org.w3c.dom.Document;
     return responses;
   }
 
+  @Override
+  public String toString() {
+    return String.format("AGS [%s]", definition.getHostUrl());
+  }
+
   /**
    * ArcGIS content iterator.
    */
