@@ -57,6 +57,10 @@ html,body {
   
 }
 
+.h-brokers-content {
+  display: table;
+}
+
 .h-brokers-caption {
   font-size: medium;
   font-weight: bold;
@@ -64,11 +68,12 @@ html,body {
 }
 
 .h-broker {
-  
+  display: table-row;
 }
 
 .h-broker > span {
-  margin-right: 1em;
+  display: table-cell;
+  padding-right: 0.2em;
 }
 
 .h-broker-type {
@@ -76,7 +81,6 @@ html,body {
 
 .h-broker-label {
   font-weight: bold;
-  background-color: lightgray;
 }
 
 .h-broker-edit {
@@ -184,6 +188,14 @@ html,body {
 }
 
 
+.h-tasks-content {
+  display: table;
+}
+
+.h-task {
+  display: table-row;
+}
+
 .h-tasks-add {
   text-decoration: underline;
   cursor: pointer;
@@ -213,6 +225,19 @@ html,body {
 }
 
 .h-task-history {
+}
+
+.h-tasks-content {
+  display: table;
+}
+
+.h-task > span {
+  display: table-cell;
+  padding-right: 0.2em;
+}
+
+.h-task-label {
+  font-weight: bold;
 }
 
 .h-task-edit {
