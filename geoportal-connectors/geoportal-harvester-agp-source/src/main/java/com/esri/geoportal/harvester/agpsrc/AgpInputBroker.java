@@ -191,7 +191,7 @@ import java.util.Date;
         
         if (nextEntry.extent!=null && nextEntry.extent.length==2 && nextEntry.extent[0]!=null && nextEntry.extent[0].length==2 && nextEntry.extent[1]!=null && nextEntry.extent[1].length==2) {
           String sBox = String.format("%f %f,%f %f", nextEntry.extent[0][0], nextEntry.extent[0][1], nextEntry.extent[1][0], nextEntry.extent[1][1]);
-          props.put("bbox", sBox);
+          props.put(WKAConstants.WKA_BBOX, sBox);
         }
         
         MapAttribute attr = AttributeUtils.fromProperties(props);

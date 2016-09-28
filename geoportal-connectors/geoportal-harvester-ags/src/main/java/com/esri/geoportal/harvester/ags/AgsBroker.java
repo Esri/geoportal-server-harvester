@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.ags;
 
 import com.esri.geoportal.commons.ags.client.AgsClient;
 import com.esri.geoportal.commons.ags.client.ContentResponse;
+import com.esri.geoportal.commons.ags.client.ExtentInfo;
 import com.esri.geoportal.commons.ags.client.ServerResponse;
 import com.esri.geoportal.commons.ags.client.ServiceInfo;
 import com.esri.geoportal.commons.constants.MimeType;
@@ -172,6 +173,14 @@ import org.w3c.dom.Document;
         attributes.put(WKAConstants.WKA_DESCRIPTION, new StringAttribute(StringUtils.defaultString(StringUtils.defaultString(StringUtils.defaultString(next.description, next.serviceDescription)))));
         attributes.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(next.url));
         attributes.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute("urn:x-esri:specification:ServiceType:ArcGIS:" + (serviceType!=null? serviceType: "Unknown")));
+        
+        String sBox = createBBox(next.fullExtent);
+        if (sBox==null) {
+          sBox = createBBox(next.initialExtent);
+        }
+        if (sBox!=null) {
+          attributes.put(WKAConstants.WKA_BBOX, new StringAttribute(sBox));
+        }
 
         MapAttribute attrs = new MapAttribute(attributes);
         Document document = metaBuilder.create(attrs);
@@ -192,6 +201,13 @@ import org.w3c.dom.Document;
       } catch (TransformerException|TransformerFactoryConfigurationError|IOException|URISyntaxException|MetaException ex) {
         throw new DataInputException(AgsBroker.this, String.format("Error creating data reference for ArcGIS Server service"), ex);
       }
+    }
+    
+    private String createBBox(ExtentInfo extent) {
+      if (extent!=null && extent.isValid()) {
+        return String.format("%f %f,%f %f", extent.xmin, extent.ymin, extent.xmax, extent.ymax);
+      }
+      return null;
     }
     
     private String getServiceType(String url) {

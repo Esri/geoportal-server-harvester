@@ -19,14 +19,26 @@ package com.esri.geoportal.commons.ags.client;
  * Extent info.
  */
 public final class ExtentInfo {
-  public Long xmin;
-  public Long ymin;
-  public Long xmax;
-  public Long ymax;
+  public Double xmin;
+  public Double ymin;
+  public Double xmax;
+  public Double ymax;
   public SpatialReferenceInfo spatialReference;
+  
+  /**
+   * Checks if extent is a valid extent.
+   * @return <code>true</code> if valid extent.
+   */
+  public boolean isValid() {
+    return isValid(xmin) && isValid(ymin) && isValid(xmax) && isValid(ymax);
+  }
+  
+  private boolean isValid(Double d) {
+    return d!=null && !d.isNaN() && !d.isInfinite();
+  }
   
   @Override
   public String toString() {
-    return String.format("{ \"xmin\": %d, \"ymin\": %d, \"xmax\": %d, \"ymax\": %d, \"spatialReference\": %s}", xmin, ymin, xmax, ymax, spatialReference);
+    return String.format("{ \"xmin\": %f, \"ymin\": %f, \"xmax\": %f, \"ymax\": %f, \"spatialReference\": %s}", xmin, ymin, xmax, ymax, spatialReference);
   }
 }
