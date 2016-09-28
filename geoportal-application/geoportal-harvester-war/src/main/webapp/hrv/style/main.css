@@ -222,6 +222,8 @@ html,body {
 }
 
 .h-task-run {
+  color: black;
+  padding-right: 0.2em;
 }
 
 .h-task-history {
