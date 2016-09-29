@@ -75,7 +75,7 @@ define(["dojo/_base/declare",
       },
       
       renderString: function(placeholderNode,arg) {
-        var input = new ValidationTextBox({name: arg.name, required: arg.required}).placeAt(placeholderNode);
+        var input = new ValidationTextBox({name: arg.name, required: arg.required, type: arg.password? "password": "input"}).placeAt(placeholderNode);
         input.name = arg.name;
         input.startup();
         return { 
