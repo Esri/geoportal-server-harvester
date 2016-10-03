@@ -80,7 +80,6 @@
                 <version>2.3</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <archiveClasses>true</archiveClasses>
                     <attachClasses>true</attachClasses>
                 </configuration>
             </plugin>
