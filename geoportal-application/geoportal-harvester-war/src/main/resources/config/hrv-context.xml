@@ -25,7 +25,7 @@
 
     <bean id="config"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
-          p:location="/WEB-INF/config.properties"/>
+          p:location="classpath:config/hrv.properties"/>
     
     <bean id="dataSource"
       class="org.springframework.jdbc.datasource.DriverManagerDataSource"
