@@ -21,6 +21,7 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.beans.EngineBean;
 import com.esri.geoportal.harvester.engine.utils.Statistics;
 import com.esri.geoportal.harvester.support.ProcessStatisticsResponse;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -105,6 +106,24 @@ public class ProcessController {
       return new ResponseEntity<>(process!=null? new ProcessResponse(processId, process.getTitle(), process.getStatus()): null, HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error aborting process: %s", processId), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  
+  /**
+   * Aborts (deletes) an existing process.
+   * @return process info
+   */
+  @RequestMapping(value = "/rest/harvester/processes/purge", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<ProcessResponse[]> purge() {
+    try {
+      LOG.debug(String.format("DELETE /rest/harvester/processespurge"));
+      List<Map.Entry<UUID, ProcessInstance>> completed = engine.getProcessesService().removeCompleted();
+      return new ResponseEntity<>(completed.stream()
+              .map(e->new ProcessResponse(e.getKey(),e.getValue().getTitle(),e.getValue().getStatus()))
+              .collect(Collectors.toList()).toArray(new ProcessResponse[0]), HttpStatus.OK);
+    } catch (DataProcessorException ex) {
+      LOG.error(String.format("Error purging processes"), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

@@ -90,4 +90,18 @@ public class DefaultProcessesService implements ProcessesService {
       throw new DataProcessorException(String.format("Error creating process: %s", task), ex);
     }
   }
+  
+  @Override
+  public List<Map.Entry<UUID, ProcessInstance>> removeCompleted() throws DataProcessorException {
+    List<Map.Entry<UUID, ProcessInstance>> completed = selectProcesses((e)->e.getValue().getStatus()==ProcessInstance.Status.completed);
+    List<UUID> uuids = completed.stream().map(e->e.getKey()).collect(Collectors.toList());
+    try {
+      for (UUID uuid: uuids) {
+        processManager.delete(uuid);
+      }
+      return completed;
+    } catch(CrudlException ex) {
+      throw new DataProcessorException(String.format("Error removing completed processes."), ex);
+    }
+  }
 }

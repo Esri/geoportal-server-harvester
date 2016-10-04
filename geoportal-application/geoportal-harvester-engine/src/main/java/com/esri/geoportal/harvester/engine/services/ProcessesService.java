@@ -69,4 +69,10 @@ public interface ProcessesService {
    * @throws DataProcessorException if accessing repository fails
    */
   List<Map.Entry<UUID, ProcessInstance>> selectProcesses(Predicate<? super Map.Entry<UUID, ProcessInstance>> predicate) throws DataProcessorException;
+  
+  /**
+   * Removes completed tasks.
+   * @throws DataProcessorException if accessing repository fails
+   */
+  List<Map.Entry<UUID, ProcessInstance>> removeCompleted() throws DataProcessorException;
 }
