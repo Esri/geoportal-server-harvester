@@ -15,6 +15,8 @@
  */
 package com.esri.geoportal.commons.robots;
 
+import com.esri.geoportal.commons.constants.HttpConstants;
+
 /**
  * Bots config.
  */
@@ -40,5 +42,5 @@ public interface BotsConfig {
   /**
    * Default bots configuration.
    */
-  BotsConfig DEFAULT = new BotsConfigImpl("GeoportalServer", true, true);
+  BotsConfig DEFAULT = new BotsConfigImpl(HttpConstants.getUserAgent(), true, true);
 }
