@@ -26,7 +26,6 @@ import java.net.URISyntaxException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
@@ -75,6 +74,7 @@ public class BotsHttpClient implements HttpClient, Closeable {
     HttpRequestWrapper wrap = HttpRequestWrapper.wrap(request);
     adviseRobotsTxt(wrap.getURI());
     wrap.setURI(applyPHP(wrap.getURI()));
+    wrap.setHeader("User-Agent", bots.getUserAgent());
     return client.execute(wrap);
   }
 
@@ -83,6 +83,7 @@ public class BotsHttpClient implements HttpClient, Closeable {
     HttpRequestWrapper wrap = HttpRequestWrapper.wrap(request);
     adviseRobotsTxt(wrap.getURI());
     wrap.setURI(applyPHP(wrap.getURI()));
+    wrap.setHeader("User-Agent", bots.getUserAgent());
     return client.execute(wrap, context);
   }
 
@@ -91,6 +92,7 @@ public class BotsHttpClient implements HttpClient, Closeable {
     HttpRequestWrapper wrap = HttpRequestWrapper.wrap(request, target);
     adviseRobotsTxt(wrap.getURI());
     wrap.setURI(applyPHP(wrap.getURI()));
+    wrap.setHeader("User-Agent", bots.getUserAgent());
     return client.execute(wrap);
   }
 
@@ -99,6 +101,7 @@ public class BotsHttpClient implements HttpClient, Closeable {
     HttpRequestWrapper wrap = HttpRequestWrapper.wrap(request, target);
     adviseRobotsTxt(wrap.getURI());
     wrap.setURI(applyPHP(wrap.getURI()));
+    wrap.setHeader("User-Agent", bots.getUserAgent());
     return client.execute(wrap, context);
   }
 
@@ -107,6 +110,7 @@ public class BotsHttpClient implements HttpClient, Closeable {
     HttpRequestWrapper wrap = HttpRequestWrapper.wrap(request);
     adviseRobotsTxt(wrap.getURI());
     wrap.setURI(applyPHP(wrap.getURI()));
+    wrap.setHeader("User-Agent", bots.getUserAgent());
     return client.execute(wrap, responseHandler);
   }
 
@@ -115,6 +119,7 @@ public class BotsHttpClient implements HttpClient, Closeable {
     HttpRequestWrapper wrap = HttpRequestWrapper.wrap(request);
     adviseRobotsTxt(wrap.getURI());
     wrap.setURI(applyPHP(wrap.getURI()));
+    wrap.setHeader("User-Agent", bots.getUserAgent());
     return client.execute(wrap, responseHandler, context);
   }
 
@@ -123,6 +128,7 @@ public class BotsHttpClient implements HttpClient, Closeable {
     HttpRequestWrapper wrap = HttpRequestWrapper.wrap(request,target);
     adviseRobotsTxt(wrap.getURI());
     wrap.setURI(applyPHP(wrap.getURI()));
+    wrap.setHeader("User-Agent", bots.getUserAgent());
     return client.execute(wrap, responseHandler);
   }
 
@@ -131,6 +137,7 @@ public class BotsHttpClient implements HttpClient, Closeable {
     HttpRequestWrapper wrap = HttpRequestWrapper.wrap(request,target);
     adviseRobotsTxt(wrap.getURI());
     wrap.setURI(applyPHP(wrap.getURI()));
+    wrap.setHeader("User-Agent", bots.getUserAgent());
     return client.execute(wrap, responseHandler, context);
   }
 
