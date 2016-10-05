@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.waf;
 
+import com.esri.geoportal.commons.constants.HttpConstants;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import static com.esri.geoportal.commons.utils.HttpClientContextBuilder.createHttpClientContext;
@@ -58,6 +59,7 @@ import org.apache.http.client.protocol.HttpClientContext;
     ContentAnalyzer analyzer = new ContentAnalyzer(root);
     HttpGet method = new HttpGet(root.toExternalForm());
     method.setConfig(DEFAULT_REQUEST_CONFIG);
+    method.setHeader("User-Agent", HttpConstants.getUserAgent());
     HttpClientContext context = creds!=null && !creds.isEmpty()? createHttpClientContext(root, creds): null;
     
     try (CloseableHttpResponse httpResponse = httpClient.execute(method, context); InputStream input = httpResponse.getEntity().getContent();) {

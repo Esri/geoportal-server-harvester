@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.waf;
 
+import com.esri.geoportal.commons.constants.HttpConstants;
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.constants.MimeTypeUtils;
 import com.esri.geoportal.commons.http.BotsHttpClient;
@@ -70,6 +71,7 @@ import org.apache.http.client.protocol.HttpClientContext;
   public SimpleDataReference readContent(BotsHttpClient httpClient, Date since) throws IOException, URISyntaxException {
     HttpGet method = new HttpGet(fileUrl.toExternalForm());
     method.setConfig(DEFAULT_REQUEST_CONFIG);
+    method.setHeader("User-Agent", HttpConstants.getUserAgent());
     HttpClientContext context = creds!=null && !creds.isEmpty()? createHttpClientContext(fileUrl, creds): null;
     
     try (CloseableHttpResponse httpResponse = httpClient.execute(method,context); InputStream input = httpResponse.getEntity().getContent();) {

@@ -17,6 +17,7 @@ package com.esri.geoportal.commons.csw.client.impl;
 
 import static com.esri.core.geometry.Operator.Type.Contains;
 import static com.esri.core.geometry.Operator.Type.Intersects;
+import com.esri.geoportal.commons.constants.HttpConstants;
 import com.esri.geoportal.commons.csw.client.IClient;
 import com.esri.geoportal.commons.csw.client.ICriteria;
 import com.esri.geoportal.commons.csw.client.IProfile;
@@ -116,13 +117,14 @@ public class Client implements IClient {
     crt.setMaxRecords(max);
     crt.setFromDate(from);
     crt.setToDate(to);
-    HttpPost postRequest = new HttpPost(capabilites.get_getRecordsPostURL());
-    postRequest.setConfig(DEFAULT_REQUEST_CONFIG);
+    HttpPost post = new HttpPost(capabilites.get_getRecordsPostURL());
+    post.setConfig(DEFAULT_REQUEST_CONFIG);
+    post.setHeader("User-Agent", HttpConstants.getUserAgent());
     String requestBody = createGetRecordsRequest(crt);
-    postRequest.setEntity(new StringEntity(requestBody, ContentType.TEXT_XML));
+    post.setEntity(new StringEntity(requestBody, ContentType.TEXT_XML));
 
     HttpClientContext context = cred!=null && !cred.isEmpty()? createHttpClientContext(baseUrl, cred): null;
-    try (CloseableHttpResponse httpResponse = httpClient.execute(postRequest,context); InputStream responseInputStream = httpResponse.getEntity().getContent();) {
+    try (CloseableHttpResponse httpResponse = httpClient.execute(post,context); InputStream responseInputStream = httpResponse.getEntity().getContent();) {
       if (httpResponse.getStatusLine().getStatusCode()>=400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
@@ -142,9 +144,10 @@ public class Client implements IClient {
     loadCapabilities();
 
     String getRecordByIdUrl = createGetMetadataByIdUrl(capabilites.get_getRecordByIDGetURL(), URLEncoder.encode(id, "UTF-8"));
-    HttpGet getMethod = new HttpGet(getRecordByIdUrl);
-    getMethod.setConfig(DEFAULT_REQUEST_CONFIG);
-    try (CloseableHttpResponse httpResponse = httpClient.execute(getMethod); InputStream responseStream = httpResponse.getEntity().getContent();) {
+    HttpGet get = new HttpGet(getRecordByIdUrl);
+    get.setConfig(DEFAULT_REQUEST_CONFIG);
+    get.setHeader("User-Agent", HttpConstants.getUserAgent());
+    try (CloseableHttpResponse httpResponse = httpClient.execute(get); InputStream responseStream = httpResponse.getEntity().getContent();) {
       if (httpResponse.getStatusLine().getStatusCode()>=400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }

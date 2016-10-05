@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.commons.gpt.client;
 
+import com.esri.geoportal.commons.constants.HttpConstants;
 import com.esri.geoportal.commons.gpt.client.QueryResponse.Hit;
 import static com.esri.geoportal.commons.utils.HttpClientContextBuilder.createHttpClientContext;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
@@ -111,6 +112,7 @@ public class Client implements Closeable {
         put.setConfig(DEFAULT_REQUEST_CONFIG);
         put.setEntity(entity);
         put.setHeader("Content-Type", "application/json; charset=UTF-8");
+        put.setHeader("User-Agent", HttpConstants.getUserAgent());
         request = put;
       }
       break;
@@ -119,6 +121,7 @@ public class Client implements Closeable {
         put.setConfig(DEFAULT_REQUEST_CONFIG);
         put.setEntity(entity);
         put.setHeader("Content-Type", "application/json; charset=UTF-8");
+        put.setHeader("User-Agent", HttpConstants.getUserAgent());
         request = put;
       }
       break;
@@ -146,6 +149,8 @@ public class Client implements Closeable {
    */
   public String readXml(String id) throws URISyntaxException, IOException {
     HttpGet get = new HttpGet(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/xml"));
+    get.setConfig(DEFAULT_REQUEST_CONFIG);
+    get.setHeader("User-Agent", HttpConstants.getUserAgent());
     
     try (CloseableHttpResponse httpResponse = execute(get); InputStream contentStream = httpResponse.getEntity().getContent();) {
       if (httpResponse.getStatusLine().getStatusCode()>=400) {
@@ -167,6 +172,8 @@ public class Client implements Closeable {
    */
   public EntryRef readItem(String id) throws URISyntaxException, IOException {
     HttpGet get = new HttpGet(url.toURI().resolve(REST_ITEM_URL + "/" + id ));
+    get.setConfig(DEFAULT_REQUEST_CONFIG);
+    get.setHeader("User-Agent", HttpConstants.getUserAgent());
     Hit hit =  execute(get,Hit.class);
     return new EntryRef(hit._id, readUri(hit._source), readLastUpdated(hit._source));
   }
@@ -225,6 +232,7 @@ public class Client implements Closeable {
   public PublishResponse delete(String id) throws URISyntaxException, IOException {
     HttpDelete del = new HttpDelete(url.toURI().resolve(REST_ITEM_URL + "/" + id));
     del.setConfig(DEFAULT_REQUEST_CONFIG);
+    del.setHeader("User-Agent", HttpConstants.getUserAgent());
 
     return execute(del, PublishResponse.class);
   }
@@ -291,6 +299,7 @@ public class Client implements Closeable {
     
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("Content-Type", "application/json");
+    get.setHeader("User-Agent", HttpConstants.getUserAgent());
     
     QueryResponse respone =  execute(get, QueryResponse.class);
     searchContext._scroll_id = respone._scroll_id;

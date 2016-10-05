@@ -54,11 +54,6 @@ import org.slf4j.LoggerFactory;
   }
 
   @Override
-  public String getUserAgent() {
-    return userAgent;
-  }
-
-  @Override
   public String getHost() {
     return host;
   }
@@ -182,7 +177,7 @@ import org.slf4j.LoggerFactory;
   }
 
   private List<Access> select(String userAgent, String relativePath, MatchingStrategy matchingStrategy) {
-    ArrayList<Access> selected = new ArrayList<Access>();
+    ArrayList<Access> selected = new ArrayList<>();
     if (!(userAgent == null || relativePath == null)) {
       Section sec = findSectionByAgent(sections, userAgent);
       if (sec != null) {
