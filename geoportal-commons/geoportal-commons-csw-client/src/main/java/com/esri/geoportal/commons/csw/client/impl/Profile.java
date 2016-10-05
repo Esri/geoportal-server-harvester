@@ -45,6 +45,7 @@ public class Profile implements IProfile {
   private String id;
   private String name;
   private String description;
+  private String expectedGptXmlOutput;
   private String getRecordsReqXslt;
   private String getRecordsRspXslt;
   private String getRecordByIdReqKVP;
@@ -75,6 +76,15 @@ public class Profile implements IProfile {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  void setExpectedGptXmlOutput(String expectedGptXmlOutput) {
+    this.expectedGptXmlOutput = expectedGptXmlOutput;
+  }
+
+  @Override
+  public String getExpectedGptXmlOutput() {
+    return expectedGptXmlOutput;
   }
 
   @Override

@@ -69,6 +69,7 @@ public class ProfilesLoader {
         String namespace = StringUtils.trimToEmpty((String)xpath.evaluate("CswNamespace", profileNode, XPathConstants.STRING));
         String description = StringUtils.trimToEmpty((String)xpath.evaluate("Description", profileNode, XPathConstants.STRING));
         
+        String expectedGptXmlOutput = StringUtils.trimToEmpty((String)xpath.evaluate("GetRecords/@expectedGptXmlOutput", profileNode, XPathConstants.STRING));
         String getRecordsReqXslt = StringUtils.trimToEmpty((String)xpath.evaluate("GetRecords/XSLTransformations/Request", profileNode, XPathConstants.STRING));
         String getRecordsRspXslt = StringUtils.trimToEmpty((String)xpath.evaluate("GetRecords/XSLTransformations/Response", profileNode, XPathConstants.STRING));
         
@@ -79,6 +80,7 @@ public class ProfilesLoader {
         prof.setId(id);
         prof.setName(name);
         prof.setDescription(description);
+        prof.setExpectedGptXmlOutput(expectedGptXmlOutput);
         prof.setGetRecordsReqXslt(getRecordsReqXslt);
         prof.setGetRecordsRspXslt(getRecordsRspXslt);
         prof.setKvp(getRecordByIdReqKVP);

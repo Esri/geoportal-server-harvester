@@ -23,8 +23,8 @@ import org.apache.http.client.config.RequestConfig;
 public class Constants {
   /** default connection timeout (120000 milliseconds) */
   public static final int CONNECTION_TIMEOUT = 120000;
-  /** default socket timeout (30000 milliseconds) */
-  public static final int SOCKET_TIMEOUT = 30000;
+  /** default socket timeout (60000 milliseconds) */
+  public static final int SOCKET_TIMEOUT = 60000;
   
   /**
    * HTTP Request configuration with timeouts.

@@ -38,6 +38,12 @@ public interface IProfile {
   String getDescription();
   
   /**
+   * Gets expected GPT XML output.
+   * @return expected GPT XML output
+   */
+  String getExpectedGptXmlOutput();
+  
+  /**
    * Generates POST request body to search for the records.
    * @param criteria search criteria
    * @return POST body
