@@ -56,7 +56,12 @@ define(["dojo/_base/declare",
               domStyle.set(this.cancelNode,"display",result.status==="working"? "inline": "none");
               domStyle.set(this.progressNode,"display",result.status==="working"? "inline": "none");
               if (result.status==="working" && result.statistics) {
-                html.set(this.progressNode, ""+result.statistics.acquired);
+                var now = new Date();
+                var start = new Date(result.statistics.startDate);
+                var duration = (now-start)/1000/60;
+                var velocity = result.statistics.acquired>0? Math.round(result.statistics.acquired/duration): null;
+                var progress = ""+result.statistics.acquired + (velocity? " ("+velocity+"/min)": "");
+                html.set(this.progressNode, progress);
               }
               if (result.status==="working" || result.status==="aborting") {
                 setTimeout(update,2000);
