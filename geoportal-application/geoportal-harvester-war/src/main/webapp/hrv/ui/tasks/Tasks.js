@@ -26,7 +26,9 @@ define(["dojo/_base/declare",
         "dojo/on",
         "dojo/json",
         "dojo/topic",
+        "dojox/form/Uploader",
         "dijit/Dialog",
+        "dijit/form/Button",
         "hrv/rest/Tasks",
         "hrv/ui/tasks/Task",
         "hrv/ui/tasks/TaskEditorPane"
@@ -34,8 +36,8 @@ define(["dojo/_base/declare",
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,domConstruct,on,json,topic,
-           Dialog,
+           lang,array,domConstruct,on,json,topic,Uploader,
+           Dialog,Button,
            TasksREST,Task,TaskEditorPane
           ){
   

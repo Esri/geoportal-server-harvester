@@ -28,6 +28,7 @@ define(["dojo/_base/declare",
         "dojo/json",
         "dojo/topic",
         "dijit/Dialog",
+        "dijit/form/Button",
         "hrv/rest/Brokers",
         "hrv/ui/brokers/Broker",
         "hrv/ui/brokers/BrokerEditorPane"
@@ -36,7 +37,7 @@ define(["dojo/_base/declare",
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
            lang,array,on,html,domConstruct,json,topic,
-           Dialog,
+           Dialog,Button,
            BrokersREST,Broker,BrokerEditorPane
           ){
   
