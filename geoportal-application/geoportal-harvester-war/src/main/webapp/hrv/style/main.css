@@ -211,6 +211,10 @@ html,body {
   padding-right: 0.3em;
 }
 
+.n-tasks-import-button > input {
+  cursor: pointer;
+}
+
 .h-history-caption {
   font-size: medium;
   font-weight: bold;
