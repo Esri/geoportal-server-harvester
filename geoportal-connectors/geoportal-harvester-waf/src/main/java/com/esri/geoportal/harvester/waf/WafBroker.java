@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
   private final WafBrokerDefinitionAdaptor definition;
   private final Set<URL> visited = new HashSet<>();
   
-  private BotsHttpClient httpClient;
+  private CloseableHttpClient httpClient;
   private LinkedList<WafFolder> subFolders;
   private LinkedList<WafFile> files;
 
@@ -63,8 +63,12 @@ import org.slf4j.LoggerFactory;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     CloseableHttpClient client = HttpClients.createDefault();
-    Bots bots = BotsUtils.readBots(definition.getBotsConfig(), client, definition.getBotsMode(), definition.getHostUrl());
-    httpClient = new BotsHttpClient(client,bots);
+    if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
+      httpClient = client;
+    } else {
+      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), client, definition.getBotsMode(), definition.getHostUrl());
+      httpClient = new BotsHttpClient(client,bots);
+    }
   }
 
   @Override

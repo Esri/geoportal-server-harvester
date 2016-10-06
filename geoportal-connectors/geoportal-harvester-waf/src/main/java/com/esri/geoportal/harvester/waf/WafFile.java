@@ -18,7 +18,6 @@ package com.esri.geoportal.harvester.waf;
 import com.esri.geoportal.commons.constants.HttpConstants;
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.constants.MimeTypeUtils;
-import com.esri.geoportal.commons.http.BotsHttpClient;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import static com.esri.geoportal.commons.utils.HttpClientContextBuilder.createHttpClientContext;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
@@ -37,6 +36,7 @@ import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 /**
  * WAF file.
@@ -68,7 +68,7 @@ import org.apache.http.client.protocol.HttpClientContext;
    * @throws IOException if reading content fails
    * @throws URISyntaxException if file url is an invalid URI
    */
-  public SimpleDataReference readContent(BotsHttpClient httpClient, Date since) throws IOException, URISyntaxException {
+  public SimpleDataReference readContent(CloseableHttpClient httpClient, Date since) throws IOException, URISyntaxException {
     HttpGet method = new HttpGet(fileUrl.toExternalForm());
     method.setConfig(DEFAULT_REQUEST_CONFIG);
     method.setHeader("User-Agent", HttpConstants.getUserAgent());

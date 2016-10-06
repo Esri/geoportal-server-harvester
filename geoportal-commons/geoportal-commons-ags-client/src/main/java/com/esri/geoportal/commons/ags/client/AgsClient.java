@@ -37,7 +37,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 
 /**
@@ -51,11 +50,12 @@ public class AgsClient implements Closeable {
   /**
    * Creates instance of the client.
    *
+   * @param httpClient HTTP client
    * @param rootUrl "arcgis/rest" root URL
    */
-  public AgsClient(URL rootUrl) {
+  public AgsClient(CloseableHttpClient httpClient, URL rootUrl) {
     this.rootUrl = adjustUrl(rootUrl);
-    this.httpClient = HttpClients.createDefault();
+    this.httpClient = httpClient;
   }
 
   @Override

@@ -15,7 +15,6 @@
  */
 package com.esri.geoportal.harvester.waf;
 
-import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -29,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +66,7 @@ import org.slf4j.LoggerFactory;
    * @throws IOException if error reading content
    * @throws URISyntaxException if invalid URL
    */
-  public WafFolderContent readContent(BotsHttpClient httpClient) throws IOException, URISyntaxException {
+  public WafFolderContent readContent(CloseableHttpClient httpClient) throws IOException, URISyntaxException {
     HtmlUrlScrapper scrapper = new HtmlUrlScrapper(httpClient, creds);
     List<URL> urls = scrapper.scrap(folderUrl);
 

@@ -18,7 +18,11 @@ package com.esri.geoportal.harvester.gptsrc;
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.gpt.client.Client;
 import com.esri.geoportal.commons.gpt.client.EntryRef;
+import com.esri.geoportal.commons.http.BotsHttpClient;
+import com.esri.geoportal.commons.robots.Bots;
+import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
@@ -29,6 +33,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +56,13 @@ import org.slf4j.LoggerFactory;
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
-    client = new Client(definition.getHostUrl(), definition.getCredentials());
+    CloseableHttpClient httpclient = HttpClients.createDefault();
+    if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
+      client = new Client(httpclient, definition.getHostUrl(), definition.getCredentials());
+    } else {
+      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getBotsMode(), definition.getHostUrl());
+      client = new Client(new BotsHttpClient(httpclient,bots), definition.getHostUrl(), definition.getCredentials());
+    }
   }
 
   @Override

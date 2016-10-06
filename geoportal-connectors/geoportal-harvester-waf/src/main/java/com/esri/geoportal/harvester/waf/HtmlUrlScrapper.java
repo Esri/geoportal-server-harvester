@@ -16,7 +16,6 @@
 package com.esri.geoportal.harvester.waf;
 
 import com.esri.geoportal.commons.constants.HttpConstants;
-import com.esri.geoportal.commons.http.BotsHttpClient;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import static com.esri.geoportal.commons.utils.HttpClientContextBuilder.createHttpClientContext;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
@@ -30,12 +29,13 @@ import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 /**
  * HTML URL scrapper.
  */
 /*package*/ class HtmlUrlScrapper {
-  private final BotsHttpClient httpClient;
+  private final CloseableHttpClient httpClient;
   private final SimpleCredentials creds;
 
   /**
@@ -43,7 +43,7 @@ import org.apache.http.client.protocol.HttpClientContext;
    * @param httpClient HTTP client
    * @param creds credentials
    */
-  public HtmlUrlScrapper(BotsHttpClient httpClient, SimpleCredentials creds) {
+  public HtmlUrlScrapper(CloseableHttpClient httpClient, SimpleCredentials creds) {
     this.httpClient = httpClient;
     this.creds = creds;
   }

@@ -43,7 +43,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 
 /**
@@ -58,13 +57,14 @@ public class AgpClient implements Closeable {
   
   /**
    * Creates instance of the client.
+   * @param httpClient HTTP client
    * @param rootUrl root URL
    * @param credentials credentials
    */
-  public AgpClient(URL rootUrl, SimpleCredentials credentials) {
+  public AgpClient(CloseableHttpClient httpClient, URL rootUrl, SimpleCredentials credentials) {
     this.rootUrl = adjustUrl(rootUrl);
     this.credentials = credentials;
-    this.httpClient = HttpClients.createDefault();
+    this.httpClient = httpClient;
   }
 
   @Override

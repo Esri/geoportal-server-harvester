@@ -25,7 +25,6 @@ import com.esri.geoportal.commons.csw.client.IRecord;
 import com.esri.geoportal.commons.csw.client.IRecords;
 import static com.esri.geoportal.commons.csw.client.impl.Constants.CONFIG_FOLDER_PATH;
 import static com.esri.geoportal.commons.csw.client.impl.Constants.SCHEME_METADATA_DOCUMENT;
-import com.esri.geoportal.commons.http.BotsHttpClient;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import static com.esri.geoportal.commons.utils.HttpClientContextBuilder.createHttpClientContext;
@@ -70,6 +69,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -84,7 +84,7 @@ import org.xml.sax.SAXException;
 public class Client implements IClient {
 
   private final Logger LOG = LoggerFactory.getLogger(Client.class);
-  private final BotsHttpClient httpClient;
+  private final CloseableHttpClient httpClient;
   private final URL baseUrl;
   private final IProfile profile;
   private final SimpleCredentials cred;
@@ -99,7 +99,7 @@ public class Client implements IClient {
    * @param profile CSW profile
    * @param cred credentials
    */
-  public Client(BotsHttpClient httpClient, URL baseUrl, IProfile profile, SimpleCredentials cred) {
+  public Client(CloseableHttpClient httpClient, URL baseUrl, IProfile profile, SimpleCredentials cred) {
     this.httpClient = httpClient;
     this.baseUrl = baseUrl;
     this.profile = profile;

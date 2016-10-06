@@ -21,6 +21,7 @@ import com.esri.geoportal.commons.ags.client.ExtentInfo;
 import com.esri.geoportal.commons.ags.client.ServerResponse;
 import com.esri.geoportal.commons.ags.client.ServiceInfo;
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.meta.Attribute;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.commons.meta.MetaException;
@@ -29,6 +30,8 @@ import com.esri.geoportal.commons.meta.StringAttribute;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.commons.meta.util.WKAConstants;
+import com.esri.geoportal.commons.robots.Bots;
+import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -48,6 +51,8 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -88,7 +93,13 @@ import org.w3c.dom.Document;
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
-    client = new AgsClient(definition.getHostUrl());
+    CloseableHttpClient httpclient = HttpClients.createDefault();
+    if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
+      client = new AgsClient(httpclient, definition.getHostUrl());
+    } else {
+      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getBotsMode(), definition.getHostUrl());
+      client = new AgsClient(new BotsHttpClient(httpclient,bots), definition.getHostUrl());
+    }
   }
 
   @Override

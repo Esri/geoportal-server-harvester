@@ -19,6 +19,7 @@ import com.esri.geoportal.commons.agp.client.AgpClient;
 import com.esri.geoportal.commons.agp.client.ContentResponse;
 import com.esri.geoportal.commons.agp.client.ItemEntry;
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.meta.AttributeUtils;
 import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaBuilder;
@@ -27,6 +28,8 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Initializable.InitContext;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.commons.meta.util.WKAConstants;
+import com.esri.geoportal.commons.robots.Bots;
+import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -49,6 +52,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import java.util.Date;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 /**
  * ArcGIS Portal output broker.
@@ -111,7 +116,13 @@ import java.util.Date;
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
-    this.client = new AgpClient(definition.getHostUrl(),definition.getCredentials());
+    CloseableHttpClient httpclient = HttpClients.createDefault();
+    if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
+      client = new AgpClient(httpclient, definition.getHostUrl(),definition.getCredentials());
+    } else {
+      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getBotsMode(), definition.getHostUrl());
+      client = new AgpClient(new BotsHttpClient(httpclient,bots), definition.getHostUrl(), definition.getCredentials());
+    }
   }
 
   @Override

@@ -30,6 +30,7 @@ public final class TaskDefinition implements Serializable {
   private List<LinkDefinition> destinations;
   private List<String> keywords = new ArrayList<>();
   private boolean incremental;
+  private boolean ignoreRobotsTxt;
 
   /**
    * Gets processor definition.
@@ -110,9 +111,25 @@ public final class TaskDefinition implements Serializable {
   public void setIncremental(boolean incremental) {
     this.incremental = incremental;
   }
+
+  /**
+   * Checks if ignore robots.txt
+   * @return <code>true</code> to ignore robots.txt
+   */
+  public boolean isIgnoreRobotsTxt() {
+    return ignoreRobotsTxt;
+  }
+
+  /**
+   * Sets to ignore robots.txt
+   * @param ignoreRobotsTxt <code>true</code> to ignore robots.txt
+   */
+  public void setIgnoreRobotsTxt(boolean ignoreRobotsTxt) {
+    this.ignoreRobotsTxt = ignoreRobotsTxt;
+  }
   
   @Override
   public String toString() {
-    return String.format("PROCESSOR: %s, SOURCE: %s, DESTINATIONS: %s, INCREMENTAL: %b", processor, source, destinations!=null? destinations: null, incremental);
+    return String.format("PROCESSOR: %s, SOURCE: %s, DESTINATIONS: %s, INCREMENTAL: %b, IGNOREROBOTSTXT", processor, source, destinations!=null? destinations: null, incremental, ignoreRobotsTxt);
   }
 }

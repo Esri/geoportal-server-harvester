@@ -27,7 +27,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -44,7 +43,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Bots http client.
  */
-public class BotsHttpClient implements HttpClient, Closeable {
+public class BotsHttpClient extends CloseableHttpClient {
   private static final Logger LOG = LoggerFactory.getLogger(BotsHttpClient.class);
   private final CloseableHttpClient client;
   private final Bots bots;
@@ -67,6 +66,11 @@ public class BotsHttpClient implements HttpClient, Closeable {
   @Override
   public ClientConnectionManager getConnectionManager() {
     return client.getConnectionManager();
+  }
+
+  @Override
+  protected CloseableHttpResponse doExecute(HttpHost target, HttpRequest request, HttpContext context) throws IOException, ClientProtocolException {
+    return execute(target, request, context);
   }
 
   @Override
