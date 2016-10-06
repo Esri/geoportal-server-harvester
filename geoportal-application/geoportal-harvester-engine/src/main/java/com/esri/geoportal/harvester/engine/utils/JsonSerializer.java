@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 
 /**
@@ -67,5 +68,20 @@ public class JsonSerializer {
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     return mapper.readValue(reader, clazz);
+  }
+
+  /**
+   * De-serialize task definition.
+   * @param <T> type of the definition
+   * @param inputStream input stream
+   * @param clazz class of the definition
+   * @return definition
+   * @throws IOException if de-serializing definition fails
+   */
+  public static <T> T deserialize(InputStream inputStream, Class<T> clazz) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    return mapper.readValue(inputStream, clazz);
   }
 }

@@ -132,6 +132,10 @@ define(["dojo/_base/declare",
       
       _onHistory: function(evt) {
         topic.publish("nav",{type: "history", data: evt.data});
+      },
+      
+      _onUpload: function(evt) {
+        this.load();
       }
     });
 });

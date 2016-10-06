@@ -207,6 +207,10 @@ html,body {
   background-color: lightgray;
 }
 
+.h-tasks-footer > span {
+  padding-right: 0.3em;
+}
+
 .h-history-caption {
   font-size: medium;
   font-weight: bold;

@@ -34,6 +34,9 @@
       p:username="${jdbc.username}"
       p:password="${jdbc.password}" />
 
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="268435456"/> <!-- 256 megs -->
+    </bean>    
   <!-- ADD PERSISTENCE SUPPORT HERE (jpa, hibernate, etc) -->
 
 </beans>
