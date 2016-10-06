@@ -70,7 +70,6 @@ define({
       remove: "remove",
       history: "history",
       schedule: "schedule",
-      selectFile: "Select file",
       imp: "Import",
       editor: {
         caption: "Task",

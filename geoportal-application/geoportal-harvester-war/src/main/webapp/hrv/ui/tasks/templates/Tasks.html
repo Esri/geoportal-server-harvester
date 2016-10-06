@@ -5,8 +5,7 @@
     <button class="h-tasks-add" data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-event="onClick:_onAdd"  style="display: table-cell;">${i18n.tasks.add}</button>
     <span class="n-tasks-import" style="display: table-cell;">
       <form method="post" action="rest/harvester/tasks/upload" id="myForm" enctype="multipart/form-data" >
-        <input name="file" multiple="false" type="file" data-dojo-type="dojox.form.Uploader" label="${i18n.tasks.selectFile}" id="uploader" data-dojo-attach-event="onComplete:_onUpload" />
-        <input type="submit" label="${i18n.tasks.imp}" data-dojo-type="dijit.form.Button"/>
+        <input name="file" multiple="false" type="file" data-dojo-type="dojox.form.Uploader" label="${i18n.tasks.imp}" id="uploader" data-dojo-attach-event="onComplete:_onUpload" data-dojo-props="uploadOnSelect: true" />
       </form>
     </span>
   </div>
