@@ -97,6 +97,7 @@ define({
     processes: {
       caption: "Processes",
       cancel: "cancel",
+      min: "min",
       errors: {
         loading: "Error loading processes",
         canceling: "Error canceling process"

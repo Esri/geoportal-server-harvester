@@ -59,8 +59,8 @@ define(["dojo/_base/declare",
                 var now = new Date();
                 var start = new Date(result.statistics.startDate);
                 var duration = (now-start)>0? (now-start)/1000/60: 0;
-                var velocity = result.statistics.acquired>0? Math.round(result.statistics.acquired/duration): null;
-                var progress = ""+result.statistics.acquired + (velocity? " ("+velocity+"/min)": "");
+                var velocity = result.statistics.acquired>0 && duration>0? Math.round(result.statistics.acquired/duration): null;
+                var progress = ""+result.statistics.acquired + (velocity? " ("+velocity+"/"+this.i18n.processes.min+")": "");
                 html.set(this.progressNode, progress);
               }
               if (result.status==="working" || result.status==="aborting") {
