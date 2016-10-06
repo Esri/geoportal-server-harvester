@@ -114,10 +114,10 @@ public class ProcessController {
    * Aborts (deletes) an existing process.
    * @return process info
    */
-  @RequestMapping(value = "/rest/harvester/processes/purge", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(value = "/rest/harvester/processes", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessResponse[]> purge() {
     try {
-      LOG.debug(String.format("DELETE /rest/harvester/processespurge"));
+      LOG.debug(String.format("DELETE /rest/harvester/processes"));
       List<Map.Entry<UUID, ProcessInstance>> completed = engine.getProcessesService().removeCompleted();
       return new ResponseEntity<>(completed.stream()
               .map(e->new ProcessResponse(e.getKey(),e.getValue().getTitle(),e.getValue().getStatus()))

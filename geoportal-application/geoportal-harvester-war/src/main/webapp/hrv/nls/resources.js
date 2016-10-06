@@ -99,6 +99,7 @@ define({
       caption: "Processes",
       cancel: "cancel",
       min: "min",
+      purge: "Purge",
       errors: {
         loading: "Error loading processes",
         canceling: "Error canceling process"

@@ -26,6 +26,7 @@ define(["dojo/_base/declare",
         "dojo/on",
         "dojo/dom-style",
         "dojo/dom-construct",
+        "dijit/form/Button",
         "hrv/rest/Processes",
         "hrv/ui/processes/Process"
       ],
@@ -33,6 +34,7 @@ define(["dojo/_base/declare",
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
            lang,array,topic,on,domStyle,domConstruct,
+           Button,
            ProcessesREST,Process
           ){
   
@@ -70,6 +72,10 @@ define(["dojo/_base/declare",
             topic.publish("msg",this.i18n.processes.errors.loading);
           })
         );
+      },
+      
+      _onPurge: function() {
+        ProcessesREST.purge().then(lang.hitch(this,this.load));
       }
     });
 });

@@ -1,4 +1,9 @@
 <div class="h-processes" data-dojo-attach-point="contentNode">
   <div class="h-processes-caption" data-dojo-attach-point="captionNode">${i18n.processes.caption}</div>
-  <div data-dojo-attach-point="processesNode"/>
+  <div>
+    <div data-dojo-attach-point="processesNode"/>
+  </div>
+  <div class="h-processes-footer" data-dojo-attach-point="footerNode" style="display: table;">
+    <button class="h-process-purge" data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-event="onClick:_onPurge"  style="display: table-cell;">${i18n.processes.purge}</button>
+  </div>
 </div>
