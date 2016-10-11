@@ -111,8 +111,8 @@ public class ProcessController {
   }
   
   /**
-   * Aborts (deletes) an existing process.
-   * @return process info
+   * Removes completed processes from the list of processes.
+   * @return process info array
    */
   @RequestMapping(value = "/rest/harvester/processes", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessResponse[]> purge() {
