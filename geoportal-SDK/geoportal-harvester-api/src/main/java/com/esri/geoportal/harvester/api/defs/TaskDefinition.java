@@ -130,6 +130,6 @@ public final class TaskDefinition implements Serializable {
   
   @Override
   public String toString() {
-    return String.format("PROCESSOR: %s, SOURCE: %s, DESTINATIONS: %s, INCREMENTAL: %b, IGNOREROBOTSTXT", processor, source, destinations!=null? destinations: null, incremental, ignoreRobotsTxt);
+    return String.format("PROCESSOR: %s, SOURCE: %s, DESTINATIONS: %s, INCREMENTAL: %b, IGNOREROBOTSTXT: %b", processor, source, destinations!=null? destinations: null, incremental, ignoreRobotsTxt);
   }
 }
