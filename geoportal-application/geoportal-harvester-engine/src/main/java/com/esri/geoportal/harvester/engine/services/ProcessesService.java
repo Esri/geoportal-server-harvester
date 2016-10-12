@@ -72,6 +72,7 @@ public interface ProcessesService {
   
   /**
    * Removes completed tasks.
+   * @return completed tasks information
    * @throws DataProcessorException if accessing repository fails
    */
   List<Map.Entry<UUID, ProcessInstance>> removeCompleted() throws DataProcessorException;
