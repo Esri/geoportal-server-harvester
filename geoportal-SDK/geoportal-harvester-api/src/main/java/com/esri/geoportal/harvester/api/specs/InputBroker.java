@@ -21,7 +21,6 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * Input broker.
@@ -72,7 +71,7 @@ public interface InputBroker extends Broker<InputConnector> {
   interface IteratorContext {
     /**
      * Gets last harvest date.
-     * @return last harvest date
+     * @return last harvest date or <code>null</code> if no last harvest date available
      */
     Date getLastHarvestDate();
   }
