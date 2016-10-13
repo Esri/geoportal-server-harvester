@@ -26,6 +26,8 @@ import java.util.Map;
  * Data reference wrapper.
  */
 public class DataReferenceWrapper implements DataReference {
+  private static final long serialVersionUID = 1L;
+  
   private final DataReference baseRef;
   private final byte [] content;
   private final MimeType contentType;

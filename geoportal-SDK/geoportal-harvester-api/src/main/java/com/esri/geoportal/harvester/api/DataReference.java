@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.api;
 
 import com.esri.geoportal.commons.constants.MimeType;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.Date;
 import java.util.Map;
@@ -25,7 +26,7 @@ import java.util.Map;
  * Data reference. It provides access to data itself as well as vital data 
  * information.
  */
-public interface DataReference {
+public interface DataReference extends Serializable {
   
   /**
    * Gets data record id.
