@@ -85,7 +85,7 @@ define(["dojo/_base/declare",
             input.set("value", !arg.password? values[arg.name]: TextScrambler.decode(values[arg.name]));
           },
           read: function(values) {
-            values[arg.name] = input.get("value");
+            values[arg.name] = !arg.password? input.get("value"): TextScrambler.encode(input.get("value"));
           },
           destroy: function() {
             input.destroy();

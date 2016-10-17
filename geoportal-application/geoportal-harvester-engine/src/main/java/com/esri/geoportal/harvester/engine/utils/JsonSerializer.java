@@ -15,17 +15,9 @@
  */
 package com.esri.geoportal.harvester.engine.utils;
 
-import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
-import com.esri.geoportal.harvester.api.base.TextScrambler;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -36,11 +28,6 @@ import java.io.Reader;
 public class JsonSerializer {
     private static final ObjectMapper mapper = new ObjectMapper();
     static {
-      SimpleModule simMod = new SimpleModule();
-      // TODO uncomment in final version
-      //simMod.addSerializer(String.class, new StringSerializer());
-      //simMod.addDeserializer(String.class, new StringDeserializer());
-      mapper.registerModule(simMod);
       mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
@@ -89,30 +76,5 @@ public class JsonSerializer {
    */
   public static <T> T deserialize(InputStream inputStream, Class<T> clazz) throws IOException {
     return mapper.readValue(inputStream, clazz);
-  }
-  
-  private static class StringSerializer extends com.fasterxml.jackson.databind.JsonSerializer<String>  {
-
-    @Override
-    public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException, JsonProcessingException {
-      if (CredentialsDefinitionAdaptor.P_CRED_PASSWORD.equals(gen.getOutputContext().getCurrentName())) {
-        value = TextScrambler.encode(value);
-      }
-      gen.writeString(value);
-    }
-    
-  }
-  
-  private static class StringDeserializer extends com.fasterxml.jackson.databind.JsonDeserializer<String> {
-
-    @Override
-    public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-      String value = p.getValueAsString();
-      if (CredentialsDefinitionAdaptor.P_CRED_PASSWORD.equals(p.getCurrentName())) {
-        value = TextScrambler.decode(value);
-      }
-      return value;
-    }
-    
   }
 }

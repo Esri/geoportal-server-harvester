@@ -15,8 +15,22 @@
  */
 package com.esri.geoportal.harvester.api.defs;
 
+import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_PASSWORD;
+import com.esri.geoportal.commons.utils.TextScrambler;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +54,8 @@ import java.util.stream.Collectors;
  * @see com.esri.geoportal.harvester.api.Connector
  * @see com.esri.geoportal.harvester.api.Broker
  */
+@JsonSerialize(using = EntityDefinition.Serializer.class)
+@JsonDeserialize(using = EntityDefinition.Deserializer.class)
 public final class EntityDefinition implements Serializable {
   private String type;
   private String label;
@@ -134,5 +150,68 @@ public final class EntityDefinition implements Serializable {
     hash = 89 * hash + Objects.hashCode(this.type);
     hash = 89 * hash + Objects.hashCode(this.properties);
     return hash;
+  }
+  
+  public static final class Serializer extends JsonSerializer<EntityDefinition> {
+
+    @Override
+    public void serialize(EntityDefinition value, JsonGenerator gen, SerializerProvider serializers) throws IOException, JsonProcessingException {
+      gen.writeStartObject();
+      
+      gen.writeFieldName("type");
+      gen.writeString(value.type);
+      
+      gen.writeFieldName("label");
+      gen.writeString(value.label);
+      
+      gen.writeObjectFieldStart("properties");
+      for (Map.Entry<String,String> e: value.properties.entrySet()) {
+        gen.writeFieldName(e.getKey());
+        gen.writeString(P_CRED_PASSWORD.equals(e.getKey()) && !e.getValue().isEmpty()? TextScrambler.encode(e.getValue()): e.getValue());
+      }
+      gen.writeEndObject();
+      
+      gen.writeArrayFieldStart("keywords");
+      for (String k: value.keywords) {
+        gen.writeString(k);
+      }
+      gen.writeEndArray();
+      
+      
+      gen.writeEndObject();
+    }
+    
+  }
+  
+  public static final class Deserializer extends JsonDeserializer<EntityDefinition> {
+
+    @Override
+    public EntityDefinition deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+      JsonNode node = jp.getCodec().readTree(jp);
+      
+      EntityDefinition ed = new EntityDefinition();
+      
+      ed.type = node.has("type")? node.get("type").asText(): "";
+      ed.label = node.has("label")? node.get("label").asText(): "";
+      
+      if (node.has("properties") && node.get("properties").isObject()) {
+        JsonNode properties = node.get("properties");
+        Iterator<Map.Entry<String, JsonNode>> fields = properties.fields();
+        while (fields.hasNext()) {
+          Map.Entry<String, JsonNode> next = fields.next();
+          ed.properties.put(next.getKey(), P_CRED_PASSWORD.equals(next.getKey())? TextScrambler.decode(next.getValue().asText()): next.getValue().asText());
+        }
+      }
+      
+      if (node.has("keywords") && node.get("keywords").isArray()) {
+        JsonNode keywords = node.get("keywords");
+        for (int i=0; i<keywords.size(); i++) {
+          ed.keywords.add(keywords.get(i).asText());
+        }
+      }
+      
+      return ed;
+    }
+    
   }
 }

@@ -15,10 +15,11 @@
  */
 package com.esri.geoportal.harvester.csw;
 
+import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_PASSWORD;
+import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_USERNAME;
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.impl.ProfilesProvider;
-import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.defs.UITemplate.Choice;
@@ -47,8 +48,8 @@ public class CswConnector implements InputConnector<InputBroker> {
   public UITemplate getTemplate() {
     List<UITemplate.Argument> arguments = new ArrayList<>();
     arguments.add(new UITemplate.StringArgument(P_HOST_URL, "URL", true));
-    arguments.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_USERNAME, "User name", false));
-    arguments.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_PASSWORD, "User password", false) {
+    arguments.add(new UITemplate.StringArgument(P_CRED_USERNAME, "User name", false));
+    arguments.add(new UITemplate.StringArgument(P_CRED_PASSWORD, "User password", false) {
       public boolean isPassword() {
         return true;
       }

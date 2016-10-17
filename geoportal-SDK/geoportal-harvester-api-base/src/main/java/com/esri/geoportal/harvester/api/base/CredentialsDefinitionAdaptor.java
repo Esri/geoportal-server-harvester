@@ -15,6 +15,8 @@
  */
 package com.esri.geoportal.harvester.api.base;
 
+import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_PASSWORD;
+import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_USERNAME;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 
@@ -22,8 +24,6 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
  * SimpleCredentials definition adaptor.
  */
 public final class CredentialsDefinitionAdaptor extends BrokerDefinitionAdaptor {
-  public static final String P_CRED_USERNAME = "cred-username";
-  public static final String P_CRED_PASSWORD = "cred-password";
   
   /**
    * Creates instance of the adaptor.

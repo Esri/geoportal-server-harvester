@@ -15,9 +15,10 @@
  */
 package com.esri.geoportal.harvester.ags;
 
+import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_PASSWORD;
+import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_USERNAME;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import static com.esri.geoportal.harvester.ags.AgsBrokerDefinitionAdaptor.P_HOST_URL;
-import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -50,8 +51,8 @@ public class AgsConnector implements InputConnector<InputBroker> {
   public UITemplate getTemplate() {
     List<UITemplate.Argument> args = new ArrayList<>();
     args.add(new UITemplate.StringArgument(P_HOST_URL, "Url", true));
-    args.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_USERNAME, "User name", false));
-    args.add(new UITemplate.StringArgument(CredentialsDefinitionAdaptor.P_CRED_PASSWORD, "User password", false) {
+    args.add(new UITemplate.StringArgument(P_CRED_USERNAME, "User name", false));
+    args.add(new UITemplate.StringArgument(P_CRED_PASSWORD, "User password", false) {
       public boolean isPassword() {
         return true;
       }
