@@ -16,8 +16,10 @@
 package com.esri.geoportal.harvester.engine.services;
 
 import com.esri.geoportal.harvester.api.Trigger;
+import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.utils.CrudlException;
 import com.esri.geoportal.harvester.engine.utils.TriggerReference;
@@ -72,6 +74,17 @@ public interface TriggersService {
    * @return list of all activated triggers
    */
   List<TriggerReference> listActivatedTriggers(UUID taskId);
+
+  /**
+   * Schedules task with trigger.
+   * @param taskId task id or <code>null</code> if no id
+   * @param trigDef trigger instance definition
+   * @param iteratorContext iterator context
+   * @return trigger reference
+   * @throws InvalidDefinitionException if invalid definition
+   * @throws DataProcessorException if error processing data
+   */
+  TriggerReference schedule(UUID taskId, TriggerDefinition trigDef, InputBroker.IteratorContext iteratorContext) throws InvalidDefinitionException, DataProcessorException;
   
   /**
    * Activates trigger instances

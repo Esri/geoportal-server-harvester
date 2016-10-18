@@ -415,7 +415,7 @@ public class TaskController {
       SimpleIteratorContext iteratorContext = new SimpleIteratorContext();
       iteratorContext.setLastHarvest(incremental && lastEvent != null ? lastEvent.getStartTimestamp() : null);
 
-      TriggerReference trigRef = engine.getExecutionService().schedule(taskId, triggerInstanceDefinition, iteratorContext);
+      TriggerReference trigRef = engine.getTriggersService().schedule(taskId, triggerInstanceDefinition, iteratorContext);
       return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), taskId, trigRef.getTriggerDefinition()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -444,7 +444,7 @@ public class TaskController {
   public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody TriggerDefinition trigDef) {
     try {
       LOG.debug(String.format("POST /rest/harvester/tasks/schedule <-- %s", trigDef));
-      TriggerReference trigRef = engine.getExecutionService().schedule(null, trigDef, new SimpleIteratorContext());
+      TriggerReference trigRef = engine.getTriggersService().schedule(null, trigDef, new SimpleIteratorContext());
       return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), null, trigRef.getTriggerDefinition()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

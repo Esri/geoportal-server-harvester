@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.beans;
 
 import com.esri.geoportal.harvester.engine.services.ExecutionService;
 import com.esri.geoportal.harvester.engine.defaults.DefaultTriggersService;
+import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
@@ -33,12 +34,13 @@ public class TriggersServiceBean extends DefaultTriggersService {
    * Creates instance of the bean.
    * @param triggerRegistry trigger registry
    * @param triggerManager trigger manager
+   * @param historyManager history manager
    * @param triggerInstanceManager trigger instance manager
    * @param executionService execution service
    */
   @Autowired
-  public TriggersServiceBean(TriggerRegistry triggerRegistry, TriggerManager triggerManager, TriggerInstanceManager triggerInstanceManager, ExecutionService executionService) {
-    super(triggerRegistry, triggerManager, triggerInstanceManager,executionService);
+  public TriggersServiceBean(TriggerRegistry triggerRegistry, TriggerManager triggerManager, HistoryManager historyManager, TriggerInstanceManager triggerInstanceManager, ExecutionService executionService) {
+    super(triggerRegistry, triggerManager, historyManager, triggerInstanceManager, executionService);
   }
   
 }

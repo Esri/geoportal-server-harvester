@@ -21,7 +21,6 @@ import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.Transformer;
 import com.esri.geoportal.harvester.api.TransformerInstance;
-import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.api.base.BrokerLinkActionAdaptor;
 import com.esri.geoportal.harvester.api.base.FilterLinkActionAdaptor;
@@ -32,7 +31,6 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.LinkDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
-import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.general.Link;
@@ -52,13 +50,11 @@ import com.esri.geoportal.harvester.engine.registers.OutboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.registers.ProcessorRegistry;
 import com.esri.geoportal.harvester.engine.registers.TransformerRegistry;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
-import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager.TaskUuidTriggerInstancePair;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
 import com.esri.geoportal.harvester.engine.utils.CrudlException;
 import com.esri.geoportal.harvester.engine.utils.HistoryManagerAdaptor;
 import com.esri.geoportal.harvester.engine.utils.ProcessReference;
-import com.esri.geoportal.harvester.engine.utils.TriggerReference;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
@@ -120,32 +116,6 @@ public class DefaultExecutionService implements ExecutionService {
     return processesService.createProcess(task, iteratorContext);
   }
   
-  @Override
-  public TriggerReference schedule(UUID taskId, TriggerDefinition trigDef, IteratorContext iteratorContext) throws InvalidDefinitionException, DataProcessorException {
-    try {
-      TriggerManager.TaskUuidTriggerDefinitionPair pair = new TriggerManager.TaskUuidTriggerDefinitionPair();
-      pair.setTaskUuid(taskId);
-      pair.setTriggerDefinition(trigDef);
-      UUID uuid = triggerManager.create(pair);
-      Trigger trigger = triggerRegistry.get(trigDef.getType());
-      TriggerInstance triggerInstance = trigger.createInstance(trigDef);
-      TaskUuidTriggerInstancePair pair2 = new TriggerInstanceManager.TaskUuidTriggerInstancePair();
-      pair2.setTaskId(taskId);
-      pair2.setTriggerInstance(triggerInstance);
-      triggerInstanceManager.put(uuid, pair2);
-      TriggerContext context = new TriggerContext(taskId);
-      triggerInstance.activate(context);
-      return new TriggerReference(uuid, taskId, trigDef);
-    } catch (CrudlException ex) {
-      throw new DataProcessorException(String.format("Error scheduling task: %s", trigDef.getTaskDefinition()), ex);
-    }
-  }
-
-  @Override
-  public TriggerInstance.Context newTriggerContext(UUID taskId) {
-    return new TriggerContext(taskId);
-  }
-  
   /**
    * Creates new task.
    * @param taskDefinition task definition
@@ -197,22 +167,6 @@ public class DefaultExecutionService implements ExecutionService {
     }
 
     return dsFactory.createBroker(entityDefinition);
-  }
-
-  /**
-   * Creates new output broker.
-   * @param entityDefinition output broker definition
-   * @return output broker
-   * @throws InvalidDefinitionException if invalid definition
-   */  
-  private OutputBroker newOutputBroker(EntityDefinition entityDefinition) throws InvalidDefinitionException {
-    OutputConnector<OutputBroker> dpFactory = outboundConnectorRegistry.get(entityDefinition.getType());
-
-    if (dpFactory == null) {
-      throw new IllegalArgumentException("Invalid output broker definition");
-    }
-
-    return dpFactory.createBroker(entityDefinition);
   }
 
   /**

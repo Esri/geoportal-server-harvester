@@ -15,11 +15,17 @@
  */
 package com.esri.geoportal.harvester.engine.defaults;
 
+import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
+import com.esri.geoportal.harvester.api.base.SimpleIteratorContext;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.specs.InputBroker;
+import com.esri.geoportal.harvester.engine.managers.History;
+import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.services.ExecutionService;
 import com.esri.geoportal.harvester.engine.services.TriggersService;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
@@ -27,9 +33,12 @@ import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager.TaskU
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
 import com.esri.geoportal.harvester.engine.utils.CrudlException;
+import com.esri.geoportal.harvester.engine.utils.HistoryManagerAdaptor;
+import com.esri.geoportal.harvester.engine.utils.ProcessReference;
 import com.esri.geoportal.harvester.engine.utils.TriggerReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -45,6 +54,7 @@ public class DefaultTriggersService implements TriggersService {
   
   protected final TriggerRegistry triggerRegistry;
   protected final TriggerManager triggerManager;
+  protected final HistoryManager historyManager;
   protected final TriggerInstanceManager triggerInstanceManager;
   protected final ExecutionService executionService;
 
@@ -52,12 +62,14 @@ public class DefaultTriggersService implements TriggersService {
    * Creates instance of the service.
    * @param triggerRegistry trigger registry
    * @param triggerManager trigger manager
+   * @param historyManager history manager
    * @param triggerInstanceManager trigger instance manager
    * @param executionService execution service
    */
-  public DefaultTriggersService(TriggerRegistry triggerRegistry, TriggerManager triggerManager, TriggerInstanceManager triggerInstanceManager, ExecutionService executionService) {
+  public DefaultTriggersService(TriggerRegistry triggerRegistry, TriggerManager triggerManager, HistoryManager historyManager, TriggerInstanceManager triggerInstanceManager, ExecutionService executionService) {
     this.triggerRegistry = triggerRegistry;
     this.triggerManager = triggerManager;
+    this.historyManager = historyManager;
     this.triggerInstanceManager = triggerInstanceManager;
     this.executionService = executionService;
   }
@@ -128,7 +140,7 @@ public class DefaultTriggersService implements TriggersService {
             throw new InvalidDefinitionException(String.format("Invalid trigger type: %s", definition.getTriggerDefinition().getType()));
           }
           TriggerInstance triggerInstance = trigger.createInstance(definition.getTriggerDefinition());
-          TriggerInstance.Context context = executionService.newTriggerContext(definition.getTaskUuid());
+          TriggerInstance.Context context = new TriggerContext(definition.getTaskUuid());
           triggerInstance.activate(context);
         } catch (DataProcessorException|InvalidDefinitionException ex) {
           LOG.warn(String.format("Error creating and activating trigger instance: %s -> %s", uuid, definition), ex);
@@ -146,5 +158,68 @@ public class DefaultTriggersService implements TriggersService {
       triggerInstance.deactivate();
     });
     triggerInstanceManager.clear();
+  }
+  
+  @Override
+  public TriggerReference schedule(UUID taskId, TriggerDefinition trigDef, InputBroker.IteratorContext iteratorContext) throws InvalidDefinitionException, DataProcessorException {
+    try {
+      TriggerManager.TaskUuidTriggerDefinitionPair pair = new TriggerManager.TaskUuidTriggerDefinitionPair();
+      pair.setTaskUuid(taskId);
+      pair.setTriggerDefinition(trigDef);
+      UUID uuid = triggerManager.create(pair);
+      Trigger trigger = triggerRegistry.get(trigDef.getType());
+      TriggerInstance triggerInstance = trigger.createInstance(trigDef);
+      TaskUuidTriggerInstancePair pair2 = new TriggerInstanceManager.TaskUuidTriggerInstancePair();
+      pair2.setTaskId(taskId);
+      pair2.setTriggerInstance(triggerInstance);
+      triggerInstanceManager.put(uuid, pair2);
+      TriggerContext context = new TriggerContext(taskId);
+      triggerInstance.activate(context);
+      return new TriggerReference(uuid, taskId, trigDef);
+    } catch (CrudlException ex) {
+      throw new DataProcessorException(String.format("Error scheduling task: %s", trigDef.getTaskDefinition()), ex);
+    }
+  }
+  
+  /**
+   * DefaultEngine-bound trigger context.
+   */
+  private class TriggerContext implements TriggerInstance.Context {
+    private final UUID taskId;
+    
+    /**
+     * Creates instance of the context.
+     * @param taskId task id
+     */
+    public TriggerContext(UUID taskId) {
+      this.taskId = taskId;
+    }
+
+    @Override
+    public synchronized ProcessInstance execute(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
+      SimpleIteratorContext iteratorContext = new SimpleIteratorContext();
+      iteratorContext.setLastHarvest(taskDefinition.isIncremental()? lastHarvest(): null);
+      ProcessReference ref = executionService.execute(taskDefinition,iteratorContext);
+      if (taskId!=null) {
+        ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref.getProcess(), historyManager));
+      }
+      ref.getProcess().init();
+      return ref.getProcess();
+    }
+    
+    @Override
+    public Date lastHarvest() throws DataProcessorException {
+      try {
+        if (taskId!=null) {
+          History history = historyManager.buildHistory(taskId);
+          History.Event lastEvent = history!=null? history.getLastEvent(): null;
+          return lastEvent!=null? lastEvent.getStartTimestamp(): null;
+        } else {
+          return null;
+        }
+      } catch (CrudlException ex) {
+        throw new DataProcessorException(String.format("Error getting last harvest for: %s", taskId), ex);
+      }
+    }
   }
 }
