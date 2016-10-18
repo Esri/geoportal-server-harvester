@@ -19,6 +19,8 @@ package com.esri.geoportal.commons.constants;
  * Crendentials constants.
  */
 public class CredentialsConstants {
+  /** user name property key */
   public static final String P_CRED_USERNAME = "cred-username";
+  /** password property key */
   public static final String P_CRED_PASSWORD = "cred-password";
 }

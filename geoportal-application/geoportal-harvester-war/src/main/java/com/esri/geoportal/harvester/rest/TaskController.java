@@ -83,21 +83,21 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * PUT /rest/harvester/tasks/execute
  * {
- * "processor": null,
- * "source": {
- * "type": "WAF",
- * "properties": {
- * "waf-host-url": "http://gptsrv12r2/wafMetadata/metadataSamples/"
- * }
- * },
- * "destinations": [
- * {
- * "type": "FOLDER",
- * "properties": {
- * "folder-root-folder": "c:\\data"
- * }
- * }
- * ]
+ *  "processor": null,
+ *  "source": {
+ *    "type": "WAF",
+ *    "properties": {
+ *      "waf-host-url": "http://gptsrv12r2/wafMetadata/metadataSamples/"
+ *    }
+ *  },
+ *  "destinations": [
+ *    {
+ *      "type": "FOLDER",
+ *      "properties": {
+ *        "folder-root-folder": "c:\\data"
+ *      }
+ *    }
+ *  ]
  * }
  * </code></pre>
  * <br>
@@ -112,27 +112,27 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * POST /rest/harvester/tasks/schedule
  * {
- * "type": "AT",
- * "properties": {
- * "t-at-time": "10:00"
- * },
- * "taskDefinition": {
- * "processor": null,
- * "source": {
- * "type": "WAF",
- * "properties": {
- * "waf-host-url": "http://gptsrv12r2/wafMetadata/metadataSamples/"
- * }
- * },
- * "destinations": [
- * {
- * "type": "FOLDER",
- * "properties": {
- * "folder-root-folder": "c:\\data"
- * }
- * }
- * ]
- * }
+ *  "type": "AT",
+ *  "properties": {
+ *    "t-at-time": "10:00"
+ *  },
+ *  "taskDefinition": {
+ *    "processor": null,
+ *    "source": {
+ *      "type": "WAF",
+ *      "properties": {
+ *        "waf-host-url": "http://gptsrv12r2/wafMetadata/metadataSamples/"
+ *      }
+ *    },
+ *    "destinations": [
+ *      {
+ *        "type": "FOLDER",
+ *        "properties": {
+ *          "folder-root-folder": "c:\\data"
+ *        }
+ *      }
+ *    ]
+ *  }
  * }
  * </code></pre>
  * <br>
@@ -141,10 +141,10 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * POST /rest/harvester/tasks/31b4f880-37f9-11e6-ac61-9e71128cae77/schedule
  * {
- * "type": "AT",
- * "properties": {
- * "t-at-time": "10:00"
- * }
+ *  "type": "AT",
+ *  "properties": {
+ *    "t-at-time": "10:00"
+ *  }
  * }
  * </code></pre>
  */

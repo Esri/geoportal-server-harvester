@@ -23,7 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 /**
- * Text TextScrambler.
+ * Text scrambler.
  */
 public class TextScrambler {
 

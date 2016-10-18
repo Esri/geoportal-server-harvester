@@ -152,6 +152,9 @@ public final class EntityDefinition implements Serializable {
     return hash;
   }
   
+  /**
+   * Serializer.
+   */
   public static final class Serializer extends JsonSerializer<EntityDefinition> {
 
     @Override
@@ -183,6 +186,9 @@ public final class EntityDefinition implements Serializable {
     
   }
   
+  /**
+   * Deserializer.
+   */
   public static final class Deserializer extends JsonDeserializer<EntityDefinition> {
 
     @Override
