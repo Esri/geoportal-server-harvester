@@ -124,10 +124,15 @@ import org.slf4j.LoggerFactory;
       data.src_source_name_s = ref.getBrokerName();
       data.src_uri_s = ref.getSourceUri().toASCIIString();
       data.src_lastupdate_dt = ref.getLastModifiedDate() != null ? fromatDate(ref.getLastModifiedDate()) : null;
-      data.xml = new String(ref.getContent(), "UTF-8");
-      if (data.xml.startsWith(SBOM)) {
-        data.xml = data.xml.substring(1);
+      
+      byte[] content = ref.getContent();
+      if (content!=null) {
+        data.xml = new String(content, "UTF-8");
+        if (data.xml.startsWith(SBOM)) {
+          data.xml = data.xml.substring(1);
+        }
       }
+      
       PublishResponse response = client.publish(data, definition.getForceAdd());
       if (response == null) {
         throw new DataOutputException(this, "No response received");
