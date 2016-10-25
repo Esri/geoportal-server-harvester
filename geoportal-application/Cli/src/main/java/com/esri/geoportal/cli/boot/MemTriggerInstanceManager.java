@@ -15,46 +15,42 @@
  */
 package com.esri.geoportal.cli.boot;
 
-import com.esri.geoportal.harvester.engine.utils.CrudlException;
-import com.esri.geoportal.harvester.engine.utils.CrudlRepo;
-import java.util.Collection;
+import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
- * Cruds in memory implementation.
+ * In-memory trigger instance manager.
  */
-public class MemCruds<T> implements CrudlRepo<T>{
-  private final HashMap<UUID,T> mem = new HashMap<>();
+public class MemTriggerInstanceManager implements TriggerInstanceManager {
+  private final HashMap<UUID,TaskUuidTriggerInstancePair> mem = new HashMap<>();
 
   @Override
-  public UUID create(T data) throws CrudlException {
-    UUID uuid = UUID.randomUUID();
-    
-    mem.put(uuid, data);
-    
-    return uuid;
+  public void put(UUID uuid, TaskUuidTriggerInstancePair instance) {
+    mem.put(uuid, instance);
   }
 
   @Override
-  public boolean delete(UUID id) throws CrudlException {
-    return mem.remove(id)!=null;
+  public TaskUuidTriggerInstancePair get(UUID uuid) {
+    return mem.get(uuid);
   }
 
   @Override
-  public T read(UUID id) throws CrudlException {
-    return mem.get(id);
+  public TaskUuidTriggerInstancePair remove(UUID uuid) {
+    return mem.remove(uuid);
   }
 
   @Override
-  public boolean update(UUID id, T data) throws CrudlException {
-    return mem.put(id, data)!=null;
+  public List<Map.Entry<UUID, TaskUuidTriggerInstancePair>> listAll() {
+    return mem.entrySet().stream().collect(Collectors.toList());
   }
 
   @Override
-  public Collection<Map.Entry<UUID, T>> list() throws CrudlException {
-    return mem.entrySet();
+  public void clear() {
+    mem.clear();
   }
   
 }
