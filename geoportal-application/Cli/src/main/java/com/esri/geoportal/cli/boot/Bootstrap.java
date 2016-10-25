@@ -34,6 +34,7 @@ import com.esri.geoportal.harvester.engine.defaults.DefaultProcessor;
 import com.esri.geoportal.harvester.engine.filters.RegExFilter;
 import com.esri.geoportal.harvester.engine.managers.BrokerDefinitionManager;
 import com.esri.geoportal.harvester.engine.managers.ProcessManager;
+import com.esri.geoportal.harvester.engine.managers.ReportManager;
 import com.esri.geoportal.harvester.engine.managers.TaskManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
@@ -85,6 +86,11 @@ public class Bootstrap {
   // <editor-fold defaultstate="collapsed" desc="managers factories">
   protected BrokerDefinitionManager createBrokerDefinitionManager() {
     BrokerDefinitionManager mgr = new MemBrokerDefinitionManager();    
+    return mgr;
+  }
+  
+  protected ReportManager createReportManager() {
+    ReportManager mgr = new MemReportManager();
     return mgr;
   }
   
