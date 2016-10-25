@@ -15,7 +15,41 @@
  */
 package com.esri.geoportal.cli.boot;
 
+import com.esri.geoportal.commons.meta.MetaAnalyzer;
+import com.esri.geoportal.commons.meta.MetaBuilder;
+import com.esri.geoportal.commons.meta.util.MultiMetaAnalyzerWrapper;
+import com.esri.geoportal.commons.meta.xml.SimpleDcMetaAnalyzer;
+import com.esri.geoportal.commons.meta.xml.SimpleDcMetaBuilder;
+import com.esri.geoportal.commons.meta.xml.SimpleFgdcMetaAnalyzer;
+import com.esri.geoportal.commons.meta.xml.SimpleIso15115MetaAnalyzer;
+import com.esri.geoportal.commons.meta.xml.SimpleIso15115_2MetaAnalyzer;
+import com.esri.geoportal.commons.meta.xml.SimpleIso15119MetaAnalyzer;
+import com.esri.geoportal.harvester.agp.AgpOutputConnector;
+import com.esri.geoportal.harvester.agpsrc.AgpInputConnector;
+import com.esri.geoportal.harvester.ags.AgsConnector;
+import com.esri.geoportal.harvester.console.ConsoleConnector;
+import com.esri.geoportal.harvester.csw.CswConnector;
+import com.esri.geoportal.harvester.engine.defaults.DefaultProcessor;
+import com.esri.geoportal.harvester.engine.filters.RegExFilter;
+import com.esri.geoportal.harvester.engine.registers.FilterRegistry;
+import com.esri.geoportal.harvester.engine.registers.InboundConnectorRegistry;
+import com.esri.geoportal.harvester.engine.registers.OutboundConnectorRegistry;
+import com.esri.geoportal.harvester.engine.registers.ProcessorRegistry;
+import com.esri.geoportal.harvester.engine.registers.StatisticsRegistry;
+import com.esri.geoportal.harvester.engine.registers.TransformerRegistry;
+import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
 import com.esri.geoportal.harvester.engine.services.Engine;
+import com.esri.geoportal.harvester.engine.transformers.XsltTransformer;
+import com.esri.geoportal.harvester.engine.triggers.AtTrigger;
+import com.esri.geoportal.harvester.engine.triggers.NowTrigger;
+import com.esri.geoportal.harvester.engine.triggers.PeriodTrigger;
+import com.esri.geoportal.harvester.folder.FolderConnector;
+import com.esri.geoportal.harvester.gptsrc.GptConnector;
+import com.esri.geoportal.harvester.unc.UncConnector;
+import com.esri.geoportal.harvester.waf.WafConnector;
+import java.io.IOException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 
 /**
  * Bootstrap.
@@ -28,5 +62,78 @@ public class Bootstrap {
    */
   public Engine createEngine() {
     return null;
+  }
+  
+  protected FilterRegistry createFilterRegistry() {
+    FilterRegistry reg = new FilterRegistry();
+    
+    reg.put(RegExFilter.TYPE, new RegExFilter());
+    
+    return reg;
+  }
+  
+  protected InboundConnectorRegistry createInboundConnectorRegistry() throws IOException, TransformerConfigurationException {
+    InboundConnectorRegistry reg = new InboundConnectorRegistry();
+    
+    MetaBuilder metaBuilder = new SimpleDcMetaBuilder();
+    
+    reg.put(CswConnector.TYPE, new CswConnector());
+    reg.put(WafConnector.TYPE, new WafConnector());
+    reg.put(UncConnector.TYPE, new UncConnector());
+    reg.put(AgpInputConnector.TYPE, new AgpInputConnector(metaBuilder));
+    reg.put(AgsConnector.TYPE, new AgsConnector(metaBuilder));
+    reg.put(GptConnector.TYPE, new GptConnector());
+    
+    return reg;
+  }
+  
+  protected OutboundConnectorRegistry createOutboundConnectorRegistry() throws IOException, TransformerConfigurationException, XPathExpressionException {
+    OutboundConnectorRegistry reg = new OutboundConnectorRegistry();
+    
+    MetaAnalyzer metaAnalyzer = new MultiMetaAnalyzerWrapper(
+            new SimpleDcMetaAnalyzer(), 
+            new SimpleFgdcMetaAnalyzer(), 
+            new SimpleIso15115MetaAnalyzer(), 
+            new SimpleIso15115_2MetaAnalyzer(), 
+            new SimpleIso15119MetaAnalyzer());
+    
+    reg.put(AgpOutputConnector.TYPE, new AgpOutputConnector(metaAnalyzer));
+    reg.put(ConsoleConnector.TYPE, new ConsoleConnector());
+    reg.put(FolderConnector.TYPE, new FolderConnector());
+    reg.put(com.esri.geoportal.harvester.gpt.GptConnector.TYPE, new com.esri.geoportal.harvester.gpt.GptConnector());
+    
+    return reg;
+  }
+  
+  protected ProcessorRegistry createProcessorRegistry() {
+    ProcessorRegistry reg = new ProcessorRegistry();
+    
+    reg.put(DefaultProcessor.TYPE, new DefaultProcessor());
+    
+    return reg;
+  }
+  
+  protected StatisticsRegistry createStatisticsRegistry() {
+    StatisticsRegistry reg = new StatisticsRegistry();
+    
+    return reg;
+  }
+  
+  protected TransformerRegistry createTransformerRegistry() {
+    TransformerRegistry reg = new TransformerRegistry();
+    
+    reg.put(XsltTransformer.TYPE, new XsltTransformer());
+    
+    return reg;
+  }
+  
+  protected TriggerRegistry createTriggerRegistry() {
+    TriggerRegistry reg = new TriggerRegistry();
+    
+    reg.put(NowTrigger.TYPE, new NowTrigger());
+    reg.put(AtTrigger.TYPE, new AtTrigger());
+    reg.put(PeriodTrigger.TYPE, new PeriodTrigger());
+    
+    return reg;
   }
 }
