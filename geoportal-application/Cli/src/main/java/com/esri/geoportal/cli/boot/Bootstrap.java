@@ -63,6 +63,14 @@ import javax.xml.xpath.XPathExpressionException;
  * Bootstrap.
  */
 public class Bootstrap {
+
+  private TriggerRegistry triggerRegistry;
+  private TransformerRegistry transformerRegistry;
+  private StatisticsRegistry statisticsRegistry;
+  private ProcessorRegistry processorRegistry;
+  private OutboundConnectorRegistry outboundConnectorRegistry;
+  private InboundConnectorRegistry inboundConnectorRegistry;
+  private FilterRegistry filterRegistry;
   
   /**
    * Creates engine.
@@ -74,13 +82,12 @@ public class Bootstrap {
   
   // <editor-fold defaultstate="collapsed" desc="services factories">
   protected BrokersService createBrokersService() throws IOException, TransformerConfigurationException, XPathExpressionException {
-    BrokersService brokersService = new DefaultBrokersService(
+    BrokersService srv = new DefaultBrokersService(
             createInboundConnectorRegistry(), 
             createOutboundConnectorRegistry(), 
             createBrokerDefinitionManager());
-    return brokersService;
+    return srv;
   }
-  
   // </editor-fold>
   
   // <editor-fold defaultstate="collapsed" desc="managers factories">
@@ -117,76 +124,89 @@ public class Bootstrap {
   
   // <editor-fold defaultstate="collapsed" desc="registries factories">
   protected FilterRegistry createFilterRegistry() {
-    FilterRegistry reg = new FilterRegistry();
+    if (filterRegistry==null) {
+      filterRegistry = new FilterRegistry();
+
+      filterRegistry.put(RegExFilter.TYPE, new RegExFilter());
+    }
     
-    reg.put(RegExFilter.TYPE, new RegExFilter());
-    
-    return reg;
+    return filterRegistry;
   }
   
   protected InboundConnectorRegistry createInboundConnectorRegistry() throws IOException, TransformerConfigurationException {
-    InboundConnectorRegistry reg = new InboundConnectorRegistry();
+    if (inboundConnectorRegistry==null) {
+      inboundConnectorRegistry = new InboundConnectorRegistry();
+
+      MetaBuilder metaBuilder = new SimpleDcMetaBuilder();
+
+      inboundConnectorRegistry.put(CswConnector.TYPE, new CswConnector());
+      inboundConnectorRegistry.put(WafConnector.TYPE, new WafConnector());
+      inboundConnectorRegistry.put(UncConnector.TYPE, new UncConnector());
+      inboundConnectorRegistry.put(AgpInputConnector.TYPE, new AgpInputConnector(metaBuilder));
+      inboundConnectorRegistry.put(AgsConnector.TYPE, new AgsConnector(metaBuilder));
+      inboundConnectorRegistry.put(GptConnector.TYPE, new GptConnector());
+    }
     
-    MetaBuilder metaBuilder = new SimpleDcMetaBuilder();
-    
-    reg.put(CswConnector.TYPE, new CswConnector());
-    reg.put(WafConnector.TYPE, new WafConnector());
-    reg.put(UncConnector.TYPE, new UncConnector());
-    reg.put(AgpInputConnector.TYPE, new AgpInputConnector(metaBuilder));
-    reg.put(AgsConnector.TYPE, new AgsConnector(metaBuilder));
-    reg.put(GptConnector.TYPE, new GptConnector());
-    
-    return reg;
+    return inboundConnectorRegistry;
   }
   
   protected OutboundConnectorRegistry createOutboundConnectorRegistry() throws IOException, TransformerConfigurationException, XPathExpressionException {
-    OutboundConnectorRegistry reg = new OutboundConnectorRegistry();
+    if (outboundConnectorRegistry==null) {
+      outboundConnectorRegistry = new OutboundConnectorRegistry();
+
+      MetaAnalyzer metaAnalyzer = new MultiMetaAnalyzerWrapper(
+              new SimpleDcMetaAnalyzer(), 
+              new SimpleFgdcMetaAnalyzer(), 
+              new SimpleIso15115MetaAnalyzer(), 
+              new SimpleIso15115_2MetaAnalyzer(), 
+              new SimpleIso15119MetaAnalyzer());
+
+      outboundConnectorRegistry.put(AgpOutputConnector.TYPE, new AgpOutputConnector(metaAnalyzer));
+      outboundConnectorRegistry.put(ConsoleConnector.TYPE, new ConsoleConnector());
+      outboundConnectorRegistry.put(FolderConnector.TYPE, new FolderConnector());
+      outboundConnectorRegistry.put(com.esri.geoportal.harvester.gpt.GptConnector.TYPE, new com.esri.geoportal.harvester.gpt.GptConnector());
+    }
     
-    MetaAnalyzer metaAnalyzer = new MultiMetaAnalyzerWrapper(
-            new SimpleDcMetaAnalyzer(), 
-            new SimpleFgdcMetaAnalyzer(), 
-            new SimpleIso15115MetaAnalyzer(), 
-            new SimpleIso15115_2MetaAnalyzer(), 
-            new SimpleIso15119MetaAnalyzer());
-    
-    reg.put(AgpOutputConnector.TYPE, new AgpOutputConnector(metaAnalyzer));
-    reg.put(ConsoleConnector.TYPE, new ConsoleConnector());
-    reg.put(FolderConnector.TYPE, new FolderConnector());
-    reg.put(com.esri.geoportal.harvester.gpt.GptConnector.TYPE, new com.esri.geoportal.harvester.gpt.GptConnector());
-    
-    return reg;
+    return outboundConnectorRegistry;
   }
   
   protected ProcessorRegistry createProcessorRegistry() {
-    ProcessorRegistry reg = new ProcessorRegistry();
+    if (processorRegistry==null) {
+      processorRegistry = new ProcessorRegistry();
+
+      processorRegistry.put(DefaultProcessor.TYPE, new DefaultProcessor());
+    }
     
-    reg.put(DefaultProcessor.TYPE, new DefaultProcessor());
-    
-    return reg;
+    return processorRegistry;
   }
   
   protected StatisticsRegistry createStatisticsRegistry() {
-    StatisticsRegistry reg = new StatisticsRegistry();
-    
-    return reg;
+    if (statisticsRegistry==null) {
+      statisticsRegistry = new StatisticsRegistry();
+    }
+    return statisticsRegistry;
   }
   
   protected TransformerRegistry createTransformerRegistry() {
-    TransformerRegistry reg = new TransformerRegistry();
+    if (transformerRegistry==null) {
+      transformerRegistry = new TransformerRegistry();
+
+      transformerRegistry.put(XsltTransformer.TYPE, new XsltTransformer());
+    }
     
-    reg.put(XsltTransformer.TYPE, new XsltTransformer());
-    
-    return reg;
+    return transformerRegistry;
   }
   
   protected TriggerRegistry createTriggerRegistry() {
-    TriggerRegistry reg = new TriggerRegistry();
+    if (triggerRegistry==null) {
+      triggerRegistry = new TriggerRegistry();
+
+      triggerRegistry.put(NowTrigger.TYPE, new NowTrigger());
+      triggerRegistry.put(AtTrigger.TYPE, new AtTrigger());
+      triggerRegistry.put(PeriodTrigger.TYPE, new PeriodTrigger());
+    }
     
-    reg.put(NowTrigger.TYPE, new NowTrigger());
-    reg.put(AtTrigger.TYPE, new AtTrigger());
-    reg.put(PeriodTrigger.TYPE, new PeriodTrigger());
-    
-    return reg;
+    return triggerRegistry;
   }
   // </editor-fold>
 }
