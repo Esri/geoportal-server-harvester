@@ -26,7 +26,7 @@ import java.util.UUID;
  * Cruds in memory implementation.
  */
 public class MemCruds<T> implements CrudlRepo<T>{
-  private final HashMap<UUID,T> mem = new HashMap<>();
+  protected final HashMap<UUID,T> mem = new HashMap<>();
 
   @Override
   public UUID create(T data) throws CrudlException {
