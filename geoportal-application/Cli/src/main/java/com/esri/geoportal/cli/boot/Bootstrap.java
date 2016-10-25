@@ -29,10 +29,17 @@ import com.esri.geoportal.harvester.agpsrc.AgpInputConnector;
 import com.esri.geoportal.harvester.ags.AgsConnector;
 import com.esri.geoportal.harvester.console.ConsoleConnector;
 import com.esri.geoportal.harvester.csw.CswConnector;
+import com.esri.geoportal.harvester.engine.defaults.DefaultEngine;
 import com.esri.geoportal.harvester.engine.defaults.DefaultBrokersService;
+import com.esri.geoportal.harvester.engine.defaults.DefaultExecutionService;
+import com.esri.geoportal.harvester.engine.defaults.DefaultProcessesService;
 import com.esri.geoportal.harvester.engine.defaults.DefaultProcessor;
+import com.esri.geoportal.harvester.engine.defaults.DefaultTriggersService;
+import com.esri.geoportal.harvester.engine.defaults.DefaultTasksService;
+import com.esri.geoportal.harvester.engine.defaults.DefaultTemplatesService;
 import com.esri.geoportal.harvester.engine.filters.RegExFilter;
 import com.esri.geoportal.harvester.engine.managers.BrokerDefinitionManager;
+import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.managers.ProcessManager;
 import com.esri.geoportal.harvester.engine.managers.ReportManager;
 import com.esri.geoportal.harvester.engine.managers.TaskManager;
@@ -47,6 +54,11 @@ import com.esri.geoportal.harvester.engine.registers.TransformerRegistry;
 import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
 import com.esri.geoportal.harvester.engine.services.BrokersService;
 import com.esri.geoportal.harvester.engine.services.Engine;
+import com.esri.geoportal.harvester.engine.services.ExecutionService;
+import com.esri.geoportal.harvester.engine.services.ProcessesService;
+import com.esri.geoportal.harvester.engine.services.TasksService;
+import com.esri.geoportal.harvester.engine.services.TemplatesService;
+import com.esri.geoportal.harvester.engine.services.TriggersService;
 import com.esri.geoportal.harvester.engine.transformers.XsltTransformer;
 import com.esri.geoportal.harvester.engine.triggers.AtTrigger;
 import com.esri.geoportal.harvester.engine.triggers.NowTrigger;
@@ -55,6 +67,7 @@ import com.esri.geoportal.harvester.folder.FolderConnector;
 import com.esri.geoportal.harvester.gptsrc.GptConnector;
 import com.esri.geoportal.harvester.unc.UncConnector;
 import com.esri.geoportal.harvester.waf.WafConnector;
+import com.esri.geoportal.harvester.api.ex.*;
 import java.io.IOException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -72,53 +85,141 @@ public class Bootstrap {
   private InboundConnectorRegistry inboundConnectorRegistry;
   private FilterRegistry filterRegistry;
   
+  private final BrokerDefinitionManager brokerDefinitionManager = new MemBrokerDefinitionManager();    
+  private final ReportManager reportManager = new MemReportManager();
+  private final HistoryManager historyManager = new MemHistoryManager();
+  private final ProcessManager processManager = new MemProcessManager();
+  private final TaskManager taskManager = new MemTaskManager();
+  private final TriggerInstanceManager triggerInstanceManager = new MemTriggerInstanceManager();
+  private final TriggerManager triggerManager = new MemTriggerManager();
+  
+  private BrokersService brokerService;
+  private ExecutionService executionService;
+  private ProcessesService processesService;
+  private TasksService taskService;
+  private TemplatesService templatesService;
+  private TriggersService triggersService;
+  
   /**
    * Creates engine.
    * @return engine.
+   * @throws com.esri.geoportal.harvester.api.ex.DataProcessorException if error creating engine
    */
-  public Engine createEngine() {
-    return null;
+  public Engine createEngine() throws DataProcessorException {
+    try {
+    return new DefaultEngine(
+            createTemplatesService(), 
+            createBrokersService(), 
+            createTasksService(), 
+            createProcessesService(), 
+            createTriggersService(), 
+            createExecutionService());
+    } catch (IOException|TransformerConfigurationException|XPathExpressionException ex) {
+      throw new DataProcessorException("Error creating engine.", ex);
+    }
   }
   
   // <editor-fold defaultstate="collapsed" desc="services factories">
   protected BrokersService createBrokersService() throws IOException, TransformerConfigurationException, XPathExpressionException {
-    BrokersService srv = new DefaultBrokersService(
-            createInboundConnectorRegistry(), 
-            createOutboundConnectorRegistry(), 
-            createBrokerDefinitionManager());
-    return srv;
+    if (brokerService==null) {
+      brokerService = new DefaultBrokersService(
+              createInboundConnectorRegistry(), 
+              createOutboundConnectorRegistry(), 
+              createBrokerDefinitionManager());
+    }
+    return brokerService;
+  }
+  
+  protected TemplatesService createTemplatesService() throws IOException, TransformerConfigurationException, XPathExpressionException {
+    if (templatesService==null) {
+      templatesService = new DefaultTemplatesService(
+              createInboundConnectorRegistry(), 
+              createOutboundConnectorRegistry(), 
+              createTransformerRegistry(), 
+              createFilterRegistry(), 
+              createTriggerRegistry(), 
+              createProcessorRegistry());
+    }
+    return templatesService;
+  }
+  
+  protected TasksService createTasksService() throws IOException, TransformerConfigurationException, XPathExpressionException {
+    if (taskService==null) {
+      taskService = new DefaultTasksService(
+              createTaskManager(), 
+              createHistoryManager(), 
+              createTriggersService());
+    }
+    return taskService;
+  }
+  
+  private ProcessesService createProcessesService() {
+    if (processesService==null) {
+      processesService = new DefaultProcessesService(
+              createProcessManager(), 
+              createReportManager(), 
+              createStatisticsRegistry());
+    }
+    return processesService;
+  }
+  
+  protected ExecutionService createExecutionService() throws IOException, TransformerConfigurationException, XPathExpressionException {
+    if (executionService==null) {
+      executionService = new DefaultExecutionService(
+              createInboundConnectorRegistry(), 
+              createOutboundConnectorRegistry(), 
+              createTransformerRegistry(), 
+              createFilterRegistry(), 
+              createProcessorRegistry(), 
+              createTriggerRegistry(), 
+              createTriggerManager(), 
+              createTriggerInstanceManager(), 
+              createHistoryManager(), 
+              createProcessesService());
+    }
+    return executionService;
+  }
+  
+  protected TriggersService createTriggersService() throws IOException, TransformerConfigurationException, XPathExpressionException {
+    if (triggersService==null) {
+      triggersService = new DefaultTriggersService(
+              createTriggerRegistry(), 
+              createTriggerManager(), 
+              createHistoryManager(), 
+              createTriggerInstanceManager(), 
+              createExecutionService());
+    }
+    return triggersService;
   }
   // </editor-fold>
   
   // <editor-fold defaultstate="collapsed" desc="managers factories">
   protected BrokerDefinitionManager createBrokerDefinitionManager() {
-    BrokerDefinitionManager mgr = new MemBrokerDefinitionManager();    
-    return mgr;
+    return brokerDefinitionManager;
+  }
+  
+  protected HistoryManager createHistoryManager() {
+    return historyManager;
   }
   
   protected ReportManager createReportManager() {
-    ReportManager mgr = new MemReportManager();
-    return mgr;
+    return reportManager;
   }
   
   protected ProcessManager createProcessManager() {
-    ProcessManager mgr = new MemProcessManager();
-    return mgr;
+    return processManager;
   }
   
   protected TaskManager createTaskManager() {
-    TaskManager mgr = new MemTaskManager();
-    return mgr;
+    return taskManager;
   }
   
   protected TriggerInstanceManager createTriggerInstanceManager() {
-    TriggerInstanceManager mgr = new MemTriggerInstanceManager();
-    return mgr;
+    return triggerInstanceManager;
   }
   
   protected TriggerManager createTriggerManager() {
-    TriggerManager mgr = new MemTriggerManager();
-    return mgr;
+    return triggerManager;
   }
   // </editor-fold>
   
