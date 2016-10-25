@@ -33,6 +33,7 @@ import com.esri.geoportal.harvester.engine.defaults.DefaultBrokersService;
 import com.esri.geoportal.harvester.engine.defaults.DefaultProcessor;
 import com.esri.geoportal.harvester.engine.filters.RegExFilter;
 import com.esri.geoportal.harvester.engine.managers.BrokerDefinitionManager;
+import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.registers.FilterRegistry;
 import com.esri.geoportal.harvester.engine.registers.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.registers.OutboundConnectorRegistry;
@@ -75,11 +76,17 @@ public class Bootstrap {
             createBrokerDefinitionManager());
     return brokersService;
   }
+  
   // </editor-fold>
   
   // <editor-fold defaultstate="collapsed" desc="managers factories">
   protected BrokerDefinitionManager createBrokerDefinitionManager() {
     BrokerDefinitionManager mgr = new MemBrokerDefinitionManager();    
+    return mgr;
+  }
+  
+  protected TriggerManager createTriggerManager() {
+    TriggerManager mgr = new MemTriggerManager();
     return mgr;
   }
   // </editor-fold>
