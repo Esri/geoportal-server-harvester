@@ -25,7 +25,7 @@ import com.esri.geoportal.harvester.engine.services.Engine;
  */
 public class Application {
   
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
     Bootstrap boot = new Bootstrap();
     Engine engine = boot.createEngine();
     IteratorContext iterCtx = new SimpleIteratorContext();
