@@ -18,6 +18,8 @@ package com.esri.geoportal.harvester.api.defs;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.general.Link;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,27 @@ public final class Task {
   private final Processor processor;
   private final InputBroker dataSource;
   private final List<Link> dataDestinations;
+  private final List<String> keywords;
+  private final boolean incremental;
+  private final boolean ignoreRobotsTxt;
+  
+  /**
+   * Creates instance of the task.
+   * @param processor processor
+   * @param dataSource data source
+   * @param dataDestinations data destination
+   * @param keyywords keywords
+   * @param incremental incremental flag
+   * @param ignoreRobotsTxt ignore robots flag
+   */
+  public Task(Processor processor, InputBroker dataSource, List<Link> dataDestinations, List<String> keyywords, boolean incremental, boolean ignoreRobotsTxt) {
+    this.processor = processor;
+    this.dataSource = dataSource;
+    this.dataDestinations = dataDestinations;
+    this.keywords = keyywords;
+    this.incremental = incremental;
+    this.ignoreRobotsTxt = ignoreRobotsTxt;
+  }
   
   /**
    * Creates instance of the task.
@@ -38,9 +61,7 @@ public final class Task {
    * @param dataDestinations data destination
    */
   public Task(Processor processor, InputBroker dataSource, List<Link> dataDestinations) {
-    this.processor = processor;
-    this.dataSource = dataSource;
-    this.dataDestinations = dataDestinations;
+    this(processor, dataSource, dataDestinations, Collections.emptyList(), false, false);
   }
 
   /**
@@ -52,6 +73,9 @@ public final class Task {
     taskDefinition.setProcessor(processor.getEntityDefinition());
     taskDefinition.setSource(dataSource.getEntityDefinition());
     taskDefinition.setDestinations(dataDestinations.stream().map(d->d.getLinkDefinition()).collect(Collectors.toList()));
+    taskDefinition.setKeywords(keywords);
+    taskDefinition.setIncremental(incremental);
+    taskDefinition.setIgnoreRobotsTxt(ignoreRobotsTxt);
     return taskDefinition;
   }
 
