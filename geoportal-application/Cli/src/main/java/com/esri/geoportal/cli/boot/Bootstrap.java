@@ -29,8 +29,10 @@ import com.esri.geoportal.harvester.agpsrc.AgpInputConnector;
 import com.esri.geoportal.harvester.ags.AgsConnector;
 import com.esri.geoportal.harvester.console.ConsoleConnector;
 import com.esri.geoportal.harvester.csw.CswConnector;
+import com.esri.geoportal.harvester.engine.defaults.DefaultBrokersService;
 import com.esri.geoportal.harvester.engine.defaults.DefaultProcessor;
 import com.esri.geoportal.harvester.engine.filters.RegExFilter;
+import com.esri.geoportal.harvester.engine.managers.BrokerDefinitionManager;
 import com.esri.geoportal.harvester.engine.registers.FilterRegistry;
 import com.esri.geoportal.harvester.engine.registers.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.registers.OutboundConnectorRegistry;
@@ -38,6 +40,7 @@ import com.esri.geoportal.harvester.engine.registers.ProcessorRegistry;
 import com.esri.geoportal.harvester.engine.registers.StatisticsRegistry;
 import com.esri.geoportal.harvester.engine.registers.TransformerRegistry;
 import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
+import com.esri.geoportal.harvester.engine.services.BrokersService;
 import com.esri.geoportal.harvester.engine.services.Engine;
 import com.esri.geoportal.harvester.engine.transformers.XsltTransformer;
 import com.esri.geoportal.harvester.engine.triggers.AtTrigger;
@@ -64,6 +67,24 @@ public class Bootstrap {
     return null;
   }
   
+  // <editor-fold defaultstate="collapsed" desc="services factories">
+  protected BrokersService createBrokersService() throws IOException, TransformerConfigurationException, XPathExpressionException {
+    BrokersService brokersService = new DefaultBrokersService(
+            createInboundConnectorRegistry(), 
+            createOutboundConnectorRegistry(), 
+            createBrokerDefinitionManager());
+    return brokersService;
+  }
+  // </editor-fold>
+  
+  // <editor-fold defaultstate="collapsed" desc="managers factories">
+  protected BrokerDefinitionManager createBrokerDefinitionManager() {
+    BrokerDefinitionManager mgr = new MemBrokerDefinitionManager();    
+    return mgr;
+  }
+  // </editor-fold>
+  
+  // <editor-fold defaultstate="collapsed" desc="registries factories">
   protected FilterRegistry createFilterRegistry() {
     FilterRegistry reg = new FilterRegistry();
     
@@ -136,4 +157,5 @@ public class Bootstrap {
     
     return reg;
   }
+  // </editor-fold>
 }
