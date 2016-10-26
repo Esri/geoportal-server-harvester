@@ -26,34 +26,46 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 
 /**
  * Command line application.
  */
 public class Application {
-  
+
   public static void main(String[] args) throws Exception {
     Application app = new Application();
     app.execute(args);
   }
-  
-  public void execute(String [] args) {
-    
+
+  public void execute(String[] args) {
+
   }
-  
-  protected CommandLine parseArgs(String [] args) throws ParseException {
-    Options options = new Options();
+
+  protected CommandLine parseArgs(String[] args) throws ParseException {
+    Option help    = new Option("h", "help", false, "print this message");
+    Option version = new Option("v", "version", false, "print the version information and exit");
+    Option verbose = new Option("V", "verbose", false, "be extra verbose");
+    Option file = new Option("f", "file", true, "file holding task definition");
+    Option task = new Option("t", "task", true, "task definition as JSON");
     
+    Options options = new Options();
+    options.addOption(help);
+    options.addOption(version);
+    options.addOption(verbose);
+    options.addOption(file);
+    options.addOption(task);
+
     CommandLineParser parser = new DefaultParser();
     return parser.parse(options, args);
   }
-  
+
   protected void harvest(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
     Bootstrap boot = new Bootstrap();
     Engine engine = boot.createEngine();
     IteratorContext iterCtx = new SimpleIteratorContext();
-    
+
     engine.getExecutionService().execute(taskDefinition, iterCtx);
   }
 }
