@@ -16,6 +16,7 @@
 package com.esri.geoportal.cli;
 
 import com.esri.geoportal.cli.boot.Bootstrap;
+import com.esri.geoportal.cli.boot.MemReportManager;
 import com.esri.geoportal.harvester.api.base.SimpleIteratorContext;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -78,7 +79,7 @@ public class Application {
   }
 
   protected void harvest(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
-    Bootstrap boot = new Bootstrap();
+    Bootstrap boot = new Bootstrap(new MemReportManager());
     Engine engine = boot.createEngine();
     IteratorContext iterCtx = new SimpleIteratorContext();
 

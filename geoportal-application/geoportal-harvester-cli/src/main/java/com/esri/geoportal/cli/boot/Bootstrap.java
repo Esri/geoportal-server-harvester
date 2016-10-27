@@ -86,7 +86,7 @@ public class Bootstrap {
   private FilterRegistry filterRegistry;
   
   private final BrokerDefinitionManager brokerDefinitionManager = new MemBrokerDefinitionManager();    
-  private final ReportManager reportManager = new MemReportManager();
+  private final ReportManager reportManager;
   private final HistoryManager historyManager = new MemHistoryManager();
   private final ProcessManager processManager = new MemProcessManager();
   private final TaskManager taskManager = new MemTaskManager();
@@ -101,19 +101,27 @@ public class Bootstrap {
   private TriggersService triggersService;
   
   /**
+   * Creates instance of the bootstrap.
+   * @param reportManager report manager
+   */
+  public Bootstrap(ReportManager reportManager) {
+    this.reportManager = reportManager;
+  }
+  
+  /**
    * Creates engine.
    * @return engine.
    * @throws com.esri.geoportal.harvester.api.ex.DataProcessorException if error creating engine
    */
   public Engine createEngine() throws DataProcessorException {
     try {
-    return new DefaultEngine(
-            createTemplatesService(), 
-            createBrokersService(), 
-            createTasksService(), 
-            createProcessesService(), 
-            createTriggersService(), 
-            createExecutionService());
+      return new DefaultEngine(
+              createTemplatesService(), 
+              createBrokersService(), 
+              createTasksService(), 
+              createProcessesService(), 
+              createTriggersService(), 
+              createExecutionService());
     } catch (IOException|TransformerConfigurationException|XPathExpressionException ex) {
       throw new DataProcessorException("Error creating engine.", ex);
     }
