@@ -25,6 +25,7 @@ import com.esri.geoportal.harvester.engine.services.Engine;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
@@ -34,21 +35,37 @@ import org.apache.commons.cli.ParseException;
  */
 public class Application {
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
     Application app = new Application();
     app.execute(args);
   }
 
   public void execute(String[] args) {
+    CommandLineParser parser = new DefaultParser();
+    Options options = createOptions();
+    
+    try {
+      CommandLine cli = parser.parse(options, args);
+      if (cli.getArgList().isEmpty() || cli.hasOption('h')) {
+        printHelp(options);
+      }
+    } catch (ParseException ex) {
+      printHelp(options);
+    }
 
   }
-
-  protected CommandLine parseArgs(String[] args) throws ParseException {
+  
+  protected void printHelp(Options options) {
+    HelpFormatter help = new HelpFormatter();
+      help.printHelp("harvest [options] [-file <file>] | [-taks <task definition>]", options);
+  }
+  
+  private Options createOptions() {
     Option help    = new Option("h", "help", false, "print this message");
     Option version = new Option("v", "version", false, "print the version information and exit");
     Option verbose = new Option("V", "verbose", false, "be extra verbose");
-    Option file = new Option("f", "file", true, "file holding task definition");
-    Option task = new Option("t", "task", true, "task definition as JSON");
+    Option file = new Option("f", "file", true, "executes task defined in the file");
+    Option task = new Option("t", "task", true, "executes task defined as JSON");
     
     Options options = new Options();
     options.addOption(help);
@@ -56,9 +73,8 @@ public class Application {
     options.addOption(verbose);
     options.addOption(file);
     options.addOption(task);
-
-    CommandLineParser parser = new DefaultParser();
-    return parser.parse(options, args);
+    
+    return options;
   }
 
   protected void harvest(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
