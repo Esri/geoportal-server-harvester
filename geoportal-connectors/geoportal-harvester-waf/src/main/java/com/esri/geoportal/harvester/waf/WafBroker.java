@@ -31,6 +31,7 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
@@ -174,7 +175,14 @@ import org.slf4j.LoggerFactory;
     
     private DataReference readContent() throws IOException, URISyntaxException {
       WafFile file = files.poll();
-      return file.readContent(httpClient, iteratorContext.getLastHarvestDate());
+      try {
+        return file.readContent(httpClient, iteratorContext.getLastHarvestDate());
+      } catch (HttpResponseException ex) {
+        if (ex.getStatusCode()!=403) {
+          throw ex;
+        }
+        return null;
+      }
     }
   }
 }

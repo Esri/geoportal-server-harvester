@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpException;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,19 +69,26 @@ import org.slf4j.LoggerFactory;
    * @throws URISyntaxException if invalid URL
    */
   public WafFolderContent readContent(CloseableHttpClient httpClient) throws IOException, URISyntaxException {
-    HtmlUrlScrapper scrapper = new HtmlUrlScrapper(httpClient, creds);
-    List<URL> urls = scrapper.scrap(folderUrl);
-
     List<WafFile> files = new ArrayList<>();
     List<WafFolder> subFolders = new ArrayList<>();
+    
+    HtmlUrlScrapper scrapper = new HtmlUrlScrapper(httpClient, creds);
+    
+    try {
+      List<URL> urls = scrapper.scrap(folderUrl);
 
-    urls.forEach(u -> {
-      if (u.toExternalForm().endsWith("/") || !cutOff(u.toExternalForm(),"/").contains(".")) {
-        subFolders.add(new WafFolder(broker, u, matchPattern, creds));
-      } else if (matchUrl(u,matchPattern)) {
-        files.add(new WafFile(broker, u, creds));
+      urls.forEach(u -> {
+        if (u.toExternalForm().endsWith("/") || !cutOff(u.toExternalForm(),"/").contains(".")) {
+          subFolders.add(new WafFolder(broker, u, matchPattern, creds));
+        } else if (matchUrl(u,matchPattern)) {
+          files.add(new WafFile(broker, u, creds));
+        }
+      });
+    } catch (HttpResponseException ex) {
+      if (ex.getStatusCode()!=403) {
+        throw ex;
       }
-    });
+    }
 
     return new WafFolderContent(this, subFolders, files);
   }
