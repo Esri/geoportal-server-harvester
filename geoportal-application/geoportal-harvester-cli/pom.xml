@@ -25,4 +25,34 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+    <build>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.6</version>
+          <configuration>
+            <archive>
+              <manifest>
+                <mainClass>com.esri.geoportal.cli.Application</mainClass>
+              </manifest>
+            </archive>
+            <descriptors>
+              <descriptor>src/main/assembly/assembly.xml</descriptor>
+            </descriptors>
+            <finalName>harvest</finalName>
+            <appendAssemblyId>false</appendAssemblyId>
+          </configuration>
+          <executions>
+            <execution>
+              <id>make-assembly</id>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+            </execution>
+          </executions>          
+        </plugin>
+      </plugins>
+    </build>
 </project>

@@ -35,6 +35,7 @@ import org.apache.commons.cli.ParseException;
  * Command line application.
  */
 public class Application {
+  private static final String version = "2.0.0";
 
   public static void main(String[] args) {
     Application app = new Application();
@@ -47,18 +48,32 @@ public class Application {
     
     try {
       CommandLine cli = parser.parse(options, args);
-      if (cli.getArgList().isEmpty() || cli.hasOption('h')) {
-        printHelp(options);
+      if (cli.getArgList().isEmpty() || cli.hasOption('h') || cli.hasOption("v")) {
+        if (cli.hasOption("v")) {
+          printVersion();
+        } else {
+          printHeader();
+          printHelp(options);
+        }
       }
     } catch (ParseException ex) {
+      printHeader();
       printHelp(options);
     }
 
   }
   
+  protected void printHeader() {
+    System.out.println(String.format("Harvest ver. %s, Copyright @ 2016 Esri, Inc.", version));
+  }
+  
+  protected void printVersion() {
+    System.out.println(String.format("Version: %s", version));
+  }
+  
   protected void printHelp(Options options) {
     HelpFormatter help = new HelpFormatter();
-      help.printHelp("harvest [options] [-file <file>] | [-taks <task definition>]", options);
+    help.printHelp("java -jar harvest.jar [options] [-file <file>] | [-taks <task definition>]", options);
   }
   
   private Options createOptions() {
