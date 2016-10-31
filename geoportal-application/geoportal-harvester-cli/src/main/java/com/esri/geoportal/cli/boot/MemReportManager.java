@@ -50,13 +50,13 @@ public class MemReportManager implements ReportManager {
       @Override
       public void acquire(ProcessInstance process, DataReference dataReference) {
         acquired++;
-        System.out.println(String.format("Acquired: %s [%d]", dataReference.getSourceUri(), acquired));
+        System.out.println(String.format("Acquired [%d]: %s", acquired, dataReference.getSourceUri()));
       }
 
       @Override
       public void success(ProcessInstance process, DataReference dataReference) {
         published++;
-        System.out.println(String.format("Published: %s [%d]", dataReference.getSourceUri(), published));
+        System.out.println(String.format("Published[%d]: %s ", published, dataReference.getSourceUri()));
       }
 
       @Override
