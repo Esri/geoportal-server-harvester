@@ -23,6 +23,11 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.InputBroker.IteratorContext;
 import com.esri.geoportal.harvester.engine.services.Engine;
+import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -42,7 +47,7 @@ public class Application {
     app.execute(args);
   }
 
-  public void execute(String[] args) {
+  private void execute(String[] args) {
     CommandLineParser parser = new DefaultParser();
     Options options = createOptions();
     
@@ -55,7 +60,23 @@ public class Application {
           printHeader();
           printHelp(options);
         }
+      } else if (cli.hasOption('f')) {
+        String fileName = cli.getOptionValue('f');
+        File file = new File(fileName);
+        try (InputStream inputStream = new FileInputStream(file)) {
+          TaskDefinition taskDefinition = deserialize(inputStream,TaskDefinition.class);
+          harvest(taskDefinition);
+        }
+      } else if (cli.hasOption('t')) {
+        String sTaskDef = cli.getOptionValue('t');
+        TaskDefinition taskDefinition = deserialize(sTaskDef,TaskDefinition.class);
+        harvest(taskDefinition);
+      } else {
+        printHeader();
+        printHelp(options);
       }
+    } catch (IOException|DataProcessorException|InvalidDefinitionException ex) {
+      ex.printStackTrace(System.err);
     } catch (ParseException ex) {
       printHeader();
       printHelp(options);
@@ -78,14 +99,14 @@ public class Application {
   
   private Options createOptions() {
     Option help    = new Option("h", "help", false, "print this message");
-    Option version = new Option("v", "version", false, "print the version information and exit");
+    Option ver = new Option("v", "version", false, "print the version information and exit");
     Option verbose = new Option("V", "verbose", false, "be extra verbose");
     Option file = new Option("f", "file", true, "executes task defined in the file");
     Option task = new Option("t", "task", true, "executes task defined as JSON");
     
     Options options = new Options();
     options.addOption(help);
-    options.addOption(version);
+    options.addOption(ver);
     options.addOption(verbose);
     options.addOption(file);
     options.addOption(task);
