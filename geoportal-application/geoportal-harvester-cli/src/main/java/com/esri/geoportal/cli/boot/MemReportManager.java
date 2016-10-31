@@ -32,6 +32,10 @@ public class MemReportManager implements ReportManager {
   @Override
   public ReportBuilder createReportBuilder(UUID uuid, ProcessInstance processInstance) {
     ReportBuilder rb = new ReportBuilder() {
+      private long acquired;
+      private long published;
+      private long failed;
+      
       @Override
       public void started(ProcessInstance process) {
         System.out.println(String.format("Started harvesting of %s", processInstance.getTask().getTaskDefinition()));
@@ -40,30 +44,36 @@ public class MemReportManager implements ReportManager {
       @Override
       public void completed(ProcessInstance process) {
         System.out.println(String.format("Completed harvesting of %s", processInstance.getTask().getTaskDefinition()));
+        System.out.println(String.format("Acquired: %d, published: %d, failed: %d", acquired, published, failed));
       }
 
       @Override
       public void acquire(ProcessInstance process, DataReference dataReference) {
-        System.out.println(String.format("Acquired: %s", dataReference.getSourceUri()));
+        acquired++;
+        System.out.println(String.format("Acquired: %s [%d]", dataReference.getSourceUri(), acquired));
       }
 
       @Override
       public void success(ProcessInstance process, DataReference dataReference) {
-        System.out.println(String.format("Published: %s", dataReference.getSourceUri()));
+        published++;
+        System.out.println(String.format("Published: %s [%d]", dataReference.getSourceUri(), published));
       }
 
       @Override
       public void error(ProcessInstance process, DataInputException ex) {
+        failed++;
         ex.printStackTrace(System.err);
       }
 
       @Override
       public void error(ProcessInstance process, DataOutputException ex) {
+        failed++;
         ex.printStackTrace(System.err);
       }
 
       @Override
       public void error(ProcessInstance process, DataProcessorException ex) {
+        failed++;
         ex.printStackTrace(System.err);
       }
     };

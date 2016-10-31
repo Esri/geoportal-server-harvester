@@ -24,6 +24,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.InputBroker.IteratorContext;
 import com.esri.geoportal.harvester.engine.services.Engine;
 import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
+import com.esri.geoportal.harvester.engine.utils.ProcessReference;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class Application {
     
     try {
       CommandLine cli = parser.parse(options, args);
-      if (cli.getArgList().isEmpty() || cli.hasOption('h') || cli.hasOption("v")) {
+      if (cli.getOptions().length==0 || cli.hasOption('h') || cli.hasOption("v")) {
         if (cli.hasOption("v")) {
           printVersion();
         } else {
@@ -119,6 +120,7 @@ public class Application {
     Engine engine = boot.createEngine();
     IteratorContext iterCtx = new SimpleIteratorContext();
 
-    engine.getExecutionService().execute(taskDefinition, iterCtx);
+    ProcessReference processRef = engine.getExecutionService().execute(taskDefinition, iterCtx);
+    processRef.getProcess().begin();
   }
 }
