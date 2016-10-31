@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -35,19 +36,25 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpResponseException;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +67,7 @@ public class Client implements Closeable {
   private static final String REST_ITEM_URL = "rest/metadata/item";
   private static final String ELASTIC_SEARCH_URL = "elastic/metadata/item/_search";
   private static final String ELASTIC_SCROLL_URL = "elastic/_search/scroll";
+  private static final String TOKEN_URL = "oauth/token";
 
   private final CloseableHttpClient httpClient;
   private final URL url;
@@ -186,6 +194,34 @@ public class Client implements Closeable {
    */
   public List<String> listIds()  throws URISyntaxException, IOException {
     return queryIds(null, null, 200);
+  }
+  
+  public Token generateToken() throws URISyntaxException, UnsupportedEncodingException, IOException {
+    HttpPost post = new HttpPost(url.toURI().resolve(TOKEN_URL));
+    post.setConfig(DEFAULT_REQUEST_CONFIG);
+    post.setHeader("User-Agent", HttpConstants.getUserAgent());
+    post.setHeader("Content-Type","application/x-www-form-urlencoded");
+    post.setHeader("Accept","application/json");
+    HashMap<String, String> params = new HashMap<>();
+    if (cred != null) {
+      params.put("username", StringUtils.trimToEmpty(cred.getUserName()));
+      params.put("password", StringUtils.trimToEmpty(cred.getPassword()));
+    }
+    params.put("grant_type", "password");
+    params.put("client_id", "geoportal-client");
+    HttpEntity entity = new UrlEncodedFormEntity(params.entrySet().stream()
+            .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()));
+    post.setEntity(entity);
+    try (CloseableHttpResponse httpResponse = httpClient.execute(post); InputStream contentStream = httpResponse.getEntity().getContent();) {
+      if (httpResponse.getStatusLine().getStatusCode()>=400) {
+        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+      }
+      String responseContent = IOUtils.toString(contentStream, "UTF-8");
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+      return mapper.readValue(responseContent, Token.class);
+    }
   }
   
   private CloseableHttpResponse execute(HttpUriRequest request) throws IOException {
@@ -329,5 +365,13 @@ public class Client implements Closeable {
   
   public static class SearchContext {
     public String _scroll_id;
+  }
+  
+  public static class Token {
+    public String access_token;
+    public String token_type;
+    public Long expires_in;
+    public String scope;
+    public String jti;
   }
 }
