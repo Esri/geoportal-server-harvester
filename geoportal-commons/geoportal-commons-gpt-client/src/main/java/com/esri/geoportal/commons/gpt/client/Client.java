@@ -414,7 +414,7 @@ public class Client implements Closeable {
   
   private String getAccessToken() throws URISyntaxException, IOException {
     LocalDateTime now = LocalDateTime.now();
-    if (tokenInfo==null || tokenInfo.validTill.isBefore(now)) {
+    if (tokenInfo==null || tokenInfo.validTill.minusMinutes(2).isBefore(now)) {
       Token token = generateToken();
       TokenInfo ti = new TokenInfo();
       ti.token = token;
