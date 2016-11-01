@@ -22,10 +22,10 @@ import java.util.List;
  */
 /*package*/ final class QueryResponse {
   public String _scroll_id;
-  public long total;
   public Hits hits;
  
   public static final class Hits {
+    public long total;
     public List<Hit> hits;
   }
   

@@ -51,6 +51,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -115,31 +116,14 @@ public class Client implements Closeable {
     StringEntity entity = new StringEntity(json,"UTF-8");
 
     List<String> ids = !forceAdd ? queryIds(data.src_uri_s) : Collections.emptyList();
-    HttpRequestBase request;
-    switch (ids.size()) {
-      case 0: {
-        HttpPut put = new HttpPut(url.toURI().resolve(REST_ITEM_URL)+"?access_token="+getAccessToken());
-        put.setConfig(DEFAULT_REQUEST_CONFIG);
-        put.setEntity(entity);
-        put.setHeader("Content-Type", "application/json; charset=UTF-8");
-        put.setHeader("User-Agent", HttpConstants.getUserAgent());
-        request = put;
-      }
-      break;
-      case 1: {
-        HttpPut put = new HttpPut(url.toURI().resolve(REST_ITEM_URL + "/" + ids.get(0))+"?access_token="+getAccessToken());
-        put.setConfig(DEFAULT_REQUEST_CONFIG);
-        put.setEntity(entity);
-        put.setHeader("Content-Type", "application/json; charset=UTF-8");
-        put.setHeader("User-Agent", HttpConstants.getUserAgent());
-        request = put;
-      }
-      break;
-      default:
-        throw new IOException(String.format("Error updating item: %s", data.src_uri_s));
-    }
+    
+    HttpPut put = new HttpPut(!ids.isEmpty()? createItemUri(ids.get(0)): createItemsUri());
+    put.setConfig(DEFAULT_REQUEST_CONFIG);
+    put.setEntity(entity);
+    put.setHeader("Content-Type", "application/json; charset=UTF-8");
+    put.setHeader("User-Agent", HttpConstants.getUserAgent());
 
-    return execute(request,PublishResponse.class);
+    return execute(put,PublishResponse.class);
   }
   
   /**
@@ -150,7 +134,7 @@ public class Client implements Closeable {
    * @throws IOException if reading metadata fails
    */
   public String readXml(String id) throws URISyntaxException, IOException {
-    HttpGet get = new HttpGet(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/xml")+"?access_token="+getAccessToken());
+    HttpGet get = new HttpGet(createXmlUri(id));
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("User-Agent", HttpConstants.getUserAgent());
     
@@ -173,7 +157,7 @@ public class Client implements Closeable {
    * @throws IOException if reading metadata fails
    */
   public EntryRef readItem(String id) throws URISyntaxException, IOException {
-    HttpGet get = new HttpGet(url.toURI().resolve(REST_ITEM_URL + "/" + id )+"?access_token="+getAccessToken());
+    HttpGet get = new HttpGet(createItemUri(id));
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("User-Agent", HttpConstants.getUserAgent());
     Hit hit =  execute(get,Hit.class);
@@ -228,11 +212,29 @@ public class Client implements Closeable {
    * @throws URISyntaxException if URL has invalid syntax
    */
   public PublishResponse delete(String id) throws URISyntaxException, IOException {
-    HttpDelete del = new HttpDelete(url.toURI().resolve(REST_ITEM_URL + "/" + id)+"?access_token="+getAccessToken());
+    HttpDelete del = new HttpDelete(createItemUri(id));
     del.setConfig(DEFAULT_REQUEST_CONFIG);
     del.setHeader("User-Agent", HttpConstants.getUserAgent());
 
     return execute(del, PublishResponse.class);
+  }
+  
+  private URI createItemsUri() throws URISyntaxException, IOException {
+    return new URIBuilder(url.toURI().resolve(REST_ITEM_URL))
+            .addParameter("access_token", getAccessToken())
+            .build();
+  }
+  
+  private URI createItemUri(String id) throws URISyntaxException, IOException {
+    return new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id))
+            .addParameter("access_token", getAccessToken())
+            .build();
+  }
+  
+  private URI createXmlUri(String id) throws URISyntaxException, IOException {
+    return new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/xml"))
+            .addParameter("access_token", getAccessToken())
+            .build();
   }
 
   /**
@@ -287,14 +289,9 @@ public class Client implements Closeable {
    * @throws URISyntaxException if URL has invalid syntax
    */
   private QueryResponse query(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
-    HttpGet get = searchContext._scroll_id==null?
-            new HttpGet(url.toURI().resolve(ELASTIC_SEARCH_URL).toASCIIString() + 
-            (term!=null && value!=null
-                    ? String.format("?q=%s:%s&size=%d&scroll=1m&access_token=%s", term, URLEncoder.encode("\"" + value + "\"", "UTF-8"), size, getAccessToken())
-                    : String.format("?q=*:*&size=%d&scroll=1m&access_token=%s", size, getAccessToken()))):
-            new HttpGet(url.toURI().resolve(ELASTIC_SCROLL_URL).toASCIIString() + 
-            String.format("?scroll=1m&scroll_id=%s&access_token=%s", searchContext._scroll_id, getAccessToken()));
+    URI uri = createQueryUri(term, value, size, searchContext);
     
+    HttpGet get = new HttpGet(uri);
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("Content-Type", "application/json");
     get.setHeader("User-Agent", HttpConstants.getUserAgent());
@@ -302,6 +299,23 @@ public class Client implements Closeable {
     QueryResponse respone =  execute(get, QueryResponse.class);
     searchContext._scroll_id = respone._scroll_id;
     return respone;
+  }
+  
+  private URI createQueryUri(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
+    if (searchContext._scroll_id==null) {
+      return new URIBuilder(url.toURI().resolve(ELASTIC_SEARCH_URL))
+              .addParameter("q",term!=null && value!=null? String.format("%s:\"%s\"", term, value): "*:*")
+              .addParameter("size", Long.toString(size))
+              .addParameter("scroll", "1m")
+              .addParameter("access_token", getAccessToken())
+              .build();      
+    } else {
+      return new URIBuilder(url.toURI().resolve(ELASTIC_SCROLL_URL))
+              .addParameter("scroll_id", searchContext._scroll_id)
+              .addParameter("scroll", "1m")
+              .addParameter("access_token", getAccessToken())
+              .build();
+    }
   }
   
   private <T> T execute(HttpUriRequest req, Class<T> clazz) throws IOException, URISyntaxException {
@@ -324,8 +338,7 @@ public class Client implements Closeable {
   
   private String getAccessToken() throws URISyntaxException, IOException {
     LocalDateTime now = LocalDateTime.now();
-    LocalDateTime changeBefore = now.plusMinutes(1);
-    if (tokenInfo==null || tokenInfo.validTill.isBefore(changeBefore)) {
+    if (tokenInfo==null || tokenInfo.validTill.minusMinutes(5).isBefore(now)) {
       Token token = generateToken();
       TokenInfo ti = new TokenInfo();
       ti.token = token;
