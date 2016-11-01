@@ -29,7 +29,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -49,7 +48,6 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
@@ -117,7 +115,22 @@ public class Client implements Closeable {
 
     List<String> ids = !forceAdd ? queryIds(data.src_uri_s) : Collections.emptyList();
     
-    HttpPut put = new HttpPut(!ids.isEmpty()? createItemUri(ids.get(0)): createItemsUri());
+    URI pubUri = !ids.isEmpty()? createItemUri(ids.get(0)): createItemsUri();
+    try {
+      return publish(pubUri, entity);
+    } catch(HttpResponseException ex) {
+      if (ex.getStatusCode()==401) {
+        clearToken();
+        pubUri = !ids.isEmpty()? createItemUri(ids.get(0)): createItemsUri();
+        return publish(pubUri, entity);
+      } else {
+        throw ex;
+      }
+    }
+  }
+  
+  private PublishResponse publish(URI uri, StringEntity entity)  throws IOException, URISyntaxException {
+    HttpPut put = new HttpPut(uri);
     put.setConfig(DEFAULT_REQUEST_CONFIG);
     put.setEntity(entity);
     put.setHeader("Content-Type", "application/json; charset=UTF-8");
@@ -134,7 +147,22 @@ public class Client implements Closeable {
    * @throws IOException if reading metadata fails
    */
   public String readXml(String id) throws URISyntaxException, IOException {
-    HttpGet get = new HttpGet(createXmlUri(id));
+    URI xmlUri = createXmlUri(id);
+    try {
+      return readXml(xmlUri);
+    } catch (HttpResponseException ex) {
+      if (ex.getStatusCode()==401) {
+        clearToken();
+        xmlUri = createXmlUri(id);
+        return readXml(xmlUri);
+      } else {
+        throw ex;
+      }
+    }
+  }
+  
+  private String readXml(URI uri) throws URISyntaxException, IOException {
+    HttpGet get = new HttpGet(uri);
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("User-Agent", HttpConstants.getUserAgent());
     
@@ -157,7 +185,22 @@ public class Client implements Closeable {
    * @throws IOException if reading metadata fails
    */
   public EntryRef readItem(String id) throws URISyntaxException, IOException {
-    HttpGet get = new HttpGet(createItemUri(id));
+    URI itemUri = createItemUri(id);
+    try {
+      return readItem(itemUri);
+    } catch (HttpResponseException ex) {
+      if (ex.getStatusCode()==401) {
+        clearToken();
+        itemUri = createItemUri(id);
+        return readItem(itemUri);
+      } else {
+        throw ex;
+      }
+    }
+  }
+  
+  private EntryRef readItem(URI uri) throws URISyntaxException, IOException {
+    HttpGet get = new HttpGet(uri);
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("User-Agent", HttpConstants.getUserAgent());
     Hit hit =  execute(get,Hit.class);
@@ -212,10 +255,24 @@ public class Client implements Closeable {
    * @throws URISyntaxException if URL has invalid syntax
    */
   public PublishResponse delete(String id) throws URISyntaxException, IOException {
-    HttpDelete del = new HttpDelete(createItemUri(id));
+    URI deleteUri = createItemUri(id);
+    try {
+      return delete(deleteUri);
+    } catch (HttpResponseException ex) {
+      if (ex.getStatusCode()==401) {
+        clearToken();
+        deleteUri = createItemUri(id);
+        return delete(deleteUri);
+      } else {
+        throw ex;
+      }
+    }
+  }
+  
+  private PublishResponse delete(URI uri) throws URISyntaxException, IOException {
+    HttpDelete del = new HttpDelete(uri);
     del.setConfig(DEFAULT_REQUEST_CONFIG);
     del.setHeader("User-Agent", HttpConstants.getUserAgent());
-
     return execute(del, PublishResponse.class);
   }
   
@@ -290,15 +347,34 @@ public class Client implements Closeable {
    */
   private QueryResponse query(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
     URI uri = createQueryUri(term, value, size, searchContext);
-    
+    try {
+      QueryResponse response =  query(uri);
+      searchContext._scroll_id = response._scroll_id;
+      return response;
+    } catch (HttpResponseException ex) {
+      if (ex.getStatusCode()==401) {
+        clearToken();
+        uri = createQueryUri(term, value, size, searchContext);
+        QueryResponse response =  query(uri);
+        searchContext._scroll_id = response._scroll_id;
+        return response;
+      } else {
+        throw ex;
+      }
+    }
+  }
+  
+  private void clearToken() {
+    tokenInfo = null;
+  }
+  
+  private QueryResponse query(URI uri)  throws IOException, URISyntaxException {
     HttpGet get = new HttpGet(uri);
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("Content-Type", "application/json");
     get.setHeader("User-Agent", HttpConstants.getUserAgent());
     
-    QueryResponse respone =  execute(get, QueryResponse.class);
-    searchContext._scroll_id = respone._scroll_id;
-    return respone;
+    return  execute(get, QueryResponse.class);
   }
   
   private URI createQueryUri(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
@@ -338,7 +414,7 @@ public class Client implements Closeable {
   
   private String getAccessToken() throws URISyntaxException, IOException {
     LocalDateTime now = LocalDateTime.now();
-    if (tokenInfo==null || tokenInfo.validTill.minusMinutes(5).isBefore(now)) {
+    if (tokenInfo==null || tokenInfo.validTill.isBefore(now)) {
       Token token = generateToken();
       TokenInfo ti = new TokenInfo();
       ti.token = token;
