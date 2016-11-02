@@ -103,6 +103,6 @@ public final class SimpleDataReference implements DataReference {
   
   @Override
   public String toString() {
-    return String.format("%s | %s | %s", id, lastModifiedDate, sourceUri);
+    return String.format("id: %s, modified: %s, source URI: %s, broker URI: %s", id, lastModifiedDate, sourceUri, brokerUri);
   }
 }
