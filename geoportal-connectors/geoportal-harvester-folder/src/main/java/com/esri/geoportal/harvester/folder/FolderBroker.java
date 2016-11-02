@@ -103,7 +103,7 @@ import org.slf4j.LoggerFactory;
         existing.remove(f.getAbsolutePath());
         return created? PublishingStatus.CREATED: PublishingStatus.UPDATED;
       } catch (Exception ex) {
-        throw new DataOutputException(this,"Error publishing data.", ex);
+        throw new DataOutputException(this,String.format("Error publishing data: %s", ref), ex);
       }
   }
 

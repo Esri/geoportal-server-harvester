@@ -56,7 +56,7 @@ public class DataPrintStreamOutput implements OutputBroker {
       SERIALIZER.serialize(out, ref);
       return PublishingStatus.CREATED;
     } catch (IOException ex) {
-      throw new DataOutputException(this, "Error serializing data.", ex);
+      throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
     }
   }
 

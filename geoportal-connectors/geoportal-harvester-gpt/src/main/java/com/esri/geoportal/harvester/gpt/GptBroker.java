@@ -143,7 +143,7 @@ import org.slf4j.LoggerFactory;
       existing.remove(response.getId());
       return response.getStatus().equalsIgnoreCase("created") ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
     } catch (IOException | URISyntaxException ex) {
-      throw new DataOutputException(this, "Error publishing data.", ex);
+      throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
     }
   }
 
