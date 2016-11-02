@@ -163,6 +163,7 @@ html,body {
 
 .h-processes-process-uuid {
   color: lightgray;
+  display: none;
 }
 
 .h-processes-process-title {
