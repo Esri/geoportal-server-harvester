@@ -74,6 +74,8 @@ public class Client implements Closeable {
   
   private TokenInfo tokenInfo;
 
+  private final ObjectMapper mapper = new ObjectMapper();
+  
   /**
    * Creates instance of the client.
    *
@@ -85,6 +87,9 @@ public class Client implements Closeable {
     this.httpClient = httpClient;
     this.url = url;
     this.cred = cred;
+    
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
   }
 
   /**
@@ -107,9 +112,7 @@ public class Client implements Closeable {
    * @throws URISyntaxException if URL has invalid syntax
    */
   public PublishResponse publish(PublishRequest data, boolean forceAdd) throws IOException, URISyntaxException {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    
     String json = mapper.writeValueAsString(data);
     StringEntity entity = new StringEntity(json,"UTF-8");
 
@@ -395,19 +398,24 @@ public class Client implements Closeable {
   }
   
   private <T> T execute(HttpUriRequest req, Class<T> clazz) throws IOException, URISyntaxException {
-
     try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
-      if (httpResponse.getStatusLine().getStatusCode()>=400) {
-        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
-      }
-      
       String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
       
-      ObjectMapper mapper = new ObjectMapper();
-      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+      if (httpResponse.getStatusLine().getStatusCode()>=400) {
+        T value = null;
+        try {
+          value = mapper.readValue(responseContent, clazz);
+        } catch (Exception ex) {
+          throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+        }
+        if (value==null) {
+          throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+        }
+        return value;
+      }
+      
       return mapper.readValue(responseContent, clazz);
     }
   }
