@@ -15,16 +15,28 @@
  */
 package com.esri.geoportal.harvester.beans;
 
+import com.esri.geoportal.commons.meta.MetaBuilder;
+import com.esri.geoportal.geoportal.harvester.ckan.CkanConnector;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /**
  * CKAN connector bean.
  */
-public class CkanConnectorBean {
+@Service
+public class CkanConnectorBean extends CkanConnector {
   private static final Logger LOG = LoggerFactory.getLogger(CkanConnectorBean.class);
+
+  /**
+   * Creates instance of the connector.
+   * @param metaBuilder meta builder
+   */
+  public CkanConnectorBean(MetaBuilder metaBuilder) {
+    super(metaBuilder);
+  }
   
   /**
    * Initializes bean.

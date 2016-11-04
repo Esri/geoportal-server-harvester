@@ -255,7 +255,7 @@ public class Bootstrap {
       inboundConnectorRegistry.put(AgpInputConnector.TYPE, new AgpInputConnector(metaBuilder));
       inboundConnectorRegistry.put(AgsConnector.TYPE, new AgsConnector(metaBuilder));
       inboundConnectorRegistry.put(GptConnector.TYPE, new GptConnector());
-      inboundConnectorRegistry.put(CkanConnector.TYPE, new CkanConnector());
+      inboundConnectorRegistry.put(CkanConnector.TYPE, new CkanConnector(metaBuilder));
     }
     
     return inboundConnectorRegistry;
