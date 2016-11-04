@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.commons.agp.client;
+package com.esri.geoportal.commons.constants;
 
-import static com.esri.geoportal.commons.agp.client.DataType.Text;
-import static com.esri.geoportal.commons.agp.client.DataType.File;
-import static com.esri.geoportal.commons.agp.client.DataType.URL;
-import com.esri.geoportal.commons.constants.MimeType;
-import com.esri.geoportal.commons.constants.MimeTypeUtils;
+import static com.esri.geoportal.commons.constants.DataType.Text;
+import static com.esri.geoportal.commons.constants.DataType.File;
+import static com.esri.geoportal.commons.constants.DataType.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,21 +31,21 @@ public enum ItemType {
   CITYENGINE_WEB_SCENE("CityEngine Web Scene", File),
   WEB_SCENE("Web Scene", Text, MimeType.APPLICATION_JSON),
   PRO_MAP("Pro Map", File, MimeType.APPLICATION_ESRI_MAPX),
-  FEATURE_SERVICE("Feature Service", URL, Pattern.compile(".+/FeatureServer$|.+/MapServer/\\d+$", Pattern.CASE_INSENSITIVE)),
-  MAP_SERVICE("Map Service", URL, Pattern.compile(".+/MapServer$", Pattern.CASE_INSENSITIVE)),
-  IMAGE_SERVICE("Image Service", URL, Pattern.compile(".+/ImageServer$", Pattern.CASE_INSENSITIVE)),
+  FEATURE_SERVICE("Feature Service", URL, Pattern.compile(".+/FeatureServer$|.+/MapServer/\\d+$", Pattern.CASE_INSENSITIVE),"FeatureServer"),
+  MAP_SERVICE("Map Service", URL, Pattern.compile(".+/MapServer$", Pattern.CASE_INSENSITIVE),"MapServer"),
+  IMAGE_SERVICE("Image Service", URL, Pattern.compile(".+/ImageServer$", Pattern.CASE_INSENSITIVE),"ImageServer"),
   KML("KML", URL, MimeType.APPLICATION_KML, MimeType.APPLICATION_KMZ),
   WMS("WMS", URL),
   WPS("WPS", URL),
   WMTS("WMTS", URL),
   FEATURE_COLLECTION("Feature Collection", Text, MimeType.APPLICATION_JSON),
   FEATURE_COLLECTION_TEMPLATE("Feature Collection Template", Text, MimeType.APPLICATION_JSON),
-  GEODATA_SERVICE("Geodata Service", URL, Pattern.compile(".+/GeoDataServer$", Pattern.CASE_INSENSITIVE)),
-  GLOBE_SERVICE("Globe Service", URL, Pattern.compile(".+/GlobeServer$", Pattern.CASE_INSENSITIVE)),
-  GEOMETRY_SERVICE("Geometry Service", URL, Pattern.compile(".+/GeometryServer$", Pattern.CASE_INSENSITIVE)),
-  GEOCODING_SERVICE("Geocoding Service", URL, Pattern.compile(".+/GeocodeServer$", Pattern.CASE_INSENSITIVE)),
-  NETWORK_ANALYSIS_SERVICE("Network Analysis Service", URL, Pattern.compile(".+/NAServer$", Pattern.CASE_INSENSITIVE)),
-  GEOPROCESSING_SERVICE("Geoprocessing Service", URL, Pattern.compile(".+/GPServer$", Pattern.CASE_INSENSITIVE)),
+  GEODATA_SERVICE("Geodata Service", URL, Pattern.compile(".+/GeoDataServer$", Pattern.CASE_INSENSITIVE),"GeoDataServer"),
+  GLOBE_SERVICE("Globe Service", URL, Pattern.compile(".+/GlobeServer$", Pattern.CASE_INSENSITIVE),"GlobeServer"),
+  GEOMETRY_SERVICE("Geometry Service", URL, Pattern.compile(".+/GeometryServer$", Pattern.CASE_INSENSITIVE),"GeometryServer"),
+  GEOCODING_SERVICE("Geocoding Service", URL, Pattern.compile(".+/GeocodeServer$", Pattern.CASE_INSENSITIVE),"GeocodeServer"),
+  NETWORK_ANALYSIS_SERVICE("Network Analysis Service", URL, Pattern.compile(".+/NAServer$", Pattern.CASE_INSENSITIVE),"NAServer"),
+  GEOPROCESSING_SERVICE("Geoprocessing Service", URL, Pattern.compile(".+/GPServer$", Pattern.CASE_INSENSITIVE),"GPServer"),
   WORKFLOW_MANAGER_SERVICE("Workflow Manager Service", URL),
   WEB_MAPPING_APPLICATION("Web Mapping Application", Text, MimeType.APPLICATION_JSON),
   MOBILE_APPLICATION("Mobile Application", Text, MimeType.APPLICATION_JSON),
@@ -118,16 +116,18 @@ public enum ItemType {
   private final DataType dataType;
   private final MimeType[] mimeTypes;
   private final Pattern pattern;
+  private final String serviceType;
 
-  ItemType(String typeName, DataType dataType, Pattern pattern, MimeType... mimeTypes) {
+  ItemType(String typeName, DataType dataType, Pattern pattern, String serviceType, MimeType... mimeTypes) {
     this.typeName = typeName;
     this.dataType = dataType;
     this.mimeTypes = mimeTypes;
     this.pattern = pattern;
+    this.serviceType = serviceType;
   }
 
   ItemType(String typeName, DataType dataType, MimeType... mimeTypes) {
-    this(typeName, dataType, null, mimeTypes);
+    this(typeName, dataType, null, null, mimeTypes);
   }
 
   /**
@@ -163,6 +163,14 @@ public enum ItemType {
    */
   public Pattern getPattern() {
     return pattern;
+  }
+  
+  /**
+   * Gets service type.
+   * @return service type
+   */
+  public String getServiceType() {
+    return serviceType;
   }
   
   /**

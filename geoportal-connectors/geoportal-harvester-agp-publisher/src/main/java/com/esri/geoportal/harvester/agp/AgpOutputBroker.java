@@ -16,11 +16,11 @@
 package com.esri.geoportal.harvester.agp;
 
 import com.esri.geoportal.commons.agp.client.AgpClient;
-import com.esri.geoportal.commons.agp.client.DataType;
+import com.esri.geoportal.commons.constants.DataType;
 import com.esri.geoportal.commons.agp.client.DeleteResponse;
 import com.esri.geoportal.commons.agp.client.ItemEntry;
 import com.esri.geoportal.commons.agp.client.ItemResponse;
-import com.esri.geoportal.commons.agp.client.ItemType;
+import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.agp.client.QueryResponse;
 import com.esri.geoportal.commons.meta.Attribute;
 import com.esri.geoportal.commons.meta.MapAttribute;

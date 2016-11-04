@@ -20,6 +20,7 @@ import com.esri.geoportal.commons.ags.client.ContentResponse;
 import com.esri.geoportal.commons.ags.client.ExtentInfo;
 import com.esri.geoportal.commons.ags.client.ServerResponse;
 import com.esri.geoportal.commons.ags.client.ServiceInfo;
+import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.meta.Attribute;
@@ -222,11 +223,10 @@ import org.w3c.dom.Document;
     }
     
     private String getServiceType(String url) {
-      if (url!=null && url.endsWith("Server")) {
-        int slashIndex = url.lastIndexOf("/");
-        return slashIndex>=0? url.substring(slashIndex+1): url;
-      }
-      return null;
+      return ItemType.matchPattern(url).stream()
+              .filter(it->it.getServiceType()!=null)
+              .map(ItemType::getServiceType)
+              .findFirst().orElse(null);
     }
     
     private String getServiceRoot(String url) {

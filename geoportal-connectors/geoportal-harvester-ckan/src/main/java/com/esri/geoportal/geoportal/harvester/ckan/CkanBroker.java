@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.geoportal.harvester.ckan;
 
+import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.meta.Attribute;
 import com.esri.geoportal.commons.meta.MapAttribute;
@@ -25,6 +26,7 @@ import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_DESCRIPTION;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_IDENTIFIER;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_MODIFIED;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_RESOURCE_URL;
+import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_RESOURCE_URL_SCHEME;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_TITLE;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
@@ -46,10 +48,13 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -176,6 +181,10 @@ import org.w3c.dom.Document;
         attrs.put(WKA_DESCRIPTION, new StringAttribute(resource.getDescription()));
         attrs.put(WKA_MODIFIED, new StringAttribute(dataSet.getMetadataModified()!=null? formatIsoDate(dataSet.getMetadataModified()): ""));
         attrs.put(WKA_RESOURCE_URL, new StringAttribute(resource.getUrl()));
+        String schemeName = generateSchemeName(resource.getUrl());
+        if (schemeName!=null) {
+          attrs.put(WKA_RESOURCE_URL_SCHEME, new StringAttribute(schemeName));
+        }
         Document doc = metaBuilder.create(new MapAttribute(attrs));
         DOMSource domSource = new DOMSource(doc);
         StringWriter writer = new StringWriter();
@@ -190,6 +199,23 @@ import org.w3c.dom.Document;
       }
     }
     
+  }
+    
+  private String generateSchemeName(String url) {
+    String serviceType = ItemType.matchPattern(url).stream()
+            .filter(it->it.getServiceType()!=null)
+            .map(ItemType::getServiceType)
+            .findFirst().orElse(null);
+    if (serviceType!=null) {
+      return "urn:x-esri:specification:ServiceType:ArcGIS:"+serviceType;
+    }
+    HashSet<MimeType> mimes = new HashSet<>();
+    ItemType.matchPattern(url).stream()
+            .filter(it->it.getServiceType()==null)
+            .map(ItemType::getMimeTypes)
+            .forEach(a->Arrays.asList(a).stream().forEach(mimes::add));
+    MimeType mime = mimes.stream().findFirst().orElse(null);
+    return mime!=null? mime.getName(): null;
   }
 
   private String formatIsoDate(Date date) {

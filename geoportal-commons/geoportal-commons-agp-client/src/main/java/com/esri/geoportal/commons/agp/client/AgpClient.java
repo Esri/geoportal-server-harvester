@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.commons.agp.client;
 
+import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
