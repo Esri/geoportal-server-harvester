@@ -21,6 +21,11 @@ import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.commons.meta.MetaException;
 import com.esri.geoportal.commons.meta.StringAttribute;
+import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_DESCRIPTION;
+import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_IDENTIFIER;
+import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_MODIFIED;
+import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_RESOURCE_URL;
+import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_TITLE;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -37,6 +42,12 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import javax.xml.transform.Transformer;
@@ -53,6 +64,8 @@ import org.w3c.dom.Document;
  */
 /*package*/ class CkanBroker implements InputBroker {
   private static final Logger LOG = LoggerFactory.getLogger(CkanBroker.class);
+  private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+  
   private final CkanConnector connector;
   private final CkanBrokerDefinitionAdaptor definition;
   private final MetaBuilder metaBuilder;
@@ -116,6 +129,7 @@ import org.w3c.dom.Document;
     private final TransformerFactory tf = TransformerFactory.newInstance();
     
     private java.util.Iterator<CkanDataset> dataSetsIter;
+    private CkanDataset dataSet;
     private java.util.Iterator<CkanResource> resourcesIter;
     
     private final int limit = 10;
@@ -133,7 +147,8 @@ import org.w3c.dom.Document;
         }
         
         if (dataSetsIter!=null && dataSetsIter.hasNext()) {
-          resourcesIter = dataSetsIter.next().getResources().iterator();
+          dataSet = dataSetsIter.next();
+          resourcesIter = dataSet.getResources().iterator();
           return hasNext();
         }
 
@@ -156,15 +171,11 @@ import org.w3c.dom.Document;
       try {
         CkanResource resource = resourcesIter.next();
         HashMap<String,Attribute> attrs = new HashMap<>();
-        /*
-          <xsl:param name="modified"/>
-          <xsl:param name="resource.url"/>
-          <xsl:param name="resource.url.scheme"/>
-          <xsl:param name="bbox"/>
-        */
-        attrs.put("identifier", new StringAttribute(resource.getId()));
-        attrs.put("title", new StringAttribute(resource.getName()));
-        attrs.put("description", new StringAttribute(resource.getDescription()));
+        attrs.put(WKA_IDENTIFIER, new StringAttribute(resource.getId()));
+        attrs.put(WKA_TITLE, new StringAttribute(resource.getName()));
+        attrs.put(WKA_DESCRIPTION, new StringAttribute(resource.getDescription()));
+        attrs.put(WKA_MODIFIED, new StringAttribute(dataSet.getMetadataModified()!=null? formatIsoDate(dataSet.getMetadataModified()): ""));
+        attrs.put(WKA_RESOURCE_URL, new StringAttribute(resource.getUrl()));
         Document doc = metaBuilder.create(new MapAttribute(attrs));
         DOMSource domSource = new DOMSource(doc);
         StringWriter writer = new StringWriter();
@@ -179,5 +190,14 @@ import org.w3c.dom.Document;
       }
     }
     
+  }
+
+  private String formatIsoDate(Date date) {
+    Instant instant = date.toInstant();
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(date);
+    ZoneOffset zoneOffset = ZoneOffset.ofHours(cal.getTimeZone().getRawOffset() / (1000 * 60 * 60));
+    OffsetDateTime ofInstant = OffsetDateTime.ofInstant(instant, zoneOffset);
+    return FORMATTER.format(ofInstant);
   }
 }
