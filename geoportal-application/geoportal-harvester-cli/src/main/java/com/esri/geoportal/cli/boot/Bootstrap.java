@@ -24,6 +24,7 @@ import com.esri.geoportal.commons.meta.xml.SimpleFgdcMetaAnalyzer;
 import com.esri.geoportal.commons.meta.xml.SimpleIso15115MetaAnalyzer;
 import com.esri.geoportal.commons.meta.xml.SimpleIso15115_2MetaAnalyzer;
 import com.esri.geoportal.commons.meta.xml.SimpleIso15119MetaAnalyzer;
+import com.esri.geoportal.geoportal.harvester.ckan.CkanConnector;
 import com.esri.geoportal.harvester.agp.AgpOutputConnector;
 import com.esri.geoportal.harvester.agpsrc.AgpInputConnector;
 import com.esri.geoportal.harvester.ags.AgsConnector;
@@ -254,6 +255,7 @@ public class Bootstrap {
       inboundConnectorRegistry.put(AgpInputConnector.TYPE, new AgpInputConnector(metaBuilder));
       inboundConnectorRegistry.put(AgsConnector.TYPE, new AgsConnector(metaBuilder));
       inboundConnectorRegistry.put(GptConnector.TYPE, new GptConnector());
+      inboundConnectorRegistry.put(CkanConnector.TYPE, new CkanConnector());
     }
     
     return inboundConnectorRegistry;
