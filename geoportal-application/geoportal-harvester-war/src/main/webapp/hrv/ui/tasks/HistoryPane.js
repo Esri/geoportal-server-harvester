@@ -90,8 +90,11 @@ define(["dojo/_base/declare",
               }
             }
           }));
+          if (taskDefinition.destinations.length>1) {
+            destLabel = "[" + destLabel + "]";
+          }
         }
-        return sourceLabel + " -> [" + destLabel + "]";
+        return sourceLabel + " -> " + destLabel;
       },
       
       makeLinkLabel: function(linkDefinition) {
