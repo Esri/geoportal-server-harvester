@@ -16,22 +16,14 @@
 package com.esri.geoportal.geoportal.harvester.ckan;
 
 import com.esri.geoportal.commons.meta.MetaBuilder;
-import com.esri.geoportal.commons.meta.xml.SimpleDcMetaBuilder;
 import static com.esri.geoportal.geoportal.harvester.ckan.CkanBrokerDefinitionAdaptor.P_HOST_URL;
 import static com.esri.geoportal.geoportal.harvester.ckan.CkanBrokerDefinitionAdaptor.P_TOKEN;
-import com.esri.geoportal.harvester.api.ProcessInstance;
-import com.esri.geoportal.harvester.api.base.DataCollector;
-import com.esri.geoportal.harvester.api.base.DataPrintStreamOutput;
-import com.esri.geoportal.harvester.api.base.SimpleInitContext;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,19 +34,6 @@ public class CkanConnector implements InputConnector<InputBroker> {
   public static final String TYPE = "CKAN";
   
   private final MetaBuilder metaBuilder;
-
-  public static void main(String[] args) throws Exception {
-    DataPrintStreamOutput destination = new DataPrintStreamOutput(System.out);
-    EntityDefinition def = new EntityDefinition();
-    CkanBrokerDefinitionAdaptor adaptor = new CkanBrokerDefinitionAdaptor(def);
-    adaptor.setHostUrl(new URL("http://demo.ckan.org/"));
-    CkanConnector connector = new CkanConnector(new SimpleDcMetaBuilder());
-    InputBroker broker = connector.createBroker(def);
-    ArrayList<ProcessInstance.Listener> listeners = new ArrayList<>();
-    broker.initialize(new SimpleInitContext(new Task(null, broker, null), listeners));
-    DataCollector dataCollector = new DataCollector(broker, Arrays.asList(new DataPrintStreamOutput[]{destination}), listeners);
-    dataCollector.collect();
-  }
 
   /**
    * Creates instance of the connector.

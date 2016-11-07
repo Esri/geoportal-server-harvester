@@ -54,7 +54,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -114,7 +113,7 @@ import org.w3c.dom.Document;
 
   @Override
   public String toString() {
-    return String.format("WAF [%s]", definition.getHostUrl());
+    return String.format("CKAN [%s]", definition.getHostUrl());
   }
 
   @Override
@@ -139,7 +138,7 @@ import org.w3c.dom.Document;
     private java.util.Iterator<CkanResource> resourcesIter;
     
     private final int limit = 10;
-    private int offset = 0;
+    private int offset = 940;
 
     public CkanIterator(IteratorContext iteratorContext) {
       this.iteratorContext = iteratorContext;

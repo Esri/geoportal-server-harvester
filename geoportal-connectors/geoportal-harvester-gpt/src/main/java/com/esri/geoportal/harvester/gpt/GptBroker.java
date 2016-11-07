@@ -166,8 +166,4 @@ import org.slf4j.LoggerFactory;
     ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     return FORMATTER.format(zonedDateTime);
   }
-
-  private boolean getCleanup() {
-    return definition.getCleanup();
-  }
 }
