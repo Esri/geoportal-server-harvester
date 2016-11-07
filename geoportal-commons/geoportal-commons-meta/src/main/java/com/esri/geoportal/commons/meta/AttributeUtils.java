@@ -46,7 +46,7 @@ public class AttributeUtils {
     
     attr.getNamedAttributes().entrySet().stream().forEach(na->{
       if (na.getValue().isString()) {
-        props.setProperty(na.getKey(), na.getValue().getValue());
+        props.setProperty(na.getKey(), na.getValue().getValue()!=null? na.getValue().getValue(): "");
       } else if (na.getValue().isArray()) {
         // skip arrays
       } else if (na.getValue().isMap()) {

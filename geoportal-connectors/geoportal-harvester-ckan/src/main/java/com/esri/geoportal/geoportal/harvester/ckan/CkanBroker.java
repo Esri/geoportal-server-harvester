@@ -60,6 +60,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -176,9 +177,9 @@ import org.w3c.dom.Document;
       try {
         CkanResource resource = resourcesIter.next();
         HashMap<String,Attribute> attrs = new HashMap<>();
-        attrs.put(WKA_IDENTIFIER, new StringAttribute(resource.getId()));
-        attrs.put(WKA_TITLE, new StringAttribute(resource.getName()));
-        attrs.put(WKA_DESCRIPTION, new StringAttribute(resource.getDescription()));
+        attrs.put(WKA_IDENTIFIER, new StringAttribute(firstNonBlank(resource.getId(),dataSet.getId())));
+        attrs.put(WKA_TITLE, new StringAttribute(firstNonBlank(resource.getName(),dataSet.getTitle(),dataSet.getName())));
+        attrs.put(WKA_DESCRIPTION, new StringAttribute(firstNonBlank(resource.getDescription())));
         attrs.put(WKA_MODIFIED, new StringAttribute(dataSet.getMetadataModified()!=null? formatIsoDate(dataSet.getMetadataModified()): ""));
         attrs.put(WKA_RESOURCE_URL, new StringAttribute(resource.getUrl()));
         String schemeName = generateSchemeName(resource.getUrl());
@@ -197,6 +198,10 @@ import org.w3c.dom.Document;
       } catch (MetaException|TransformerException|URISyntaxException|UnsupportedEncodingException ex) {
         throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
       }
+    }
+    
+    private String firstNonBlank(String...strs) {
+      return Arrays.asList(strs).stream().filter(s->!StringUtils.isBlank(s)).findFirst().orElse(null);
     }
     
   }
