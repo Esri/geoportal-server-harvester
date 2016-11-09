@@ -27,6 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -46,16 +47,19 @@ public class Client implements Closeable {
 
   private final CloseableHttpClient httpClient;
   private final URL url;
+  private final String apiKey;
   private final ObjectMapper mapper = new ObjectMapper();
 
   /**
    * Creates instance of the client.
    * @param httpClient HTTP client
    * @param url base URL
+   * @param apiKey API key
    */
-  public Client(CloseableHttpClient httpClient, URL url) {
+  public Client(CloseableHttpClient httpClient, URL url, String apiKey) {
     this.httpClient = httpClient;
     this.url = url;
+    this.apiKey = StringUtils.trimToNull(apiKey);
     
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -79,6 +83,10 @@ public class Client implements Closeable {
   public Response listPackages(long rows, long start) throws IOException, URISyntaxException {
     URI uri = createListPackagesUri(rows, start);
     HttpGet get = new HttpGet(uri);
+    if (apiKey!=null) {
+      get.addHeader("X-CKAN-API-Key", apiKey);
+      get.addHeader("Authorization", apiKey);
+    }
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("Content-Type", "application/json; charset=UTF-8");
     get.setHeader("User-Agent", HttpConstants.getUserAgent());

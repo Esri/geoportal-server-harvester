@@ -102,7 +102,7 @@ import org.w3c.dom.Document;
       Bots bots = BotsUtils.readBots(definition.getBotsConfig(), http, definition.getBotsMode(), definition.getHostUrl());
       httpClient = new BotsHttpClient(http,bots);
     }
-    client = new Client(httpClient, definition.getHostUrl());
+    client = new Client(httpClient, definition.getHostUrl(), definition.getApiKey());
   }
 
   @Override

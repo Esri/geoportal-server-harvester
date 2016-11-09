@@ -30,11 +30,11 @@ import org.apache.commons.lang3.StringUtils;
  */
 /*package*/class CkanBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public static final String P_HOST_URL  = "ckan-host-url";
-  public static final String P_TOKEN     = "ckan-token";
+  public static final String P_API_KEY     = "ckan-apikey";
   
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private URL hostUrl;
-  private String token;
+  private String apiKey;
 
 
   /**
@@ -55,7 +55,7 @@ import org.apache.commons.lang3.StringUtils;
       } catch (MalformedURLException ex) {
         throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
       }
-      token = get(P_TOKEN);
+      apiKey = get(P_API_KEY);
     }
   }
   
@@ -68,13 +68,13 @@ import org.apache.commons.lang3.StringUtils;
     set(P_HOST_URL,hostUrl.toExternalForm());
   }
 
-  public String getToken() {
-    return token;
+  public String getApiKey() {
+    return apiKey;
   }
 
-  public void setToken(String token) {
-    this.token = token;
-    set(P_TOKEN,token);
+  public void setApiKey(String apiKey) {
+    this.apiKey = apiKey;
+    set(P_API_KEY,apiKey);
   }
 
   /**

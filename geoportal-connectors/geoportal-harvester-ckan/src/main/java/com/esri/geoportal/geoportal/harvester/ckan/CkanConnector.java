@@ -17,7 +17,6 @@ package com.esri.geoportal.geoportal.harvester.ckan;
 
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import static com.esri.geoportal.geoportal.harvester.ckan.CkanBrokerDefinitionAdaptor.P_HOST_URL;
-import static com.esri.geoportal.geoportal.harvester.ckan.CkanBrokerDefinitionAdaptor.P_TOKEN;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -25,6 +24,7 @@ import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.util.ArrayList;
 import java.util.List;
+import static com.esri.geoportal.geoportal.harvester.ckan.CkanBrokerDefinitionAdaptor.P_API_KEY;
 
 /**
  * CKAN connector.
@@ -52,7 +52,7 @@ public class CkanConnector implements InputConnector<InputBroker> {
   public UITemplate getTemplate() {
     List<UITemplate.Argument> args = new ArrayList<>();
     args.add(new UITemplate.StringArgument(P_HOST_URL, "Url", true));
-    args.add(new UITemplate.StringArgument(P_TOKEN, "Token"));
+    args.add(new UITemplate.StringArgument(P_API_KEY, "API key"));
     return new UITemplate(getType(), "CKAN", args);
   }
 
