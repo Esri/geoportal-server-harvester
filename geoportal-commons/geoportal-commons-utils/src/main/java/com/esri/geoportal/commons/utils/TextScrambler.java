@@ -47,8 +47,8 @@ public class TextScrambler {
   
   /**
    * Unscrambles text.
-   * @param str
-   * @return 
+   * @param str string to decode
+   * @return decoded string
    */
   public static String decode(String str) {
     if (str.length()<16) {
