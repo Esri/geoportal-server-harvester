@@ -50,7 +50,6 @@ public class Dataset {
   public String url;
   public String notes;
   public String owner_org;
-  public List<Extra> extras;
   public String title;
   public String revision_id;
 }
