@@ -17,6 +17,7 @@ package com.esri.geoportal.geoportal.harvester.ckan;
 
 import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.meta.Attribute;
 import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaBuilder;
@@ -28,6 +29,12 @@ import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_MODIFIED;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_RESOURCE_URL;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_RESOURCE_URL_SCHEME;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_TITLE;
+import com.esri.geoportal.commons.robots.Bots;
+import com.esri.geoportal.commons.robots.BotsUtils;
+import com.esri.geoportal.geoportal.commons.ckan.client.Client;
+import com.esri.geoportal.geoportal.commons.ckan.client.Dataset;
+import com.esri.geoportal.geoportal.commons.ckan.client.Resource;
+import com.esri.geoportal.geoportal.commons.ckan.client.Response;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -35,21 +42,14 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
-import eu.trentorise.opendata.jackan.CkanClient;
-import eu.trentorise.opendata.jackan.SearchResults;
-import eu.trentorise.opendata.jackan.exceptions.JackanException;
-import eu.trentorise.opendata.jackan.model.CkanDataset;
-import eu.trentorise.opendata.jackan.model.CkanResource;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,6 +60,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -75,7 +77,8 @@ import org.w3c.dom.Document;
   private final CkanBrokerDefinitionAdaptor definition;
   private final MetaBuilder metaBuilder;
   
-  private CkanClient client;
+  private CloseableHttpClient httpClient;
+  private Client client;
  
   
   /**
@@ -92,13 +95,25 @@ import org.w3c.dom.Document;
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
-    client = definition.getToken()!=null && !definition.getToken().isEmpty()? 
-              new CkanClient(definition.getHostUrl().toExternalForm(), definition.getToken())
-            : new CkanClient(definition.getHostUrl().toExternalForm());
+    CloseableHttpClient http = HttpClients.createDefault();
+    if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
+      httpClient = http;
+    } else {
+      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), http, definition.getBotsMode(), definition.getHostUrl());
+      httpClient = new BotsHttpClient(http,bots);
+    }
+    client = new Client(httpClient, definition.getHostUrl());
   }
 
   @Override
   public void terminate() {
+    if (httpClient!=null) {
+      try {
+        httpClient.close();
+      } catch (IOException ex) {
+        LOG.error(String.format("Error terminating broker."), ex);
+      }
+    }
   }
 
   @Override
@@ -133,12 +148,12 @@ import org.w3c.dom.Document;
     private final IteratorContext iteratorContext;
     private final TransformerFactory tf = TransformerFactory.newInstance();
     
-    private java.util.Iterator<CkanDataset> dataSetsIter;
-    private CkanDataset dataSet;
-    private java.util.Iterator<CkanResource> resourcesIter;
+    private java.util.Iterator<Dataset> dataSetsIter;
+    private Dataset dataSet;
+    private java.util.Iterator<Resource> resourcesIter;
     
     private final int limit = 10;
-    private int offset = 940;
+    private int offset = 0;
 
     public CkanIterator(IteratorContext iteratorContext) {
       this.iteratorContext = iteratorContext;
@@ -153,20 +168,25 @@ import org.w3c.dom.Document;
         
         if (dataSetsIter!=null && dataSetsIter.hasNext()) {
           dataSet = dataSetsIter.next();
-          resourcesIter = dataSet.getResources().iterator();
+          if (dataSet!=null && dataSet.resources!=null) {
+            resourcesIter = dataSet.resources.iterator();
+          }
           return hasNext();
         }
 
-        SearchResults<CkanDataset> searchDatasets = client.searchDatasets("", limit, offset+=limit);
-        List<CkanDataset> results = searchDatasets.getResults();
+        Response response = client.listPackages(limit, offset);
+        offset+=limit;
         
-        if (results.size()>0) {
-          dataSetsIter = searchDatasets.getResults().iterator();
-          return hasNext();
+        if (response!=null && response.result!=null && response.result.results!=null) {
+          List<Dataset> results = response.result.results;
+          if (results!=null && results.size()>0) {
+            dataSetsIter = results.iterator();
+            return hasNext();
+          }
         }
         
         return false;
-      } catch (JackanException ex) {
+      } catch (IOException|URISyntaxException ex) {
         throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
       }
     }
@@ -174,14 +194,15 @@ import org.w3c.dom.Document;
     @Override
     public DataReference next() throws DataInputException {
       try {
-        CkanResource resource = resourcesIter.next();
+        Resource resource = resourcesIter.next();
         HashMap<String,Attribute> attrs = new HashMap<>();
-        attrs.put(WKA_IDENTIFIER, new StringAttribute(firstNonBlank(resource.getId(),dataSet.getId())));
-        attrs.put(WKA_TITLE, new StringAttribute(firstNonBlank(resource.getName(),dataSet.getTitle(),dataSet.getName())));
-        attrs.put(WKA_DESCRIPTION, new StringAttribute(firstNonBlank(resource.getDescription())));
-        attrs.put(WKA_MODIFIED, new StringAttribute(dataSet.getMetadataModified()!=null? formatIsoDate(dataSet.getMetadataModified()): ""));
-        attrs.put(WKA_RESOURCE_URL, new StringAttribute(resource.getUrl()));
-        String schemeName = generateSchemeName(resource.getUrl());
+        String id = firstNonBlank(resource.id,dataSet.id);
+        attrs.put(WKA_IDENTIFIER, new StringAttribute(id));
+        attrs.put(WKA_TITLE, new StringAttribute(firstNonBlank(resource.name,dataSet.title,dataSet.name)));
+        attrs.put(WKA_DESCRIPTION, new StringAttribute(firstNonBlank(resource.description)));
+        attrs.put(WKA_MODIFIED, new StringAttribute(dataSet.metadata_modified));
+        attrs.put(WKA_RESOURCE_URL, new StringAttribute(resource.url));
+        String schemeName = generateSchemeName(resource.url);
         if (schemeName!=null) {
           attrs.put(WKA_RESOURCE_URL_SCHEME, new StringAttribute(schemeName));
         }
@@ -192,9 +213,8 @@ import org.w3c.dom.Document;
         Transformer transformer = tf.newTransformer();
         transformer.transform(domSource, result);
 
-        return new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), resource.getId(), resource.getCreated(), URI.create(resource.getId()), writer.toString().getBytes("UTF-8"), MimeType.APPLICATION_XML);
-        
-      } catch (MetaException|TransformerException|URISyntaxException|UnsupportedEncodingException ex) {
+        return new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, parseIsoDate(resource.created), URI.create(id), writer.toString().getBytes("UTF-8"), MimeType.APPLICATION_XML);
+      } catch (MetaException|TransformerException|URISyntaxException|UnsupportedEncodingException|IllegalArgumentException ex) {
         throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
       }
     }
@@ -206,10 +226,10 @@ import org.w3c.dom.Document;
   }
     
   private String generateSchemeName(String url) {
-    String serviceType = ItemType.matchPattern(url).stream()
+    String serviceType = url!=null? ItemType.matchPattern(url).stream()
             .filter(it->it.getServiceType()!=null)
             .map(ItemType::getServiceType)
-            .findFirst().orElse(null);
+            .findFirst().orElse(null): null;
     if (serviceType!=null) {
       return "urn:x-esri:specification:ServiceType:ArcGIS:"+serviceType;
     }
@@ -222,12 +242,17 @@ import org.w3c.dom.Document;
     return mime!=null? mime.getName(): null;
   }
 
-  private String formatIsoDate(Date date) {
-    Instant instant = date.toInstant();
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(date);
-    ZoneOffset zoneOffset = ZoneOffset.ofHours(cal.getTimeZone().getRawOffset() / (1000 * 60 * 60));
-    OffsetDateTime ofInstant = OffsetDateTime.ofInstant(instant, zoneOffset);
-    return FORMATTER.format(ofInstant);
+  /**
+   * Parses ISO date
+   *
+   * @param strDate ISO date as string
+   * @return date object or <code>null</code> if unable to parse date
+   */
+  private static Date parseIsoDate(String strDate) {
+    try {
+      return Date.from(ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(strDate)).toInstant());
+    } catch (Exception ex) {
+      return null;
+    }
   }
 }

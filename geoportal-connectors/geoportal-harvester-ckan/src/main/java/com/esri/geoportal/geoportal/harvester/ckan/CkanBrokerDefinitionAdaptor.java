@@ -15,6 +15,9 @@
  */
 package com.esri.geoportal.geoportal.harvester.ckan;
 
+import com.esri.geoportal.commons.robots.BotsConfig;
+import com.esri.geoportal.commons.robots.BotsMode;
+import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -29,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
   public static final String P_HOST_URL  = "ckan-host-url";
   public static final String P_TOKEN     = "ckan-token";
   
+  private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private URL hostUrl;
   private String token;
 
@@ -40,6 +44,7 @@ import org.apache.commons.lang3.StringUtils;
    */
   public CkanBrokerDefinitionAdaptor(EntityDefinition def) throws InvalidDefinitionException {
     super(def);
+    this.botsAdaptor = new BotsBrokerDefinitionAdaptor(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(CkanConnector.TYPE);
     } else if (!CkanConnector.TYPE.equals(def.getType())) {
@@ -71,6 +76,37 @@ import org.apache.commons.lang3.StringUtils;
     this.token = token;
     set(P_TOKEN,token);
   }
-  
+
+  /**
+   * Gets bots mode.
+   * @return bots mode
+   */
+  public BotsMode getBotsMode() {
+    return botsAdaptor.getBotsMode();
+  }
+
+  /**
+   * Sets bots mode.
+   * @param botsMode bots mode 
+   */
+  public void setBotsMode(BotsMode botsMode) {
+    botsAdaptor.setBotsMode(botsMode);
+  }
+
+  /**
+   * Gets bots config.
+   * @return bots config
+   */
+  public BotsConfig getBotsConfig() {
+    return botsAdaptor.getBotsConfig();
+  }
+
+  /**
+   * Sets bots config.
+   * @param botsConfig bots config 
+   */
+  public void setBotsConfig(BotsConfig botsConfig) {
+    botsAdaptor.setBotsConfig(botsConfig);
+  }
   
 }

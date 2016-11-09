@@ -70,9 +70,9 @@ public final class Task {
    */
   public TaskDefinition getTaskDefinition() {
     TaskDefinition taskDefinition = new TaskDefinition();
-    taskDefinition.setProcessor(processor.getEntityDefinition());
-    taskDefinition.setSource(dataSource.getEntityDefinition());
-    taskDefinition.setDestinations(dataDestinations.stream().map(d->d.getLinkDefinition()).collect(Collectors.toList()));
+    taskDefinition.setProcessor(processor!=null? processor.getEntityDefinition(): null);
+    taskDefinition.setSource(dataSource!=null? dataSource.getEntityDefinition(): null);
+    taskDefinition.setDestinations(dataDestinations!=null? dataDestinations.stream().map(d->d.getLinkDefinition()).collect(Collectors.toList()): null);
     taskDefinition.setKeywords(keywords);
     taskDefinition.setIncremental(incremental);
     taskDefinition.setIgnoreRobotsTxt(ignoreRobotsTxt);

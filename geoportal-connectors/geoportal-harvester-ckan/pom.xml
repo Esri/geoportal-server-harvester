@@ -11,11 +11,6 @@
     <name>Esri :: Geoportal Server :: Harvester :: Data Source :: CKAN</name>
     <dependencies>
         <dependency>
-            <groupId>eu.trentorise.opendata</groupId>
-            <artifactId>jackan</artifactId>
-            <version>0.4.2</version>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
             <version>2.7.3</version>
@@ -36,6 +31,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>harvester-api-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>geoportal-commons-ckan-client</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

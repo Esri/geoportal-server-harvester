@@ -62,7 +62,7 @@ public class SimpleLink implements Link {
   public LinkDefinition getLinkDefinition() {
     LinkDefinition linkDef = new LinkDefinition();
     linkDef.setAction(action.getLinkActionDefinition());
-    linkDef.setDrains(drains.stream().map(d->d.getLinkDefinition()).collect(Collectors.toList()));
+    linkDef.setDrains(drains!=null? drains.stream().map(d->d.getLinkDefinition()).collect(Collectors.toList()): null);
     return linkDef;
   }
 
