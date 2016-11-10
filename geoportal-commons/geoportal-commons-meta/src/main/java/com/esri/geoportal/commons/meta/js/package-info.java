@@ -13,34 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.commons.meta;
-
 /**
- * String attribute.
+ * JavaScript-based metadata handlers.
  */
-public class StringAttribute implements Attribute {
-  private final String value;
-
-  /**
-   * Creates instance of the attribute.
-   * @param value single string value
-   */
-  public StringAttribute(String value) {
-    this.value = value;
-  }
-
-  @Override
-  public boolean isString() {
-    return true;
-  }
-
-  @Override
-  public String getValue() {
-    return value;
-  }
-  
-  @Override
-  public String toString() {
-    return String.format("%s", value);
-  }
-}
+package com.esri.geoportal.commons.meta.js;

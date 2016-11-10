@@ -15,7 +15,9 @@
  */
 package com.esri.geoportal.commons.meta;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Attribute.
@@ -44,21 +46,16 @@ public interface Attribute {
    * @return value or <code>null</code>
    */
   default String getValue() { return null; }
+  
   /**
    * Gets named attributes.
    * @return named attributes or <code>null</code>
    */
   default Map<String, Attribute> getNamedAttributes() { return null; }
+  
   /**
    * Gets an array of attributes.
    * @return array of attributes
    */
   default Attribute[] getAttributes() { return null; }
-  
-  /**
-   * Flattens attribute.
-   * @param prefix prefix
-   * @return map of flattened attribute values.
-   */
-  Map<String,String> flatten(String prefix);
 }

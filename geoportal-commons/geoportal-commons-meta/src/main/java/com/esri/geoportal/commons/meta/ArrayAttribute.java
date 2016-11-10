@@ -16,8 +16,7 @@
 package com.esri.geoportal.commons.meta;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -26,8 +25,20 @@ import java.util.stream.Collectors;
 public final class ArrayAttribute implements Attribute {
   private final Attribute [] attributes;
 
-  public ArrayAttribute(Attribute[] attributes) {
+  /**
+   * Creates instance of the attribute.
+   * @param attributes array of the attributes
+   */
+  public ArrayAttribute(Attribute...attributes) {
     this.attributes = attributes;
+  }
+
+  /**
+   * Creates instance of the attribute.
+   * @param attributes array of the attributes
+   */
+  public ArrayAttribute(List<Attribute> attributes) {
+    this.attributes = attributes.toArray(new Attribute[attributes.size()]);
   }
 
   @Override
@@ -39,19 +50,9 @@ public final class ArrayAttribute implements Attribute {
   public Attribute[] getAttributes() {
     return attributes;
   }
-
-  @Override
-  public Map<String, String> flatten(String prefix) {
-    HashMap<String,String> flat = new HashMap<>();
-    for (int i=0; i<attributes.length; i++) {
-      Map<String, String> f = attributes[i].flatten(prefix!=null? String.format("%s:%d", prefix, i): String.format("%d", i));
-      flat.putAll(f);
-    }
-    return flat;
-  }
   
   @Override
   public String toString() {
-    return String.format("[ %s ]", Arrays.asList(attributes).stream().map(Object::toString).collect(Collectors.joining(", ")));
+    return String.format("[ %s ]", Arrays.stream(attributes).map(Object::toString).collect(Collectors.joining(", ")));
   }
 }

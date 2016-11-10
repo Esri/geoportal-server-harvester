@@ -15,7 +15,6 @@
  */
 package com.esri.geoportal.commons.meta;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -23,8 +22,12 @@ import java.util.stream.Collectors;
  * Object attribute.
  */
 public class MapAttribute implements Attribute {
-  private final Map<String,Attribute> attributes;
+  protected final Map<String,Attribute> attributes;
 
+  /**
+   * Creates instance of the attribute.
+   * @param attributes names attributes
+   */
   public MapAttribute(Map<String, Attribute> attributes) {
     this.attributes = attributes;
   }
@@ -37,16 +40,6 @@ public class MapAttribute implements Attribute {
   @Override
   public Map<String, Attribute> getNamedAttributes() {
     return attributes;
-  }
-
-  @Override
-  public Map<String, String> flatten(String prefix) {
-    HashMap<String,String> flat = new HashMap<>();
-    attributes.entrySet().forEach(entry->{
-      Map<String, String> f = entry.getValue().flatten(prefix!=null? String.format("%s.%s", prefix, entry.getKey()): String.format("%s", entry.getKey()));
-      flat.putAll(f);
-    });
-    return flat;
   }
   
   @Override

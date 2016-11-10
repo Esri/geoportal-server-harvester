@@ -15,15 +15,12 @@
  */
 package com.esri.geoportal.harvester.beans;
 
+import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.commons.meta.MetaException;
-import com.esri.geoportal.commons.meta.MapAttribute;
-import com.esri.geoportal.commons.meta.xml.BaseXmlMetaBuilder;
-import com.esri.geoportal.commons.meta.xml.SimpleDcMetaBuilder;
-import java.io.IOException;
+import com.esri.geoportal.commons.meta.js.SimpleDcMetaBuilder;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.xml.transform.TransformerConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -35,19 +32,15 @@ import org.w3c.dom.Document;
 @Service
 public class DefaultMetadataBuilderBean implements MetaBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultMetadataBuilderBean.class);
-  private BaseXmlMetaBuilder xmlMetaBuilder;
+  private MetaBuilder xmlMetaBuilder;
   
   /**
    * Initializes bean.
    */
   @PostConstruct
   public void init() {
-    try {
-      xmlMetaBuilder = new SimpleDcMetaBuilder();
-      LOG.info("DefaultMetadataBuilderBean initialized.");
-    } catch (IOException|TransformerConfigurationException ex) {
-      LOG.error(String.format("Error creating DefaultMetadataHandlerBean"), ex);
-    }
+    xmlMetaBuilder = new SimpleDcMetaBuilder();
+    LOG.info("DefaultMetadataBuilderBean initialized.");
   }
 
   @Override

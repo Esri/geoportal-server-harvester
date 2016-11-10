@@ -13,34 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.commons.meta;
+package com.esri.geoportal.commons.meta.js;
 
 /**
- * String attribute.
+ * Simple JavaScript DC meta builder.
  */
-public class StringAttribute implements Attribute {
-  private final String value;
-
+public class SimpleDcMetaBuilder extends BaseJSMetaBuilder {
+  
   /**
-   * Creates instance of the attribute.
-   * @param value single string value
+   * Creates instance of the builder.
    */
-  public StringAttribute(String value) {
-    this.value = value;
-  }
-
-  @Override
-  public boolean isString() {
-    return true;
-  }
-
-  @Override
-  public String getValue() {
-    return value;
+  public SimpleDcMetaBuilder() {
+    super("meta/js/encodedc.js");
   }
   
-  @Override
-  public String toString() {
-    return String.format("%s", value);
-  }
 }
