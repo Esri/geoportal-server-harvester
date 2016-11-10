@@ -17,7 +17,9 @@ package com.esri.geoportal.geoportal.harvester.ckan;
 
 import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.constants.MimeTypeUtils;
 import com.esri.geoportal.commons.http.BotsHttpClient;
+import com.esri.geoportal.commons.meta.ArrayAttribute;
 import com.esri.geoportal.commons.meta.Attribute;
 import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaBuilder;
@@ -26,6 +28,7 @@ import com.esri.geoportal.commons.meta.StringAttribute;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_DESCRIPTION;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_IDENTIFIER;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_MODIFIED;
+import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_REFERENCES;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_RESOURCE_URL;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_RESOURCE_URL_SCHEME;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_TITLE;
@@ -33,7 +36,6 @@ import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.geoportal.commons.ckan.client.Client;
 import com.esri.geoportal.geoportal.commons.ckan.client.Dataset;
-import com.esri.geoportal.geoportal.commons.ckan.client.Resource;
 import com.esri.geoportal.geoportal.commons.ckan.client.Response;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
@@ -49,11 +51,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -149,8 +153,6 @@ import org.w3c.dom.Document;
     private final TransformerFactory tf = TransformerFactory.newInstance();
     
     private java.util.Iterator<Dataset> dataSetsIter;
-    private Dataset dataSet;
-    private java.util.Iterator<Resource> resourcesIter;
     
     private final int limit = 10;
     private int offset = 0;
@@ -162,16 +164,8 @@ import org.w3c.dom.Document;
     @Override
     public boolean hasNext() throws DataInputException {
       try {
-        if (resourcesIter!=null && resourcesIter.hasNext()) {
-          return true;
-        }
-        
         if (dataSetsIter!=null && dataSetsIter.hasNext()) {
-          dataSet = dataSetsIter.next();
-          if (dataSet!=null && dataSet.resources!=null) {
-            resourcesIter = dataSet.resources.iterator();
-          }
-          return hasNext();
+          return true;
         }
 
         Response response = client.listPackages(limit, offset);
@@ -194,18 +188,39 @@ import org.w3c.dom.Document;
     @Override
     public DataReference next() throws DataInputException {
       try {
-        Resource resource = resourcesIter.next();
+        Dataset dataSet = dataSetsIter.next();
+        
         HashMap<String,Attribute> attrs = new HashMap<>();
-        String id = firstNonBlank(resource.id,dataSet.id);
+        String id = firstNonBlank(dataSet.id);
         attrs.put(WKA_IDENTIFIER, new StringAttribute(id));
-        attrs.put(WKA_TITLE, new StringAttribute(firstNonBlank(resource.name,dataSet.title,dataSet.name)));
-        attrs.put(WKA_DESCRIPTION, new StringAttribute(firstNonBlank(resource.description)));
+        attrs.put(WKA_TITLE, new StringAttribute(firstNonBlank(dataSet.title,dataSet.name)));
+        attrs.put(WKA_DESCRIPTION, new StringAttribute(firstNonBlank(dataSet.notes)));
         attrs.put(WKA_MODIFIED, new StringAttribute(dataSet.metadata_modified));
-        attrs.put(WKA_RESOURCE_URL, new StringAttribute(resource.url));
-        String schemeName = generateSchemeName(resource.url);
-        if (schemeName!=null) {
-          attrs.put(WKA_RESOURCE_URL_SCHEME, new StringAttribute(schemeName));
+        
+        if (dataSet.resources!=null) {
+          final List<Attribute> references = new ArrayList<>();
+          dataSet.resources.forEach(resource->{
+            HashMap<String,Attribute> reference = new HashMap<>();
+            if (resource.url!=null) {
+              String scheme = generateSchemeName(resource.url);
+              reference.put(WKA_RESOURCE_URL, new StringAttribute(resource.url));
+              if (scheme!=null) {
+                reference.put(WKA_RESOURCE_URL_SCHEME, new StringAttribute(scheme));
+              }
+            }
+            references.add(new MapAttribute(reference));
+          });
+          if (references.size()==1) {
+            Map<String, Attribute> namedAttributes = references.get(0).getNamedAttributes();
+            attrs.put(WKA_RESOURCE_URL, namedAttributes.get(WKA_RESOURCE_URL));
+            if (namedAttributes.containsKey(WKA_RESOURCE_URL_SCHEME)) {
+              attrs.put(WKA_RESOURCE_URL_SCHEME, namedAttributes.get(WKA_RESOURCE_URL_SCHEME));
+            }
+          } else if (!references.isEmpty()) {
+            attrs.put(WKA_REFERENCES, new ArrayAttribute(references));
+          }
         }
+        
         Document doc = metaBuilder.create(new MapAttribute(attrs));
         DOMSource domSource = new DOMSource(doc);
         StringWriter writer = new StringWriter();
@@ -213,7 +228,7 @@ import org.w3c.dom.Document;
         Transformer transformer = tf.newTransformer();
         transformer.transform(domSource, result);
 
-        return new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, parseIsoDate(resource.created), URI.create(id), writer.toString().getBytes("UTF-8"), MimeType.APPLICATION_XML);
+        return new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, parseIsoDate(dataSet.metadata_modified), URI.create(id), writer.toString().getBytes("UTF-8"), MimeType.APPLICATION_XML);
       } catch (MetaException|TransformerException|URISyntaxException|UnsupportedEncodingException|IllegalArgumentException ex) {
         throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
       }
@@ -224,7 +239,7 @@ import org.w3c.dom.Document;
     }
     
   }
-    
+  
   private String generateSchemeName(String url) {
     String serviceType = url!=null? ItemType.matchPattern(url).stream()
             .filter(it->it.getServiceType()!=null)
@@ -233,13 +248,17 @@ import org.w3c.dom.Document;
     if (serviceType!=null) {
       return "urn:x-esri:specification:ServiceType:ArcGIS:"+serviceType;
     }
-    HashSet<MimeType> mimes = new HashSet<>();
-    ItemType.matchPattern(url).stream()
-            .filter(it->it.getServiceType()==null)
-            .map(ItemType::getMimeTypes)
-            .forEach(a->Arrays.asList(a).stream().forEach(mimes::add));
-    MimeType mime = mimes.stream().findFirst().orElse(null);
-    return mime!=null? mime.getName(): null;
+    if (url!=null) {
+      int idx = url.lastIndexOf(".");
+      if (idx>=0) {
+        String ext = url.substring(idx+1);
+        MimeType mimeType = MimeTypeUtils.mapExtension(ext);
+        if (mimeType!=null) {
+          return "urn:"+mimeType.getName();
+        }
+      }
+    }
+    return null;
   }
 
   /**
@@ -248,7 +267,7 @@ import org.w3c.dom.Document;
    * @param strDate ISO date as string
    * @return date object or <code>null</code> if unable to parse date
    */
-  private static Date parseIsoDate(String strDate) {
+  private Date parseIsoDate(String strDate) {
     try {
       return Date.from(ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(strDate)).toInstant());
     } catch (Exception ex) {

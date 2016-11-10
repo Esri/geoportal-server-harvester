@@ -3,6 +3,7 @@ text/xml=xml
 text/csv=csv
 text/css=css
 application/xml=xml
+application/javascript=js
 application/json=json
 application/pdf=pdf
 application/msword=doc dot

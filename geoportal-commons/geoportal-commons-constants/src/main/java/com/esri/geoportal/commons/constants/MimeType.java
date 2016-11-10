@@ -52,6 +52,7 @@ public enum MimeType {
   APPLICATION_ATOM_XML("application/atom+xml"),
   APPLICATION_FORM_URLENCODED("application/x-www-form-urlencoded"),
   APPLICATION_JSON("application/json"),
+  APPLICATION_JAVASCRIPT("application/javascript"),
   APPLICATION_OCTET_STREAM("application/octet-stream"),
   APPLICATION_XHTML_XML("application/xhtml+xml"),
   APPLICATION_XML("application/xml"),

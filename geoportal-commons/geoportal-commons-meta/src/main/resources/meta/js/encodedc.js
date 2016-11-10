@@ -66,7 +66,7 @@ function create(attributes) {
     B.writeEndElement();
   }
   
-  var urls = readArray(attributes,"urls");
+  var urls = readArray(attributes,"references");
   if (urls) {
     for (i=0; i<urls.length; i++) {
       var urlInfo = urls[i];
@@ -81,8 +81,8 @@ function create(attributes) {
         } else if (urlInfo.isMap()) {
           var values = urlInfo.getNamedAttributes();
           if (values) {
-            var url = values.get("url");
-            var scheme = values.get("scheme");
+            var url = values.get("resource.url");
+            var scheme = values.get("resource.url.scheme");
             if (url) {
               B.writeStartElement("dct","references",URI.DCT);
               if (scheme) {
