@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpException;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
@@ -89,6 +88,9 @@ import org.slf4j.LoggerFactory;
         throw ex;
       }
     }
+    
+    LOG.debug(String.format("WAF FILES in %s: %s",folderUrl,files.toString()));
+    LOG.debug(String.format("WAF SUBFOLDERS in %s: %s",folderUrl,subFolders.toString()));
 
     return new WafFolderContent(this, subFolders, files);
   }

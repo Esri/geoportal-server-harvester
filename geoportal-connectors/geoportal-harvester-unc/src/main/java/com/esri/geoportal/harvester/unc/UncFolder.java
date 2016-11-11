@@ -27,11 +27,14 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * UNC folder.
  */
 /*package*/ class UncFolder {
+  private static final Logger LOG = LoggerFactory.getLogger(UncFolder.class);
   private static final FileSystem fileSystem = FileSystems.getDefault();
   private static final String DEFAULT_MATCH_PATTERN = "**.xml";
   
@@ -71,7 +74,10 @@ import org.apache.commons.lang3.StringUtils;
         files.add(new UncFile(broker, f));
       }
     });
-
+    
+    LOG.debug(String.format("UNC FILES in %s: %s",folder,files.toString()));
+    LOG.debug(String.format("UNC SUBFOLDERS in %s: %s",folder,subFolders.toString()));
+    
     return new UncFolderContent(this, subFolders, files);
   }
 
