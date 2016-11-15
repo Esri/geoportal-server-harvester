@@ -18,11 +18,11 @@ package com.esri.geoportal.harvester.unc;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.constants.MimeTypeUtils;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Date;
 import org.apache.commons.io.IOUtils;
 
@@ -31,14 +31,14 @@ import org.apache.commons.io.IOUtils;
  */
 /*package*/ class UncFile {
   private final UncBroker broker;
-  private final File file;
+  private final Path file;
 
   /**
    * Creates instance of UNC file.
    * @param broker broker
    * @param file file
    */
-  public UncFile(UncBroker broker, File file) {
+  public UncFile(UncBroker broker, Path file) {
     this.broker = broker;
     this.file = file;
   }
@@ -52,8 +52,8 @@ import org.apache.commons.io.IOUtils;
   public SimpleDataReference readContent() throws IOException, URISyntaxException {
     Date lastModifiedDate = readLastModifiedDate();
     MimeType contentType = readContentType();
-    try (InputStream input = new FileInputStream(file)) {
-      return new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), file.getAbsolutePath(), lastModifiedDate, file.toURI(), IOUtils.toByteArray(input), contentType);
+    try (InputStream input = Files.newInputStream(file)) {
+      return new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), file.toAbsolutePath().toString(), lastModifiedDate, file.toUri(), IOUtils.toByteArray(input), contentType);
     }
   }
 
@@ -61,8 +61,8 @@ import org.apache.commons.io.IOUtils;
    * Reads last modified date.
    * @return last modified date
    */
-  private Date readLastModifiedDate() {
-    return new Date(file.lastModified());
+  private Date readLastModifiedDate() throws IOException {
+    return new Date(Files.getLastModifiedTime(file).toMillis());
   }
   
   /**
@@ -71,7 +71,7 @@ import org.apache.commons.io.IOUtils;
    */
   private MimeType readContentType() {
     try {
-      String strFileUrl = file.getAbsolutePath();
+      String strFileUrl = file.toAbsolutePath().toString();
       int lastDotIndex = strFileUrl.lastIndexOf(".");
       String ext = lastDotIndex>=0? strFileUrl.substring(lastDotIndex+1): "";
       return MimeTypeUtils.mapExtension(ext);

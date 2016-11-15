@@ -24,6 +24,7 @@ import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 
 /**
@@ -114,7 +115,7 @@ import java.util.LinkedList;
         }
 
         if (subFolders==null) {
-          UncFolderContent content = new UncFolder(UncBroker.this, definition.getRootFolder(), definition.getPattern(), iteratorContext.getLastHarvestDate()).readContent();
+          UncFolderContent content = new UncFolder(UncBroker.this, Paths.get(definition.getRootFolder().getAbsolutePath()), definition.getPattern(), iteratorContext.getLastHarvestDate()).readContent();
           subFolders = new LinkedList<>(content.getSubFolders());
           files = new LinkedList<>(content.getFiles());
           return hasNext();

@@ -15,15 +15,14 @@
  */
 package com.esri.geoportal.harvester.unc;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +38,7 @@ import org.slf4j.LoggerFactory;
   private static final String DEFAULT_MATCH_PATTERN = "**.xml";
   
   private final UncBroker broker;
-  private final File folder;
+  private final Path folder;
   private final String matchPattern;
   private final Date since;
 
@@ -50,7 +49,7 @@ import org.slf4j.LoggerFactory;
    * @param matchPattern match pattern
    * @param since since date
    */
-  public UncFolder(UncBroker broker, File folder, String matchPattern, Date since) {
+  public UncFolder(UncBroker broker, Path folder, String matchPattern, Date since) {
     this.broker = broker;
     this.folder = folder;
     this.matchPattern = StringUtils.defaultIfBlank(matchPattern, DEFAULT_MATCH_PATTERN);
@@ -67,11 +66,18 @@ import org.slf4j.LoggerFactory;
     List<UncFile> files = new ArrayList<>();
     List<UncFolder> subFolders = new ArrayList<>();
 
-    Arrays.asList(folder.listFiles()).forEach(f->{
-      if (f.isDirectory()) {
-        subFolders.add(new UncFolder(broker, f, matchPattern, since));
-      } else if (f.isFile() && matchFileName(f, matchPattern) && (since==null || f.lastModified()>=since.getTime())) {
-        files.add(new UncFile(broker, f));
+    Files.list(folder).forEach(f->{
+      try {
+        if (Files.isSymbolicLink(f)) {
+          f = f.toRealPath();
+        }
+        if (Files.isDirectory(f)) {
+          subFolders.add(new UncFolder(broker, f, matchPattern, since));
+        } else if (Files.isRegularFile(f) && matchFileName(f, matchPattern) && (since==null || Files.getLastModifiedTime(f).toMillis()>=since.getTime())) {
+          files.add(new UncFile(broker, f));
+        }
+      } catch (IOException ex) {
+        LOG.warn(String.format("Error processing path element: %s", f), ex);
       }
     });
     
@@ -92,8 +98,7 @@ import org.slf4j.LoggerFactory;
    * @param pattern match patter (glob)
    * @return <code>true</code> if URL matches the pattern
    */
-  private boolean matchFileName(File file, String pattern) {
-    Path path = file.toPath();
+  private boolean matchFileName(Path path, String pattern) {
     PathMatcher pathMatcher = fileSystem.getPathMatcher("glob:"+pattern);
     return pathMatcher.matches(path);
   }
