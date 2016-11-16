@@ -28,14 +28,16 @@ define(["dojo/_base/declare",
         "dojo/dom-construct",
         "dijit/form/Button",
         "hrv/rest/Processes",
-        "hrv/ui/processes/Process"
+        "hrv/rest/Triggers",
+        "hrv/ui/processes/Process",
+        "hrv/ui/processes/Trigger"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
            lang,array,topic,on,domStyle,domConstruct,
            Button,
-           ProcessesREST,Process
+           ProcessesREST,TriggersREST,Process, Trigger
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
@@ -65,6 +67,7 @@ define(["dojo/_base/declare",
       
       load: function() {
         domConstruct.empty(this.processesNode);
+        domConstruct.empty(this.triggersNode);
 
         ProcessesREST.list().then(
           lang.hitch(this,this.processProcesses),
@@ -72,6 +75,23 @@ define(["dojo/_base/declare",
             topic.publish("msg",this.i18n.processes.errors.loading);
           })
         );
+
+        TriggersREST.list().then(
+          lang.hitch(this,this.processTriggers),
+          lang.hitch(this,function(error){
+            topic.publish("msg",this.i18n.triggers.errors.loading);
+          })
+        );
+      },
+      
+      processTriggers: function(response) {
+        array.forEach(response,lang.hitch(this,this.processSingleTrigger));
+      },
+      
+      processSingleTrigger: function(info) {
+        var widget = new Trigger(info).placeAt(this.triggersNode);
+        on(widget,"reload",lang.hitch(this,this.load));
+        widget.startup();
       },
       
       _onPurge: function() {

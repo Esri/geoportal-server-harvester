@@ -157,6 +157,10 @@ html,body {
   background-color: lightgray;
 }
 
+.h-processes-footer {
+  margin-bottom: 2em;
+}
+
 .h-processes-process > span {
   margin-right: 1em;
 }
@@ -175,6 +179,35 @@ html,body {
 }
 
 .h-processes-process-cancel {
+  text-decoration: underline;
+  cursor: pointer;
+  color: red;
+}
+
+.h-processes-trigger {
+  
+}
+
+.h-processes-trigger-caption {
+  font-size: medium;
+  font-weight: bold;
+  background-color: lightgray;
+}
+
+.h-processes-trigger > span {
+  margin-right: 1em;
+}
+
+.h-processes-trigger-uuid {
+  color: lightgray;
+  display: none;
+}
+
+.h-processes-trigger-title {
+ font-weight: bold; 
+}
+
+.h-processes-trigger-cancel {
   text-decoration: underline;
   cursor: pointer;
   color: red;

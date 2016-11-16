@@ -104,6 +104,15 @@ define({
         loading: "Error loading processes",
         canceling: "Error canceling process"
       }
+    },
+    
+    triggers: {
+      caption: "Scheduled processes",
+      cancel: "cancel",
+      errors: {
+        loading: "Error loading triggers",
+        canceling: "Error canceling trigger"
+      }
     }
 
   }
