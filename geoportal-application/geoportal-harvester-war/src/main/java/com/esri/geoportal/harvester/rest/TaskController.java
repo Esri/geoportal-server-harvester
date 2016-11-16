@@ -354,7 +354,6 @@ public class TaskController {
       return new ResponseEntity<>(new ProcessResponse(
               ref.getProcessId(), 
               taskDefinition, 
-              ref.getProcess().getTitle(), 
               ref.getProcess().getStatus()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -380,7 +379,6 @@ public class TaskController {
       return new ResponseEntity<>(new ProcessResponse(
               ref.getProcessId(), 
               taskDefinition, 
-              ref.getProcess().getTitle(), 
               ref.getProcess().getStatus()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

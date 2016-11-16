@@ -79,7 +79,7 @@ public class ProcessController {
       LOG.debug(String.format("GET /rest/harvester/processes/%s", processId));
       ProcessInstance process = engine.getProcessesService().getProcess(processId);
       Statistics statistics = engine.getProcessesService().getStatistics(processId);
-      return new ResponseEntity<>(process!=null? new ProcessStatisticsResponse(processId, process.getTitle(), process.getStatus(), statistics): null,HttpStatus.OK);
+      return new ResponseEntity<>(process!=null? new ProcessStatisticsResponse(processId, process.getTask().getTaskDefinition(), process.getStatus(), statistics): null,HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error getting process info: %s", processId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -106,7 +106,6 @@ public class ProcessController {
       return new ResponseEntity<>(process!=null? new ProcessResponse(
               processId, 
               process.getTask().getTaskDefinition(), 
-              process.getTitle(), 
               process.getStatus()): null, HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error aborting process: %s", processId), ex);
@@ -127,7 +126,6 @@ public class ProcessController {
               .map(e->new ProcessResponse(
                       e.getKey(),
                       e.getValue().getTask().getTaskDefinition(), 
-                      e.getValue().getTitle(),
                       e.getValue().getStatus()))
               .collect(Collectors.toList()).toArray(new ProcessResponse[0]), HttpStatus.OK);
     } catch (DataProcessorException ex) {
@@ -146,7 +144,6 @@ public class ProcessController {
             .map(e->new ProcessResponse(
                     e.getKey(),
                     e.getValue().getTask().getTaskDefinition(), 
-                    e.getValue().getTitle(),
                     e.getValue().getStatus()))
             .collect(Collectors.toList()).toArray(new ProcessResponse[0]);
   }

@@ -18,7 +18,6 @@ package com.esri.geoportal.harvester.api.defs;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.general.Link;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -105,6 +104,6 @@ public final class Task {
   
   @Override
   public String toString() {
-    return String.format("TASK :: %s", getTaskDefinition());
+    return String.format("%s", getTaskDefinition());
   }
 }

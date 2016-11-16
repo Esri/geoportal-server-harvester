@@ -25,20 +25,17 @@ import java.util.UUID;
 public final class ProcessResponse {
   private final UUID uuid;
   private final TaskDefinition taskDefinition;
-  private final String description;
   private final ProcessInstance.Status status;
 
   /**
    * Creates instance of the process info.
    * @param uuid process uuid
    * @param taskDefinition task definition
-   * @param description process description
    * @param status process status
    */
-  public ProcessResponse(UUID uuid, TaskDefinition taskDefinition, String description, ProcessInstance.Status status) {
+  public ProcessResponse(UUID uuid, TaskDefinition taskDefinition, ProcessInstance.Status status) {
     this.uuid = uuid;
     this.taskDefinition = taskDefinition;
-    this.description = description;
     this.status = status;
   }
 
@@ -48,14 +45,6 @@ public final class ProcessResponse {
    */
   public UUID getUuid() {
     return uuid;
-  }
-
-  /**
-   * Gets process description.
-   * @return process description
-   */
-  public String getDescription() {
-    return description;
   }
 
   /**
@@ -76,7 +65,7 @@ public final class ProcessResponse {
   
   @Override
   public String toString() {
-    return String.format("PROCESS :: id: %s, description: %s, status: %s", uuid, description, status);
+    return String.format("PROCESS :: id: %s, task: %s, status: %s", uuid, taskDefinition, status);
   }
   
 }

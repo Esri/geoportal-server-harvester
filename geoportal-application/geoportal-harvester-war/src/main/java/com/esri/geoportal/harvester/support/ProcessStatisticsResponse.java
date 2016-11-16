@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.support;
 
 import com.esri.geoportal.harvester.api.ProcessInstance;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.engine.utils.Statistics;
 import java.util.UUID;
 
@@ -24,20 +25,20 @@ import java.util.UUID;
  */
 public final class ProcessStatisticsResponse {
   private final UUID uuid;
-  private final String description;
+  private final TaskDefinition taskDefinition;
   private final ProcessInstance.Status status;
   private final Statistics statistics;
 
   /**
    * Creates instance of the process info.
    * @param uuid process uuid
-   * @param description process description
+   * @param taskDefinition task definition
    * @param status process status
    * @param statistics statistics
    */
-  public ProcessStatisticsResponse(UUID uuid, String description, ProcessInstance.Status status, Statistics statistics) {
+  public ProcessStatisticsResponse(UUID uuid, TaskDefinition taskDefinition, ProcessInstance.Status status, Statistics statistics) {
     this.uuid = uuid;
-    this.description = description;
+    this.taskDefinition = taskDefinition;
     this.status = status;
     this.statistics = statistics;
   }
@@ -51,11 +52,11 @@ public final class ProcessStatisticsResponse {
   }
 
   /**
-   * Gets process description.
-   * @return process description
+   * Task definition.
+   * @return task definition
    */
-  public String getDescription() {
-    return description;
+  public TaskDefinition getTaskDefinition() {
+    return taskDefinition;
   }
 
   /**
@@ -76,6 +77,6 @@ public final class ProcessStatisticsResponse {
   
   @Override
   public String toString() {
-    return String.format("PROCESS/STATISTICS :: id: %s, description: %s, status: %s, statistics: %s", uuid, description, status, statistics);
+    return String.format("PROCESS/STATISTICS :: id: %s, task: %s, status: %s, statistics: %s", uuid, taskDefinition, status, statistics);
   }
 }

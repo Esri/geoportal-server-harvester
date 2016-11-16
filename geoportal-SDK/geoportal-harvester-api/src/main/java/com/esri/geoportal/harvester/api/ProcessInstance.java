@@ -34,13 +34,6 @@ public interface ProcessInstance {
    * @return task
    */
   Task getTask();
-
-  /**
-   * Gets process title.
-   *
-   * @return process title
-   */
-  String getTitle();
   
   /**
    * Initialize process.

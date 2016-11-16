@@ -84,6 +84,10 @@ public class DefaultProcessor implements Processor {
     private volatile boolean completed;
     private volatile boolean aborting;
 
+    private String getTitle() {
+      return task.getTaskDefinition().toString();
+    }
+    
     /**
      * Initializes all elements.
      * @param context init context
@@ -170,16 +174,6 @@ public class DefaultProcessor implements Processor {
     @Override
     public void addListener(ProcessInstance.Listener listener) {
       listeners.add(listener);
-    }
-
-    /**
-     * Gets process title.
-     *
-     * @return process title
-     */
-    @Override
-    public String getTitle() {
-      return String.format("%s --> %s", task.getDataSource().toString(), task.getDataDestinations());
     }
 
     /**
