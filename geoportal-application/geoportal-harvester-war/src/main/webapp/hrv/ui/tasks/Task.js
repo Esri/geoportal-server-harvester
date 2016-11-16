@@ -31,6 +31,7 @@ define(["dojo/_base/declare",
         "hrv/rest/Tasks",
         "hrv/rest/Triggers",
         "hrv/ui/tasks/SchedulerEditorPane",
+        "hrv/utils/TaskUtils"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
@@ -38,7 +39,7 @@ define(["dojo/_base/declare",
            lang,array,domAttr,topic,on,json,all,
            Dialog,
            TasksREST, TriggersREST,
-           SchedulerEditorPane
+           SchedulerEditorPane, TaskUtils
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
@@ -47,7 +48,7 @@ define(["dojo/_base/declare",
       
       constructor: function(args) {
         this.data = args;
-        this.label = this.makeLabel(this.data.taskDefinition);
+        this.label = TaskUtils.makeLabel(this.data.taskDefinition);
       },
     
       postCreate: function(){
@@ -134,48 +135,6 @@ define(["dojo/_base/declare",
             topic.publish("msg",new Error("Unable to read scheduling"));
           })
         );
-      },
-      
-      makeLabel: function(taskDefinition) {
-        var sourceLabel = taskDefinition.source? taskDefinition.source.label: "";
-        var destLabel = "";
-        if (taskDefinition.destinations) {
-          array.forEach(taskDefinition.destinations,lang.hitch(this,function(linkDefinition){
-            var label =this.makeLinkLabel(linkDefinition);
-            if (label) {
-              if (!destLabel || destLabel.length==0) {
-                destLabel = label;
-              } else {
-                destLabel += ", "+label;
-              }
-            }
-          }));
-          if (taskDefinition.destinations.length>1) {
-            destLabel = "[" + destLabel + "]";
-          }
-        }
-        return sourceLabel + " -> " + destLabel;
-      },
-      
-      makeLinkLabel: function(linkDefinition) {
-        if (linkDefinition.drains && linkDefinition.drains.length>0) {
-          var destLabel = null;
-          array.forEach(linkDefinition.drains,lang.hitch(this,function(linkDefinition){
-            var label = this.makeLinkLabel(linkDefinition);
-            if (label) {
-              if (!destLabel || destLabel.length==0) {
-                destLabel = label;
-              } else {
-                destLabel += ", "+label;
-              }
-            }
-          }));
-          return destLabel;
-        } else if (linkDefinition.action) {
-          return linkDefinition.action.label;
-        } else {
-          return null;
-        }
       }
     });
 });

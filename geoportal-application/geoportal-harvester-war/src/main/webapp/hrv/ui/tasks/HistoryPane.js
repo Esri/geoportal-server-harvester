@@ -26,13 +26,14 @@ define(["dojo/_base/declare",
         "dojo/dom-style",
         "dojo/html",
         "hrv/rest/Tasks",
-        "hrv/ui/tasks/Event"
+        "hrv/ui/tasks/Event",
+        "hrv/utils/TaskUtils"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
            lang,array,topic,domStyle,html,
-           TasksREST,Event
+           TasksREST,Event,TaskUtils
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
@@ -52,7 +53,7 @@ define(["dojo/_base/declare",
         }
         domStyle.set(this.domNode,"display", evt.type==="history"? "block": "none");
         if (evt.data && evt.data.taskDefinition) {
-          html.set(this.labelNode, this.makeLabel(evt.data.taskDefinition));
+          html.set(this.labelNode, TaskUtils.makeLabel(evt.data.taskDefinition));
           TasksREST.history(evt.data.uuid).then(
             lang.hitch(this,this.processHistory),
             lang.hitch(this,function(error){
@@ -73,49 +74,6 @@ define(["dojo/_base/declare",
         widget.placeAt(this.contentNode);
         widget.startup();
         this.widgets.push(widget);
-      },
-      
-      
-      makeLabel: function(taskDefinition) {
-        var sourceLabel = taskDefinition.source? taskDefinition.source.label: "";
-        var destLabel = "";
-        if (taskDefinition.destinations) {
-          array.forEach(taskDefinition.destinations,lang.hitch(this,function(linkDefinition){
-            var label =this.makeLinkLabel(linkDefinition);
-            if (label) {
-              if (!destLabel || destLabel.length==0) {
-                destLabel = label;
-              } else {
-                destLabel += ", "+label;
-              }
-            }
-          }));
-          if (taskDefinition.destinations.length>1) {
-            destLabel = "[" + destLabel + "]";
-          }
-        }
-        return sourceLabel + " -> " + destLabel;
-      },
-      
-      makeLinkLabel: function(linkDefinition) {
-        if (linkDefinition.drains && linkDefinition.drains.length>0) {
-          var destLabel = null;
-          array.forEach(linkDefinition.drains,lang.hitch(this,function(linkDefinition){
-            var label = this.makeLinkLabel(linkDefinition);
-            if (label) {
-              if (!destLabel || destLabel.length==0) {
-                destLabel = label;
-              } else {
-                destLabel += ", "+label;
-              }
-            }
-          }));
-          return destLabel;
-        } else if (linkDefinition.action) {
-          return linkDefinition.action.label;
-        } else {
-          return null;
-        }
       }
     });
 });
