@@ -103,7 +103,11 @@ public class ProcessController {
           LOG.warn("Unable to abort the process.", ex);
         }
       }
-      return new ResponseEntity<>(process!=null? new ProcessResponse(processId, process.getTitle(), process.getStatus()): null, HttpStatus.OK);
+      return new ResponseEntity<>(process!=null? new ProcessResponse(
+              processId, 
+              process.getTask().getTaskDefinition(), 
+              process.getTitle(), 
+              process.getStatus()): null, HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error aborting process: %s", processId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -120,7 +124,11 @@ public class ProcessController {
       LOG.debug(String.format("DELETE /rest/harvester/processes"));
       List<Map.Entry<UUID, ProcessInstance>> completed = engine.getProcessesService().removeCompleted();
       return new ResponseEntity<>(completed.stream()
-              .map(e->new ProcessResponse(e.getKey(),e.getValue().getTitle(),e.getValue().getStatus()))
+              .map(e->new ProcessResponse(
+                      e.getKey(),
+                      e.getValue().getTask().getTaskDefinition(), 
+                      e.getValue().getTitle(),
+                      e.getValue().getStatus()))
               .collect(Collectors.toList()).toArray(new ProcessResponse[0]), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error purging processes"), ex);
@@ -135,7 +143,11 @@ public class ProcessController {
    */
   private ProcessResponse[] filterProcesses(Predicate<? super Map.Entry<UUID, ProcessInstance>> predicate) throws DataProcessorException {
     return engine.getProcessesService().selectProcesses(predicate).stream()
-            .map(e->new ProcessResponse(e.getKey(),e.getValue().getTitle(),e.getValue().getStatus()))
+            .map(e->new ProcessResponse(
+                    e.getKey(),
+                    e.getValue().getTask().getTaskDefinition(), 
+                    e.getValue().getTitle(),
+                    e.getValue().getStatus()))
             .collect(Collectors.toList()).toArray(new ProcessResponse[0]);
   }
   

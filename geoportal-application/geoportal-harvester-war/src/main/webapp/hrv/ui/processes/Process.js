@@ -25,13 +25,14 @@ define(["dojo/_base/declare",
         "dojo/dom-style",
         "dojo/html",
         "dojo/topic",
-        "hrv/rest/Processes"
+        "hrv/rest/Processes",
+        "hrv/utils/TaskUtils"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
            lang,domClass,domStyle,html,topic,
-           ProcessesREST
+           ProcessesREST, TaskUtils
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
@@ -44,6 +45,7 @@ define(["dojo/_base/declare",
       },
     
       postCreate: function(){
+        html.set(this.titleNode,TaskUtils.makeLabel(this.data.taskDefinition));
         var update = lang.hitch(this,function(){
           ProcessesREST.get(this.data.uuid).then(
             lang.hitch(this,function(result){

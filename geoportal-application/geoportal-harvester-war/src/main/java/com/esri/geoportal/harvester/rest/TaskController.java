@@ -351,7 +351,11 @@ public class TaskController {
       ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref.getProcess(), historyManager));
       ref.getProcess().init();
       ref.getProcess().begin();
-      return new ResponseEntity<>(new ProcessResponse(ref.getProcessId(), ref.getProcess().getTitle(), ref.getProcess().getStatus()), HttpStatus.OK);
+      return new ResponseEntity<>(new ProcessResponse(
+              ref.getProcessId(), 
+              taskDefinition, 
+              ref.getProcess().getTitle(), 
+              ref.getProcess().getStatus()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     } catch (DataProcessorException ex) {
@@ -373,7 +377,11 @@ public class TaskController {
       ProcessReference ref = engine.getExecutionService().execute(taskDefinition, new SimpleIteratorContext());
       ref.getProcess().init();
       ref.getProcess().begin();
-      return new ResponseEntity<>(new ProcessResponse(ref.getProcessId(), ref.getProcess().getTitle(), ref.getProcess().getStatus()), HttpStatus.OK);
+      return new ResponseEntity<>(new ProcessResponse(
+              ref.getProcessId(), 
+              taskDefinition, 
+              ref.getProcess().getTitle(), 
+              ref.getProcess().getStatus()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     } catch (DataProcessorException ex) {

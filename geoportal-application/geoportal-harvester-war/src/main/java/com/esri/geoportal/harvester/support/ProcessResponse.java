@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.support;
 
 import com.esri.geoportal.harvester.api.ProcessInstance;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import java.util.UUID;
 
 /**
@@ -23,17 +24,20 @@ import java.util.UUID;
  */
 public final class ProcessResponse {
   private final UUID uuid;
+  private final TaskDefinition taskDefinition;
   private final String description;
   private final ProcessInstance.Status status;
 
   /**
    * Creates instance of the process info.
    * @param uuid process uuid
+   * @param taskDefinition task definition
    * @param description process description
    * @param status process status
    */
-  public ProcessResponse(UUID uuid, String description, ProcessInstance.Status status) {
+  public ProcessResponse(UUID uuid, TaskDefinition taskDefinition, String description, ProcessInstance.Status status) {
     this.uuid = uuid;
+    this.taskDefinition = taskDefinition;
     this.description = description;
     this.status = status;
   }
@@ -60,6 +64,14 @@ public final class ProcessResponse {
    */
   public ProcessInstance.Status getStatus() {
     return status;
+  }
+
+  /**
+   * Gets task definition.
+   * @return task definition
+   */
+  public TaskDefinition getTaskDefinition() {
+    return taskDefinition;
   }
   
   @Override
