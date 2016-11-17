@@ -51,17 +51,24 @@ public class ReportLogger implements ReportBuilder {
 
   @Override
   public void error(ProcessInstance process, DataInputException ex) {
-    LOG.error(String.format("Error processing task: %s", process), ex);
+    logError(process, ex);
   }
 
   @Override
   public void error(ProcessInstance process, DataOutputException ex) {
-    LOG.error(String.format("Error processing task: %s", process), ex);
+    logError(process, ex);
   }
 
   @Override
   public void error(ProcessInstance process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
-    LOG.error(String.format("Error processing task: %s", process), ex);
+    logError(process, ex);
   }
   
+  private void logError(ProcessInstance process, Exception ex) {
+    if (LOG.isDebugEnabled()) {
+      LOG.error(String.format("Error processing task: %s | %s", process, ex.getMessage()), ex);
+    } else {
+      LOG.error(String.format("Error processing task: %s | %s", process, ex.getMessage()));
+    }
+  }
 }
