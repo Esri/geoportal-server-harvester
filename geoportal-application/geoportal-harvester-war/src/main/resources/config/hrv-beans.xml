@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
+  
+  <bean class="com.esri.geoportal.harvester.agp.AgpOutputConnector">
+    <constructor-arg>
+      <bean class="com.esri.geoportal.harvester.beans.MultiMetaAnalyzerBean"/>
+    </constructor-arg>
+  </bean>
+  
+  <bean class="com.esri.geoportal.harvester.agpsrc.AgpInputConnector">
+    <constructor-arg>
+      <bean class="com.esri.geoportal.harvester.beans.DefaultMetadataBuilderBean"/>
+    </constructor-arg>
+  </bean>
+  
+  <bean class="com.esri.geoportal.harvester.ags.AgsConnector">
+    <constructor-arg>
+      <bean class="com.esri.geoportal.harvester.beans.DefaultMetadataBuilderBean"/>
+    </constructor-arg>
+  </bean>
+  
+  <bean class="com.esri.geoportal.geoportal.harvester.ckan.CkanConnector">
+    <constructor-arg>
+      <bean class="com.esri.geoportal.harvester.beans.DefaultMetadataBuilderBean"/>
+    </constructor-arg>
+  </bean>
+  
+  <bean class="com.esri.geoportal.commons.meta.xml.SimpleDcMetaAnalyzer"/>
+  <bean class="com.esri.geoportal.commons.meta.xml.SimpleFgdcMetaAnalyzer"/>
+  <bean class="com.esri.geoportal.commons.meta.xml.SimpleIso15115MetaAnalyzer"/>
+  <bean class="com.esri.geoportal.commons.meta.xml.SimpleIso15115_2MetaAnalyzer"/>
+  <bean class="com.esri.geoportal.commons.meta.xml.SimpleIso15119MetaAnalyzer"/>
+  
+  <bean class="com.esri.geoportal.harvester.gptsrc.GptConnector"/>
+  <bean class="com.esri.geoportal.harvester.csw.CswConnector"/>
+  <bean class="com.esri.geoportal.harvester.folder.FolderConnector"/>
+  <bean class="com.esri.geoportal.harvester.gpt.GptConnector"/>
+  <bean class="com.esri.geoportal.harvester.unc.UncConnector"/>
+  <bean class="com.esri.geoportal.harvester.waf.WafConnector"/>
+  
+  <bean class="com.esri.geoportal.harvester.engine.triggers.NowTrigger"/>
+  <bean class="com.esri.geoportal.harvester.engine.triggers.AtTrigger"/>
+  <bean class="com.esri.geoportal.harvester.engine.triggers.PeriodTrigger"/>
+  
+  <bean class="com.esri.geoportal.harvester.engine.transformers.XsltTransformer"/>
+  <bean class="com.esri.geoportal.harvester.engine.filters.RegExFilter"/>
+  
+</beans>

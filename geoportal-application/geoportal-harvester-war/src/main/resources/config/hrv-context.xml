@@ -19,10 +19,11 @@
        http://www.springframework.org/schema/mvc/spring-mvc.xsd"
 >
   
+    <!-- Bootstrap -->
 	<context:component-scan base-package="com.esri.geoportal.harvester.rest, com.esri.geoportal.harvester.beans" />
 	<mvc:annotation-driven />
     <mvc:default-servlet-handler />
-
+    
     <bean id="config"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
           p:location="classpath:config/hrv.properties"/>
@@ -37,6 +38,10 @@
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <property name="maxUploadSize" value="268435456"/> <!-- 256 megs -->
     </bean>    
-  <!-- ADD PERSISTENCE SUPPORT HERE (jpa, hibernate, etc) -->
+
+    <!-- Definitions of un-annotated managed beans -->
+	<import resource="hrv-beans.xml" />
+    
+    <!-- ADD PERSISTENCE SUPPORT HERE (jpa, hibernate, etc) -->
 
 </beans>
