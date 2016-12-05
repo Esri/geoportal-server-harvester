@@ -48,4 +48,6 @@
   <bean class="com.esri.geoportal.harvester.engine.transformers.XsltTransformer"/>
   <bean class="com.esri.geoportal.harvester.engine.filters.RegExFilter"/>
   
+  <bean class="com.esri.geoportal.harvester.engine.registers.StatisticsRegistry"/>
+  
 </beans>
