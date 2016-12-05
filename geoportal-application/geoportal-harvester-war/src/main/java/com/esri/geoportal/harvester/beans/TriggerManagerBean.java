@@ -35,9 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.annotation.PreDestroy;
 import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
-import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
 
 /**
  * Trigger manager bean.
