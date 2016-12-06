@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.rest;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.support.ProcessResponse;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.beans.EngineBean;
+import com.esri.geoportal.harvester.engine.services.Engine;
 import com.esri.geoportal.harvester.engine.utils.Statistics;
 import com.esri.geoportal.harvester.support.ProcessStatisticsResponse;
 import java.util.List;
@@ -51,7 +51,7 @@ public class ProcessController {
   private static final Logger LOG = LoggerFactory.getLogger(ProcessController.class);
   
   @Autowired
-  private EngineBean engine;
+  private Engine engine;
   
   /**
    * List all processes.

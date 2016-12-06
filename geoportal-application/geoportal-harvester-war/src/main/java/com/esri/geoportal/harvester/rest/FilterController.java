@@ -16,7 +16,7 @@
 package com.esri.geoportal.harvester.rest;
 
 import com.esri.geoportal.harvester.api.defs.UITemplate;
-import com.esri.geoportal.harvester.beans.EngineBean;
+import com.esri.geoportal.harvester.engine.services.Engine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class FilterController {
   private static final Logger LOG = LoggerFactory.getLogger(FilterController.class);
   
   @Autowired
-  private EngineBean engine;
+  private Engine engine;
   
   /**
    * Lists all filters.

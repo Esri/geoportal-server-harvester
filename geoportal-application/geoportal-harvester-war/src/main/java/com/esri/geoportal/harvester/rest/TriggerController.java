@@ -18,7 +18,7 @@ package com.esri.geoportal.harvester.rest;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
-import com.esri.geoportal.harvester.beans.EngineBean;
+import com.esri.geoportal.harvester.engine.services.Engine;
 import com.esri.geoportal.harvester.engine.utils.TriggerReference;
 import com.esri.geoportal.harvester.support.TriggerResponse;
 import java.util.List;
@@ -49,7 +49,7 @@ public class TriggerController {
   private static final Logger LOG = LoggerFactory.getLogger(TriggerController.class);
   
   @Autowired
-  private EngineBean engine;
+  private Engine engine;
   
   
   /**

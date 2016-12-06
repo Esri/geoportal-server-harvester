@@ -18,13 +18,13 @@ package com.esri.geoportal.harvester.rest;
 import com.esri.geoportal.harvester.api.base.SimpleIteratorContext;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.support.TaskResponse;
-import com.esri.geoportal.harvester.beans.EngineBean;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.managers.History;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
+import com.esri.geoportal.harvester.engine.services.Engine;
 import com.esri.geoportal.harvester.engine.utils.HistoryManagerAdaptor;
 import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
 import com.esri.geoportal.harvester.engine.utils.ProcessReference;
@@ -154,7 +154,7 @@ public class TaskController {
   private static final Logger LOG = LoggerFactory.getLogger(TaskController.class);
 
   @Autowired
-  private EngineBean engine;
+  private Engine engine;
 
   @Autowired
   private HistoryManager historyManager;

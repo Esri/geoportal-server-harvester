@@ -16,13 +16,13 @@
 package com.esri.geoportal.harvester.rest;
 
 import com.esri.geoportal.harvester.api.defs.UITemplate;
+import com.esri.geoportal.harvester.engine.services.Engine;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.esri.geoportal.harvester.beans.EngineBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -160,7 +160,7 @@ public class ConnectorController {
   private static final Logger LOG = LoggerFactory.getLogger(ConnectorController.class);
   
   @Autowired
-  private EngineBean engine;
+  private Engine engine;
   
   /**
    * Lists all inbound connectors. A connector might be: WAF, CSW, etc.
