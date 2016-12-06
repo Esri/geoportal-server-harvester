@@ -4,28 +4,23 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
   
+  <bean class="com.esri.geoportal.harvester.beans.MultiMetaAnalyzerBean" id="metaAnalyzer"/>
+  <bean class="com.esri.geoportal.harvester.beans.DefaultMetadataBuilderBean" id="metaBuilder"/>
+  
   <bean class="com.esri.geoportal.harvester.agp.AgpOutputConnector">
-    <constructor-arg>
-      <bean class="com.esri.geoportal.harvester.beans.MultiMetaAnalyzerBean"/>
-    </constructor-arg>
+    <constructor-arg ref="metaAnalyzer"/>
   </bean>
   
   <bean class="com.esri.geoportal.harvester.agpsrc.AgpInputConnector">
-    <constructor-arg>
-      <bean class="com.esri.geoportal.harvester.beans.DefaultMetadataBuilderBean"/>
-    </constructor-arg>
+    <constructor-arg ref="metaBuilder"/>
   </bean>
   
   <bean class="com.esri.geoportal.harvester.ags.AgsConnector">
-    <constructor-arg>
-      <bean class="com.esri.geoportal.harvester.beans.DefaultMetadataBuilderBean"/>
-    </constructor-arg>
+    <constructor-arg ref="metaBuilder"/>
   </bean>
   
   <bean class="com.esri.geoportal.geoportal.harvester.ckan.CkanConnector">
-    <constructor-arg>
-      <bean class="com.esri.geoportal.harvester.beans.DefaultMetadataBuilderBean"/>
-    </constructor-arg>
+    <constructor-arg ref="metaBuilder"/>
   </bean>
   
   <bean class="com.esri.geoportal.commons.meta.xml.SimpleDcMetaAnalyzer"/>
