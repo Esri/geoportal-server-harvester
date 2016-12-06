@@ -3,38 +3,41 @@
 	xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
-  
+
+  <!-- Services -->  
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultBrokersService" autowire="constructor"/>
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultTasksService" autowire="constructor"/>
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultExecutionService" autowire="constructor"/>
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultTemplatesService" autowire="constructor"/>
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultTriggersService" autowire="constructor"/>
+
+  <!-- Registers -->  
+  <bean class="com.esri.geoportal.harvester.engine.registers.StatisticsRegistry"/>
   
+  <!-- Metadata Analyzers -->
   <bean class="com.esri.geoportal.harvester.beans.MultiMetaAnalyzerBean" id="metaAnalyzer"/>
-  <bean class="com.esri.geoportal.harvester.beans.DefaultMetadataBuilderBean" id="metaBuilder"/>
-  
-  <bean class="com.esri.geoportal.harvester.agp.AgpOutputConnector">
-    <constructor-arg ref="metaAnalyzer"/>
-  </bean>
-  
-  <bean class="com.esri.geoportal.harvester.agpsrc.AgpInputConnector">
-    <constructor-arg ref="metaBuilder"/>
-  </bean>
-  
-  <bean class="com.esri.geoportal.harvester.ags.AgsConnector">
-    <constructor-arg ref="metaBuilder"/>
-  </bean>
-  
-  <bean class="com.esri.geoportal.geoportal.harvester.ckan.CkanConnector">
-    <constructor-arg ref="metaBuilder"/>
-  </bean>
-  
   <bean class="com.esri.geoportal.commons.meta.xml.SimpleDcMetaAnalyzer"/>
   <bean class="com.esri.geoportal.commons.meta.xml.SimpleFgdcMetaAnalyzer"/>
   <bean class="com.esri.geoportal.commons.meta.xml.SimpleIso15115MetaAnalyzer"/>
   <bean class="com.esri.geoportal.commons.meta.xml.SimpleIso15115_2MetaAnalyzer"/>
   <bean class="com.esri.geoportal.commons.meta.xml.SimpleIso15119MetaAnalyzer"/>
   
+  <!-- Metadata Builders -->
+  <bean class="com.esri.geoportal.harvester.beans.DefaultMetadataBuilderBean" id="metaBuilder"/>
+  
+  <!-- Connectors -->
+  <bean class="com.esri.geoportal.harvester.agp.AgpOutputConnector">
+    <constructor-arg ref="metaAnalyzer"/>
+  </bean>
+  <bean class="com.esri.geoportal.harvester.agpsrc.AgpInputConnector">
+    <constructor-arg ref="metaBuilder"/>
+  </bean>
+  <bean class="com.esri.geoportal.harvester.ags.AgsConnector">
+    <constructor-arg ref="metaBuilder"/>
+  </bean>
+  <bean class="com.esri.geoportal.geoportal.harvester.ckan.CkanConnector">
+    <constructor-arg ref="metaBuilder"/>
+  </bean>
   <bean class="com.esri.geoportal.harvester.gptsrc.GptConnector"/>
   <bean class="com.esri.geoportal.harvester.csw.CswConnector"/>
   <bean class="com.esri.geoportal.harvester.folder.FolderConnector"/>
@@ -42,13 +45,15 @@
   <bean class="com.esri.geoportal.harvester.unc.UncConnector"/>
   <bean class="com.esri.geoportal.harvester.waf.WafConnector"/>
   
+  <!-- Triggers -->
   <bean class="com.esri.geoportal.harvester.engine.triggers.NowTrigger"/>
   <bean class="com.esri.geoportal.harvester.engine.triggers.AtTrigger"/>
   <bean class="com.esri.geoportal.harvester.engine.triggers.PeriodTrigger"/>
   
-  <bean class="com.esri.geoportal.harvester.engine.transformers.XsltTransformer"/>
+  <!-- Filters -->
   <bean class="com.esri.geoportal.harvester.engine.filters.RegExFilter"/>
   
-  <bean class="com.esri.geoportal.harvester.engine.registers.StatisticsRegistry"/>
+  <!-- Transformers -->
+  <bean class="com.esri.geoportal.harvester.engine.transformers.XsltTransformer"/>
   
 </beans>
