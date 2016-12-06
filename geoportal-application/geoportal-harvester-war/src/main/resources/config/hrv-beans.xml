@@ -4,6 +4,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
   
+  <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultBrokersService" autowire="constructor"/>
+  <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultTasksService" autowire="constructor"/>
+  <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultExecutionService" autowire="constructor"/>
+  <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultTemplatesService" autowire="constructor"/>
+  <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultTriggersService" autowire="constructor"/>
+  
   <bean class="com.esri.geoportal.harvester.beans.MultiMetaAnalyzerBean" id="metaAnalyzer"/>
   <bean class="com.esri.geoportal.harvester.beans.DefaultMetadataBuilderBean" id="metaBuilder"/>
   
