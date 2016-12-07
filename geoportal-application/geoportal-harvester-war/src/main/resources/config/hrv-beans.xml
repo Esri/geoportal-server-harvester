@@ -26,7 +26,7 @@
   <bean class="com.esri.geoportal.commons.meta.xml.SimpleIso15119MetaAnalyzer"/>
   
   <!-- Metadata Builders -->
-  <bean class="com.esri.geoportal.harvester.beans.DefaultMetadataBuilderBean" id="metaBuilder"/>
+  <bean class="com.esri.geoportal.commons.meta.js.SimpleDcMetaBuilder" id="metaBuilder"/>
   
   <!-- Connectors -->
   <bean class="com.esri.geoportal.harvester.agp.AgpOutputConnector">
