@@ -13,11 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.commons.ckan.client;
+package com.esri.geoportal.commons.ckan.client;
 
 /**
- * Relationship.
+ * Group.
  */
-public class Relationship {
-  
+public class Group {
+  public String display_name;
+  public String description;
+  public String image_display_url;
+  public String title;
+  public String id;
+  public String name;
 }

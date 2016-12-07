@@ -38,7 +38,7 @@
   <bean class="com.esri.geoportal.harvester.ags.AgsConnector">
     <constructor-arg ref="metaBuilder"/>
   </bean>
-  <bean class="com.esri.geoportal.geoportal.harvester.ckan.CkanConnector">
+  <bean class="com.esri.geoportal.harvester.ckan.CkanConnector">
     <constructor-arg ref="metaBuilder"/>
   </bean>
   <bean class="com.esri.geoportal.harvester.gptsrc.GptConnector"/>

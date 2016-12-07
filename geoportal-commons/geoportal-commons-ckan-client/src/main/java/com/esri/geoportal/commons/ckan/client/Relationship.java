@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.commons.ckan.client;
+package com.esri.geoportal.commons.ckan.client;
 
 /**
- * Facets.
+ * Relationship.
  */
-public class Facets {
+public class Relationship {
   
 }

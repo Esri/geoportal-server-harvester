@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.harvester.ckan;
+package com.esri.geoportal.harvester.ckan;
 
 import com.esri.geoportal.commons.meta.MetaBuilder;
-import static com.esri.geoportal.geoportal.harvester.ckan.CkanBrokerDefinitionAdaptor.P_HOST_URL;
+import static com.esri.geoportal.harvester.ckan.CkanBrokerDefinitionAdaptor.P_HOST_URL;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -24,7 +24,7 @@ import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.util.ArrayList;
 import java.util.List;
-import static com.esri.geoportal.geoportal.harvester.ckan.CkanBrokerDefinitionAdaptor.P_API_KEY;
+import static com.esri.geoportal.harvester.ckan.CkanBrokerDefinitionAdaptor.P_API_KEY;
 
 /**
  * CKAN connector.

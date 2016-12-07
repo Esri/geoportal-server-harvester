@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.commons.ckan.client;
+package com.esri.geoportal.commons.ckan.client;
 
 import com.esri.geoportal.commons.constants.HttpConstants;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;

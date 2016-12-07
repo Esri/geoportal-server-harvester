@@ -13,13 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.commons.ckan.client;
-
 /**
- * Response.
+ * Command Line Application bootstrap.
  */
-public class Response {
-  public String help;
-  public Boolean success;
-  public Result result;
-}
+package com.esri.geoportal.cli.boot;

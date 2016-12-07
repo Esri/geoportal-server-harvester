@@ -13,21 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.commons.ckan.client;
+package com.esri.geoportal.commons.ckan.client;
 
 /**
- * Organization.
+ * Resource.
  */
-public class Organization {
-  public String description;
-  public String created;
-  public String title;
-  public String name;
-  public Boolean is_organization;
-  public String state;
-  public String image_url;
-  public String revision_id;
-  public String type;
+public class Resource {
+  public String cache_last_updated;
+  public String package_id;
+  public String webstore_last_updated;
+  public Boolean datastore_active;
   public String id;
-  public String approval_status;
+  public String size;
+  public String state;
+  public String hash;
+  public String description;
+  public String format;
+  public String last_modified;
+  public String url_type;
+  public String mimetype;
+  public String cache_url;
+  public String name;
+  public String created;
+  public String url;
+  public String webstore_url;
+  public String mimetype_inner;
+  public Long position;
+  public String revision_id;
+  public String resource_type;
 }

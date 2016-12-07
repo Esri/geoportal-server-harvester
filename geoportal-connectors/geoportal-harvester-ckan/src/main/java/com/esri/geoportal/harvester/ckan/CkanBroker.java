@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.harvester.ckan;
+package com.esri.geoportal.harvester.ckan;
 
 import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.constants.MimeType;
@@ -34,9 +34,9 @@ import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_RESOURCE_URL
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_TITLE;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
-import com.esri.geoportal.geoportal.commons.ckan.client.Client;
-import com.esri.geoportal.geoportal.commons.ckan.client.Dataset;
-import com.esri.geoportal.geoportal.commons.ckan.client.Response;
+import com.esri.geoportal.commons.ckan.client.Client;
+import com.esri.geoportal.commons.ckan.client.Dataset;
+import com.esri.geoportal.commons.ckan.client.Response;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -55,7 +55,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import javax.xml.transform.Transformer;

@@ -15,6 +15,6 @@
  */
 
 /**
- * CKAN data source.
+ * Lightweight CKAN client.
  */
-package com.esri.geoportal.geoportal.harvester.ckan;
+package com.esri.geoportal.commons.ckan.client;

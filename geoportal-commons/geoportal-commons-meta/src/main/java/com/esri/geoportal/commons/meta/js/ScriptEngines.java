@@ -41,9 +41,9 @@ public class ScriptEngines {
    * <br>Only use for thread safe, immutable JavaScript modules.
    * @param javascriptFile the path to a JavaScript file
    * @return the engine
-   * @throws IOException 
-   * @throws URISyntaxException 
-   * @throws ScriptException 
+   * @throws IOException if reading script fails
+   * @throws URISyntaxException if invalid script URI
+   * @throws ScriptException if invalid script
    */
   public ScriptEngine getCachedEngine(String javascriptFile) 
       throws URISyntaxException, IOException, ScriptException {

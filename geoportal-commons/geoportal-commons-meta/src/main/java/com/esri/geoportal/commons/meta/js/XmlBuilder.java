@@ -43,7 +43,7 @@ public class XmlBuilder {
   
   /**
    * Initialize the builder.
-   * @throws Exception
+   * @throws Exception if initialization fails
    */
   public void init() throws Exception {
     XMLOutputFactory factory = XMLOutputFactory.newInstance();
@@ -53,7 +53,7 @@ public class XmlBuilder {
   
   /**
    * Start the document.
-   * @throws XMLStreamException
+   * @throws XMLStreamException if writing to the stream fails
    */
   public void writeStartDocument() throws XMLStreamException {
     writer.writeStartDocument("UTF-8","1.0");
@@ -61,7 +61,7 @@ public class XmlBuilder {
   
   /**
    * End the document.
-   * @throws XMLStreamException
+   * @throws XMLStreamException if writing to the stream fails
    */
   public void writeEndDocument() throws XMLStreamException {
     writer.writeEndDocument();
@@ -71,7 +71,7 @@ public class XmlBuilder {
    * Starts element.
    * @param namespaceURI namespace URI
    * @param localName local name
-   * @throws XMLStreamException 
+   * @throws XMLStreamException if writing to the stream fails
    */
   public void writeStartElement(String namespaceURI, String localName) throws XMLStreamException {
     writer.writeStartElement(namespaceURI, localName);
@@ -82,7 +82,7 @@ public class XmlBuilder {
    * @param prefix prefix
    * @param localName local name
    * @param namespaceURI namespace URI
-   * @throws XMLStreamException if XML operation fails
+   * @throws XMLStreamException if writing to the stream fails
    */
   public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
     writer.writeStartElement(prefix, localName, namespaceURI);
@@ -90,7 +90,7 @@ public class XmlBuilder {
 
   /**
    * Ends element.
-   * @throws XMLStreamException if XML operation fails
+   * @throws XMLStreamException if writing to the stream fails
    */
   public void writeEndElement() throws XMLStreamException {
     writer.writeEndElement();
@@ -100,7 +100,7 @@ public class XmlBuilder {
    * Writes attribute.
    * @param localName local name
    * @param value value
-   * @throws XMLStreamException if XML operation fails
+   * @throws XMLStreamException if writing to the stream fails
    */
   public void writeAttribute(String localName, String value) throws XMLStreamException {
     writer.writeAttribute(localName, value);
@@ -109,7 +109,7 @@ public class XmlBuilder {
   /**
    * Writes characters.
    * @param text text
-   * @throws XMLStreamException if XML operation fails
+   * @throws XMLStreamException if writing to the stream fails
    */
   public void writeCharacters(String text) throws XMLStreamException {
     writer.writeCharacters(text);

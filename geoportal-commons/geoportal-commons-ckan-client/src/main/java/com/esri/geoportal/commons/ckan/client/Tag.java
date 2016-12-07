@@ -13,8 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.esri.geoportal.commons.ckan.client;
 
 /**
- * Lightweight CKAN client.
+ * Tag.
  */
-package com.esri.geoportal.geoportal.commons.ckan.client;
+public class Tag {
+  public String vocabulary_id;
+  public String state;
+  public String display_name;
+  public String id;
+  public String name;
+}

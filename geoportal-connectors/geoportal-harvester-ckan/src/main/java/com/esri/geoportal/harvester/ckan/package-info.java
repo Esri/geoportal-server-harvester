@@ -13,16 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.commons.ckan.client;
-
-import java.util.List;
 
 /**
- * Result.
+ * CKAN data source.
  */
-public class Result {
-  public Long count;
-  public String sort;
-  public Facets facets;
-  public List<Dataset> results;
-}
+package com.esri.geoportal.harvester.ckan;

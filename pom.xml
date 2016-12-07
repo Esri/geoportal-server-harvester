@@ -32,7 +32,7 @@
               </group>
               <group>
                 <title>Connectors</title>
-                <packages>com.esri.geoportal.harvester.console:com.esri.geoportal.harvester.gpt:com.esri.geoportal.harvester.gptsrc:com.esri.geoportal.harvester.gpt.*:com.esri.geoportal.harvester.waf:com.esri.geoportal.harvester.csw:com.esri.geoportal.harvester.csw.*:com.esri.geoportal.harvester.folder:com.esri.geoportal.harvester.unc:com.esri.geoportal.harvester.ags:com.esri.geoportal.harvester.agp:com.esri.geoportal.harvester.agpsrc</packages>
+                <packages>com.esri.geoportal.harvester.console:com.esri.geoportal.harvester.gpt:com.esri.geoportal.harvester.gptsrc:com.esri.geoportal.harvester.gpt.*:com.esri.geoportal.harvester.waf:com.esri.geoportal.harvester.csw:com.esri.geoportal.harvester.csw.*:com.esri.geoportal.harvester.folder:com.esri.geoportal.harvester.unc:com.esri.geoportal.harvester.ags:com.esri.geoportal.harvester.agp:com.esri.geoportal.harvester.agpsrc:com.esri.geoportal.harvester.ckan</packages>
               </group>
               <group>
                 <title>Engine</title>
@@ -41,6 +41,10 @@
               <group>
                 <title>WAR</title>
                 <packages>com.esri.geoportal.harvester.beans:com.esri.geoportal.harvester.rest:com.esri.geoportal.harvester.support</packages>
+              </group>
+              <group>
+                <title>CLI</title>
+                <packages>com.esri.geoportal.cli:com.esri.geoportal.cli.boot</packages>
               </group>
               <group>
                 <title>Commons</title>

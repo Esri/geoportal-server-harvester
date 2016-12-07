@@ -24,7 +24,7 @@ import com.esri.geoportal.commons.meta.xml.SimpleFgdcMetaAnalyzer;
 import com.esri.geoportal.commons.meta.xml.SimpleIso15115MetaAnalyzer;
 import com.esri.geoportal.commons.meta.xml.SimpleIso15115_2MetaAnalyzer;
 import com.esri.geoportal.commons.meta.xml.SimpleIso15119MetaAnalyzer;
-import com.esri.geoportal.geoportal.harvester.ckan.CkanConnector;
+import com.esri.geoportal.harvester.ckan.CkanConnector;
 import com.esri.geoportal.harvester.agp.AgpOutputConnector;
 import com.esri.geoportal.harvester.agpsrc.AgpInputConnector;
 import com.esri.geoportal.harvester.ags.AgsConnector;
