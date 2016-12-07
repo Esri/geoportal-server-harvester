@@ -17,21 +17,13 @@ package com.esri.geoportal.harvester.engine.registers;
 
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.engine.defaults.DefaultProcessor;
-import java.util.HashMap;
+import com.esri.geoportal.harvester.engine.utils.EntityRegistry;
 
 /**
  * Processor registry.
  */
-public class ProcessorRegistry extends HashMap<String,Processor>{
+public class ProcessorRegistry extends EntityRegistry<Processor>{
   private final Processor defaultProcessor = new DefaultProcessor();
-  
-  /**
-   * Registers processor.
-   * @param processor processor
-   */
-  public void register(Processor processor) {
-    put(processor.getType(),processor);
-  }
   
   /**
    * Gets default processor.

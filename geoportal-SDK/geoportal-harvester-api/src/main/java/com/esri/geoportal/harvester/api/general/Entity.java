@@ -21,10 +21,9 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
  * Entity.
  */
 public interface Entity {
-  
   /**
-   * Gets entity type.
-   * @return entity type.
+   * Gets item type.
+   * @return item type.
    */
   String getType();
   

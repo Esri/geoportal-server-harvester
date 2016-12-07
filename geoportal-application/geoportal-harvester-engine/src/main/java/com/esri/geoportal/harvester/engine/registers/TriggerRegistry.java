@@ -19,24 +19,16 @@ import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.engine.utils.EntityRegistry;
 import com.esri.geoportal.harvester.engine.utils.TriggerReference;
-import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Trigger registry.
  */
-public class TriggerRegistry extends HashMap<String, Trigger> implements AutoCloseable {
+public class TriggerRegistry extends EntityRegistry<Trigger> implements AutoCloseable {
   private static final Logger LOG = LoggerFactory.getLogger(TriggerRegistry.class);
-  
-  /**
-   * Registers trigger.
-   * @param trigger trigger
-   */
-  public void register(Trigger trigger) {
-    put(trigger.getType(), trigger);
-  }
   
   /**
    * Creates trigger instance.

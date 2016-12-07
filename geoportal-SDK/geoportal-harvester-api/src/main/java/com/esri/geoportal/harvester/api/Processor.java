@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.api;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
-import com.esri.geoportal.harvester.api.defs.UITemplate;
+import com.esri.geoportal.harvester.api.general.Entity;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 
 /**
@@ -28,24 +28,12 @@ import com.esri.geoportal.harvester.api.specs.InputBroker;
  * {@link com.esri.geoportal.harvester.api.specs.OutputConnector} interface.
  * @see com.esri.geoportal.harvester.api API
  */
-public interface Processor {
+public interface Processor extends Entity {
   /**
    * Gets processor definition.
    * @return processor definition
    */
   EntityDefinition getEntityDefinition();
-  
-  /**
-   * Gets UI template
-   * @return UI template
-   */
-  UITemplate getTemplate();
-  
-  /**
-   * Gets type of the processor.
-   * @return type of the processor
-   */
-  public String getType();
 
   /**
    * Creates process.

@@ -16,22 +16,21 @@
 package com.esri.geoportal.harvester.engine.utils;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.general.Entity;
+import java.util.HashMap;
 
 /**
  * Entity registry.
- * @param <F> type of the factory
+ * @param <E> type of the factory
  */
-public abstract class EntityRegistry<F extends Entity> extends HashMap<String,F> {
-  
+public abstract class EntityRegistry<E extends Entity> extends HashMap<String,E> {
   /**
    * Registers entity.
    * @param entity entity
    */
-  public void register(F entity) {
+  public void register(E entity) {
     put(entity.getType(), entity);
   }
   
