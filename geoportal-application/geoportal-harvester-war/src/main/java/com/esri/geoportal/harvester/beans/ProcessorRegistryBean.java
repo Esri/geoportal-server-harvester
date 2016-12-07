@@ -42,7 +42,7 @@ public class ProcessorRegistryBean extends ProcessorRegistry {
   @PostConstruct
   public void init() {
     if (processors!=null) {
-      processors.stream().filter(p->!p.getType().equals(DefaultProcessor.TYPE)).forEach(p->put(p.getType(),p));
+      processors.stream().filter(p->!p.getType().equals(DefaultProcessor.TYPE)).forEach(this::register);
     }
     LOG.info("ProcessorRegistryBean initialized.");
   }

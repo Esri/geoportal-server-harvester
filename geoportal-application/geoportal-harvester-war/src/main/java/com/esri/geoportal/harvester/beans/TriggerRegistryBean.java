@@ -41,7 +41,7 @@ public class TriggerRegistryBean extends TriggerRegistry {
   @PostConstruct
   public void init() {
     if (triggers!=null) {
-      triggers.stream().forEach(t->put(t.getType(),t));
+      triggers.stream().forEach(this::register);
     }
     LOG.info("TriggerRegistryBean initialized.");
   }

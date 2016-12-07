@@ -31,6 +31,14 @@ public class TriggerRegistry extends HashMap<String, Trigger> implements AutoClo
   private static final Logger LOG = LoggerFactory.getLogger(TriggerRegistry.class);
   
   /**
+   * Registers trigger.
+   * @param trigger trigger
+   */
+  public void register(Trigger trigger) {
+    put(trigger.getType(), trigger);
+  }
+  
+  /**
    * Creates trigger instance.
    * @param triggerReference trigger reference
    * @return trigger instance

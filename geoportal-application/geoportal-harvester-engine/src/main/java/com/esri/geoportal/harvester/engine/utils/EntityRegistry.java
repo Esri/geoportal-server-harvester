@@ -26,6 +26,15 @@ import com.esri.geoportal.harvester.api.general.Entity;
  * @param <F> type of the factory
  */
 public abstract class EntityRegistry<F extends Entity> extends HashMap<String,F> {
+  
+  /**
+   * Registers entity.
+   * @param entity entity
+   */
+  public void register(F entity) {
+    put(entity.getType(), entity);
+  }
+  
   /**
    * Gets all templates.
    * @return list of all templates

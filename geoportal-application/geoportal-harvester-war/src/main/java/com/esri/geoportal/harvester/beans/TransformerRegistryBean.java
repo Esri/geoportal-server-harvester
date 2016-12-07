@@ -41,7 +41,7 @@ public class TransformerRegistryBean extends TransformerRegistry {
   @PostConstruct
   public void init() {
     if (transformers!=null) {
-      transformers.stream().forEach(c->put(c.getType(),c));
+      transformers.stream().forEach(this::register);
     }
     LOG.info("TransformerRegistryBean initialized.");
   }

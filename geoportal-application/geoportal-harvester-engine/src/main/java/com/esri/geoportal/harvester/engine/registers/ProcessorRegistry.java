@@ -25,6 +25,18 @@ import java.util.HashMap;
 public class ProcessorRegistry extends HashMap<String,Processor>{
   private final Processor defaultProcessor = new DefaultProcessor();
   
+  /**
+   * Registers processor.
+   * @param processor processor
+   */
+  public void register(Processor processor) {
+    put(processor.getType(),processor);
+  }
+  
+  /**
+   * Gets default processor.
+   * @return default processor
+   */
   public Processor getDefaultProcessor() {
     return defaultProcessor;
   }

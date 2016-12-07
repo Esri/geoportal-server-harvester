@@ -41,7 +41,7 @@ public class FilterRegistryBean extends FilterRegistry {
   @PostConstruct
   public void init() {
     if (filters!=null) {
-      filters.stream().forEach(c->put(c.getType(),c));
+      filters.stream().forEach(this::register);
     }
     LOG.info("FilterRegistryBean initialized.");
   }
