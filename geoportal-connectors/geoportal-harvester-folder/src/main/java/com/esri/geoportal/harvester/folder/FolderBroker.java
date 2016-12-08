@@ -29,11 +29,13 @@ import java.io.OutputStream;
 import java.net.URI;
 import static com.esri.geoportal.harvester.folder.PathUtil.splitPath;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,8 +65,10 @@ import org.slf4j.LoggerFactory;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     try {
-      Path rootFolder = Paths.get(definition.getRootFolder().toURI());
-      Files.createDirectories(rootFolder);
+      URI ssp = URI.create(context.getTask().getDataSource().getBrokerUri().getSchemeSpecificPart());
+      String sspRoot = StringUtils.defaultIfEmpty(ssp.getHost(), ssp.getPath());
+      Path brokerRootFolder = definition.getRootFolder().toPath().toRealPath().resolve(sspRoot);
+      Files.createDirectories(brokerRootFolder);
       if (definition.getCleanup()) {
         context.addListener(new BaseProcessInstanceListener() {
           @Override
@@ -72,37 +76,36 @@ import org.slf4j.LoggerFactory;
             preventCleanup = true;
           }
         });
-        fetchExisting(rootFolder);
+        fetchExisting(brokerRootFolder);
       }
-    } catch (IOException ex) {
+    } catch (IOException|URISyntaxException ex) {
       throw new DataProcessorException(String.format("Error initializing broker."), ex);
     }
   }
 
   private void fetchExisting(Path folder) throws IOException {
-    Files.list(folder.toRealPath()).forEach(f -> {
-      try {
-        if (Files.isRegularFile(f)) {
-          existing.add(f.toRealPath().toString());
-        } else if (Files.isDirectory(f)) {
-          fetchExisting(f);
-        }
-      } catch (IOException ex) {
-        LOG.warn(String.format("Error processing fetch of the file: %s", f), ex);
+    List<Path> content = Files.list(folder.toRealPath()).collect(Collectors.toList());
+    for (Path f: content) {
+      if (Thread.currentThread().isInterrupted()) break;
+      if (Files.isRegularFile(f)) {
+        existing.add(f.toRealPath().toString());
+      } else if (Files.isDirectory(f)) {
+        fetchExisting(f);
       }
-    });
+    }
   }
 
   @Override
   public void terminate() {
     if (definition.getCleanup() && !preventCleanup) {
-      existing.forEach(f -> {
+      for (String f: existing) {
+        if (Thread.currentThread().isInterrupted()) break;
         try {
           Files.delete(Paths.get(f));
         } catch (IOException ex) {
           LOG.warn(String.format("Error deleting file: %s", f), ex);
         }
-      });
+      }
       LOG.info(String.format("%d records has been removed during cleanup.", existing.size()));
     }
   }
@@ -134,16 +137,16 @@ import org.slf4j.LoggerFactory;
   public String toString() {
     return String.format("FOLDER [%s]", definition.getRootFolder());
   }
-
+  
   private Path generateFileName(URI brokerUri, URI sourceUri, String id) throws IOException {
     URI ssp = URI.create(brokerUri.getSchemeSpecificPart());
-    String root = StringUtils.defaultIfEmpty(ssp.getHost(), ssp.getPath());
-    Path rootFolder = definition.getRootFolder().toPath().toRealPath().resolve(root);
+    String sspRoot = StringUtils.defaultIfEmpty(ssp.getHost(), ssp.getPath());
+    Path brokerRootFolder = definition.getRootFolder().toPath().toRealPath().resolve(sspRoot);
 
-    Path fileName = rootFolder;
+    Path fileName = brokerRootFolder;
     if (sourceUri.getPath() != null) {
       List<String> subFolder = splitPath(sourceUri.getPath().replaceAll("/[a-zA-Z]:/|/$", ""));
-      if (!subFolder.isEmpty() && subFolder.get(0).equals(root)) {
+      if (!subFolder.isEmpty() && subFolder.get(0).equals(sspRoot)) {
         subFolder.remove(0);
       }
       for (String sf : subFolder) {
