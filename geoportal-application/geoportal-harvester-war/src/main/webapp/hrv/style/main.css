@@ -54,7 +54,7 @@ html,body {
 }
 
 .h-brokers {
-  
+  margin-bottom: 2em;
 }
 
 .h-brokers-content {
@@ -65,6 +65,7 @@ html,body {
   font-size: medium;
   font-weight: bold;
   background-color: lightgray;
+  padding-left: 0.5em;
 }
 
 .h-broker {
@@ -81,6 +82,7 @@ html,body {
 
 .h-broker-label {
   font-weight: bold;
+  padding-left: 0.5em;
 }
 
 .h-broker-edit {
@@ -155,6 +157,7 @@ html,body {
   font-size: medium;
   font-weight: bold;
   background-color: lightgray;
+  padding-left: 0.5em;
 }
 
 .h-processes-footer {
@@ -171,7 +174,8 @@ html,body {
 }
 
 .h-processes-process-title {
- font-weight: bold; 
+  font-weight: bold; 
+  padding-left: 0.5em;
 }
 
 .h-processes-process-status {
@@ -192,6 +196,7 @@ html,body {
   font-size: medium;
   font-weight: bold;
   background-color: lightgray;
+  padding-left: 0.5em;
 }
 
 .h-processes-trigger > span {
@@ -204,7 +209,8 @@ html,body {
 }
 
 .h-processes-trigger-title {
- font-weight: bold; 
+  font-weight: bold; 
+  padding-left: 0.5em;
 }
 
 .h-processes-trigger-cancel {
@@ -239,6 +245,7 @@ html,body {
   font-size: medium;
   font-weight: bold;
   background-color: lightgray;
+  padding-left: 0.5em;
 }
 
 .h-tasks-footer > span {
@@ -282,6 +289,7 @@ html,body {
 
 .h-task-label {
   font-weight: bold;
+  padding-left: 0.5em;
 }
 
 .h-task-edit {
