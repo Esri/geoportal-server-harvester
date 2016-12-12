@@ -40,7 +40,7 @@ public class OutboundConnectorRegistryBean extends OutboundConnectorRegistry {
    */
   @PostConstruct
   public void init() {
-    connectors.stream().forEach(c->put(c.getType(),c));
+    connectors.stream().forEach(this::register);
     LOG.info("OutboundConnectorRegistryBean initialized.");
   }
   
