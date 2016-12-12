@@ -36,7 +36,7 @@ public class MultiMetaAnalyzerBean implements MetaAnalyzer {
   private MetaAnalyzer metaAnalyzer;
   
   @Autowired
-  List<MetaAnalyzer> analyzers;
+  private List<MetaAnalyzer> analyzers;
   
   /**
    * Initializes bean.

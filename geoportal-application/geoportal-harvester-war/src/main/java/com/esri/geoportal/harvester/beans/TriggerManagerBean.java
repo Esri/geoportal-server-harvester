@@ -45,7 +45,7 @@ public class TriggerManagerBean implements TriggerManager {
   private static final Logger LOG = LoggerFactory.getLogger(TriggerManagerBean.class);
 
   @Autowired
-  DataSource dataSource;
+  private DataSource dataSource;
 
   /**
    * Initializes bean.
