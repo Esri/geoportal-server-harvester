@@ -47,6 +47,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -65,6 +67,7 @@ import org.w3c.dom.Document;
  */
 /*package*/ class AgsBroker implements InputBroker {
   private static final Logger LOG = LoggerFactory.getLogger(AgsBroker.class);
+  private static final Pattern rootPattern = Pattern.compile("\\/[^\\/]*Server(\\/[0-9]+)?$");
 
   private final AgsConnector connector;
   private final AgsBrokerDefinitionAdaptor definition;
@@ -198,11 +201,11 @@ import org.w3c.dom.Document;
       try {
         ServerResponse next = iterator.next();
         String serviceType = getServiceType(next.url);
-        String serviceRoor = getServiceRoot(next.url);
+        String serviceRoot = getServiceRoot(next.url);
         
         HashMap<String, Attribute> attributes = new HashMap<>();
         attributes.put(WKAConstants.WKA_IDENTIFIER, new StringAttribute(next.url));
-        attributes.put(WKAConstants.WKA_TITLE, new StringAttribute(String.format("%s/%s", serviceRoor, StringUtils.defaultString(StringUtils.defaultString(next.mapName, next.name),StringUtils.defaultString(serviceType, next.url)))));
+        attributes.put(WKAConstants.WKA_TITLE, new StringAttribute(String.format("%s/%s", serviceRoot, StringUtils.defaultString(StringUtils.defaultString(next.mapName, next.name),StringUtils.defaultString(serviceType, next.url)))));
         attributes.put(WKAConstants.WKA_DESCRIPTION, new StringAttribute(StringUtils.defaultString(StringUtils.defaultString(StringUtils.defaultString(next.description, next.serviceDescription)))));
         attributes.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(next.url));
         attributes.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute("urn:x-esri:specification:ServiceType:ArcGIS:" + (serviceType!=null? serviceType: "Unknown")));
@@ -251,12 +254,15 @@ import org.w3c.dom.Document;
     }
     
     private String getServiceRoot(String url) {
-      if (url!=null && url.endsWith("Server")) {
-        int slashIndex = url.lastIndexOf("/");
-        if (slashIndex>0) {
-          url = url.substring(0,slashIndex);
-          slashIndex = url.lastIndexOf("/");
-          return slashIndex>=0? url.substring(slashIndex+1): url;
+      if (url!=null) {
+        Matcher matcher = rootPattern.matcher(url);
+        if (matcher.find()) {
+          int slashIndex = matcher.start();
+          if (slashIndex>0) {
+            url = url.substring(0,slashIndex);
+            slashIndex = url.lastIndexOf("/");
+            return slashIndex>=0? url.substring(slashIndex+1): url;
+          }
         }
       }
       return null;
