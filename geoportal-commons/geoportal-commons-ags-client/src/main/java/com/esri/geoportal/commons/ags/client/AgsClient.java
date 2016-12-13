@@ -129,7 +129,7 @@ public class AgsClient implements Closeable {
    * Reads service information.
    *
    * @param folder folder
-   * @param si serivce info obtained through {@link listContent}
+   * @param si service info obtained through {@link listContent}
    * @return service response
    * @throws URISyntaxException if invalid URL
    * @throws IOException if accessing token fails
@@ -147,6 +147,34 @@ public class AgsClient implements Closeable {
       mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
       ServerResponse response = mapper.readValue(responseContent, ServerResponse.class);
+      response.url = url;
+      return response;
+    }
+  }
+
+  /**
+   * Reads layer information.
+   *
+   * @param folder folder
+   * @param si service info obtained through {@link listContent}
+   * @param lRef layer reference
+   * @return service response
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if accessing token fails
+   */
+  public LayerInfo readLayerInformation(String folder, ServiceInfo si, LayerRef lRef) throws URISyntaxException, IOException {
+    String url = rootUrl.toURI().resolve("rest/services/").resolve(StringUtils.stripToEmpty(folder)).resolve(si.name + "/" + si.type + "/" + lRef.id).toASCIIString();
+    HttpGet get = new HttpGet(url + String.format("?f=%s", "json"));
+
+    try (CloseableHttpResponse httpResponse = httpClient.execute(get); InputStream contentStream = httpResponse.getEntity().getContent();) {
+      if (httpResponse.getStatusLine().getStatusCode()>=400) {
+        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+      }
+      String responseContent = IOUtils.toString(contentStream, "UTF-8");
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+      LayerInfo response = mapper.readValue(responseContent, LayerInfo.class);
       response.url = url;
       return response;
     }

@@ -15,24 +15,14 @@
  */
 package com.esri.geoportal.commons.ags.client;
 
-import java.util.List;
-
 /**
- * Map server response.
+ * Layer info.
  */
-public final class ServerResponse {
+public class LayerInfo {
   public String url;
-  public String mapName;
-  public String serviceDescription;
+  public String id;
   public String name;
+  public String type;
   public String description;
-  public SpatialReferenceInfo spatialReference;
-  public ExtentInfo initialExtent;
-  public ExtentInfo fullExtent;
-  public List<LayerRef> layers;
-  
-  @Override
-  public String toString() {
-    return String.format("{ \"mapName\": \"%s\", \"serviceDescription\": \"%s\", \"spatialReference\": %s, \"initialExtent\": %s, \"fullExtent\": %s}", mapName, serviceDescription, spatialReference, initialExtent, fullExtent);
-  }
+  public ExtentInfo extent;
 }
