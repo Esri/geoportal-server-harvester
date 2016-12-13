@@ -19,6 +19,7 @@ import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_P
 import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_USERNAME;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import static com.esri.geoportal.harvester.ags.AgsBrokerDefinitionAdaptor.P_HOST_URL;
+import static com.esri.geoportal.harvester.ags.AgsBrokerDefinitionAdaptor.P_ENABLE_LAYERS;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -57,6 +58,7 @@ public class AgsConnector implements InputConnector<InputBroker> {
         return true;
       }
     });
+    args.add(new UITemplate.BooleanArgument(P_ENABLE_LAYERS, "Enable layers"));
     return new UITemplate(getType(), "ArcGIS Server Services", args);
   }
 

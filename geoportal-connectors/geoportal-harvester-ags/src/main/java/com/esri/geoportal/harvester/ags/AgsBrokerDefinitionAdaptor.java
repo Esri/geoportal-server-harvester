@@ -25,18 +25,21 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * Ags broker definition adaptor.
  */
 /*package*/ class AgsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
-  public static final String P_HOST_URL    = "ags-host-url";
+  public static final String P_HOST_URL      = "ags-host-url";
+  public static final String P_ENABLE_LAYERS = "ags-enable-layers";
   
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private final CredentialsDefinitionAdaptor credAdaptor;
   
   private URL hostUrl;
+  private boolean enableLayers;
 
   /**
    * Creates instance of the adaptor.
@@ -57,6 +60,7 @@ import org.apache.commons.lang3.StringUtils;
       } catch (MalformedURLException ex) {
         throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
       }
+      enableLayers = BooleanUtils.toBoolean(get(P_ENABLE_LAYERS));
     }
   }
   
@@ -75,6 +79,23 @@ import org.apache.commons.lang3.StringUtils;
   public void setHostUrl(URL url) {
     this.hostUrl = url;
     set(P_HOST_URL, url.toExternalForm());
+  }
+
+  /**
+   * Checks if harvesting layers enabled.
+   * @return <code>true</code> if harvesting layers enabled
+   */
+  public boolean getEnableLayers() {
+    return enableLayers;
+  }
+
+  /**
+   * Allows or disallows to harvest layers.
+   * @param enableLayers <code>true</code> if harvesting layers enabled
+   */
+  public void setEnableLayers(boolean enableLayers) {
+    this.enableLayers = enableLayers;
+    set(P_ENABLE_LAYERS, BooleanUtils.toStringTrueFalse(enableLayers));
   }
 
   /**

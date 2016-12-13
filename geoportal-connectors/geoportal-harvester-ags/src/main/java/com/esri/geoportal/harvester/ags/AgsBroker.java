@@ -18,6 +18,8 @@ package com.esri.geoportal.harvester.ags;
 import com.esri.geoportal.commons.ags.client.AgsClient;
 import com.esri.geoportal.commons.ags.client.ContentResponse;
 import com.esri.geoportal.commons.ags.client.ExtentInfo;
+import com.esri.geoportal.commons.ags.client.LayerInfo;
+import com.esri.geoportal.commons.ags.client.LayerRef;
 import com.esri.geoportal.commons.ags.client.ServerResponse;
 import com.esri.geoportal.commons.ags.client.ServiceInfo;
 import com.esri.geoportal.commons.constants.ItemType;
@@ -130,6 +132,16 @@ import org.w3c.dom.Document;
     }
   }
 
+  private ServerResponse layerInfoToServerResponse(LayerInfo layerInfo) {
+    ServerResponse response = new ServerResponse();
+    response.url = layerInfo.url;
+    response.name = layerInfo.name;
+    response.description = layerInfo.description;
+    response.fullExtent = layerInfo.extent;
+    response.initialExtent = layerInfo.extent;
+    return response;
+  }
+  
   private List<ServerResponse> listResponses(String rootFolder) throws URISyntaxException, IOException {
     ArrayList<ServerResponse> responses = new ArrayList<>();
 
@@ -138,6 +150,15 @@ import org.w3c.dom.Document;
       for (ServiceInfo si : content.services) {
         ServerResponse response = client.readServiceInformation(rootFolder, si);
         responses.add(response);
+        if (definition.getEnableLayers() && response.layers!=null) {
+          for (LayerRef lRef: response.layers) {
+            if (lRef.subLayerIds==null || !lRef.subLayerIds.isEmpty()) {
+              LayerInfo layerInfo = client.readLayerInformation(rootFolder, si, lRef);
+              ServerResponse rsp = layerInfoToServerResponse(layerInfo);
+              responses.add(rsp);
+            }
+          }
+        }
       }
     }
     if (content.folders != null) {
