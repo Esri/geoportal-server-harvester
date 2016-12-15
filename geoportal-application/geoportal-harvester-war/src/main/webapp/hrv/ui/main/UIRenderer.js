@@ -56,7 +56,7 @@ define(["dojo/_base/declare",
       
       renderArgument: function(rootNode,arg) {
         var argNode = domConstruct.create("div",{class: "h-editor-line"},rootNode);
-        var titleNode = domConstruct.create("span",{innerHTML: arg.label, class: "h-editor-argname"},argNode);
+        var titleNode = domConstruct.create("span",{innerHTML: arg.label+":", class: "h-editor-argname"},argNode);
         var placeholderWrapper = domConstruct.create("span",{class: "h-editor-argctrl"},argNode);
         var placeholderNode = domConstruct.create("span",null,placeholderWrapper);
         
