@@ -28,6 +28,7 @@ import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -70,6 +71,14 @@ import org.apache.commons.lang3.StringUtils;
         throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_PROFILE_ID, get(P_PROFILE_ID)));
       }
     }
+  }
+
+  @Override
+  public void override(Map<String, String> params) {
+    consume(params,P_HOST_URL);
+    consume(params,P_PROFILE_ID);
+    credAdaptor.override(params);
+    botsAdaptor.override(params);
   }
 
   /**

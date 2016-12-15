@@ -18,7 +18,9 @@ package com.esri.geoportal.harvester.api.base;
 import com.esri.geoportal.harvester.api.Broker;
 import com.esri.geoportal.harvester.api.ProcessInstance.Listener;
 import com.esri.geoportal.harvester.api.defs.Task;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Simple broker context.
@@ -40,6 +42,11 @@ public class SimpleInitContext implements Broker.InitContext {
   @Override
   public Task getTask() {
     return task;
+  }
+
+  @Override
+  public Map<String, String> getParams() {
+    return Collections.emptyMap();
   }
 
   @Override

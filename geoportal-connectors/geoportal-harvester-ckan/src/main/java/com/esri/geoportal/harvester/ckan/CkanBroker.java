@@ -98,6 +98,7 @@ import org.w3c.dom.Document;
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
+    definition.override(context.getParams());
     CloseableHttpClient http = HttpClients.createDefault();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       httpClient = http;

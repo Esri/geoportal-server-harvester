@@ -64,6 +64,7 @@ import org.slf4j.LoggerFactory;
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
+    definition.override(context.getParams());
     try {
       URI ssp = URI.create(context.getTask().getDataSource().getBrokerUri().getSchemeSpecificPart());
       String sspRoot = StringUtils.defaultIfEmpty(ssp.getHost(), ssp.getPath());

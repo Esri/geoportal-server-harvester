@@ -77,6 +77,7 @@ import org.slf4j.LoggerFactory;
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
+    definition.override(context.getParams());
     client = new Client(definition.getHostUrl(), definition.getCredentials());
 
     if (definition.getCleanup()) {

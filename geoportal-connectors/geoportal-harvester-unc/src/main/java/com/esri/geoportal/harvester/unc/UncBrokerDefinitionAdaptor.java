@@ -19,6 +19,7 @@ import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.io.File;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -50,6 +51,12 @@ public class UncBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
       }
       pattern = get(P_PATTERN);
     }
+  }
+
+  @Override
+  public void override(Map<String, String> params) {
+    consume(params,P_ROOT_FOLDER);
+    consume(params,P_PATTERN);
   }
   
   /**

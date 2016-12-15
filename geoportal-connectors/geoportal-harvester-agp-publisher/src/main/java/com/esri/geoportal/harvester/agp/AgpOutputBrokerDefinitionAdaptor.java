@@ -22,6 +22,7 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -59,6 +60,14 @@ import org.apache.commons.lang3.StringUtils;
       folderId = get(P_FOLDER_ID);
       cleanup  = Boolean.parseBoolean(get(P_FOLDER_CLEANUP));
     }
+  }
+
+  @Override
+  public void override(Map<String, String> params) {
+    consume(params,P_HOST_URL);
+    consume(params,P_FOLDER_ID);
+    consume(params,P_FOLDER_CLEANUP);
+    credAdaptor.override(params);
   }
   
   /**

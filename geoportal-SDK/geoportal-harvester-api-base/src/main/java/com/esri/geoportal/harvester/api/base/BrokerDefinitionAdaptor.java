@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import java.util.Map;
 
 /**
  * Broker adaptor.
@@ -38,6 +39,27 @@ public abstract class BrokerDefinitionAdaptor {
    */
   public EntityDefinition getEntityDefinition() {
     return entityDefinition;
+  }
+  
+  /**
+   * Allows to override/update params.
+   * @param params 
+   */
+  public abstract void override(Map<String,String> params);
+  
+  /**
+   * Consumes parameter.
+   * <p>
+   * Uses given parameter to update existing parameter and removes given
+   * parameter from the map.
+   * @param params map of parameters
+   * @param paramName parameter name
+   */
+  protected void consume(Map<String,String> params, String paramName) {
+    if (params.containsKey(paramName)) {
+      String value = params.get(paramName);
+      set(paramName,value);
+    }
   }
   
   /**

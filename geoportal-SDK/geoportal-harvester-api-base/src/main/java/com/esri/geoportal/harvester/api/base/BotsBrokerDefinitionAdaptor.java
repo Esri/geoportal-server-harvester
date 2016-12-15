@@ -19,6 +19,7 @@ import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsConfigImpl;
 import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import java.util.Map;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,6 +39,14 @@ public final class BotsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    */
   public BotsBrokerDefinitionAdaptor(EntityDefinition def) {
     super(def);
+  }
+
+  @Override
+  public void override(Map<String, String> params) {
+    consume(params,P_BOTS_AGENT);
+    consume(params,P_BOTS_ENABLED);
+    consume(params,P_BOTS_OVERRIDE);
+    consume(params,P_BOTS_MODE);
   }
   
   /**

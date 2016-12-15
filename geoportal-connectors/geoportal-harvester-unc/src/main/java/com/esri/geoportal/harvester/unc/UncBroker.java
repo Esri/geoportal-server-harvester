@@ -49,7 +49,7 @@ import java.util.LinkedList;
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
-    // nothing to initialize
+    definition.override(context.getParams());
   }
 
   @Override

@@ -19,6 +19,7 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.io.File;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -51,6 +52,12 @@ import org.apache.commons.lang3.StringUtils;
       }
       cleanup  = Boolean.parseBoolean(get(P_FOLDER_CLEANUP));
     }
+  }
+
+  @Override
+  public void override(Map<String, String> params) {
+    consume(params,P_ROOT_FOLDER);
+    consume(params,P_FOLDER_CLEANUP);
   }
 
   /**

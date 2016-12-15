@@ -66,6 +66,7 @@ import org.slf4j.LoggerFactory;
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
+    definition.override(context.getParams());
     httpclient = HttpClients.createDefault();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new Client(httpclient, definition.getHostUrl(), definition.getProfile(), definition.getCredentials());

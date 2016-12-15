@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.api;
 import com.esri.geoportal.harvester.api.ProcessInstance.Listener;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import java.util.Map;
 
 /**
  * Initializable.
@@ -45,6 +46,12 @@ public interface Initializable {
      * @return task
      */
     Task getTask();
+    
+    /**
+     * Get parameters to override.
+     * @return map of parameters to override
+     */
+    Map<String,String> getParams();
     
     /**
      * Adds process listener.

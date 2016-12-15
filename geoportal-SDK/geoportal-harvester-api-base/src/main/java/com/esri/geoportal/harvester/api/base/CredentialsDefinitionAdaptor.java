@@ -19,6 +19,7 @@ import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_P
 import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_USERNAME;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import java.util.Map;
 
 /**
  * SimpleCredentials definition adaptor.
@@ -31,6 +32,12 @@ public final class CredentialsDefinitionAdaptor extends BrokerDefinitionAdaptor 
    */
   public CredentialsDefinitionAdaptor(EntityDefinition def) {
     super(def);
+  }
+
+  @Override
+  public void override(Map<String, String> params) {
+    consume(params,P_CRED_USERNAME);
+    consume(params,P_CRED_PASSWORD);
   }
   
   /**

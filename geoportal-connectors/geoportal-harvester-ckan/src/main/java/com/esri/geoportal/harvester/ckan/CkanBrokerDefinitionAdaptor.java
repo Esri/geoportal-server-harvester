@@ -23,6 +23,7 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -57,6 +58,13 @@ import org.apache.commons.lang3.StringUtils;
       }
       apiKey = get(P_API_KEY);
     }
+  }
+
+  @Override
+  public void override(Map<String, String> params) {
+    consume(params,P_HOST_URL);
+    consume(params,P_API_KEY);
+    botsAdaptor.override(params);
   }
   
   public URL getHostUrl() {

@@ -116,6 +116,7 @@ import org.apache.http.impl.client.HttpClients;
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
+    definition.override(context.getParams());
     CloseableHttpClient httpclient = HttpClients.createDefault();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new AgpClient(httpclient, definition.getHostUrl(),definition.getCredentials());
