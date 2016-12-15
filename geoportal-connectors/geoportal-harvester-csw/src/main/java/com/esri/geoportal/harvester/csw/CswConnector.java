@@ -31,6 +31,8 @@ import static com.esri.geoportal.harvester.csw.CswBrokerDefinitionAdaptor.P_PROF
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * CSW connector.
@@ -45,11 +47,12 @@ public class CswConnector implements InputConnector<InputBroker> {
   }
 
   @Override
-  public UITemplate getTemplate() {
+  public UITemplate getTemplate(Locale locale) {
+    ResourceBundle bundle = ResourceBundle.getBundle("CswResource", locale);
     List<UITemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new UITemplate.StringArgument(P_HOST_URL, "URL", true));
-    arguments.add(new UITemplate.StringArgument(P_CRED_USERNAME, "User name", false));
-    arguments.add(new UITemplate.StringArgument(P_CRED_PASSWORD, "User password", false) {
+    arguments.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("csw.url"), true));
+    arguments.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("csw.username"), false));
+    arguments.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("csw.password"), false) {
       public boolean isPassword() {
         return true;
       }
@@ -57,13 +60,13 @@ public class CswConnector implements InputConnector<InputBroker> {
     ProfilesProvider of = new ProfilesProvider();
     IProfiles profiles = of.newProfiles();
     Choice<String>[] choices = profiles.listAll().stream().map(p->new Choice<String>(p.getId(),p.getName())).toArray(Choice[]::new);
-    arguments.add(new UITemplate.ChoiceArgument(P_PROFILE_ID, "Profile", Arrays.asList(choices)){
+    arguments.add(new UITemplate.ChoiceArgument(P_PROFILE_ID, bundle.getString("csw.profile"), Arrays.asList(choices)){
       public String getDefault() {
         IProfile defaultProfile = profiles.getDefaultProfile();
         return defaultProfile!=null? defaultProfile.getId(): null;
       }
     });
-    return new UITemplate(getType(), "Catalogue service for the web", arguments);
+    return new UITemplate(getType(), bundle.getString("csw"), arguments);
   }
 
   @Override

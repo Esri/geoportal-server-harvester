@@ -25,6 +25,8 @@ import com.esri.geoportal.harvester.api.specs.InputConnector;
 import static com.esri.geoportal.harvester.gptsrc.GptBrokerDefinitionAdaptor.P_HOST_URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * GPT connector.
@@ -39,16 +41,17 @@ public class GptConnector implements InputConnector<InputBroker> {
   }
 
   @Override
-  public UITemplate getTemplate() {
+  public UITemplate getTemplate(Locale locale) {
+    ResourceBundle bundle = ResourceBundle.getBundle("GptSrcResource", locale);
     List<UITemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new UITemplate.StringArgument(P_HOST_URL, "URL", true));
-    arguments.add(new UITemplate.StringArgument(P_CRED_USERNAME, "User name", true));
-    arguments.add(new UITemplate.StringArgument(P_CRED_PASSWORD, "User password", true) {
+    arguments.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("gptsrc.url"), true));
+    arguments.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("gptsrc.username"), true));
+    arguments.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("gptsrc.password"), true) {
       public boolean isPassword() {
         return true;
       }
     });
-    return new UITemplate(getType(), "Geoportal Server 2.0", arguments);
+    return new UITemplate(getType(), bundle.getString("gptsrc"), arguments);
   }
 
   @Override

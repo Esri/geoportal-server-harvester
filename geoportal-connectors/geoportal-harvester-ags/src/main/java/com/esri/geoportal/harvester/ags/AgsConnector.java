@@ -27,6 +27,8 @@ import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * ArcGIS server connector.
@@ -49,17 +51,18 @@ public class AgsConnector implements InputConnector<InputBroker> {
   }
   
   @Override
-  public UITemplate getTemplate() {
+  public UITemplate getTemplate(Locale locale) {
+    ResourceBundle bundle = ResourceBundle.getBundle("AgsResource", locale);
     List<UITemplate.Argument> args = new ArrayList<>();
-    args.add(new UITemplate.StringArgument(P_HOST_URL, "Url", true));
-    args.add(new UITemplate.StringArgument(P_CRED_USERNAME, "User name", false));
-    args.add(new UITemplate.StringArgument(P_CRED_PASSWORD, "User password", false) {
+    args.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("ags.url"), true));
+    args.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("ags.username"), false));
+    args.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("ags.password"), false) {
       public boolean isPassword() {
         return true;
       }
     });
     args.add(new UITemplate.BooleanArgument(P_ENABLE_LAYERS, "Enable layers"));
-    return new UITemplate(getType(), "ArcGIS Server Services", args);
+    return new UITemplate(getType(), bundle.getString("ags"), args);
   }
 
   @Override

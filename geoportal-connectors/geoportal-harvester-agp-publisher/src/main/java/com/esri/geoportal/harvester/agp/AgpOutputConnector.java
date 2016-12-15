@@ -28,6 +28,8 @@ import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * ArcGIS Portal output connector.
@@ -56,18 +58,19 @@ public class AgpOutputConnector implements OutputConnector<OutputBroker> {
   }
 
   @Override
-  public UITemplate getTemplate() {
+  public UITemplate getTemplate(Locale locale) {
+    ResourceBundle bundle = ResourceBundle.getBundle("AgpResource", locale);
     List<UITemplate.Argument> args = new ArrayList<>();
-    args.add(new UITemplate.StringArgument(P_HOST_URL, "Url", true));
-    args.add(new UITemplate.StringArgument(P_FOLDER_ID, "Folder Id", false));
-    args.add(new UITemplate.StringArgument(P_CRED_USERNAME, "User name", true));
-    args.add(new UITemplate.StringArgument(P_CRED_PASSWORD, "User password", true) {
+    args.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("agp.url"), true));
+    args.add(new UITemplate.StringArgument(P_FOLDER_ID, bundle.getString("agp.folderId"), false));
+    args.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("agp.username"), true));
+    args.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("agp.password"), true) {
       public boolean isPassword() {
         return true;
       }
     });
     args.add(new UITemplate.BooleanArgument(P_FOLDER_CLEANUP, "Perform cleanup"));
-    return new UITemplate(getType(), "ArcGIS Portal", args);
+    return new UITemplate(getType(), bundle.getString("agp"), args);
   }
   
 }

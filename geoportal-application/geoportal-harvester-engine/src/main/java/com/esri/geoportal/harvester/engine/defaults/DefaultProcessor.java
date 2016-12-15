@@ -33,6 +33,7 @@ import com.esri.geoportal.harvester.api.specs.InputBroker.IteratorContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +52,7 @@ public class DefaultProcessor implements Processor {
   }
 
   @Override
-  public UITemplate getTemplate() {
+  public UITemplate getTemplate(Locale locale) {
     UITemplate uiTemplate = new UITemplate(getType(), "Default processor", null);
     return uiTemplate;
   }

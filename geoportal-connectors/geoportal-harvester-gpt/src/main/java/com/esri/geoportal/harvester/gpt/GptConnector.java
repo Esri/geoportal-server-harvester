@@ -26,6 +26,8 @@ import static com.esri.geoportal.harvester.gpt.GptBrokerDefinitionAdaptor.P_CLEA
 import static com.esri.geoportal.harvester.gpt.GptBrokerDefinitionAdaptor.P_HOST_URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * GPT connector.
@@ -40,17 +42,18 @@ public class GptConnector implements OutputConnector<OutputBroker> {
   }
 
   @Override
-  public UITemplate getTemplate() {
+  public UITemplate getTemplate(Locale locale) {
+    ResourceBundle bundle = ResourceBundle.getBundle("GptResource", locale);
     List<UITemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new UITemplate.StringArgument(P_HOST_URL, "URL", true));
-    arguments.add(new UITemplate.StringArgument(P_CRED_USERNAME, "User name", true));
-    arguments.add(new UITemplate.StringArgument(P_CRED_PASSWORD, "User password", true) {
+    arguments.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("gpt.url"), true));
+    arguments.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("gpt.username"), true));
+    arguments.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("gpt.password"), true) {
       public boolean isPassword() {
         return true;
       }
     });
-    arguments.add(new UITemplate.BooleanArgument(P_CLEANUP, "Perform cleanup"));
-    return new UITemplate(getType(), "Geoportal Server 2.0", arguments);
+    arguments.add(new UITemplate.BooleanArgument(P_CLEANUP, bundle.getString("gpt.cleanup")));
+    return new UITemplate(getType(), bundle.getString("gpt"), arguments);
   }
 
   @Override

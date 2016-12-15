@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.api.general;
 
 import com.esri.geoportal.harvester.api.defs.UITemplate;
+import java.util.Locale;
 
 /**
  * Entity.
@@ -29,7 +30,8 @@ public interface Entity {
   
   /**
    * Gets entity UI template.
+   * @param locale locale
    * @return entity UI template
    */
-  UITemplate getTemplate();
+  UITemplate getTemplate(Locale locale);
 }

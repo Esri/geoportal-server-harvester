@@ -26,6 +26,8 @@ import static com.esri.geoportal.harvester.waf.WafBrokerDefinitionAdaptor.P_HOST
 import static com.esri.geoportal.harvester.waf.WafBrokerDefinitionAdaptor.P_PATTERN;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Waf connector.
@@ -40,17 +42,18 @@ public class WafConnector implements InputConnector<InputBroker> {
   }
   
   @Override
-  public UITemplate getTemplate() {
+  public UITemplate getTemplate(Locale locale) {
+    ResourceBundle bundle = ResourceBundle.getBundle("WafResource", locale);
     List<UITemplate.Argument> args = new ArrayList<>();
-    args.add(new UITemplate.StringArgument(P_HOST_URL, "Url", true));
-    args.add(new UITemplate.StringArgument(P_PATTERN, "Pattern"));
-    args.add(new UITemplate.StringArgument(P_CRED_USERNAME, "User name", false));
-    args.add(new UITemplate.StringArgument(P_CRED_PASSWORD, "User password", false) {
+    args.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("waf.url"), true));
+    args.add(new UITemplate.StringArgument(P_PATTERN, bundle.getString("waf.pattern")));
+    args.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("waf.username"), false));
+    args.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("waf.password"), false) {
       public boolean isPassword() {
         return true;
       }
     });
-    return new UITemplate(getType(), "Web Accessible Folder", args);
+    return new UITemplate(getType(), bundle.getString("waf"), args);
   }
 
   @Override

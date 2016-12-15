@@ -25,6 +25,7 @@ import com.esri.geoportal.harvester.engine.registers.TransformerRegistry;
 import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -63,35 +64,35 @@ public class DefaultTemplatesService implements TemplatesService {
   }
   
   @Override
-  public List<UITemplate> getInboundConnectorTemplates() {
-    return inboundConnectorRegistry.getTemplates();
+  public List<UITemplate> getInboundConnectorTemplates(Locale locale) {
+    return inboundConnectorRegistry.getTemplates(locale);
   }
 
   @Override
-  public List<UITemplate> getOutboundConnectorTemplates() {
-    return outboundConnectorRegistry.getTemplates();
+  public List<UITemplate> getOutboundConnectorTemplates(Locale locale) {
+    return outboundConnectorRegistry.getTemplates(locale);
   }
 
   @Override
-  public List<UITemplate> getTransformerTemplates() {
-    return transformerRegistry.getTemplates();
+  public List<UITemplate> getTransformerTemplates(Locale locale) {
+    return transformerRegistry.getTemplates(locale);
   }
 
   @Override
-  public List<UITemplate> getFilterTemplates() {
-    return filterRegistry.getTemplates();
+  public List<UITemplate> getFilterTemplates(Locale locale) {
+    return filterRegistry.getTemplates(locale);
   }
 
   @Override
-  public List<UITemplate> getTriggersTemplates() {
-    return triggerRegistry.values().stream().map(v->v.getTemplate()).collect(Collectors.toList());
+  public List<UITemplate> getTriggersTemplates(Locale locale) {
+    return triggerRegistry.values().stream().map(v->v.getTemplate(locale)).collect(Collectors.toList());
   }
 
   @Override
-  public List<UITemplate> getProcessorsTemplates() {
+  public List<UITemplate> getProcessorsTemplates(Locale locale) {
     List<UITemplate> templates = new ArrayList<>();
-    templates.add(processorRegistry.getDefaultProcessor().getTemplate());
-    templates.addAll(processorRegistry.values().stream().map(p->p.getTemplate()).collect(Collectors.toList()));
+    templates.add(processorRegistry.getDefaultProcessor().getTemplate(locale));
+    templates.addAll(processorRegistry.values().stream().map(p->p.getTemplate(locale)).collect(Collectors.toList()));
     return templates;
   }
 }

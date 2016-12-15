@@ -20,6 +20,7 @@ import com.esri.geoportal.harvester.engine.services.Engine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -46,7 +47,7 @@ public class ProcessorController {
   @RequestMapping(value = "/rest/harvester/processors/types", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate[] listProcessorTypes() {
     LOG.debug(String.format("GET /rest/harvester/processors/types"));
-    return engine.getTemplatesService().getProcessorsTemplates().toArray(new UITemplate[0]);
+    return engine.getTemplatesService().getProcessorsTemplates(LocaleContextHolder.getLocale()).toArray(new UITemplate[0]);
   }
   
 }

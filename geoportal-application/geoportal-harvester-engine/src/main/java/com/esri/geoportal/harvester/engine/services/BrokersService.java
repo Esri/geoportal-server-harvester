@@ -19,6 +19,7 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.engine.utils.BrokerReference;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -30,20 +31,22 @@ public interface BrokersService {
    * Creates a broker.
    *
    * @param brokerDefinition broker definition
+   * @param locale locale
    * @return broker info or <code>null</code> if broker has not been created
    * @throws DataProcessorException if accessing repository fails
    */
-  BrokerReference createBroker(EntityDefinition brokerDefinition) throws DataProcessorException;
+  BrokerReference createBroker(EntityDefinition brokerDefinition, Locale locale) throws DataProcessorException;
 
   /**
    * Creates a broker.
    *
    * @param brokerId broker id
    * @param brokerDefinition broker definition
+   * @param locale locale
    * @return broker info or <code>null</code> if broker has not been created
    * @throws DataProcessorException if accessing repository fails
    */
-  BrokerReference updateBroker(UUID brokerId, EntityDefinition brokerDefinition) throws DataProcessorException;
+  BrokerReference updateBroker(UUID brokerId, EntityDefinition brokerDefinition, Locale locale) throws DataProcessorException;
 
   /**
    * Deletes broker.
@@ -58,19 +61,21 @@ public interface BrokersService {
    * Finds broker by id.
    *
    * @param brokerId broker id
+   * @param locale locale
    * @return broker info or <code>null</code> if no broker corresponding to the
    * broker id can be found
    * @throws DataProcessorException if accessing repository fails
    */
-  BrokerReference findBroker(UUID brokerId) throws DataProcessorException;
+  BrokerReference findBroker(UUID brokerId, Locale locale) throws DataProcessorException;
 
   /**
    * Gets broker definitions.
    *
    * @param category broker category
+   * @param locale locale
    * @return broker infos
    * @throws DataProcessorException if accessing repository fails
    */
-  List<BrokerReference> getBrokersDefinitions(BrokerReference.Category category) throws DataProcessorException;
+  List<BrokerReference> getBrokersDefinitions(BrokerReference.Category category, Locale locale) throws DataProcessorException;
 
 }

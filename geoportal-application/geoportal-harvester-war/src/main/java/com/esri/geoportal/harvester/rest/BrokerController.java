@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -93,7 +94,7 @@ public class BrokerController {
       } catch (IllegalArgumentException ex) {
         // ignore
       }
-      return new ResponseEntity<>(engine.getBrokersService().getBrokersDefinitions(ctg).stream().map(d->BrokerResponse.createFrom(d)).collect(Collectors.toList()).toArray(new BrokerResponse[0]), HttpStatus.OK);
+      return new ResponseEntity<>(engine.getBrokersService().getBrokersDefinitions(ctg, LocaleContextHolder.getLocale()).stream().map(d->BrokerResponse.createFrom(d)).collect(Collectors.toList()).toArray(new BrokerResponse[0]), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error listing all brokers"), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -109,7 +110,7 @@ public class BrokerController {
   public ResponseEntity<BrokerResponse> getBroker(@PathVariable UUID brokerId) {
     try {
       LOG.debug(String.format("GET /rest/harvester/brokers/%s", brokerId));
-      return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().findBroker(brokerId)), HttpStatus.OK);
+      return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().findBroker(brokerId, LocaleContextHolder.getLocale())), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error getting broker: %s", brokerId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -126,7 +127,7 @@ public class BrokerController {
     try {
       LOG.debug(String.format("DELETE /rest/harvester/brokers/%s", brokerId));
       engine.getBrokersService().deleteBroker(brokerId);
-      return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().findBroker(brokerId)), HttpStatus.OK);
+      return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().findBroker(brokerId, LocaleContextHolder.getLocale())), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error deleting broker: %s", brokerId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -142,7 +143,7 @@ public class BrokerController {
   public ResponseEntity<BrokerResponse> createBroker(@RequestBody EntityDefinition brokerDefinition) {
     try {
       LOG.debug(String.format("POST /rest/harvester/brokers <-- %s", brokerDefinition));
-      return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().createBroker(brokerDefinition)), HttpStatus.OK);
+      return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().createBroker(brokerDefinition, LocaleContextHolder.getLocale())), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error creating broker: %s", brokerDefinition), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -159,7 +160,7 @@ public class BrokerController {
   public ResponseEntity<BrokerResponse> updateBroker(@RequestBody EntityDefinition brokerDefinition, @PathVariable UUID brokerId) {
     try {
       LOG.debug(String.format("PUT /rest/harvester/brokers/%s <-- %s", brokerId, brokerDefinition));
-      return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().updateBroker(brokerId, brokerDefinition)), HttpStatus.OK);
+      return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().updateBroker(brokerId, brokerDefinition, LocaleContextHolder.getLocale())), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error updating broker: %s <-- %s", brokerId, brokerDefinition), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

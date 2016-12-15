@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.engine.services;
 
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Templates service.
@@ -26,38 +27,48 @@ public interface TemplatesService {
   /**
    * Gets inbound connector templates.
    *
+   * @param locale locale
    * @return list of inbound connector templates
    */
-  List<UITemplate> getInboundConnectorTemplates();
+  List<UITemplate> getInboundConnectorTemplates(Locale locale);
   
   /**
    * Gets outbound connector templates.
    *
+   * @param locale locale
    * @return list of outbound connector templates
    */
-  List<UITemplate> getOutboundConnectorTemplates();
+  List<UITemplate> getOutboundConnectorTemplates(Locale locale);
 
   /**
    * Gets transformer templates.
+   * 
+   * @param locale locale
    * @return transformer templates
    */
-  List<UITemplate> getTransformerTemplates();
+  List<UITemplate> getTransformerTemplates(Locale locale);
   
   /**
    * Gets filter templates.
+   * 
+   * @param locale locale
    * @return filter templates
    */
-  List<UITemplate> getFilterTemplates();
+  List<UITemplate> getFilterTemplates(Locale locale);
   
   /**
    * Gets triggers templates.
+   * 
+   * @param locale locale
    * @return list of trigger templates
    */
-  List<UITemplate> getTriggersTemplates();
+  List<UITemplate> getTriggersTemplates(Locale locale);
 
   /**
    * Gets processors templates.
+   * 
+   * @param locale locale
    * @return list of processor templates
    */
-  List<UITemplate> getProcessorsTemplates();
+  List<UITemplate> getProcessorsTemplates(Locale locale);
 }

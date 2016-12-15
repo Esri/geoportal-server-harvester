@@ -24,6 +24,8 @@ import static com.esri.geoportal.harvester.folder.FolderBrokerDefinitionAdaptor.
 import static com.esri.geoportal.harvester.folder.FolderBrokerDefinitionAdaptor.P_ROOT_FOLDER;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Folder connector.
@@ -38,11 +40,12 @@ public class FolderConnector implements OutputConnector<OutputBroker> {
   }
 
   @Override
-  public UITemplate getTemplate() {
+  public UITemplate getTemplate(Locale locale) {
+    ResourceBundle bundle = ResourceBundle.getBundle("FolderResource", locale);
     List<UITemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new UITemplate.StringArgument(P_ROOT_FOLDER, "Root folder", true));
-    arguments.add(new UITemplate.BooleanArgument(P_FOLDER_CLEANUP, "Perform cleanup"));
-    return new UITemplate(getType(), "Folder", arguments);
+    arguments.add(new UITemplate.StringArgument(P_ROOT_FOLDER, bundle.getString("folder.rootFolder"), true));
+    arguments.add(new UITemplate.BooleanArgument(P_FOLDER_CLEANUP, bundle.getString("folder.cleanup")));
+    return new UITemplate(getType(), bundle.getString("folder"), arguments);
   }
 
   @Override

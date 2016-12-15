@@ -33,6 +33,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -65,7 +66,7 @@ public class XsltTransformer implements Transformer {
   }
 
   @Override
-  public UITemplate getTemplate() {
+  public UITemplate getTemplate(Locale locale) {
     List<UITemplate.Argument> arguments = new ArrayList<>();
     arguments.add(new UITemplate.TextArgument(X_XSLT_XSLT, "XSLT", true));
     arguments.add(new UITemplate.TextArgument(X_XSLT_PROPS, "Properties", false));

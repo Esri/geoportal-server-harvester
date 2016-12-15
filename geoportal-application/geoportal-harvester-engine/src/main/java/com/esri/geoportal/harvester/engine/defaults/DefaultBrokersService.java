@@ -28,6 +28,7 @@ import static com.esri.geoportal.harvester.engine.utils.BrokerReference.Category
 import com.esri.geoportal.harvester.engine.utils.CrudlException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -54,10 +55,10 @@ public class DefaultBrokersService implements BrokersService {
   }
 
   @Override
-  public List<BrokerReference> getBrokersDefinitions(BrokerReference.Category category) throws DataProcessorException {
+  public List<BrokerReference> getBrokersDefinitions(BrokerReference.Category category, Locale locale) throws DataProcessorException {
     if (category != null) {
       try {
-        Set<String> brokerTypes = listTypesByCategory(category);
+        Set<String> brokerTypes = listTypesByCategory(category, locale);
         return brokerDefinitionManager.list().stream()
                 .filter(e -> brokerTypes.contains(e.getValue().getType()))
                 .map(e -> new BrokerReference(e.getKey(), category, e.getValue()))
@@ -66,16 +67,16 @@ public class DefaultBrokersService implements BrokersService {
         throw new DataProcessorException(String.format("Error getting brokers for category: %s", category), ex);
       }
     } else {
-      return Stream.concat(getBrokersDefinitions(INBOUND).stream(), getBrokersDefinitions(OUTBOUND).stream()).collect(Collectors.toList());
+      return Stream.concat(getBrokersDefinitions(INBOUND,locale).stream(), getBrokersDefinitions(OUTBOUND,locale).stream()).collect(Collectors.toList());
     }
   }
 
   @Override
-  public BrokerReference findBroker(UUID brokerId) throws DataProcessorException {
+  public BrokerReference findBroker(UUID brokerId, Locale locale) throws DataProcessorException {
     try {
       EntityDefinition brokerDefinition = brokerDefinitionManager.read(brokerId);
       if (brokerDefinition != null) {
-        BrokerReference.Category category = getBrokerCategoryByType(brokerDefinition.getType());
+        BrokerReference.Category category = getBrokerCategoryByType(brokerDefinition.getType(), locale);
         if (category != null) {
           return new BrokerReference(brokerId, category, brokerDefinition);
         }
@@ -87,8 +88,8 @@ public class DefaultBrokersService implements BrokersService {
   }
 
   @Override
-  public BrokerReference createBroker(EntityDefinition brokerDefinition) throws DataProcessorException {
-    BrokerReference.Category category = getBrokerCategoryByType(brokerDefinition.getType());
+  public BrokerReference createBroker(EntityDefinition brokerDefinition, Locale locale) throws DataProcessorException {
+    BrokerReference.Category category = getBrokerCategoryByType(brokerDefinition.getType(), locale);
     if (category != null) {
       try {
         UUID id = brokerDefinitionManager.create(brokerDefinition);
@@ -101,7 +102,7 @@ public class DefaultBrokersService implements BrokersService {
   }
 
   @Override
-  public BrokerReference updateBroker(UUID brokerId, EntityDefinition brokerDefinition) throws DataProcessorException {
+  public BrokerReference updateBroker(UUID brokerId, EntityDefinition brokerDefinition, Locale locale) throws DataProcessorException {
     try {
       EntityDefinition oldBrokerDef = brokerDefinitionManager.read(brokerId);
       if (oldBrokerDef != null) {
@@ -109,7 +110,7 @@ public class DefaultBrokersService implements BrokersService {
           oldBrokerDef = null;
         }
       }
-      BrokerReference.Category category = oldBrokerDef != null ? getBrokerCategoryByType(oldBrokerDef.getType()) : null;
+      BrokerReference.Category category = oldBrokerDef != null ? getBrokerCategoryByType(oldBrokerDef.getType(), locale) : null;
       return category != null ? new BrokerReference(brokerId, category, brokerDefinition) : null;
     } catch (CrudlException ex) {
       throw new DataProcessorException(String.format("Error updating broker: %s <-- %s", brokerId, brokerDefinition), ex);
@@ -129,12 +130,13 @@ public class DefaultBrokersService implements BrokersService {
    * Lists types by category.
    *
    * @param category category
+   * @param locale locale
    * @return set of types within the category
    */
-  private Set<String> listTypesByCategory(BrokerReference.Category category) {
+  private Set<String> listTypesByCategory(BrokerReference.Category category, Locale locale) {
     List<UITemplate> templates
-            = category == INBOUND ? inboundConnectorRegistry.getTemplates()
-                    : category == OUTBOUND ? outboundConnectorRegistry.getTemplates()
+            = category == INBOUND ? inboundConnectorRegistry.getTemplates(locale)
+                    : category == OUTBOUND ? outboundConnectorRegistry.getTemplates(locale)
                             : null;
 
     if (templates != null) {
@@ -148,12 +150,13 @@ public class DefaultBrokersService implements BrokersService {
    * Gets broker category by broker type.
    *
    * @param brokerType broker type
+   * @param locale locale
    * @return broker category or <code>null</code> if category couldn't be
    * determined
    */
-  private BrokerReference.Category getBrokerCategoryByType(String brokerType) {
-    Set<String> inboundTypes = inboundConnectorRegistry.getTemplates().stream().map(t -> t.getType()).collect(Collectors.toSet());
-    Set<String> outboundTypes = outboundConnectorRegistry.getTemplates().stream().map(t -> t.getType()).collect(Collectors.toSet());
+  private BrokerReference.Category getBrokerCategoryByType(String brokerType, Locale locale) {
+    Set<String> inboundTypes = inboundConnectorRegistry.getTemplates(locale).stream().map(t -> t.getType()).collect(Collectors.toSet());
+    Set<String> outboundTypes = outboundConnectorRegistry.getTemplates(locale).stream().map(t -> t.getType()).collect(Collectors.toSet());
     return inboundTypes.contains(brokerType) ? INBOUND : outboundTypes.contains(brokerType) ? OUTBOUND : null;
   }
 }

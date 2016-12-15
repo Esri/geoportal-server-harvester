@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -59,7 +60,7 @@ public class TriggerController {
   @RequestMapping(value = "/rest/harvester/triggers/types", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate[] listTriggerTypes() {
     LOG.debug(String.format("GET /rest/harvester/triggers/types"));
-    return engine.getTemplatesService().getTriggersTemplates().toArray(new UITemplate[0]);
+    return engine.getTemplatesService().getTriggersTemplates(LocaleContextHolder.getLocale()).toArray(new UITemplate[0]);
   }
   
   /**

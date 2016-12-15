@@ -20,6 +20,7 @@ import java.util.List;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.general.Entity;
 import java.util.HashMap;
+import java.util.Locale;
 
 /**
  * Entity registry.
@@ -38,7 +39,7 @@ public abstract class EntityRegistry<E extends Entity> extends HashMap<String,E>
    * Gets all templates.
    * @return list of all templates
    */
-  public List<UITemplate> getTemplates() {
-    return Arrays.asList(values().stream().map(f->f.getTemplate()).toArray(UITemplate[]::new));
+  public List<UITemplate> getTemplates(Locale locale) {
+    return Arrays.asList(values().stream().map(f->f.getTemplate(locale)).toArray(UITemplate[]::new));
   }
 }

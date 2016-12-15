@@ -25,6 +25,8 @@ import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.util.ArrayList;
 import java.util.List;
 import static com.esri.geoportal.harvester.ckan.CkanBrokerDefinitionAdaptor.P_API_KEY;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * CKAN connector.
@@ -49,11 +51,12 @@ public class CkanConnector implements InputConnector<InputBroker> {
   }
 
   @Override
-  public UITemplate getTemplate() {
+  public UITemplate getTemplate(Locale locale) {
+    ResourceBundle bundle = ResourceBundle.getBundle("CkanResource", locale);
     List<UITemplate.Argument> args = new ArrayList<>();
-    args.add(new UITemplate.StringArgument(P_HOST_URL, "Url", true));
-    args.add(new UITemplate.StringArgument(P_API_KEY, "API key"));
-    return new UITemplate(getType(), "CKAN", args);
+    args.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("ckan.url"), true));
+    args.add(new UITemplate.StringArgument(P_API_KEY, bundle.getString("ckan.apiKey")));
+    return new UITemplate(getType(), bundle.getString("ckan"), args);
   }
 
   @Override

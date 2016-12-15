@@ -24,6 +24,8 @@ import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * UNC connector.
@@ -38,11 +40,12 @@ public class UncConnector implements InputConnector<InputBroker> {
   }
   
   @Override
-  public UITemplate getTemplate() {
+  public UITemplate getTemplate(Locale locale) {
+    ResourceBundle bundle = ResourceBundle.getBundle("UncResource", locale);
     List<UITemplate.Argument> args = new ArrayList<>();
-    args.add(new UITemplate.StringArgument(P_ROOT_FOLDER, "Root Folder", true));
-    args.add(new UITemplate.StringArgument(P_PATTERN, "Pattern"));
-    return new UITemplate(getType(), "UNC Path", args);
+    args.add(new UITemplate.StringArgument(P_ROOT_FOLDER, bundle.getString("unc.rootFolder"), true));
+    args.add(new UITemplate.StringArgument(P_PATTERN, bundle.getString("unc.pattern")));
+    return new UITemplate(getType(), bundle.getString("unc"), args);
   }
 
   @Override
