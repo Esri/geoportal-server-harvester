@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -67,10 +68,11 @@ public class XsltTransformer implements Transformer {
 
   @Override
   public UITemplate getTemplate(Locale locale) {
+    ResourceBundle bundle = ResourceBundle.getBundle("EngineResource", locale);
     List<UITemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new UITemplate.TextArgument(X_XSLT_XSLT, "XSLT", true));
-    arguments.add(new UITemplate.TextArgument(X_XSLT_PROPS, "Properties", false));
-    UITemplate uiTemplate = new UITemplate(getType(), "XSLT transformer", arguments);
+    arguments.add(new UITemplate.TextArgument(X_XSLT_XSLT, bundle.getString("engine.transformers.xslttransformer.xslt"), true));
+    arguments.add(new UITemplate.TextArgument(X_XSLT_PROPS, bundle.getString("engine.transformers.xslttransformer.properties"), false));
+    UITemplate uiTemplate = new UITemplate(getType(), bundle.getString("engine.transformers.xslttransformer"), arguments);
     return uiTemplate;
   }
 

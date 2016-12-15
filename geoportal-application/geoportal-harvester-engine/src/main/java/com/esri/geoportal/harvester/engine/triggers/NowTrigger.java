@@ -22,6 +22,7 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.util.Locale;
+import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +46,8 @@ public class NowTrigger implements Trigger {
 
   @Override
   public UITemplate getTemplate(Locale locale) {
-    return new UITemplate(getType(), "Harvest now", null);
+    ResourceBundle bundle = ResourceBundle.getBundle("EngineResource", locale);
+    return new UITemplate(getType(), bundle.getString("engine.triggers.now"), null);
   }
 
   @Override

@@ -31,6 +31,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.WeakHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -90,9 +91,10 @@ public class AtTrigger implements Trigger {
 
   @Override
   public UITemplate getTemplate(Locale locale) {
+    ResourceBundle bundle = ResourceBundle.getBundle("EngineResource", locale);
     List<UITemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new UITemplate.TemporalArgument(T_AT_TIME, "Time", true));
-    UITemplate uiTemplate = new UITemplate(getType(), "Harvest at", arguments);
+    arguments.add(new UITemplate.TemporalArgument(T_AT_TIME, bundle.getString("engine.triggers.at.time"), true));
+    UITemplate uiTemplate = new UITemplate(getType(), bundle.getString("engine.triggers.at"), arguments);
     return uiTemplate;
   }
 

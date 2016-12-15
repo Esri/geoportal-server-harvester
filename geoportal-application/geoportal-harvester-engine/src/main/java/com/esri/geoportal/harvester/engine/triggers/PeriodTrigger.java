@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.WeakHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -73,9 +74,10 @@ public class PeriodTrigger implements Trigger {
 
   @Override
   public UITemplate getTemplate(Locale locale) {
+    ResourceBundle bundle = ResourceBundle.getBundle("EngineResource", locale);
     List<UITemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new UITemplate.PeriodicalArgument(T_PERIOD, "Period", true));
-    UITemplate uiTemplate = new UITemplate(getType(), "Harvest periodically", arguments);
+    arguments.add(new UITemplate.PeriodicalArgument(T_PERIOD, bundle.getString("engine.triggers.period.period"), true));
+    UITemplate uiTemplate = new UITemplate(getType(), bundle.getString("engine.triggers.period"), arguments);
     return uiTemplate;
   }
 
