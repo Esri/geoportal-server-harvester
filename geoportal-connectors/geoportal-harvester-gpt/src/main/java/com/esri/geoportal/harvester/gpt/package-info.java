@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * Geoportal 2.0 catalog output.
+ * Geoportal Server 2.0 catalog output.
  * <p>
  * Allows to publish information into the Geoportal 2.0 catalog.
  * <p>
