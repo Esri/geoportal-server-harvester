@@ -26,7 +26,6 @@ import java.util.Base64;
  * Text scrambler.
  */
 public class TextScrambler {
-
   
   /**
    * Scrambles text.
@@ -62,12 +61,12 @@ public class TextScrambler {
       Base64.Decoder decoder = Base64.getDecoder();
       byte[] decoded = decoder.decode(encText.getBytes("UTF-8"));
       
-      String text = URLDecoder.decode(new String(decoded,"UTF-8"), "UTF-8");
-      if (!hash(text).equals(sCrc)) {
+      String sDecoded = new String(decoded,"UTF-8");
+      if (!hash(sDecoded).equals(sCrc)) {
         return str;
       }
       
-      return text;
+      return URLDecoder.decode(sDecoded, "UTF-8");
     } catch (NumberFormatException|UnsupportedEncodingException|NoSuchAlgorithmException ex) {
       return str;
     }
