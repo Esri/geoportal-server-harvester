@@ -59,6 +59,10 @@ define({
             outbound: "Error loading outbound connectors"
           }
         }
+      },
+      removeDialog: {
+        title: "Delete adaptor?",
+        content: "Please, confirm deletion of the broker: ${title}"
       }
     },
     
@@ -89,6 +93,10 @@ define({
       scheduler: {
         type: "Type",
         submit: "Submit"
+      },
+      removeDialog: {
+        title: "Delete task?",
+        content: "Please, confirm deletion of the task:<br> ${title}"
       },
       errors: {
         typesLoadingError: "Unable to load trigger types."

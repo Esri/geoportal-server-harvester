@@ -21,18 +21,20 @@ define(["dojo/_base/declare",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/Broker.html",
         "dojo/_base/lang",
+        "dojo/string",
         "dojo/topic",
         "dojo/on",
         "dojo/json",
         "dijit/Dialog",
+        "dijit/ConfirmDialog",
         "hrv/rest/Brokers",
         "hrv/ui/brokers/BrokerEditorPane"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,topic,on,json,
-           Dialog,
+           lang,string,topic,on,json,
+           Dialog,ConfirmDialog,
            BrokersREST,BrokerEditorPane
           ){
   
@@ -86,7 +88,16 @@ define(["dojo/_base/declare",
       },
       
       _onRemove: function() {
-        this.emit("remove",{data: this.data});
+        var dlg = new ConfirmDialog({
+          title: this.i18n.brokers.removeDialog.title,
+          content: string.substitute(this.i18n.brokers.removeDialog.content,{title: this.data.brokerDefinition.label}),
+          "class": "h-brokers-remove-dialog",
+          onExecute: lang.hitch(this,function(){
+            this.emit("remove",{data: this.data});
+          })
+        });
+        dlg.show();
+        //this.emit("remove",{data: this.data});
       }
     });
 });

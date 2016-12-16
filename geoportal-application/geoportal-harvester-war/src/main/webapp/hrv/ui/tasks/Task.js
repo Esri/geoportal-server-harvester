@@ -22,12 +22,14 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/Task.html",
         "dojo/_base/lang",
         "dojo/_base/array",
+        "dojo/string",
         "dojo/dom-attr",
         "dojo/topic",
         "dojo/on",
         "dojo/json",
         "dojo/promise/all",
         "dijit/Dialog",
+        "dijit/ConfirmDialog",
         "hrv/rest/Tasks",
         "hrv/rest/Triggers",
         "hrv/ui/tasks/SchedulerEditorPane",
@@ -36,8 +38,8 @@ define(["dojo/_base/declare",
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,domAttr,topic,on,json,all,
-           Dialog,
+           lang,array,string,domAttr,topic,on,json,all,
+           Dialog,ConfirmDialog,
            TasksREST, TriggersREST,
            SchedulerEditorPane, TaskUtils
           ){
@@ -56,7 +58,15 @@ define(["dojo/_base/declare",
       },
       
       _onRemove: function() {
-        this.emit("remove",{data: this.data});
+        var dlg = new ConfirmDialog({
+          title: this.i18n.tasks.removeDialog.title,
+          content: string.substitute(this.i18n.tasks.removeDialog.content,{title: TaskUtils.makeLabel(this.data.taskDefinition)}),
+          "class": "h-tasks-remove-dialog",
+          onExecute: lang.hitch(this,function(){
+            this.emit("remove",{data: this.data});
+          })
+        });
+        dlg.show();
       },
       
       _onRun: function() {

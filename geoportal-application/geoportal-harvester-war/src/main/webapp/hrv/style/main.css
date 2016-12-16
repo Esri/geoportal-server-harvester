@@ -100,6 +100,10 @@ html,body {
   cursor: pointer;
 }
 
+.h-brokers-remove-dialog {
+  width: 300px;
+}
+
 
 .h-status {
   
@@ -252,8 +256,12 @@ html,body {
   padding-right: 0.3em;
 }
 
-.n-tasks-import-button > input {
+.h-tasks-import-button > input {
   cursor: pointer;
+}
+
+.h-tasks-remove-dialog {
+  width: 300px;
 }
 
 .h-history-caption {
