@@ -53,7 +53,12 @@ public class CkanConnector implements InputConnector<InputBroker> {
   public UITemplate getTemplate(Locale locale) {
     ResourceBundle bundle = ResourceBundle.getBundle("CkanResource", locale);
     List<UITemplate.Argument> args = new ArrayList<>();
-    args.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("ckan.url"), true));
+    args.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("ckan.url"), true){
+      @Override
+      public String getHint() {
+        return bundle.getString("ckan.hint");
+      }
+    });
     args.add(new UITemplate.StringArgument(P_API_KEY, bundle.getString("ckan.apiKey")));
     return new UITemplate(getType(), bundle.getString("ckan"), args);
   }

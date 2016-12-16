@@ -20,6 +20,7 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/dom-construct",
+        "dojo/html",
         "dojo/number",
         "dijit/form/Select",
         "dijit/form/ValidationTextBox",
@@ -27,12 +28,13 @@ define(["dojo/_base/declare",
         "dijit/form/TimeTextBox",
         "dijit/form/RadioButton",
         "dijit/form/Form",
+        "dojox/html/entities",
         "hrv/utils/TextScrambler"
       ],
   function(declare,i18n,
-           lang,array,domConstruct,number,
+           lang,array,domConstruct,html,number,
            Select,ValidationTextBox,CheckBox,TimeTextBox,RadioButton,Form,
-           TextScrambler
+           entities,TextScrambler
           ){
   
     return {
@@ -59,6 +61,12 @@ define(["dojo/_base/declare",
         var titleNode = domConstruct.create("span",{innerHTML: arg.label+":", class: "h-editor-argname"},argNode);
         var placeholderWrapper = domConstruct.create("span",{class: "h-editor-argctrl"},argNode);
         var placeholderNode = domConstruct.create("span",null,placeholderWrapper);
+        
+        if (arg.hint) {
+          domConstruct.create("br",null,placeholderWrapper,"last");
+          var hintNode = domConstruct.create("span",{class: "h-editor-argctrl-hint"},placeholderWrapper,"last");
+          html.set(hintNode,i18n.brokers.hint+": "+entities.encode(arg.hint));
+        }
         
         switch(arg.type) {
           case "string": return this.renderString(placeholderNode,arg);

@@ -43,7 +43,12 @@ public class GptConnector implements InputConnector<InputBroker> {
   public UITemplate getTemplate(Locale locale) {
     ResourceBundle bundle = ResourceBundle.getBundle("GptSrcResource", locale);
     List<UITemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("gptsrc.url"), true));
+    arguments.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("gptsrc.url"), true){
+      @Override
+      public String getHint() {
+        return bundle.getString("gptsrc.hint");
+      }
+    });
     arguments.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("gptsrc.username"), true));
     arguments.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("gptsrc.password"), true) {
       public boolean isPassword() {

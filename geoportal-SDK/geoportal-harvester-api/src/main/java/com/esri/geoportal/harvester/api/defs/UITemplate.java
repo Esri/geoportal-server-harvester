@@ -92,6 +92,8 @@ public final class UITemplate {
     ArgumentType getType();
     String getName();
     String getLabel();
+    String getHint();
+    boolean getRequired();
   }
   
   /**
@@ -140,8 +142,14 @@ public final class UITemplate {
      * Checks if is required.
      * @return <code>true</code> if required
      */
+    @Override
     public boolean getRequired() {
       return required;
+    }
+
+    @Override
+    public String getHint() {
+      return null;
     }
 
     @Override

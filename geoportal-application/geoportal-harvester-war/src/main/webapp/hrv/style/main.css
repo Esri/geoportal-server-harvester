@@ -133,6 +133,11 @@ html,body {
   
 }
 
+.h-editor-argctrl-hint {
+  font-size: small;
+  font-style: italic;
+}
+
 .h-broker-editor {
 }
 

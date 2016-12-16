@@ -43,7 +43,12 @@ public class GptConnector implements OutputConnector<OutputBroker> {
   public UITemplate getTemplate(Locale locale) {
     ResourceBundle bundle = ResourceBundle.getBundle("GptResource", locale);
     List<UITemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("gpt.url"), true));
+    arguments.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("gpt.url"), true){
+      @Override
+      public String getHint() {
+        return bundle.getString("gpt.hint");
+      }
+    });
     arguments.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("gpt.username"), true));
     arguments.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("gpt.password"), true) {
       public boolean isPassword() {

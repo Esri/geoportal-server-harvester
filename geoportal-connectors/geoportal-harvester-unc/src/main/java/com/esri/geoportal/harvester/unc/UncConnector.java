@@ -42,7 +42,12 @@ public class UncConnector implements InputConnector<InputBroker> {
   public UITemplate getTemplate(Locale locale) {
     ResourceBundle bundle = ResourceBundle.getBundle("UncResource", locale);
     List<UITemplate.Argument> args = new ArrayList<>();
-    args.add(new UITemplate.StringArgument(P_ROOT_FOLDER, bundle.getString("unc.rootFolder"), true));
+    args.add(new UITemplate.StringArgument(P_ROOT_FOLDER, bundle.getString("unc.rootFolder"), true){
+      @Override
+      public String getHint() {
+        return bundle.getString("unc.hint");
+      }
+    });
     args.add(new UITemplate.StringArgument(P_PATTERN, bundle.getString("unc.pattern")));
     return new UITemplate(getType(), bundle.getString("unc"), args);
   }

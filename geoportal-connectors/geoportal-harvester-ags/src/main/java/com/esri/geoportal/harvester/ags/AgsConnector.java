@@ -52,7 +52,12 @@ public class AgsConnector implements InputConnector<InputBroker> {
   public UITemplate getTemplate(Locale locale) {
     ResourceBundle bundle = ResourceBundle.getBundle("AgsResource", locale);
     List<UITemplate.Argument> args = new ArrayList<>();
-    args.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("ags.url"), true));
+    args.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("ags.url"), true){
+      @Override
+      public String getHint() {
+        return bundle.getString("ags.hint");
+      }
+    });
     args.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("ags.username"), false));
     args.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("ags.password"), false) {
       public boolean isPassword() {

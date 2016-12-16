@@ -48,7 +48,12 @@ public class CswConnector implements InputConnector<InputBroker> {
   public UITemplate getTemplate(Locale locale) {
     ResourceBundle bundle = ResourceBundle.getBundle("CswResource", locale);
     List<UITemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("csw.url"), true));
+    arguments.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("csw.url"), true){
+      @Override
+      public String getHint() {
+        return bundle.getString("csw.hint");
+      }
+    });
     arguments.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("csw.username"), false));
     arguments.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("csw.password"), false) {
       public boolean isPassword() {

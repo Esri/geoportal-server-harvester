@@ -58,7 +58,12 @@ public class AgpInputConnector implements InputConnector<InputBroker> {
   public UITemplate getTemplate(Locale locale) {
     ResourceBundle bundle = ResourceBundle.getBundle("AgpSrcResource", locale);
     List<UITemplate.Argument> args = new ArrayList<>();
-    args.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("agpsrc.url"), true));
+    args.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("agpsrc.url"), true){
+      @Override
+      public String getHint() {
+        return bundle.getString("agpsrc.hint");
+      }
+    });
     args.add(new UITemplate.StringArgument(P_FOLDER_ID, bundle.getString("agpsrc.folderId"), false));
     args.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("agpsrc.username"), true));
     args.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("agpsrc.password"), true) {

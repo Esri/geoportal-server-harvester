@@ -48,6 +48,7 @@ define({
       edit: "edit",
       remove: "remove",
       add: "Add",
+      hint: "Hint",
       editor: {
         caption: "Broker",
         type: "Type:",

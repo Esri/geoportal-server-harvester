@@ -42,7 +42,12 @@ public class FolderConnector implements OutputConnector<OutputBroker> {
   public UITemplate getTemplate(Locale locale) {
     ResourceBundle bundle = ResourceBundle.getBundle("FolderResource", locale);
     List<UITemplate.Argument> arguments = new ArrayList<>();
-    arguments.add(new UITemplate.StringArgument(P_ROOT_FOLDER, bundle.getString("folder.rootFolder"), true));
+    arguments.add(new UITemplate.StringArgument(P_ROOT_FOLDER, bundle.getString("folder.rootFolder"), true){
+      @Override
+      public String getHint() {
+        return bundle.getString("folder.hint");
+      }
+    });
     arguments.add(new UITemplate.BooleanArgument(P_FOLDER_CLEANUP, bundle.getString("folder.cleanup")));
     return new UITemplate(getType(), bundle.getString("folder"), arguments);
   }
