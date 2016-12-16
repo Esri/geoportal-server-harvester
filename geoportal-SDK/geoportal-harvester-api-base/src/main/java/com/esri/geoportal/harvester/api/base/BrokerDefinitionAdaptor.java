@@ -42,8 +42,8 @@ public abstract class BrokerDefinitionAdaptor {
   }
   
   /**
-   * Allows to override/update params.
-   * @param params 
+   * Allows to override/update parameters.
+   * @param params initialization parameters
    */
   public abstract void override(Map<String,String> params);
   

@@ -37,6 +37,7 @@ public abstract class EntityRegistry<E extends Entity> extends HashMap<String,E>
   
   /**
    * Gets all templates.
+   * @param locale locale
    * @return list of all templates
    */
   public List<UITemplate> getTemplates(Locale locale) {
