@@ -27,13 +27,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import static com.esri.geoportal.harvester.waf.WafConstants.*;
 
 /**
  * WAF broker definition adaptor.
  */
 /*package*/ class WafBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
-  public static final String P_HOST_URL    = "waf-host-url";
-  public static final String P_PATTERN     = "waf-pattern";
   
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private final CredentialsDefinitionAdaptor credAdaptor;

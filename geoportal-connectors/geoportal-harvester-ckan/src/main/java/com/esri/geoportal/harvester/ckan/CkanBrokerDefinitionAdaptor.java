@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.ckan;
 
+import static com.esri.geoportal.harvester.ckan.CkanConstants.*;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
@@ -30,8 +31,6 @@ import org.apache.commons.lang3.StringUtils;
  * CKAN broker definition adaptor.
  */
 /*package*/class CkanBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
-  public static final String P_HOST_URL  = "ckan-host-url";
-  public static final String P_API_KEY     = "ckan-apikey";
   
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private URL hostUrl;

@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.folder;
 
+import static com.esri.geoportal.harvester.folder.FolderConstants.*;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -26,9 +27,6 @@ import org.apache.commons.lang3.StringUtils;
  * Folder broker definition adaptor.
  */
 /*package*/ class FolderBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
-
-  public static final String P_ROOT_FOLDER = "folder-root-folder";
-  public static final String P_FOLDER_CLEANUP = "folder-cleanup";
   
   private File rootFolder;
   private boolean cleanup;

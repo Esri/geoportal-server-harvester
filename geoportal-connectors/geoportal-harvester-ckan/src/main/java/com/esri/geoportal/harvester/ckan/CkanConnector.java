@@ -15,8 +15,8 @@
  */
 package com.esri.geoportal.harvester.ckan;
 
+import static com.esri.geoportal.harvester.ckan.CkanConstants.*;
 import com.esri.geoportal.commons.meta.MetaBuilder;
-import static com.esri.geoportal.harvester.ckan.CkanBrokerDefinitionAdaptor.P_HOST_URL;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -24,7 +24,6 @@ import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.util.ArrayList;
 import java.util.List;
-import static com.esri.geoportal.harvester.ckan.CkanBrokerDefinitionAdaptor.P_API_KEY;
 import java.util.Locale;
 import java.util.ResourceBundle;
 

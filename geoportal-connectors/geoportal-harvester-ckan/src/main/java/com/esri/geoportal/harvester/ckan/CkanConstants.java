@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.commons.constants;
+package com.esri.geoportal.harvester.ckan;
 
 /**
- * Crendentials constants.
+ * CKAN constants.
  */
-public final class CredentialsConstants {
-  /** user name property key */
-  public static final String P_CRED_USERNAME = "cred-username";
-  /** password property key */
-  public static final String P_CRED_PASSWORD = "cred-password";
+/*package*/ final class CkanConstants {
+  public static final String P_HOST_URL  = "ckan-host-url";
+  public static final String P_API_KEY   = "ckan-apikey";
 }

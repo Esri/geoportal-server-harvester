@@ -22,15 +22,12 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import java.util.Map;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import static com.esri.geoportal.harvester.api.base.BotsConstants.*;
 
 /**
  * Bots properties adaptor.
  */
 public final class BotsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
-  public static final String P_BOTS_AGENT = "bots-config-agent";
-  public static final String P_BOTS_ENABLED = "bots-config-enabled";
-  public static final String P_BOTS_OVERRIDE = "bots-config-override";
-  public static final String P_BOTS_MODE = "bots-mode";
 
 
   /**

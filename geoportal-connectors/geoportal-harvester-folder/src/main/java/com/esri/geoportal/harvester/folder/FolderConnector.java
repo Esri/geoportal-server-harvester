@@ -15,13 +15,12 @@
  */
 package com.esri.geoportal.harvester.folder;
 
+import static com.esri.geoportal.harvester.folder.FolderConstants.*;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
-import static com.esri.geoportal.harvester.folder.FolderBrokerDefinitionAdaptor.P_FOLDER_CLEANUP;
-import static com.esri.geoportal.harvester.folder.FolderBrokerDefinitionAdaptor.P_ROOT_FOLDER;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;

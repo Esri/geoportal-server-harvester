@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.commons.constants;
+package com.esri.geoportal.harvester.unc;
 
 /**
- * Crendentials constants.
+ * UNC constants.
  */
-public final class CredentialsConstants {
-  /** user name property key */
-  public static final String P_CRED_USERNAME = "cred-username";
-  /** password property key */
-  public static final String P_CRED_PASSWORD = "cred-password";
+/*package*/ final class UncConstants {
+  public static final String P_ROOT_FOLDER    = "unc-root-folder";
+  public static final String P_PATTERN        = "unc-pattern";
 }

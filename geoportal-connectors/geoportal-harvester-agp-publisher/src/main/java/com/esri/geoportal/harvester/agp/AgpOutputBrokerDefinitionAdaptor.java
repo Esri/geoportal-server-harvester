@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.agp;
 
+import static com.esri.geoportal.harvester.agp.AgpConstants.*;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
@@ -29,9 +30,6 @@ import org.apache.commons.lang3.StringUtils;
  * ArcGIS Portal definition adaptor.
  */
 /*package*/ class AgpOutputBrokerDefinitionAdaptor  extends BrokerDefinitionAdaptor {
-  public static final String P_HOST_URL    = "agp-host-url";
-  public static final String P_FOLDER_ID   = "agp-folder-id";
-  public static final String P_FOLDER_CLEANUP = "agp-folder-cleanup";
 
   private final CredentialsDefinitionAdaptor credAdaptor;
   

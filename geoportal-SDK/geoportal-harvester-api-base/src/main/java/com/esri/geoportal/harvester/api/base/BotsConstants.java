@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.commons.constants;
+package com.esri.geoportal.harvester.api.base;
 
 /**
- * Crendentials constants.
+ * Bots constants.
  */
-public final class CredentialsConstants {
-  /** user name property key */
-  public static final String P_CRED_USERNAME = "cred-username";
-  /** password property key */
-  public static final String P_CRED_PASSWORD = "cred-password";
+public final class BotsConstants {
+  public static final String P_BOTS_AGENT = "bots-config-agent";
+  public static final String P_BOTS_ENABLED = "bots-config-enabled";
+  public static final String P_BOTS_OVERRIDE = "bots-config-override";
+  public static final String P_BOTS_MODE = "bots-mode";
 }

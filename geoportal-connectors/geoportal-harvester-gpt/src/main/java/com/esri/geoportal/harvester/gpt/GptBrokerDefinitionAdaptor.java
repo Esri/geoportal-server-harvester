@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.gpt;
 
+import static com.esri.geoportal.harvester.gpt.GptConstants.*;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
@@ -29,9 +30,6 @@ import org.apache.commons.lang3.StringUtils;
  * GPT broker definition adaptor.
  */
 /*package*/ class GptBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
-  public static final String P_HOST_URL        = "gpt-host-url";
-  public static final String P_FORCE_ADD       = "gpt-force-add";
-  public static final String P_CLEANUP         = "gpt-cleanup";
 
   private final CredentialsDefinitionAdaptor credAdaptor;
   private URL hostUrl;

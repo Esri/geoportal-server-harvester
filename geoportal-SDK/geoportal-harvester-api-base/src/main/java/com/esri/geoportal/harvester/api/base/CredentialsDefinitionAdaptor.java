@@ -15,8 +15,7 @@
  */
 package com.esri.geoportal.harvester.api.base;
 
-import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_PASSWORD;
-import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_USERNAME;
+import static com.esri.geoportal.commons.constants.CredentialsConstants.*;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import java.util.Map;

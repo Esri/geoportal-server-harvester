@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.commons.constants;
+package com.esri.geoportal.harvester.ags;
 
 /**
- * Crendentials constants.
+ * AGS constants.
  */
-public final class CredentialsConstants {
-  /** user name property key */
-  public static final String P_CRED_USERNAME = "cred-username";
-  /** password property key */
-  public static final String P_CRED_PASSWORD = "cred-password";
+/*package*/ final class AgsConstants {
+  public static final String P_HOST_URL      = "ags-host-url";
+  public static final String P_ENABLE_LAYERS = "ags-enable-layers";
 }

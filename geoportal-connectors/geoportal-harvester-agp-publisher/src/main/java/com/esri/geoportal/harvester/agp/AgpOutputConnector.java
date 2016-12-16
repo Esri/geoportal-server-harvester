@@ -15,12 +15,9 @@
  */
 package com.esri.geoportal.harvester.agp;
 
-import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_PASSWORD;
-import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_USERNAME;
+import static com.esri.geoportal.commons.constants.CredentialsConstants.*;
+import static com.esri.geoportal.harvester.agp.AgpConstants.*;
 import com.esri.geoportal.commons.meta.MetaAnalyzer;
-import static com.esri.geoportal.harvester.agp.AgpOutputBrokerDefinitionAdaptor.P_FOLDER_CLEANUP;
-import static com.esri.geoportal.harvester.agp.AgpOutputBrokerDefinitionAdaptor.P_FOLDER_ID;
-import static com.esri.geoportal.harvester.agp.AgpOutputBrokerDefinitionAdaptor.P_HOST_URL;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;

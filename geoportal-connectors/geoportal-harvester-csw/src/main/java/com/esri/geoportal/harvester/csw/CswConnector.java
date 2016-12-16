@@ -15,8 +15,8 @@
  */
 package com.esri.geoportal.harvester.csw;
 
-import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_PASSWORD;
-import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_USERNAME;
+import static com.esri.geoportal.commons.constants.CredentialsConstants.*;
+import static com.esri.geoportal.harvester.csw.CswConstants.*;
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.impl.ProfilesProvider;
@@ -26,8 +26,6 @@ import com.esri.geoportal.harvester.api.defs.UITemplate.Choice;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
-import static com.esri.geoportal.harvester.csw.CswBrokerDefinitionAdaptor.P_HOST_URL;
-import static com.esri.geoportal.harvester.csw.CswBrokerDefinitionAdaptor.P_PROFILE_ID;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

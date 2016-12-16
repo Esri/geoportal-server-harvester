@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.ags;
 
+import static com.esri.geoportal.harvester.ags.AgsConstants.*;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
@@ -33,8 +34,6 @@ import org.apache.commons.lang3.StringUtils;
  * Ags broker definition adaptor.
  */
 /*package*/ class AgsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
-  public static final String P_HOST_URL      = "ags-host-url";
-  public static final String P_ENABLE_LAYERS = "ags-enable-layers";
   
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private final CredentialsDefinitionAdaptor credAdaptor;

@@ -21,13 +21,12 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.io.File;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import static com.esri.geoportal.harvester.unc.UncConstants.*;
 
 /**
  * UNC broker definition adaptor.
  */
 public class UncBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
-  public static final String P_ROOT_FOLDER    = "unc-root-folder";
-  public static final String P_PATTERN        = "unc-pattern";
   
   private File rootFolder;
   private String pattern;

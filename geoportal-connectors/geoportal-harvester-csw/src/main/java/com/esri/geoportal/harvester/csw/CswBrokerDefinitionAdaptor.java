@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.csw;
 
+import static com.esri.geoportal.harvester.csw.CswConstants.*;
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.impl.ProfilesProvider;
@@ -35,9 +36,6 @@ import org.apache.commons.lang3.StringUtils;
  * CSW definition.
  */
 /*package*/ class CswBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
-
-  public static final String P_HOST_URL = "csw-host-url";
-  public static final String P_PROFILE_ID = "csw-profile-id";
 
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private final CredentialsDefinitionAdaptor credAdaptor;
