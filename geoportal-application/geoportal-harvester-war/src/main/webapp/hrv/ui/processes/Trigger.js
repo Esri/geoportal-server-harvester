@@ -21,17 +21,18 @@ define(["dojo/_base/declare",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/Trigger.html",
         "dojo/_base/lang",
-        "dojo/dom-class",
-        "dojo/dom-style",
+        "dojo/string",
         "dojo/html",
         "dojo/topic",
+        "dijit/ConfirmDialog",
         "hrv/rest/Triggers",
         "hrv/utils/TaskUtils"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,domClass,domStyle,html,topic,
+           lang,string,html,topic,
+           ConfirmDialog,
            TriggersREST, TaskUtils
           ){
   
@@ -45,20 +46,24 @@ define(["dojo/_base/declare",
       },
     
       postCreate: function(){
-        html.set(this.titleNode,this._makeLabel(this.data.triggerDefinition));
-      },
-      
-      _makeLabel: function(triggerDefinition) {
-        return TaskUtils.makeLabel(triggerDefinition.taskDefinition);
+        html.set(this.titleNode,TaskUtils.makeLabel(this.data.triggerDefinition.taskDefinition));
       },
       
       _onCancel: function(evt) {
-        TriggersREST.delete(this.data.uuid).then(
-            lang.hitch(this,this._onCanceled),
-            lang.hitch(this,function(error){
-              topic.publish("msg",this.i18n.triggers.errors.canceling);
-            })
-        );
+        var dlg = new ConfirmDialog({
+          title: this.i18n.triggers.removeDialog.title,
+          content: string.substitute(this.i18n.triggers.removeDialog.content,{title: TaskUtils.makeLabel(this.data.triggerDefinition.taskDefinition)}),
+          "class": "h-processes-trigger-remove-dialog",
+          onExecute: lang.hitch(this,function(){
+            TriggersREST.delete(this.data.uuid).then(
+                lang.hitch(this,this._onCanceled),
+                lang.hitch(this,function(error){
+                  topic.publish("msg",this.i18n.triggers.errors.canceling);
+                })
+            );
+          })
+        });
+        dlg.show();
       },
       
       _onCanceled: function(evt) {

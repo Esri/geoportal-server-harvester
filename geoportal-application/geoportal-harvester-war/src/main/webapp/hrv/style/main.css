@@ -196,6 +196,10 @@ html,body {
   
 }
 
+.h-processes-trigger-remove-dialog {
+  width: 400px;
+}
+
 .h-processes-trigger-caption {
   font-size: medium;
   font-weight: bold;

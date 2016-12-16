@@ -117,6 +117,10 @@ define({
     triggers: {
       caption: "Scheduled processes",
       cancel: "cancel",
+      removeDialog: {
+        title: "Cancel scheduled process?",
+        content: "Please, confirm cancelation of the scheduled process:<br> ${title}"
+      },
       errors: {
         loading: "Error loading triggers",
         canceling: "Error canceling trigger"
