@@ -22,8 +22,9 @@ define(["dojo/_base/declare",
   
     return {
       encode: function(text) {
+        text = encodeURIComponent(text);
         var crc = this._hash(text);
-        var encoded = btoa(encodeURIComponent(text));
+        var encoded = btoa(text);
         return crc + encoded;
       },
       
@@ -34,12 +35,12 @@ define(["dojo/_base/declare",
         var crc = text.substr(0,24);
         var encoded = text.slice(24);
         
-        var decoded = decodeURIComponent(atob(encoded));
+        var decoded = atob(encoded);
         if (this._hash(decoded)!=crc) {
           return text;
         }
         
-        return decoded;
+        return decodeURIComponent(decoded);
       },
 
       _hash: function (string) {
