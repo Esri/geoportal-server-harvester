@@ -99,6 +99,10 @@ define({
         title: "Delete task?",
         content: "Please, confirm deletion of the task:<br> ${title}"
       },
+      runDialog: {
+        title: "Run task?",
+        content: "Please, confirm executing task:<br> ${title}"
+      },
       errors: {
         typesLoadingError: "Unable to load trigger types."
       }

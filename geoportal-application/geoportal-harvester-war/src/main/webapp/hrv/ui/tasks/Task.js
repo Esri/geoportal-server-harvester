@@ -70,7 +70,15 @@ define(["dojo/_base/declare",
       },
       
       _onRun: function() {
-        this.emit("run",{data: this.data});
+        var dlg = new ConfirmDialog({
+          title: this.i18n.tasks.runDialog.title,
+          content: string.substitute(this.i18n.tasks.runDialog.content,{title: TaskUtils.makeLabel(this.data.taskDefinition)}),
+          "class": "h-tasks-run-dialog",
+          onExecute: lang.hitch(this,function(){
+            this.emit("run",{data: this.data});
+          })
+        });
+        dlg.show();
       },
       
       _onHistory: function() {

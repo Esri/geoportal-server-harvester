@@ -273,6 +273,10 @@ html,body {
   width: 300px;
 }
 
+.h-tasks-run-dialog {
+  width: 300px;
+}
+
 .h-history-caption {
   font-size: medium;
   font-weight: bold;

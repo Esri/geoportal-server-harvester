@@ -52,7 +52,6 @@ define(["dojo/_base/declare",
       },
       
       _onEdit: function() {
-        //this.emit("edit",{data: this.data});
         var brokerEditorPane = new BrokerEditorPane({
           category: this.category==="INBOUND"? "inbound": this.category==="OUTBOUND"? "outbound": null,
           data: this.data
@@ -99,7 +98,6 @@ define(["dojo/_base/declare",
           })
         });
         dlg.show();
-        //this.emit("remove",{data: this.data});
       }
     });
 });
