@@ -41,9 +41,11 @@ define(["dojo/_base/declare",
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
+      typeLC: null,
       
       constructor: function(args) {
         this.data = args;
+        this.typeLC = this.data.brokerDefinition.type.toLowerCase();
       },
     
       postCreate: function(){
