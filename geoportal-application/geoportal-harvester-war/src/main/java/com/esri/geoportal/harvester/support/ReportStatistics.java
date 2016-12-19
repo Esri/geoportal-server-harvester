@@ -29,9 +29,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Report statistics.
  */
-public class ReportStatistics implements ReportBuilder, Statistics {
+public class ReportStatistics extends ProgressLogger implements ReportBuilder, Statistics {
   private final Logger LOG = LoggerFactory.getLogger(ReportStatistics.class);
-  private final long STATUS_LOG_MODULO = 100;
   
   private Date startDate;
   private Date endDate;
@@ -82,6 +81,7 @@ public class ReportStatistics implements ReportBuilder, Statistics {
   @Override
   public void acquire(ProcessInstance process, DataReference dataReference) {
     acquired++;
+    super.acquire(process, dataReference);
   }
 
   @Override
@@ -98,13 +98,13 @@ public class ReportStatistics implements ReportBuilder, Statistics {
   @Override
   public void success(ProcessInstance process, DataReference dataReference) {
     ++succeeded;
-    printStatusLog();
+    super.success(process, dataReference);
   }
 
   @Override
   public void error(ProcessInstance process, DataInputException ex) {
     ++harvestFailed;
-    printStatusLog();;
+    super.error(process, ex);
   }
 
   @Override
@@ -115,15 +115,6 @@ public class ReportStatistics implements ReportBuilder, Statistics {
   @Override
   public void error(ProcessInstance process, com.esri.geoportal.harvester.api.ex.DataProcessorException ex) {
     failure = true;
-  }
-
-  /**
-   * Prints status log.
-   */
-  private void printStatusLog() {
-    if ((succeeded+harvestFailed) % STATUS_LOG_MODULO == 0) {
-      LOG.debug(String.format("Progress: %d", succeeded+harvestFailed));
-    }
   }
   
   @Override
