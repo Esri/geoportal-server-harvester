@@ -63,7 +63,7 @@ define({
       },
       removeDialog: {
         title: "Delete adaptor?",
-        content: "Please, confirm deletion of the broker: ${title}"
+        content: "Please, confirm deletion of the broker:<br>${title}"
       }
     },
     
@@ -97,11 +97,11 @@ define({
       },
       removeDialog: {
         title: "Delete task?",
-        content: "Please, confirm deletion of the task:<br> ${title}"
+        content: "Please, confirm deletion of the task:<br>${title}"
       },
       runDialog: {
         title: "Run task?",
-        content: "Please, confirm executing task:<br> ${title}"
+        content: "Please, confirm executing task:<br>${title}"
       },
       errors: {
         typesLoadingError: "Unable to load trigger types."
@@ -124,7 +124,7 @@ define({
       cancel: "cancel",
       removeDialog: {
         title: "Cancel scheduled process?",
-        content: "Please, confirm cancelation of the scheduled process:<br> ${title}"
+        content: "Please, confirm cancelation of the scheduled process:<br>${title}"
       },
       errors: {
         loading: "Error loading triggers",
