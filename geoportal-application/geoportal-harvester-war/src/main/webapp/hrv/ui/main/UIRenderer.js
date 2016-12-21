@@ -89,15 +89,12 @@ define(["dojo/_base/declare",
         var input = new ValidationTextBox({
           name: arg.name, 
           required: arg.required, 
-          type: arg.password? "password": "input",
-          readonly: !!arg.password,
-          onFocus: lang.hitch(input,function(evt) {
-            if (arg.password) {
-              domAttr.set(this.focusNode,"readonly", false);
-            }
-          })
+          type: arg.password? "password": "input"
         }).placeAt(placeholderNode);
         input.name = arg.name;
+        if (arg.password) {
+          domAttr.set(input.focusNode,"autocomplete","new-password");
+        }
         input.startup();
         return { 
           init: function(values) {
