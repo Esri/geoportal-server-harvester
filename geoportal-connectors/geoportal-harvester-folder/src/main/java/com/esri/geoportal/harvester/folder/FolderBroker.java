@@ -130,7 +130,7 @@ import org.slf4j.LoggerFactory;
         throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
       }
     } catch (IOException ex) {
-      throw new DataOutputException(this, String.format("Error publishing data: %s", ref.getSourceUri()), ex);
+      throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
     }
   }
 
