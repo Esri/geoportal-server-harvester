@@ -20,6 +20,7 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/dom-construct",
+        "dojo/dom-attr",
         "dojo/html",
         "dojo/number",
         "dijit/form/Select",
@@ -32,7 +33,7 @@ define(["dojo/_base/declare",
         "hrv/utils/TextScrambler"
       ],
   function(declare,i18n,
-           lang,array,domConstruct,html,number,
+           lang,array,domConstruct,domAttr,html,number,
            Select,ValidationTextBox,CheckBox,TimeTextBox,RadioButton,Form,
            entities,TextScrambler
           ){
@@ -85,7 +86,17 @@ define(["dojo/_base/declare",
       },
       
       renderString: function(placeholderNode,arg) {
-        var input = new ValidationTextBox({name: arg.name, required: arg.required, type: arg.password? "password": "input"}).placeAt(placeholderNode);
+        var input = new ValidationTextBox({
+          name: arg.name, 
+          required: arg.required, 
+          type: arg.password? "password": "input",
+          readonly: !!arg.password,
+          onFocus: lang.hitch(input,function(evt) {
+            if (arg.password) {
+              domAttr.set(this.focusNode,"readonly", false);
+            }
+          })
+        }).placeAt(placeholderNode);
         input.name = arg.name;
         input.startup();
         return { 
