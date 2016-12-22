@@ -277,6 +277,15 @@ html,body {
   width: 300px;
 }
 
+.h-tasks-run-dialog-options {
+  margin-top: 1em;
+}
+
+.h-tasks-run-dialog-options > label {
+  margin-left: 0.5em;
+  font-weight: normal;
+}
+
 .h-history-caption {
   font-size: medium;
   font-weight: bold;

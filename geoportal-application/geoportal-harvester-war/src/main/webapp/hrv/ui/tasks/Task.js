@@ -28,6 +28,7 @@ define(["dojo/_base/declare",
         "dojo/on",
         "dojo/json",
         "dojo/promise/all",
+        "dijit/registry",
         "dijit/Dialog",
         "dijit/ConfirmDialog",
         "hrv/rest/Tasks",
@@ -39,7 +40,7 @@ define(["dojo/_base/declare",
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
            lang,array,string,domAttr,topic,on,json,all,
-           Dialog,ConfirmDialog,
+           registry, Dialog,ConfirmDialog,
            TasksREST, TriggersREST,
            SchedulerEditorPane, TaskUtils
           ){
@@ -72,10 +73,19 @@ define(["dojo/_base/declare",
       _onRun: function() {
         var dlg = new ConfirmDialog({
           title: this.i18n.tasks.runDialog.title,
-          content: string.substitute(this.i18n.tasks.runDialog.content,{title: TaskUtils.makeLabel(this.data.taskDefinition)}),
+          content: string.substitute(this.i18n.tasks.runDialog.content,{title: TaskUtils.makeLabel(this.data.taskDefinition)})+
+                  "<div class='h-tasks-run-dialog-options'><button data-dojo-type='dijit/form/CheckBox' id='ignoreRobots'></button><label for='ignoreRobots'>" +this.i18n.tasks.runDialog.ignoreRobots+ "</label></div>",
           "class": "h-tasks-run-dialog",
+          parseOnLoad: true,
           onExecute: lang.hitch(this,function(){
+            var ignoreRobots = registry.byId("ignoreRobots");
+            this.data.taskDefinition.ignoreRobotsTxt = ignoreRobots.checked;
             this.emit("run",{data: this.data});
+            ignoreRobots.destroyRecursive();
+          }),
+          onCancel: lang.hitch(this,function() {
+            var ignoreRobots = registry.byId("ignoreRobots");
+            ignoreRobots.destroyRecursive();
           })
         });
         dlg.show();

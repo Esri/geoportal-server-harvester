@@ -38,8 +38,8 @@ define(["dojo/_base/declare",
         return xhr.put("rest/harvester/tasks/"+id,{data: taskDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
       },
       
-      execute: function(id) {
-        return xhr.post("rest/harvester/tasks/"+id+"/execute",{handleAs: "json", headers: {"Content-Type": "application/json"}});
+      execute: function(id, ignoreRobots) {
+        return xhr.post("rest/harvester/tasks/"+id+"/execute"+(ignoreRobots? "?ignoreRobots="+ignoreRobots: ""),{handleAs: "json", headers: {"Content-Type": "application/json"}});
       },
       
       schedule: function(id, triggerDefinition) {

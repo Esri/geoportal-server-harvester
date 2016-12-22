@@ -328,7 +328,7 @@ public class TaskController {
    * been deleted
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/execute", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ProcessResponse> executeTask(@PathVariable UUID taskId, @RequestParam(required = false) Boolean incremental) {
+  public ResponseEntity<ProcessResponse> executeTask(@PathVariable UUID taskId, @RequestParam(required = false) Boolean ignoreRobots, @RequestParam(required = false) Boolean incremental) {
     try {
       LOG.debug(String.format("POST /rest/harvester/tasks/%s/execute", taskId));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
@@ -337,6 +337,11 @@ public class TaskController {
       }
       if (incremental == null) {
         incremental = taskDefinition.isIncremental();
+      } else {
+        taskDefinition.setIncremental(incremental);
+      }
+      if (ignoreRobots!=null) {
+        taskDefinition.setIgnoreRobotsTxt(ignoreRobots);
       }
 
       // obtain last harvest data
