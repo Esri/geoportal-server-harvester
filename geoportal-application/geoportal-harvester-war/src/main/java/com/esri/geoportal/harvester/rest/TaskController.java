@@ -323,6 +323,7 @@ public class TaskController {
    * Executes task by id.
    *
    * @param taskId task id
+   * @param ignoreRobots optional flag to ignore robots.txt
    * @param incremental optional incremental harvest flag
    * @return task info of the deleted task or <code>null</code> if no tasks have
    * been deleted
