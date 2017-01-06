@@ -106,4 +106,23 @@ public final class Task {
   public String toString() {
     return String.format("%s", getTaskDefinition());
   }
+  
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    if (obj instanceof Task) {
+      Task t = (Task)obj;
+      return getTaskDefinition().equals(t.getTaskDefinition());
+    }
+
+    return false;
+  }
 }

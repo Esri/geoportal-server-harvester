@@ -132,4 +132,25 @@ public final class TaskDefinition implements Serializable {
   public String toString() {
     return String.format("PROCESSOR: %s, SOURCE: %s, DESTINATIONS: %s, INCREMENTAL: %b, IGNOREROBOTSTXT: %b", processor, source, destinations!=null? destinations: null, incremental, ignoreRobotsTxt);
   }
+  
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    if (obj instanceof TaskDefinition) {
+      TaskDefinition td = (TaskDefinition)obj;
+      return ((getProcessor()!=null && td.getProcessor()!=null && getProcessor().equals(td.getProcessor())) || (getProcessor()==null && td.getProcessor()==null)) &&
+             ((getSource()!=null && td.getSource()!=null && getSource().equals(td.getSource())) || (getSource()==null && td.getSource()==null)) &&
+             ((getDestinations()!=null && td.getDestinations()!=null && getDestinations().equals(td.getDestinations())) || (getDestinations()==null && td.getDestinations()==null)) ;
+    }
+    
+    return false;
+  }
 }

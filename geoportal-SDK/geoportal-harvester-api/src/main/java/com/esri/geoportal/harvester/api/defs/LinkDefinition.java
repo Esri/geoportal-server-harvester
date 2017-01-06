@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.api.defs;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -64,5 +65,26 @@ public final class LinkDefinition {
     } else {
       return String.format("%s", action);
     }
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final LinkDefinition other = (LinkDefinition) obj;
+    if (!Objects.equals(this.action, other.action)) {
+      return false;
+    }
+    if (!Objects.equals(this.drains, other.drains)) {
+      return false;
+    }
+    return true;
   }
 }
