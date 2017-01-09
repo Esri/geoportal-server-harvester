@@ -71,7 +71,7 @@ import org.slf4j.LoggerFactory;
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new Client(httpclient, definition.getHostUrl(), definition.getProfile(), definition.getCredentials());
     } else {
-      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getBotsMode(), definition.getHostUrl());
+      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getHostUrl());
       client = new Client(new BotsHttpClient(httpclient,bots), definition.getHostUrl(), definition.getProfile(), definition.getCredentials());
     }
   }

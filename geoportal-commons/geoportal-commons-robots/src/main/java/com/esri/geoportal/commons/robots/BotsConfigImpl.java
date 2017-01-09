@@ -20,33 +20,19 @@ package com.esri.geoportal.commons.robots;
  */
 public class BotsConfigImpl implements BotsConfig{
   private final String userAgent;
-  private final boolean enabled;
-  private final boolean override;
 
-  public BotsConfigImpl(String userAgent, boolean enabled, boolean override) {
+  public BotsConfigImpl(String userAgent) {
     this.userAgent = userAgent;
-    this.enabled = enabled;
-    this.override = override;
   }
 
   @Override
   public String getUserAgent() {
     return userAgent;
   }
-
-  @Override
-  public boolean isEnabled() {
-    return enabled;
-  }
-
-  @Override
-  public boolean isOverride() {
-    return override;
-  }
   
   @Override
   public String toString() {
-    return String.format("%s/%s/override:%b", userAgent, enabled? "enabled": "disabled", override);
+    return String.format("%s", userAgent);
   }
   
 }

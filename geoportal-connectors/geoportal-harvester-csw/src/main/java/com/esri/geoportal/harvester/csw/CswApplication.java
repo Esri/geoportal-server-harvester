@@ -19,7 +19,6 @@ import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.impl.ProfilesProvider;
 import com.esri.geoportal.commons.robots.BotsConfig;
-import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.DataCollector;
@@ -57,7 +56,6 @@ public class CswApplication {
         adaptor.setHostUrl(start);
         adaptor.setProfile(profile);
         adaptor.setBotsConfig(BotsConfig.DEFAULT);
-        adaptor.setBotsMode(BotsMode.inherit);
         
         InputBroker csw = null;
         try {

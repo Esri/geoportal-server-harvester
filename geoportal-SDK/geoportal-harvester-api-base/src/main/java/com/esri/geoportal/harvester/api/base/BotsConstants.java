@@ -20,7 +20,4 @@ package com.esri.geoportal.harvester.api.base;
  */
 public final class BotsConstants {
   public static final String P_BOTS_AGENT = "bots-config-agent";
-  public static final String P_BOTS_ENABLED = "bots-config-enabled";
-  public static final String P_BOTS_OVERRIDE = "bots-config-override";
-  public static final String P_BOTS_MODE = "bots-mode";
 }

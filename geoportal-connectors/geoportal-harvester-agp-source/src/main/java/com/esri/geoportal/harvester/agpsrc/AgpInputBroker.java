@@ -121,7 +121,7 @@ import org.apache.http.impl.client.HttpClients;
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new AgpClient(httpclient, definition.getHostUrl(),definition.getCredentials());
     } else {
-      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getBotsMode(), definition.getHostUrl());
+      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getHostUrl());
       client = new AgpClient(new BotsHttpClient(httpclient,bots), definition.getHostUrl(), definition.getCredentials());
     }
   }

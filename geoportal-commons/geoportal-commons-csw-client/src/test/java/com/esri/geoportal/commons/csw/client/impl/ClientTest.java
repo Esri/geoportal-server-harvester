@@ -19,7 +19,6 @@ import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IRecords;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.robots.Bots;
-import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -110,7 +109,7 @@ public class ClientTest {
     IProfile defaultProfile = profiles.getDefaultProfile();
     assertNotNull("No default profile", defaultProfile);
     
-    Bots bots = BotsUtils.readBots(BotsMode.always, "http://localhost:5000/robots.txt");
+    Bots bots = BotsUtils.readBots("http://localhost:5000/robots.txt");
     BotsHttpClient httpClient = new BotsHttpClient(bots);
     
     Client cswClient = new Client(httpClient, new URL("http://localhost:5000/csw"), defaultProfile, null);
@@ -125,7 +124,7 @@ public class ClientTest {
     IProfile defaultProfile = profiles.getDefaultProfile();
     assertNotNull("No default profile", defaultProfile);
     
-    Bots bots = BotsUtils.readBots(BotsMode.always, "http://localhost:5000/robots.txt");
+    Bots bots = BotsUtils.readBots("http://localhost:5000/robots.txt");
     BotsHttpClient httpClient = new BotsHttpClient(bots);
     
     Client cswClient = new Client(httpClient, new URL("http://localhost:5000/csw"), defaultProfile, null);

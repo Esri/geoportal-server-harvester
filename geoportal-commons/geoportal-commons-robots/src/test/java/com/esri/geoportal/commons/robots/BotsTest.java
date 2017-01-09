@@ -61,7 +61,7 @@ public class BotsTest {
 
   @Test
   public void testAccessGranted() throws IOException {
-    Bots bots = BotsUtils.readBots(BotsMode.always, "http://localhost:5000/robots.txt");
+    Bots bots = BotsUtils.readBots("http://localhost:5000/robots.txt");
     Access access = BotsUtils.requestAccess(bots, "http://localhost:5000/data.txt");
     
     assertTrue("Access denied", access.hasAccess());
@@ -69,23 +69,15 @@ public class BotsTest {
 
   @Test
   public void testAccessDenied() throws IOException {
-    Bots bots = BotsUtils.readBots(BotsMode.always, "http://localhost:5000/robots.txt");
+    Bots bots = BotsUtils.readBots("http://localhost:5000/robots.txt");
     Access access = BotsUtils.requestAccess(bots, "http://localhost:5000/tmp/data.txt");
     
     assertFalse("Access granted", access.hasAccess());
   }
 
   @Test
-  public void testAccessIgnored() throws IOException {
-    Bots bots = BotsUtils.readBots(BotsMode.never, "http://localhost:5000/robots.txt");
-    Access access = BotsUtils.requestAccess(bots, "http://localhost:5000/tmp/data.txt");
-    
-    assertTrue("Access denied", access.hasAccess());
-  }
-
-  @Test
   public void testAccessInapplicable() throws IOException {
-    Bots bots = BotsUtils.readBots(BotsMode.always, "http://localhost:5000/robots.txt");
+    Bots bots = BotsUtils.readBots("http://localhost:5000/robots.txt");
     Access access = BotsUtils.requestAccess(bots, "http://localhost:5000/test/data.txt");
     
     assertTrue("Access denied", access.hasAccess());

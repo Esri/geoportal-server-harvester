@@ -16,7 +16,6 @@
 package com.esri.geoportal.harvester.waf;
 
 import com.esri.geoportal.commons.robots.BotsConfig;
-import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
@@ -103,22 +102,6 @@ import static com.esri.geoportal.harvester.waf.WafConstants.*;
   public void setPattern(String pattern) {
     this.pattern = pattern;
     set(P_PATTERN, pattern);
-  }
-
-  /**
-   * Gets bots mode.
-   * @return bots mode
-   */
-  public BotsMode getBotsMode() {
-    return botsAdaptor.getBotsMode();
-  }
-
-  /**
-   * Sets bots mode.
-   * @param botsMode bots mode 
-   */
-  public void setBotsMode(BotsMode botsMode) {
-    botsAdaptor.setBotsMode(botsMode);
   }
 
   /**

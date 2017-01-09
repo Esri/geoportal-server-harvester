@@ -103,7 +103,7 @@ import org.w3c.dom.Document;
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       httpClient = http;
     } else {
-      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), http, definition.getBotsMode(), definition.getHostUrl());
+      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), http, definition.getHostUrl());
       httpClient = new BotsHttpClient(http,bots);
     }
     client = new Client(httpClient, definition.getHostUrl(), definition.getApiKey());

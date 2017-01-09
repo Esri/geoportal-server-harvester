@@ -16,7 +16,6 @@
 package com.esri.geoportal.commons.http;
 
 import com.esri.geoportal.commons.robots.Bots;
-import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,7 +74,7 @@ public class BotsHttpClientTest {
 
   @Test(expected = IOException.class)
   public void testAccessDenied() throws IOException {
-    Bots bots = BotsUtils.readBots(BotsMode.always, "http://localhost:5000/robots.txt");
+    Bots bots = BotsUtils.readBots("http://localhost:5000/robots.txt");
     BotsHttpClient client = new BotsHttpClient(bots);
     HttpGet request = new HttpGet("http://localhost:5000/tmp/data.txt");
     client.execute(request);
@@ -83,7 +82,7 @@ public class BotsHttpClientTest {
   
   @Test
   public void testAccessGrandted() throws IOException {
-    Bots bots = BotsUtils.readBots(BotsMode.always, "http://localhost:5000/robots.txt");
+    Bots bots = BotsUtils.readBots("http://localhost:5000/robots.txt");
     BotsHttpClient client = new BotsHttpClient(bots);
     HttpGet request = new HttpGet("http://localhost:5000/data.txt");
     HttpResponse response = client.execute(request);

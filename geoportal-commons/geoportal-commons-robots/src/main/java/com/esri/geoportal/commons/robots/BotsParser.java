@@ -43,11 +43,9 @@ public class BotsParser {
    * @return instance
    */
   public static BotsParser getInstance(BotsConfig botsConfig,HttpClient httpClient) {
-      boolean enabled = botsConfig.isEnabled();
-      boolean override = botsConfig.isOverride();
       String userAgent = botsConfig.getUserAgent();
 
-      LOG.info(String.format("Creating default RobotsTxtParser :: enabled: %b, override: %b, user-agent: %s", enabled, override, userAgent));
+      LOG.info(String.format("Creating default RobotsTxtParser :: user-agent: %s", userAgent));
 
       return new BotsParser(botsConfig,httpClient);
   }
@@ -72,27 +70,8 @@ public class BotsParser {
   }
 
   /**
-   * Checks if using robots.txt is enabled.
-   *
-   * @return <code>true</code> if using robots.txt is enabled
-   */
-  public boolean isEnabled() {
-    return botsConfig.isEnabled();
-  }
-
-  /**
-   * Checks if robots.txt enabled flag can be overridden.
-   *
-   * @return <code>true</code> if robots.txt enabled flag can be overridden
-   */
-  public boolean canOverride() {
-    return botsConfig.isOverride();
-  }
-
-  /**
    * Parses context of the Robots.txt file if available.
    *
-   * @param mode robots.txt mode
    * @param matchingStrategy matching strategy
    * @param winningStrategy winning strategy
    * @param serverUrl url of the server which is expected to have robots.txt
@@ -100,10 +79,10 @@ public class BotsParser {
    * @return instance of {@link Bots} or <code>null</code> if unable to
    * obtain robots.txt
    */
-  public Bots readRobotsTxt(BotsMode mode, MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, String serverUrl) {
-    if (canParse(mode) && serverUrl != null) {
+  public Bots readRobotsTxt(MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, String serverUrl) {
+    if (serverUrl != null) {
       try {
-        return BotsParser.this.readRobotsTxt(mode, matchingStrategy, winningStrategy, new URL(serverUrl));
+        return BotsParser.this.readRobotsTxt(matchingStrategy, winningStrategy, new URL(serverUrl));
       } catch (MalformedURLException ex) {
         LOG.warn(String.format("Invalid server url: %s", serverUrl), ex);
       }
@@ -114,7 +93,6 @@ public class BotsParser {
   /**
    * Parses context of the Robots.txt file if available.
    *
-   * @param mode robots.txt mode
    * @param matchingStrategy matching strategy
    * @param winningStrategy winning strategy
    * @param serverUrl url of the server which is expected to have robots.txt
@@ -122,8 +100,8 @@ public class BotsParser {
    * @return instance of {@link Bots} or <code>null</code> if unable to
    * obtain robots.txt
    */
-  public Bots readRobotsTxt(BotsMode mode, MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, URL serverUrl) {
-    if (canParse(mode) && serverUrl != null) {
+  public Bots readRobotsTxt(MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, URL serverUrl) {
+    if (serverUrl != null) {
       LOG.info(String.format("Accessing robots.txt for: %s", serverUrl.toExternalForm()));
       try {
         URL robotsTxtUrl = getRobotsTxtUrl(serverUrl);
@@ -134,7 +112,7 @@ public class BotsParser {
           HttpResponse response = httpClient.execute(method);
           if (response.getStatusLine().getStatusCode()<300) {
             InputStream responseStream = response.getEntity().getContent();
-            Bots robots = BotsParser.this.readRobotsTxt(mode, matchingStrategy, winningStrategy, responseStream);
+            Bots robots = BotsParser.this.readRobotsTxt(matchingStrategy, winningStrategy, responseStream);
             if (robots != null) {
               LOG.info(String.format("Received Robotx.txt for: %s", serverUrl.toExternalForm()));
               LOG.debug(String.format("Robotx.txt for: %s\n%s", serverUrl.toExternalForm(), robots.toString()));
@@ -153,21 +131,18 @@ public class BotsParser {
   /**
    * Parses robots TXT
    *
-   * @param mode robots.txt mode
    * @param matchingStrategy matching strategy
    * @param winningStrategy winning strategy
    * @param robotsTxt stream of data
    * @return instance or RobotsTxt or <code>null</code>
    */
-  public Bots readRobotsTxt(BotsMode mode, MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, InputStream robotsTxt) {
+  public Bots readRobotsTxt(MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, InputStream robotsTxt) {
     Bots robots = null;
     BotsReader reader = null;
 
     try {
-      if (canParse(mode)) {
-        reader = new BotsReader(getUserAgent(), matchingStrategy, winningStrategy, robotsTxt);
-        robots = reader.readRobotsTxt();
-      }
+      reader = new BotsReader(getUserAgent(), matchingStrategy, winningStrategy, robotsTxt);
+      robots = reader.readRobotsTxt();
     } catch (IOException ex) {
       LOG.warn("Unable to parse robots.txt", ex);
       return null;
@@ -181,21 +156,6 @@ public class BotsParser {
     }
 
     return robots;
-  }
-
-  private boolean canParse(BotsMode mode) {
-    mode = mode != null ? mode : BotsMode.getDefault();
-
-    switch (mode) {
-      case inherit:
-        return isEnabled();
-      case always:
-        return true;
-      case never:
-        return false;
-    }
-
-    return true;
   }
 
   private URL getRobotsTxtUrl(URL baseUrl) {

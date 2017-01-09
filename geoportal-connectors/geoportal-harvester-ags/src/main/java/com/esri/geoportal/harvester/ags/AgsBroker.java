@@ -104,7 +104,7 @@ import org.w3c.dom.Document;
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new AgsClient(httpclient, definition.getHostUrl());
     } else {
-      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getBotsMode(), definition.getHostUrl());
+      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getHostUrl());
       client = new AgsClient(new BotsHttpClient(httpclient,bots), definition.getHostUrl());
     }
   }

@@ -28,19 +28,7 @@ public interface BotsConfig {
   String getUserAgent();
   
   /**
-   * Checks if bots is enabled.
-   * @return <code>true</code> if bots are enabled
-   */
-  boolean isEnabled();
-  
-  /**
-   * Checks if bots can be override.
-   * @return <code>true</code> if bots can be override
-   */
-  boolean isOverride();
-  
-  /**
    * Default bots configuration.
    */
-  BotsConfig DEFAULT = new BotsConfigImpl(HttpConstants.getUserAgent(), true, true);
+  BotsConfig DEFAULT = new BotsConfigImpl(HttpConstants.getUserAgent());
 }

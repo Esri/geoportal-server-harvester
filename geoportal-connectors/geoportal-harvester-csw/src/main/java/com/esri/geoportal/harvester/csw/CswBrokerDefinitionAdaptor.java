@@ -20,7 +20,6 @@ import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.impl.ProfilesProvider;
 import com.esri.geoportal.commons.robots.BotsConfig;
-import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
@@ -115,22 +114,6 @@ import org.apache.commons.lang3.StringUtils;
   public void setProfile(IProfile profile) {
     this.profile = profile;
     set(P_PROFILE_ID, profile.getId());
-  }
-
-  /**
-   * Gets bots mode.
-   * @return bots mode
-   */
-  public BotsMode getBotsMode() {
-    return botsAdaptor.getBotsMode();
-  }
-
-  /**
-   * Sets bots mode.
-   * @param botsMode bots mode 
-   */
-  public void setBotsMode(BotsMode botsMode) {
-    botsAdaptor.setBotsMode(botsMode);
   }
 
   /**

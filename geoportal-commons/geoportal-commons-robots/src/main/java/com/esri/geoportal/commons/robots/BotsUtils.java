@@ -47,7 +47,6 @@ public final class BotsUtils {
   
   /**
    * Reads robots.txt
-   * @param mode robots.txt mode
    * @param matchingStrategy matching strategy
    * @param winningStrategy winning strategy
    * @param serverUrl url of the server which is expected to have robots.txt
@@ -55,13 +54,12 @@ public final class BotsUtils {
    * @return instance of {@link Bots} or <code>null</code> if unable to
    * obtain robots.txt
    */
-  public static Bots readBots(BotsMode mode, MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, String serverUrl) {
-    return parser().readRobotsTxt(mode, matchingStrategy, winningStrategy, serverUrl);
+  public static Bots readBots(MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, String serverUrl) {
+    return parser().readRobotsTxt(matchingStrategy, winningStrategy, serverUrl);
   }
   
   /**
    * Reads robots.txt
-   * @param mode robots.txt mode
    * @param matchingStrategy matching strategy
    * @param winningStrategy winning strategy
    * @param serverUrl url of the server which is expected to have robots.txt
@@ -69,32 +67,30 @@ public final class BotsUtils {
    * @return instance of {@link Bots} or <code>null</code> if unable to
    * obtain robots.txt
    */
-  public static Bots readBots(BotsMode mode, MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, URL serverUrl) {
-    return parser().readRobotsTxt(mode, matchingStrategy, winningStrategy, serverUrl);
+  public static Bots readBots(MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, URL serverUrl) {
+    return parser().readRobotsTxt(matchingStrategy, winningStrategy, serverUrl);
   }
   
   /**
    * Reads robots.txt
-   * @param mode robots.txt mode
    * @param serverUrl url of the server which is expected to have robots.txt
    * present
    * @return instance of {@link Bots} or <code>null</code> if unable to
    * obtain robots.txt
    */
-  public static Bots readBots(BotsMode mode, String serverUrl) {
-    return parser().readRobotsTxt(mode, DEFAULT_MATCHING_STRATEGY, DEFAULT_WINNIG_STRATEGY, serverUrl);
+  public static Bots readBots(String serverUrl) {
+    return parser().readRobotsTxt(DEFAULT_MATCHING_STRATEGY, DEFAULT_WINNIG_STRATEGY, serverUrl);
   }
   
   /**
    * Reads robots.txt
-   * @param mode robots.txt mode
    * @param serverUrl url of the server which is expected to have robots.txt
    * present
    * @return instance of {@link Bots} or <code>null</code> if unable to
    * obtain robots.txt
    */
-  public static Bots readBots(BotsMode mode, URL serverUrl) {
-    return parser().readRobotsTxt(mode, DEFAULT_MATCHING_STRATEGY, DEFAULT_WINNIG_STRATEGY, serverUrl);
+  public static Bots readBots(URL serverUrl) {
+    return parser().readRobotsTxt(DEFAULT_MATCHING_STRATEGY, DEFAULT_WINNIG_STRATEGY, serverUrl);
   }
 
   
@@ -102,28 +98,26 @@ public final class BotsUtils {
    * Reads robots.txt
    * @param botsConfig bots config
    * @param httpClient http client
-   * @param mode robots.txt mode
    * @param serverUrl url of the server which is expected to have robots.txt
    * present
    * @return instance of {@link Bots} or <code>null</code> if unable to
    * obtain robots.txt
    */
-  public static Bots readBots(BotsConfig botsConfig, HttpClient httpClient, BotsMode mode, String serverUrl) {
-    return parser(botsConfig,httpClient).readRobotsTxt(mode, DEFAULT_MATCHING_STRATEGY, DEFAULT_WINNIG_STRATEGY, serverUrl);
+  public static Bots readBots(BotsConfig botsConfig, HttpClient httpClient, String serverUrl) {
+    return parser(botsConfig,httpClient).readRobotsTxt(DEFAULT_MATCHING_STRATEGY, DEFAULT_WINNIG_STRATEGY, serverUrl);
   }
   
   /**
    * Reads robots.txt
    * @param botsConfig bots config
    * @param httpClient http client
-   * @param mode robots.txt mode
    * @param serverUrl url of the server which is expected to have robots.txt
    * present
    * @return instance of {@link Bots} or <code>null</code> if unable to
    * obtain robots.txt
    */
-  public static Bots readBots(BotsConfig botsConfig, HttpClient httpClient, BotsMode mode, URL serverUrl) {
-    return parser(botsConfig,httpClient).readRobotsTxt(mode, DEFAULT_MATCHING_STRATEGY, DEFAULT_WINNIG_STRATEGY, serverUrl);
+  public static Bots readBots(BotsConfig botsConfig, HttpClient httpClient, URL serverUrl) {
+    return parser(botsConfig,httpClient).readRobotsTxt(DEFAULT_MATCHING_STRATEGY, DEFAULT_WINNIG_STRATEGY, serverUrl);
   }
   
   /**

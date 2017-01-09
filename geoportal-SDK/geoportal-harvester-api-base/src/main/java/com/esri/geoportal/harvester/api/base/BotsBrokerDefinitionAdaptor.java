@@ -17,10 +17,8 @@ package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.robots.BotsConfigImpl;
-import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import java.util.Map;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import static com.esri.geoportal.harvester.api.base.BotsConstants.*;
 
@@ -41,28 +39,6 @@ public final class BotsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   @Override
   public void override(Map<String, String> params) {
     consume(params,P_BOTS_AGENT);
-    consume(params,P_BOTS_ENABLED);
-    consume(params,P_BOTS_OVERRIDE);
-    consume(params,P_BOTS_MODE);
-  }
-  
-  /**
-   * Gets bots mode.
-   *
-   * @return bots mode
-   */
-  public BotsMode getBotsMode() {
-    String sBootMode = get(P_BOTS_MODE);
-    return BotsMode.parseMode(sBootMode);
-  }
-
-  /**
-   * Sets bots mode.
-   *
-   * @param botsMode bots mode
-   */
-  public void setBotsMode(BotsMode botsMode) {
-    set(P_BOTS_MODE, botsMode.name());
   }
 
   /**
@@ -72,9 +48,7 @@ public final class BotsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    */
   public BotsConfig getBotsConfig() {
     return new BotsConfigImpl(
-            StringUtils.defaultIfBlank(get(P_BOTS_AGENT), BotsConfig.DEFAULT.getUserAgent()), 
-            BooleanUtils.toBoolean(StringUtils.defaultIfBlank(get(P_BOTS_ENABLED), Boolean.toString(BotsConfig.DEFAULT.isEnabled()))), 
-            BooleanUtils.toBoolean(StringUtils.defaultIfBlank(get(P_BOTS_OVERRIDE), Boolean.toString(BotsConfig.DEFAULT.isOverride())))
+            StringUtils.defaultIfBlank(get(P_BOTS_AGENT), BotsConfig.DEFAULT.getUserAgent())
     );
   }
 
@@ -85,12 +59,10 @@ public final class BotsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    */
   public void setBotsConfig(BotsConfig botsConfig) {
     set(P_BOTS_AGENT, botsConfig.getUserAgent());
-    set(P_BOTS_ENABLED, Boolean.toString(botsConfig.isEnabled()));
-    set(P_BOTS_OVERRIDE, Boolean.toString(botsConfig.isOverride()));
   }
   
   @Override
   public String toString() {
-    return String.format("%s/%s", getBotsConfig(), getBotsMode());
+    return String.format("%s", getBotsConfig());
   }
 }

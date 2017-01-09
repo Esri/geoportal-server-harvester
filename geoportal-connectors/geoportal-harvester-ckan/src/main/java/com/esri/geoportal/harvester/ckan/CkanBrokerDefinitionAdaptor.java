@@ -17,7 +17,6 @@ package com.esri.geoportal.harvester.ckan;
 
 import static com.esri.geoportal.harvester.ckan.CkanConstants.*;
 import com.esri.geoportal.commons.robots.BotsConfig;
-import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -82,22 +81,6 @@ import org.apache.commons.lang3.StringUtils;
   public void setApiKey(String apiKey) {
     this.apiKey = apiKey;
     set(P_API_KEY,apiKey);
-  }
-
-  /**
-   * Gets bots mode.
-   * @return bots mode
-   */
-  public BotsMode getBotsMode() {
-    return botsAdaptor.getBotsMode();
-  }
-
-  /**
-   * Sets bots mode.
-   * @param botsMode bots mode 
-   */
-  public void setBotsMode(BotsMode botsMode) {
-    botsAdaptor.setBotsMode(botsMode);
   }
 
   /**

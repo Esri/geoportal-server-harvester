@@ -26,7 +26,7 @@
  * <a href="https://developers.google.com/webmasters/control-crawl-index/docs/robots_txt">https://developers.google.com/webmasters/control-crawl-index/docs/robots_txt</a><br>
  * <p>
  * The easiest way to take advantage of this package is to request robots.txt
- * structure using {@link com.esri.geoportal.commons.robots.BotsUtils#readBots(com.esri.geoportal.commons.robots.BotsMode, java.lang.String)}
+ * structure using {@link com.esri.geoportal.commons.robots.BotsUtils#readBots(java.lang.String)}
  * method. It will return an instance of the {@link com.esri.geoportal.commons.robots.Bots} or <code>null</code>
  * if no robots.txt available for the requested URL. If Bots are available, then the
  * next step is to request access to the resource through {@link com.esri.geoportal.commons.robots.BotsUtils#requestAccess(com.esri.geoportal.commons.robots.Bots, java.lang.String)}.

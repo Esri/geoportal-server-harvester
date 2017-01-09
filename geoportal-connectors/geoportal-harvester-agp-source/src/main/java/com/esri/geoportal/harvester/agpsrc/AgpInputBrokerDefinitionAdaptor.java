@@ -17,7 +17,6 @@ package com.esri.geoportal.harvester.agpsrc;
 
 import static com.esri.geoportal.harvester.agpsrc.AgpConstants.*;
 import com.esri.geoportal.commons.robots.BotsConfig;
-import com.esri.geoportal.commons.robots.BotsMode;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
@@ -119,23 +118,6 @@ import org.apache.commons.lang3.StringUtils;
    */
   public void setCredentials(SimpleCredentials cred) {
     credAdaptor.setCredentials(cred);
-  }
-  
-
-  /**
-   * Gets bots mode.
-   * @return bots mode
-   */
-  public BotsMode getBotsMode() {
-    return botsAdaptor.getBotsMode();
-  }
-
-  /**
-   * Sets bots mode.
-   * @param botsMode bots mode 
-   */
-  public void setBotsMode(BotsMode botsMode) {
-    botsAdaptor.setBotsMode(botsMode);
   }
 
   /**
