@@ -14,6 +14,7 @@
  */
 package com.esri.geoportal.commons.meta.js;
 import java.io.StringWriter;
+import static org.apache.commons.lang3.StringEscapeUtils.*;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -103,7 +104,7 @@ public class XmlBuilder {
    * @throws XMLStreamException if writing to the stream fails
    */
   public void writeAttribute(String localName, String value) throws XMLStreamException {
-    writer.writeAttribute(localName, value);
+    writer.writeAttribute(localName, escapeXml11(value));
   }
 
   /**
@@ -112,7 +113,7 @@ public class XmlBuilder {
    * @throws XMLStreamException if writing to the stream fails
    */
   public void writeCharacters(String text) throws XMLStreamException {
-    writer.writeCharacters(text);
+    writer.writeCharacters(escapeXml11(text));
   }
   
   

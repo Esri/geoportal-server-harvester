@@ -9,6 +9,13 @@
     <artifactId>geoportal-commons-meta</artifactId>
     <name>Esri :: Geoportal Server :: Commons :: Meta</name>
     <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.5</version>
+        </dependency>
+    </dependencies>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
