@@ -140,6 +140,12 @@ public class DefaultTriggersService implements TriggersService {
             throw new InvalidDefinitionException(String.format("Invalid trigger type: %s", definition.getTriggerDefinition().getType()));
           }
           TriggerInstance triggerInstance = trigger.createInstance(definition.getTriggerDefinition());
+          
+          TaskUuidTriggerInstancePair pair2 = new TriggerInstanceManager.TaskUuidTriggerInstancePair();
+          pair2.setTaskId(definition.getTaskUuid());
+          pair2.setTriggerInstance(triggerInstance);
+          triggerInstanceManager.put(uuid, pair2);
+          
           TriggerInstance.Context context = new TriggerContext(definition.getTaskUuid());
           triggerInstance.activate(context);
         } catch (DataProcessorException|InvalidDefinitionException ex) {
@@ -169,10 +175,12 @@ public class DefaultTriggersService implements TriggersService {
       UUID uuid = triggerManager.create(pair);
       Trigger trigger = triggerRegistry.get(trigDef.getType());
       TriggerInstance triggerInstance = trigger.createInstance(trigDef);
+      
       TaskUuidTriggerInstancePair pair2 = new TriggerInstanceManager.TaskUuidTriggerInstancePair();
       pair2.setTaskId(taskId);
       pair2.setTriggerInstance(triggerInstance);
       triggerInstanceManager.put(uuid, pair2);
+      
       TriggerContext context = new TriggerContext(taskId);
       triggerInstance.activate(context);
       return new TriggerReference(uuid, taskId, trigDef);
