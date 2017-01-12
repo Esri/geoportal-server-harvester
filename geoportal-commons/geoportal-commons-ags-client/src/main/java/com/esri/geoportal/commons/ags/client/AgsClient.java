@@ -17,6 +17,8 @@ package com.esri.geoportal.commons.ags.client;
 
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Closeable;
@@ -145,6 +147,7 @@ public class AgsClient implements Closeable {
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       ObjectMapper mapper = new ObjectMapper();
       mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      mapper.configure(Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
       mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
       ServerResponse response = mapper.readValue(responseContent, ServerResponse.class);
       response.url = url;
