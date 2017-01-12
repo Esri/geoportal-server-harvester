@@ -206,8 +206,8 @@ import org.w3c.dom.Document;
         
         HashMap<String, Attribute> attributes = new HashMap<>();
         attributes.put(WKAConstants.WKA_IDENTIFIER, new StringAttribute(next.url));
-        attributes.put(WKAConstants.WKA_TITLE, new StringAttribute(String.format("%s/%s", serviceRoot, StringUtils.defaultString(StringUtils.defaultString(next.mapName, next.name),StringUtils.defaultString(serviceType, next.url)))));
-        attributes.put(WKAConstants.WKA_DESCRIPTION, new StringAttribute(StringUtils.defaultString(StringUtils.defaultString(StringUtils.defaultString(next.description, next.serviceDescription)))));
+        attributes.put(WKAConstants.WKA_TITLE, new StringAttribute(String.format("%s/%s", serviceRoot, StringUtils.defaultString(StringUtils.defaultIfBlank(StringUtils.defaultIfBlank(next.mapName, next.name),StringUtils.defaultIfBlank(serviceType, next.url))))));
+        attributes.put(WKAConstants.WKA_DESCRIPTION, new StringAttribute(StringUtils.defaultString(StringUtils.defaultIfBlank(next.description, next.serviceDescription))));
         attributes.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(next.url));
         attributes.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute("urn:x-esri:specification:ServiceType:ArcGIS:" + (serviceType!=null? serviceType: "Unknown")));
         
