@@ -46,6 +46,9 @@ function create(attributes) {
     B.writeStartElement("dc","description",URI.DC);
     B.writeCharacters(description);
     B.writeEndElement();
+    B.writeStartElement("dct","abstract",URI.DCT);
+    B.writeCharacters(description);
+    B.writeEndElement();
   }
   
   var modified = readValue(attributes,"modified");

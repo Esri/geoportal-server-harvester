@@ -17,6 +17,7 @@
 		<dc:identifier><xsl:value-of select="$identifier"/></dc:identifier>
 		<dc:title><xsl:value-of select="$title"/></dc:title>
 		<dc:description><xsl:value-of select="$description"/></dc:description>
+		<dct:abstract><xsl:value-of select="$description"/></dct:abstract>
 		<dc:date><xsl:value-of select="$modified"/></dc:date>
 		<dct:references>
 			<xsl:attribute name="scheme"><xsl:value-of select="$resource.url.scheme"/></xsl:attribute>
