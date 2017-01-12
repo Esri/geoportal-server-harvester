@@ -45,9 +45,9 @@ import java.util.regex.Pattern;
       String group = hrefMatcher.group();
       Matcher quotMatcher = quotPattern.matcher(group);
       if (quotMatcher.find()) {
-        String extractedUrl = quotMatcher.group().replaceAll("^.|.$", "");
+        String extractedUrl = quotMatcher.group().replaceAll("^.|.$", "").replaceAll("\\{", "%7B").replaceAll("\\}", "%7D");
         try {
-          URL url = root.toURI().resolve(extractedUrl).toURL();
+          URL url = new URL(root,extractedUrl); //root.toURI().resolve(extractedUrl).toURL();
           if (url.toExternalForm().startsWith(root.toExternalForm()) && url.toExternalForm().length() > root.toExternalForm().length()) {
             list.add(url);
           }
