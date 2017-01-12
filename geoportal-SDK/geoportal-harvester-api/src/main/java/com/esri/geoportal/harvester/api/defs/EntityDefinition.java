@@ -129,7 +129,7 @@ public final class EntityDefinition implements Serializable {
   @Override
   public String toString() {
     return String.format("%s[%s]", type, properties.entrySet().stream()
-            .map(e->String.format("%s=%s", e.getKey(), e.getValue()))
+            .map(e->String.format("%s=%s", e.getKey(), P_CRED_PASSWORD.equals(e.getKey())? "*****": e.getValue()))
             .collect(Collectors.joining(", ")));
   }
   
