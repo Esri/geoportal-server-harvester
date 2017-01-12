@@ -339,6 +339,11 @@ html,body {
   padding: 0.5em;
 }
 
+.h-task-editor-scroll {
+  height: 400px; 
+  overflow-y: scroll;
+}
+
 .h-task-editor-cell-caption {
   font-weight: bold;
   background-color: lightgray;

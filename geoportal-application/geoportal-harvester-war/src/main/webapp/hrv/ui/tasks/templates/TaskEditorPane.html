@@ -6,8 +6,16 @@
         <span style="display: table-cell" class="h-task-editor-cell h-task-editor-cell-caption">${i18n.tasks.editor.outputs}</span>
       </div>
       <div style="display: table-row" class="h-task-editor-row h-task-editor-content">
-        <div style="display: table-cell" data-dojo-attach-point="inputsNode" class="h-task-editor-inputs h-task-editor-cell h-task-editor-brokers"></div>
-        <div style="display: table-cell" data-dojo-attach-point="outputsNode" class="h-task-editor-outputs h-task-editor-cell h-task-editor-brokers"></div>
+        <div style="display: table-cell" class="h-task-editor-inputs h-task-editor-cell h-task-editor-brokers">
+          <div data-dojo-attach-point="inputsNode" class="h-task-editor-scroll">
+            
+          </div>
+        </div>
+        <div style="display: table-cell" class="h-task-editor-outputs h-task-editor-cell h-task-editor-brokers">
+          <div data-dojo-attach-point="outputsNode" class="h-task-editor-scroll">
+            
+          </div>
+        </div>
       </div>
     </div>
   </div>
