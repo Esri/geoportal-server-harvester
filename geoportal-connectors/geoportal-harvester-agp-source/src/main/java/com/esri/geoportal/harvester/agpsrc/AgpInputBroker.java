@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.agpsrc;
 import com.esri.geoportal.commons.agp.client.AgpClient;
 import com.esri.geoportal.commons.agp.client.ContentResponse;
 import com.esri.geoportal.commons.agp.client.ItemEntry;
+import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.meta.AttributeUtils;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -199,6 +201,10 @@ import org.apache.http.impl.client.HttpClients;
         }
         if (nextEntry.url!=null) {
           props.put(WKAConstants.WKA_RESOURCE_URL, nextEntry.url);
+        } else if (ItemType.WEB_MAP.getTypeName().equals(nextEntry.type)) {
+          props.put(WKAConstants.WKA_RESOURCE_URL, definition.getHostUrl().toExternalForm().replaceAll("/+$", "")+"/home/webmap/viewer.html?webmap="+nextEntry.id);
+        } else {
+          props.put(WKAConstants.WKA_RESOURCE_URL, definition.getHostUrl().toExternalForm().replaceAll("/+$", "")+"/home/item.html?id="+nextEntry.id);
         }
         
         if (nextEntry.extent!=null && nextEntry.extent.length==2 && nextEntry.extent[0]!=null && nextEntry.extent[0].length==2 && nextEntry.extent[1]!=null && nextEntry.extent[1].length==2) {
