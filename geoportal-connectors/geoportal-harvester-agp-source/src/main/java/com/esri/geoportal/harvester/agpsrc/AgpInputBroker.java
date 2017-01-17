@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
