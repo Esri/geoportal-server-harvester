@@ -207,7 +207,7 @@ public class Client implements Closeable {
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("User-Agent", HttpConstants.getUserAgent());
     Hit hit =  execute(get,Hit.class);
-    return new EntryRef(hit._id, readUri(hit._source), readLastUpdated(hit._source));
+    return new EntryRef(hit._id, readUri(hit._source, uri), readLastUpdated(hit._source, new Date()));
   }
   
   /**
@@ -220,22 +220,22 @@ public class Client implements Closeable {
     return queryIds(null, null, 200);
   }
   
-  private URI readUri(QueryResponse.Source source) {
+  private URI readUri(QueryResponse.Source source, URI defUri) {
     if (source!=null && source.src_uri_s!=null) {
       try {
         return new URI(source.src_uri_s);
       } catch (Exception ex) {}
     }
-    return null;
+    return defUri;
   }
   
-  private Date readLastUpdated(QueryResponse.Source source) {
+  private Date readLastUpdated(QueryResponse.Source source, Date defDate) {
     if (source!=null && source.src_lastupdate_dt!=null) {
       try {
         return Date.from(ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(source.src_lastupdate_dt)).toInstant());
       } catch (Exception ex) {}
     }
-    return null;
+    return defDate;
   }
 
   /**
