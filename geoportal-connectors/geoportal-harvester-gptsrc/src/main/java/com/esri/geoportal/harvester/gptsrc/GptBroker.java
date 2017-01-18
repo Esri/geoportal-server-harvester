@@ -58,10 +58,10 @@ import org.slf4j.LoggerFactory;
     definition.override(context.getParams());
     CloseableHttpClient httpclient = HttpClients.createDefault();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
-      client = new Client(httpclient, definition.getHostUrl(), definition.getCredentials());
+      client = new Client(httpclient, definition.getHostUrl(), definition.getCredentials(), definition.getIndex());
     } else {
       Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getHostUrl());
-      client = new Client(new BotsHttpClient(httpclient,bots), definition.getHostUrl(), definition.getCredentials());
+      client = new Client(new BotsHttpClient(httpclient,bots), definition.getHostUrl(), definition.getCredentials(), definition.getIndex());
     }
   }
 

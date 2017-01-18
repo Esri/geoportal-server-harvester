@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
   private URL hostUrl;
   private boolean forceAdd;
   private boolean cleanup;
+  private String index;
 
   /**
    * Creates instance of the adaptor.
@@ -59,6 +60,7 @@ import org.apache.commons.lang3.StringUtils;
       }
       forceAdd = Boolean.parseBoolean(get(P_FORCE_ADD));
       cleanup  = Boolean.parseBoolean(get(P_CLEANUP));
+      index  = get(P_INDEX);
     }
   }
 
@@ -67,6 +69,7 @@ import org.apache.commons.lang3.StringUtils;
     consume(params,P_HOST_URL);
     consume(params,P_FORCE_ADD);
     consume(params,P_CLEANUP);
+    consume(params,P_INDEX);
     credAdaptor.override(params);
   }
 
@@ -135,5 +138,22 @@ import org.apache.commons.lang3.StringUtils;
   public void setCleanup(boolean cleanup) {
     this.cleanup = cleanup;
     set(P_CLEANUP, Boolean.toString(cleanup));
+  }
+
+  /**
+   * Gets index.
+   * @return index
+   */
+  public String getIndex() {
+    return index;
+  }
+
+  /**
+   * Sets index.
+   * @param index index
+   */
+  public void setIndex(String index) {
+    this.index = index;
+    set(P_INDEX, index);
   }
 }

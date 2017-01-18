@@ -63,14 +63,16 @@ import org.slf4j.LoggerFactory;
 public class Client implements Closeable {
   private final Logger LOG = LoggerFactory.getLogger(Client.class);
 
+  private static final String DEFAILT_INDEX = "metadata";
   private static final String REST_ITEM_URL = "rest/metadata/item";
-  private static final String ELASTIC_SEARCH_URL = "elastic/metadata/item/_search";
+  private static final String ELASTIC_SEARCH_URL = "elastic/{metadata}/item/_search";
   private static final String ELASTIC_SCROLL_URL = "elastic/_search/scroll";
   private static final String TOKEN_URL = "oauth/token";
 
   private final CloseableHttpClient httpClient;
   private final URL url;
   private final SimpleCredentials cred;
+  private final String index;
   
   private TokenInfo tokenInfo;
 
@@ -82,11 +84,13 @@ public class Client implements Closeable {
    * @param httpClient HTTP client
    * @param url URL of the GPT REST end point
    * @param cred credentials
+   * @param index index name
    */
-  public Client(CloseableHttpClient httpClient, URL url, SimpleCredentials cred) {
+  public Client(CloseableHttpClient httpClient, URL url, SimpleCredentials cred, String index) {
     this.httpClient = httpClient;
     this.url = url;
     this.cred = cred;
+    this.index = StringUtils.defaultIfBlank(index, DEFAILT_INDEX);
     
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -97,9 +101,10 @@ public class Client implements Closeable {
    *
    * @param url URL of the GPT REST end point
    * @param cred credentials
+   * @param index index name
    */
-  public Client(URL url, SimpleCredentials cred) {
-    this(HttpClients.createDefault(), url, cred);
+  public Client(URL url, SimpleCredentials cred, String index) {
+    this(HttpClients.createDefault(), url, cred, index);
   }
 
   /**
@@ -380,9 +385,13 @@ public class Client implements Closeable {
     return  execute(get, QueryResponse.class);
   }
   
+  private String createElasticSearchUrl() {
+    return ELASTIC_SEARCH_URL.replaceAll("\\{metadata\\}", index);
+  }
+  
   private URI createQueryUri(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
     if (searchContext._scroll_id==null) {
-      return new URIBuilder(url.toURI().resolve(ELASTIC_SEARCH_URL))
+      return new URIBuilder(url.toURI().resolve(createElasticSearchUrl()))
               .addParameter("q",term!=null && value!=null? String.format("%s:\"%s\"", term, value): "*:*")
               .addParameter("size", Long.toString(size))
               .addParameter("scroll", "1m")

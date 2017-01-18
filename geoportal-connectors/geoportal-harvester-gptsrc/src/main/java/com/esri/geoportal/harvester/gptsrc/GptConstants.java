@@ -20,4 +20,5 @@ package com.esri.geoportal.harvester.gptsrc;
  */
 /*package*/ final class GptConstants {
   public static final String P_HOST_URL        = "gpt-host-url";
+  public static final String P_INDEX           = "gpt-index";
 }

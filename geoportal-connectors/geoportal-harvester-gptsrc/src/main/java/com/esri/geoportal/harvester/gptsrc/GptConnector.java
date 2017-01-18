@@ -55,6 +55,7 @@ public class GptConnector implements InputConnector<InputBroker> {
         return true;
       }
     });
+    arguments.add(new UITemplate.StringArgument(P_INDEX, bundle.getString("gptsrc.index")));
     return new UITemplate(getType(), bundle.getString("gptsrc"), arguments);
   }
 
