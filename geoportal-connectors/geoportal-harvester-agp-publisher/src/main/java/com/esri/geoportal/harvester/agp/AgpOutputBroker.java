@@ -370,14 +370,17 @@ import org.xml.sax.SAXException;
     }
     
     try {
-      FolderEntry[] folders = this.client.listFolders(definition.getCredentials().getUserName(), generateToken(1));
-      FolderEntry selectedFodler = Arrays.stream(folders).filter(folder->folder.id!=null && folder.id.equals(definition.getFolderId())).findFirst().orElse(
-              Arrays.stream(folders).filter(folder->folder.title!=null && folder.title.equals(definition.getFolderId())).findFirst().orElse(null)
-      );
-      if (selectedFodler!=null) {
-        definition.setFolderId(selectedFodler.id);
-      } else {
-        definition.setFolderId(null);
+      String folderId = StringUtils.trimToNull(definition.getFolderId());
+      if (folderId!=null) {
+        FolderEntry[] folders = this.client.listFolders(definition.getCredentials().getUserName(), generateToken(1));
+        FolderEntry selectedFodler = Arrays.stream(folders).filter(folder->folder.id!=null && folder.id.equals(folderId)).findFirst().orElse(
+                Arrays.stream(folders).filter(folder->folder.title!=null && folder.title.equals(folderId)).findFirst().orElse(null)
+        );
+        if (selectedFodler!=null) {
+          definition.setFolderId(selectedFodler.id);
+        } else {
+          definition.setFolderId(null);
+        }
       }
     } catch (IOException|URISyntaxException ex) {
       throw new DataProcessorException(String.format("Error listing folders for user: %s", definition.getCredentials().getUserName()), ex);

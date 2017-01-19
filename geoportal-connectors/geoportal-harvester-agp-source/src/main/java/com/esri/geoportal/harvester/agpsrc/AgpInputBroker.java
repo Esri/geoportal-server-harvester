@@ -54,6 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import java.util.Date;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
@@ -128,14 +129,17 @@ import org.apache.http.impl.client.HttpClients;
     }
     
     try {
-      FolderEntry[] folders = this.client.listFolders(definition.getCredentials().getUserName(), generateToken(1));
-      FolderEntry selectedFodler = Arrays.stream(folders).filter(folder->folder.id!=null && folder.id.equals(definition.getFolderId())).findFirst().orElse(
-              Arrays.stream(folders).filter(folder->folder.title!=null && folder.title.equals(definition.getFolderId())).findFirst().orElse(null)
-      );
-      if (selectedFodler!=null) {
-        definition.setFolderId(selectedFodler.id);
-      } else {
-        definition.setFolderId(null);
+      String folderId = StringUtils.trimToNull(definition.getFolderId());
+      if (folderId!=null) {
+        FolderEntry[] folders = this.client.listFolders(definition.getCredentials().getUserName(), generateToken(1));
+        FolderEntry selectedFodler = Arrays.stream(folders).filter(folder->folder.id!=null && folder.id.equals(folderId)).findFirst().orElse(
+                Arrays.stream(folders).filter(folder->folder.title!=null && folder.title.equals(folderId)).findFirst().orElse(null)
+        );
+        if (selectedFodler!=null) {
+          definition.setFolderId(selectedFodler.id);
+        } else {
+          definition.setFolderId(null);
+        }
       }
     } catch (IOException|URISyntaxException ex) {
       throw new DataProcessorException(String.format("Error listing folders for user: %s", definition.getCredentials().getUserName()), ex);
