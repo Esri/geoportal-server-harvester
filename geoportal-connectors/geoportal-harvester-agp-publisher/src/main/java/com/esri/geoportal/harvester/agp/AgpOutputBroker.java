@@ -381,6 +381,8 @@ import org.xml.sax.SAXException;
         } else {
           definition.setFolderId(null);
         }
+      } else {
+        definition.setFolderId(null);
       }
     } catch (IOException|URISyntaxException ex) {
       throw new DataProcessorException(String.format("Error listing folders for user: %s", definition.getCredentials().getUserName()), ex);
