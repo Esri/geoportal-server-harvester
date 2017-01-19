@@ -26,24 +26,28 @@ define(["dojo/_base/declare",
           ){
     return {
       makeLabel: function(taskDefinition,long) {
-        var sourceLabel = this._makeEntityLabel(taskDefinition.source,long);
-        var destLabel = "";
-        if (taskDefinition.destinations) {
-          array.forEach(taskDefinition.destinations,lang.hitch(this,function(linkDefinition){
-            var label =this._makeLinkLabel(linkDefinition,long);
-            if (label) {
-              if (!destLabel || destLabel.length==0) {
-                destLabel = label;
-              } else {
-                destLabel += ", "+label;
+        if (taskDefinition){
+          var sourceLabel = this._makeEntityLabel(taskDefinition.source,long);
+          var destLabel = "";
+          if (taskDefinition.destinations) {
+            array.forEach(taskDefinition.destinations,lang.hitch(this,function(linkDefinition){
+              var label =this._makeLinkLabel(linkDefinition,long);
+              if (label) {
+                if (!destLabel || destLabel.length==0) {
+                  destLabel = label;
+                } else {
+                  destLabel += ", "+label;
+                }
               }
+            }));
+            if (taskDefinition.destinations.length>1) {
+              destLabel = "[" + destLabel + "]";
             }
-          }));
-          if (taskDefinition.destinations.length>1) {
-            destLabel = "[" + destLabel + "]";
           }
+          return sourceLabel + " -> " + destLabel;
+        } else {
+          return "";
         }
-        return sourceLabel + " -> " + destLabel;
       },
       
       _makeLinkLabel: function(linkDefinition,long) {

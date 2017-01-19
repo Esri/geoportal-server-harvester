@@ -31,14 +31,16 @@ define(["dojo/_base/declare",
         "dijit/form/Button",
         "hrv/rest/Tasks",
         "hrv/ui/tasks/Task",
-        "hrv/ui/tasks/TaskEditorPane"
+        "hrv/ui/tasks/TaskEditorPane",
+        "hrv/utils/TaskUtils"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
            lang,array,domConstruct,on,json,topic,Uploader,
            Dialog,Button,
-           TasksREST,Task,TaskEditorPane
+           TasksREST,Task,TaskEditorPane,
+           TaskUtils
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
@@ -61,6 +63,13 @@ define(["dojo/_base/declare",
       },
       
       processTasks: function(response) {
+        response = response.sort(function(a,b){
+          var t1 = TaskUtils.makeLabel(a.taskDefinition).toLowerCase();
+          var t2 = TaskUtils.makeLabel(b.taskDefinition).toLowerCase();
+          if (t1<t2) return -1;
+          if (t1>t2) return 1;
+          return 0;
+        });
         array.forEach(response,lang.hitch(this,this.processTask));
       },
       
