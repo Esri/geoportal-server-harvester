@@ -356,6 +356,26 @@ public class AgpClient implements Closeable {
   }
   
   /**
+   * Lists folders.
+   * @param owner owner
+   * @param token token
+   * @return array of folders
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public FolderEntry[] listFolders(String owner, String token) throws URISyntaxException, IOException {
+    URIBuilder builder = new URIBuilder(userUri(owner, null));
+    
+    builder.setParameter("f", "json");
+    if (token!=null) {
+      builder.setParameter("token", token);
+    }
+    HttpGet req = new HttpGet(builder.build());
+    
+    return execute(req,ContentResponse.class).folders;
+  }
+  
+  /**
    * Searches for items.
    * @param query query
    * @param num max number of items
