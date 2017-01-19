@@ -65,6 +65,15 @@ define(["dojo/_base/declare",
       },
       
       processInputs: function(response) {
+        response = response.sort(function(a,b){
+          var t1 = a.brokerDefinition.label;
+          t1 = t1? t1.toLowerCase(): "";
+          var t2 = b.brokerDefinition.label;
+          t2 = t2? t2.toLowerCase(): "";
+          if (t1<t2) return -1;
+          if (t1>t2) return 1;
+          return 0;
+        });
         array.forEach(response,lang.hitch(this,this.addInput));
       },
       
@@ -84,6 +93,15 @@ define(["dojo/_base/declare",
       },
       
       processOutputs: function(response) {
+        response = response.sort(function(a,b){
+          var t1 = a.brokerDefinition.label;
+          t1 = t1? t1.toLowerCase(): "";
+          var t2 = b.brokerDefinition.label;
+          t2 = t2? t2.toLowerCase(): "";
+          if (t1<t2) return -1;
+          if (t1>t2) return 1;
+          return 0;
+        });
         array.forEach(response,lang.hitch(this,this.addOutput));
       },
       
