@@ -474,7 +474,7 @@ public class AgpClient implements Closeable {
   
   private HttpEntity createEntity(Map<String, String> params) throws UnsupportedEncodingException {
     return  new UrlEncodedFormEntity(params.entrySet().stream()
-            .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()));
+            .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()), "UTF-8");
   }
   
   private <T> T execute(HttpUriRequest req, Class<T> clazz) throws IOException {
