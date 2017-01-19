@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.agpsrc;
 
 import com.esri.geoportal.commons.agp.client.AgpClient;
 import com.esri.geoportal.commons.agp.client.ContentResponse;
+import com.esri.geoportal.commons.agp.client.FolderEntry;
 import com.esri.geoportal.commons.agp.client.ItemEntry;
 import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.constants.MimeType;
@@ -124,6 +125,20 @@ import org.apache.http.impl.client.HttpClients;
     } else {
       Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getHostUrl());
       client = new AgpClient(new BotsHttpClient(httpclient,bots), definition.getHostUrl(), definition.getCredentials());
+    }
+    
+    try {
+      FolderEntry[] folders = this.client.listFolders(definition.getCredentials().getUserName(), generateToken(1));
+      FolderEntry selectedFodler = Arrays.stream(folders).filter(folder->folder.id!=null && folder.id.equals(definition.getFolderId())).findFirst().orElse(
+              Arrays.stream(folders).filter(folder->folder.title!=null && folder.title.equals(definition.getFolderId())).findFirst().orElse(null)
+      );
+      if (selectedFodler!=null) {
+        definition.setFolderId(selectedFodler.id);
+      } else {
+        definition.setFolderId(null);
+      }
+    } catch (IOException|URISyntaxException ex) {
+      throw new DataProcessorException(String.format("Error listing folders for user: %s", definition.getCredentials().getUserName()), ex);
     }
   }
 

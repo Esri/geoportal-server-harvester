@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.agp;
 import com.esri.geoportal.commons.agp.client.AgpClient;
 import com.esri.geoportal.commons.constants.DataType;
 import com.esri.geoportal.commons.agp.client.DeleteResponse;
+import com.esri.geoportal.commons.agp.client.FolderEntry;
 import com.esri.geoportal.commons.agp.client.ItemEntry;
 import com.esri.geoportal.commons.agp.client.ItemResponse;
 import com.esri.geoportal.commons.constants.ItemType;
@@ -366,6 +367,20 @@ import org.xml.sax.SAXException;
       } catch (URISyntaxException|IOException ex) {
         throw new DataProcessorException(String.format("Error collecting ids of existing items."), ex);
       }
+    }
+    
+    try {
+      FolderEntry[] folders = this.client.listFolders(definition.getCredentials().getUserName(), generateToken(1));
+      FolderEntry selectedFodler = Arrays.stream(folders).filter(folder->folder.id!=null && folder.id.equals(definition.getFolderId())).findFirst().orElse(
+              Arrays.stream(folders).filter(folder->folder.title!=null && folder.title.equals(definition.getFolderId())).findFirst().orElse(null)
+      );
+      if (selectedFodler!=null) {
+        definition.setFolderId(selectedFodler.id);
+      } else {
+        definition.setFolderId(null);
+      }
+    } catch (IOException|URISyntaxException ex) {
+      throw new DataProcessorException(String.format("Error listing folders for user: %s", definition.getCredentials().getUserName()), ex);
     }
   }
 
