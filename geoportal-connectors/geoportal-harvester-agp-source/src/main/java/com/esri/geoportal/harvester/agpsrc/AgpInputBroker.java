@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -64,8 +63,7 @@ import org.apache.http.impl.client.HttpClients;
 /*package*/ class AgpInputBroker implements InputBroker {
 
   private static final Logger LOG = LoggerFactory.getLogger(AgpInputBroker.class);
-  private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-
+  
   private final AgpInputConnector connector;
   private final AgpInputBrokerDefinitionAdaptor definition;
   private final MetaBuilder metaBuilder;

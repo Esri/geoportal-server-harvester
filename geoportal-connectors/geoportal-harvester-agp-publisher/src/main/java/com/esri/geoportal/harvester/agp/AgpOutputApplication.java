@@ -54,7 +54,7 @@ public class AgpOutputApplication {
       OutputBroker broker = connector.createBroker(def);
     
       DataReferenceSerializer ser = new DataReferenceSerializer();
-      DataReference ref = null;
+      DataReference ref;
       while (( ref = ser.deserialize(System.in))!=null) {
         broker.publish(ref);
       }
