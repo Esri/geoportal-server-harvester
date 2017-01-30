@@ -86,7 +86,7 @@ public class Application {
   }
   
   protected void printHeader() {
-    System.out.println(String.format("Harvest ver. %s, Copyright @ 2016 Esri, Inc.", version));
+    System.out.println(String.format("Harvest ver. %s, Copyright @ 2017 Esri, Inc.", version));
   }
   
   protected void printVersion() {
