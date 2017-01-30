@@ -95,7 +95,7 @@ public class Application {
   
   protected void printHelp(Options options) {
     HelpFormatter help = new HelpFormatter();
-    help.printHelp("java -jar harvest.jar [options] [-file <file>] | [-taks <task definition>]", options);
+    help.printHelp("java -jar harvest.jar [options] [-file <file>] | [-task <task definition>]", options);
   }
   
   private Options createOptions() {
