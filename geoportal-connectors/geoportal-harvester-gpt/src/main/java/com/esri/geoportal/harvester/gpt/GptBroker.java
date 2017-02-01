@@ -119,12 +119,16 @@ import org.slf4j.LoggerFactory;
   @Override
   public PublishingStatus publish(DataReference ref) throws DataOutputException {
     try {
+      Object ownerObj = ref.getAttributesMap().get("owner");
+      String owner = ownerObj instanceof String? (String)ownerObj: null;
+      
       PublishRequest data = new PublishRequest();
       data.src_source_type_s = ref.getBrokerUri().getScheme();
       data.src_source_uri_s = ref.getBrokerUri().toASCIIString();
       data.src_source_name_s = ref.getBrokerName();
       data.src_uri_s = ref.getSourceUri().toASCIIString();
       data.src_lastupdate_dt = ref.getLastModifiedDate() != null ? fromatDate(ref.getLastModifiedDate()) : null;
+      data.src_owner_s = owner;
       
       byte[] content = ref.getContent();
       if (content!=null) {
