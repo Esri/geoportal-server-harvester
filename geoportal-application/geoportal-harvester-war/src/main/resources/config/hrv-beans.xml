@@ -47,6 +47,7 @@
   <bean class="com.esri.geoportal.harvester.gpt.GptConnector"/>
   <bean class="com.esri.geoportal.harvester.unc.UncConnector"/>
   <bean class="com.esri.geoportal.harvester.waf.WafConnector"/>
+  <bean class="com.esri.geoportal.harvester.migration.MigrationConnector"/>
   
   <!-- Triggers -->
   <bean class="com.esri.geoportal.harvester.engine.triggers.NowTrigger"/>

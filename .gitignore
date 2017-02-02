@@ -37,3 +37,4 @@
 /geoportal-application/geoportal-harvester-cli/target/
 /geoportal-connectors/geoportal-harvester-ckan/target/
 /geoportal-commons/geoportal-commons-ckan-client/target/
+/geoportal-connectors/geoportal-harvester-migration/target/

@@ -18,6 +18,6 @@ package com.esri.geoportal.harvester.migration;
 /**
  * Migration constants.
  */
-public class MigConstants {
-  public static String P_JNDI_NAME = "mig-jndi-name";
+/*package*/ class MigrationConstants {
+  public static String P_JNDI_NAME = "migration-jndi-name";
 }

@@ -9,6 +9,13 @@
     <artifactId>geoportal-harvester-migration</artifactId>
     <name>Esri :: Geoportal Server :: Harvester :: Data Source :: Migration Tool</name>
     <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>harvester-api-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
