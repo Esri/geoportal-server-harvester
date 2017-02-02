@@ -33,6 +33,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +85,7 @@ import org.slf4j.LoggerFactory;
     try {
       initDataSource();
       buildUserMap();
+      buildHarvestSites();
     } catch (NamingException|SQLException ex) {
       throw new DataProcessorException(String.format("Unable to init broker."), ex);
     }
@@ -102,7 +104,7 @@ import org.slf4j.LoggerFactory;
   private void buildUserMap() throws SQLException {
     try (
             Connection conn = dataSource.getConnection(); 
-            PreparedStatement st = conn.prepareStatement("SELECT * FROM GPT_USER");
+            PreparedStatement st = makeUserStatement(conn);
             ResultSet rs = st.executeQuery();
         ) {
       while (rs.next()) {
@@ -111,6 +113,31 @@ import org.slf4j.LoggerFactory;
         userMap.put(userId, userName);
       }
     }
+  }
+  
+  private PreparedStatement makeUserStatement(Connection conn) throws SQLException {
+    return conn.prepareStatement("SELECT * FROM GPT_USER");
+  }
+  
+  private void buildHarvestSites() throws SQLException {
+    try (
+            Connection conn = dataSource.getConnection(); 
+            PreparedStatement st = makeSitesStatement(conn);
+            ResultSet rs = st.executeQuery();
+        ) {
+      while (rs.next()) {
+        String docuuid = StringUtils.trimToEmpty(rs.getString("DOCUUID"));
+        String title = StringUtils.trimToEmpty(rs.getString("TITLE"));
+        String type = StringUtils.trimToEmpty(rs.getString("PROTOCOL_TYPE")).toUpperCase();
+        String host = StringUtils.trimToEmpty(rs.getString("HOST_URL"));
+        String protocol = rs.getString("PROTOCOL");
+        Frequency frequency = Frequency.parse(StringUtils.trimToEmpty(rs.getString("FREQUENCY")));
+      }
+    }
+  }
+  
+  private PreparedStatement makeSitesStatement(Connection conn) throws SQLException {
+    return conn.prepareStatement("SELECT * FROM GPT_RESOURCE WHERE PROTOCOL IS NOT NULL");
   }
   
   private class MigrationIterator implements InputBroker.Iterator {
@@ -132,5 +159,18 @@ import org.slf4j.LoggerFactory;
       return null;
     }
     
+  }
+  
+  private static enum Frequency {
+    Monthy, BiWeekly, Weekly, Dayly, Hourly, Once, Skip, AdHoc;
+    
+    public static Frequency parse(String freq) {
+      for (Frequency f: values()) {
+        if (f.name().equalsIgnoreCase(freq)) {
+          return f;
+        }
+      }
+      return null;
+    }
   }
 }
