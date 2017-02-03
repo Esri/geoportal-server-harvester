@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
   
   private DataSource dataSource;
   private final Map<Integer,String> userMap = new HashMap<>();
+  private final Map<String,HarvestSite> harvestSites = new HashMap<>();
 
   /**
    * Creates instance of the broker.
@@ -126,12 +127,14 @@ import org.slf4j.LoggerFactory;
             ResultSet rs = st.executeQuery();
         ) {
       while (rs.next()) {
-        String docuuid = StringUtils.trimToEmpty(rs.getString("DOCUUID"));
-        String title = StringUtils.trimToEmpty(rs.getString("TITLE"));
-        String type = StringUtils.trimToEmpty(rs.getString("PROTOCOL_TYPE")).toUpperCase();
-        String host = StringUtils.trimToEmpty(rs.getString("HOST_URL"));
-        String protocol = rs.getString("PROTOCOL");
-        Frequency frequency = Frequency.parse(StringUtils.trimToEmpty(rs.getString("FREQUENCY")));
+        HarvestSite hs = new HarvestSite();
+        hs.docuuid = StringUtils.trimToEmpty(rs.getString("DOCUUID"));
+        hs.title = StringUtils.trimToEmpty(rs.getString("TITLE"));
+        hs.type = StringUtils.trimToEmpty(rs.getString("PROTOCOL_TYPE")).toUpperCase();
+        hs.host = StringUtils.trimToEmpty(rs.getString("HOST_URL"));
+        hs.protocol = rs.getString("PROTOCOL");
+        hs.frequency = Frequency.parse(StringUtils.trimToEmpty(rs.getString("FREQUENCY")));
+        harvestSites.put(hs.docuuid, hs);
       }
     }
   }
@@ -172,5 +175,14 @@ import org.slf4j.LoggerFactory;
       }
       return null;
     }
+  }
+  
+  private static class HarvestSite {
+    public String docuuid;
+    public String title;
+    public String type;
+    public String host;
+    public String protocol;
+    public Frequency frequency;
   }
 }
