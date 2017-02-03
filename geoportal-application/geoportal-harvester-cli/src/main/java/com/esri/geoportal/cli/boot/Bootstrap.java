@@ -28,6 +28,7 @@ import com.esri.geoportal.harvester.ckan.CkanConnector;
 import com.esri.geoportal.harvester.agp.AgpOutputConnector;
 import com.esri.geoportal.harvester.agpsrc.AgpInputConnector;
 import com.esri.geoportal.harvester.ags.AgsConnector;
+import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.console.ConsoleConnector;
 import com.esri.geoportal.harvester.csw.CswConnector;
 import com.esri.geoportal.harvester.engine.defaults.DefaultEngine;
@@ -283,9 +284,13 @@ public class Bootstrap {
   
   protected ProcessorRegistry createProcessorRegistry() {
     if (processorRegistry==null) {
-      processorRegistry = new ProcessorRegistry();
-
-      processorRegistry.put(DefaultProcessor.TYPE, new DefaultProcessor());
+      final DefaultProcessor defaultProcessor = new DefaultProcessor();
+      processorRegistry = new ProcessorRegistry() {
+        @Override
+        public Processor getDefaultProcessor() {
+          return defaultProcessor;
+        }
+      };
     }
     
     return processorRegistry;

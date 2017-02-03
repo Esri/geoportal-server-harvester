@@ -36,6 +36,9 @@ public class ProcessorRegistryBean extends ProcessorRegistry {
   @Autowired(required = false)
   private List<Processor> processors;
   
+  @Autowired
+  private DefaultProcessor defaultProcessor;
+  
   /**
    * Initializes bean.
    */
@@ -53,6 +56,11 @@ public class ProcessorRegistryBean extends ProcessorRegistry {
   @PreDestroy
   public void destroy() {
     LOG.info(String.format("ProcessorRegistryBean destroyed."));
+  }
+
+  @Override
+  public Processor getDefaultProcessor() {
+    return defaultProcessor;
   }
   
 }

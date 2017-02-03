@@ -6,6 +6,7 @@
 
   <!-- Services -->  
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultEngine" autowire="constructor"/>
+  <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultProcessor" autowire="constructor"/>
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultBrokersService" autowire="constructor"/>
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultTasksService" autowire="constructor"/>
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultExecutionService" autowire="constructor"/>

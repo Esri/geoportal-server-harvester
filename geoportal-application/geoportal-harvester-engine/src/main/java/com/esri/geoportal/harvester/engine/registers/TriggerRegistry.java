@@ -16,11 +16,7 @@
 package com.esri.geoportal.harvester.engine.registers;
 
 import com.esri.geoportal.harvester.api.Trigger;
-import com.esri.geoportal.harvester.api.TriggerInstance;
-import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
-import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.utils.EntityRegistry;
-import com.esri.geoportal.harvester.engine.utils.TriggerReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,21 +25,6 @@ import org.slf4j.LoggerFactory;
  */
 public class TriggerRegistry extends EntityRegistry<Trigger> implements AutoCloseable {
   private static final Logger LOG = LoggerFactory.getLogger(TriggerRegistry.class);
-  
-  /**
-   * Creates trigger instance.
-   * @param triggerReference trigger reference
-   * @return trigger instance
-   * @throws InvalidDefinitionException if trigger definition is invalid.
-   */
-  public TriggerInstance createInstance(TriggerReference triggerReference) throws InvalidDefinitionException {
-    TriggerDefinition triggerInstanceDefinition = triggerReference.getTriggerDefinition();
-    Trigger trigger = get(triggerInstanceDefinition.getType());
-    if (trigger==null) {
-      throw new InvalidDefinitionException(String.format("Invalid trigger definition: %s", triggerInstanceDefinition));
-    }
-    return trigger.createInstance(triggerInstanceDefinition);
-  }
 
   @Override
   public void close() throws Exception {

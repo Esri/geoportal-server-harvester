@@ -16,20 +16,16 @@
 package com.esri.geoportal.harvester.engine.registers;
 
 import com.esri.geoportal.harvester.api.Processor;
-import com.esri.geoportal.harvester.engine.defaults.DefaultProcessor;
 import com.esri.geoportal.harvester.engine.utils.EntityRegistry;
 
 /**
  * Processor registry.
  */
-public class ProcessorRegistry extends EntityRegistry<Processor>{
-  private final Processor defaultProcessor = new DefaultProcessor();
+public abstract class ProcessorRegistry extends EntityRegistry<Processor>{
   
   /**
    * Gets default processor.
    * @return default processor
    */
-  public Processor getDefaultProcessor() {
-    return defaultProcessor;
-  }
+  public abstract Processor getDefaultProcessor();
 }
