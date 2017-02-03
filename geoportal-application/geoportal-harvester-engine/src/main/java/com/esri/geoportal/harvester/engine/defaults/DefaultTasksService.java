@@ -17,14 +17,11 @@ package com.esri.geoportal.harvester.engine.defaults;
 
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.services.TasksService;
 import com.esri.geoportal.harvester.engine.managers.History;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.managers.TaskManager;
-import com.esri.geoportal.harvester.engine.services.TriggersService;
 import com.esri.geoportal.harvester.engine.utils.CrudlException;
-import com.esri.geoportal.harvester.engine.utils.TriggerReference;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -37,18 +34,15 @@ import java.util.stream.Collectors;
 public class DefaultTasksService implements TasksService {
   protected final TaskManager taskManager;
   protected final HistoryManager historyManager;
-  protected final TriggersService triggersService;
 
   /**
    * Creates instance of the service.
    * @param taskManager task manager
    * @param historyManager history manager
-   * @param triggersService triggers service
    */
-  public DefaultTasksService(TaskManager taskManager, HistoryManager historyManager, TriggersService triggersService) {
+  public DefaultTasksService(TaskManager taskManager, HistoryManager historyManager) {
     this.taskManager = taskManager;
     this.historyManager = historyManager;
-    this.triggersService = triggersService;
   }
 
   @Override
@@ -72,13 +66,9 @@ public class DefaultTasksService implements TasksService {
   @Override
   public boolean deleteTaskDefinition(UUID taskId) throws DataProcessorException {
     try {
-      List<TriggerReference> triggers = triggersService.listActivatedTriggers(taskId);
-      for (TriggerReference ref: triggers) {
-        triggersService.deactivateTriggerInstance(ref.getUuid());
-      }
       historyManager.purgeHistory(taskId);
       return taskManager.delete(taskId);
-    } catch (CrudlException|InvalidDefinitionException ex) {
+    } catch (CrudlException ex) {
       throw new DataProcessorException(String.format("Error deleting task definition: %s", taskId), ex);
     }
   }

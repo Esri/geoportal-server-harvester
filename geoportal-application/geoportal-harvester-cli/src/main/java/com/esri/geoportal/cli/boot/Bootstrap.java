@@ -157,8 +157,8 @@ public class Bootstrap {
     if (taskService==null) {
       taskService = new DefaultTasksService(
               createTaskManager(), 
-              createHistoryManager(), 
-              createTriggersService());
+              createHistoryManager() 
+      );
     }
     return taskService;
   }
