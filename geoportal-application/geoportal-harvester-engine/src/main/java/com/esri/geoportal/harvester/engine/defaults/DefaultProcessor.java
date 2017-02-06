@@ -30,6 +30,9 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.general.Link;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputBroker.IteratorContext;
+import com.esri.geoportal.harvester.engine.services.Engine;
+import com.esri.geoportal.harvester.engine.services.TasksService;
+import com.esri.geoportal.harvester.engine.services.TriggersService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,7 +48,17 @@ public class DefaultProcessor implements Processor {
   public static final String TYPE = "DEFAULT";
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultProcessor.class);
-
+  
+  private final Engine engine;
+  
+  /**
+   * Creates instance of the default processor
+   * @param engine engine
+   */
+  public DefaultProcessor(Engine engine) {
+    this.engine = engine;
+  }
+  
   @Override
   public String getType() {
     return TYPE;

@@ -48,8 +48,6 @@ import com.esri.geoportal.harvester.engine.registers.TransformerRegistry;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
-import com.esri.geoportal.harvester.engine.services.TasksService;
-import com.esri.geoportal.harvester.engine.services.TriggersService;
 import com.esri.geoportal.harvester.engine.utils.ProcessReference;
 import java.util.ArrayList;
 
