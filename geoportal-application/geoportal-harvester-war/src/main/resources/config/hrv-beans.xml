@@ -5,7 +5,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
 
   <!-- Services -->  
-  <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultEngine" autowire="constructor"/>
+  <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultEngine" autowire="constructor" init-method="init"/>
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultProcessor" autowire="constructor"/>
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultBrokersService" autowire="constructor"/>
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultTasksService" autowire="constructor"/>

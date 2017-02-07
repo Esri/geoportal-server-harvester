@@ -21,6 +21,7 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
+import com.esri.geoportal.harvester.engine.services.Engine;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
@@ -49,7 +50,6 @@ import org.slf4j.LoggerFactory;
   
   private DataSource dataSource;
   private final Map<Integer,String> userMap = new HashMap<>();
-  private final Map<String,HarvestSite> harvestSites = new HashMap<>();
 
   /**
    * Creates instance of the broker.
@@ -84,9 +84,9 @@ import org.slf4j.LoggerFactory;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     try {
-      initDataSource();
-      buildUserMap();
-      buildHarvestSites();
+      initDataSource(context);
+      buildUserMap(context);
+      buildHarvestSites(context);
     } catch (NamingException|SQLException ex) {
       throw new DataProcessorException(String.format("Unable to init broker."), ex);
     }
@@ -96,13 +96,21 @@ import org.slf4j.LoggerFactory;
   public void terminate() {
   }
   
-  private void initDataSource() throws NamingException {
+  private Engine getEngine() {
+    Engine e = Engine.ENGINES.get("DEFAULT");
+    if (e==null) {
+      e = Engine.ENGINES.values().stream().findFirst().orElse(null);
+    }
+    return e;
+  }
+  
+  private void initDataSource(InitContext context) throws NamingException {
     Context initContext = new InitialContext();
     Context webContext = (Context)initContext.lookup("java:/comp/env");
     dataSource = (DataSource) webContext.lookup(definition.getJndi());  
   }
   
-  private void buildUserMap() throws SQLException {
+  private void buildUserMap(InitContext context) throws SQLException {
     try (
             Connection conn = dataSource.getConnection(); 
             PreparedStatement st = makeUserStatement(conn);
@@ -120,21 +128,24 @@ import org.slf4j.LoggerFactory;
     return conn.prepareStatement("SELECT * FROM GPT_USER");
   }
   
-  private void buildHarvestSites() throws SQLException {
+  private void buildHarvestSites(InitContext context) throws SQLException {
     try (
             Connection conn = dataSource.getConnection(); 
             PreparedStatement st = makeSitesStatement(conn);
             ResultSet rs = st.executeQuery();
         ) {
+      MigrationSiteBuilder builder = new MigrationSiteBuilder(getEngine());
       while (rs.next()) {
-        HarvestSite hs = new HarvestSite();
+        MigrationHarvestSite hs = new MigrationHarvestSite();
+        
         hs.docuuid = StringUtils.trimToEmpty(rs.getString("DOCUUID"));
         hs.title = StringUtils.trimToEmpty(rs.getString("TITLE"));
         hs.type = StringUtils.trimToEmpty(rs.getString("PROTOCOL_TYPE")).toUpperCase();
         hs.host = StringUtils.trimToEmpty(rs.getString("HOST_URL"));
         hs.protocol = rs.getString("PROTOCOL");
-        hs.frequency = Frequency.parse(StringUtils.trimToEmpty(rs.getString("FREQUENCY")));
-        harvestSites.put(hs.docuuid, hs);
+        hs.frequency = MigrationHarvestSite.Frequency.parse(StringUtils.trimToEmpty(rs.getString("FREQUENCY")));
+        
+        builder.buildSite(hs);
       }
     }
   }
@@ -162,27 +173,5 @@ import org.slf4j.LoggerFactory;
       return null;
     }
     
-  }
-  
-  private static enum Frequency {
-    Monthy, BiWeekly, Weekly, Dayly, Hourly, Once, Skip, AdHoc;
-    
-    public static Frequency parse(String freq) {
-      for (Frequency f: values()) {
-        if (f.name().equalsIgnoreCase(freq)) {
-          return f;
-        }
-      }
-      return null;
-    }
-  }
-  
-  private static class HarvestSite {
-    public String docuuid;
-    public String title;
-    public String type;
-    public String host;
-    public String protocol;
-    public Frequency frequency;
   }
 }

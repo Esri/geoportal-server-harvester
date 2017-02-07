@@ -15,10 +15,20 @@
  */
 package com.esri.geoportal.harvester.engine.services;
 
+import java.util.WeakHashMap;
+
 /**
  * Engine interface.
  */
 public interface Engine {
+  WeakHashMap<String, Engine> ENGINES = new WeakHashMap<>();
+          
+  /**
+   * Gets engine type.
+   * @return type.
+   */
+  String getType();
+  
   /**
    * Gets templates service.
    * @return templates service

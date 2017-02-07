@@ -123,7 +123,8 @@ public class Bootstrap {
               createProcessesService(), 
               createTriggersService(), 
               createExecutionService());
-      processorRegistry.setDefaultProcessor(new DefaultProcessor(taskService, triggersService));
+      processorRegistry.setDefaultProcessor(new DefaultProcessor());
+      engine.init();
       return engine;
     } catch (IOException|TransformerConfigurationException|XPathExpressionException ex) {
       throw new DataProcessorException("Error creating engine.", ex);
