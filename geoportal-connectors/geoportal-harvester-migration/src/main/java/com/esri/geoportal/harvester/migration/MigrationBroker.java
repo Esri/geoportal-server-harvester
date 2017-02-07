@@ -22,12 +22,14 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.engine.services.Engine;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.naming.Context;
@@ -50,7 +52,9 @@ import org.slf4j.LoggerFactory;
   
   private DataSource dataSource;
   private final Map<Integer,String> userMap = new HashMap<>();
-
+  private final Map<String,MigrationHarvestSite> sites = new HashMap<>();
+  private final ArrayList<MigrationIterator> iters = new ArrayList<>();
+  
   /**
    * Creates instance of the broker.
    * @param connector connector
@@ -68,7 +72,13 @@ import org.slf4j.LoggerFactory;
 
   @Override
   public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
-    return new MigrationIterator(iteratorContext);
+    try {
+      MigrationIterator iter = new MigrationIterator(definition, getBrokerUri(), iteratorContext);
+      iters.add(iter);
+      return iter;
+    } catch(URISyntaxException ex) {
+      throw new DataInputException(this, String.format("Error creating iterator."), ex);
+    }
   }
 
   @Override
@@ -94,6 +104,8 @@ import org.slf4j.LoggerFactory;
 
   @Override
   public void terminate() {
+    iters.forEach(MigrationIterator::close);
+    iters.clear();
   }
   
   private Engine getEngine() {
@@ -145,6 +157,8 @@ import org.slf4j.LoggerFactory;
         hs.protocol = rs.getString("PROTOCOL");
         hs.frequency = MigrationHarvestSite.Frequency.parse(StringUtils.trimToEmpty(rs.getString("FREQUENCY")));
         
+        sites.put(hs.docuuid, hs);
+        
         builder.buildSite(hs);
       }
     }
@@ -156,21 +170,105 @@ import org.slf4j.LoggerFactory;
   
   private class MigrationIterator implements InputBroker.Iterator {
     private final IteratorContext iteratorContext;
+    private final MigrationDataBuilder dataBuilder;
+    
+    private Connection conn;
+    private PreparedStatement adminSt;
+    private ResultSet adminRs;
+    
+    private MigrationData data;
 
-    public MigrationIterator(IteratorContext iteratorContext) {
+    public MigrationIterator(MigrationBrokerDefinitionAdaptor definition, URI brokerUri, IteratorContext iteratorContext) {
       this.iteratorContext = iteratorContext;
+      this.dataBuilder = new MigrationDataBuilder(definition, brokerUri, userMap, sites);
     }
 
     @Override
     public boolean hasNext() throws DataInputException {
-      // TODO implement hasNext() for MigrationIterator
-      return false;
+      try {
+        initResultSet();
+        if (data!=null) return true;
+        if (!adminRs.next()) {
+          return false;
+        }
+        
+        MigrationData dt = new MigrationData();
+        
+        dt.docuuid = StringUtils.trimToEmpty(adminRs.getString("DOCUUID"));
+        dt.title = StringUtils.trimToEmpty(adminRs.getString("TITLE"));
+        dt.owner = adminRs.getInt("OWNER");
+        dt.updateDate = adminRs.getTimestamp("UPDATEDATE");
+        dt.fileidentifier = StringUtils.trimToEmpty(adminRs.getString("FILEIDENTIFIER"));
+        dt.pubmethod = StringUtils.trimToEmpty(adminRs.getString("PUBMETHOD"));
+        dt.sourceuri = StringUtils.trimToEmpty(adminRs.getString("SOURCEURI"));
+        dt.siteuuid = StringUtils.trimToEmpty(adminRs.getString("SITEUUID"));
+        
+        data = dt;
+        
+        return true;
+      } catch (SQLException ex) {
+        throw new DataInputException(MigrationBroker.this, String.format("Error fetching data."), ex);
+      }
     }
 
     @Override
     public DataReference next() throws DataInputException {
-      // TODO implement next() for MigrationIterator
-      return null;
+      if (data==null) {
+        throw new DataInputException(MigrationBroker.this, String.format("No more data available"));
+      }
+      
+      try (PreparedStatement st = createDataStatement(data.docuuid); ResultSet rs = st.executeQuery();) {
+        if (rs.next()) {
+          String xml = rs.getString("XML");
+          return dataBuilder.buildReference(data, xml);
+        } else {
+          throw new DataInputException(MigrationBroker.this, String.format("No more data available"));
+        }
+      } catch (SQLException|IOException|URISyntaxException ex) {
+        throw new DataInputException(MigrationBroker.this, String.format("Error reading data."), ex);
+      }
+    }
+    
+    private PreparedStatement createDataStatement(String id) throws SQLException {
+      PreparedStatement st = conn.prepareStatement("SELECT * FROM GPT_RESOURCE_DATA WHERE DOCUUID = ?");
+      st.setString(1, id);
+      return st;
+    }
+    
+    public void close() {
+      if (adminRs!=null) {
+        try {
+          adminRs.close();
+        } catch(SQLException ex) {
+          LOG.warn(String.format("Error closing iterator."), ex);
+        }
+      }
+      if (adminSt!=null) {
+        try {
+          adminSt.close();
+        } catch(SQLException ex) {
+          LOG.warn(String.format("Error closing iterator."), ex);
+        }
+      }
+      if (conn!=null) {
+        try {
+          conn.close();
+        } catch(SQLException ex) {
+          LOG.warn(String.format("Error closing iterator."), ex);
+        }
+      }
+    }
+    
+    private void initResultSet() throws SQLException {
+      if (conn==null) {
+        conn = dataSource.getConnection();
+      }
+      if (adminSt==null) {
+        adminSt = conn.prepareStatement("SELECT * FROM GPT_RESOURCE WHERE APPROVALSTATUS IN ('APPROVED') AND PROTOCOL IS NULL");
+      }
+      if (adminRs==null) {
+        adminRs = adminSt.executeQuery();
+      }
     }
     
   }
