@@ -119,6 +119,7 @@ Spring Web
 -------------------------------------------------------------------------------
 The Spring Framework is released under version 2.0 of the Apache License.
 
+See Common Open Source Licenses section below for copy of Apache 2.0 License.
 ===============================================================================
 Common Open Source Licenses
 ===============================================================================
