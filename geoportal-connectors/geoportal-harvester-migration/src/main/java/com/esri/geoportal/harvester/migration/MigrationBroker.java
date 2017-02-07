@@ -220,7 +220,9 @@ import org.slf4j.LoggerFactory;
       try (PreparedStatement st = createDataStatement(data.docuuid); ResultSet rs = st.executeQuery();) {
         if (rs.next()) {
           String xml = rs.getString("XML");
-          return dataBuilder.buildReference(data, xml);
+          DataReference ref = dataBuilder.buildReference(data, xml);
+          data = null;
+          return ref;
         } else {
           throw new DataInputException(MigrationBroker.this, String.format("No more data available"));
         }
