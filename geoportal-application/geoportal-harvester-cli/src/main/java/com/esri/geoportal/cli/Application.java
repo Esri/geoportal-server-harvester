@@ -86,7 +86,7 @@ public class Application {
   }
   
   protected void printHeader() {
-    System.out.println(String.format("Harvest ver. %s, Copyright @ 2016 Esri, Inc.", version));
+    System.out.println(String.format("Harvest ver. %s, Copyright @ 2017 Esri, Inc.", version));
   }
   
   protected void printVersion() {
@@ -95,7 +95,7 @@ public class Application {
   
   protected void printHelp(Options options) {
     HelpFormatter help = new HelpFormatter();
-    help.printHelp("java -jar harvest.jar [options] [-file <file>] | [-taks <task definition>]", options);
+    help.printHelp("java -jar harvest.jar [options] [-file <file>] | [-task <task definition>]", options);
   }
   
   private Options createOptions() {
