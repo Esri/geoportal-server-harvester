@@ -216,12 +216,13 @@ import org.slf4j.LoggerFactory;
       if (data==null) {
         throw new DataInputException(MigrationBroker.this, String.format("No more data available"));
       }
+      MigrationData dt = data;
+      data = null;
       
-      try (PreparedStatement st = createDataStatement(data.docuuid); ResultSet rs = st.executeQuery();) {
+      try (PreparedStatement st = createDataStatement(dt.docuuid); ResultSet rs = st.executeQuery();) {
         if (rs.next()) {
           String xml = rs.getString("XML");
-          DataReference ref = dataBuilder.buildReference(data, xml);
-          data = null;
+          DataReference ref = dataBuilder.buildReference(dt, xml);
           return ref;
         } else {
           throw new DataInputException(MigrationBroker.this, String.format("No more data available"));

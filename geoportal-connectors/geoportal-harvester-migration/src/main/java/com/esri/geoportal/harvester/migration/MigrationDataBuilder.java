@@ -16,9 +16,11 @@
 package com.esri.geoportal.harvester.migration;
 
 import com.esri.geoportal.commons.constants.MimeType;
+import static com.esri.geoportal.commons.utils.UriUtils.escapeUri;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -66,15 +68,15 @@ import org.apache.commons.lang3.StringUtils;
     return ref;
   }
 
-  public URI createSourceUri(MigrationData data) throws URISyntaxException {
+  public URI createSourceUri(MigrationData data) throws URISyntaxException, UnsupportedEncodingException {
     MigrationHarvestSite site = data.siteuuid!=null? sites.get(data.siteuuid): null;
     if (site!=null) {
       String type = StringUtils.trimToEmpty(site.type).toUpperCase();
       switch (type) {
         case "CSW":
-          return new URI("uuid",data.sourceuri,null);
+          return new URI("uuid",escapeUri(data.sourceuri),null);
       }
     }
-    return URI.create(data.sourceuri);
+    return URI.create(escapeUri(data.sourceuri));
   }
 }
