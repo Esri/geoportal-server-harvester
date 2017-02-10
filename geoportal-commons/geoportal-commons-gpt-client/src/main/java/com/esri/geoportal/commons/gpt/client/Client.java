@@ -125,12 +125,12 @@ public class Client implements Closeable {
     
     URI pubUri = !ids.isEmpty()? createItemUri(ids.get(0)): createItemsUri();
     try {
-      return publish(pubUri, entity, data.src_owner_s);
+      return publish(pubUri, entity, data.sys_owner_s);
     } catch(HttpResponseException ex) {
       if (ex.getStatusCode()==401) {
         clearToken();
         pubUri = !ids.isEmpty()? createItemUri(ids.get(0)): createItemsUri();
-        return publish(pubUri, entity, data.src_owner_s);
+        return publish(pubUri, entity, data.sys_owner_s);
       } else {
         throw ex;
       }

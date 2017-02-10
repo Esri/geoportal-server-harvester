@@ -20,11 +20,23 @@ import static com.esri.geoportal.commons.utils.UriUtils.escapeUri;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Map;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * Migration data builder.
@@ -51,9 +63,9 @@ import org.apache.commons.lang3.StringUtils;
     this.sites = sites;
   }
 
-  public DataReference buildReference(MigrationData data, String xml) throws IOException, URISyntaxException {
+  public DataReference buildReference(MigrationData data, String xml) throws URISyntaxException, UnsupportedEncodingException {
     SimpleDataReference ref = new SimpleDataReference(
-            brokerUri,
+            createBrokerUri(data),
             definition.getEntityDefinition().getLabel(),
             data.docuuid,
             data.updateDate,
@@ -68,15 +80,44 @@ import org.apache.commons.lang3.StringUtils;
     return ref;
   }
 
+  private URI createBrokerUri(MigrationData data) throws URISyntaxException {
+    MigrationHarvestSite site = data.siteuuid != null ? sites.get(data.siteuuid) : null;
+    if (site != null) {
+      String type = StringUtils.trimToEmpty(site.type).toUpperCase();
+      switch (type) {
+        case "WAF":
+          return new URI("WAF", escapeUri(site.host), null);
+        case "CKAN":
+          return new URI("CKAN", escapeUri(site.host), null);
+        case "CSW":
+          try {
+            Document doc = strToDom(site.protocol);
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            String protocolId = (String)xPath.evaluate("/protocol[@type='CSW']/profile", doc, XPathConstants.STRING);
+            URL host = new URL(site.host);
+            host = new URL(host.getProtocol(), host.getHost(), host.getPort(), host.getPath());
+            return new URI("CSW", host.toExternalForm(), protocolId);
+          } catch (Exception ex) {}
+      }
+    }
+    return brokerUri;
+  }
+
   public URI createSourceUri(MigrationData data) throws URISyntaxException, UnsupportedEncodingException {
-    MigrationHarvestSite site = data.siteuuid!=null? sites.get(data.siteuuid): null;
-    if (site!=null) {
+    MigrationHarvestSite site = data.siteuuid != null ? sites.get(data.siteuuid) : null;
+    if (site != null) {
       String type = StringUtils.trimToEmpty(site.type).toUpperCase();
       switch (type) {
         case "CSW":
-          return new URI("uuid",escapeUri(data.sourceuri),null);
+          return new URI("uuid", escapeUri(data.sourceuri), null);
       }
     }
     return URI.create(escapeUri(data.sourceuri));
+  }
+
+  private Document strToDom(String strXml) throws ParserConfigurationException, SAXException, IOException {
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder builder = factory.newDocumentBuilder();
+    return builder.parse(new InputSource(new StringReader(strXml)));
   }
 }

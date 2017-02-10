@@ -227,7 +227,9 @@ import org.slf4j.LoggerFactory;
         } else {
           throw new DataInputException(MigrationBroker.this, String.format("No more data available"));
         }
-      } catch (SQLException|IOException|URISyntaxException ex) {
+      } catch (DataInputException ex) {
+        throw ex;
+      } catch (Exception ex) {
         throw new DataInputException(MigrationBroker.this, String.format("Error reading data."), ex);
       }
     }

@@ -128,7 +128,7 @@ import org.slf4j.LoggerFactory;
       data.src_source_name_s = ref.getBrokerName();
       data.src_uri_s = ref.getSourceUri().toASCIIString();
       data.src_lastupdate_dt = ref.getLastModifiedDate() != null ? fromatDate(ref.getLastModifiedDate()) : null;
-      data.src_owner_s = owner;
+      data.sys_owner_s = owner;
       
       byte[] content = ref.getContent();
       if (content!=null) {
