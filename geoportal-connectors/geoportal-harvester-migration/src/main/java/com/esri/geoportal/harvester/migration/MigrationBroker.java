@@ -22,7 +22,6 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.engine.services.Engine;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
@@ -269,7 +268,7 @@ import org.slf4j.LoggerFactory;
         conn = dataSource.getConnection();
       }
       if (adminSt==null) {
-        adminSt = conn.prepareStatement("SELECT * FROM GPT_RESOURCE WHERE APPROVALSTATUS IN ('APPROVED') AND PROTOCOL IS NULL");
+        adminSt = conn.prepareStatement("SELECT * FROM GPT_RESOURCE WHERE APPROVALSTATUS IN ('APPROVED','REVIEWED') AND PROTOCOL IS NULL");
       }
       if (adminRs==null) {
         adminRs = adminSt.executeQuery();
