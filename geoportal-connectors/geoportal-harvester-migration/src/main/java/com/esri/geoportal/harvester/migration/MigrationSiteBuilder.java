@@ -15,13 +15,29 @@
  */
 package com.esri.geoportal.harvester.migration;
 
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.services.Engine;
+import com.esri.geoportal.harvester.engine.utils.BrokerReference;
+import com.esri.geoportal.harvester.waf.WafBrokerDefinitionAdaptor;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Migration harvest site builder.
  */
 /*package*/ class MigrationSiteBuilder {
   private final Engine engine;
+  
+  private final Map<String,WafDefinitionBuilder> builders = new HashMap<>();
+  {
+    builders.put("WAF", new WafDefinitionBuilder());
+  }
 
   /**
    * Creates instance of the builder.
@@ -31,7 +47,38 @@ import com.esri.geoportal.harvester.engine.services.Engine;
     this.engine = engine;
   }
   
-  public void buildSite(MigrationHarvestSite site) {
-    
+  public void buildSite(MigrationHarvestSite site) throws DataProcessorException {
+    WafDefinitionBuilder builder = builders.get(site.type.toUpperCase());
+    if (builder!=null) {
+      try {
+        EntityDefinition brokerDefinition = builder.buildDefinition(site);
+        brokerDefinition.setLabel(site.title);
+        BrokerReference brokerReference = engine.getBrokersService().createBroker(brokerDefinition, Locale.getDefault());
+      } catch (InvalidDefinitionException ex) {
+        throw new DataProcessorException(String.format("Error importing site: %s", site.title), ex);
+      }
+    }
+  }
+  
+  private List<BrokerReference> listInputBrokers() throws DataProcessorException {
+    return engine.getBrokersService().getBrokersDefinitions(BrokerReference.Category.INBOUND, Locale.getDefault());
+  }
+  
+  private static interface AdaptorDefinitonBuilder {
+    EntityDefinition buildDefinition(MigrationHarvestSite site) throws InvalidDefinitionException;
+  }
+  
+  private static class WafDefinitionBuilder implements AdaptorDefinitonBuilder {
+    @Override
+    public EntityDefinition buildDefinition(MigrationHarvestSite site) throws InvalidDefinitionException {
+      try {
+        EntityDefinition entityDefinition = new EntityDefinition();
+        WafBrokerDefinitionAdaptor adaptor = new WafBrokerDefinitionAdaptor(entityDefinition);
+        adaptor.setHostUrl(new URL(site.host));
+        return entityDefinition;
+      } catch (MalformedURLException ex) {
+        throw new InvalidDefinitionException(String.format("Invalid site definition."), ex);
+      }
+    }
   }
 }

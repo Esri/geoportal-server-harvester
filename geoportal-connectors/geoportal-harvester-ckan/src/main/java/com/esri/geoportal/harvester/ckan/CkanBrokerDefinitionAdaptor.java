@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * CKAN broker definition adaptor.
  */
-/*package*/class CkanBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
+public class CkanBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private URL hostUrl;
@@ -39,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
   /**
    * Creates instance of the adaptor.
    * @param def broker definition
+   * @throws InvalidDefinitionException if definition is invalid
    * @throws IllegalArgumentException if invalid broker definition
    */
   public CkanBrokerDefinitionAdaptor(EntityDefinition def) throws InvalidDefinitionException {

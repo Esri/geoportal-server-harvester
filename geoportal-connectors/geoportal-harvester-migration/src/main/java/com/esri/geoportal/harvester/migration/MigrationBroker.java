@@ -139,7 +139,7 @@ import org.slf4j.LoggerFactory;
     return conn.prepareStatement("SELECT * FROM GPT_USER");
   }
   
-  private void buildHarvestSites(InitContext context) throws SQLException {
+  private void buildHarvestSites(InitContext context) throws SQLException, DataProcessorException {
     try (
             Connection conn = dataSource.getConnection(); 
             PreparedStatement st = makeSitesStatement(conn);

@@ -34,7 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * CSW definition.
  */
-/*package*/ class CswBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
+public class CswBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
 
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private final CredentialsDefinitionAdaptor credAdaptor;
