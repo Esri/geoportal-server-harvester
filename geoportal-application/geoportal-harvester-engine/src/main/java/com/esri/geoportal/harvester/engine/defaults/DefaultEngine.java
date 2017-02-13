@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 public class DefaultEngine implements Engine {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultEngine.class);
+  public static final String TYPE = "DEFAULT";
   
   protected final TemplatesService templatesService;
   protected final BrokersService brokersService;
@@ -62,6 +63,15 @@ public class DefaultEngine implements Engine {
     this.processesService = processesService;
     this.triggersService = triggersService;
     this.executionService = executionService;
+  }
+  
+  public void init() {
+    Engine.ENGINES.put(getType(), this);
+  }
+
+  @Override
+  public String getType() {
+    return TYPE;
   }
 
   @Override

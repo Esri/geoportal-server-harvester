@@ -36,6 +36,8 @@ public class ProcessorRegistryBean extends ProcessorRegistry {
   @Autowired(required = false)
   private List<Processor> processors;
   
+  private Processor defaultProcessor;
+  
   /**
    * Initializes bean.
    */
@@ -43,6 +45,7 @@ public class ProcessorRegistryBean extends ProcessorRegistry {
   public void init() {
     if (processors!=null) {
       processors.stream().filter(p->!p.getType().equals(DefaultProcessor.TYPE)).forEach(this::register);
+      defaultProcessor = processors.stream().filter(p->p.getType().equals(DefaultProcessor.TYPE)).findFirst().orElse(null);
     }
     LOG.info("ProcessorRegistryBean initialized.");
   }
@@ -53,6 +56,11 @@ public class ProcessorRegistryBean extends ProcessorRegistry {
   @PreDestroy
   public void destroy() {
     LOG.info(String.format("ProcessorRegistryBean destroyed."));
+  }
+
+  @Override
+  public Processor getDefaultProcessor() {
+    return defaultProcessor;
   }
   
 }

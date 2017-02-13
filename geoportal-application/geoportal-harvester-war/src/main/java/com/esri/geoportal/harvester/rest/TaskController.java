@@ -272,10 +272,14 @@ public class TaskController {
       LOG.debug(String.format("DELETE /rest/harvester/tasks/%s", taskId));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
       if (taskDefinition != null) {
+        List<TriggerReference> triggers = engine.getTriggersService().listActivatedTriggers(taskId);
+        for (TriggerReference ref: triggers) {
+          engine.getTriggersService().deactivateTriggerInstance(ref.getUuid());
+        }
         engine.getTasksService().deleteTaskDefinition(taskId);
       }
       return new ResponseEntity<>(new TaskResponse(taskId, taskDefinition), HttpStatus.OK);
-    } catch (DataProcessorException ex) {
+    } catch (DataProcessorException|InvalidDefinitionException ex) {
       LOG.error(String.format("Error deleting task: %s", taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }

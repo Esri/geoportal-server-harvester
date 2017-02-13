@@ -32,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Ags broker definition adaptor.
  */
-/*package*/ class AgsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
+public class AgsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private final CredentialsDefinitionAdaptor credAdaptor;

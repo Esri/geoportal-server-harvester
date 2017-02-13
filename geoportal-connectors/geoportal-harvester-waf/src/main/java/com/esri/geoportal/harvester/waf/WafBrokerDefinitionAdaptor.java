@@ -31,7 +31,7 @@ import static com.esri.geoportal.harvester.waf.WafConstants.*;
 /**
  * WAF broker definition adaptor.
  */
-/*package*/ class WafBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
+public class WafBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private final CredentialsDefinitionAdaptor credAdaptor;
@@ -42,6 +42,7 @@ import static com.esri.geoportal.harvester.waf.WafConstants.*;
   /**
    * Creates instance of the adaptor.
    * @param def broker definition
+   * @throws InvalidDefinitionException if definition is invalid
    * @throws IllegalArgumentException if invalid broker definition
    */
   public WafBrokerDefinitionAdaptor(EntityDefinition def) throws InvalidDefinitionException {

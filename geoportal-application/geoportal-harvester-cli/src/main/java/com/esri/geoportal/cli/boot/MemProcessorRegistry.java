@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Esri, Inc.
+ * Copyright 2017 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine.registers;
+package com.esri.geoportal.cli.boot;
 
 import com.esri.geoportal.harvester.api.Processor;
-import com.esri.geoportal.harvester.engine.utils.EntityRegistry;
+import com.esri.geoportal.harvester.engine.registers.ProcessorRegistry;
 
 /**
- * Processor registry.
+ * Memory based processor registry.
  */
-public abstract class ProcessorRegistry extends EntityRegistry<Processor>{
+public class MemProcessorRegistry extends ProcessorRegistry {
+  private Processor defaultProcessor;
+
+  @Override
+  public Processor getDefaultProcessor() {
+    return defaultProcessor;
+  }
+
+  public void setDefaultProcessor(Processor defaultProcessor) {
+    this.defaultProcessor = defaultProcessor;
+  }
   
-  /**
-   * Gets default processor.
-   * @return default processor
-   */
-  public abstract Processor getDefaultProcessor();
 }

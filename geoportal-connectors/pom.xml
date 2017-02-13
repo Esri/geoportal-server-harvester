@@ -21,6 +21,7 @@
         <module>geoportal-harvester-agp-source</module>
         <module>geoportal-harvester-gptsrc</module>
         <module>geoportal-harvester-ckan</module>
+        <module>geoportal-harvester-migration</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -17,14 +17,11 @@ package com.esri.geoportal.harvester.engine.defaults;
 
 import com.esri.geoportal.harvester.api.Filter;
 import com.esri.geoportal.harvester.api.FilterInstance;
-import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Processor;
 import com.esri.geoportal.harvester.api.Transformer;
 import com.esri.geoportal.harvester.api.TransformerInstance;
-import com.esri.geoportal.harvester.api.TriggerInstance;
 import com.esri.geoportal.harvester.api.base.BrokerLinkActionAdaptor;
 import com.esri.geoportal.harvester.api.base.FilterLinkActionAdaptor;
-import com.esri.geoportal.harvester.api.base.SimpleIteratorContext;
 import com.esri.geoportal.harvester.api.base.SimpleLink;
 import com.esri.geoportal.harvester.api.base.TransformerLinkActionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -43,7 +40,6 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import com.esri.geoportal.harvester.engine.services.ExecutionService;
 import com.esri.geoportal.harvester.engine.services.ProcessesService;
 import com.esri.geoportal.harvester.engine.registers.FilterRegistry;
-import com.esri.geoportal.harvester.engine.managers.History;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.registers.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.registers.OutboundConnectorRegistry;
@@ -52,12 +48,8 @@ import com.esri.geoportal.harvester.engine.registers.TransformerRegistry;
 import com.esri.geoportal.harvester.engine.managers.TriggerInstanceManager;
 import com.esri.geoportal.harvester.engine.managers.TriggerManager;
 import com.esri.geoportal.harvester.engine.registers.TriggerRegistry;
-import com.esri.geoportal.harvester.engine.utils.CrudlException;
-import com.esri.geoportal.harvester.engine.utils.HistoryManagerAdaptor;
 import com.esri.geoportal.harvester.engine.utils.ProcessReference;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.UUID;
 
 /**
  * Default execution service.
@@ -97,7 +89,8 @@ public class DefaultExecutionService implements ExecutionService {
           TriggerManager triggerManager, 
           TriggerInstanceManager triggerInstanceManager, 
           HistoryManager historyManager, 
-          ProcessesService processesService) {
+          ProcessesService processesService
+  ) {
     this.inboundConnectorRegistry = inboundConnectorRegistry;
     this.outboundConnectorRegistry = outboundConnectorRegistry;
     this.transformerRegistry = transformerRegistry;
@@ -212,47 +205,5 @@ public class DefaultExecutionService implements ExecutionService {
     }
     
     throw new InvalidDefinitionException(String.format("Error creating link action for: %s", actionDefinition.getType()));
-  }
-  
-  /**
-   * DefaultEngine-bound trigger context.
-   */
-  private class TriggerContext implements TriggerInstance.Context {
-    private final UUID taskId;
-    
-    /**
-     * Creates instance of the context.
-     * @param taskId task id
-     */
-    public TriggerContext(UUID taskId) {
-      this.taskId = taskId;
-    }
-
-    @Override
-    public synchronized ProcessInstance execute(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
-      SimpleIteratorContext iteratorContext = new SimpleIteratorContext();
-      iteratorContext.setLastHarvest(taskDefinition.isIncremental()? lastHarvest(): null);
-      ProcessReference ref = DefaultExecutionService.this.execute(taskDefinition,iteratorContext);
-      if (taskId!=null) {
-        ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref.getProcess(), historyManager));
-      }
-      ref.getProcess().init();
-      return ref.getProcess();
-    }
-    
-    @Override
-    public Date lastHarvest() throws DataProcessorException {
-      try {
-        if (taskId!=null) {
-          History history = historyManager.buildHistory(taskId);
-          History.Event lastEvent = history!=null? history.getLastEvent(): null;
-          return lastEvent!=null? lastEvent.getStartTimestamp(): null;
-        } else {
-          return null;
-        }
-      } catch (CrudlException ex) {
-        throw new DataProcessorException(String.format("Error getting last harvest for: %s", taskId), ex);
-      }
-    }
   }
 }

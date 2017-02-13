@@ -125,25 +125,40 @@ public class Client implements Closeable {
     
     URI pubUri = !ids.isEmpty()? createItemUri(ids.get(0)): createItemsUri();
     try {
-      return publish(pubUri, entity);
+      return publish(pubUri, entity, data.sys_owner_s);
     } catch(HttpResponseException ex) {
       if (ex.getStatusCode()==401) {
         clearToken();
         pubUri = !ids.isEmpty()? createItemUri(ids.get(0)): createItemsUri();
-        return publish(pubUri, entity);
+        return publish(pubUri, entity, data.sys_owner_s);
       } else {
         throw ex;
       }
     }
   }
   
-  private PublishResponse publish(URI uri, StringEntity entity)  throws IOException, URISyntaxException {
+  private PublishResponse publish(URI uri, StringEntity entity, String owner)  throws IOException, URISyntaxException {
     HttpPut put = new HttpPut(uri);
     put.setConfig(DEFAULT_REQUEST_CONFIG);
     put.setEntity(entity);
     put.setHeader("Content-Type", "application/json; charset=UTF-8");
     put.setHeader("User-Agent", HttpConstants.getUserAgent());
 
+    PublishResponse response = execute(put,PublishResponse.class);
+    if (response.getError()==null && owner!=null) {
+      changeOwner(response.getId(), owner);
+    }
+    
+    return response;
+  }
+  
+  private PublishResponse changeOwner(String id, String owner)  throws IOException, URISyntaxException {
+    URI uri = createChangeOwnerUri(id, owner);
+    HttpPut put = new HttpPut(uri);
+    put.setConfig(DEFAULT_REQUEST_CONFIG);
+    put.setHeader("Content-Type", "application/json; charset=UTF-8");
+    put.setHeader("User-Agent", HttpConstants.getUserAgent());
+    
     return execute(put,PublishResponse.class);
   }
   
@@ -292,6 +307,12 @@ public class Client implements Closeable {
   
   private URI createItemUri(String id) throws URISyntaxException, IOException {
     return new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id))
+            .addParameter("access_token", getAccessToken())
+            .build();
+  }
+  
+  private URI createChangeOwnerUri(String id,String owner) throws URISyntaxException, IOException {
+    return new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/owner/" + owner))
             .addParameter("access_token", getAccessToken())
             .build();
   }

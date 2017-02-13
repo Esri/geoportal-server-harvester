@@ -45,7 +45,7 @@ public class DefaultProcessor implements Processor {
   public static final String TYPE = "DEFAULT";
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultProcessor.class);
-
+  
   @Override
   public String getType() {
     return TYPE;

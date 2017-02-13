@@ -34,7 +34,6 @@ import com.esri.geoportal.harvester.engine.defaults.DefaultEngine;
 import com.esri.geoportal.harvester.engine.defaults.DefaultBrokersService;
 import com.esri.geoportal.harvester.engine.defaults.DefaultExecutionService;
 import com.esri.geoportal.harvester.engine.defaults.DefaultProcessesService;
-import com.esri.geoportal.harvester.engine.defaults.DefaultProcessor;
 import com.esri.geoportal.harvester.engine.defaults.DefaultTriggersService;
 import com.esri.geoportal.harvester.engine.defaults.DefaultTasksService;
 import com.esri.geoportal.harvester.engine.defaults.DefaultTemplatesService;
@@ -69,6 +68,7 @@ import com.esri.geoportal.harvester.gptsrc.GptConnector;
 import com.esri.geoportal.harvester.unc.UncConnector;
 import com.esri.geoportal.harvester.waf.WafConnector;
 import com.esri.geoportal.harvester.api.ex.*;
+import com.esri.geoportal.harvester.engine.defaults.DefaultProcessor;
 import java.io.IOException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -81,7 +81,7 @@ public class Bootstrap {
   private TriggerRegistry triggerRegistry;
   private TransformerRegistry transformerRegistry;
   private StatisticsRegistry statisticsRegistry;
-  private ProcessorRegistry processorRegistry;
+  private MemProcessorRegistry processorRegistry;
   private OutboundConnectorRegistry outboundConnectorRegistry;
   private InboundConnectorRegistry inboundConnectorRegistry;
   private FilterRegistry filterRegistry;
@@ -116,13 +116,16 @@ public class Bootstrap {
    */
   public Engine createEngine() throws DataProcessorException {
     try {
-      return new DefaultEngine(
+      DefaultEngine engine = new DefaultEngine(
               createTemplatesService(), 
               createBrokersService(), 
               createTasksService(), 
               createProcessesService(), 
               createTriggersService(), 
               createExecutionService());
+      processorRegistry.setDefaultProcessor(new DefaultProcessor());
+      engine.init();
+      return engine;
     } catch (IOException|TransformerConfigurationException|XPathExpressionException ex) {
       throw new DataProcessorException("Error creating engine.", ex);
     }
@@ -156,8 +159,8 @@ public class Bootstrap {
     if (taskService==null) {
       taskService = new DefaultTasksService(
               createTaskManager(), 
-              createHistoryManager(), 
-              createTriggersService());
+              createHistoryManager() 
+      );
     }
     return taskService;
   }
@@ -283,9 +286,7 @@ public class Bootstrap {
   
   protected ProcessorRegistry createProcessorRegistry() {
     if (processorRegistry==null) {
-      processorRegistry = new ProcessorRegistry();
-
-      processorRegistry.put(DefaultProcessor.TYPE, new DefaultProcessor());
+      processorRegistry = new MemProcessorRegistry();
     }
     
     return processorRegistry;

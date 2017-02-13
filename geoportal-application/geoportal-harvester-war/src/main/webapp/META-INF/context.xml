@@ -1,2 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="/harvester"/>
+<Context path="/harvester">
+  <Resource 
+    name="jdbc/gpt" 
+    type="javax.sql.DataSource" 
+    driverClassName="com.mysql.jdbc.Driver" 
+    url="jdbc:mysql://pandzelvm:3306/geoportal" 
+    username="root" 
+    password="admin" 
+    auth="Container" 
+    maxActive="20" 
+    maxIdle="10" 
+    maxWait="-1" 
+    testOnBorrow="true" 
+    validationQuery="select 1"
+  />
+</Context>

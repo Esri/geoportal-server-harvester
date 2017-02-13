@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Esri, Inc.
+ * Copyright 2017 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine.registers;
-
-import com.esri.geoportal.harvester.api.Processor;
-import com.esri.geoportal.harvester.engine.utils.EntityRegistry;
+package com.esri.geoportal.harvester.migration;
 
 /**
- * Processor registry.
+ * Migration constants.
  */
-public abstract class ProcessorRegistry extends EntityRegistry<Processor>{
-  
-  /**
-   * Gets default processor.
-   * @return default processor
-   */
-  public abstract Processor getDefaultProcessor();
+/*package*/ class MigrationConstants {
+  public static String P_JNDI_NAME = "migration-jndi-name";
 }

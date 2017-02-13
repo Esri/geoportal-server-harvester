@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Esri, Inc.
+ * Copyright 2017 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine.registers;
+package com.esri.geoportal.harvester.migration;
 
-import com.esri.geoportal.harvester.api.Processor;
-import com.esri.geoportal.harvester.engine.utils.EntityRegistry;
+import java.util.Date;
 
 /**
- * Processor registry.
+ * Migration data.
  */
-public abstract class ProcessorRegistry extends EntityRegistry<Processor>{
-  
-  /**
-   * Gets default processor.
-   * @return default processor
-   */
-  public abstract Processor getDefaultProcessor();
+/*package*/ class MigrationData {
+  public String docuuid;
+  public String title;
+  public int owner;
+  public Date updateDate;
+  public String pubmethod;
+  public String siteuuid;
+  public String sourceuri;
+  public String fileidentifier;
 }
