@@ -48,12 +48,16 @@ import java.util.Map;
   }
   
   public void buildSite(MigrationHarvestSite site) throws DataProcessorException {
+    List<BrokerReference> brokers = listInputBrokers();
     WafDefinitionBuilder builder = builders.get(site.type.toUpperCase());
     if (builder!=null) {
       try {
         EntityDefinition brokerDefinition = builder.buildDefinition(site);
-        brokerDefinition.setLabel(site.title);
-        BrokerReference brokerReference = engine.getBrokersService().createBroker(brokerDefinition, Locale.getDefault());
+        BrokerReference ref = findReference(brokers, brokerDefinition);
+        if (ref==null) {
+          brokerDefinition.setLabel(site.title);
+          BrokerReference brokerReference = engine.getBrokersService().createBroker(brokerDefinition, Locale.getDefault());
+        }
       } catch (InvalidDefinitionException ex) {
         throw new DataProcessorException(String.format("Error importing site: %s", site.title), ex);
       }
@@ -62,6 +66,10 @@ import java.util.Map;
   
   private List<BrokerReference> listInputBrokers() throws DataProcessorException {
     return engine.getBrokersService().getBrokersDefinitions(BrokerReference.Category.INBOUND, Locale.getDefault());
+  }
+  
+  private BrokerReference findReference(List<BrokerReference> brokers, EntityDefinition brokerDefinition) {
+    return brokers.stream().filter(br->br.getBrokerDefinition().equals(brokerDefinition)).findFirst().orElse(null);
   }
   
   private static interface AdaptorDefinitonBuilder {
