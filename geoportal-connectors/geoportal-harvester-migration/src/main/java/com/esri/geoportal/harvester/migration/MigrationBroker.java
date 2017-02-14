@@ -268,7 +268,7 @@ import org.slf4j.LoggerFactory;
         conn = dataSource.getConnection();
       }
       if (adminSt==null) {
-        adminSt = conn.prepareStatement("SELECT * FROM GPT_RESOURCE WHERE APPROVALSTATUS IN ('APPROVED','REVIEWED') AND PROTOCOL IS NULL");
+        adminSt = conn.prepareStatement("SELECT * FROM GPT_RESOURCE WHERE APPROVALSTATUS IN ('APPROVED','REVIEWED','approved','reviewed') AND PROTOCOL IS NULL");
       }
       if (adminRs==null) {
         adminRs = adminSt.executeQuery();
