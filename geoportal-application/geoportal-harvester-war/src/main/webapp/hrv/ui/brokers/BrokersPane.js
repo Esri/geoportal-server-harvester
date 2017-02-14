@@ -40,6 +40,10 @@ define(["dojo/_base/declare",
       },
       
       _onNav: function(evt) {
+        if (evt.type==="brokers") {
+          this.inputBrokers.load();
+          this.outputBrokers.load();
+        }
         domStyle.set(this.domNode,"display", evt.type==="brokers"? "block": "none");
       }
     });
