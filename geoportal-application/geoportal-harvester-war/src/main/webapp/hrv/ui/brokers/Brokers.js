@@ -51,7 +51,6 @@ define(["dojo/_base/declare",
       },
       
       load: function() {
-        domConstruct.empty(this.contentNode);
         BrokersREST[this.category]().then(
           lang.hitch(this,this.processBrokers),
           lang.hitch(this,function(error){
@@ -71,6 +70,7 @@ define(["dojo/_base/declare",
           if (t1>t2) return 1;
           return 0;
         });
+        domConstruct.empty(this.contentNode);
         array.forEach(response,lang.hitch(this,this.processBroker));
       },
       
