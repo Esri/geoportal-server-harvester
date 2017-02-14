@@ -77,6 +77,10 @@ html,body {
   padding-right: 0.2em;
 }
 
+.h-broker:hover > span {
+  background-color: lightblue;
+}
+
 .h-broker-type {
 }
 
@@ -162,6 +166,10 @@ html,body {
   
 }
 
+.h-processes-process:hover {
+  background-color: lightblue;
+}
+
 .h-processes-caption {
   font-size: medium;
   font-weight: bold;
@@ -199,6 +207,10 @@ html,body {
 
 .h-processes-trigger {
   
+}
+
+.h-processes-trigger:hover {
+  background-color: lightblue;
 }
 
 .h-processes-trigger-remove-dialog {
@@ -305,6 +317,11 @@ html,body {
   padding-right: 0.2em;
 }
 
+.h-task-export, .h-task-export:hover {
+  color: black;
+  padding-right: 0.2em;
+}
+
 .h-task-history {
 }
 
@@ -315,6 +332,10 @@ html,body {
 .h-task > span {
   display: table-cell;
   padding-right: 0.2em;
+}
+
+.h-task:hover > span {
+  background-color: lightblue;
 }
 
 .h-task-label {
