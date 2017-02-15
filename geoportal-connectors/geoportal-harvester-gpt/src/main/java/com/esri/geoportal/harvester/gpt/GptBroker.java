@@ -99,7 +99,7 @@ import org.slf4j.LoggerFactory;
   @Override
   public void terminate() {
     try {
-      if (definition.getCleanup() && !preventCleanup) {
+      if (client!=null && definition.getCleanup() && !preventCleanup) {
         for (String id : existing) {
           client.delete(id);
         }
@@ -109,7 +109,9 @@ import org.slf4j.LoggerFactory;
       LOG.error(String.format("Error terminating broker."), ex);
     } finally {
       try {
-        client.close();
+        if (client!=null) {
+          client.close();
+        }
       } catch (IOException ex) {
         LOG.error(String.format("Error terminating broker.", ex));
       }
