@@ -111,25 +111,26 @@ public class Client implements Closeable {
    * Publishes a document.
    *
    * @param data data to publish
+   * @param id custom id
    * @param forceAdd <code>true</code> to force add.
    * @return response information
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  public PublishResponse publish(PublishRequest data, boolean forceAdd) throws IOException, URISyntaxException {
+  public PublishResponse publish(PublishRequest data, String id, boolean forceAdd) throws IOException, URISyntaxException {
     
     String json = mapper.writeValueAsString(data);
     StringEntity entity = new StringEntity(json,"UTF-8");
 
     List<String> ids = !forceAdd ? queryIds(data.src_uri_s) : Collections.emptyList();
     
-    URI pubUri = !ids.isEmpty()? createItemUri(ids.get(0)): createItemsUri();
+    URI pubUri = id!=null? createItemUri(id): !ids.isEmpty()? createItemUri(ids.get(0)): createItemsUri();
     try {
       return publish(pubUri, entity, data.sys_owner_s);
     } catch(HttpResponseException ex) {
       if (ex.getStatusCode()==401) {
         clearToken();
-        pubUri = !ids.isEmpty()? createItemUri(ids.get(0)): createItemsUri();
+        pubUri = id!=null? createItemUri(id): !ids.isEmpty()? createItemUri(ids.get(0)): createItemsUri();
         return publish(pubUri, entity, data.sys_owner_s);
       } else {
         throw ex;

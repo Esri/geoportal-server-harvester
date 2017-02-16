@@ -20,4 +20,5 @@ package com.esri.geoportal.harvester.migration;
  */
 /*package*/ class MigrationConstants {
   public static String P_JNDI_NAME = "migration-jndi-name";
+  public static String P_PRESERVE_UUIDS = "migration-preserve-uuids";
 }

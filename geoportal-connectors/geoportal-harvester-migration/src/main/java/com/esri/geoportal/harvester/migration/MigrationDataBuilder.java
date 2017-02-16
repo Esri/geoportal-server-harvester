@@ -25,16 +25,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
@@ -79,6 +76,11 @@ import org.xml.sax.SAXException;
     String owner = userMap.get(data.owner);
     if (owner != null) {
       ref.getAttributesMap().put("owner", owner);
+    }
+    if (definition.getPreserveUuids() && data.docuuid!=null) {
+      try {
+        ref.getAttributesMap().put("uuid", UUID.fromString(data.docuuid.replaceAll("[\\{\\}]", "")));
+      } catch (IllegalArgumentException ex) {}
     }
     return ref;
   }

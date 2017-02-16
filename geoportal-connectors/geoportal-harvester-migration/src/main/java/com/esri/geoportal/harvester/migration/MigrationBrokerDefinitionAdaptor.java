@@ -19,7 +19,9 @@ import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import static com.esri.geoportal.harvester.migration.MigrationConstants.P_JNDI_NAME;
+import static com.esri.geoportal.harvester.migration.MigrationConstants.P_PRESERVE_UUIDS;
 import java.util.Map;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -27,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 /*package*/ class MigrationBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   private String jndi;
+  private boolean preserveUuids;
 
   /**
    * Creates instance of the adaptor.
@@ -42,6 +45,7 @@ import org.apache.commons.lang3.StringUtils;
       throw new InvalidDefinitionException("Broker definition doesn't match");
     } else {
       jndi = get(P_JNDI_NAME);
+      preserveUuids = BooleanUtils.toBoolean(get(P_PRESERVE_UUIDS));
     }
   }
 
@@ -57,5 +61,14 @@ import org.apache.commons.lang3.StringUtils;
   public void setJndi(String jndi) {
     this.jndi = jndi;
     set(P_JNDI_NAME,jndi);
+  }
+
+  public boolean getPreserveUuids() {
+    return preserveUuids;
+  }
+
+  public void setPreserveUuids(boolean preserveUuids) {
+    this.preserveUuids = preserveUuids;
+    set(P_PRESERVE_UUIDS,Boolean.toString(preserveUuids));
   }
 }

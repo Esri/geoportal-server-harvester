@@ -21,6 +21,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import static com.esri.geoportal.harvester.migration.MigrationConstants.P_JNDI_NAME;
+import static com.esri.geoportal.harvester.migration.MigrationConstants.P_PRESERVE_UUIDS;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -47,6 +48,7 @@ import java.util.ResourceBundle;
     ResourceBundle bundle = ResourceBundle.getBundle("MigrationResource", locale);
     List<UITemplate.Argument> arguments = new ArrayList<>();
     arguments.add(new UITemplate.StringArgument(P_JNDI_NAME, bundle.getString("migration.jndi"), true));
+    arguments.add(new UITemplate.BooleanArgument(P_PRESERVE_UUIDS, bundle.getString("migration.preserveuuids"), true));
     return new UITemplate(getType(), bundle.getString("migration"), arguments);
   }
 }

@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,6 +124,9 @@ import org.slf4j.LoggerFactory;
     try {
       Object ownerObj = ref.getAttributesMap().get("owner");
       String owner = ownerObj instanceof String? (String)ownerObj: null;
+
+      Object uuidObj = ref.getAttributesMap().get("uuid");
+      String uuid = uuidObj instanceof UUID? ((UUID)uuidObj).toString().replaceAll("[\\{\\}-]", ""): null;
       
       PublishRequest data = new PublishRequest();
       data.src_source_type_s = ref.getBrokerUri().getScheme();
@@ -140,7 +144,7 @@ import org.slf4j.LoggerFactory;
         }
       }
       
-      PublishResponse response = client.publish(data, definition.getForceAdd());
+      PublishResponse response = client.publish(data, uuid, definition.getForceAdd());
       if (response == null) {
         throw new DataOutputException(this, "No response received");
       }
