@@ -25,7 +25,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -102,17 +105,10 @@ import org.xml.sax.SAXException;
     }
     return brokerUri;
   }
-
+  
   public URI createSourceUri(MigrationData data) throws URISyntaxException, UnsupportedEncodingException {
-    MigrationHarvestSite site = data.siteuuid != null ? sites.get(data.siteuuid) : null;
-    if (site != null) {
-      String type = StringUtils.trimToEmpty(site.type).toUpperCase();
-      switch (type) {
-        case "CSW":
-          return new URI("uuid", escapeUri(data.sourceuri), null);
-      }
-    }
-    return URI.create(escapeUri(data.sourceuri));
+    String sourceuri = StringUtils.defaultIfBlank(data.sourceuri, data.docuuid);
+    return URI.create(escapeUri(sourceuri));
   }
 
   private Document strToDom(String strXml) throws ParserConfigurationException, SAXException, IOException {
