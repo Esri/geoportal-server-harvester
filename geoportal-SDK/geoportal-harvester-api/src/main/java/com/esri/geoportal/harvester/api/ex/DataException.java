@@ -47,4 +47,12 @@ public class DataException extends Exception {
   public DataException(String msg, Throwable t) {
     super(msg,t);
   }
+  
+  /**
+   * Checks if exception is negligible.
+   * @return <code>true</code> if exception is negligible
+   */
+  public boolean isNegligible() {
+    return false;
+  }
 }

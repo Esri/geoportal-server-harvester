@@ -85,7 +85,9 @@ import org.slf4j.LoggerFactory;
       context.addListener(new BaseProcessInstanceListener() {
         @Override
         public void onError(DataException ex) {
-          preventCleanup = true;
+          if (!ex.isNegligible()) {
+            preventCleanup = true;
+          }
         }
       });
       try {
@@ -149,7 +151,12 @@ import org.slf4j.LoggerFactory;
         throw new DataOutputException(this, "No response received");
       }
       if (response.getError() != null) {
-        throw new DataOutputException(this, response.getError().getMessage());
+        throw new DataOutputException(this, response.getError().getMessage()) {
+          @Override
+          public boolean isNegligible() {
+            return true;
+          }
+        };
       }
       existing.remove(response.getId());
       return response.getStatus().equalsIgnoreCase("created") ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
