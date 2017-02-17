@@ -131,7 +131,7 @@ import org.slf4j.LoggerFactory;
       try {
         if (files!=null && !files.isEmpty()) {
           nextFile = readContent();
-          if (nextFile.getContent()==null) {
+          if (nextFile==null || nextFile.getContent()==null) {
             nextFile = null;
             return hasNext();
           }
@@ -179,7 +179,7 @@ import org.slf4j.LoggerFactory;
       try {
         return file.readContent(httpClient, iteratorContext.getLastHarvestDate());
       } catch (HttpResponseException ex) {
-        if (ex.getStatusCode()!=403) {
+        if (ex.getStatusCode()!=403 && ex.getStatusCode()!=404) {
           throw ex;
         }
         return null;
