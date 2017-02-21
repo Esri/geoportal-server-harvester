@@ -94,6 +94,11 @@ import org.xml.sax.SAXException;
           return new URI("WAF", escapeUri(site.host), null);
         case "CKAN":
           return new URI("CKAN", escapeUri(site.host), null);
+        case "ARCGIS": {
+            int rsIdx = site.host.toLowerCase().indexOf("/rest/services");
+            String host = rsIdx>=0? site.host.substring(0, rsIdx): site.host;
+            return new URI("AGS", escapeUri(host), null);
+          }
         case "CSW":
           try {
             Document doc = strToDom(site.protocol);

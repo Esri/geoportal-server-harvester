@@ -136,7 +136,7 @@ import org.xml.sax.SAXException;
       try {
         EntityDefinition entityDefinition = new EntityDefinition();
         CkanBrokerDefinitionAdaptor adaptor = new CkanBrokerDefinitionAdaptor(entityDefinition);
-        int apiPart = site.host.indexOf("/api/3");
+        int apiPart = site.host.toLowerCase().indexOf("/api/3");
         String apiUrl = apiPart >= 0 ? site.host.substring(0, apiPart) : site.host;
         adaptor.setHostUrl(new URL(apiUrl));
         return entityDefinition;
@@ -153,7 +153,7 @@ import org.xml.sax.SAXException;
       try {
         EntityDefinition entityDefinition = new EntityDefinition();
         AgsBrokerDefinitionAdaptor adaptor = new AgsBrokerDefinitionAdaptor(entityDefinition);
-        int restIdx = site.host.indexOf("/rest/services");
+        int restIdx = site.host.toLowerCase().indexOf("/rest/services");
         String restUrl = restIdx>=0? site.host.substring(0, restIdx): site.host;
         adaptor.setHostUrl(new URL(restUrl));
         
