@@ -53,7 +53,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,7 +104,7 @@ public class Client implements Closeable {
    * @param index index name
    */
   public Client(URL url, SimpleCredentials cred, String index) {
-    this(HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build(), url, cred, index);
+    this(HttpClientBuilder.create().build(), url, cred, index);
   }
 
   /**

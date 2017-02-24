@@ -117,22 +117,25 @@ public class Client implements IClient {
     crt.setMaxRecords(max);
     crt.setFromDate(from);
     crt.setToDate(to);
-    HttpPost post = new HttpPost(capabilites.get_getRecordsPostURL());
-    post.setConfig(DEFAULT_REQUEST_CONFIG);
-    post.setHeader("User-Agent", HttpConstants.getUserAgent());
     String requestBody = createGetRecordsRequest(crt);
-    post.setEntity(new StringEntity(requestBody, ContentType.TEXT_XML));
+    
+    HttpPost post = createRecordsPostRequest(capabilites.get_getRecordsPostURL(), requestBody);
 
     HttpClientContext context = cred!=null && !cred.isEmpty()? createHttpClientContext(baseUrl, cred): null;
     try (CloseableHttpResponse httpResponse = httpClient.execute(post,context); InputStream responseInputStream = httpResponse.getEntity().getContent();) {
       if (httpResponse.getStatusLine().getStatusCode()>=400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
-      String response = IOUtils.toString(responseInputStream, "UTF-8");
-      try (ByteArrayInputStream contentInputStream = new ByteArrayInputStream(response.getBytes("UTF-8"));) {
-        Records records = new Records();
-        records.addAll(readRecords(contentInputStream));
-        return records;
+      if (httpResponse.getStatusLine().getStatusCode()==302) {
+        HttpPost post2 = createRecordsPostRequest(httpResponse.getFirstHeader("Location").getValue(), requestBody);
+        try (CloseableHttpResponse httpResponse2 = httpClient.execute(post2,context); InputStream responseInputStream2 = httpResponse2.getEntity().getContent();) {
+          if (httpResponse2.getStatusLine().getStatusCode()>=400) {
+            throw new HttpResponseException(httpResponse2.getStatusLine().getStatusCode(), httpResponse2.getStatusLine().getReasonPhrase());
+          }
+          return readRecordsFromStream(responseInputStream2);
+        }
+      } else {
+        return readRecordsFromStream(responseInputStream);
       }
     }
   }
@@ -434,6 +437,23 @@ public class Client implements IClient {
   private static String formatIsoDate(Date date) {
     ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(zonedDateTime);
+  }
+  
+  private HttpPost createRecordsPostRequest(String url, String requestBody) {
+    HttpPost post = new HttpPost(url);
+    post.setConfig(DEFAULT_REQUEST_CONFIG);
+    post.setHeader("User-Agent", HttpConstants.getUserAgent());
+    post.setEntity(new StringEntity(requestBody, ContentType.TEXT_XML));
+    return post;
+  }
+  
+  private IRecords readRecordsFromStream(InputStream inputStream) throws Exception {
+    String response = IOUtils.toString(inputStream, "UTF-8");
+    try (ByteArrayInputStream contentInputStream = new ByteArrayInputStream(response.getBytes("UTF-8"));) {
+      Records records = new Records();
+      records.addAll(readRecords(contentInputStream));
+      return records;
+    }
   }
   
   @Override

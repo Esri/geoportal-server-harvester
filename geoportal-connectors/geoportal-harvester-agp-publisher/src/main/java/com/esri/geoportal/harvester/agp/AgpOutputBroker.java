@@ -57,7 +57,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -346,7 +345,7 @@ import org.xml.sax.SAXException;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
-    this.client = new AgpClient(HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build(), definition.getHostUrl(),definition.getCredentials());
+    this.client = new AgpClient(HttpClientBuilder.create().build(), definition.getHostUrl(),definition.getCredentials());
     if(definition.getCleanup()) {
       context.addListener(new BaseProcessInstanceListener() {
         @Override

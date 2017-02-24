@@ -56,7 +56,6 @@ import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.LaxRedirectStrategy;
 
 /**
  * ArcGIS Portal output broker.
@@ -119,7 +118,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
-    CloseableHttpClient httpclient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
+    CloseableHttpClient httpclient = HttpClientBuilder.create().build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new AgpClient(httpclient, definition.getHostUrl(),definition.getCredentials());
     } else {
