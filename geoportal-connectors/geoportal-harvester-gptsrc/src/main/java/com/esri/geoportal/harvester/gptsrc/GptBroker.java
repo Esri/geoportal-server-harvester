@@ -33,7 +33,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,7 @@ import org.slf4j.LoggerFactory;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
-    CloseableHttpClient httpclient = HttpClients.createDefault();
+    CloseableHttpClient httpclient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new Client(httpclient, definition.getHostUrl(), definition.getCredentials(), definition.getIndex());
     } else {
