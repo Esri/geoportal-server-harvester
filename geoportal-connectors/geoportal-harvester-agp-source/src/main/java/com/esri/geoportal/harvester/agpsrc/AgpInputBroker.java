@@ -250,8 +250,12 @@ import org.apache.http.impl.client.HttpClientBuilder;
         transformer.transform(domSource, result);
 
         SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), nextEntry.id, new Date(nextEntry.modified), URI.create(nextEntry.id));
-        ref.addContext(MimeType.APPLICATION_XML, writer.toString().getBytes("UTF-8"));
-        ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(nextEntry).getBytes("UTF-8"));
+        if (definition.getEmitXml()) {
+          ref.addContext(MimeType.APPLICATION_XML, writer.toString().getBytes("UTF-8"));
+        }
+        if (definition.getEmitJson()) {
+          ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(nextEntry).getBytes("UTF-8"));
+        }
         
         return ref;
         

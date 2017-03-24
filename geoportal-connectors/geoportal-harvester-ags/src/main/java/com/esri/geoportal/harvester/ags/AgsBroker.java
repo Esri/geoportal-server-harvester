@@ -232,8 +232,12 @@ import org.w3c.dom.Document;
         byte [] bytes = writer.toString().getBytes("UTF-8");
         
         SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(),  next.url, null, URI.create(next.url));
-        ref.addContext(MimeType.APPLICATION_XML, bytes);
-        ref.addContext(MimeType.APPLICATION_JSON, next.json.getBytes("UTF-8"));
+        if (definition.getEmitXml()) {
+          ref.addContext(MimeType.APPLICATION_XML, bytes);
+        }
+        if (definition.getEmitJson()) {
+          ref.addContext(MimeType.APPLICATION_JSON, next.json.getBytes("UTF-8"));
+        }
         
         ref.getAttributesMap().put("attributes", attrs);
         

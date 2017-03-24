@@ -24,6 +24,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -34,6 +35,8 @@ public class CkanBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private URL hostUrl;
   private String apiKey;
+  private boolean emitXml = true;
+  private boolean emitJson = false;
 
 
   /**
@@ -56,6 +59,8 @@ public class CkanBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
         throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
       }
       apiKey = get(P_API_KEY);
+      emitXml = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_XML)), true);
+      emitJson = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_JSON)), false);
     }
   }
 
@@ -63,6 +68,8 @@ public class CkanBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public void override(Map<String, String> params) {
     consume(params,P_HOST_URL);
     consume(params,P_API_KEY);
+    consume(params,P_EMIT_XML);
+    consume(params,P_EMIT_JSON);
     botsAdaptor.override(params);
   }
   
@@ -98,6 +105,24 @@ public class CkanBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    */
   public void setBotsConfig(BotsConfig botsConfig) {
     botsAdaptor.setBotsConfig(botsConfig);
+  }
+
+  public boolean getEmitXml() {
+    return emitXml;
+  }
+
+  public void setEmitXml(boolean emitXml) {
+    this.emitXml = emitXml;
+    set(P_EMIT_XML, BooleanUtils.toStringTrueFalse(emitXml));
+  }
+
+  public boolean getEmitJson() {
+    return emitJson;
+  }
+
+  public void setEmitJson(boolean emitJson) {
+    this.emitJson = emitJson;
+    set(P_EMIT_JSON, BooleanUtils.toStringTrueFalse(emitJson));
   }
   
 }

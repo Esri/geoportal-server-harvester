@@ -132,11 +132,11 @@ import org.slf4j.LoggerFactory;
         EntryRef entryRef = client.readItem(id);
         SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), entryRef.getId(), entryRef.getLastModified(), entryRef.getSourceUri());
         
-        if (xml!=null) {
+        if (xml!=null && definition.getEmitXml()) {
           ref.addContext(MimeType.APPLICATION_XML, xml.getBytes("UTF-8"));
         }
         
-        if (json!=null) {
+        if (json!=null && definition.getEmitJson()) {
           ref.addContext(MimeType.APPLICATION_JSON, json.getBytes("UTF-8"));
         }
         

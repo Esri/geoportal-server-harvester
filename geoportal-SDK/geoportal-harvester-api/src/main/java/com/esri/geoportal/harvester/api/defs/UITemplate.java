@@ -94,6 +94,7 @@ public final class UITemplate {
     String getLabel();
     String getHint();
     boolean getRequired();
+    T getDefaultValue();
   }
   
   /**
@@ -104,6 +105,7 @@ public final class UITemplate {
     private final String name;
     private final String label;
     private final boolean required;
+    private final T defaultValue;
 
     /**
      * Creates instance of the argument.
@@ -114,6 +116,7 @@ public final class UITemplate {
       this.name = name;
       this.label = label;
       this.required = false;
+      this.defaultValue = null;
     }
 
     /**
@@ -126,6 +129,21 @@ public final class UITemplate {
       this.name = name;
       this.label = label;
       this.required = required;
+      this.defaultValue = null;
+    }
+
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     * @param required <code>true</code> if argument is required
+     * @param defaultValue default value
+     */
+    public ArgumentBase(String name, String label, boolean required, T defaultValue) {
+      this.name = name;
+      this.label = label;
+      this.required = required;
+      this.defaultValue = defaultValue;
     }
 
     @Override
@@ -150,6 +168,10 @@ public final class UITemplate {
     @Override
     public String getHint() {
       return null;
+    }
+
+    public T getDefaultValue() {
+      return defaultValue;
     }
 
     @Override
@@ -179,6 +201,16 @@ public final class UITemplate {
     public StringArgument(String name, String label, boolean required) {
       super(name, label, required);
     }
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     * @param required <code>true</code> if argument is required
+     * @param defaultValue default value
+     */
+    public StringArgument(String name, String label, boolean required, String defaultValue) {
+      super(name, label, required, defaultValue);
+    }
 
     @Override
     public ArgumentType getType() {
@@ -207,6 +239,16 @@ public final class UITemplate {
     public TextArgument(String name, String label, boolean required) {
       super(name, label, required);
     }
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     * @param required <code>true</code> if argument is required
+     * @param defaultValue defaultValue
+     */
+    public TextArgument(String name, String label, boolean required, String defaultValue) {
+      super(name, label, required, defaultValue);
+    }
 
     @Override
     public ArgumentType getType() {
@@ -234,6 +276,16 @@ public final class UITemplate {
      */
     public IntegerArgument(String name, String label, boolean required) {
       super(name, label, required);
+    }
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     * @param required required
+     * @param defaultValue default value
+     */
+    public IntegerArgument(String name, String label, boolean required, Integer defaultValue) {
+      super(name, label, required, defaultValue);
     }
 
     @Override
@@ -300,18 +352,6 @@ public final class UITemplate {
       this.choices = choices;
     }
 
-    /**
-     * Creates instance of the argument.
-     * @param name type
-     * @param label label
-     * @param required required
-     * @param choices choices
-     */
-    public ChoiceArgument(String name, String label, boolean required, List<Choice<CT>> choices) {
-      super(name, label, required);
-      this.choices = choices;
-    }
-
     @Override
     public ArgumentType getType() {
       return ArgumentType.choice;
@@ -347,6 +387,16 @@ public final class UITemplate {
     public BooleanArgument(String name, String label, boolean required) {
       super(name, label, required);
     }
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     * @param required required
+     * @param defaultValue default value
+     */
+    public BooleanArgument(String name, String label, boolean required, Boolean defaultValue) {
+      super(name, label, required, defaultValue);
+    }
 
     @Override
     public ArgumentType getType() {
@@ -375,6 +425,16 @@ public final class UITemplate {
     public TemporalArgument(String name, String label, boolean required) {
       super(name, label, required);
     }
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     * @param required required
+     * @param defaultValue default value
+     */
+    public TemporalArgument(String name, String label, boolean required, Integer defaultValue) {
+      super(name, label, required, defaultValue);
+    }
 
     @Override
     public ArgumentType getType() {
@@ -402,6 +462,16 @@ public final class UITemplate {
      */
     public PeriodicalArgument(String name, String label, boolean required) {
       super(name, label, required);
+    }
+    /**
+     * Creates instance of the argument.
+     * @param name type
+     * @param label label
+     * @param required required
+     * @param defaultValue default value
+     */
+    public PeriodicalArgument(String name, String label, boolean required, Integer defaultValue) {
+      super(name, label, required, defaultValue);
     }
 
     @Override

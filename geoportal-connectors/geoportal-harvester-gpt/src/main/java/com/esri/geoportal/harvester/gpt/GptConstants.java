@@ -23,4 +23,6 @@ package com.esri.geoportal.harvester.gpt;
   public static final String P_FORCE_ADD       = "gpt-force-add";
   public static final String P_CLEANUP         = "gpt-cleanup";
   public static final String P_INDEX           = "gpt-index";
+  public static final String P_ACCEPT_XML      = "gpt-accept-xml";
+  public static final String P_ACCEPT_JSON     = "gpt-accept-json";
 }

@@ -64,7 +64,9 @@ public class AgsConnector implements InputConnector<InputBroker> {
         return true;
       }
     });
-    args.add(new UITemplate.BooleanArgument(P_ENABLE_LAYERS, "Enable layers"));
+    args.add(new UITemplate.BooleanArgument(P_ENABLE_LAYERS, bundle.getString("ags.enableLayers")));
+    args.add(new UITemplate.BooleanArgument(P_EMIT_XML, bundle.getString("ags.emit.xml"),false, Boolean.TRUE));
+    args.add(new UITemplate.BooleanArgument(P_EMIT_JSON, bundle.getString("ags.emit.json"),false, Boolean.FALSE));
     return new UITemplate(getType(), bundle.getString("ags"), args);
   }
 

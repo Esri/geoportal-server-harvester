@@ -60,6 +60,8 @@ public class CkanConnector implements InputConnector<InputBroker> {
       }
     });
     args.add(new UITemplate.StringArgument(P_API_KEY, bundle.getString("ckan.apiKey")));
+    args.add(new UITemplate.BooleanArgument(P_EMIT_XML, bundle.getString("ckan.emit.xml"),false, Boolean.TRUE));
+    args.add(new UITemplate.BooleanArgument(P_EMIT_JSON, bundle.getString("ckan.emit.json"),false, Boolean.FALSE));
     return new UITemplate(getType(), bundle.getString("ckan"), args);
   }
 

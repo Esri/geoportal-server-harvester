@@ -56,6 +56,8 @@ public class GptConnector implements InputConnector<InputBroker> {
       }
     });
     arguments.add(new UITemplate.StringArgument(P_INDEX, bundle.getString("gptsrc.index")));
+    arguments.add(new UITemplate.BooleanArgument(P_EMIT_XML, bundle.getString("gptsrc.emit.xml"),false, Boolean.TRUE));
+    arguments.add(new UITemplate.BooleanArgument(P_EMIT_JSON, bundle.getString("gptsrc.emit.json"),false, Boolean.FALSE));
     return new UITemplate(getType(), bundle.getString("gptsrc"), arguments);
   }
 

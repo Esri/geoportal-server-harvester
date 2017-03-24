@@ -21,4 +21,6 @@ package com.esri.geoportal.harvester.ags;
 /*package*/ final class AgsConstants {
   public static final String P_HOST_URL      = "ags-host-url";
   public static final String P_ENABLE_LAYERS = "ags-enable-layers";
+  public static final String P_EMIT_XML      = "ags-emit-xml";
+  public static final String P_EMIT_JSON     = "ags-emit-json";
 }

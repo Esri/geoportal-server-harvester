@@ -57,6 +57,8 @@ public class GptConnector implements OutputConnector<OutputBroker> {
     });
     arguments.add(new UITemplate.StringArgument(P_INDEX, bundle.getString("gpt.index")));
     arguments.add(new UITemplate.BooleanArgument(P_CLEANUP, bundle.getString("gpt.cleanup")));
+    arguments.add(new UITemplate.BooleanArgument(P_ACCEPT_XML, bundle.getString("gpt.accept.xml"),false, Boolean.TRUE));
+    arguments.add(new UITemplate.BooleanArgument(P_ACCEPT_JSON, bundle.getString("gpt.accept.json"),false, Boolean.FALSE));
     return new UITemplate(getType(), bundle.getString("gpt"), arguments);
   }
 

@@ -24,6 +24,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -36,6 +37,8 @@ import org.apache.commons.lang3.StringUtils;
   private boolean forceAdd;
   private boolean cleanup;
   private String index;
+  private boolean emitXml = true;
+  private boolean emitJson = false;
 
   /**
    * Creates instance of the adaptor.
@@ -61,6 +64,8 @@ import org.apache.commons.lang3.StringUtils;
       forceAdd = Boolean.parseBoolean(get(P_FORCE_ADD));
       cleanup  = Boolean.parseBoolean(get(P_CLEANUP));
       index  = get(P_INDEX);
+      emitXml = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_ACCEPT_XML)), true);
+      emitJson = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_ACCEPT_JSON)), false);
     }
   }
 
@@ -70,6 +75,8 @@ import org.apache.commons.lang3.StringUtils;
     consume(params,P_FORCE_ADD);
     consume(params,P_CLEANUP);
     consume(params,P_INDEX);
+    consume(params,P_ACCEPT_XML);
+    consume(params,P_ACCEPT_JSON);
     credAdaptor.override(params);
   }
 
@@ -155,5 +162,23 @@ import org.apache.commons.lang3.StringUtils;
   public void setIndex(String index) {
     this.index = index;
     set(P_INDEX, index);
+  }
+
+  public boolean getAcceptXml() {
+    return emitXml;
+  }
+
+  public void setEmitXml(boolean emitXml) {
+    this.emitXml = emitXml;
+    set(P_ACCEPT_XML, BooleanUtils.toStringTrueFalse(emitXml));
+  }
+
+  public boolean getAcceptJson() {
+    return emitJson;
+  }
+
+  public void setEmitJson(boolean emitJson) {
+    this.emitJson = emitJson;
+    set(P_ACCEPT_JSON, BooleanUtils.toStringTrueFalse(emitJson));
   }
 }

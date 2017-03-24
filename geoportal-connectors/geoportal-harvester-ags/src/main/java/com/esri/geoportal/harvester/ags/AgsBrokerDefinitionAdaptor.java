@@ -39,11 +39,13 @@ public class AgsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   
   private URL hostUrl;
   private boolean enableLayers;
+  private boolean emitXml = true;
+  private boolean emitJson = false;
 
   /**
    * Creates instance of the adaptor.
    * @param def broker definition
-   * @throws IllegalArgumentException if invalid broker definition
+   * @throws InvalidDefinitionException if invalid broker definition
    */
   public AgsBrokerDefinitionAdaptor(EntityDefinition def) throws InvalidDefinitionException {
     super(def);
@@ -60,6 +62,8 @@ public class AgsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
         throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
       }
       enableLayers = BooleanUtils.toBoolean(get(P_ENABLE_LAYERS));
+      emitXml = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_XML)), true);
+      emitJson = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_JSON)), false);
     }
   }
 
@@ -67,6 +71,8 @@ public class AgsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public void override(Map<String, String> params) {
     consume(params,P_HOST_URL);
     consume(params,P_ENABLE_LAYERS);
+    consume(params,P_EMIT_XML);
+    consume(params,P_EMIT_JSON);
     credAdaptor.override(params);
     botsAdaptor.override(params);
   }
@@ -135,6 +141,24 @@ public class AgsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    */
   public void setBotsConfig(BotsConfig botsConfig) {
     botsAdaptor.setBotsConfig(botsConfig);
+  }
+
+  public boolean getEmitXml() {
+    return emitXml;
+  }
+
+  public void setEmitXml(boolean emitXml) {
+    this.emitXml = emitXml;
+    set(P_EMIT_XML, BooleanUtils.toStringTrueFalse(emitXml));
+  }
+
+  public boolean getEmitJson() {
+    return emitJson;
+  }
+
+  public void setEmitJson(boolean emitJson) {
+    this.emitJson = emitJson;
+    set(P_EMIT_JSON, BooleanUtils.toStringTrueFalse(emitJson));
   }
   
 }

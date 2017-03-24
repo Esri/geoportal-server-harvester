@@ -26,6 +26,7 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -38,6 +39,8 @@ import org.apache.commons.lang3.StringUtils;
   
   private URL hostUrl;
   private String folderId;
+  private boolean emitXml = true;
+  private boolean emitJson = false;
 
   /**
    * Creates instance of the adaptor.
@@ -59,6 +62,8 @@ import org.apache.commons.lang3.StringUtils;
         throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
       }
       folderId = get(P_FOLDER_ID);
+      emitXml = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_XML)), true);
+      emitJson = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_JSON)), false);
     }
   }
 
@@ -66,6 +71,8 @@ import org.apache.commons.lang3.StringUtils;
   public void override(Map<String, String> params) {
     consume(params,P_HOST_URL);
     consume(params,P_FOLDER_ID);
+    consume(params,P_EMIT_XML);
+    consume(params,P_EMIT_JSON);
     credAdaptor.override(params);
     botsAdaptor.override(params);
   }
@@ -134,6 +141,24 @@ import org.apache.commons.lang3.StringUtils;
    */
   public void setBotsConfig(BotsConfig botsConfig) {
     botsAdaptor.setBotsConfig(botsConfig);
+  }
+
+  public boolean getEmitXml() {
+    return emitXml;
+  }
+
+  public void setEmitXml(boolean emitXml) {
+    this.emitXml = emitXml;
+    set(P_EMIT_XML, BooleanUtils.toStringTrueFalse(emitXml));
+  }
+
+  public boolean getEmitJson() {
+    return emitJson;
+  }
+
+  public void setEmitJson(boolean emitJson) {
+    this.emitJson = emitJson;
+    set(P_EMIT_JSON, BooleanUtils.toStringTrueFalse(emitJson));
   }
   
 }

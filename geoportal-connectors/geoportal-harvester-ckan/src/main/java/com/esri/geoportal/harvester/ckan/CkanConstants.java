@@ -21,4 +21,6 @@ package com.esri.geoportal.harvester.ckan;
 /*package*/ final class CkanConstants {
   public static final String P_HOST_URL  = "ckan-host-url";
   public static final String P_API_KEY   = "ckan-apikey";
+  public static final String P_EMIT_XML  = "ckan-emit-xml";
+  public static final String P_EMIT_JSON = "ckan-emit-json";
 }

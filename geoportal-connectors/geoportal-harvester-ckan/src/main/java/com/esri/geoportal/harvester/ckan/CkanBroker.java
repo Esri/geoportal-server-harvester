@@ -240,8 +240,12 @@ import org.w3c.dom.Document;
         transformer.transform(domSource, result);
 
         SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, parseIsoDate(dataSet.metadata_modified), URI.create(id));
-        ref.addContext(MimeType.APPLICATION_XML, writer.toString().getBytes("UTF-8"));
-        ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(dataSet).getBytes("UTF-8"));
+        if (definition.getEmitXml()) {
+          ref.addContext(MimeType.APPLICATION_XML, writer.toString().getBytes("UTF-8"));
+        }
+        if (definition.getEmitJson()) {
+          ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(dataSet).getBytes("UTF-8"));
+        }
         
         return ref;
         
