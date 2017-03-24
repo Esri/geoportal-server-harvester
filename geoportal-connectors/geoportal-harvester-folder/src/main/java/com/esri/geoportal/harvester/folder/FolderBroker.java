@@ -15,6 +15,8 @@
  */
 package com.esri.geoportal.harvester.folder;
 
+import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.constants.MimeTypeUtils;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
@@ -119,16 +121,22 @@ import org.slf4j.LoggerFactory;
   @Override
   public PublishingStatus publish(DataReference ref) throws DataOutputException {
     try {
-      Path f = generateFileName(ref.getBrokerUri(), ref.getSourceUri(), ref.getId());
-      boolean created = !Files.exists(f);
-      Files.createDirectories(f.getParent());
-      try (OutputStream output = Files.newOutputStream(f)) {
-        output.write(ref.getContent());
-        existing.remove(f.toRealPath().toString());
-        return created ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
-      } catch (Exception ex) {
-        throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
+      for (MimeType ct: ref.getContentType()) {
+        String extension = MimeTypeUtils.findExtensions(ct).stream().findFirst().orElse(null);
+        if (extension!=null) {
+          Path f = generateFileName(ref.getBrokerUri(), ref.getSourceUri(), ref.getId(), extension);
+          boolean created = !Files.exists(f);
+          Files.createDirectories(f.getParent());
+          try (OutputStream output = Files.newOutputStream(f)) {
+            output.write(ref.getContent(ct));
+            existing.remove(f.toRealPath().toString());
+            //return created ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
+          } catch (Exception ex) {
+            throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
+          }
+        }
       }
+      return PublishingStatus.CREATED;
     } catch (IOException ex) {
       throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
     }
@@ -139,7 +147,7 @@ import org.slf4j.LoggerFactory;
     return String.format("FOLDER [%s]", definition.getRootFolder());
   }
   
-  private Path generateFileName(URI brokerUri, URI sourceUri, String id) throws IOException {
+  private Path generateFileName(URI brokerUri, URI sourceUri, String id, String extension) throws IOException {
     URI ssp = URI.create(brokerUri.getSchemeSpecificPart());
     String sspRoot = StringUtils.defaultIfEmpty(ssp.getHost(), ssp.getPath());
     Path brokerRootFolder = definition.getRootFolder().toPath().toRealPath().resolve(sspRoot);
@@ -154,7 +162,7 @@ import org.slf4j.LoggerFactory;
         fileName = Paths.get(fileName.toString(), sf);
       }
       if (!fileName.getFileName().toString().contains(".")) {
-        fileName = fileName.getParent().resolve(fileName.getFileName() + ".xml");
+        fileName = fileName.getParent().resolve(fileName.getFileName() + "." + extension);
       }
     } else {
       fileName = Paths.get(fileName.toString(), id + ".xml");

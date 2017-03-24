@@ -22,6 +22,8 @@ import java.util.List;
  */
 public final class ServerResponse {
   public String url;
+  public String json;
+  
   public String mapName;
   public String serviceDescription;
   public String name;

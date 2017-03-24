@@ -17,9 +17,12 @@ package com.esri.geoportal.harvester.api.base;
 
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.commons.constants.MimeType;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Simple data reference.
@@ -27,13 +30,15 @@ import java.util.HashMap;
 public final class SimpleDataReference implements DataReference {
   private static final long serialVersionUID = 1L;
   
+  // info
   private final URI brokerUri;
   private final String brokerName;
   private final String id;
   private final Date lastModifiedDate;
   private final URI sourceUri;
-  private final byte [] content;
-  private final MimeType contentType;
+  
+  // data
+  private final Map<MimeType,byte []> content = new HashMap<>();
   private final HashMap<String,Object> attributesMap = new HashMap<>();
 
   /**
@@ -43,19 +48,24 @@ public final class SimpleDataReference implements DataReference {
    * @param id record id
    * @param lastModifiedDate last modified date
    * @param sourceUri source URI
-   * @param content content
-   * @param contentType content type
    */
-  public SimpleDataReference(URI brokerUri, String brokerName, String id, Date lastModifiedDate, URI sourceUri, byte [] content, MimeType contentType) {
+  public SimpleDataReference(URI brokerUri, String brokerName, String id, Date lastModifiedDate, URI sourceUri) {
     this.brokerUri = brokerUri;
     this.brokerName = brokerName;
     this.id = id;
     this.lastModifiedDate = lastModifiedDate;
     this.sourceUri = sourceUri;
-    this.content = content;
-    this.contentType = contentType;
   }
 
+  /**
+   * Adds content of a particular type to the reference.
+   * @param mimeType mime type
+   * @param content content
+   */
+  public void addContext(MimeType mimeType, byte [] content) {
+    this.content.put(mimeType, content);
+  }
+  
   @Override
   public URI getBrokerUri() {
     return brokerUri;
@@ -82,13 +92,13 @@ public final class SimpleDataReference implements DataReference {
   }
 
   @Override
-  public byte [] getContent() {
-    return content;
+  public byte[] getContent(MimeType mimeType) throws IOException {
+    return content.get(mimeType);
   }
 
   @Override
-  public MimeType getContentType() {
-    return contentType;
+  public Set<MimeType> getContentType() {
+    return content.keySet();
   }
 
   @Override

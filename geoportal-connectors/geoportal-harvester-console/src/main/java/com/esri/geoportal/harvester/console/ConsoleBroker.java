@@ -14,6 +14,7 @@
  */
 package com.esri.geoportal.harvester.console;
 
+import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -56,10 +57,13 @@ import java.io.IOException;
     try {
       counter++;
       
-      System.out.println(String.format("%s [%s]", ref.getId(), ref.getLastModifiedDate()));
-      System.out.println(String.format("%s", new String(ref.getContent(),"UTF-8")));
-      System.out.println(String.format("--- END OF %d ---", counter));
-      System.out.println();
+      for (MimeType ct: ref.getContentType()) {
+        System.out.println(String.format("%s [%s]", ref.getId(), ref.getLastModifiedDate()));
+        System.out.println(String.format("%s", new String(ref.getContent(ct),"UTF-8")));
+        System.out.println(String.format("--- END OF %d ---", counter));
+        System.out.println();
+      }
+      
       return PublishingStatus.CREATED;
     } catch (IOException ex) {
       throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);

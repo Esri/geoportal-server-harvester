@@ -20,7 +20,10 @@ import com.esri.geoportal.commons.constants.MimeType;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Data reference wrapper.
@@ -29,29 +32,43 @@ public class DataReferenceWrapper implements DataReference {
   private static final long serialVersionUID = 1L;
   
   private final DataReference baseRef;
-  private final byte [] content;
-  private final MimeType contentType;
+  
+  // data
+  private final Map<MimeType,byte []> content = new HashMap<>();
   
   /**
    * Creates instance of the data reference.
    * @param baseRef base data reference
-   * @param content new content
-   * @param contentType content type
    */
-  public DataReferenceWrapper(DataReference baseRef, byte [] content, MimeType contentType) {
+  public DataReferenceWrapper(DataReference baseRef) {
     this.baseRef = baseRef;
-    this.content = content;
-    this.contentType = contentType;
+  }
+
+  /**
+   * Adds content of a particular type to the reference.
+   * @param mimeType mime type
+   * @param content content
+   */
+  public void addContext(MimeType mimeType, byte [] content) {
+    this.content.put(mimeType, content);
+  }
+  
+
+  @Override
+  public byte[] getContent(MimeType mimeType) throws IOException {
+    byte [] data =  content.get(mimeType);
+    if (data==null) {
+      data = baseRef.getContent(mimeType);
+    }
+    return data;
   }
 
   @Override
-  public byte[] getContent() throws IOException {
-    return content;
-  }
-
-  @Override
-  public MimeType getContentType() {
-    return contentType;
+  public Set<MimeType> getContentType() {
+    HashSet<MimeType> mimeTypes = new HashSet<>();
+    mimeTypes.addAll(content.keySet());
+    mimeTypes.addAll(baseRef.getContentType());
+    return mimeTypes;
   }
 
   @Override

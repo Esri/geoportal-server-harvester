@@ -173,19 +173,41 @@ public class Client implements Closeable {
   public String readXml(String id) throws URISyntaxException, IOException {
     URI xmlUri = createXmlUri(id);
     try {
-      return readXml(xmlUri);
+      return readContent(xmlUri);
     } catch (HttpResponseException ex) {
       if (ex.getStatusCode()==401) {
         clearToken();
         xmlUri = createXmlUri(id);
-        return readXml(xmlUri);
+        return readContent(xmlUri);
       } else {
         throw ex;
       }
     }
   }
   
-  private String readXml(URI uri) throws URISyntaxException, IOException {
+  /**
+   * Reads metadata.
+   * @param id id of the metadata
+   * @return string representing metadata
+   * @throws URISyntaxException if invalid URI
+   * @throws IOException if reading metadata fails
+   */
+  public String readJson(String id) throws URISyntaxException, IOException {
+    URI jsonUri = createJsonUri(id);
+    try {
+      return readContent(jsonUri);
+    } catch (HttpResponseException ex) {
+      if (ex.getStatusCode()==401) {
+        clearToken();
+        jsonUri = createJsonUri(id);
+        return readContent(jsonUri);
+      } else {
+        throw ex;
+      }
+    }
+  }
+  
+  private String readContent(URI uri) throws URISyntaxException, IOException {
     HttpGet get = new HttpGet(uri);
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("User-Agent", HttpConstants.getUserAgent());
@@ -320,6 +342,12 @@ public class Client implements Closeable {
   
   private URI createXmlUri(String id) throws URISyntaxException, IOException {
     return new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/xml"))
+            .addParameter("access_token", getAccessToken())
+            .build();
+  }
+  
+  private URI createJsonUri(String id) throws URISyntaxException, IOException {
+    return new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/json"))
             .addParameter("access_token", getAccessToken())
             .build();
   }

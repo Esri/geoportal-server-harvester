@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Data reference. It provides access to data itself as well as vital data 
@@ -42,16 +43,17 @@ public interface DataReference extends Serializable {
   
   /**
    * Gets content.
-   * @return content
+   * @param mimeType required mime type
+   * @return content or <code>nulle</code> if content by the mime type unavailable
    * @throws IOException if getting content fails
    */
-  byte [] getContent() throws IOException;
+  byte [] getContent(MimeType mimeType) throws IOException;
   
   /**
    * Gets content type.
-   * @return content type
+   * @return content type variances
    */
-  MimeType getContentType();
+  Set<MimeType> getContentType();
   
   /**
    * Gets source URI.

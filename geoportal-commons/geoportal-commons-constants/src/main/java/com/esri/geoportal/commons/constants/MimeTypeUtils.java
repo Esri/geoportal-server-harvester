@@ -16,7 +16,11 @@
 package com.esri.geoportal.commons.constants;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -30,6 +34,7 @@ public class MimeTypeUtils {
   private static final Logger LOG = Logger.getLogger(MimeTypeUtils.class.getCanonicalName());
   private static final String mappingFile = "mime.types";
   private static final Map<String,MimeType> mapping = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+  private static final Map<MimeType,List<String>> reverseMapping = new HashMap<>();
   static {
     loadMapping();
   }
@@ -41,6 +46,16 @@ public class MimeTypeUtils {
    */
   public static MimeType mapExtension(String ext) {
     return mapping.get(ext);
+  }
+  
+  /**
+   * Finds all file extensions by mime type.
+   * @param mimeType mime type
+   * @return list of extensions
+   */
+  public static List<String> findExtensions(MimeType mimeType) {
+    List<String> exts = reverseMapping.get(mimeType);
+    return exts!=null? exts: Collections.emptyList();
   }
   
   private static void loadMapping() {
@@ -55,6 +70,13 @@ public class MimeTypeUtils {
             if (!mapping.containsKey(ext)) {
               mapping.put(ext, mimeType);
             }
+            
+            List<String> exts = reverseMapping.get(mimeType);
+            if (exts==null) {
+              exts = new ArrayList<>();
+              reverseMapping.put(mimeType, exts);
+            }
+            exts.add(ext);
           });
         }
       });

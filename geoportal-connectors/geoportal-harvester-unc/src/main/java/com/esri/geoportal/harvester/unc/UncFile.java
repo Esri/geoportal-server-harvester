@@ -53,7 +53,9 @@ import org.apache.commons.io.IOUtils;
     Date lastModifiedDate = readLastModifiedDate();
     MimeType contentType = readContentType();
     try (InputStream input = Files.newInputStream(file)) {
-      return new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), file.toAbsolutePath().toString(), lastModifiedDate, file.toUri(), IOUtils.toByteArray(input), contentType);
+      SimpleDataReference ref = new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), file.toAbsolutePath().toString(), lastModifiedDate, file.toUri());
+      ref.addContext(contentType, IOUtils.toByteArray(input));
+      return ref;
     }
   }
 

@@ -127,8 +127,20 @@ import org.slf4j.LoggerFactory;
       String id = iter.next();
       try {
         String xml = client.readXml(id);
-        EntryRef ref = client.readItem(id);
-        return new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), ref.getId(), ref.getLastModified(), ref.getSourceUri(), xml.getBytes("UTF-8"), MimeType.APPLICATION_XML);
+        String json = client.readJson(id);
+        
+        EntryRef entryRef = client.readItem(id);
+        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), entryRef.getId(), entryRef.getLastModified(), entryRef.getSourceUri());
+        
+        if (xml!=null) {
+          ref.addContext(MimeType.APPLICATION_XML, xml.getBytes("UTF-8"));
+        }
+        
+        if (json!=null) {
+          ref.addContext(MimeType.APPLICATION_JSON, json.getBytes("UTF-8"));
+        }
+        
+        return ref;
       } catch (URISyntaxException|IOException ex) {
         throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records."), ex);
       }

@@ -23,6 +23,7 @@ import com.esri.geoportal.commons.agp.client.ItemEntry;
 import com.esri.geoportal.commons.agp.client.ItemResponse;
 import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.agp.client.QueryResponse;
+import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.meta.Attribute;
 import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaAnalyzer;
@@ -230,12 +231,14 @@ import org.xml.sax.SAXException;
         if (doc != null) {
           attributes = metaAnalyzer.extract(doc);
         } else {
-          String sXml = new String(ref.getContent(), "UTF-8");
-          DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-          factory.setNamespaceAware(true);
-          DocumentBuilder builder = factory.newDocumentBuilder();
-          doc = builder.parse(new InputSource(new StringReader(sXml)));
-          attributes = metaAnalyzer.extract(doc);
+          if (ref.getContentType().contains(MimeType.APPLICATION_XML)) {
+            String sXml = new String(ref.getContent(MimeType.APPLICATION_XML), "UTF-8");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            doc = builder.parse(new InputSource(new StringReader(sXml)));
+            attributes = metaAnalyzer.extract(doc);
+          }
         }
       }
       return attributes;

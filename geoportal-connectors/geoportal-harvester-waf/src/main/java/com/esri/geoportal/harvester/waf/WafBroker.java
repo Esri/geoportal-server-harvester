@@ -131,7 +131,7 @@ import org.slf4j.LoggerFactory;
       try {
         if (files!=null && !files.isEmpty()) {
           nextFile = readContent();
-          if (nextFile==null || nextFile.getContent()==null) {
+          if (nextFile==null || nextFile.getContent(nextFile.getContentType().stream().findFirst().orElse(null))==null) {
             nextFile = null;
             return hasNext();
           }

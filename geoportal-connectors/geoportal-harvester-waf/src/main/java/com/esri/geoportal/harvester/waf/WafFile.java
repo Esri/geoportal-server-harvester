@@ -81,7 +81,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
       Date lastModifiedDate = readLastModifiedDate(httpResponse);
       MimeType contentType = readContentType(httpResponse);
       boolean readBody = since==null || lastModifiedDate==null || lastModifiedDate.getTime()>=since.getTime();
-      return new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), fileUrl.toExternalForm(), lastModifiedDate, fileUrl.toURI(), readBody? IOUtils.toByteArray(input): null, contentType);
+      SimpleDataReference ref = new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), fileUrl.toExternalForm(), lastModifiedDate, fileUrl.toURI());
+      ref.addContext(contentType, readBody? IOUtils.toByteArray(input): null);
+      return ref;
     }
   }
 

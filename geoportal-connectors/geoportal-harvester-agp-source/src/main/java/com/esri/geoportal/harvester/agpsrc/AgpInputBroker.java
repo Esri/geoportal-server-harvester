@@ -37,6 +37,10 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
@@ -68,7 +72,14 @@ import org.apache.http.impl.client.HttpClientBuilder;
   private final AgpInputBrokerDefinitionAdaptor definition;
   private final MetaBuilder metaBuilder;
   private AgpClient client;
-
+ 
+  private static final ObjectMapper mapper = new ObjectMapper();
+  static {
+      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      mapper.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
+      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+  }
+  
   /**
    * Creates instance of the broker.
    *
@@ -238,7 +249,12 @@ import org.apache.http.impl.client.HttpClientBuilder;
         Transformer transformer = tf.newTransformer();
         transformer.transform(domSource, result);
 
-        return new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), nextEntry.id, new Date(nextEntry.modified), URI.create(nextEntry.id), writer.toString().getBytes("UTF-8"), MimeType.APPLICATION_XML);
+        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), nextEntry.id, new Date(nextEntry.modified), URI.create(nextEntry.id));
+        ref.addContext(MimeType.APPLICATION_XML, writer.toString().getBytes("UTF-8"));
+        ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(nextEntry).getBytes("UTF-8"));
+        
+        return ref;
+        
       } catch (MetaException|TransformerException|URISyntaxException|IOException ex) {
         throw new DataInputException(AgpInputBroker.this, String.format("Error reading next data reference."), ex);
       }

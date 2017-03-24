@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.gpt;
 
+import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.gpt.client.Client;
 import com.esri.geoportal.commons.gpt.client.PublishRequest;
 import com.esri.geoportal.commons.gpt.client.PublishResponse;
@@ -138,11 +139,18 @@ import org.slf4j.LoggerFactory;
       data.src_lastupdate_dt = ref.getLastModifiedDate() != null ? fromatDate(ref.getLastModifiedDate()) : null;
       data.sys_owner_s = owner;
       
-      byte[] content = ref.getContent();
+      byte[] content = ref.getContent(MimeType.APPLICATION_XML);
       if (content!=null) {
         data.xml = new String(content, "UTF-8");
         if (data.xml.startsWith(SBOM)) {
           data.xml = data.xml.substring(1);
+        }
+      }
+      content = ref.getContent(MimeType.APPLICATION_JSON);
+      if (content!=null) {
+        data.json = new String(content, "UTF-8");
+        if (data.json.startsWith(SBOM)) {
+          data.json = data.json.substring(1);
         }
       }
       
