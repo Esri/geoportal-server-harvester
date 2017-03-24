@@ -98,7 +98,7 @@ define(["dojo/_base/declare",
         input.startup();
         return { 
           init: function(values) {
-            input.set("value", !arg.password? (values[arg.name]!=undefined? values[arg.name]: arg.defaultValue): TextScrambler.decode(values[arg.name]));
+            input.set("value", !arg.password? (values[arg.name]!=undefined? values[arg.name]: arg.defaultValue): (values[arg.name]? TextScrambler.decode(values[arg.name]): ""));
           },
           read: function(values) {
             values[arg.name] = !arg.password? input.get("value"): TextScrambler.encode(input.get("value"));
