@@ -94,11 +94,14 @@ define(["dojo/_base/declare",
         input.name = arg.name;
         if (arg.password) {
           domAttr.set(input.focusNode,"autocomplete","new-password");
+        } 
+        if (arg.defaultValue!=null) {
+          input.set("value", arg.defaultValue);
         }
         input.startup();
         return { 
           init: function(values) {
-            input.set("value", !arg.password? (values[arg.name]!=undefined? values[arg.name]: arg.defaultValue): (values[arg.name]? TextScrambler.decode(values[arg.name]): ""));
+            input.set("value", !arg.password? (values[arg.name]!=null? values[arg.name]: arg.defaultValue): (values[arg.name]? TextScrambler.decode(values[arg.name]): ""));
           },
           read: function(values) {
             values[arg.name] = !arg.password? input.get("value"): TextScrambler.encode(input.get("value"));
@@ -131,10 +134,13 @@ define(["dojo/_base/declare",
       renderBool: function(placeholderNode,arg) {
         var input = new CheckBox({name: arg.name, required: arg.required}).placeAt(placeholderNode);
         input.name = arg.name;
+        if (arg.defaultValue!=null) {
+          input.set("checked", arg.defaultValue);
+        }
         input.startup();
         return { 
           init: function(values) {
-            input.set("checked", values[arg.name]!=undefined? values[arg.name]=="true": arg.defaultValue==true);
+            input.set("checked", values[arg.name]!=null? values[arg.name]=="true": arg.defaultValue==true);
           },
           read: function(values) {
             values[arg.name] = input.get("checked")? "true": "false";
@@ -157,11 +163,15 @@ define(["dojo/_base/declare",
           }
         }).placeAt(placeholderNode);
         
+        if (arg.defaultValue!=null) {
+          input.set("vallue", "T"+arg.defaultValue);
+        }
+        
         input.startup();
         
         return { 
           init: function(values) {
-            input.set("value", "T"+(values[arg.name]!=undefined? values[arg.name]: arg.defaultValue));
+            input.set("value", "T"+(values[arg.name]!=null? values[arg.name]: arg.defaultValue));
           },
           read: function(values) {
             var result = input.get("value");
