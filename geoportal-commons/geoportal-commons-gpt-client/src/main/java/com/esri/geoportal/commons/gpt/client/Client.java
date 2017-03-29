@@ -128,8 +128,12 @@ public class Client implements Closeable {
       jsonRequest.put("xml", xml);
     }
     if (json!=null) {
-      ObjectNode jsonValue = mapper.readValue(json, ObjectNode.class);
-      jsonRequest.set("_json", jsonValue);
+      try {
+        ObjectNode jsonValue = mapper.readValue(json, ObjectNode.class);
+        jsonRequest.set("_json", jsonValue);
+      } catch (Exception ex) {
+        LOG.debug(String.format("Invalid json received.", json), ex);
+      }
     }
     
     String strRequest = mapper.writeValueAsString(jsonRequest);
