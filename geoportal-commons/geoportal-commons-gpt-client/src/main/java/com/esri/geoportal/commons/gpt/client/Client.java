@@ -21,7 +21,9 @@ import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -112,15 +114,26 @@ public class Client implements Closeable {
    *
    * @param data data to publish
    * @param id custom id
+   * @param xml xml
+   * @param json json
    * @param forceAdd <code>true</code> to force add.
    * @return response information
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  public PublishResponse publish(PublishRequest data, String id, boolean forceAdd) throws IOException, URISyntaxException {
+  public PublishResponse publish(PublishRequest data, String id, String xml, String json, boolean forceAdd) throws IOException, URISyntaxException {
     
-    String json = mapper.writeValueAsString(data);
-    StringEntity entity = new StringEntity(json,"UTF-8");
+    ObjectNode jsonRequest = mapper.convertValue(data, ObjectNode.class);
+    if (xml!=null) {
+      jsonRequest.put("xml", xml);
+    }
+    if (json!=null) {
+      ObjectNode jsonValue = mapper.readValue(json, ObjectNode.class);
+      jsonRequest.set("_json", jsonValue);
+    }
+    
+    String strRequest = mapper.writeValueAsString(jsonRequest);
+    StringEntity entity = new StringEntity(strRequest,"UTF-8");
 
     List<String> ids = !forceAdd ? queryIds(data.src_uri_s) : Collections.emptyList();
     

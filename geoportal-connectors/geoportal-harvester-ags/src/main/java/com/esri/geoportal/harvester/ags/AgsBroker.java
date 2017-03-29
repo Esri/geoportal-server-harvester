@@ -139,6 +139,7 @@ import org.w3c.dom.Document;
   private ServerResponse layerInfoToServerResponse(LayerInfo layerInfo) {
     ServerResponse response = new ServerResponse();
     response.url = layerInfo.url;
+    response.json = layerInfo.json;
     response.name = layerInfo.name;
     response.description = layerInfo.description;
     response.fullExtent = layerInfo.extent;
@@ -235,7 +236,7 @@ import org.w3c.dom.Document;
         if (definition.getEmitXml()) {
           ref.addContext(MimeType.APPLICATION_XML, bytes);
         }
-        if (definition.getEmitJson()) {
+        if (definition.getEmitJson() && next.json!=null) {
           ref.addContext(MimeType.APPLICATION_JSON, next.json.getBytes("UTF-8"));
         }
         

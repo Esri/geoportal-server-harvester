@@ -179,6 +179,7 @@ public class AgsClient implements Closeable {
       mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
       LayerInfo response = mapper.readValue(responseContent, LayerInfo.class);
       response.url = url;
+      response.json = responseContent;
       return response;
     }
   }

@@ -24,7 +24,5 @@ public final class PublishRequest {
   public String src_source_name_s;
   public String src_uri_s;
   public String src_lastupdate_dt;
-  public String xml;
-  public String json;
   public String sys_owner_s;
 }

@@ -139,28 +139,30 @@ import org.slf4j.LoggerFactory;
       data.src_lastupdate_dt = ref.getLastModifiedDate() != null ? fromatDate(ref.getLastModifiedDate()) : null;
       data.sys_owner_s = owner;
       
-      byte[] content;
+      
+      String xml = null;
       if (definition.getAcceptXml()) {
-        content = ref.getContent(MimeType.APPLICATION_XML);
+        byte[] content = ref.getContent(MimeType.APPLICATION_XML);
         if (content!=null) {
-          data.xml = new String(content, "UTF-8");
-          if (data.xml.startsWith(SBOM)) {
-            data.xml = data.xml.substring(1);
+          xml = new String(content, "UTF-8");
+          if (xml.startsWith(SBOM)) {
+            xml = xml.substring(1);
           }
         }
       }
       
+      String json = null;
       if (definition.getAcceptJson()) {
-        content = ref.getContent(MimeType.APPLICATION_JSON);
+        byte[] content = ref.getContent(MimeType.APPLICATION_JSON);
         if (content!=null) {
-          data.json = new String(content, "UTF-8");
-          if (data.json.startsWith(SBOM)) {
-            data.json = data.json.substring(1);
+          json = new String(content, "UTF-8");
+          if (json.startsWith(SBOM)) {
+            json = json.substring(1);
           }
         }
       }
       
-      PublishResponse response = client.publish(data, uuid, definition.getForceAdd());
+      PublishResponse response = client.publish(data, uuid, xml, json, definition.getForceAdd());
       if (response == null) {
         throw new DataOutputException(this, "No response received");
       }

@@ -25,4 +25,5 @@ public class LayerInfo {
   public String type;
   public String description;
   public ExtentInfo extent;
+  public String json;
 }
