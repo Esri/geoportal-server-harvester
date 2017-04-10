@@ -38,7 +38,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -131,6 +133,29 @@ public class Client implements Closeable {
       try {
         ObjectNode jsonValue = mapper.readValue(json, ObjectNode.class);
         jsonRequest.set("_json", jsonValue);
+        if (jsonValue.isObject()) {
+          Iterator<Map.Entry<String, JsonNode>> fldIter = jsonValue.fields();
+          while (fldIter.hasNext()) {
+            Map.Entry<String, JsonNode> fld = fldIter.next();
+            switch (fld.getValue().getNodeType()) {
+              case STRING:
+                jsonRequest.put(String.format("%s_txt", fld.getKey()), fld.getValue().asText());
+                break;
+              case NUMBER:
+                jsonRequest.put(String.format("%s_d", fld.getKey()), fld.getValue().asDouble());
+                break;
+              case BOOLEAN:
+                jsonRequest.put(String.format("%s_b", fld.getKey()), fld.getValue().asBoolean());
+                break;
+              case ARRAY:
+                jsonRequest.set(String.format("%s", fld.getKey()), fld.getValue());
+                break;
+              case OBJECT:
+                jsonRequest.set(String.format("%s_obj", fld.getKey()), fld.getValue());
+                break;
+            }
+          }
+        }
       } catch (Exception ex) {
         LOG.debug(String.format("Invalid json received.", json), ex);
       }
