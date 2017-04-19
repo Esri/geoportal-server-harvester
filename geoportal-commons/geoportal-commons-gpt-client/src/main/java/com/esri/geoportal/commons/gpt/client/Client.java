@@ -139,7 +139,27 @@ public class Client implements Closeable {
             Map.Entry<String, JsonNode> fld = fldIter.next();
             switch (fld.getValue().getNodeType()) {
               case STRING:
-                jsonRequest.put(String.format("%s_txt", fld.getKey()), fld.getValue().asText());
+				String s_format = "%s_txt";
+				
+				switch (fld.getKey()) {
+				  case "allowedUploadFileTypes":
+				  case "capabilities":
+				  case "configuredState":
+				  case "clusterName":
+				  case "executionType":
+				  case "geometryType":
+				  case "htmlPopupType":
+				  case "isolationLevel":
+				  case "loadBalancing":
+				  case "supportedQueryFormats":
+				  case "tags":
+				  case "type":
+				  case "typeName":
+				  case "units":
+					s_format = "%s_s";
+					break;
+				}
+                jsonRequest.put(String.format(s_format, fld.getKey()), fld.getValue().asText());
                 break;
               case NUMBER:
                 jsonRequest.put(String.format("%s_d", fld.getKey()), fld.getValue().asDouble());
