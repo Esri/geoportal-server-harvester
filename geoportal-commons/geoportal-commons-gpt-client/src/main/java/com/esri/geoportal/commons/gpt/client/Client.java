@@ -15,19 +15,23 @@
  */
 package com.esri.geoportal.commons.gpt.client;
 
+import com.esri.core.geometry.MultiPoint;
 import com.esri.geoportal.commons.constants.HttpConstants;
 import com.esri.geoportal.commons.gpt.client.QueryResponse.Hit;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -65,6 +69,7 @@ import org.slf4j.LoggerFactory;
  * GPT 2.0 Client.
  */
 public class Client implements Closeable {
+
   private final Logger LOG = LoggerFactory.getLogger(Client.class);
 
   private static final String DEFAILT_INDEX = "metadata";
@@ -74,14 +79,15 @@ public class Client implements Closeable {
   private static final String TOKEN_URL = "oauth/token";
 
   private final CloseableHttpClient httpClient;
+  private final GeometryService gs;
   private final URL url;
   private final SimpleCredentials cred;
   private final String index;
-  
+
   private TokenInfo tokenInfo;
 
   private final ObjectMapper mapper = new ObjectMapper();
-  
+
   /**
    * Creates instance of the client.
    *
@@ -90,12 +96,13 @@ public class Client implements Closeable {
    * @param cred credentials
    * @param index index name
    */
-  public Client(CloseableHttpClient httpClient, URL url, SimpleCredentials cred, String index) {
+  public Client(CloseableHttpClient httpClient, GeometryService gs, URL url, SimpleCredentials cred, String index) {
     this.httpClient = httpClient;
+    this.gs = gs;
     this.url = url;
     this.cred = cred;
     this.index = StringUtils.defaultIfBlank(index, DEFAILT_INDEX);
-    
+
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
   }
@@ -107,8 +114,8 @@ public class Client implements Closeable {
    * @param cred credentials
    * @param index index name
    */
-  public Client(URL url, SimpleCredentials cred, String index) {
-    this(HttpClientBuilder.create().build(), url, cred, index);
+  public Client(GeometryService gs, URL url, SimpleCredentials cred, String index) {
+    this(HttpClientBuilder.create().build(), gs, url, cred, index);
   }
 
   /**
@@ -124,12 +131,12 @@ public class Client implements Closeable {
    * @throws URISyntaxException if URL has invalid syntax
    */
   public PublishResponse publish(PublishRequest data, String id, String xml, String json, boolean forceAdd) throws IOException, URISyntaxException {
-    
+
     ObjectNode jsonRequest = mapper.convertValue(data, ObjectNode.class);
-    if (xml!=null) {
+    if (xml != null) {
       jsonRequest.put("xml", xml);
     }
-    if (json!=null) {
+    if (json != null) {
       try {
         ObjectNode jsonValue = mapper.readValue(json, ObjectNode.class);
         jsonRequest.set("_json", jsonValue);
@@ -137,9 +144,75 @@ public class Client implements Closeable {
           Iterator<Map.Entry<String, JsonNode>> fldIter = jsonValue.fields();
           while (fldIter.hasNext()) {
             Map.Entry<String, JsonNode> fld = fldIter.next();
+
+            if (fld.getKey().equals("fullExtent")) {
+              JsonNode fullExtent = fld.getValue();
+
+              Double xmin = fullExtent.path("xmin").asDouble();
+              Double ymin = fullExtent.path("ymin").asDouble();
+              Double xmax = fullExtent.path("xmax").asDouble();
+              Double ymax = fullExtent.path("ymax").asDouble();
+
+              MultiPoint mp = new MultiPoint();
+              mp.add(xmin, ymin);
+              mp.add(xmax, ymax);
+
+              JsonNode spatialReference = fullExtent.get("spatialReference");
+              if (spatialReference != null && spatialReference.has("wkid")) {
+                int wkid = spatialReference.get("wkid").asInt();
+                if (wkid != 4326) {
+                  MultiPoint mp2 = gs.project(mp, wkid, 4326);
+                  if (mp2.getPointCount()==2) {
+                    mp = mp2;
+                  }
+                }
+              }
+
+              ObjectNode envelope_geo = mapper.createObjectNode();
+              envelope_geo.put("type", "envelope");
+              ArrayNode coordinates = mapper.createArrayNode();
+              ArrayNode southWest = coordinates.addArray();
+              southWest.add(mp.getPoint(0).getX());
+              southWest.add(mp.getPoint(0).getY());
+              ArrayNode northEast = coordinates.addArray();
+              northEast.add(mp.getPoint(1).getX());
+              northEast.add(mp.getPoint(1).getY());
+              envelope_geo.set("coordinates", coordinates);
+              
+              jsonRequest.set("envelope_geo", envelope_geo);
+              
+              double lon = (mp.getPoint(0).getX() + mp.getPoint(1).getX()) / 2.0;
+              double lat = (mp.getPoint(0).getY() + mp.getPoint(1).getY()) / 2.0;
+              
+              ObjectNode envelope_cen_pt = mapper.createObjectNode();
+              envelope_cen_pt.put("lon", lon);
+              envelope_cen_pt.put("lat", lat);
+              
+              jsonRequest.set("envelope_cen_pt", envelope_cen_pt);
+            }
+
             switch (fld.getValue().getNodeType()) {
               case STRING:
-                jsonRequest.put(String.format("%s_txt", fld.getKey()), fld.getValue().asText());
+                String s_format = "%s_txt";
+                switch (fld.getKey()) {
+                  case "allowedUploadFileTypes":
+                  case "capabilities":
+                  case "configuredState":
+                  case "clusterName":
+                  case "executionType":
+                  case "geometryType":
+                  case "htmlPopupType":
+                  case "isolationLevel":
+                  case "loadBalancing":
+                  case "supportedQueryFormats":
+                  case "tags":
+                  case "type":
+                  case "typeName":
+                  case "units":
+                    s_format = "%s_s";
+                    break;
+                }
+                jsonRequest.put(String.format(s_format, fld.getKey()), fld.getValue().asText());
                 break;
               case NUMBER:
                 jsonRequest.put(String.format("%s_d", fld.getKey()), fld.getValue().asDouble());
@@ -160,53 +233,54 @@ public class Client implements Closeable {
         LOG.debug(String.format("Invalid json received.", json), ex);
       }
     }
-    
+
     String strRequest = mapper.writeValueAsString(jsonRequest);
-    StringEntity entity = new StringEntity(strRequest,"UTF-8");
+    StringEntity entity = new StringEntity(strRequest, "UTF-8");
 
     List<String> ids = !forceAdd ? queryIds(data.src_uri_s) : Collections.emptyList();
-    
-    URI pubUri = id!=null? createItemUri(id): !ids.isEmpty()? createItemUri(ids.get(0)): createItemsUri();
+
+    URI pubUri = id != null ? createItemUri(id) : !ids.isEmpty() ? createItemUri(ids.get(0)) : createItemsUri();
     try {
       return publish(pubUri, entity, data.sys_owner_s);
-    } catch(HttpResponseException ex) {
-      if (ex.getStatusCode()==401) {
+    } catch (HttpResponseException ex) {
+      if (ex.getStatusCode() == 401) {
         clearToken();
-        pubUri = id!=null? createItemUri(id): !ids.isEmpty()? createItemUri(ids.get(0)): createItemsUri();
+        pubUri = id != null ? createItemUri(id) : !ids.isEmpty() ? createItemUri(ids.get(0)) : createItemsUri();
         return publish(pubUri, entity, data.sys_owner_s);
       } else {
         throw ex;
       }
     }
   }
-  
-  private PublishResponse publish(URI uri, StringEntity entity, String owner)  throws IOException, URISyntaxException {
+
+  private PublishResponse publish(URI uri, StringEntity entity, String owner) throws IOException, URISyntaxException {
     HttpPut put = new HttpPut(uri);
     put.setConfig(DEFAULT_REQUEST_CONFIG);
     put.setEntity(entity);
     put.setHeader("Content-Type", "application/json; charset=UTF-8");
     put.setHeader("User-Agent", HttpConstants.getUserAgent());
 
-    PublishResponse response = execute(put,PublishResponse.class);
-    if (response.getError()==null && owner!=null) {
+    PublishResponse response = execute(put, PublishResponse.class);
+    if (response.getError() == null && owner != null) {
       changeOwner(response.getId(), owner);
     }
-    
+
     return response;
   }
-  
-  private PublishResponse changeOwner(String id, String owner)  throws IOException, URISyntaxException {
+
+  private PublishResponse changeOwner(String id, String owner) throws IOException, URISyntaxException {
     URI uri = createChangeOwnerUri(id, owner);
     HttpPut put = new HttpPut(uri);
     put.setConfig(DEFAULT_REQUEST_CONFIG);
     put.setHeader("Content-Type", "application/json; charset=UTF-8");
     put.setHeader("User-Agent", HttpConstants.getUserAgent());
-    
-    return execute(put,PublishResponse.class);
+
+    return execute(put, PublishResponse.class);
   }
-  
+
   /**
    * Reads metadata.
+   *
    * @param id id of the metadata
    * @return string representing metadata
    * @throws URISyntaxException if invalid URI
@@ -217,7 +291,7 @@ public class Client implements Closeable {
     try {
       return readContent(xmlUri);
     } catch (HttpResponseException ex) {
-      if (ex.getStatusCode()==401) {
+      if (ex.getStatusCode() == 401) {
         clearToken();
         xmlUri = createXmlUri(id);
         return readContent(xmlUri);
@@ -226,9 +300,10 @@ public class Client implements Closeable {
       }
     }
   }
-  
+
   /**
    * Reads metadata.
+   *
    * @param id id of the metadata
    * @return string representing metadata
    * @throws URISyntaxException if invalid URI
@@ -239,7 +314,7 @@ public class Client implements Closeable {
     try {
       return readContent(jsonUri);
     } catch (HttpResponseException ex) {
-      if (ex.getStatusCode()==401) {
+      if (ex.getStatusCode() == 401) {
         clearToken();
         jsonUri = createJsonUri(id);
         return readContent(jsonUri);
@@ -248,14 +323,14 @@ public class Client implements Closeable {
       }
     }
   }
-  
+
   private String readContent(URI uri) throws URISyntaxException, IOException {
     HttpGet get = new HttpGet(uri);
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("User-Agent", HttpConstants.getUserAgent());
-    
+
     try (CloseableHttpResponse httpResponse = httpClient.execute(get); InputStream contentStream = httpResponse.getEntity().getContent();) {
-      if (httpResponse.getStatusLine().getStatusCode()>=400) {
+      if (httpResponse.getStatusLine().getStatusCode() >= 400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
       String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
@@ -264,9 +339,10 @@ public class Client implements Closeable {
       return responseContent;
     }
   }
-  
+
   /**
    * Reads metadata.
+   *
    * @param id id of the metadata
    * @return string representing metadata
    * @throws URISyntaxException if invalid URI
@@ -277,7 +353,7 @@ public class Client implements Closeable {
     try {
       return readItem(itemUri);
     } catch (HttpResponseException ex) {
-      if (ex.getStatusCode()==401) {
+      if (ex.getStatusCode() == 401) {
         clearToken();
         itemUri = createItemUri(id);
         return readItem(itemUri);
@@ -286,39 +362,42 @@ public class Client implements Closeable {
       }
     }
   }
-  
+
   private EntryRef readItem(URI uri) throws URISyntaxException, IOException {
     HttpGet get = new HttpGet(uri);
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("User-Agent", HttpConstants.getUserAgent());
-    Hit hit =  execute(get,Hit.class);
+    Hit hit = execute(get, Hit.class);
     return new EntryRef(hit._id, readUri(hit._source, uri), readLastUpdated(hit._source, new Date()));
   }
-  
+
   /**
    * Returns listIds of ids.
+   *
    * @return listIds of ids or <code>null</code> if no more ids.
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  public List<String> listIds()  throws URISyntaxException, IOException {
+  public List<String> listIds() throws URISyntaxException, IOException {
     return queryIds(null, null, 200);
   }
-  
+
   private URI readUri(QueryResponse.Source source, URI defUri) {
-    if (source!=null && source.src_uri_s!=null) {
+    if (source != null && source.src_uri_s != null) {
       try {
         return new URI(source.src_uri_s);
-      } catch (Exception ex) {}
+      } catch (Exception ex) {
+      }
     }
     return defUri;
   }
-  
+
   private Date readLastUpdated(QueryResponse.Source source, Date defDate) {
-    if (source!=null && source.src_lastupdate_dt!=null) {
+    if (source != null && source.src_lastupdate_dt != null) {
       try {
         return Date.from(ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(source.src_lastupdate_dt)).toInstant());
-      } catch (Exception ex) {}
+      } catch (Exception ex) {
+      }
     }
     return defDate;
   }
@@ -337,6 +416,7 @@ public class Client implements Closeable {
 
   /**
    * Deletes record by id.
+   *
    * @param id record id
    * @return publish response
    * @throws IOException if reading response fails
@@ -347,7 +427,7 @@ public class Client implements Closeable {
     try {
       return delete(deleteUri);
     } catch (HttpResponseException ex) {
-      if (ex.getStatusCode()==401) {
+      if (ex.getStatusCode() == 401) {
         clearToken();
         deleteUri = createItemUri(id);
         return delete(deleteUri);
@@ -356,38 +436,38 @@ public class Client implements Closeable {
       }
     }
   }
-  
+
   private PublishResponse delete(URI uri) throws URISyntaxException, IOException {
     HttpDelete del = new HttpDelete(uri);
     del.setConfig(DEFAULT_REQUEST_CONFIG);
     del.setHeader("User-Agent", HttpConstants.getUserAgent());
     return execute(del, PublishResponse.class);
   }
-  
+
   private URI createItemsUri() throws URISyntaxException, IOException {
     return new URIBuilder(url.toURI().resolve(REST_ITEM_URL))
             .addParameter("access_token", getAccessToken())
             .build();
   }
-  
+
   private URI createItemUri(String id) throws URISyntaxException, IOException {
     return new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id))
             .addParameter("access_token", getAccessToken())
             .build();
   }
-  
-  private URI createChangeOwnerUri(String id,String owner) throws URISyntaxException, IOException {
+
+  private URI createChangeOwnerUri(String id, String owner) throws URISyntaxException, IOException {
     return new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/owner/" + owner))
             .addParameter("access_token", getAccessToken())
             .build();
   }
-  
+
   private URI createXmlUri(String id) throws URISyntaxException, IOException {
     return new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/xml"))
             .addParameter("access_token", getAccessToken())
             .build();
   }
-  
+
   private URI createJsonUri(String id) throws URISyntaxException, IOException {
     return new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/json"))
             .addParameter("access_token", getAccessToken())
@@ -405,9 +485,10 @@ public class Client implements Closeable {
   private List<String> queryIds(String src_uri_s) throws IOException, URISyntaxException {
     return queryIds("src_uri_s", src_uri_s, 5);
   }
-  
+
   /**
    * Query ids.
+   *
    * @param term term to query
    * @param value value of the term
    * @return listIds of ids
@@ -417,7 +498,7 @@ public class Client implements Closeable {
   private List<String> queryIds(String term, String value, long size) throws IOException, URISyntaxException {
     ArrayList<String> ids = new ArrayList<>();
     SearchContext searchContext = new SearchContext();
-    
+
     while (true) {
       QueryResponse response = query(term, value, size, searchContext);
       if (Thread.currentThread().isInterrupted()) {
@@ -431,7 +512,7 @@ public class Client implements Closeable {
               .filter(id -> id != null)
               .collect(Collectors.toList()));
     }
-    
+
     return ids;
   }
 
@@ -448,14 +529,14 @@ public class Client implements Closeable {
   private QueryResponse query(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
     URI uri = createQueryUri(term, value, size, searchContext);
     try {
-      QueryResponse response =  query(uri);
+      QueryResponse response = query(uri);
       searchContext._scroll_id = response._scroll_id;
       return response;
     } catch (HttpResponseException ex) {
-      if (ex.getStatusCode()==401) {
+      if (ex.getStatusCode() == 401) {
         clearToken();
         uri = createQueryUri(term, value, size, searchContext);
-        QueryResponse response =  query(uri);
+        QueryResponse response = query(uri);
         searchContext._scroll_id = response._scroll_id;
         return response;
       } else {
@@ -463,32 +544,32 @@ public class Client implements Closeable {
       }
     }
   }
-  
+
   private void clearToken() {
     tokenInfo = null;
   }
-  
-  private QueryResponse query(URI uri)  throws IOException, URISyntaxException {
+
+  private QueryResponse query(URI uri) throws IOException, URISyntaxException {
     HttpGet get = new HttpGet(uri);
     get.setConfig(DEFAULT_REQUEST_CONFIG);
     get.setHeader("Content-Type", "application/json");
     get.setHeader("User-Agent", HttpConstants.getUserAgent());
-    
-    return  execute(get, QueryResponse.class);
+
+    return execute(get, QueryResponse.class);
   }
-  
+
   private String createElasticSearchUrl() {
     return ELASTIC_SEARCH_URL.replaceAll("\\{metadata\\}", index);
   }
-  
+
   private URI createQueryUri(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
-    if (searchContext._scroll_id==null) {
+    if (searchContext._scroll_id == null) {
       return new URIBuilder(url.toURI().resolve(createElasticSearchUrl()))
-              .addParameter("q",term!=null && value!=null? String.format("%s:\"%s\"", term, value): "*:*")
+              .addParameter("q", term != null && value != null ? String.format("%s:\"%s\"", term, value) : "*:*")
               .addParameter("size", Long.toString(size))
               .addParameter("scroll", "1m")
               .addParameter("access_token", getAccessToken())
-              .build();      
+              .build();
     } else {
       return new URIBuilder(url.toURI().resolve(ELASTIC_SCROLL_URL))
               .addParameter("scroll_id", searchContext._scroll_id)
@@ -497,33 +578,33 @@ public class Client implements Closeable {
               .build();
     }
   }
-  
+
   private <T> T execute(HttpUriRequest req, Class<T> clazz) throws IOException, URISyntaxException {
     try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
       String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
-      
-      if (httpResponse.getStatusLine().getStatusCode()>=400) {
+
+      if (httpResponse.getStatusLine().getStatusCode() >= 400) {
         T value = null;
         try {
           value = mapper.readValue(responseContent, clazz);
         } catch (Exception ex) {
           throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
         }
-        if (value==null) {
+        if (value == null) {
           throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
         }
         return value;
       }
-      
+
       return mapper.readValue(responseContent, clazz);
     }
   }
-  
+
   private String getAccessToken() throws URISyntaxException, IOException {
     LocalDateTime now = LocalDateTime.now();
-    if (tokenInfo==null || tokenInfo.validTill.minusSeconds(60).isBefore(now)) {
+    if (tokenInfo == null || tokenInfo.validTill.minusSeconds(60).isBefore(now)) {
       Token token = generateToken();
       TokenInfo ti = new TokenInfo();
       ti.token = token;
@@ -532,13 +613,13 @@ public class Client implements Closeable {
     }
     return tokenInfo.token.access_token;
   }
-  
+
   private Token generateToken() throws URISyntaxException, UnsupportedEncodingException, IOException {
     HttpPost post = new HttpPost(url.toURI().resolve(TOKEN_URL));
     post.setConfig(DEFAULT_REQUEST_CONFIG);
     post.setHeader("User-Agent", HttpConstants.getUserAgent());
-    post.setHeader("Content-Type","application/x-www-form-urlencoded");
-    post.setHeader("Accept","application/json");
+    post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+    post.setHeader("Accept", "application/json");
     HashMap<String, String> params = new HashMap<>();
     if (cred != null) {
       params.put("username", StringUtils.trimToEmpty(cred.getUserName()));
@@ -549,8 +630,8 @@ public class Client implements Closeable {
     HttpEntity entity = new UrlEncodedFormEntity(params.entrySet().stream()
             .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()));
     post.setEntity(entity);
-    
-    return execute(post,Token.class);
+
+    return execute(post, Token.class);
   }
 
   @Override
@@ -558,21 +639,25 @@ public class Client implements Closeable {
     if (httpClient instanceof Closeable) {
       ((Closeable) httpClient).close();
     }
+    gs.close();
   }
-  
+
   public static class SearchContext {
+
     public String _scroll_id;
   }
-  
+
   public static class Token {
+
     public String access_token;
     public String token_type;
     public Long expires_in;
     public String scope;
     public String jti;
   }
-  
+
   private static class TokenInfo {
+
     public Token token;
     public LocalDateTime validTill;
   }

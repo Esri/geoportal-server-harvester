@@ -21,6 +21,7 @@ import com.esri.geoportal.commons.gpt.client.EntryRef;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
+import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -29,8 +30,10 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -56,12 +59,17 @@ import org.slf4j.LoggerFactory;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
-    CloseableHttpClient httpclient = HttpClientBuilder.create().build();
-    if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
-      client = new Client(httpclient, definition.getHostUrl(), definition.getCredentials(), definition.getIndex());
-    } else {
-      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getHostUrl());
-      client = new Client(new BotsHttpClient(httpclient,bots), definition.getHostUrl(), definition.getCredentials(), definition.getIndex());
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+    try {
+      GeometryService gs = new GeometryService(httpClient, new URL(connector.geometryServiceUrl));
+      if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
+        client = new Client(httpClient, gs, definition.getHostUrl(), definition.getCredentials(), definition.getIndex());
+      } else {
+        Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpClient, definition.getHostUrl());
+        client = new Client(new BotsHttpClient(httpClient,bots), gs, definition.getHostUrl(), definition.getCredentials(), definition.getIndex());
+      }
+    } catch (MalformedURLException ex) {
+      throw new DataProcessorException(String.format("Invalid geometry service url: %s", connector.geometryServiceUrl), ex);
     }
   }
 

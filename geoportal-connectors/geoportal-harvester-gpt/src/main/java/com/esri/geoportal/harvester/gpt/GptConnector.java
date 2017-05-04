@@ -33,6 +33,12 @@ import java.util.ResourceBundle;
  */
 public class GptConnector implements OutputConnector<OutputBroker> {
   public static final String TYPE = "GPT";
+  
+  final String geometryServiceUrl;
+
+  public GptConnector(String geometryServiceUrl) {
+    this.geometryServiceUrl = geometryServiceUrl;
+  }
 
   @Override
   public String getType() {
