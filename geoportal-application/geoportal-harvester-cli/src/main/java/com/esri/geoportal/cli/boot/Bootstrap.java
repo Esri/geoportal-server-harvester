@@ -70,6 +70,7 @@ import com.esri.geoportal.harvester.waf.WafConnector;
 import com.esri.geoportal.harvester.api.ex.*;
 import com.esri.geoportal.harvester.engine.defaults.DefaultProcessor;
 import java.io.IOException;
+import java.net.URL;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
@@ -100,12 +101,15 @@ public class Bootstrap {
   private TasksService taskService;
   private TemplatesService templatesService;
   private TriggersService triggersService;
+  private final String geometryServiceUrl;
   
   /**
    * Creates instance of the bootstrap.
+   * @param geometryServiceUrl
    * @param reportManager report manager
    */
-  public Bootstrap(ReportManager reportManager) {
+  public Bootstrap(String geometryServiceUrl, ReportManager reportManager) {
+    this.geometryServiceUrl = geometryServiceUrl;
     this.reportManager = reportManager;
   }
   
@@ -257,7 +261,7 @@ public class Bootstrap {
       inboundConnectorRegistry.put(UncConnector.TYPE, new UncConnector());
       inboundConnectorRegistry.put(AgpInputConnector.TYPE, new AgpInputConnector(metaBuilder));
       inboundConnectorRegistry.put(AgsConnector.TYPE, new AgsConnector(metaBuilder));
-      inboundConnectorRegistry.put(GptConnector.TYPE, new GptConnector());
+      inboundConnectorRegistry.put(GptConnector.TYPE, new GptConnector(geometryServiceUrl));
       inboundConnectorRegistry.put(CkanConnector.TYPE, new CkanConnector(metaBuilder));
     }
     
@@ -278,7 +282,7 @@ public class Bootstrap {
       outboundConnectorRegistry.put(AgpOutputConnector.TYPE, new AgpOutputConnector(metaAnalyzer));
       outboundConnectorRegistry.put(ConsoleConnector.TYPE, new ConsoleConnector());
       outboundConnectorRegistry.put(FolderConnector.TYPE, new FolderConnector());
-      outboundConnectorRegistry.put(com.esri.geoportal.harvester.gpt.GptConnector.TYPE, new com.esri.geoportal.harvester.gpt.GptConnector());
+      outboundConnectorRegistry.put(com.esri.geoportal.harvester.gpt.GptConnector.TYPE, new com.esri.geoportal.harvester.gpt.GptConnector(geometryServiceUrl));
     }
     
     return outboundConnectorRegistry;

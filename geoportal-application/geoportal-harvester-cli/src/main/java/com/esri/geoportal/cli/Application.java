@@ -42,6 +42,7 @@ import org.apache.commons.cli.ParseException;
  */
 public class Application {
   private static final String version = "2.0.0";
+  private static final String geometryServiceUrl = "http://sampleserver6.arcgisonline.com/arcgis/rest/services/Utilities/Geometry/GeometryServer";
 
   public static void main(String[] args) {
     Application app = new Application();
@@ -116,7 +117,7 @@ public class Application {
   }
 
   protected void harvest(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
-    Bootstrap boot = new Bootstrap(new MemReportManager());
+    Bootstrap boot = new Bootstrap(geometryServiceUrl, new MemReportManager());
     Engine engine = boot.createEngine();
     IteratorContext iterCtx = new SimpleIteratorContext();
 

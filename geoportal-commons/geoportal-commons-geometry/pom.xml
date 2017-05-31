@@ -3,27 +3,32 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.esri.geoportal</groupId>
-        <artifactId>geoportal-connectors</artifactId>
+        <artifactId>geoportal-commons</artifactId>
         <version>2.5.1-SNAPSHOT</version>
     </parent>
-    <artifactId>geoportal-harvester-gptsrc</artifactId>
-    <name>Esri :: Geoportal Server :: Harvester :: Data Source :: Geoportal Rest</name>
+    <artifactId>geoportal-commons-geometry</artifactId>
+    <name>Esri :: Geoportal Server :: Commons :: Geometry Utils</name>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>harvester-api-base</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.esri.geometry</groupId>
+            <artifactId>esri-geometry-api</artifactId>
+            <version>1.2.1</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>geoportal-commons-gpt-client</artifactId>
+            <artifactId>commons-utils</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>geoportal-commons-geometry</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.7.2</version>
+        </dependency>
+        <dependency>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+          <version>2.4</version>
         </dependency>
     </dependencies>
     <properties>
