@@ -47,7 +47,7 @@ public interface DataReference extends Serializable {
    * @return content or <code>nulle</code> if content by the mime type unavailable
    * @throws IOException if getting content fails
    */
-  byte [] getContent(MimeType mimeType) throws IOException;
+  byte [] getContent(MimeType... mimeType) throws IOException;
   
   /**
    * Gets content type.

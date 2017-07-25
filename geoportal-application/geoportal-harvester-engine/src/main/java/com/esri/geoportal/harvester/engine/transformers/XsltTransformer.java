@@ -128,7 +128,7 @@ public class XsltTransformer implements Transformer {
     public List<DataReference> transform(DataReference input) throws DataTransformerException {
       ByteArrayOutputStream result = new ByteArrayOutputStream();
       try {
-        xsltTransformer.transform(new StreamSource(new InputStreamReader(new ByteArrayInputStream(input.getContent(MimeType.APPLICATION_XML)), "UTF-8")), new StreamResult(new OutputStreamWriter(result, "UTF-8")));
+        xsltTransformer.transform(new StreamSource(new InputStreamReader(new ByteArrayInputStream(input.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML)), "UTF-8")), new StreamResult(new OutputStreamWriter(result, "UTF-8")));
         DataReferenceWrapper dataRef = new DataReferenceWrapper(input);
         dataRef.addContext(MimeType.APPLICATION_XML, result.toByteArray());
         return Arrays.asList(new DataReference[]{dataRef});

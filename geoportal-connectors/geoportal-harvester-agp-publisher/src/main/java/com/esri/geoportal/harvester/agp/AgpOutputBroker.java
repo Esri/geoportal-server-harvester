@@ -231,8 +231,8 @@ import org.xml.sax.SAXException;
         if (doc != null) {
           attributes = metaAnalyzer.extract(doc);
         } else {
-          if (ref.getContentType().contains(MimeType.APPLICATION_XML)) {
-            String sXml = new String(ref.getContent(MimeType.APPLICATION_XML), "UTF-8");
+          if (ref.getContentType().contains(MimeType.APPLICATION_XML) || ref.getContentType().contains(MimeType.TEXT_XML)) {
+            String sXml = new String(ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML), "UTF-8");
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             DocumentBuilder builder = factory.newDocumentBuilder();

@@ -55,7 +55,7 @@ public class DataReferenceWrapper implements DataReference {
   
 
   @Override
-  public byte[] getContent(MimeType mimeType) throws IOException {
+  public byte[] getContent(MimeType...mimeType) throws IOException {
     byte [] data =  content.get(mimeType);
     if (data==null) {
       data = baseRef.getContent(mimeType);

@@ -92,8 +92,14 @@ public final class SimpleDataReference implements DataReference {
   }
 
   @Override
-  public byte[] getContent(MimeType mimeType) throws IOException {
-    return content.get(mimeType);
+  public byte[] getContent(MimeType...mimeType) throws IOException {
+    for (MimeType mt: mimeType) {
+      byte [] bytes = content.get(mt);
+      if (bytes!=null) {
+        return bytes;
+      }
+    }
+    return null;
   }
 
   @Override

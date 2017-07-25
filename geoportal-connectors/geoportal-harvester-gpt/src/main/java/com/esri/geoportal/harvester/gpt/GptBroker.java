@@ -147,7 +147,7 @@ import org.slf4j.LoggerFactory;
 
       String xml = null;
       if (definition.getAcceptXml()) {
-        byte[] content = ref.getContent(MimeType.APPLICATION_XML);
+        byte[] content = ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML);
         if (content != null) {
           xml = new String(content, "UTF-8");
           if (xml.startsWith(SBOM)) {
