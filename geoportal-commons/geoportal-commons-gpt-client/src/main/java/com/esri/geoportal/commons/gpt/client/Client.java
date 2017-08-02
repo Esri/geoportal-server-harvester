@@ -31,7 +31,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -72,7 +71,7 @@ public class Client implements Closeable {
 
   private final Logger LOG = LoggerFactory.getLogger(Client.class);
 
-  private static final String DEFAILT_INDEX = "metadata";
+  private static final String DEFAULT_INDEX = "metadata";
   private static final String REST_ITEM_URL = "rest/metadata/item";
   private static final String ELASTIC_SEARCH_URL = "elastic/{metadata}/item/_search";
   private static final String ELASTIC_SCROLL_URL = "elastic/_search/scroll";
@@ -101,7 +100,7 @@ public class Client implements Closeable {
     this.gs = gs;
     this.url = url;
     this.cred = cred;
-    this.index = StringUtils.defaultIfBlank(index, DEFAILT_INDEX);
+    this.index = StringUtils.defaultIfBlank(index, DEFAULT_INDEX);
 
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
