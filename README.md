@@ -12,9 +12,7 @@ To report an issue, please go to [issues](https://github.com/Esri/geoportal-serv
 
 ## Features
 
-* Support for harvesting WAF and CSW repositories
-* Publication into Geoportal Server catalog or a local folder
-* Extensibility
+* Please visit [Features](https://github.com/Esri/geoportal-server-harvester/wiki/Features).
 
 ## Instructions
 
