@@ -6,6 +6,7 @@
     <version>2.5.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Esri :: Geoportal Server :: Harvester</name>
+    <description>Top-level project for all Harvester modules.</description>
     <modules>
         <module>geoportal-connectors</module>
         <module>geoportal-application</module>

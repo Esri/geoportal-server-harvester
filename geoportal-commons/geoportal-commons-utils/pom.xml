@@ -9,6 +9,7 @@
     <artifactId>commons-utils</artifactId>
     <packaging>jar</packaging>
     <name>Esri :: Geoportal Server :: Commons :: Utils</name>
+    <description>Collection of uncategorized utility classes.</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>

@@ -9,6 +9,7 @@
     <artifactId>geoportal-harvester-ckan</artifactId>
     <packaging>jar</packaging>
     <name>Esri :: Geoportal Server :: Harvester :: Data Source :: CKAN</name>
+    <description>Inbound adaptor capable of harvesting data from CKAN end point.</description>
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

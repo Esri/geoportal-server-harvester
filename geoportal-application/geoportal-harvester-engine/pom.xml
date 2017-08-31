@@ -8,6 +8,7 @@
     </parent>
     <artifactId>geoportal-harvester-engine</artifactId>
     <name>Esri :: Geoportal Server :: Harvester :: Application :: Engine</name>
+    <description>Harvester engine with full capability to perform harvesting.</description>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

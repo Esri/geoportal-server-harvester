@@ -8,6 +8,7 @@
     </parent>
     <artifactId>geoportal-harvester-unc</artifactId>
     <name>Esri :: Geoportal Server :: Harvester :: Data Source :: Unc</name>
+    <description>Inbound adaptor for harvesting data located on UNC path.</description>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

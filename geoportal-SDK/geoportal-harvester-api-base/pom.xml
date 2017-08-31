@@ -8,6 +8,7 @@
     </parent>
     <artifactId>harvester-api-base</artifactId>
     <name>Esri :: Geoportal Server :: Harvester :: Api Base</name>
+    <description>Abstract implementations of API interfaces.</description>
     <packaging>jar</packaging>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>

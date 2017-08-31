@@ -8,6 +8,7 @@
     </parent>
     <artifactId>geoportal-harvester-gptsrc</artifactId>
     <name>Esri :: Geoportal Server :: Harvester :: Data Source :: Geoportal Rest</name>
+    <description>Inbound adaptor for Geoportal Server 2.x.x capable of harvesting data from Geoportal REST end point.</description>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

@@ -8,6 +8,7 @@
     </parent>
     <artifactId>geoportal-commons-geometry</artifactId>
     <name>Esri :: Geoportal Server :: Commons :: Geometry Utils</name>
+    <description>Geometry utitlity classes.</description>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

@@ -9,6 +9,7 @@
     <artifactId>geoportal-application</artifactId>
     <packaging>pom</packaging>
     <name>Esri :: Geoportal Server :: Harvester :: Application</name>
+    <description>Collection of various implementations of the Harvester.</description>
     <modules>
         <module>geoportal-harvester-engine</module>
         <module>geoportal-harvester-war</module>
