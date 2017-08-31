@@ -8,6 +8,7 @@
     </parent>
     <artifactId>geoportal-harvester-console</artifactId>
     <name>Esri :: Geoportal Server :: Harvester :: Data Publisher :: Console</name>
+    <description>Outbound adaptor for the system console.</description>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

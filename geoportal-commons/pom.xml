@@ -9,6 +9,7 @@
     <artifactId>geoportal-commons</artifactId>
     <packaging>pom</packaging>
     <name>Esri :: Geoportal Server :: Harvester :: Commons</name>
+    <description>Collection of Harvester common modules.</description>
     <modules>
         <module>geoportal-commons-csw-client</module>
         <module>geoportal-commons-gpt-client</module>

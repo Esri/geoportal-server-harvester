@@ -9,6 +9,7 @@
     <artifactId>geoportal-harvester-cli</artifactId>
     <packaging>jar</packaging>
     <name>Esri :: Geoportal Server :: Harvester :: Application :: Cli</name>
+    <description>Final Harvester artifact implemented as a command line interface.</description>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

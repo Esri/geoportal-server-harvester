@@ -8,6 +8,7 @@
     </parent>
     <artifactId>geoportal-harvester-folder</artifactId>
     <name>Esri :: Geoportal Server :: Harvester :: Data Publisher :: Folder</name>
+    <description>Outbound adaptor for a local folder capable to store data on the disk.</description>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

@@ -9,6 +9,7 @@
     <artifactId>geoportal-SDK</artifactId>
     <packaging>pom</packaging>
     <name>Esri :: Geoportal Server :: Harvester :: SDK</name>
+    <description>Harvester software development kit. Interfaces and abstract classes required for writting Harvester extensions.</description>
     <modules>
         <module>geoportal-harvester-api</module>
         <module>geoportal-harvester-api-base</module>

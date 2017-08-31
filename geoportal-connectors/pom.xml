@@ -9,6 +9,7 @@
     <artifactId>geoportal-connectors</artifactId>
     <packaging>pom</packaging>
     <name>Esri :: Geoportal Server :: Harvester :: Connectors</name>
+    <description>Collection of inbound and outbound adaptors.</description>
     <modules>
         <module>geoportal-harvester-console</module>
         <module>geoportal-harvester-csw</module>

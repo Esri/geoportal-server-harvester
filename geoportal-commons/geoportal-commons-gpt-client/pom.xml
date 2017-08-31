@@ -8,6 +8,7 @@
     </parent>
     <artifactId>geoportal-commons-gpt-client</artifactId>
     <name>Esri :: Geoportal Server :: Commons :: Geoportal Rest Client</name>
+    <description>Lightweight Geoportal 2.x.x client of conducting communication with the server instance through the REST interface.</description>
     <packaging>jar</packaging>
     <dependencies>
       <dependency>

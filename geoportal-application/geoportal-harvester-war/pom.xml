@@ -9,6 +9,7 @@
     <artifactId>geoportal-harvester-war</artifactId>
     <packaging>war</packaging>
     <name>Esri :: Geoportal Server :: Harvester :: Application :: War</name>
+    <description>Final Harvester artifact implemented as a web application ready for deployment.</description>
 
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>

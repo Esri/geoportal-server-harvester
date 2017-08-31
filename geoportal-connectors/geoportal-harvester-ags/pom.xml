@@ -8,6 +8,7 @@
     </parent>
     <artifactId>geoportal-harvester-ags</artifactId>
     <name>Esri :: Geoportal Server :: Harvester :: Data Source :: ArcGIS Server</name>
+    <description>Inbound adaptor for ArcGIS Server capable of harvesting data from the server.</description>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

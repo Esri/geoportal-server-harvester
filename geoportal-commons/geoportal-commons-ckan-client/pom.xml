@@ -8,6 +8,7 @@
     </parent>
     <artifactId>geoportal-commons-ckan-client</artifactId>
     <name>Esri :: Geoportal Server :: Commons :: CKAN Lightweight Client</name>
+    <description>Lightweight CKAN client.</description>
     <packaging>jar</packaging>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>

@@ -8,6 +8,7 @@
     </parent>
     <artifactId>geoportal-commons-agp-client</artifactId>
     <name>Esri :: Geoportal Server :: Commons :: ArcGIS Portal Client</name>
+    <description>Lightweight ArcGIS Portal client capable of conducting communication with the portal instance through the REST interface.</description>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

@@ -8,6 +8,7 @@
     </parent>
     <artifactId>geoportal-harvester-csw</artifactId>
     <name>Esri :: Geoportal Server :: Harvester :: Data Source :: Csw</name>
+    <description>Inbound adaptor for CSW archives capable of harvesting data from CSW end point.</description>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

@@ -8,6 +8,7 @@
   </parent>
   <artifactId>commons-robots</artifactId>
   <name>Esri :: Geoportal Server :: Commons :: Robots</name>
+  <description>Robots.txt parser and utility methods.</description>
   <packaging>jar</packaging>
   <dependencies>
     <dependency>
