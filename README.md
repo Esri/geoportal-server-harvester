@@ -3,6 +3,10 @@ As part of the evolution of Geoportal Server, the harvesting capability has been
 
 This repository thus contains the harvesting capability, while it's sibling [geoportal-server-catalog](https://github.com/Esri/geoportal-server-catalog) is the new catalog of Geoportal Server.
 
+For details about geoportal server harvester, please visit the [wiki](https://github.com/Esri/geoportal-server-harvester/wiki).
+
+To report an issue, please go to [issues](https://github.com/Esri/geoportal-server-harvester/issues).
+
 ## Releases and Downloads
 - 2.5.0 - Released February 22, 2017, click [here](https://github.com/Esri/geoportal-server-harvester/releases) for release notes and downloads.  
 
