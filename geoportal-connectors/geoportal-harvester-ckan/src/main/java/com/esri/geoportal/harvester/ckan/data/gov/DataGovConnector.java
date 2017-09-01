@@ -13,35 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.ckan;
+package com.esri.geoportal.harvester.ckan.data.gov;
 
-import static com.esri.geoportal.harvester.ckan.CkanConstants.*;
+import com.esri.geoportal.harvester.ckan.*;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
-import com.esri.geoportal.harvester.api.specs.InputConnector;
-import java.util.ArrayList;
-import java.util.List;
+import static com.esri.geoportal.harvester.ckan.data.gov.DataGovConstants.*;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
  * CKAN connector.
  */
-public class CkanConnector implements InputConnector<InputBroker> {
+public class DataGovConnector extends CkanConnector {
 
-  public static final String TYPE = "CKAN";
-  
-  protected final MetaBuilder metaBuilder;
+  public static final String TYPE = "DATA.GOV";
 
   /**
    * Creates instance of the connector.
    * @param metaBuilder meta builder
    */
-  public CkanConnector(MetaBuilder metaBuilder) {
-    this.metaBuilder = metaBuilder;
+  public DataGovConnector(MetaBuilder metaBuilder) {
+    super(metaBuilder);
   }
 
   @Override
@@ -52,21 +48,37 @@ public class CkanConnector implements InputConnector<InputBroker> {
   @Override
   public UITemplate getTemplate(Locale locale) {
     ResourceBundle bundle = ResourceBundle.getBundle("CkanResource", locale);
-    List<UITemplate.Argument> args = new ArrayList<>();
-    args.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("ckan.url"), true){
+    UITemplate template = super.getTemplate(locale);
+    
+    UITemplate.Argument apiUrlArg = template.getArguments().remove(0);
+    template.getArguments().add(0, new UITemplate.ArgumentWrapper(apiUrlArg){
+      @Override
+      public boolean getRequired() {
+        return false;
+      }
       @Override
       public String getHint() {
-        return bundle.getString("ckan.hint");
+        return bundle.getString("data.gov.url.hint");
       }
     });
-    args.add(new UITemplate.StringArgument(P_API_KEY, bundle.getString("ckan.apiKey")));
-    args.add(new UITemplate.BooleanArgument(P_EMIT_XML, bundle.getString("ckan.emit.xml"),false, Boolean.TRUE));
-    args.add(new UITemplate.BooleanArgument(P_EMIT_JSON, bundle.getString("ckan.emit.json"),false, Boolean.FALSE));
-    return new UITemplate(getType(), bundle.getString("ckan"), args);
+    template.getArguments().add(1, new UITemplate.StringArgument(P_XML_URL, bundle.getString("data.gov.xml")){
+      @Override
+      public String getHint() {
+        return bundle.getString("data.gov.xml.hint");
+      }
+    });
+    template.getArguments().add(2, new UITemplate.StringArgument(P_OID_KEY, bundle.getString("data.gov.oid")){
+      @Override
+      public String getHint() {
+        return bundle.getString("data.gov.oid.hint");
+      }
+    });
+    
+    return template;
   }
 
   @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
-    return new CkanBroker(this, new CkanBrokerDefinitionAdaptor(definition), metaBuilder);
+    return new DataGovBroker(this, new DataGovBrokerDefinitionAdaptor(definition), metaBuilder);
   }
 }

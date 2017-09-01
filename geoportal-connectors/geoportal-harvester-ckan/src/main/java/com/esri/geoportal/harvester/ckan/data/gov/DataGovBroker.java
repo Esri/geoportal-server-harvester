@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.ckan;
+package com.esri.geoportal.harvester.ckan.data.gov;
 
 import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.constants.MimeType;
@@ -77,11 +77,11 @@ import org.w3c.dom.Document;
 /**
  * CKAN broker.
  */
-/*package*/ class CkanBroker implements InputBroker {
-  private static final Logger LOG = LoggerFactory.getLogger(CkanBroker.class);
+/*package*/ class DataGovBroker implements InputBroker {
+  private static final Logger LOG = LoggerFactory.getLogger(DataGovBroker.class);
   
-  private final CkanConnector connector;
-  private final CkanBrokerDefinitionAdaptor definition;
+  private final DataGovConnector connector;
+  private final DataGovBrokerDefinitionAdaptor definition;
   private final MetaBuilder metaBuilder;
   
   private CloseableHttpClient httpClient;
@@ -100,7 +100,7 @@ import org.w3c.dom.Document;
    * @param definition definition
    * @param metaBuilder meta builder
    */
-  public CkanBroker(CkanConnector connector, CkanBrokerDefinitionAdaptor definition, MetaBuilder metaBuilder) {
+  public DataGovBroker(DataGovConnector connector, DataGovBrokerDefinitionAdaptor definition, MetaBuilder metaBuilder) {
     this.connector = connector;
     this.definition = definition;
     this.metaBuilder = metaBuilder;
@@ -191,7 +191,7 @@ import org.w3c.dom.Document;
         
         return false;
       } catch (IOException|URISyntaxException ex) {
-        throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
+        throw new DataInputException(DataGovBroker.this, String.format("Error reading data from: %s", this), ex);
       }
     }
 
@@ -249,7 +249,7 @@ import org.w3c.dom.Document;
         return ref;
         
       } catch (MetaException|TransformerException|URISyntaxException|UnsupportedEncodingException|IllegalArgumentException|JsonProcessingException ex) {
-        throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
+        throw new DataInputException(DataGovBroker.this, String.format("Error reading data from: %s", this), ex);
       }
     }
     
