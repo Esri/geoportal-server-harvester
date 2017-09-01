@@ -52,4 +52,5 @@ public class Dataset {
   public String owner_org;
   public String title;
   public String revision_id;
+  public List<Extra> extras;
 }
