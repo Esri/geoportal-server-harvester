@@ -19,17 +19,14 @@ import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.commons.meta.MetaException;
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.URISyntaxException;
 import javax.script.Invocable;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import com.esri.geoportal.commons.utils.XmlUtils;
 
 /**
  * Base JavaScript metadata builder.
@@ -51,9 +48,7 @@ public class BaseJSMetaBuilder implements MetaBuilder {
   public Document create(MapAttribute wellKnowsAttributes) throws MetaException {
     try {
       String xmlString = execute(wellKnowsAttributes).toString();
-      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder builder = factory.newDocumentBuilder();
-      return builder.parse(new InputSource(new StringReader(xmlString)));
+      return XmlUtils.toDocument(xmlString);
     } catch (IOException|ParserConfigurationException|SAXException ex) {
       throw new MetaException("Error creating document.", ex);
     }

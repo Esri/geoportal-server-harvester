@@ -50,7 +50,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -62,24 +61,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import com.esri.geoportal.commons.utils.XmlUtils;
 
 /**
  * CKAN broker.
  */
 public class CkanBroker implements InputBroker {
   private static final Logger LOG = LoggerFactory.getLogger(CkanBroker.class);
-  private static final TransformerFactory tf = TransformerFactory.newInstance();
   
   private final CkanConnector connector;
   private final CkanBrokerDefinitionAdaptor definition;
@@ -196,14 +191,9 @@ public class CkanBroker implements InputBroker {
         }
       }
 
-      Document doc = metaBuilder.create(new MapAttribute(attrs));
-      DOMSource domSource = new DOMSource(doc);
-      StringWriter writer = new StringWriter();
-      StreamResult result = new StreamResult(writer);
-      Transformer transformer = tf.newTransformer();
-      transformer.transform(domSource, result);
+      Document document = metaBuilder.create(new MapAttribute(attrs));
 
-      return writer.toString();
+      return XmlUtils.toString(document);
     } catch (MetaException|TransformerException ex) {
       throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
     }
