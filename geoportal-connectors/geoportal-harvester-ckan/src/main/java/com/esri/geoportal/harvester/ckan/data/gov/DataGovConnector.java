@@ -22,6 +22,7 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import static com.esri.geoportal.harvester.ckan.data.gov.DataGovConstants.*;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -50,8 +51,9 @@ public class DataGovConnector extends CkanConnector {
     ResourceBundle bundle = ResourceBundle.getBundle("CkanResource", locale);
     UITemplate template = super.getTemplate(locale);
     
-    UITemplate.Argument apiUrlArg = template.getArguments().remove(0);
-    template.getArguments().add(0, new UITemplate.ArgumentWrapper(apiUrlArg){
+    List<UITemplate.Argument> arguments = template.getArguments();
+    UITemplate.Argument apiUrlArg = arguments.remove(0);
+    arguments.add(0, new UITemplate.ArgumentWrapper(apiUrlArg){
       @Override
       public boolean getRequired() {
         return false;
@@ -61,20 +63,20 @@ public class DataGovConnector extends CkanConnector {
         return bundle.getString("data.gov.url.hint");
       }
     });
-    template.getArguments().add(1, new UITemplate.StringArgument(P_XML_URL, bundle.getString("data.gov.xml")){
+    arguments.add(1, new UITemplate.StringArgument(P_XML_URL, bundle.getString("data.gov.xml")){
       @Override
       public String getHint() {
         return bundle.getString("data.gov.xml.hint");
       }
     });
-    template.getArguments().add(2, new UITemplate.StringArgument(P_OID_KEY, bundle.getString("data.gov.oid")){
+    arguments.add(2, new UITemplate.StringArgument(P_OID_KEY, bundle.getString("data.gov.oid")){
       @Override
       public String getHint() {
         return bundle.getString("data.gov.oid.hint");
       }
     });
     
-    return template;
+    return new UITemplate(getType(), bundle.getString("data.gov"), arguments);
   }
 
   @Override

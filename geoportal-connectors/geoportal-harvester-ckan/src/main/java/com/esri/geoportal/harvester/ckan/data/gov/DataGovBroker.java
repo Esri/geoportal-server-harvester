@@ -17,7 +17,6 @@ package com.esri.geoportal.harvester.ckan.data.gov;
 
 import com.esri.geoportal.commons.ckan.client.Dataset;
 import com.esri.geoportal.commons.ckan.client.Extra;
-import com.esri.geoportal.commons.ckan.client.Response;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
@@ -30,7 +29,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;

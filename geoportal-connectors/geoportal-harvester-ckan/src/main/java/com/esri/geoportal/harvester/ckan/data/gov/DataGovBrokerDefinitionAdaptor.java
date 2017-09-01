@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 public class DataGovBrokerDefinitionAdaptor extends CkanBrokerDefinitionAdaptor {
   private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(DataGovBrokerDefinitionAdaptor.class);
   private static final URL DEFAULT_API_URL = createDefaultUrl("https://catalog.data.gov/", "DEFAULT_API_URL");
-  private static final URL DEFAULT_XML_URL = createDefaultUrl("https://data.gov.in/catalog/", "DEFAULT_XML_URL");
+  private static final URL DEFAULT_XML_URL = createDefaultUrl("https://catalog.data.gov/harvest/object/", "DEFAULT_XML_URL");
   private static final String DEFAULT_OID_KEY = "harvest_object_id";
   
   private URL xmlUrl;
@@ -39,6 +39,11 @@ public class DataGovBrokerDefinitionAdaptor extends CkanBrokerDefinitionAdaptor 
   
   public DataGovBrokerDefinitionAdaptor(EntityDefinition def) throws InvalidDefinitionException {
     super(def);
+  }
+
+  @Override
+  protected String getType() {
+    return DataGovConnector.TYPE;
   }
 
   @Override

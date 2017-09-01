@@ -42,6 +42,9 @@
   <bean class="com.esri.geoportal.harvester.ckan.CkanConnector">
     <constructor-arg ref="metaBuilder"/>
   </bean>
+  <bean class="com.esri.geoportal.harvester.ckan.data.gov.DataGovConnector">
+    <constructor-arg ref="metaBuilder"/>
+  </bean>
   <bean class="com.esri.geoportal.harvester.gptsrc.GptConnector">
     <constructor-arg value="${geometry.service.url}"/>
   </bean>
