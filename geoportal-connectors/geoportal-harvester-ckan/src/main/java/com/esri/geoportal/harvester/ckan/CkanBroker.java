@@ -77,14 +77,15 @@ import org.w3c.dom.Document;
 /**
  * CKAN broker.
  */
-/*package*/ class CkanBroker implements InputBroker {
+public class CkanBroker implements InputBroker {
   private static final Logger LOG = LoggerFactory.getLogger(CkanBroker.class);
+  private static final TransformerFactory tf = TransformerFactory.newInstance();
   
   private final CkanConnector connector;
   private final CkanBrokerDefinitionAdaptor definition;
   private final MetaBuilder metaBuilder;
   
-  private CloseableHttpClient httpClient;
+  protected CloseableHttpClient httpClient;
   private Client client;
  
   private static final ObjectMapper mapper = new ObjectMapper();
@@ -156,11 +157,67 @@ import org.w3c.dom.Document;
   }
   
   /**
+   * Creates document from dataset.
+   * @param dataSet dataset
+   * @return document as string.
+   * @throws DataInputException if creating document fails
+   */
+  protected String createDocument(Dataset dataSet) throws DataInputException {
+        
+    try {
+      HashMap<String,Attribute> attrs = new HashMap<>();
+      String id = firstNonBlank(dataSet.id);
+      attrs.put(WKA_IDENTIFIER, new StringAttribute(id));
+      attrs.put(WKA_TITLE, new StringAttribute(firstNonBlank(dataSet.title,dataSet.name)));
+      attrs.put(WKA_DESCRIPTION, new StringAttribute(firstNonBlank(dataSet.notes)));
+      attrs.put(WKA_MODIFIED, new StringAttribute(dataSet.metadata_modified));
+
+      if (dataSet.resources!=null) {
+        final List<Attribute> references = new ArrayList<>();
+        dataSet.resources.forEach(resource->{
+          HashMap<String,Attribute> reference = new HashMap<>();
+          if (resource.url!=null) {
+            String scheme = generateSchemeName(resource.url);
+            reference.put(WKA_RESOURCE_URL, new StringAttribute(resource.url));
+            if (scheme!=null) {
+              reference.put(WKA_RESOURCE_URL_SCHEME, new StringAttribute(scheme));
+            }
+          }
+          references.add(new MapAttribute(reference));
+        });
+        if (references.size()==1) {
+          Map<String, Attribute> namedAttributes = references.get(0).getNamedAttributes();
+          attrs.put(WKA_RESOURCE_URL, namedAttributes.get(WKA_RESOURCE_URL));
+          if (namedAttributes.containsKey(WKA_RESOURCE_URL_SCHEME)) {
+            attrs.put(WKA_RESOURCE_URL_SCHEME, namedAttributes.get(WKA_RESOURCE_URL_SCHEME));
+          }
+        } else if (!references.isEmpty()) {
+          attrs.put(WKA_REFERENCES, new ArrayAttribute(references));
+        }
+      }
+
+      Document doc = metaBuilder.create(new MapAttribute(attrs));
+      DOMSource domSource = new DOMSource(doc);
+      StringWriter writer = new StringWriter();
+      StreamResult result = new StreamResult(writer);
+      Transformer transformer = tf.newTransformer();
+      transformer.transform(domSource, result);
+
+      return writer.toString();
+    } catch (MetaException|TransformerException ex) {
+      throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
+    }
+  }
+    
+  private String firstNonBlank(String...strs) {
+    return Arrays.asList(strs).stream().filter(s->!StringUtils.isBlank(s)).findFirst().orElse(null);
+  }
+  
+  /**
    * CKAN iterator.
    */
   private class CkanIterator implements InputBroker.Iterator {
     private final IteratorContext iteratorContext;
-    private final TransformerFactory tf = TransformerFactory.newInstance();
     
     private java.util.Iterator<Dataset> dataSetsIter;
     
@@ -198,49 +255,14 @@ import org.w3c.dom.Document;
     @Override
     public DataReference next() throws DataInputException {
       try {
+        
         Dataset dataSet = dataSetsIter.next();
-        
-        HashMap<String,Attribute> attrs = new HashMap<>();
         String id = firstNonBlank(dataSet.id);
-        attrs.put(WKA_IDENTIFIER, new StringAttribute(id));
-        attrs.put(WKA_TITLE, new StringAttribute(firstNonBlank(dataSet.title,dataSet.name)));
-        attrs.put(WKA_DESCRIPTION, new StringAttribute(firstNonBlank(dataSet.notes)));
-        attrs.put(WKA_MODIFIED, new StringAttribute(dataSet.metadata_modified));
-        
-        if (dataSet.resources!=null) {
-          final List<Attribute> references = new ArrayList<>();
-          dataSet.resources.forEach(resource->{
-            HashMap<String,Attribute> reference = new HashMap<>();
-            if (resource.url!=null) {
-              String scheme = generateSchemeName(resource.url);
-              reference.put(WKA_RESOURCE_URL, new StringAttribute(resource.url));
-              if (scheme!=null) {
-                reference.put(WKA_RESOURCE_URL_SCHEME, new StringAttribute(scheme));
-              }
-            }
-            references.add(new MapAttribute(reference));
-          });
-          if (references.size()==1) {
-            Map<String, Attribute> namedAttributes = references.get(0).getNamedAttributes();
-            attrs.put(WKA_RESOURCE_URL, namedAttributes.get(WKA_RESOURCE_URL));
-            if (namedAttributes.containsKey(WKA_RESOURCE_URL_SCHEME)) {
-              attrs.put(WKA_RESOURCE_URL_SCHEME, namedAttributes.get(WKA_RESOURCE_URL_SCHEME));
-            }
-          } else if (!references.isEmpty()) {
-            attrs.put(WKA_REFERENCES, new ArrayAttribute(references));
-          }
-        }
-        
-        Document doc = metaBuilder.create(new MapAttribute(attrs));
-        DOMSource domSource = new DOMSource(doc);
-        StringWriter writer = new StringWriter();
-        StreamResult result = new StreamResult(writer);
-        Transformer transformer = tf.newTransformer();
-        transformer.transform(domSource, result);
+        String xml = createDocument(dataSet);
 
         SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, parseIsoDate(dataSet.metadata_modified), URI.create(id));
         if (definition.getEmitXml()) {
-          ref.addContext(MimeType.APPLICATION_XML, writer.toString().getBytes("UTF-8"));
+          ref.addContext(MimeType.APPLICATION_XML, xml.getBytes("UTF-8"));
         }
         if (definition.getEmitJson()) {
           ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(dataSet).getBytes("UTF-8"));
@@ -248,13 +270,9 @@ import org.w3c.dom.Document;
         
         return ref;
         
-      } catch (MetaException|TransformerException|URISyntaxException|UnsupportedEncodingException|IllegalArgumentException|JsonProcessingException ex) {
+      } catch (URISyntaxException|UnsupportedEncodingException|IllegalArgumentException|JsonProcessingException ex) {
         throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
       }
-    }
-    
-    private String firstNonBlank(String...strs) {
-      return Arrays.asList(strs).stream().filter(s->!StringUtils.isBlank(s)).findFirst().orElse(null);
     }
     
   }
