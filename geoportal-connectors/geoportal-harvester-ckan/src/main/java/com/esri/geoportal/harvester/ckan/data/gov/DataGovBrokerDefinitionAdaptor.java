@@ -22,6 +22,7 @@ import com.esri.geoportal.harvester.ckan.CkanBrokerDefinitionAdaptor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -33,15 +34,6 @@ public class DataGovBrokerDefinitionAdaptor extends CkanBrokerDefinitionAdaptor 
   private static final URL DEFAULT_XML_URL = createDefaultUrl("https://data.gov.in/catalog/", "DEFAULT_XML_URL");
   private static final String DEFAULT_OID_KEY = "harvest_object_id";
   
-  private static URL createDefaultUrl(String url, String name) {
-    try {
-      return new URL(url);
-    } catch (MalformedURLException ex) {
-      LOG.error(String.format("Invalid %s: %s", name, url));
-      return null;
-    }
-  }
-  
   private URL xmlUrl;
   private String oidKey;
   
@@ -51,11 +43,14 @@ public class DataGovBrokerDefinitionAdaptor extends CkanBrokerDefinitionAdaptor 
 
   @Override
   protected void initialize(EntityDefinition def) throws InvalidDefinitionException {
-    super.initialize(def);
+    try {
+      super.initialize(def);
+    } catch (InvalidDefinitionException ex) {
+    }
     try {
       xmlUrl = new URL(get(P_XML_URL));
     } catch (MalformedURLException ex) {
-      throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_XML_URL, get(P_XML_URL)), ex);
+      xmlUrl = null;
     }
     oidKey = get(P_OID_KEY);
   }
@@ -67,7 +62,12 @@ public class DataGovBrokerDefinitionAdaptor extends CkanBrokerDefinitionAdaptor 
   }
   
   public URL getXmlUrl() {
-    return xmlUrl;
+    return xmlUrl!=null? xmlUrl: DEFAULT_XML_URL;
+  }
+
+  @Override
+  public URL getHostUrl() {
+    return super.getHostUrl()!=null? super.getHostUrl(): DEFAULT_API_URL;
   }
 
   public void setXmlUrl(URL hostUrl) {
@@ -76,12 +76,21 @@ public class DataGovBrokerDefinitionAdaptor extends CkanBrokerDefinitionAdaptor 
   }
 
   public String getOidKey() {
-    return oidKey;
+    return !StringUtils.isBlank(oidKey)? oidKey: DEFAULT_OID_KEY;
   }
 
   public void setOidKey(String oidKey) {
     this.oidKey = oidKey;
     set(P_OID_KEY, oidKey);
+  }
+  
+  private static URL createDefaultUrl(String url, String name) {
+    try {
+      return new URL(url);
+    } catch (MalformedURLException ex) {
+      LOG.error(String.format("Invalid %s: %s", name, url));
+      return null;
+    }
   }
   
 }
