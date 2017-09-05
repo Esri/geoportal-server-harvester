@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.ckan.data.gov;
 
 import com.esri.geoportal.commons.ckan.client.Dataset;
 import com.esri.geoportal.commons.ckan.client.Extra;
+import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
@@ -29,6 +30,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
@@ -76,7 +78,7 @@ import org.slf4j.LoggerFactory;
   }
 
   @Override
-  protected String createDocument(Dataset dataSet) throws DataInputException {
+  protected Content createContent(Dataset dataSet) throws DataInputException {
     if (dataSet.extras!=null) {
       String oid = findOid(dataSet);
       if (oid!=null) {
@@ -87,14 +89,17 @@ import org.slf4j.LoggerFactory;
             String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
             String responseContent = IOUtils.toString(contentStream, "UTF-8");
             LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
-            return responseContent;
+            Header contentTypeHeader = httpResponse.getFirstHeader("Content-Type");
+            String contentType = contentTypeHeader!=null? contentTypeHeader.getValue(): null;
+            
+            return new Content(responseContent, MimeType.parse(contentType));
           }
         } catch(URISyntaxException|IOException ex) {
           throw new DataInputException(this, String.format("Error reading metadata for object: %s", oid), ex);
         }
       }
     }
-    return super.createDocument(dataSet);
+    return super.createContent(dataSet);
   }
   
   private String findOid(Dataset dataSet) {

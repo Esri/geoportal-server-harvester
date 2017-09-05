@@ -152,12 +152,12 @@ public class CkanBroker implements InputBroker {
   }
   
   /**
-   * Creates document from dataset.
+   * Creates document content from dataset.
    * @param dataSet dataset
-   * @return document as string.
-   * @throws DataInputException if creating document fails
+   * @return content as string.
+   * @throws DataInputException if creating content fails
    */
-  protected String createDocument(Dataset dataSet) throws DataInputException {
+  protected Content createContent(Dataset dataSet) throws DataInputException {
         
     try {
       HashMap<String,Attribute> attrs = new HashMap<>();
@@ -193,7 +193,7 @@ public class CkanBroker implements InputBroker {
 
       Document document = metaBuilder.create(new MapAttribute(attrs));
 
-      return XmlUtils.toString(document);
+      return new Content(XmlUtils.toString(document), MimeType.APPLICATION_XML);
     } catch (MetaException|TransformerException ex) {
       throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
     }
@@ -248,14 +248,18 @@ public class CkanBroker implements InputBroker {
         
         Dataset dataSet = dataSetsIter.next();
         String id = firstNonBlank(dataSet.id);
-        String xml = createDocument(dataSet);
+        Content content = createContent(dataSet);
 
         SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, parseIsoDate(dataSet.metadata_modified), URI.create(id));
-        if (definition.getEmitXml()) {
-          ref.addContext(MimeType.APPLICATION_XML, xml.getBytes("UTF-8"));
+        if (definition.getEmitXml() && Arrays.asList(new MimeType[]{MimeType.APPLICATION_XML,MimeType.TEXT_XML}).contains(content.getContentType())) {
+          ref.addContext(MimeType.APPLICATION_XML, content.getData().getBytes("UTF-8"));
         }
         if (definition.getEmitJson()) {
-          ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(dataSet).getBytes("UTF-8"));
+          if (Arrays.asList(new MimeType[]{MimeType.APPLICATION_JSON}).contains(content.getContentType())) {
+            ref.addContext(MimeType.APPLICATION_JSON, content.getData().getBytes("UTF-8"));
+          } else {
+            ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(dataSet).getBytes("UTF-8"));
+          }
         }
         
         return ref;
@@ -299,6 +303,40 @@ public class CkanBroker implements InputBroker {
       return Date.from(ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(strDate)).toInstant());
     } catch (Exception ex) {
       return null;
+    }
+  }
+  
+  /**
+   * Content provided by the broker.
+   */
+  protected static final class Content {
+    private final String data;
+    private final MimeType contentType;
+    
+    /**
+     * Creates instance of the content.
+     * @param data content data
+     * @param contentType content type
+     */
+    public Content(String data, MimeType contentType) {
+      this.data = data;
+      this.contentType = contentType;
+    }
+
+    /**
+     * Gets content data.
+     * @return content data
+     */
+    public String getData() {
+      return data;
+    }
+
+    /**
+     * Gets content type.
+     * @return content type
+     */
+    public MimeType getContentType() {
+      return contentType;
     }
   }
 }
