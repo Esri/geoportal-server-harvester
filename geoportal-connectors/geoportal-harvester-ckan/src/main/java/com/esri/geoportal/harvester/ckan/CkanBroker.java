@@ -251,9 +251,13 @@ public class CkanBroker implements InputBroker {
         Content content = createContent(dataSet);
 
         SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, parseIsoDate(dataSet.metadata_modified), URI.create(id));
-        if (definition.getEmitXml() && Arrays.asList(new MimeType[]{MimeType.APPLICATION_XML,MimeType.TEXT_XML}).contains(content.getContentType())) {
-          ref.addContext(MimeType.APPLICATION_XML, content.getData().getBytes("UTF-8"));
+        
+        if (definition.getEmitXml()) {
+          if (Arrays.asList(new MimeType[]{MimeType.APPLICATION_XML,MimeType.TEXT_XML}).contains(content.getContentType())) {
+            ref.addContext(MimeType.APPLICATION_XML, content.getData().getBytes("UTF-8"));
+          }
         }
+        
         if (definition.getEmitJson()) {
           if (Arrays.asList(new MimeType[]{MimeType.APPLICATION_JSON}).contains(content.getContentType())) {
             ref.addContext(MimeType.APPLICATION_JSON, content.getData().getBytes("UTF-8"));
