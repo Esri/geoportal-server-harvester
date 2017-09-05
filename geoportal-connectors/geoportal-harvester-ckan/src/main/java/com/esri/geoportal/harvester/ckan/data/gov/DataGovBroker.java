@@ -31,6 +31,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
@@ -89,17 +90,29 @@ import org.slf4j.LoggerFactory;
             String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
             String responseContent = IOUtils.toString(contentStream, "UTF-8");
             LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
-            Header contentTypeHeader = httpResponse.getFirstHeader("Content-Type");
-            String contentType = contentTypeHeader!=null? contentTypeHeader.getValue(): null;
             
-            return new Content(responseContent, MimeType.parse(contentType));
+            return new Content(responseContent, readContentType(httpResponse));
           }
         } catch(URISyntaxException|IOException ex) {
           throw new DataInputException(this, String.format("Error reading metadata for object: %s", oid), ex);
         }
+      } else {
+        LOG.warn(String.format("Unable to find '%s' for dataset: %s", definition.getOidKey(), dataSet.id));
       }
     }
     return super.createContent(dataSet);
+  }
+  
+  private MimeType readContentType(HttpResponse httpResponse) {
+    Header contentTypeHeader = httpResponse.getFirstHeader("Content-Type");
+    String contentType = contentTypeHeader!=null? contentTypeHeader.getValue(): null;
+    if (contentType!=null) {
+      int semiCol = contentType.indexOf(";");
+      if (semiCol>=0) {
+        contentType = contentType.substring(0, semiCol);
+      }
+    }
+    return MimeType.parse(contentType);
   }
   
   private String findOid(Dataset dataSet) {

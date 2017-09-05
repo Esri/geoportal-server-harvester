@@ -338,5 +338,10 @@ public class CkanBroker implements InputBroker {
     public MimeType getContentType() {
       return contentType;
     }
+    
+    @Override
+    public String toString() {
+      return String.format("[%s]: %s", contentType, data);
+    }
   }
 }
