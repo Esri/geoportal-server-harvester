@@ -25,6 +25,7 @@ import com.esri.geoportal.commons.meta.xml.SimpleIso15115MetaAnalyzer;
 import com.esri.geoportal.commons.meta.xml.SimpleIso15115_2MetaAnalyzer;
 import com.esri.geoportal.commons.meta.xml.SimpleIso15119MetaAnalyzer;
 import com.esri.geoportal.harvester.ckan.CkanConnector;
+import com.esri.geoportal.harvester.ckan.data.gov.DataGovConnector;
 import com.esri.geoportal.harvester.agp.AgpOutputConnector;
 import com.esri.geoportal.harvester.agpsrc.AgpInputConnector;
 import com.esri.geoportal.harvester.ags.AgsConnector;
@@ -70,7 +71,6 @@ import com.esri.geoportal.harvester.waf.WafConnector;
 import com.esri.geoportal.harvester.api.ex.*;
 import com.esri.geoportal.harvester.engine.defaults.DefaultProcessor;
 import java.io.IOException;
-import java.net.URL;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
@@ -263,6 +263,7 @@ public class Bootstrap {
       inboundConnectorRegistry.put(AgsConnector.TYPE, new AgsConnector(metaBuilder));
       inboundConnectorRegistry.put(GptConnector.TYPE, new GptConnector(geometryServiceUrl));
       inboundConnectorRegistry.put(CkanConnector.TYPE, new CkanConnector(metaBuilder));
+      inboundConnectorRegistry.put(DataGovConnector.TYPE, new DataGovConnector(metaBuilder));
     }
     
     return inboundConnectorRegistry;
