@@ -91,6 +91,7 @@ public class Client implements Closeable {
    * Creates instance of the client.
    *
    * @param httpClient HTTP client
+   * @param gs geometry service
    * @param url URL of the GPT REST end point
    * @param cred credentials
    * @param index index name
@@ -109,6 +110,7 @@ public class Client implements Closeable {
   /**
    * Creates instance of the client.
    *
+   * @param gs geometry service
    * @param url URL of the GPT REST end point
    * @param cred credentials
    * @param index index name
@@ -209,6 +211,9 @@ public class Client implements Closeable {
                   case "typeName":
                   case "units":
                     s_format = "%s_s";
+                    break;
+                  case "title":
+                    s_format = "%s";
                     break;
                 }
                 jsonRequest.put(String.format(s_format, fld.getKey()), fld.getValue().asText());

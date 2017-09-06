@@ -50,17 +50,31 @@ public class CkanBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
     this.botsAdaptor = new BotsBrokerDefinitionAdaptor(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(CkanConnector.TYPE);
-    } else if (!CkanConnector.TYPE.equals(def.getType())) {
+    } else if (!getType().equals(def.getType())) {
       throw new InvalidDefinitionException("Broker definition doesn't match");
     } else {
-      try {
-        hostUrl = new URL(get(P_HOST_URL));
-      } catch (MalformedURLException ex) {
-        throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
-      }
-      apiKey = get(P_API_KEY);
-      emitXml = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_XML)), true);
-      emitJson = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_JSON)), false);
+      initialize(def);
+    }
+  }
+
+  protected String getType() {
+    return CkanConnector.TYPE;
+  }
+  
+  /**
+   * Initializes adaptor from definition.
+   * @param def broker definition
+   * @throws InvalidDefinitionException if definition is invalid
+   */
+  protected void initialize(EntityDefinition def) throws InvalidDefinitionException {
+    apiKey = get(P_API_KEY);
+    emitXml = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_XML)), true);
+    emitJson = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_JSON)), false);
+    
+    try {
+      hostUrl = new URL(get(P_HOST_URL));
+    } catch (MalformedURLException ex) {
+      throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
     }
   }
 

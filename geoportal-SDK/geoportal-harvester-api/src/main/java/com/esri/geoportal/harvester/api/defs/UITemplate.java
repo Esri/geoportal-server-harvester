@@ -98,14 +98,57 @@ public final class UITemplate {
   }
   
   /**
+   * Argument wrapper.
+   * @param <T> data type
+   */
+  public static class ArgumentWrapper<T> implements Argument<T> {
+    private Argument<T> arg;
+
+    public ArgumentWrapper(Argument<T> arg) {
+      this.arg = arg;
+    }
+
+    @Override
+    public ArgumentType getType() {
+      return arg.getType();
+    }
+
+    @Override
+    public String getName() {
+      return arg.getName();
+    }
+
+    @Override
+    public String getLabel() {
+      return arg.getLabel();
+    }
+
+    @Override
+    public String getHint() {
+      return arg.getHint();
+    }
+
+    @Override
+    public boolean getRequired() {
+      return arg.getRequired();
+    }
+
+    @Override
+    public T getDefaultValue() {
+      return arg.getDefaultValue();
+    }
+    
+  }
+  
+  /**
    * Argument base implementation.
    * @param <T> data type
    */
   public static abstract class ArgumentBase<T> implements Argument<T> {
     private final String name;
     private final String label;
-    private final boolean required;
-    private final T defaultValue;
+    private boolean required;
+    private T defaultValue;
 
     /**
      * Creates instance of the argument.
@@ -170,6 +213,7 @@ public final class UITemplate {
       return null;
     }
 
+    @Override
     public T getDefaultValue() {
       return defaultValue;
     }

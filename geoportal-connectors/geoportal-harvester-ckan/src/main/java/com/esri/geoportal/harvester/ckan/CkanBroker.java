@@ -50,7 +50,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -62,30 +61,26 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import com.esri.geoportal.commons.utils.XmlUtils;
 
 /**
  * CKAN broker.
  */
-/*package*/ class CkanBroker implements InputBroker {
+public class CkanBroker implements InputBroker {
   private static final Logger LOG = LoggerFactory.getLogger(CkanBroker.class);
-  private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
   
   private final CkanConnector connector;
   private final CkanBrokerDefinitionAdaptor definition;
   private final MetaBuilder metaBuilder;
   
-  private CloseableHttpClient httpClient;
+  protected CloseableHttpClient httpClient;
   private Client client;
  
   private static final ObjectMapper mapper = new ObjectMapper();
@@ -157,11 +152,62 @@ import org.w3c.dom.Document;
   }
   
   /**
+   * Creates document content from dataset.
+   * @param dataSet dataset
+   * @return content as string.
+   * @throws DataInputException if creating content fails
+   */
+  protected Content createContent(Dataset dataSet) throws DataInputException {
+        
+    try {
+      HashMap<String,Attribute> attrs = new HashMap<>();
+      String id = firstNonBlank(dataSet.id);
+      attrs.put(WKA_IDENTIFIER, new StringAttribute(id));
+      attrs.put(WKA_TITLE, new StringAttribute(firstNonBlank(dataSet.title,dataSet.name)));
+      attrs.put(WKA_DESCRIPTION, new StringAttribute(firstNonBlank(dataSet.notes)));
+      attrs.put(WKA_MODIFIED, new StringAttribute(dataSet.metadata_modified));
+
+      if (dataSet.resources!=null) {
+        final List<Attribute> references = new ArrayList<>();
+        dataSet.resources.forEach(resource->{
+          HashMap<String,Attribute> reference = new HashMap<>();
+          if (resource.url!=null) {
+            String scheme = generateSchemeName(resource.url);
+            reference.put(WKA_RESOURCE_URL, new StringAttribute(resource.url));
+            if (scheme!=null) {
+              reference.put(WKA_RESOURCE_URL_SCHEME, new StringAttribute(scheme));
+            }
+          }
+          references.add(new MapAttribute(reference));
+        });
+        if (references.size()==1) {
+          Map<String, Attribute> namedAttributes = references.get(0).getNamedAttributes();
+          attrs.put(WKA_RESOURCE_URL, namedAttributes.get(WKA_RESOURCE_URL));
+          if (namedAttributes.containsKey(WKA_RESOURCE_URL_SCHEME)) {
+            attrs.put(WKA_RESOURCE_URL_SCHEME, namedAttributes.get(WKA_RESOURCE_URL_SCHEME));
+          }
+        } else if (!references.isEmpty()) {
+          attrs.put(WKA_REFERENCES, new ArrayAttribute(references));
+        }
+      }
+
+      Document document = metaBuilder.create(new MapAttribute(attrs));
+
+      return new Content(XmlUtils.toString(document), MimeType.APPLICATION_XML);
+    } catch (MetaException|TransformerException ex) {
+      throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
+    }
+  }
+    
+  private String firstNonBlank(String...strs) {
+    return Arrays.asList(strs).stream().filter(s->!StringUtils.isBlank(s)).findFirst().orElse(null);
+  }
+  
+  /**
    * CKAN iterator.
    */
   private class CkanIterator implements InputBroker.Iterator {
     private final IteratorContext iteratorContext;
-    private final TransformerFactory tf = TransformerFactory.newInstance();
     
     private java.util.Iterator<Dataset> dataSetsIter;
     
@@ -199,63 +245,32 @@ import org.w3c.dom.Document;
     @Override
     public DataReference next() throws DataInputException {
       try {
+        
         Dataset dataSet = dataSetsIter.next();
-        
-        HashMap<String,Attribute> attrs = new HashMap<>();
         String id = firstNonBlank(dataSet.id);
-        attrs.put(WKA_IDENTIFIER, new StringAttribute(id));
-        attrs.put(WKA_TITLE, new StringAttribute(firstNonBlank(dataSet.title,dataSet.name)));
-        attrs.put(WKA_DESCRIPTION, new StringAttribute(firstNonBlank(dataSet.notes)));
-        attrs.put(WKA_MODIFIED, new StringAttribute(dataSet.metadata_modified));
+        Content content = createContent(dataSet);
+
+        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, parseIsoDate(dataSet.metadata_modified), URI.create(id));
         
-        if (dataSet.resources!=null) {
-          final List<Attribute> references = new ArrayList<>();
-          dataSet.resources.forEach(resource->{
-            HashMap<String,Attribute> reference = new HashMap<>();
-            if (resource.url!=null) {
-              String scheme = generateSchemeName(resource.url);
-              reference.put(WKA_RESOURCE_URL, new StringAttribute(resource.url));
-              if (scheme!=null) {
-                reference.put(WKA_RESOURCE_URL_SCHEME, new StringAttribute(scheme));
-              }
-            }
-            references.add(new MapAttribute(reference));
-          });
-          if (references.size()==1) {
-            Map<String, Attribute> namedAttributes = references.get(0).getNamedAttributes();
-            attrs.put(WKA_RESOURCE_URL, namedAttributes.get(WKA_RESOURCE_URL));
-            if (namedAttributes.containsKey(WKA_RESOURCE_URL_SCHEME)) {
-              attrs.put(WKA_RESOURCE_URL_SCHEME, namedAttributes.get(WKA_RESOURCE_URL_SCHEME));
-            }
-          } else if (!references.isEmpty()) {
-            attrs.put(WKA_REFERENCES, new ArrayAttribute(references));
+        if (definition.getEmitXml()) {
+          if (Arrays.asList(new MimeType[]{MimeType.APPLICATION_XML,MimeType.TEXT_XML}).contains(content.getContentType())) {
+            ref.addContext(MimeType.APPLICATION_XML, content.getData().getBytes("UTF-8"));
           }
         }
         
-        Document doc = metaBuilder.create(new MapAttribute(attrs));
-        DOMSource domSource = new DOMSource(doc);
-        StringWriter writer = new StringWriter();
-        StreamResult result = new StreamResult(writer);
-        Transformer transformer = tf.newTransformer();
-        transformer.transform(domSource, result);
-
-        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, parseIsoDate(dataSet.metadata_modified), URI.create(id));
-        if (definition.getEmitXml()) {
-          ref.addContext(MimeType.APPLICATION_XML, writer.toString().getBytes("UTF-8"));
-        }
         if (definition.getEmitJson()) {
-          ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(dataSet).getBytes("UTF-8"));
+          if (Arrays.asList(new MimeType[]{MimeType.APPLICATION_JSON}).contains(content.getContentType())) {
+            ref.addContext(MimeType.APPLICATION_JSON, content.getData().getBytes("UTF-8"));
+          } else {
+            ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(dataSet).getBytes("UTF-8"));
+          }
         }
         
         return ref;
         
-      } catch (MetaException|TransformerException|URISyntaxException|UnsupportedEncodingException|IllegalArgumentException|JsonProcessingException ex) {
+      } catch (URISyntaxException|UnsupportedEncodingException|IllegalArgumentException|JsonProcessingException ex) {
         throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
       }
-    }
-    
-    private String firstNonBlank(String...strs) {
-      return Arrays.asList(strs).stream().filter(s->!StringUtils.isBlank(s)).findFirst().orElse(null);
     }
     
   }
@@ -292,6 +307,45 @@ import org.w3c.dom.Document;
       return Date.from(ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(strDate)).toInstant());
     } catch (Exception ex) {
       return null;
+    }
+  }
+  
+  /**
+   * Content provided by the broker.
+   */
+  protected static final class Content {
+    private final String data;
+    private final MimeType contentType;
+    
+    /**
+     * Creates instance of the content.
+     * @param data content data
+     * @param contentType content type
+     */
+    public Content(String data, MimeType contentType) {
+      this.data = data;
+      this.contentType = contentType;
+    }
+
+    /**
+     * Gets content data.
+     * @return content data
+     */
+    public String getData() {
+      return data;
+    }
+
+    /**
+     * Gets content type.
+     * @return content type
+     */
+    public MimeType getContentType() {
+      return contentType;
+    }
+    
+    @Override
+    public String toString() {
+      return String.format("[%s]: %s", contentType, data);
     }
   }
 }

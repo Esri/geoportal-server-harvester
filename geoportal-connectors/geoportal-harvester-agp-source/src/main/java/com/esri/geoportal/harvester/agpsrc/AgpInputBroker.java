@@ -42,17 +42,13 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -60,6 +56,7 @@ import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import com.esri.geoportal.commons.utils.XmlUtils;
 
 /**
  * ArcGIS Portal output broker.
@@ -242,16 +239,12 @@ import org.apache.http.impl.client.HttpClientBuilder;
         }
         
         MapAttribute attr = AttributeUtils.fromProperties(props);
-        Document doc = metaBuilder.create(attr);
-        DOMSource domSource = new DOMSource(doc);
-        StringWriter writer = new StringWriter();
-        StreamResult result = new StreamResult(writer);
-        Transformer transformer = tf.newTransformer();
-        transformer.transform(domSource, result);
+        Document document = metaBuilder.create(attr);
+        byte [] bytes = XmlUtils.toString(document).getBytes("UTF-8");
 
         SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), nextEntry.id, new Date(nextEntry.modified), URI.create(nextEntry.id));
         if (definition.getEmitXml()) {
-          ref.addContext(MimeType.APPLICATION_XML, writer.toString().getBytes("UTF-8"));
+          ref.addContext(MimeType.APPLICATION_XML, bytes);
         }
         if (definition.getEmitJson()) {
           ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(nextEntry).getBytes("UTF-8"));
