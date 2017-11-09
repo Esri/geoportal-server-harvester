@@ -23,6 +23,8 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/dom-construct",
+        "dojo/dom-attr",
+        "dojo/query",
         "dojo/on",
         "dojo/json",
         "dojo/topic",
@@ -37,7 +39,7 @@ define(["dojo/_base/declare",
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,domConstruct,on,json,topic,Uploader,
+           lang,array,domConstruct, domAttr, query, on,json,topic,Uploader,
            Dialog,Button,
            TasksREST,Task,TaskEditorPane,
            TaskUtils
@@ -46,9 +48,17 @@ define(["dojo/_base/declare",
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
+      uploader: null,
     
-      postCreate: function(){
+      postCreate: function() {
+        this.inherited(arguments);
         this.load();
+      },
+      
+      startup: function() {
+        this.inherited(arguments);
+        var inputNode = query("input", this.uploader.domNode);
+        domAttr.set(inputNode[0], "accept", ".json");
       },
       
       load: function() {
