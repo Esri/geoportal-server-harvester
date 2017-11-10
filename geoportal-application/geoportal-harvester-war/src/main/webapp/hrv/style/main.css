@@ -434,3 +434,17 @@ html,body {
 .h-period-radio {
   margin-right: 1em;
 }
+
+.h-error-header {
+  width: 100%;
+  background-color: red;
+  color: white;
+  padding: 15px;
+  vertical-align: middle;
+  font-weight: 400;
+  font-size: 16px;
+}
+
+.h-error-content {
+  padding: 15px;
+}
