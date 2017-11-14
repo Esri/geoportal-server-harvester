@@ -15,6 +15,8 @@
  */
 package com.esri.geoportal.harvester.engine.utils;
 
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
+
 /**
  * CRLF utilities.
  */
@@ -27,12 +29,12 @@ public class CrlfUtils {
    * @param subst replacement
    * @return sanitized string
    */
-  public static String crlfSanitize(String str, String subst) {
+  public static String encodeForHTML(String str, String subst) {
     if (str == null) {
       return str;
     }
     
-    return str.replaceAll("(\n|\r|\f)+(\\s+(\n|\r|\f)+)?", subst);
+    return escapeHtml4(str.replaceAll("(\n|\r|\f)+(\\s+(\n|\r|\f)+)?", subst));
   }
   
   
@@ -41,7 +43,7 @@ public class CrlfUtils {
    * @param str input string.
    * @return sanitized string
    */
-  public static String crlfSanitize(String str) {
-    return crlfSanitize(str, STD_REPLACEMENT);
+  public static String encodeForHTML(String str) {
+    return CrlfUtils.encodeForHTML(str, STD_REPLACEMENT);
   }
 }
