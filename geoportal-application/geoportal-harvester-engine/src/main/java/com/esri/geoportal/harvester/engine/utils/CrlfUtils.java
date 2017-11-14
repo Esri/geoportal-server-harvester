@@ -15,8 +15,6 @@
  */
 package com.esri.geoportal.harvester.engine.utils;
 
-import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
-
 /**
  * CRLF utilities.
  */
@@ -34,7 +32,7 @@ public class CrlfUtils {
       return str;
     }
     
-    return  escapeHtml4(str.replaceAll("(\n|\r|\f)+(\\s+(\n|\r|\f)+)?", subst));
+    return str.replaceAll("(\n|\r|\f)+(\\s+(\n|\r|\f)+)?", subst);
   }
   
   
