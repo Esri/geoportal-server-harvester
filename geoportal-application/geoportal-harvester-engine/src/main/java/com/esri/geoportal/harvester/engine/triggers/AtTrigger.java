@@ -42,7 +42,7 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
+import org.owasp.esapi.ESAPI;
 
 /**
  * 'At' trigger. Triggers harvesting at the specific time.
@@ -265,7 +265,7 @@ public class AtTrigger implements Trigger {
                 return cal.get(Calendar.DAY_OF_WEEK)==n;
               });
             } catch (NumberFormatException ex) {
-              LOG.warn(escapeHtml4(crlfSanitize(String.format("Invalid day of the week definition: %s", str))));
+              LOG.warn(ESAPI.encoder().encodeForHTML(crlfSanitize(String.format("Invalid day of the week definition: %s", str))), ex);
             }
           });
           predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));
@@ -286,7 +286,7 @@ public class AtTrigger implements Trigger {
                 return cal.get(Calendar.WEEK_OF_MONTH)==n;
               });
             } catch (NumberFormatException ex) {
-              LOG.warn(escapeHtml4(crlfSanitize(String.format("Invalid week of the month definition: %s", str))));
+              LOG.warn(ESAPI.encoder().encodeForHTML(crlfSanitize(String.format("Invalid week of the month definition: %s", str))), ex);
             }
           });
           predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));
@@ -307,7 +307,7 @@ public class AtTrigger implements Trigger {
                 return cal.get(Calendar.MONTH)==n;
               });
             } catch (NumberFormatException ex) {
-              LOG.warn(escapeHtml4(crlfSanitize(String.format("Invalid month definition: %s", str))));
+              LOG.warn(ESAPI.encoder().encodeForHTML(crlfSanitize(String.format("Invalid month definition: %s", str))), ex);
             }
           });
           predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));
