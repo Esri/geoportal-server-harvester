@@ -40,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static com.esri.geoportal.harvester.engine.utils.CrlfUtils.encodeForHTML;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -306,7 +305,8 @@ public class AtTrigger implements Trigger {
                 return cal.get(Calendar.MONTH)==n;
               });
             } catch (NumberFormatException ex) {
-              LOG.warn(String.format("Invalid month definition: %s", StringUtils.trimToEmpty(str).replaceAll("[\n\r]+", " ")));
+              String msg = String.format("Invalid month definition: %s", str);
+              LOG.warn(msg.replace("\n", "_").replace("\r", "_"));
             }
           });
           predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));
