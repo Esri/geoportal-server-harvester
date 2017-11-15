@@ -41,6 +41,7 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static com.esri.geoportal.harvester.engine.utils.CrlfUtils.encodeForHTML;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 'At' trigger. Triggers harvesting at the specific time.
@@ -263,7 +264,7 @@ public class AtTrigger implements Trigger {
                 return cal.get(Calendar.DAY_OF_WEEK)==n;
               });
             } catch (NumberFormatException ex) {
-              LOG.warn(String.format("Invalid day of the week definition: %s", encodeForHTML(str)), ex);
+              LOG.warn(String.format("Invalid day of the week definition: %s", StringUtils.trimToEmpty(str).replaceAll("[\n\r]+", " ")));
             }
           });
           predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));
@@ -284,7 +285,7 @@ public class AtTrigger implements Trigger {
                 return cal.get(Calendar.WEEK_OF_MONTH)==n;
               });
             } catch (NumberFormatException ex) {
-              LOG.warn(String.format("Invalid week of the month definition: %s", encodeForHTML(str)), ex);
+              LOG.warn(String.format("Invalid week of the month definition: %s", StringUtils.trimToEmpty(str).replaceAll("[\n\r]+", " ")));
             }
           });
           predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));
@@ -305,7 +306,7 @@ public class AtTrigger implements Trigger {
                 return cal.get(Calendar.MONTH)==n;
               });
             } catch (NumberFormatException ex) {
-              LOG.warn(String.format("Invalid month definition: %s", encodeForHTML(str)), ex);
+              LOG.warn(String.format("Invalid month definition: %s", StringUtils.trimToEmpty(str).replaceAll("[\n\r]+", " ")));
             }
           });
           predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));
