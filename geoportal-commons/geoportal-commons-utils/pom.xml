@@ -26,5 +26,11 @@
             <artifactId>geoportal-commons-constants</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.owasp.esapi</groupId>
+            <artifactId>esapi</artifactId>
+            <version>2.1.0.1</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 </project>

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.engine.utils;
+package com.esri.geoportal.commons.utils;
 
 import org.owasp.esapi.ESAPI;
 
@@ -23,10 +23,18 @@ import org.owasp.esapi.ESAPI;
 public class CrlfUtils {
   public static final String STD_REPLACEMENT = "_";
   
-  public static String formatLog(String format, String...args) {
+  /**
+   * Formats string for the log entry.
+   * @param format format
+   * @param args arguments
+   * @return formatted log message
+   */
+  public static String formatForLog(String format, String...args) {
     String msg = String.format(format, args);
-    msg = msg.replace("\n", "_").replace("\r", "_");
-    msg = ESAPI.encoder().encodeForHTML(msg);
+    msg = msg.replace("\n", STD_REPLACEMENT).replace("\r", STD_REPLACEMENT);
+    if (ESAPI.securityConfiguration().getLogEncodingRequired()) {
+      msg = ESAPI.encoder().encodeForHTML(msg);
+    }
     return msg;
   }
 }
