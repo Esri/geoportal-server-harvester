@@ -32,9 +32,7 @@ public class CrlfUtils {
   public static String formatForLog(String format, String...args) {
     String msg = String.format(format, args);
     msg = msg.replace("\n", STD_REPLACEMENT).replace("\r", STD_REPLACEMENT);
-    if (ESAPI.securityConfiguration().getLogEncodingRequired()) {
-      msg = ESAPI.encoder().encodeForHTML(msg);
-    }
+    msg = ESAPI.encoder().encodeForXML(msg);
     return msg;
   }
 }
