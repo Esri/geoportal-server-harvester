@@ -41,6 +41,7 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.owasp.esapi.ESAPI;
 
 /**
  * 'At' trigger. Triggers harvesting at the specific time.
@@ -306,7 +307,9 @@ public class AtTrigger implements Trigger {
               });
             } catch (NumberFormatException ex) {
               String msg = String.format("Invalid month definition: %s", str);
-              LOG.warn(msg.replace("\n", "_").replace("\r", "_"));
+              msg = msg.replace("\n", "_").replace("\r", "_");
+              msg = ESAPI.encoder().encodeForHTML(msg);
+              LOG.warn(msg);
             }
           });
           predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));
