@@ -15,35 +15,18 @@
  */
 package com.esri.geoportal.harvester.engine.utils;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
+import org.owasp.esapi.ESAPI;
 
 /**
  * CRLF utilities.
  */
 public class CrlfUtils {
-  public static final String STD_REPLACEMENT = ", ";
+  public static final String STD_REPLACEMENT = "_";
   
-  /**
-   * Sanitizes new line type characters in the input.
-   * @param str input string.
-   * @param subst replacement
-   * @return sanitized string
-   */
-  public static String encodeForHTML(String str, String subst) {
-    if (str == null) {
-      return str;
-    }
-    
-    return escapeHtml4(str.replaceAll("(\n|\r|\f)+(\\s+(\n|\r|\f)+)?", subst));
-  }
-  
-  
-  /**
-   * Sanitizes new line type characters in the input withe standard replacement.
-   * @param str input string.
-   * @return sanitized string
-   */
-  public static String encodeForHTML(String str) {
-    return CrlfUtils.encodeForHTML(str, STD_REPLACEMENT);
+  public static String formatLog(String format, String...args) {
+    String msg = String.format(format, args);
+    msg = msg.replace("\n", "_").replace("\r", "_");
+    msg = ESAPI.encoder().encodeForHTML(msg);
+    return msg;
   }
 }

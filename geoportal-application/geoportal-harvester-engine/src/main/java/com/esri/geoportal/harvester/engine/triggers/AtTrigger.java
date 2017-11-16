@@ -23,6 +23,7 @@ import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
+import static com.esri.geoportal.harvester.engine.utils.CrlfUtils.formatLog;
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -40,8 +41,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.lang3.StringUtils;
-import org.owasp.esapi.ESAPI;
 
 /**
  * 'At' trigger. Triggers harvesting at the specific time.
@@ -264,7 +263,7 @@ public class AtTrigger implements Trigger {
                 return cal.get(Calendar.DAY_OF_WEEK)==n;
               });
             } catch (NumberFormatException ex) {
-              LOG.warn(String.format("Invalid day of the week definition: %s", StringUtils.trimToEmpty(str).replaceAll("[\n\r]+", " ")));
+              LOG.warn(formatLog("Invalid day of the week definition: %s", str));
             }
           });
           predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));
@@ -285,7 +284,7 @@ public class AtTrigger implements Trigger {
                 return cal.get(Calendar.WEEK_OF_MONTH)==n;
               });
             } catch (NumberFormatException ex) {
-              LOG.warn(String.format("Invalid week of the month definition: %s", StringUtils.trimToEmpty(str).replaceAll("[\n\r]+", " ")));
+              LOG.warn(formatLog("Invalid week of the month definition: %s", str));
             }
           });
           predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));
@@ -306,10 +305,7 @@ public class AtTrigger implements Trigger {
                 return cal.get(Calendar.MONTH)==n;
               });
             } catch (NumberFormatException ex) {
-              String msg = String.format("Invalid month definition: %s", str);
-              msg = msg.replace("\n", "_").replace("\r", "_");
-              msg = ESAPI.encoder().encodeForHTML(msg);
-              LOG.warn(msg);
+              LOG.warn(formatLog("Invalid month definition: %s", str), ex);
             }
           });
           predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));
