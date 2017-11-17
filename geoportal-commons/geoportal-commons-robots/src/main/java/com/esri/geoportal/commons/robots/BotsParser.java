@@ -138,21 +138,12 @@ public class BotsParser {
    */
   public Bots readRobotsTxt(MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, InputStream robotsTxt) {
     Bots robots = null;
-    BotsReader reader = null;
 
-    try {
-      reader = new BotsReader(getUserAgent(), matchingStrategy, winningStrategy, robotsTxt);
+    try (BotsReader reader = new BotsReader(getUserAgent(), matchingStrategy, winningStrategy, robotsTxt);) {
       robots = reader.readRobotsTxt();
     } catch (IOException ex) {
       LOG.warn("Unable to parse robots.txt", ex);
       return null;
-    } finally {
-      if (reader != null) {
-        try {
-          reader.close();
-        } catch (IOException ex) {
-        }
-      }
     }
 
     return robots;

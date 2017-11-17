@@ -32,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
   private final String userAgent;
   private final MatchingStrategy matchingStrategy;
   private final WinningStrategy winningStrategy;
-  private final BufferedReader reader;
+  private BufferedReader reader;
   private BotsImpl robots;
 
   public BotsReader(String userAgent, MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, InputStream inputStream) throws UnsupportedEncodingException {
@@ -49,7 +49,8 @@ import org.apache.commons.lang3.StringUtils;
 
   @Override
   public void close() throws IOException {
-    reader.close();
+    this.reader.close();
+    this.reader = null;
   }
 
   public Bots readRobotsTxt() throws IOException {
