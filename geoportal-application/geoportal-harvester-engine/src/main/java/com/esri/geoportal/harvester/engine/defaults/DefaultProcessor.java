@@ -221,7 +221,7 @@ public class DefaultProcessor implements Processor {
       if (getStatus() != ProcessInstance.Status.working) {
         throw new IllegalStateException(formatForLog("Error aborting the process: process is in %s state", getStatus()));
       }
-      LOG.info(String.format("Aborting process: %s", getTitle()));
+      LOG.info(formatForLog("Aborting process: %s", getTitle()));
       aborting = true;
       onStatusChange();
       thread.interrupt();

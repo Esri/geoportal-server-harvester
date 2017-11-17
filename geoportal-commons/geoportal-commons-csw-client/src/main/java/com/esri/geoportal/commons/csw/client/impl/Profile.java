@@ -130,6 +130,13 @@ public class Profile implements IProfile {
       
       // create internal request DOM
       DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+      builderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+      builderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+      builderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+      builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+      builderFactory.setXIncludeAware(false);
+      builderFactory.setExpandEntityReferences(false);
+      builderFactory.setNamespaceAware(true);
       DocumentBuilder builder = builderFactory.newDocumentBuilder();
       Document internalRequestDOM = builder.parse(new InputSource(internalRequestInputStream));
 

@@ -26,6 +26,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -34,9 +36,23 @@ import org.xml.sax.SAXException;
  * XML utils.
  */
 public class XmlUtils {
+  private static final Logger LOG = LoggerFactory.getLogger(XmlUtils.class);
   private static final TransformerFactory tf = TransformerFactory.newInstance();
   private static final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
   
+  static {
+    try {
+      factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+      factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+      factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+      factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+      factory.setXIncludeAware(false);
+      factory.setExpandEntityReferences(false);
+      factory.setNamespaceAware(true);
+    } catch(ParserConfigurationException ex) {
+      LOG.error("Error initializing XmlUtils", ex);
+    }
+  }
   /**
    * Converts XML document into the string.
    * @param document XML
