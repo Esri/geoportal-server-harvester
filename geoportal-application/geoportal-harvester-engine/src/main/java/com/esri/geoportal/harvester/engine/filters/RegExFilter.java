@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine.filters;
 
+import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Filter;
 import com.esri.geoportal.harvester.api.FilterInstance;
@@ -79,7 +80,7 @@ public class RegExFilter implements Filter {
       try {
         pattern = Pattern.compile(strPattern);
       } catch (PatternSyntaxException ex) {
-        throw new InvalidDefinitionException(String.format("Invalid pattern: %s", strPattern), ex);
+        throw new InvalidDefinitionException(formatForLog("Invalid pattern: %s", strPattern), ex);
       }
     }
 
@@ -104,7 +105,7 @@ public class RegExFilter implements Filter {
       Matcher matcher = pattern.matcher(sourceUri);
       boolean result = matcher.matches();
       if (!result) {
-        LOG.debug(String.format("Source URI: %s does not match pattern: %s", sourceUri, pattern.pattern()));
+        LOG.debug(formatForLog("Source URI: %s does not match pattern: %s", sourceUri, pattern.pattern()));
       }
       return result;
     }

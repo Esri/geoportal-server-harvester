@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.rest;
 
+import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.support.ProcessResponse;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -76,12 +77,12 @@ public class ProcessController {
   @RequestMapping(value = "/rest/harvester/processes/{processId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessStatisticsResponse> getProcessInfo(@PathVariable UUID processId) {
     try {
-      LOG.debug(String.format("GET /rest/harvester/processes/%s", processId));
+      LOG.debug(formatForLog("GET /rest/harvester/processes/%s", processId));
       ProcessInstance process = engine.getProcessesService().getProcess(processId);
       Statistics statistics = engine.getProcessesService().getStatistics(processId);
       return new ResponseEntity<>(process!=null? new ProcessStatisticsResponse(processId, process.getTask().getTaskDefinition(), process.getStatus(), statistics): null,HttpStatus.OK);
     } catch (DataProcessorException ex) {
-      LOG.error(String.format("Error getting process info: %s", processId), ex);
+      LOG.error(formatForLog("Error getting process info: %s", processId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -94,7 +95,7 @@ public class ProcessController {
   @RequestMapping(value = "/rest/harvester/processes/{processId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessResponse> abortProcess(@PathVariable UUID processId) {
     try {
-      LOG.debug(String.format("DELETE /rest/harvester/processes/%s", processId));
+      LOG.debug(formatForLog("DELETE /rest/harvester/processes/%s", processId));
       ProcessInstance process = engine.getProcessesService().getProcess(processId);
       if (process!=null) {
         try {
@@ -108,7 +109,7 @@ public class ProcessController {
               process.getTask().getTaskDefinition(), 
               process.getStatus()): null, HttpStatus.OK);
     } catch (DataProcessorException ex) {
-      LOG.error(String.format("Error aborting process: %s", processId), ex);
+      LOG.error(formatForLog("Error aborting process: %s", processId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

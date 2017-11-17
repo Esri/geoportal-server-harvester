@@ -19,6 +19,7 @@ import com.esri.geoportal.commons.ckan.client.Dataset;
 import com.esri.geoportal.commons.ckan.client.Extra;
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.meta.MetaBuilder;
+import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
@@ -97,7 +98,7 @@ import org.slf4j.LoggerFactory;
           throw new DataInputException(this, String.format("Error reading metadata for object: %s", oid), ex);
         }
       } else {
-        LOG.warn(String.format("Unable to find '%s' for dataset: %s", definition.getOidKey(), dataSet.id));
+        LOG.warn(formatForLog("Unable to find '%s' for dataset: %s", definition.getOidKey(), dataSet.id));
       }
     }
     return super.createContent(dataSet);

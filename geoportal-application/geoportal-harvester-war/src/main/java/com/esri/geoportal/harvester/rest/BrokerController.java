@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 
 /**
  * Broker controller.
@@ -87,7 +88,7 @@ public class BrokerController {
   @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BrokerResponse[]> listBrokers(@RequestParam(value = "category", required = false) String category) {
     try {
-      LOG.debug(String.format("GET /rest/harvester/brokers%s",category!=null? "&category="+category: ""));
+      LOG.debug(formatForLog("GET /rest/harvester/brokers%s",category!=null? "&category="+category: ""));
       Category ctg = null;
       try {
         ctg = Category.parse(category);
@@ -109,10 +110,10 @@ public class BrokerController {
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BrokerResponse> getBroker(@PathVariable UUID brokerId) {
     try {
-      LOG.debug(String.format("GET /rest/harvester/brokers/%s", brokerId));
+      LOG.debug(formatForLog("GET /rest/harvester/brokers/%s", brokerId));
       return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().findBroker(brokerId, LocaleContextHolder.getLocale())), HttpStatus.OK);
     } catch (DataProcessorException ex) {
-      LOG.error(String.format("Error getting broker: %s", brokerId), ex);
+      LOG.error(formatForLog("Error getting broker: %s", brokerId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -125,11 +126,11 @@ public class BrokerController {
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BrokerResponse> deleteBroker(@PathVariable UUID brokerId) {
     try {
-      LOG.debug(String.format("DELETE /rest/harvester/brokers/%s", brokerId));
+      LOG.debug(formatForLog("DELETE /rest/harvester/brokers/%s", brokerId));
       engine.getBrokersService().deleteBroker(brokerId);
       return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().findBroker(brokerId, LocaleContextHolder.getLocale())), HttpStatus.OK);
     } catch (DataProcessorException ex) {
-      LOG.error(String.format("Error deleting broker: %s", brokerId), ex);
+      LOG.error(formatForLog("Error deleting broker: %s", brokerId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -159,10 +160,10 @@ public class BrokerController {
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BrokerResponse> updateBroker(@RequestBody EntityDefinition brokerDefinition, @PathVariable UUID brokerId) {
     try {
-      LOG.debug(String.format("PUT /rest/harvester/brokers/%s <-- %s", brokerId, brokerDefinition));
+      LOG.debug(formatForLog("PUT /rest/harvester/brokers/%s <-- %s", brokerId, brokerDefinition));
       return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().updateBroker(brokerId, brokerDefinition, LocaleContextHolder.getLocale())), HttpStatus.OK);
     } catch (DataProcessorException ex) {
-      LOG.error(String.format("Error updating broker: %s <-- %s", brokerId, brokerDefinition), ex);
+      LOG.error(formatForLog("Error updating broker: %s <-- %s", brokerId, brokerDefinition), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

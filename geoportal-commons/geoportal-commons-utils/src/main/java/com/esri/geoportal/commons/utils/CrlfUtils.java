@@ -29,7 +29,7 @@ public class CrlfUtils {
    * @param args arguments
    * @return formatted log message
    */
-  public static String formatForLog(String format, String...args) {
+  public static String formatForLog(String format, Object...args) {
     String msg = String.format(format, args);
     msg = msg.replace("\n", STD_REPLACEMENT).replace("\r", STD_REPLACEMENT);
     msg = ESAPI.encoder().encodeForXML(msg);
