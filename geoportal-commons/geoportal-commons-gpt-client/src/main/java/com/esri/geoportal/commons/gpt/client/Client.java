@@ -610,6 +610,9 @@ public class Client implements Closeable {
     LocalDateTime now = LocalDateTime.now();
     if (tokenInfo == null || tokenInfo.validTill.minusSeconds(60).isBefore(now)) {
       Token token = generateToken();
+      if (token.access_token==null) {
+        throw new IOException("Error obtaining access token");
+      }
       TokenInfo ti = new TokenInfo();
       ti.token = token;
       ti.validTill = now.plusSeconds(token.expires_in);
