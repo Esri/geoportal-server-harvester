@@ -21,6 +21,22 @@ import org.owasp.esapi.ESAPI;
  * CRLF utilities.
  */
 public class CrlfUtils {
+
+  /**
+   * Sanitizes string for log.
+   * @param msg message to sanitize
+   * @return sanitized message
+   */
+  public static String sanitizeForLog(String msg) {
+    String clean = msg != null ?  msg.replace('\n', '_').replace('\r', '_') : "";
+    if ( ESAPI.securityConfiguration().getLogEncodingRequired() ) {
+      clean = ESAPI.encoder().encodeForHTML(clean);
+      if (!msg.equals(clean)) {
+        clean += " (Encoded)";
+      }
+    }
+    return clean;
+  }
   
   /**
    * Formats string for the log entry.
@@ -30,14 +46,6 @@ public class CrlfUtils {
    */
   public static String formatForLog(String format, Object...args) {
     String msg = String.format(format, args);
-    
-    String clean = msg.replace('\n', '_').replace('\r', '_');
-    if ( ESAPI.securityConfiguration().getLogEncodingRequired() ) {
-      clean = ESAPI.encoder().encodeForHTML(msg);
-      if (!msg.equals(clean)) {
-        clean += " (Encoded)";
-      }
-    }
-    return clean;
+    return sanitizeForLog(msg);
   }
 }
