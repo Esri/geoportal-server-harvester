@@ -21,7 +21,6 @@ import org.owasp.esapi.ESAPI;
  * CRLF utilities.
  */
 public class CrlfUtils {
-  public static final String STD_REPLACEMENT = "_";
   
   /**
    * Formats string for the log entry.
@@ -31,8 +30,14 @@ public class CrlfUtils {
    */
   public static String formatForLog(String format, Object...args) {
     String msg = String.format(format, args);
-    msg = msg.replace("\n", STD_REPLACEMENT).replace("\r", STD_REPLACEMENT);
-    msg = ESAPI.encoder().encodeForXML(msg);
-    return msg;
+    
+    String clean = msg.replace('\n', '_').replace('\r', '_');
+    if ( ESAPI.securityConfiguration().getLogEncodingRequired() ) {
+      clean = ESAPI.encoder().encodeForHTML(msg);
+      if (!msg.equals(clean)) {
+        clean += " (Encoded)";
+      }
+    }
+    return clean;
   }
 }
