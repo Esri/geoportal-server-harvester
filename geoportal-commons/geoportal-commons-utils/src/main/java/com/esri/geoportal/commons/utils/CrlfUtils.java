@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.commons.utils;
 
-import org.owasp.esapi.ESAPI;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  * CRLF utilities.
@@ -29,11 +29,9 @@ public class CrlfUtils {
    */
   public static String sanitizeForLog(String msg) {
     String clean = msg != null ?  msg.replace('\n', '_').replace('\r', '_') : "";
-    if ( ESAPI.securityConfiguration().getLogEncodingRequired() ) {
-      clean = ESAPI.encoder().encodeForHTML(clean);
-      if (!msg.equals(clean)) {
-        clean += " (Encoded)";
-      }
+    clean = StringEscapeUtils.escapeHtml4(clean);
+    if (!msg.equals(clean)) {
+      clean += " (Encoded)";
     }
     return clean;
   }
