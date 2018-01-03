@@ -19,6 +19,7 @@ import com.esri.geoportal.commons.agp.client.AgpClient;
 import com.esri.geoportal.commons.agp.client.ContentResponse;
 import com.esri.geoportal.commons.agp.client.FolderEntry;
 import com.esri.geoportal.commons.agp.client.ItemEntry;
+import com.esri.geoportal.commons.agp.client.QueryResponse;
 import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.http.BotsHttpClient;
@@ -258,9 +259,15 @@ import com.esri.geoportal.commons.utils.XmlUtils;
     }
     
     private List<ItemEntry> list() throws URISyntaxException, IOException {
-      ContentResponse content = client.listContent(definition.getCredentials().getUserName(), definition.getFolderId(), size, from, generateToken(1));
-      from += size;
-      return content!=null && content.items!=null && content.items.length>0? Arrays.asList(content.items): null;
+      if (!definition.getCredentials().isEmpty()) {
+        ContentResponse content = client.listContent(definition.getCredentials().getUserName(), definition.getFolderId(), size, from, generateToken(1));
+        from += size;
+        return content!=null && content.items!=null && content.items.length>0? Arrays.asList(content.items): null;
+      } else {
+        QueryResponse content = client.listPublicContent(size, from);
+        from += size;
+        return content!=null && content.results!=null && content.results.length>0? Arrays.asList(content.results): null;
+      }
     }
     
   }

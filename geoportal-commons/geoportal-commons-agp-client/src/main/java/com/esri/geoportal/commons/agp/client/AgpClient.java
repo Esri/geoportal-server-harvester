@@ -356,6 +356,30 @@ public class AgpClient implements Closeable {
   }
   
   /**
+   * Lists public content. Only specified item types will be included. See config.properties file.
+   * @param num number items to return
+   * @param start start item
+   * @return content response
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public QueryResponse listPublicContent(long num, long start) throws URISyntaxException, IOException {
+    URIBuilder builder = new URIBuilder(searchUri());
+    
+    builder.setParameter("f", "json");
+    builder.setParameter("num", Long.toString(num));
+    builder.setParameter("start", Long.toString(start));
+    
+    String type = Arrays.stream(Config.readTypes()).map(s->StringUtils.trimToNull(s)).filter(s->s != null).collect(Collectors.joining(" OR "));
+    String q = String.format("type: (%s)", type);
+    builder.setParameter("q", q);
+    
+    HttpGet req = new HttpGet(builder.build());
+    
+    return execute(req,QueryResponse.class);
+  }
+  
+  /**
    * Lists folders.
    * @param owner owner
    * @param token token
