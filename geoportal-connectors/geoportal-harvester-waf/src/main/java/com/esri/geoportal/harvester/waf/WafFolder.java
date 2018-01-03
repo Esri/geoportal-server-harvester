@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.waf;
 
+import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -89,8 +90,8 @@ import org.slf4j.LoggerFactory;
       }
     }
     
-    LOG.debug(String.format("WAF FILES in %s: %s",folderUrl,files.toString()));
-    LOG.debug(String.format("WAF SUBFOLDERS in %s: %s",folderUrl,subFolders.toString()));
+    LOG.debug(formatForLog("WAF FILES in %s: %s",folderUrl,files.toString()));
+    LOG.debug(formatForLog("WAF SUBFOLDERS in %s: %s",folderUrl,subFolders.toString()));
 
     return new WafFolderContent(this, subFolders, files);
   }

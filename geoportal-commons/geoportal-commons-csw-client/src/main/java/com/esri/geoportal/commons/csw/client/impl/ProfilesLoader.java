@@ -54,6 +54,13 @@ public class ProfilesLoader {
     Profiles profiles = new Profiles();
     try (InputStream profilesXml = Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_FILE_PATH);) {
       DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+      builderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+      builderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+      builderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+      builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+      builderFactory.setXIncludeAware(false);
+      builderFactory.setExpandEntityReferences(false);
+      builderFactory.setNamespaceAware(true);
       DocumentBuilder builder = builderFactory.newDocumentBuilder();
       
       Document profilesDom = builder.parse(new InputSource(profilesXml));

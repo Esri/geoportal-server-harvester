@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.rest;
 
+import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.engine.services.Engine;
 import org.springframework.http.MediaType;
@@ -190,7 +191,7 @@ public class ConnectorController {
    */
   @RequestMapping(value = "/rest/harvester/connectors/inbound/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate getInboundConnector(@PathVariable String id) {
-    LOG.debug(String.format("GET /rest/harvester/connectors/inbound/%s", id));
+    LOG.debug(formatForLog("GET /rest/harvester/connectors/inbound/%s", id));
     return engine.getTemplatesService().getInboundConnectorTemplates(LocaleContextHolder.getLocale()).stream().filter(a->a.getType().equals(id)).findFirst().orElse(null);
   }
   
@@ -201,7 +202,7 @@ public class ConnectorController {
    */
   @RequestMapping(value = "/rest/harvester/connectors/outbound/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate getOutboundConnector(@PathVariable String id) {
-    LOG.debug(String.format("GET /rest/harvester/connectors/outbound/%s", id));
+    LOG.debug(formatForLog("GET /rest/harvester/connectors/outbound/%s", id));
     return engine.getTemplatesService().getOutboundConnectorTemplates(LocaleContextHolder.getLocale()).stream().filter(a->a.getType().equals(id)).findFirst().orElse(null);
   }
 }

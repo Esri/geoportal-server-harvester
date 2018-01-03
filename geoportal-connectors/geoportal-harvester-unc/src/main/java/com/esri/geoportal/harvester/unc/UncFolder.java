@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.unc;
 
+import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
@@ -77,12 +78,12 @@ import org.slf4j.LoggerFactory;
           files.add(new UncFile(broker, f));
         }
       } catch (IOException ex) {
-        LOG.warn(String.format("Error processing path element: %s", f), ex);
+        LOG.warn(formatForLog("Error processing path element: %s", f), ex);
       }
     });
     
-    LOG.debug(String.format("UNC FILES in %s: %s",folder,files.toString()));
-    LOG.debug(String.format("UNC SUBFOLDERS in %s: %s",folder,subFolders.toString()));
+    LOG.debug(formatForLog("UNC FILES in %s: %s",folder,files.toString()));
+    LOG.debug(formatForLog("UNC SUBFOLDERS in %s: %s",folder,subFolders.toString()));
     
     return new UncFolderContent(this, subFolders, files);
   }

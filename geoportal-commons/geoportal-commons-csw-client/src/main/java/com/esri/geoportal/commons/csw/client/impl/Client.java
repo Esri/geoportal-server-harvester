@@ -59,6 +59,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import org.apache.batik.util.XMLConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.http.client.HttpResponseException;
@@ -264,6 +265,12 @@ public class Client implements IClient {
 
       // create internal request DOM
       DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+      builderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+      builderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+      builderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+      builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+      builderFactory.setXIncludeAware(false);
+      builderFactory.setExpandEntityReferences(false);
       DocumentBuilder builder = builderFactory.newDocumentBuilder();
       Document internalRequestDOM = builder.parse(new InputSource(internalRequestInputStream));
 
@@ -304,6 +311,12 @@ public class Client implements IClient {
 
       // create internal request DOM
       DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+      builderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+      builderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+      builderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+      builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+      builderFactory.setXIncludeAware(false);
+      builderFactory.setExpandEntityReferences(false);
       DocumentBuilder builder = builderFactory.newDocumentBuilder();
       Document resultDom = builder.parse(new InputSource(transformedContentStream));
 

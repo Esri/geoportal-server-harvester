@@ -16,9 +16,9 @@
 
 define(["dojo/_base/declare",
         "dojo/_base/lang",
-        "dojox/encoding/digests/MD5"
+        "dojox/encoding/digests/SHA256"
       ],
-  function(declare,lang,MD5){
+  function(declare,lang,dig){
   
     return {
       encode: function(text) {
@@ -29,11 +29,11 @@ define(["dojo/_base/declare",
       },
       
       decode: function(text) {
-        if (text.length<24) {
+        if (text.length<44) {
           return text;
         }
-        var crc = text.substr(0,24);
-        var encoded = text.slice(24);
+        var crc = text.substr(0,44);
+        var encoded = text.slice(44);
         
         var decoded = atob(encoded);
         if (this._hash(decoded)!=crc) {
@@ -44,7 +44,7 @@ define(["dojo/_base/declare",
       },
 
       _hash: function (string) {
-        return MD5(string);
+        return dig(string);
       }
     };
 });

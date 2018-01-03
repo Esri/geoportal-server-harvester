@@ -15,6 +15,7 @@
 package com.esri.geoportal.commons.robots;
 
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
+import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -102,7 +103,7 @@ public class BotsParser {
    */
   public Bots readRobotsTxt(MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, URL serverUrl) {
     if (serverUrl != null) {
-      LOG.info(String.format("Accessing robots.txt for: %s", serverUrl.toExternalForm()));
+      LOG.info(formatForLog("Accessing robots.txt for: %s", serverUrl.toExternalForm()));
       try {
         URL robotsTxtUrl = getRobotsTxtUrl(serverUrl);
         if (robotsTxtUrl != null) {
@@ -114,14 +115,13 @@ public class BotsParser {
             InputStream responseStream = response.getEntity().getContent();
             Bots robots = BotsParser.this.readRobotsTxt(matchingStrategy, winningStrategy, responseStream);
             if (robots != null) {
-              LOG.info(String.format("Received Robotx.txt for: %s", serverUrl.toExternalForm()));
-              LOG.debug(String.format("Robotx.txt for: %s\n%s", serverUrl.toExternalForm(), robots.toString()));
+              LOG.info(formatForLog("Received Robotx.txt for: %s", serverUrl.toExternalForm()));
             }
             return robots;
           }
         }
       } catch (IOException ex) {
-        LOG.debug(String.format("Unable to access robots.txt for: %s", serverUrl.toExternalForm()));
+        LOG.debug(formatForLog("Unable to access robots.txt for: %s", serverUrl.toExternalForm()));
         LOG.debug("",ex);
       }
     }
@@ -138,21 +138,12 @@ public class BotsParser {
    */
   public Bots readRobotsTxt(MatchingStrategy matchingStrategy, WinningStrategy winningStrategy, InputStream robotsTxt) {
     Bots robots = null;
-    BotsReader reader = null;
 
-    try {
-      reader = new BotsReader(getUserAgent(), matchingStrategy, winningStrategy, robotsTxt);
+    try (BotsReader reader = new BotsReader(getUserAgent(), matchingStrategy, winningStrategy, robotsTxt);) {
       robots = reader.readRobotsTxt();
     } catch (IOException ex) {
       LOG.warn("Unable to parse robots.txt", ex);
       return null;
-    } finally {
-      if (reader != null) {
-        try {
-          reader.close();
-        } catch (IOException ex) {
-        }
-      }
     }
 
     return robots;

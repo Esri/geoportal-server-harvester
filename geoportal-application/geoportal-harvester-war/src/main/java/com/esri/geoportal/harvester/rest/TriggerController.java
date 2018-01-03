@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.rest;
 
+import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -84,7 +85,7 @@ public class TriggerController {
   @RequestMapping(value = "/rest/harvester/triggers/{triggerId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TriggerResponse> deactivateTrigger(@PathVariable UUID triggerId) {
     try {
-      LOG.debug(String.format("DELETE /rest/harvester/triggers/%s", triggerId));
+      LOG.debug(formatForLog("DELETE /rest/harvester/triggers/%s", triggerId));
       TriggerReference trigRef = engine.getTriggersService().deactivateTriggerInstance(triggerId);
       return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), trigRef.getTaskId(), trigRef.getTriggerDefinition()),HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {

@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine.utils;
 
+import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ProcessInstance;
@@ -81,7 +82,7 @@ public class HistoryManagerAdaptor extends BaseProcessInstanceListener {
           try {
             historyManager.create(event);
           } catch (CrudlException ex) {
-            LOG.error(String.format("Error creating history event for: %s", uuid), ex);
+            LOG.error(formatForLog("Error creating history event for: %s", uuid), ex);
           }
         }
         break;

@@ -40,6 +40,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 
 /**
  * 'At' trigger. Triggers harvesting at the specific time.
@@ -262,7 +263,7 @@ public class AtTrigger implements Trigger {
                 return cal.get(Calendar.DAY_OF_WEEK)==n;
               });
             } catch (NumberFormatException ex) {
-              LOG.warn(String.format("Invalid day of the week definition", str), ex);
+              LOG.warn(formatForLog("Invalid day of the week definition: %s", str), ex);
             }
           });
           predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));
@@ -283,7 +284,7 @@ public class AtTrigger implements Trigger {
                 return cal.get(Calendar.WEEK_OF_MONTH)==n;
               });
             } catch (NumberFormatException ex) {
-              LOG.warn(String.format("Invalid week of the month definition", str), ex);
+              LOG.warn(formatForLog("Invalid week of the month definition: %s", str), ex);
             }
           });
           predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));
@@ -304,7 +305,7 @@ public class AtTrigger implements Trigger {
                 return cal.get(Calendar.MONTH)==n;
               });
             } catch (NumberFormatException ex) {
-              LOG.warn(String.format("Invalid month definition", str), ex);
+              LOG.warn(formatForLog("Invalid month definition: %s", str), ex);
             }
           });
           predicates.add((d)->pred.stream().map(p->p.test(d)).anyMatch(b->b==true));

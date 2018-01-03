@@ -11,16 +11,32 @@
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
+  
   <servlet-mapping>
     <servlet-name>spring</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
+  
   <session-config>
     <session-timeout>
       30
     </session-timeout>
   </session-config>
+  
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
+  
+  <error-page>
+    <exception-type>java.lang.Throwable</exception-type>
+    <location>/error.html</location>
+  </error-page>
+  <error-page>
+    <error-code>404</error-code>
+    <location>/error.html</location>
+  </error-page>
+  <error-page>
+    <error-code>500</error-code>
+    <location>/error.html</location>
+  </error-page>  
 </web-app>

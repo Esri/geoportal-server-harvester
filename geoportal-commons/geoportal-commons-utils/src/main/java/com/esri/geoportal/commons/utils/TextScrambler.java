@@ -50,13 +50,13 @@ public class TextScrambler {
    * @return decoded string
    */
   public static String decode(String str) {
-    if (str.length()<16) {
+    if (str.length()<44) {
       return str;
     }
     
     try {
-      String sCrc = str.substring(0,24);
-      String encText = str.substring(24);
+      String sCrc = str.substring(0,44);
+      String encText = str.substring(44);
       
       Base64.Decoder decoder = Base64.getDecoder();
       byte[] decoded = decoder.decode(encText.getBytes("UTF-8"));
@@ -73,7 +73,7 @@ public class TextScrambler {
   }
   
   private static String hash(String string) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-    MessageDigest md = MessageDigest.getInstance("MD5");
+    MessageDigest md = MessageDigest.getInstance("SHA-256");
     md.update(string.getBytes("UTF-8"));
     byte[] digest = md.digest();
     Base64.Encoder encoder = Base64.getEncoder();

@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine.defaults;
 
+import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Initializable.InitContext;
 import com.esri.geoportal.harvester.api.ProcessInstance;
@@ -121,7 +122,7 @@ public class DefaultProcessor implements Processor {
       this.task = task;
       this.thread = new Thread(() -> {
         InitContext initContext = new SimpleInitContext(task,listeners);
-        LOG.info(String.format("Started harvest: %s", getTitle()));
+        LOG.info(formatForLog("Started harvest: %s", getTitle()));
         
         if (!task.getDataDestinations().isEmpty()) {
           try {
@@ -138,23 +139,23 @@ public class DefaultProcessor implements Processor {
               task.getDataDestinations().stream().forEach((d) -> {
                 try {
                   PublishingStatus status = d.push(dataReference);
-                  LOG.debug(String.format("Harvested %s during %s", dataReference, getTitle()));
+                  LOG.debug(formatForLog("Harvested %s during %s", dataReference, getTitle()));
                   onSuccess(dataReference, status);
                 } catch (DataProcessorException ex) {
-                  LOG.warn(String.format("Failed harvesting %s during %s", dataReference, getTitle()));
+                  LOG.warn(formatForLog("Failed harvesting %s during %s", dataReference, getTitle()));
                   onError(ex);
                 } catch (DataOutputException ex) {
-                  LOG.warn(String.format("Failed harvesting %s during %s", dataReference, getTitle()));
+                  LOG.warn(formatForLog("Failed harvesting %s during %s", dataReference, getTitle()));
                   onError(ex);
                 }
               });
             }
             
           } catch (DataInputException ex) {
-            LOG.error(String.format("Error harvesting of %s", getTitle()), ex);
+            LOG.error(formatForLog("Error harvesting of %s", getTitle()), ex);
             onError(ex);
           } catch (DataProcessorException ex) {
-            LOG.error(String.format("Error harvesting of %s", getTitle()), ex);
+            LOG.error(formatForLog("Error harvesting of %s", getTitle()), ex);
             onError(ex);
           } finally {
             terminate();
@@ -207,7 +208,7 @@ public class DefaultProcessor implements Processor {
     @Override
     public synchronized void begin() {
       if (getStatus() != ProcessInstance.Status.submitted) {
-        throw new IllegalStateException(String.format("Error begininig the process: process is in %s state", getStatus()));
+        throw new IllegalStateException(formatForLog("Error begininig the process: process is in %s state", getStatus()));
       }
       thread.start();
     }
@@ -218,9 +219,9 @@ public class DefaultProcessor implements Processor {
     @Override
     public synchronized void abort() {
       if (getStatus() != ProcessInstance.Status.working) {
-        throw new IllegalStateException(String.format("Error aborting the process: process is in %s state", getStatus()));
+        throw new IllegalStateException(formatForLog("Error aborting the process: process is in %s state", getStatus()));
       }
-      LOG.info(String.format("Aborting process: %s", getTitle()));
+      LOG.info(formatForLog("Aborting process: %s", getTitle()));
       aborting = true;
       onStatusChange();
       thread.interrupt();

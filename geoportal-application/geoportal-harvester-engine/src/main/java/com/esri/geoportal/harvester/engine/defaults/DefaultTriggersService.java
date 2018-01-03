@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine.defaults;
 
+import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.api.Trigger;
 import com.esri.geoportal.harvester.api.TriggerInstance;
@@ -93,7 +94,7 @@ public class DefaultTriggersService implements TriggersService {
   public TriggerReference deactivateTriggerInstance(UUID triggerInstanceUuid) throws InvalidDefinitionException, DataProcessorException {
     TaskUuidTriggerInstancePair pair = triggerInstanceManager.remove(triggerInstanceUuid);
     if (pair == null) {
-      throw new InvalidDefinitionException(String.format("Invalid trigger id: %s", triggerInstanceUuid));
+      throw new InvalidDefinitionException(formatForLog("Invalid trigger id: %s", triggerInstanceUuid));
     }
     try {
       TriggerDefinition trigDef = pair.getTriggerInstance().getTriggerDefinition();
@@ -101,12 +102,12 @@ public class DefaultTriggersService implements TriggersService {
       pair.getTriggerInstance().deactivate();
       return triggerReference;
     } catch (Exception ex) {
-      throw new DataProcessorException(String.format("Error deactivating trigger: %s", triggerInstanceUuid), ex);
+      throw new DataProcessorException(formatForLog("Error deactivating trigger: %s", triggerInstanceUuid), ex);
     } finally {
       try {
         triggerManager.delete(triggerInstanceUuid);
       } catch (CrudlException ex) {
-        LOG.warn(String.format("Error deleting trigger: %s", triggerInstanceUuid), ex);
+        LOG.warn(formatForLog("Error deleting trigger: %s", triggerInstanceUuid), ex);
       }
     }
   }
@@ -137,7 +138,7 @@ public class DefaultTriggersService implements TriggersService {
         try {
           Trigger trigger = getTrigger(definition.getTriggerDefinition().getType());
           if (trigger==null) {
-            throw new InvalidDefinitionException(String.format("Invalid trigger type: %s", definition.getTriggerDefinition().getType()));
+            throw new InvalidDefinitionException(formatForLog("Invalid trigger type: %s", definition.getTriggerDefinition().getType()));
           }
           TriggerInstance triggerInstance = trigger.createInstance(definition.getTriggerDefinition());
           
@@ -149,7 +150,7 @@ public class DefaultTriggersService implements TriggersService {
           TriggerInstance.Context context = new TriggerContext(definition.getTaskUuid());
           triggerInstance.activate(context);
         } catch (DataProcessorException|InvalidDefinitionException ex) {
-          LOG.warn(String.format("Error creating and activating trigger instance: %s -> %s", uuid, definition), ex);
+          LOG.warn(formatForLog("Error creating and activating trigger instance: %s -> %s", uuid, definition), ex);
         }
       });
     } catch (CrudlException ex) {
@@ -185,7 +186,7 @@ public class DefaultTriggersService implements TriggersService {
       triggerInstance.activate(context);
       return new TriggerReference(uuid, taskId, trigDef);
     } catch (CrudlException ex) {
-      throw new DataProcessorException(String.format("Error scheduling task: %s", trigDef.getTaskDefinition()), ex);
+      throw new DataProcessorException(formatForLog("Error scheduling task: %s", trigDef.getTaskDefinition()), ex);
     }
   }
   
@@ -226,7 +227,7 @@ public class DefaultTriggersService implements TriggersService {
           return null;
         }
       } catch (CrudlException ex) {
-        throw new DataProcessorException(String.format("Error getting last harvest for: %s", taskId), ex);
+        throw new DataProcessorException(formatForLog("Error getting last harvest for: %s", taskId), ex);
       }
     }
   }

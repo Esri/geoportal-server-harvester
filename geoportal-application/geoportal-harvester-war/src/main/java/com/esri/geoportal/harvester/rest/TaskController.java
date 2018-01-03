@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.rest;
 
+import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.harvester.api.base.SimpleIteratorContext;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.support.TaskResponse;
@@ -184,14 +185,14 @@ public class TaskController {
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TaskResponse> getTask(@PathVariable UUID taskId) {
     try {
-      LOG.debug(String.format("GET /rest/harvester/tasks/%s", taskId));
+      LOG.debug(formatForLog("GET /rest/harvester/tasks/%s", taskId));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
       if (taskDefinition == null) {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
       }
       return new ResponseEntity<>(new TaskResponse(taskId, taskDefinition), HttpStatus.OK);
     } catch (DataProcessorException ex) {
-      LOG.error(String.format("Error getting task: %s", taskId), ex);
+      LOG.error(formatForLog("Error getting task: %s", taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -205,7 +206,7 @@ public class TaskController {
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/export", method = RequestMethod.GET)
   public ResponseEntity<String> export(@PathVariable UUID taskId) {
     try {
-      LOG.debug(String.format("GET /rest/harvester/tasks/%s", taskId));
+      LOG.debug(formatForLog("GET /rest/harvester/tasks/%s", taskId));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
       if (taskDefinition == null) {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -218,7 +219,7 @@ public class TaskController {
       ResponseEntity<String> responseEntity = new ResponseEntity<>(mapper.writeValueAsString(taskDefinition), headers, HttpStatus.OK);
       return responseEntity;
     } catch (DataProcessorException | JsonProcessingException ex) {
-      LOG.error(String.format("Error getting task: %s", taskId), ex);
+      LOG.error(formatForLog("Error getting task: %s", taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -232,11 +233,11 @@ public class TaskController {
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/history", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<List<EventResponse>> getTaskHistory(@PathVariable UUID taskId) {
     try {
-      LOG.debug(String.format("GET /rest/harvester/tasks/%s/history", taskId));
+      LOG.debug(formatForLog("GET /rest/harvester/tasks/%s/history", taskId));
       List<History.Event> history = engine.getTasksService().getHistory(taskId);
       return new ResponseEntity<>(history.stream().map(e -> new EventResponse(e)).collect(Collectors.toList()), HttpStatus.OK);
     } catch (DataProcessorException ex) {
-      LOG.error(String.format("Error getting task: %s", taskId), ex);
+      LOG.error(formatForLog("Error getting task: %s", taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -250,11 +251,11 @@ public class TaskController {
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/history", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Void> purgeHistory(@PathVariable UUID taskId) {
     try {
-      LOG.debug(String.format("DELETE /rest/harvester/tasks/%s/history", taskId));
+      LOG.debug(formatForLog("DELETE /rest/harvester/tasks/%s/history", taskId));
       engine.getTasksService().purgeHistory(taskId);
       return new ResponseEntity<>(HttpStatus.OK);
     } catch (DataProcessorException ex) {
-      LOG.error(String.format("Error purging history for task: %s", taskId), ex);
+      LOG.error(formatForLog("Error purging history for task: %s", taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -269,7 +270,7 @@ public class TaskController {
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TaskResponse> deleteTask(@PathVariable UUID taskId) {
     try {
-      LOG.debug(String.format("DELETE /rest/harvester/tasks/%s", taskId));
+      LOG.debug(formatForLog("DELETE /rest/harvester/tasks/%s", taskId));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
       if (taskDefinition != null) {
         List<TriggerReference> triggers = engine.getTriggersService().listActivatedTriggers(taskId);
@@ -280,7 +281,7 @@ public class TaskController {
       }
       return new ResponseEntity<>(new TaskResponse(taskId, taskDefinition), HttpStatus.OK);
     } catch (DataProcessorException|InvalidDefinitionException ex) {
-      LOG.error(String.format("Error deleting task: %s", taskId), ex);
+      LOG.error(formatForLog("Error deleting task: %s", taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -294,11 +295,11 @@ public class TaskController {
   @RequestMapping(value = "/rest/harvester/tasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TaskResponse> addTask(@RequestBody TaskDefinition taskDefinition) {
     try {
-      LOG.debug(String.format("POST /rest/harvester/tasks <-- %s", taskDefinition));
+      LOG.debug(formatForLog("POST /rest/harvester/tasks <-- %s", taskDefinition));
       UUID id = engine.getTasksService().addTaskDefinition(taskDefinition);
       return new ResponseEntity<>(new TaskResponse(id, taskDefinition), HttpStatus.OK);
     } catch (DataProcessorException ex) {
-      LOG.error(String.format("Error adding task: %s", taskDefinition), ex);
+      LOG.error(formatForLog("Error adding task: %s", taskDefinition), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -314,11 +315,11 @@ public class TaskController {
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TaskResponse> updateTask(@RequestBody TaskDefinition taskDefinition, @PathVariable UUID taskId) {
     try {
-      LOG.debug(String.format("PUT /rest/harvester/tasks/%s <-- %s", taskId, taskDefinition));
+      LOG.debug(formatForLog("PUT /rest/harvester/tasks/%s <-- %s", taskId, taskDefinition));
       TaskDefinition oldTaskDef = engine.getTasksService().updateTaskDefinition(taskId, taskDefinition);
       return new ResponseEntity<>(oldTaskDef != null ? new TaskResponse(taskId, oldTaskDef) : null, HttpStatus.OK);
     } catch (DataProcessorException ex) {
-      LOG.error(String.format("Error updating task: %s <-- %s", taskId, taskDefinition), ex);
+      LOG.error(formatForLog("Error updating task: %s <-- %s", taskId, taskDefinition), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -335,7 +336,7 @@ public class TaskController {
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/execute", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessResponse> executeTask(@PathVariable UUID taskId, @RequestParam(required = false) Boolean ignoreRobots, @RequestParam(required = false) Boolean incremental) {
     try {
-      LOG.debug(String.format("POST /rest/harvester/tasks/%s/execute", taskId));
+      LOG.debug(formatForLog("POST /rest/harvester/tasks/%s/execute", taskId));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
       if (taskDefinition == null) {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -382,7 +383,7 @@ public class TaskController {
   @RequestMapping(value = "/rest/harvester/tasks/execute", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessResponse> executeTask(@RequestBody TaskDefinition taskDefinition) {
     try {
-      LOG.debug(String.format("POST /rest/harvester/tasks/execute <-- %s", taskDefinition));
+      LOG.debug(formatForLog("POST /rest/harvester/tasks/execute <-- %s", taskDefinition));
       ProcessReference ref = engine.getExecutionService().execute(taskDefinition, new SimpleIteratorContext());
       ref.getProcess().init();
       ref.getProcess().begin();
@@ -409,7 +410,7 @@ public class TaskController {
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/schedule", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId, @RequestParam(required = false) Boolean incremental) {
     try {
-      LOG.debug(String.format("POST /rest/harvester/tasks/%s/schedule <-- %s", taskId, triggerDefinition));
+      LOG.debug(formatForLog("POST /rest/harvester/tasks/%s/schedule <-- %s", taskId, triggerDefinition));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
       if (taskDefinition == null) {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -442,7 +443,7 @@ public class TaskController {
 
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/triggers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<List<TriggerResponse>> listTriggers(@PathVariable UUID taskId) {
-    LOG.debug(String.format("GET /rest/harvester/tasks/%s/triggers", taskId));
+    LOG.debug(formatForLog("GET /rest/harvester/tasks/%s/triggers", taskId));
     List<TriggerResponse> triggerResponses = engine.getTriggersService().listActivatedTriggers(taskId).stream()
             .map(t -> new TriggerResponse(t.getUuid(), t.getTaskId(), t.getTriggerDefinition()))
             .collect(Collectors.toList());
@@ -459,7 +460,7 @@ public class TaskController {
   @RequestMapping(value = "/rest/harvester/tasks/schedule", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody TriggerDefinition trigDef) {
     try {
-      LOG.debug(String.format("POST /rest/harvester/tasks/schedule <-- %s", trigDef));
+      LOG.debug(formatForLog("POST /rest/harvester/tasks/schedule <-- %s", trigDef));
       TriggerReference trigRef = engine.getTriggersService().schedule(null, trigDef, new SimpleIteratorContext());
       return new ResponseEntity<>(new TriggerResponse(trigRef.getUuid(), null, trigRef.getTriggerDefinition()), HttpStatus.OK);
     } catch (InvalidDefinitionException ex) {
@@ -474,7 +475,7 @@ public class TaskController {
     try (InputStream inputStream = file.getInputStream()) {
       try {
         TaskDefinition taskDefinition = deserialize(inputStream,TaskDefinition.class);
-        LOG.debug(String.format("POST /rest/harvester/tasks/upload <-- %s", taskDefinition));
+        LOG.debug(formatForLog("POST /rest/harvester/tasks/upload <-- %s", taskDefinition));
         UUID id = engine.getTasksService().addTaskDefinition(taskDefinition);
         return new ResponseEntity<>(new TaskResponse(id, taskDefinition), HttpStatus.OK);
       } catch (IOException|DataProcessorException ex) {
