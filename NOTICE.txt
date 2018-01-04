@@ -22,6 +22,7 @@ Apache Commons Codec (dependency of 3rd party libraries)
 Apache Commons FileUpload
 Apache Commons IO
 Apache Commons Lang
+Apache Commons Text
 Logging (dependency of 3rd party libraries)
 -------------------------------------------------------------------------------
 © 2002-2016 The Apache Software Foundation
