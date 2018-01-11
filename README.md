@@ -8,7 +8,7 @@ For details about geoportal server harvester, please visit the [wiki](https://gi
 To report an issue, please go to [issues](https://github.com/Esri/geoportal-server-harvester/issues).
 
 ## Releases and Downloads
-- 2.5.0 - Released February 22, 2017, click [here](https://github.com/Esri/geoportal-server-harvester/releases) for release notes and downloads.  
+- 2.5.1 - Released January 11, 2018, click [here](https://github.com/Esri/geoportal-server-harvester/releases) for release notes and downloads.  
 
 ## Features
 
