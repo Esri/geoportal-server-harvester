@@ -25,9 +25,11 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.Period;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -157,8 +159,8 @@ public class PeriodTrigger implements Trigger {
           LOG.info(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition()));
           future = service.submit(runnable);
         } else {
-          Period period = parsePeriod(triggerDefinition.getProperties().get(T_PERIOD));
-          Instant due = (Instant)period.addTo(lastHarvest.toInstant());
+          TemporalAmount tempAmt = parseTemporalAmount(triggerDefinition.getProperties().get(T_PERIOD));
+          Instant due = (Instant)tempAmt.addTo(lastHarvest.toInstant());
           
           long delay = (due.toEpochMilli()-new Date().getTime())/1000/60;
           if (delay>0) {
@@ -176,16 +178,20 @@ public class PeriodTrigger implements Trigger {
   }
     
   /**
-   * Parses minute of the day. Format: HH:mm.
+   * Parses temporal amount.
    * @param strPeriod period
    * @return period
    * @throws ParseException if invalid minute of the day definition
    */
-  private static Period parsePeriod(String strPeriod) throws ParseException {
+  private static TemporalAmount parseTemporalAmount(String strPeriod) throws ParseException {
     try {
       return Period.parse(strPeriod);
-    } catch (DateTimeParseException ex) {
-      throw new ParseException(String.format("Invalid period: %s", strPeriod), 0);
+    } catch (DateTimeParseException thenTryAgain) {
+      try {
+        return Duration.parse(strPeriod);
+      } catch (DateTimeParseException ex) {
+        throw new ParseException(String.format("Invalid period: %s", strPeriod), 0);
+      }
     }
   }
 }

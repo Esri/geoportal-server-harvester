@@ -25,6 +25,7 @@ define({
     },
     
     periodical: {
+      hourly: "Hourly",
       daily: "Daily",
       weekly: "Weekly",
       biweekly: "Bi-weekly",

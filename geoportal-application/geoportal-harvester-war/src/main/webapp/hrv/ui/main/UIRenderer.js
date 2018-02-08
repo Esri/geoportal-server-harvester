@@ -188,6 +188,7 @@ define(["dojo/_base/declare",
       renderPeriod: function(placeholderNode,arg) {
         var rootNode = domConstruct.create("div",null,placeholderNode);
         var rendHandlers = [];
+        rendHandlers.push(this.renderRadio(rootNode,arg.name,"PT1H",i18n.periodical.hourly));
         rendHandlers.push(this.renderRadio(rootNode,arg.name,"P1D",i18n.periodical.daily));
         rendHandlers.push(this.renderRadio(rootNode,arg.name,"P1W",i18n.periodical.weekly));
         rendHandlers.push(this.renderRadio(rootNode,arg.name,"P2W",i18n.periodical.biweekly));
