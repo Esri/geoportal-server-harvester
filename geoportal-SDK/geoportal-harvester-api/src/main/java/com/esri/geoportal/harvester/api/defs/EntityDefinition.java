@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Entity definition.
@@ -138,12 +139,12 @@ public final class EntityDefinition implements Serializable {
     if (o instanceof EntityDefinition) {
       EntityDefinition ed = (EntityDefinition)o;
       return ((getType()!=null && ed.getType()!=null && getType().equals(ed.getType()) || (getType()==null && ed.getType()==null))) && 
-              getProperties().equals(ed.getProperties());
+              getCleanProperties(getProperties()).equals(getCleanProperties(ed.getProperties()));
     }
 
     return false;
   }
-
+  
   @Override
   public int hashCode() {
     int hash = 5;
@@ -220,4 +221,9 @@ public final class EntityDefinition implements Serializable {
     }
     
   }
+  
+  private Map<String,String> getCleanProperties(Map<String,String> props) {
+    return props.entrySet().stream().filter(e -> !StringUtils.isBlank(e.getValue())).collect(Collectors.toMap(Map.Entry<String,String>::getKey, Map.Entry<String,String>::getValue));
+  }
+
 }
