@@ -42,8 +42,8 @@ define(["dojo/_base/declare",
         return xhr.post("rest/harvester/tasks/"+id+"/execute?"+(ignoreRobots? "&ignoreRobots="+ignoreRobots: "")+(incremental? "&incremental="+incremental: ""),{handleAs: "json", headers: {"Content-Type": "application/json"}});
       },
       
-      schedule: function(id, triggerDefinition) {
-        return xhr.post("rest/harvester/tasks/"+id+"/schedule",{data: triggerDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
+      schedule: function(id, triggerDefinition, ignoreRobots, incremental) {
+        return xhr.post("rest/harvester/tasks/"+id+"/schedule?"+(ignoreRobots? "&ignoreRobots="+ignoreRobots: "")+(incremental? "&incremental="+incremental: ""),{data: triggerDefinition, handleAs: "json", headers: {"Content-Type": "application/json"}});
       },
       
       history: function(id) {

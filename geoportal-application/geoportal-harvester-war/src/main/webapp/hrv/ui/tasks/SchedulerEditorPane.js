@@ -70,7 +70,6 @@ define(["dojo/_base/declare",
         
         setTimeout(lang.hitch(this,function(){
           this.rendHandler.init(this.data);
-          //this.formWidget.setValues(this.data);
         }),100);
         
       },
@@ -109,7 +108,7 @@ define(["dojo/_base/declare",
           triggerDefinition.type = values.type;
           this.rendHandler.read(triggerDefinition.properties);
           delete triggerDefinition.properties.type;
-          this.emit("submit",{triggerDefinition: triggerDefinition});
+          this.emit("submit",{triggerDefinition: triggerDefinition, ignoreRobots: this.ignoreRobots.checked, incremental: this.incremental.checked});
         }
       }
     });

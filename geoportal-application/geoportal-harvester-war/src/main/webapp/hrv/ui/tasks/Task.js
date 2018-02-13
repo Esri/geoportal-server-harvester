@@ -139,7 +139,7 @@ define(["dojo/_base/declare",
 
                   all(deferred).then(lang.hitch(this,function(response){
                     if (evt.triggerDefinition.type!=="NULL") {
-                      TasksREST.schedule(this.data.uuid,json.stringify(evt.triggerDefinition)).then(
+                      TasksREST.schedule(this.data.uuid,json.stringify(evt.triggerDefinition), evt.ignoreRobots, evt.incremental).then(
                         lang.hitch(this,function(response){
                           close();
                         }),

@@ -7,9 +7,14 @@
           <select name="type" data-dojo-type="dijit/form/Select" data-dojo-attach-point="typeSelector" data-dojo-attach-event="onChange:_onTypeChanged"></select>
         </span>
       </div>
+    </div>
+    
+    <div class="h-editor-footer">
+      <button data-dojo-type='dijit/form/CheckBox' id='ignoreRobotsSch' data-dojo-attach-point="ignoreRobots"></button>
+      <label for='ignoreRobotsSch'>${i18n.tasks.runDialog.ignoreRobots}</label><br>
+      <button data-dojo-type='dijit/form/CheckBox' id='incrementalSch' data-dojo-attach-point="incremental"></button>
+      <label for='incrementalSch'>${i18n.tasks.runDialog.incremental}</label><br>
+      <button data-dojo-type="dijit/form/Button" data-dojo-attach-event="onClick:_onSubmit">${i18n.tasks.scheduler.submit}</button>
+    </div>
   </div>
-  
-  <div class="h-editor-footer">
-    <button data-dojo-type="dijit/form/Button" data-dojo-attach-event="onClick:_onSubmit">${i18n.tasks.scheduler.submit}</button>
-  </div>
-</div>
+</div>  
