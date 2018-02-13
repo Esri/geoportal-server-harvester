@@ -102,7 +102,8 @@ define({
       runDialog: {
         title: "Run task?",
         content: "Please, confirm executing task:<br>${title}",
-        ignoreRobots: "Ignore robots.txt"
+        ignoreRobots: "Ignore robots.txt",
+        incremental: "Incremental"
       },
       errors: {
         typesLoadingError: "Unable to load trigger types."

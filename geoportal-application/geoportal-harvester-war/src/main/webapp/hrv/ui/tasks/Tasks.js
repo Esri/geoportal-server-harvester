@@ -104,7 +104,7 @@ define(["dojo/_base/declare",
       
       _onRun: function(evt) {
         var data = evt.data;
-        TasksREST.execute(data.uuid,data.taskDefinition.ignoreRobotsTxt).then(
+        TasksREST.execute(data.uuid,data.taskDefinition.ignoreRobotsTxt, data.taskDefinition.incremental).then(
           lang.hitch(this,function(){
             this.load();
           }),

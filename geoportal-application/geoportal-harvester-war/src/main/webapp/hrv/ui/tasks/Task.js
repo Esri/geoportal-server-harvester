@@ -74,18 +74,28 @@ define(["dojo/_base/declare",
         var dlg = new ConfirmDialog({
           title: this.i18n.tasks.runDialog.title,
           content: string.substitute(this.i18n.tasks.runDialog.content,{title: TaskUtils.makeLabel(this.data.taskDefinition)})+
-                  "<div class='h-tasks-run-dialog-options'><button data-dojo-type='dijit/form/CheckBox' id='ignoreRobots'></button><label for='ignoreRobots'>" +this.i18n.tasks.runDialog.ignoreRobots+ "</label></div>",
+                  "<div class='h-tasks-run-dialog-options'>"+
+                  "<button data-dojo-type='dijit/form/CheckBox' id='ignoreRobots'></button>"+
+                  "<label for='ignoreRobots'>" +this.i18n.tasks.runDialog.ignoreRobots+ "</label><br>"+
+                  "<button data-dojo-type='dijit/form/CheckBox' id='incremental'></button>"+
+                  "<label for='incremental'>" +this.i18n.tasks.runDialog.incremental+ "</label>"+
+                  "</div>",
           "class": "h-tasks-run-dialog",
           parseOnLoad: true,
           onExecute: lang.hitch(this,function(){
             var ignoreRobots = registry.byId("ignoreRobots");
             this.data.taskDefinition.ignoreRobotsTxt = ignoreRobots.checked;
+            var incremental = registry.byId("incremental");
+            this.data.taskDefinition.incremental = incremental.checked;
             this.emit("run",{data: this.data});
             ignoreRobots.destroyRecursive();
+            incremental.destroyRecursive();
           }),
           onCancel: lang.hitch(this,function() {
             var ignoreRobots = registry.byId("ignoreRobots");
+            var incremental = registry.byId("incremental");
             ignoreRobots.destroyRecursive();
+            incremental.destroyRecursive();
           })
         });
         dlg.show();
