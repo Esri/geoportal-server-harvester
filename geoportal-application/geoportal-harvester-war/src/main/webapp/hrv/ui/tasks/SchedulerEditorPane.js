@@ -23,6 +23,7 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/dom-construct",
+        "dojo/dom-style",
         "dojo/query",
         "dojo/topic",
         "dijit/form/Select",
@@ -34,7 +35,7 @@ define(["dojo/_base/declare",
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,domConstruct,query,topic,
+           lang,array,domConstruct,domStyle,query,topic,
            Select,Button,Form,
            TriggersREST,
            Renderer
@@ -51,6 +52,7 @@ define(["dojo/_base/declare",
       },
     
       postCreate: function(){
+        this._showOptions(false);
         TriggersREST.types().then(
           lang.hitch(this,this.processTypes),
           lang.hitch(this,function(error){
@@ -96,6 +98,7 @@ define(["dojo/_base/declare",
         var type = this.allTypes[evt];
         this.resetForm();
         this.rendHandler = Renderer.render(this.formNode, type.arguments);
+        this._showOptions(type.type != "NULL");
       },
       
       _onSubmit: function(evt) {
@@ -110,6 +113,10 @@ define(["dojo/_base/declare",
           delete triggerDefinition.properties.type;
           this.emit("submit",{triggerDefinition: triggerDefinition, ignoreRobots: this.ignoreRobots.checked, incremental: this.incremental.checked});
         }
+      },
+      
+      _showOptions: function(show) {
+        domStyle.set(this.optionsSection,"display",show? "block": "none");
       }
     });
 });
