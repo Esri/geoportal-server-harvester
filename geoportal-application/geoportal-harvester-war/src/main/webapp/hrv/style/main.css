@@ -291,6 +291,7 @@ html,body {
 
 .h-tasks-run-dialog-options {
   margin-top: 1em;
+  margin-bottom: 1em;
 }
 
 .h-tasks-run-dialog-options > label {

@@ -403,12 +403,13 @@ public class TaskController {
    *
    * @param triggerDefinition trigger definition
    * @param taskId task id
+   * @param ignoreRobots optional flag to ignore robots.txt
    * @param incremental optional incremental harvest flag
    * @return task info of the deleted task or <code>null</code> if no tasks have
    * been deleted
    */
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/schedule", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId, @RequestParam(required = false) Boolean incremental) {
+  public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId, @RequestParam(required = false) Boolean ignoreRobots, @RequestParam(required = false) Boolean incremental) {
     try {
       LOG.debug(formatForLog("POST /rest/harvester/tasks/%s/schedule <-- %s", taskId, triggerDefinition));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
@@ -417,6 +418,11 @@ public class TaskController {
       }
       if (incremental == null) {
         incremental = taskDefinition.isIncremental();
+      } else {
+        taskDefinition.setIncremental(incremental);
+      }
+      if (ignoreRobots!=null) {
+        taskDefinition.setIgnoreRobotsTxt(ignoreRobots);
       }
 
       TriggerDefinition triggerInstanceDefinition = new TriggerDefinition();
