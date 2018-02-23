@@ -144,7 +144,7 @@ Template default
       <ogc:PropertyIsGreaterThanOrEqualTo>
         <ogc:PropertyName>Modified</ogc:PropertyName>
         <ogc:Literal>
-          <xsl:value-of select="normalize-space(/GetRecords/FromDate/text())"/>
+          <xsl:value-of select="substring-before(normalize-space(/GetRecords/FromDate/text()),'T')"/>
         </ogc:Literal>
       </ogc:PropertyIsGreaterThanOrEqualTo>
     </xsl:if>
@@ -152,7 +152,7 @@ Template default
       <ogc:PropertyIsLessThanOrEqualTo>
         <ogc:PropertyName>Modified</ogc:PropertyName>
         <ogc:Literal>
-          <xsl:value-of select="normalize-space(/GetRecords/ToDate/text())"/>
+          <xsl:value-of select="substring-before(normalize-space(/GetRecords/ToDate/text()),'T')"/>
         </ogc:Literal>
       </ogc:PropertyIsLessThanOrEqualTo>
     </xsl:if>
