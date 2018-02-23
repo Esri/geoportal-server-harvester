@@ -23,7 +23,10 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -74,8 +77,21 @@ import org.slf4j.LoggerFactory;
         }
         if (Files.isDirectory(f)) {
           subFolders.add(new UncFolder(broker, f, matchPattern, since));
-        } else if (Files.isRegularFile(f) && matchFileName(f, matchPattern) && (since==null || Files.getLastModifiedTime(f).toMillis()>=since.getTime())) {
-          files.add(new UncFile(broker, f));
+        } else if (Files.isRegularFile(f) && matchFileName(f, matchPattern)) {
+          if (since==null)
+            files.add(new UncFile(broker, f));
+          else {
+            Path fPath = Paths.get(f.toUri());
+            
+            ArrayList<Long> allTimes = new ArrayList<>();
+            collectTime(allTimes, fPath, "lastModifiedTime");
+            collectTime(allTimes, fPath, "lastAccessTime");
+            collectTime(allTimes, fPath, "creationTime");
+            
+            long latestTime = max(allTimes);
+            if (latestTime >= since.getTime()) 
+              files.add(new UncFile(broker, f));
+          }
         }
       } catch (IOException ex) {
         LOG.warn(formatForLog("Error processing path element: %s", f), ex);
@@ -86,6 +102,27 @@ import org.slf4j.LoggerFactory;
     LOG.debug(formatForLog("UNC SUBFOLDERS in %s: %s",folder,subFolders.toString()));
     
     return new UncFolderContent(this, subFolders, files);
+  }
+  
+  private void collectTime(ArrayList<Long> allTimes, Path fPath, String timeName) {
+    try {
+      FileTime fileTime = (FileTime) Files.getAttribute(fPath, timeName);
+      if (fileTime != null) {
+        allTimes.add(fileTime.toMillis());
+      }
+    } catch (Exception ex) {
+      // It's OK to ignore it.
+    }
+  }
+  private long max(List<Long> attrs) {
+    Long max = null;
+    for (long attr : attrs) {
+      if (max == null)
+        max = attr;
+      else
+        max = Math.max(max, attr);
+    }
+    return max;
   }
 
   @Override
