@@ -15,8 +15,10 @@
  */
 package com.esri.geoportal.commons.agp.client;
 
+import com.esri.core.geometry.MultiPoint;
 import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,17 +57,20 @@ public class AgpClient implements Closeable {
   private final URL rootUrl;
   private final SimpleCredentials credentials;
   private final CloseableHttpClient httpClient;
+  private final GeometryService gs;
   
   /**
    * Creates instance of the client.
    * @param httpClient HTTP client
+   * @param gs geometry service
    * @param rootUrl root URL
    * @param credentials credentials
    */
-  public AgpClient(CloseableHttpClient httpClient, URL rootUrl, SimpleCredentials credentials) {
+  public AgpClient(CloseableHttpClient httpClient, GeometryService gs, URL rootUrl, SimpleCredentials credentials) {
     this.rootUrl = adjustUrl(rootUrl);
     this.credentials = credentials;
     this.httpClient = httpClient;
+    this.gs = gs;
   }
 
   @Override
@@ -83,6 +88,7 @@ public class AgpClient implements Closeable {
    * @param thumbnailUrl thumbnail url
    * @param itemType item type (must be a URL type)
    * @param extent extent
+   * @param wkid wkid if available
    * @param typeKeywords type keywords
    * @param tags tags tags
    * @param token token
@@ -90,7 +96,7 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse addItem(String owner, String folderId, String title, String description, String text, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+  public ItemResponse addItem(String owner, String folderId, String title, String description, String text, URL thumbnailUrl, ItemType itemType, Double [] extent, Long wkid, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(addItemUri(owner, StringUtils.trimToNull(folderId)));
     
     HttpPost req = new HttpPost(builder.build());
@@ -104,6 +110,7 @@ public class AgpClient implements Closeable {
       params.put("thumbnailurl", thumbnailUrl.toExternalForm());
     }
     if (extent!=null && extent.length==4) {
+      projectExtent(extent, wkid);
       params.put("extent",Arrays.asList(extent).stream().map(Object::toString).collect(Collectors.joining(",")));
     }
     if (typeKeywords!=null) {
@@ -129,6 +136,7 @@ public class AgpClient implements Closeable {
    * @param thumbnailUrl thumbnail url
    * @param itemType item type (must be a URL type)
    * @param extent extent
+   * @param wkid wkid if available
    * @param typeKeywords type keywords
    * @param tags tags tags
    * @param token token
@@ -136,7 +144,7 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse addItem(String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+  public ItemResponse addItem(String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] extent, Long wkid, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(addItemUri(owner, StringUtils.trimToNull(folderId)));
     
     HttpPost req = new HttpPost(builder.build());
@@ -150,6 +158,7 @@ public class AgpClient implements Closeable {
       params.put("thumbnailurl", thumbnailUrl.toExternalForm());
     }
     if (extent!=null && extent.length==4) {
+      projectExtent(extent, wkid);
       params.put("extent",Arrays.asList(extent).stream().map(Object::toString).collect(Collectors.joining(",")));
     }
     if (typeKeywords!=null) {
@@ -176,6 +185,7 @@ public class AgpClient implements Closeable {
    * @param thumbnailUrl thumbnail URL
    * @param itemType item type (must be a URL type)
    * @param extent extent
+   * @param wkid wkid if available
    * @param typeKeywords type keywords
    * @param tags tags tags
    * @param token token
@@ -183,7 +193,7 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, String text, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, String text, URL thumbnailUrl, ItemType itemType, Double [] extent, Long wkid, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(updateItemUri(owner, StringUtils.trimToNull(folderId), itemId));
     
     HttpPost req = new HttpPost(builder.build());
@@ -197,6 +207,7 @@ public class AgpClient implements Closeable {
       params.put("thumbnailurl", thumbnailUrl.toExternalForm());
     }
     if (extent!=null && extent.length==4) {
+      projectExtent(extent, wkid);
       params.put("extent",Arrays.asList(extent).stream().map(Object::toString).collect(Collectors.joining(",")));
     }
     if (typeKeywords!=null) {
@@ -244,6 +255,7 @@ public class AgpClient implements Closeable {
    * @param thumbnailUrl thumbnail URL
    * @param itemType item type (must be a URL type)
    * @param extent extent
+   * @param wkid wkid if available
    * @param typeKeywords type keywords
    * @param tags tags tags
    * @param token token
@@ -251,7 +263,7 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] extent, Long wkid, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(updateItemUri(owner, StringUtils.trimToNull(folderId), itemId));
     
     HttpPost req = new HttpPost(builder.build());
@@ -265,6 +277,7 @@ public class AgpClient implements Closeable {
       params.put("thumbnailurl", thumbnailUrl.toExternalForm());
     }
     if (extent!=null && extent.length==4) {
+      projectExtent(extent, wkid);
       params.put("extent",Arrays.asList(extent).stream().map(Object::toString).collect(Collectors.joining(",")));
     }
     if (typeKeywords!=null) {
@@ -541,5 +554,26 @@ public class AgpClient implements Closeable {
     } catch (MalformedURLException ex) {
       return rootUrl;
     }
+  }
+  
+  private boolean projectExtent(Double [] extent, Long wkid) throws IOException, URISyntaxException {
+    if (extent != null && extent.length ==4 && wkid != null && wkid != 4326) {
+
+      MultiPoint mp = new MultiPoint();
+      mp.add(extent[0], extent[1]);
+      mp.add(extent[2], extent[3]);
+      
+      MultiPoint mpProjected = gs.project(mp, wkid.intValue(), 4326);
+      if (mpProjected!=null && mpProjected.getPointCount() == 2) {
+        extent[0] = mpProjected.getPoint(0).getX();
+        extent[1] = mpProjected.getPoint(0).getY();
+        extent[2] = mpProjected.getPoint(1).getX();
+        extent[3] = mpProjected.getPoint(1).getY();
+        
+        return true;
+      }
+      
+    }
+    return false;
   }
 }

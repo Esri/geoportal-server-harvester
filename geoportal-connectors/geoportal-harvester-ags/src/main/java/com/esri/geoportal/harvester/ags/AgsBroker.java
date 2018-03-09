@@ -209,11 +209,16 @@ import com.esri.geoportal.commons.utils.XmlUtils;
         attributes.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute("urn:x-esri:specification:ServiceType:ArcGIS:" + (serviceType!=null? serviceType: "Unknown")));
         
         String sBox = createBBox(next.fullExtent);
+        Long lWkid = createWkid(next.fullExtent);
         if (sBox==null) {
           sBox = createBBox(next.initialExtent);
+          lWkid = createWkid(next.initialExtent);
         }
         if (sBox!=null) {
           attributes.put(WKAConstants.WKA_BBOX, new StringAttribute(sBox));
+          if (lWkid!=null) {
+            attributes.put(WKAConstants.WKA_WKID, new StringAttribute(lWkid.toString()));
+          }
         }
 
         MapAttribute attrs = new MapAttribute(attributes);
@@ -239,6 +244,13 @@ import com.esri.geoportal.commons.utils.XmlUtils;
     private String createBBox(ExtentInfo extent) {
       if (extent!=null && extent.isValid()) {
         return String.format("%f %f,%f %f", extent.xmin, extent.ymin, extent.xmax, extent.ymax);
+      }
+      return null;
+    }
+    
+    private Long createWkid(ExtentInfo extent) {
+      if (extent!=null && extent.isValid()) {
+        return extent.spatialReference!=null ? extent.spatialReference.wkid : null;
       }
       return null;
     }

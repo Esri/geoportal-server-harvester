@@ -32,9 +32,11 @@
   <!-- Connectors -->
   <bean class="com.esri.geoportal.harvester.agp.AgpOutputConnector">
     <constructor-arg ref="metaAnalyzer"/>
+    <constructor-arg value="${geometry.service.url}"/>
   </bean>
   <bean class="com.esri.geoportal.harvester.agpsrc.AgpInputConnector">
     <constructor-arg ref="metaBuilder"/>
+    <constructor-arg value="${geometry.service.url}"/>
   </bean>
   <bean class="com.esri.geoportal.harvester.ags.AgsConnector">
     <constructor-arg ref="metaBuilder"/>

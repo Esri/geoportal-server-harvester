@@ -35,13 +35,16 @@ public class AgpInputConnector implements InputConnector<InputBroker> {
   public static final String TYPE = "AGP-IN";
   
   private final MetaBuilder metaBuilder;
+  final String geometryServiceUrl;
 
   /**
    * Creates instance of the connector.
    * @param metaBuilder meta builder
+   * @param geometryServiceUrl geometry service url
    */
-  public AgpInputConnector(MetaBuilder metaBuilder) {
+  public AgpInputConnector(MetaBuilder metaBuilder, String geometryServiceUrl) {
     this.metaBuilder = metaBuilder;
+    this.geometryServiceUrl = geometryServiceUrl;
   }
 
   @Override

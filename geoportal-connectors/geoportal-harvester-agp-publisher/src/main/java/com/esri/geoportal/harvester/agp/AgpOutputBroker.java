@@ -31,6 +31,7 @@ import com.esri.geoportal.commons.meta.MetaException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import com.esri.geoportal.commons.meta.util.WKAConstants;
+import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.ex.DataException;
@@ -57,6 +58,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,7 +147,7 @@ import org.xml.sax.SAXException;
           ItemResponse response = addItem(getAttributeValue(attributes, WKAConstants.WKA_TITLE, null),
                   getAttributeValue(attributes, WKAConstants.WKA_DESCRIPTION, null),
                   resourceUrl, thumbnailUrl, 
-                  itemType, extractEnvelope(getAttributeValue(attributes, WKAConstants.WKA_BBOX, null)), typeKeywords);
+                  itemType, extractEnvelope(getAttributeValue(attributes, WKAConstants.WKA_BBOX)), extractWkid(getAttributeValue(attributes, WKAConstants.WKA_WKID)), typeKeywords);
 
           if (response == null || !response.success) {
             throw new DataOutputException(this, String.format("Error adding item: %s", ref));
@@ -166,7 +168,7 @@ import org.xml.sax.SAXException;
                   getAttributeValue(attributes, WKAConstants.WKA_TITLE, null),
                   getAttributeValue(attributes, WKAConstants.WKA_DESCRIPTION, null),
                   resourceUrl, thumbnailUrl,
-                  itemType, extractEnvelope(getAttributeValue(attributes, WKAConstants.WKA_BBOX, null)), typeKeywords);
+                  itemType, extractEnvelope(getAttributeValue(attributes, WKAConstants.WKA_BBOX)), extractWkid(getAttributeValue(attributes, WKAConstants.WKA_WKID)), typeKeywords);
           if (response == null || !response.success) {
             throw new DataOutputException(this, String.format("Error updating item: %s", ref));
           }
@@ -182,6 +184,11 @@ import org.xml.sax.SAXException;
     } catch (MetaException | IOException | ParserConfigurationException | SAXException | URISyntaxException ex) {
       throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
     }
+  }
+  
+  private Long extractWkid(String sWkid) {
+    long lWkid = NumberUtils.toLong(sWkid);
+    return lWkid > 0 ? lWkid : null;
   }
   
   private Double [] extractEnvelope(String sBbox) {
@@ -214,6 +221,10 @@ import org.xml.sax.SAXException;
   private String getAttributeValue(MapAttribute attributes, String attributeName, String defaultValue) {
     Attribute attr = attributes.getNamedAttributes().get(attributeName);
     return attr != null ? attr.getValue() : defaultValue;
+  }
+  
+  private String getAttributeValue(MapAttribute attributes, String attributeName) {
+    return getAttributeValue(attributes, attributeName, null);
   }
 
   private MapAttribute extractMapAttributes(DataReference ref) throws MetaException, IOException, ParserConfigurationException, SAXException {
@@ -250,7 +261,7 @@ import org.xml.sax.SAXException;
       return attributes;
   }
 
-  private ItemResponse addItem(String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] envelope, String[] typeKeywords) throws IOException, URISyntaxException {
+  private ItemResponse addItem(String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] envelope, Long wkid, String[] typeKeywords) throws IOException, URISyntaxException {
     if (token==null) {
       token = generateToken();
     }
@@ -258,29 +269,29 @@ import org.xml.sax.SAXException;
             title,
             description,
             url, thumbnailUrl,
-            itemType, envelope, typeKeywords, token);
+            itemType, envelope, wkid, typeKeywords, token);
     if (response.error != null && response.error.code == 498) {
       token = generateToken();
       response = addItem(
               title,
               description,
               url, thumbnailUrl,
-              itemType, envelope, typeKeywords, token);
+              itemType, envelope, wkid, typeKeywords, token);
     }
     return response;
   }
 
-  private ItemResponse addItem(String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] envelope, String[] typeKeywords, String token) throws IOException, URISyntaxException {
+  private ItemResponse addItem(String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] envelope, Long wkid, String[] typeKeywords, String token) throws IOException, URISyntaxException {
     return client.addItem(
             definition.getCredentials().getUserName(),
             definition.getFolderId(),
             title,
             description,
             url, thumbnailUrl,
-            itemType, envelope, typeKeywords, null, token);
+            itemType, envelope, wkid, typeKeywords, null, token);
   }
 
-  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] envelope, String[] typeKeywords) throws IOException, URISyntaxException {
+  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] envelope, Long wkid, String[] typeKeywords) throws IOException, URISyntaxException {
     if (token==null) {
       token = generateToken();
     }
@@ -291,7 +302,7 @@ import org.xml.sax.SAXException;
             title,
             description,
             url, thumbnailUrl, 
-            itemType, envelope, typeKeywords, token);
+            itemType, envelope, wkid, typeKeywords, token);
     if (response.error != null && response.error.code == 498) {
       token = generateToken();
       response = updateItem(
@@ -301,12 +312,12 @@ import org.xml.sax.SAXException;
               title,
               description,
               url, thumbnailUrl, 
-              itemType, envelope, typeKeywords, token);
+              itemType, envelope, wkid, typeKeywords, token);
     }
     return response;
   }
 
-  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] envelope, String[] typeKeywords, String token) throws IOException, URISyntaxException {
+  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] envelope, Long wkid, String[] typeKeywords, String token) throws IOException, URISyntaxException {
     return client.updateItem(
             owner,
             folderId,
@@ -314,7 +325,7 @@ import org.xml.sax.SAXException;
             title,
             description,
             url, thumbnailUrl,
-            itemType, envelope, typeKeywords, null, token);
+            itemType, envelope, wkid, typeKeywords, null, token);
   }
   
   private DeleteResponse deleteItem(String id, String owner, String folderId) throws URISyntaxException, IOException {
@@ -354,47 +365,53 @@ import org.xml.sax.SAXException;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
-    this.client = new AgpClient(HttpClientBuilder.create().build(), definition.getHostUrl(),definition.getCredentials());
-    if(definition.getCleanup()) {
-      context.addListener(new BaseProcessInstanceListener() {
-        @Override
-        public void onError(DataException ex) {
-          preventCleanup = true;
-        }
-      });
-      try {
-        String src_source_uri_s = URLEncoder.encode(context.getTask().getDataSource().getBrokerUri().toASCIIString(), "UTF-8");
-        QueryResponse search = client.search(String.format("typekeywords:%s", String.format("src_source_uri_s=%s", src_source_uri_s)), 0, 0, generateToken(1));
-        while (search!=null && search.results!=null && search.results.length>0) {
-          existing.addAll(Arrays.asList(search.results).stream().map(i->i.id).collect(Collectors.toList()));
-          if (search.nextStart>0) {
-            search = client.search(String.format("typekeywords:%s", String.format("src_source_uri_s=%s", src_source_uri_s)), 0, search.nextStart, generateToken(1));
-          } else {
-            break;
-          }
-        }
-      } catch (URISyntaxException|IOException ex) {
-        throw new DataProcessorException(String.format("Error collecting ids of existing items."), ex);
-      }
-    }
-    
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     try {
-      String folderId = StringUtils.trimToNull(definition.getFolderId());
-      if (folderId!=null) {
-        FolderEntry[] folders = this.client.listFolders(definition.getCredentials().getUserName(), generateToken(1));
-        FolderEntry selectedFodler = Arrays.stream(folders).filter(folder->folder.id!=null && folder.id.equals(folderId)).findFirst().orElse(
-                Arrays.stream(folders).filter(folder->folder.title!=null && folder.title.equals(folderId)).findFirst().orElse(null)
-        );
-        if (selectedFodler!=null) {
-          definition.setFolderId(selectedFodler.id);
+      GeometryService gs = new GeometryService(httpClient, new URL(connector.geometryServiceUrl));
+      this.client = new AgpClient(httpClient, gs, definition.getHostUrl(),definition.getCredentials());
+      if(definition.getCleanup()) {
+        context.addListener(new BaseProcessInstanceListener() {
+          @Override
+          public void onError(DataException ex) {
+            preventCleanup = true;
+          }
+        });
+        try {
+          String src_source_uri_s = URLEncoder.encode(context.getTask().getDataSource().getBrokerUri().toASCIIString(), "UTF-8");
+          QueryResponse search = client.search(String.format("typekeywords:%s", String.format("src_source_uri_s=%s", src_source_uri_s)), 0, 0, generateToken(1));
+          while (search!=null && search.results!=null && search.results.length>0) {
+            existing.addAll(Arrays.asList(search.results).stream().map(i->i.id).collect(Collectors.toList()));
+            if (search.nextStart>0) {
+              search = client.search(String.format("typekeywords:%s", String.format("src_source_uri_s=%s", src_source_uri_s)), 0, search.nextStart, generateToken(1));
+            } else {
+              break;
+            }
+          }
+        } catch (URISyntaxException|IOException ex) {
+          throw new DataProcessorException(String.format("Error collecting ids of existing items."), ex);
+        }
+      }
+
+      try {
+        String folderId = StringUtils.trimToNull(definition.getFolderId());
+        if (folderId!=null) {
+          FolderEntry[] folders = this.client.listFolders(definition.getCredentials().getUserName(), generateToken(1));
+          FolderEntry selectedFodler = Arrays.stream(folders).filter(folder->folder.id!=null && folder.id.equals(folderId)).findFirst().orElse(
+                  Arrays.stream(folders).filter(folder->folder.title!=null && folder.title.equals(folderId)).findFirst().orElse(null)
+          );
+          if (selectedFodler!=null) {
+            definition.setFolderId(selectedFodler.id);
+          } else {
+            definition.setFolderId(null);
+          }
         } else {
           definition.setFolderId(null);
         }
-      } else {
-        definition.setFolderId(null);
+      } catch (IOException|URISyntaxException ex) {
+        throw new DataProcessorException(String.format("Error listing folders for user: %s", definition.getCredentials().getUserName()), ex);
       }
-    } catch (IOException|URISyntaxException ex) {
-      throw new DataProcessorException(String.format("Error listing folders for user: %s", definition.getCredentials().getUserName()), ex);
+    } catch (MalformedURLException ex) {
+      throw new DataProcessorException(String.format("Invalid geometry service url: %s", connector.geometryServiceUrl), ex);
     }
   }
 

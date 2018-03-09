@@ -105,7 +105,7 @@ public class Bootstrap {
   
   /**
    * Creates instance of the bootstrap.
-   * @param geometryServiceUrl
+   * @param geometryServiceUrl geometry service URL
    * @param reportManager report manager
    */
   public Bootstrap(String geometryServiceUrl, ReportManager reportManager) {
@@ -259,7 +259,7 @@ public class Bootstrap {
       inboundConnectorRegistry.put(CswConnector.TYPE, new CswConnector());
       inboundConnectorRegistry.put(WafConnector.TYPE, new WafConnector());
       inboundConnectorRegistry.put(UncConnector.TYPE, new UncConnector());
-      inboundConnectorRegistry.put(AgpInputConnector.TYPE, new AgpInputConnector(metaBuilder));
+      inboundConnectorRegistry.put(AgpInputConnector.TYPE, new AgpInputConnector(metaBuilder,geometryServiceUrl));
       inboundConnectorRegistry.put(AgsConnector.TYPE, new AgsConnector(metaBuilder));
       inboundConnectorRegistry.put(GptConnector.TYPE, new GptConnector(geometryServiceUrl));
       inboundConnectorRegistry.put(CkanConnector.TYPE, new CkanConnector(metaBuilder));
@@ -280,7 +280,7 @@ public class Bootstrap {
               new SimpleIso15115_2MetaAnalyzer(), 
               new SimpleIso15119MetaAnalyzer());
 
-      outboundConnectorRegistry.put(AgpOutputConnector.TYPE, new AgpOutputConnector(metaAnalyzer));
+      outboundConnectorRegistry.put(AgpOutputConnector.TYPE, new AgpOutputConnector(metaAnalyzer, geometryServiceUrl));
       outboundConnectorRegistry.put(ConsoleConnector.TYPE, new ConsoleConnector());
       outboundConnectorRegistry.put(FolderConnector.TYPE, new FolderConnector());
       outboundConnectorRegistry.put(com.esri.geoportal.harvester.gpt.GptConnector.TYPE, new com.esri.geoportal.harvester.gpt.GptConnector(geometryServiceUrl));

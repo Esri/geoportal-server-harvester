@@ -21,6 +21,12 @@
             <artifactId>harvester-api-base</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.esri.geoportal</groupId>
+            <artifactId>geoportal-commons-geometry</artifactId>
+            <version>2.5.1-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
