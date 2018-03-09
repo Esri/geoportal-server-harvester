@@ -35,13 +35,16 @@ public class AgpOutputConnector implements OutputConnector<OutputBroker> {
   public static final String TYPE = "AGP-OUT";
   
   private final MetaAnalyzer metaAnalyzer;
+  final String geometryServiceUrl;
 
   /**
    * Creates instance of the connector.
    * @param metaAnalyzer meta analyzer
+   * @param geometryServiceUrl geometry service URL
    */
-  public AgpOutputConnector(MetaAnalyzer metaAnalyzer) {
+  public AgpOutputConnector(MetaAnalyzer metaAnalyzer, String geometryServiceUrl) {
     this.metaAnalyzer = metaAnalyzer;
+    this.geometryServiceUrl = geometryServiceUrl;
   }
 
   @Override

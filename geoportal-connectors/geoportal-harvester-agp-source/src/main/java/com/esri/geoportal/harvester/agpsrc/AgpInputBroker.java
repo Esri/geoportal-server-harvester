@@ -58,6 +58,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import com.esri.geoportal.commons.utils.XmlUtils;
+import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
+import java.net.MalformedURLException;
+import java.net.URL;
+import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * ArcGIS Portal output broker.
@@ -65,19 +69,20 @@ import com.esri.geoportal.commons.utils.XmlUtils;
 /*package*/ class AgpInputBroker implements InputBroker {
 
   private static final Logger LOG = LoggerFactory.getLogger(AgpInputBroker.class);
-  
+
   private final AgpInputConnector connector;
   private final AgpInputBrokerDefinitionAdaptor definition;
   private final MetaBuilder metaBuilder;
   private AgpClient client;
- 
+
   private static final ObjectMapper mapper = new ObjectMapper();
+
   static {
-      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-      mapper.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
-      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
   }
-  
+
   /**
    * Creates instance of the broker.
    *
@@ -127,31 +132,36 @@ import com.esri.geoportal.commons.utils.XmlUtils;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
-    CloseableHttpClient httpclient = HttpClientBuilder.create().build();
-    if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
-      client = new AgpClient(httpclient, definition.getHostUrl(),definition.getCredentials());
-    } else {
-      Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getHostUrl());
-      client = new AgpClient(new BotsHttpClient(httpclient,bots), definition.getHostUrl(), definition.getCredentials());
-    }
-    
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     try {
-      String folderId = StringUtils.trimToNull(definition.getFolderId());
-      if (folderId!=null) {
-        FolderEntry[] folders = this.client.listFolders(definition.getCredentials().getUserName(), generateToken(1));
-        FolderEntry selectedFodler = Arrays.stream(folders).filter(folder->folder.id!=null && folder.id.equals(folderId)).findFirst().orElse(
-                Arrays.stream(folders).filter(folder->folder.title!=null && folder.title.equals(folderId)).findFirst().orElse(null)
-        );
-        if (selectedFodler!=null) {
-          definition.setFolderId(selectedFodler.id);
+      GeometryService gs = new GeometryService(httpClient, new URL(connector.geometryServiceUrl));
+      if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
+        client = new AgpClient(httpClient, gs, definition.getHostUrl(), definition.getCredentials());
+      } else {
+        Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpClient, definition.getHostUrl());
+        client = new AgpClient(new BotsHttpClient(httpClient, bots), gs, definition.getHostUrl(), definition.getCredentials());
+      }
+
+      try {
+        String folderId = StringUtils.trimToNull(definition.getFolderId());
+        if (folderId != null) {
+          FolderEntry[] folders = this.client.listFolders(definition.getCredentials().getUserName(), generateToken(1));
+          FolderEntry selectedFodler = Arrays.stream(folders).filter(folder -> folder.id != null && folder.id.equals(folderId)).findFirst().orElse(
+                  Arrays.stream(folders).filter(folder -> folder.title != null && folder.title.equals(folderId)).findFirst().orElse(null)
+          );
+          if (selectedFodler != null) {
+            definition.setFolderId(selectedFodler.id);
+          } else {
+            definition.setFolderId(null);
+          }
         } else {
           definition.setFolderId(null);
         }
-      } else {
-        definition.setFolderId(null);
+      } catch (IOException | URISyntaxException ex) {
+        throw new DataProcessorException(String.format("Error listing folders for user: %s", definition.getCredentials().getUserName()), ex);
       }
-    } catch (IOException|URISyntaxException ex) {
-      throw new DataProcessorException(String.format("Error listing folders for user: %s", definition.getCredentials().getUserName()), ex);
+    } catch (MalformedURLException ex) {
+      throw new DataProcessorException(String.format("Invalid geometry service url: %s", connector.geometryServiceUrl), ex);
     }
   }
 
@@ -165,6 +175,7 @@ import com.esri.geoportal.commons.utils.XmlUtils;
   }
 
   private class AgpIterator implements InputBroker.Iterator {
+
     private final IteratorContext iteratorContext;
     private final TransformerFactory tf = TransformerFactory.newInstance();
     private final long size = 10;
@@ -182,66 +193,69 @@ import com.esri.geoportal.commons.utils.XmlUtils;
       if (done) {
         return false;
       }
-      if (iter==null) {
+      if (iter == null) {
         try {
           List<ItemEntry> list = list();
-          if (list==null || list.isEmpty()) {
+          if (list == null || list.isEmpty()) {
             done = true;
             return false;
           }
           iter = list.iterator();
-        } catch (IOException|URISyntaxException ex) {
+        } catch (IOException | URISyntaxException ex) {
           done = true;
           throw new DataInputException(AgpInputBroker.this, String.format("Error reading content."), ex);
         }
       }
-      if (iter!=null && !iter.hasNext()) {
+      if (iter != null && !iter.hasNext()) {
         iter = null;
         return hasNext();
       }
-      
+
       nextEntry = iter.next();
-      if (iteratorContext.getLastHarvestDate()!=null && nextEntry.modified<iteratorContext.getLastHarvestDate().getTime()) {
+      if (iteratorContext.getLastHarvestDate() != null && nextEntry.modified < iteratorContext.getLastHarvestDate().getTime()) {
         nextEntry = null;
         return hasNext();
       }
-      
+
       return true;
     }
 
     @Override
     public DataReference next() throws DataInputException {
       try {
-        if (nextEntry==null) {
-            throw new DataInputException(AgpInputBroker.this, String.format("Error reading content."));
+        if (nextEntry == null) {
+          throw new DataInputException(AgpInputBroker.this, String.format("Error reading content."));
         }
-        
+
         Properties props = new Properties();
-        if (nextEntry.id!=null) {
+        if (nextEntry.id != null) {
           props.put(WKAConstants.WKA_IDENTIFIER, nextEntry.id);
         }
-        if (nextEntry.title!=null) {
+        if (nextEntry.title != null) {
           props.put(WKAConstants.WKA_TITLE, nextEntry.title);
         }
-        if (nextEntry.description!=null) {
+        if (nextEntry.description != null) {
           props.put(WKAConstants.WKA_DESCRIPTION, nextEntry.description);
         }
-        if (nextEntry.url!=null) {
+        if (nextEntry.url != null) {
           props.put(WKAConstants.WKA_RESOURCE_URL, nextEntry.url);
         } else if (ItemType.WEB_MAP.getTypeName().equals(nextEntry.type)) {
-          props.put(WKAConstants.WKA_RESOURCE_URL, definition.getHostUrl().toExternalForm().replaceAll("/+$", "")+"/home/webmap/viewer.html?webmap="+nextEntry.id);
+          props.put(WKAConstants.WKA_RESOURCE_URL, definition.getHostUrl().toExternalForm().replaceAll("/+$", "") + "/home/webmap/viewer.html?webmap=" + nextEntry.id);
         } else {
-          props.put(WKAConstants.WKA_RESOURCE_URL, definition.getHostUrl().toExternalForm().replaceAll("/+$", "")+"/home/item.html?id="+nextEntry.id);
+          props.put(WKAConstants.WKA_RESOURCE_URL, definition.getHostUrl().toExternalForm().replaceAll("/+$", "") + "/home/item.html?id=" + nextEntry.id);
         }
-        
-        if (nextEntry.extent!=null && nextEntry.extent.length==2 && nextEntry.extent[0]!=null && nextEntry.extent[0].length==2 && nextEntry.extent[1]!=null && nextEntry.extent[1].length==2) {
+
+        if (nextEntry.extent != null && nextEntry.extent.length == 2 && nextEntry.extent[0] != null && nextEntry.extent[0].length == 2 && nextEntry.extent[1] != null && nextEntry.extent[1].length == 2) {
           String sBox = String.format("%f %f,%f %f", nextEntry.extent[0][0], nextEntry.extent[0][1], nextEntry.extent[1][0], nextEntry.extent[1][1]);
           props.put(WKAConstants.WKA_BBOX, sBox);
+          if (NumberUtils.toLong(nextEntry.spatialReference) > 0L) {
+            props.put(WKAConstants.WKA_WKID, nextEntry.spatialReference);
+          }
         }
-        
+
         MapAttribute attr = AttributeUtils.fromProperties(props);
         Document document = metaBuilder.create(attr);
-        byte [] bytes = XmlUtils.toString(document).getBytes("UTF-8");
+        byte[] bytes = XmlUtils.toString(document).getBytes("UTF-8");
 
         SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), nextEntry.id, new Date(nextEntry.modified), URI.create(nextEntry.id));
         if (definition.getEmitXml()) {
@@ -250,25 +264,25 @@ import com.esri.geoportal.commons.utils.XmlUtils;
         if (definition.getEmitJson()) {
           ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(nextEntry).getBytes("UTF-8"));
         }
-        
+
         return ref;
-        
-      } catch (MetaException|TransformerException|URISyntaxException|IOException ex) {
+
+      } catch (MetaException | TransformerException | URISyntaxException | IOException ex) {
         throw new DataInputException(AgpInputBroker.this, String.format("Error reading next data reference."), ex);
       }
     }
-    
+
     private List<ItemEntry> list() throws URISyntaxException, IOException {
       if (!definition.getCredentials().isEmpty()) {
         ContentResponse content = client.listContent(definition.getCredentials().getUserName(), definition.getFolderId(), size, from, generateToken(1));
         from += size;
-        return content!=null && content.items!=null && content.items.length>0? Arrays.asList(content.items): null;
+        return content != null && content.items != null && content.items.length > 0 ? Arrays.asList(content.items) : null;
       } else {
         QueryResponse content = client.listPublicContent(size, from);
         from += size;
-        return content!=null && content.results!=null && content.results.length>0? Arrays.asList(content.results): null;
+        return content != null && content.results != null && content.results.length > 0 ? Arrays.asList(content.results) : null;
       }
     }
-    
+
   }
 }

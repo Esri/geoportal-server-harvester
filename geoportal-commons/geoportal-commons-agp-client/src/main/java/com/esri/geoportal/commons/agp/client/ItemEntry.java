@@ -28,6 +28,7 @@ public final class ItemEntry {
   public String [] typeKeywords;
   public String [] tags;
   public Double [][] extent;
+  public String spatialReference;
   public String description;
   public String url;
   public String ownerFolder;
