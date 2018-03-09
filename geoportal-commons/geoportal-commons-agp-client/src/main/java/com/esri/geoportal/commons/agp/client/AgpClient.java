@@ -88,6 +88,7 @@ public class AgpClient implements Closeable {
    * @param thumbnailUrl thumbnail url
    * @param itemType item type (must be a URL type)
    * @param extent extent
+   * @param wkid wkid if available
    * @param typeKeywords type keywords
    * @param tags tags tags
    * @param token token
@@ -135,6 +136,7 @@ public class AgpClient implements Closeable {
    * @param thumbnailUrl thumbnail url
    * @param itemType item type (must be a URL type)
    * @param extent extent
+   * @param wkid wkid if available
    * @param typeKeywords type keywords
    * @param tags tags tags
    * @param token token
@@ -183,6 +185,7 @@ public class AgpClient implements Closeable {
    * @param thumbnailUrl thumbnail URL
    * @param itemType item type (must be a URL type)
    * @param extent extent
+   * @param wkid wkid if available
    * @param typeKeywords type keywords
    * @param tags tags tags
    * @param token token
@@ -252,6 +255,7 @@ public class AgpClient implements Closeable {
    * @param thumbnailUrl thumbnail URL
    * @param itemType item type (must be a URL type)
    * @param extent extent
+   * @param wkid wkid if available
    * @param typeKeywords type keywords
    * @param tags tags tags
    * @param token token
