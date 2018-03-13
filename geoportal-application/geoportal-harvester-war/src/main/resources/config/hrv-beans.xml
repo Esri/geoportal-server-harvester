@@ -5,6 +5,10 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
 
   <!-- Services -->  
+  <bean class="com.esri.geoportal.harvester.beans.GeometryServiceBean" id="geometryService" destroy-method="close">
+    <constructor-arg value="${geometry.service.url}"/>
+  </bean>
+  
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultEngine" autowire="constructor" init-method="init"/>
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultProcessor" autowire="constructor"/>
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultBrokersService" autowire="constructor"/>
@@ -38,6 +42,7 @@
   </bean>
   <bean class="com.esri.geoportal.harvester.ags.AgsConnector">
     <constructor-arg ref="metaBuilder"/>
+    <constructor-arg ref="geometryService"/>
   </bean>
   <bean class="com.esri.geoportal.harvester.ckan.CkanConnector">
     <constructor-arg ref="metaBuilder"/>

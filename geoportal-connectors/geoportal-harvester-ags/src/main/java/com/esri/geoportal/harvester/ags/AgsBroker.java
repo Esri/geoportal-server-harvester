@@ -57,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import com.esri.geoportal.commons.utils.XmlUtils;
+import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
 
 /**
  * Ags broker.
@@ -68,6 +69,7 @@ import com.esri.geoportal.commons.utils.XmlUtils;
   private final AgsConnector connector;
   private final AgsBrokerDefinitionAdaptor definition;
   private final MetaBuilder metaBuilder;
+  private final GeometryService gs;
   private AgsClient client;
 
   /**
@@ -76,11 +78,13 @@ import com.esri.geoportal.commons.utils.XmlUtils;
    * @param connector connector
    * @param definition definition
    * @param metaBuilder meta builder
+   * @param gs geometry service
    */
-  public AgsBroker(AgsConnector connector, AgsBrokerDefinitionAdaptor definition, MetaBuilder metaBuilder) {
+  public AgsBroker(AgsConnector connector, AgsBrokerDefinitionAdaptor definition, MetaBuilder metaBuilder, GeometryService gs) {
     this.connector = connector;
     this.definition = definition;
     this.metaBuilder = metaBuilder;
+    this.gs = gs;
   }
 
   @Override
