@@ -19,7 +19,6 @@ import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.gpt.client.Client;
 import com.esri.geoportal.commons.gpt.client.PublishRequest;
 import com.esri.geoportal.commons.gpt.client.PublishResponse;
-import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
@@ -32,7 +31,6 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -41,8 +39,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,9 +81,7 @@ import org.slf4j.LoggerFactory;
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     try {
-      CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-      GeometryService gs = new GeometryService(httpClient, new URL(connector.geometryServiceUrl));
-      client = new Client(gs, definition.getHostUrl(), definition.getCredentials(), definition.getIndex());
+      client = new Client(definition.getHostUrl(), definition.getCredentials(), definition.getIndex());
 
       if (definition.getCleanup()) {
         context.addListener(new BaseProcessInstanceListener() {

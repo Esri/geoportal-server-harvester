@@ -261,7 +261,7 @@ public class Bootstrap {
       inboundConnectorRegistry.put(UncConnector.TYPE, new UncConnector());
       inboundConnectorRegistry.put(AgpInputConnector.TYPE, new AgpInputConnector(metaBuilder));
       inboundConnectorRegistry.put(AgsConnector.TYPE, new AgsConnector(metaBuilder));
-      inboundConnectorRegistry.put(GptConnector.TYPE, new GptConnector(geometryServiceUrl));
+      inboundConnectorRegistry.put(GptConnector.TYPE, new GptConnector());
       inboundConnectorRegistry.put(CkanConnector.TYPE, new CkanConnector(metaBuilder));
       inboundConnectorRegistry.put(DataGovConnector.TYPE, new DataGovConnector(metaBuilder));
     }
@@ -283,7 +283,7 @@ public class Bootstrap {
       outboundConnectorRegistry.put(AgpOutputConnector.TYPE, new AgpOutputConnector(metaAnalyzer));
       outboundConnectorRegistry.put(ConsoleConnector.TYPE, new ConsoleConnector());
       outboundConnectorRegistry.put(FolderConnector.TYPE, new FolderConnector());
-      outboundConnectorRegistry.put(com.esri.geoportal.harvester.gpt.GptConnector.TYPE, new com.esri.geoportal.harvester.gpt.GptConnector(geometryServiceUrl));
+      outboundConnectorRegistry.put(com.esri.geoportal.harvester.gpt.GptConnector.TYPE, new com.esri.geoportal.harvester.gpt.GptConnector());
     }
     
     return outboundConnectorRegistry;
