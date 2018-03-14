@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.ags;
 
+import com.esri.core.geometry.MultiPoint;
 import com.esri.geoportal.commons.ags.client.AgsClient;
 import com.esri.geoportal.commons.ags.client.ContentResponse;
 import com.esri.geoportal.commons.ags.client.ExtentInfo;
@@ -57,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import com.esri.geoportal.commons.utils.XmlUtils;
+import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
 
 /**
  * Ags broker.
@@ -68,6 +70,7 @@ import com.esri.geoportal.commons.utils.XmlUtils;
   private final AgsConnector connector;
   private final AgsBrokerDefinitionAdaptor definition;
   private final MetaBuilder metaBuilder;
+  private final GeometryService gs;
   private AgsClient client;
 
   /**
@@ -76,11 +79,13 @@ import com.esri.geoportal.commons.utils.XmlUtils;
    * @param connector connector
    * @param definition definition
    * @param metaBuilder meta builder
+   * @param gs geometry service
    */
-  public AgsBroker(AgsConnector connector, AgsBrokerDefinitionAdaptor definition, MetaBuilder metaBuilder) {
+  public AgsBroker(AgsConnector connector, AgsBrokerDefinitionAdaptor definition, MetaBuilder metaBuilder, GeometryService gs) {
     this.connector = connector;
     this.definition = definition;
     this.metaBuilder = metaBuilder;
+    this.gs = gs;
   }
 
   @Override
@@ -208,12 +213,12 @@ import com.esri.geoportal.commons.utils.XmlUtils;
         attributes.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(next.url));
         attributes.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute("urn:x-esri:specification:ServiceType:ArcGIS:" + (serviceType!=null? serviceType: "Unknown")));
         
-        String sBox = createBBox(next.fullExtent);
-        if (sBox==null) {
-          sBox = createBBox(next.initialExtent);
-        }
-        if (sBox!=null) {
-          attributes.put(WKAConstants.WKA_BBOX, new StringAttribute(sBox));
+        if (next.fullExtent != null) {
+          normalizeExtent(next.fullExtent, 4326);
+          String sBox = createBBox(next.fullExtent);
+          if (sBox!=null) {
+            attributes.put(WKAConstants.WKA_BBOX, new StringAttribute(sBox));
+          }
         }
 
         MapAttribute attrs = new MapAttribute(attributes);
@@ -236,6 +241,31 @@ import com.esri.geoportal.commons.utils.XmlUtils;
       }
     }
     
+    /**
+     * Normalizes extent.
+     * @param extent
+     * @throws IOException
+     * @throws URISyntaxException 
+     */
+    private void normalizeExtent(ExtentInfo extent, int wkid) throws IOException, URISyntaxException {
+      if (extent!=null && extent.isValid()) {
+        if (extent.spatialReference!=null && extent.spatialReference.wkid!=null && extent.spatialReference.wkid!=4326) {
+          MultiPoint mp = new MultiPoint();
+          mp.add(extent.xmin, extent.ymin);
+          mp.add(extent.xmax, extent.ymax);
+          
+          mp = gs.project(mp, extent.spatialReference.wkid.intValue(), wkid);
+          
+          if (mp.getPointCount()==2) {
+            extent.xmin = mp.getPoint(0).getX();
+            extent.ymin = mp.getPoint(0).getY();
+            extent.xmax = mp.getPoint(1).getX();
+            extent.ymax = mp.getPoint(1).getY();
+            extent.spatialReference.wkid = (long)wkid;
+          }
+        }
+      }
+    }
     private String createBBox(ExtentInfo extent) {
       if (extent!=null && extent.isValid()) {
         return String.format("%f %f,%f %f", extent.xmin, extent.ymin, extent.xmax, extent.ymax);

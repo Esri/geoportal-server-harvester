@@ -15,12 +15,10 @@
  */
 package com.esri.geoportal.commons.gpt.client;
 
-import com.esri.core.geometry.MultiPoint;
 import com.esri.geoportal.commons.constants.HttpConstants;
 import com.esri.geoportal.commons.gpt.client.QueryResponse.Hit;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
-import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -78,7 +76,6 @@ public class Client implements Closeable {
   private static final String TOKEN_URL = "oauth/token";
 
   private final CloseableHttpClient httpClient;
-  private final GeometryService gs;
   private final URL url;
   private final SimpleCredentials cred;
   private final String index;
@@ -91,14 +88,12 @@ public class Client implements Closeable {
    * Creates instance of the client.
    *
    * @param httpClient HTTP client
-   * @param gs geometry service
    * @param url URL of the GPT REST end point
    * @param cred credentials
    * @param index index name
    */
-  public Client(CloseableHttpClient httpClient, GeometryService gs, URL url, SimpleCredentials cred, String index) {
+  public Client(CloseableHttpClient httpClient, URL url, SimpleCredentials cred, String index) {
     this.httpClient = httpClient;
-    this.gs = gs;
     this.url = url;
     this.cred = cred;
     this.index = StringUtils.defaultIfBlank(index, DEFAULT_INDEX);
@@ -110,13 +105,12 @@ public class Client implements Closeable {
   /**
    * Creates instance of the client.
    *
-   * @param gs geometry service
    * @param url URL of the GPT REST end point
    * @param cred credentials
    * @param index index name
    */
-  public Client(GeometryService gs, URL url, SimpleCredentials cred, String index) {
-    this(HttpClientBuilder.create().build(), gs, url, cred, index);
+  public Client(URL url, SimpleCredentials cred, String index) {
+    this(HttpClientBuilder.create().build(), url, cred, index);
   }
 
   /**
@@ -154,36 +148,27 @@ public class Client implements Closeable {
               Double xmax = fullExtent.path("xmax").asDouble();
               Double ymax = fullExtent.path("ymax").asDouble();
 
+              /*
               MultiPoint mp = new MultiPoint();
               mp.add(xmin, ymin);
               mp.add(xmax, ymax);
-
-              JsonNode spatialReference = fullExtent.get("spatialReference");
-              if (spatialReference != null && spatialReference.has("wkid")) {
-                int wkid = spatialReference.get("wkid").asInt();
-                if (wkid != 4326) {
-                  MultiPoint mp2 = gs.project(mp, wkid, 4326);
-                  if (mp2.getPointCount()==2) {
-                    mp = mp2;
-                  }
-                }
-              }
+              */
 
               ObjectNode envelope_geo = mapper.createObjectNode();
               envelope_geo.put("type", "envelope");
               ArrayNode coordinates = mapper.createArrayNode();
               ArrayNode southWest = coordinates.addArray();
-              southWest.add(mp.getPoint(0).getX());
-              southWest.add(mp.getPoint(0).getY());
+              southWest.add(xmin);
+              southWest.add(ymin);
               ArrayNode northEast = coordinates.addArray();
-              northEast.add(mp.getPoint(1).getX());
-              northEast.add(mp.getPoint(1).getY());
+              northEast.add(xmax);
+              northEast.add(ymax);
               envelope_geo.set("coordinates", coordinates);
               
               jsonRequest.set("envelope_geo", envelope_geo);
               
-              double lon = (mp.getPoint(0).getX() + mp.getPoint(1).getX()) / 2.0;
-              double lat = (mp.getPoint(0).getY() + mp.getPoint(1).getY()) / 2.0;
+              double lon = (xmin + xmax) / 2.0;
+              double lat = (ymin + ymax) / 2.0;
               
               ObjectNode envelope_cen_pt = mapper.createObjectNode();
               envelope_cen_pt.put("lon", lon);
@@ -646,7 +631,6 @@ public class Client implements Closeable {
     if (httpClient instanceof Closeable) {
       ((Closeable) httpClient).close();
     }
-    gs.close();
   }
 
   public static class SearchContext {

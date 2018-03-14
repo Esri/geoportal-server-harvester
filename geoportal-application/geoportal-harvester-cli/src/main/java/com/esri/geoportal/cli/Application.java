@@ -42,7 +42,7 @@ import org.apache.commons.cli.ParseException;
  */
 public class Application {
   private static final String version = "2.0.0";
-  private static final String geometryServiceUrl = "http://sampleserver6.arcgisonline.com/arcgis/rest/services/Utilities/Geometry/GeometryServer";
+  private static final String geometryServiceUrl = "https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer";
 
   public static void main(String[] args) {
     Application app = new Application();
