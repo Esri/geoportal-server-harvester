@@ -105,7 +105,7 @@ public class CkanBroker implements InputBroker {
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
-    CloseableHttpClient http = HttpClientBuilder.create().build();
+    CloseableHttpClient http = HttpClientBuilder.create().useSystemProperties().build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       httpClient = http;
     } else {

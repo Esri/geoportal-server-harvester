@@ -32,7 +32,7 @@ public final class BotsUtils {
    * @return default parser (never <code>null</code>)
    */
   public static BotsParser parser() {
-    return parser(BotsConfig.DEFAULT,HttpClientBuilder.create().build());
+    return parser(BotsConfig.DEFAULT,HttpClientBuilder.create().useSystemProperties().build());
   }
   
   /**

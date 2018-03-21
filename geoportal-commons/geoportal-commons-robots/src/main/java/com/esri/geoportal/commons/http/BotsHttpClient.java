@@ -54,7 +54,7 @@ public class BotsHttpClient extends CloseableHttpClient {
   }
 
   public BotsHttpClient(Bots bots) {
-    this.client = HttpClientBuilder.create().build();
+    this.client = HttpClientBuilder.create().useSystemProperties().build();
     this.bots = bots;
   }
 

@@ -127,7 +127,7 @@ import com.esri.geoportal.commons.utils.XmlUtils;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
-    CloseableHttpClient httpclient = HttpClientBuilder.create().build();
+    CloseableHttpClient httpclient = HttpClientBuilder.create().useSystemProperties().build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new AgpClient(httpclient, definition.getHostUrl(),definition.getCredentials());
     } else {
