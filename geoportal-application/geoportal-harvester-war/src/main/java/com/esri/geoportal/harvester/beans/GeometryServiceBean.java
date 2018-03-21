@@ -31,7 +31,7 @@ public class GeometryServiceBean extends GeometryService {
    * @throws MalformedURLException if invalid geometry service url
    */
   public GeometryServiceBean(String geometryServiceUrl) throws MalformedURLException {
-    super(HttpClients.custom().build(), new URL(geometryServiceUrl));
+    super(HttpClients.custom().useSystemProperties().build(), new URL(geometryServiceUrl));
   }
   
 }
