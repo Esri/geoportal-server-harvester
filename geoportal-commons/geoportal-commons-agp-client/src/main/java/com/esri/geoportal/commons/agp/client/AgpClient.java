@@ -453,7 +453,16 @@ public class AgpClient implements Closeable {
     builder.setScheme(rootUrl.toURI().getScheme())
            .setHost(rootUrl.toURI().getHost())
            .setPort(rootUrl.toURI().getPort())
-           .setPath(rootUrl.toURI().getPath() + "sharing/content/items/" + itemId);
+           .setPath(rootUrl.toURI().getPath() + "sharing/content/items/" + itemId );
+    return builder.build();
+  }
+  
+  private URI itemMetaUri(String itemId) throws URISyntaxException {
+    URIBuilder builder = new URIBuilder();
+    builder.setScheme(rootUrl.toURI().getScheme())
+           .setHost(rootUrl.toURI().getHost())
+           .setPort(rootUrl.toURI().getPort())
+           .setPath(rootUrl.toURI().getPath() + "sharing/content/items/" + itemId + "/info/metadata/metadata.xml");
     return builder.build();
   }
   
