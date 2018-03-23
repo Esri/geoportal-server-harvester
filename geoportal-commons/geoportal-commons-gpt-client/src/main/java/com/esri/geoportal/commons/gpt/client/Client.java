@@ -110,7 +110,7 @@ public class Client implements Closeable {
    * @param index index name
    */
   public Client(URL url, SimpleCredentials cred, String index) {
-    this(HttpClientBuilder.create().build(), url, cred, index);
+    this(HttpClientBuilder.create().useSystemProperties().build(), url, cred, index);
   }
 
   /**

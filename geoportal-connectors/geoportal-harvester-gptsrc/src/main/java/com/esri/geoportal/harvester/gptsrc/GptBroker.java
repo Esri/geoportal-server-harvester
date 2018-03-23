@@ -57,7 +57,7 @@ class GptBroker implements InputBroker {
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
-    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+    CloseableHttpClient httpClient = HttpClientBuilder.create().useSystemProperties().build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new Client(httpClient, definition.getHostUrl(), definition.getCredentials(), definition.getIndex());
     } else {
