@@ -531,16 +531,19 @@ public class AgpClient implements Closeable {
   }
   
   private <T> T execute(HttpUriRequest req, Class<T> clazz) throws IOException {
-
+    String responseContent = execute(req);
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    return mapper.readValue(responseContent, clazz);
+  }
+  
+  private String execute(HttpUriRequest req) throws IOException {
     try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
       if (httpResponse.getStatusLine().getStatusCode()>=400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
-      String responseContent = IOUtils.toString(contentStream, "UTF-8");
-      ObjectMapper mapper = new ObjectMapper();
-      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-      return mapper.readValue(responseContent, clazz);
+      return IOUtils.toString(contentStream, "UTF-8");
     }
   }
 
