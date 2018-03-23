@@ -223,7 +223,6 @@ public class AgpClient implements Closeable {
   public ItemEntry readItem(String itemId, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(itemInfoUri(itemId));
     
-    
     builder.setParameter("f", "json");
     if (token!=null) {
       builder.setParameter("token", token);
@@ -231,6 +230,34 @@ public class AgpClient implements Closeable {
     HttpGet req = new HttpGet(builder.build());
     
     return execute(req,ItemEntry.class);
+  }
+  
+  /**
+   * Reads item metadata.
+   * @param itemId item id
+   * @param format metadata format
+   * @param token token
+   * @return item metadata if available
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public String readItemMetadata(String itemId, MetadataFormat format, String token) throws IOException, URISyntaxException {
+    URIBuilder builder = new URIBuilder(itemMetaUri(itemId));
+    
+    builder.setParameter("format", (format != null ? format : MetadataFormat.DEFAULT).toString());
+    if (token!=null) {
+      builder.setParameter("token", token);
+    }
+    HttpGet req = new HttpGet(builder.build());
+    
+    try {
+      return execute(req);
+    } catch (HttpResponseException ex) {
+      if (ex.getStatusCode() == 500) {
+        return null;
+      }
+      throw ex;
+    }
   }
   
   /**
@@ -552,6 +579,18 @@ public class AgpClient implements Closeable {
       return new URL(rootUrl.toExternalForm().replaceAll("/*$", "/"));
     } catch (MalformedURLException ex) {
       return rootUrl;
+    }
+  }
+  
+  /**
+   * Metadata format.
+   */
+  public static enum MetadataFormat {
+    DEFAULT, ISO19115, FGDC, INSPIRE;
+    
+    @Override
+    public String toString() {
+      return name().toLowerCase();
     }
   }
 }
