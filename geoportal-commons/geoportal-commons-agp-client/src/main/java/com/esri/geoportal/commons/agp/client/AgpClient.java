@@ -592,5 +592,9 @@ public class AgpClient implements Closeable {
     public String toString() {
       return name().toLowerCase();
     }
+    
+    public static MetadataFormat parse(String fmt, MetadataFormat def) {
+      return Arrays.stream(MetadataFormat.values()).filter(f -> f.name().equalsIgnoreCase(fmt)).findFirst().orElse(def);
+    }
   }
 }
