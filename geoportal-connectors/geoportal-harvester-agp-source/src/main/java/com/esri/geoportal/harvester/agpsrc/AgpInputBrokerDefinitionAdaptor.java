@@ -40,6 +40,7 @@ import org.apache.commons.lang3.StringUtils;
   private URL hostUrl;
   private String folderId;
   private boolean emitXml = true;
+  private boolean extractMetadata = true;
   private boolean emitJson = false;
 
   /**
@@ -63,6 +64,7 @@ import org.apache.commons.lang3.StringUtils;
       }
       folderId = get(P_FOLDER_ID);
       emitXml = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_XML)), true);
+      extractMetadata = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EXTRACT_META)), true);
       emitJson = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_JSON)), false);
     }
   }
@@ -72,6 +74,7 @@ import org.apache.commons.lang3.StringUtils;
     consume(params,P_HOST_URL);
     consume(params,P_FOLDER_ID);
     consume(params,P_EMIT_XML);
+    consume(params,P_EXTRACT_META);
     consume(params,P_EMIT_JSON);
     credAdaptor.override(params);
     botsAdaptor.override(params);
@@ -150,6 +153,15 @@ import org.apache.commons.lang3.StringUtils;
   public void setEmitXml(boolean emitXml) {
     this.emitXml = emitXml;
     set(P_EMIT_XML, BooleanUtils.toStringTrueFalse(emitXml));
+  }
+
+  public boolean getExtractMetadata() {
+    return extractMetadata;
+  }
+
+  public void setExtractMetadata(boolean extractMetadata) {
+    this.extractMetadata = extractMetadata;
+    set(P_EXTRACT_META, BooleanUtils.toStringTrueFalse(extractMetadata));
   }
 
   public boolean getEmitJson() {

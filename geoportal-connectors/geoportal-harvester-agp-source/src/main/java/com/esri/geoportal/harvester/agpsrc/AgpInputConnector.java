@@ -72,6 +72,7 @@ public class AgpInputConnector implements InputConnector<InputBroker> {
       }
     });
     args.add(new UITemplate.BooleanArgument(P_EMIT_XML, bundle.getString("agpsrc.emit.xml"),false, Boolean.TRUE));
+    args.add(new UITemplate.BooleanArgument(P_EXTRACT_META, bundle.getString("agpsrc.extract.metadata"),false, Boolean.TRUE));
     args.add(new UITemplate.BooleanArgument(P_EMIT_JSON, bundle.getString("agpsrc.emit.json"),false, Boolean.FALSE));
     return new UITemplate(getType(), bundle.getString("agpsrc"), args);
   }

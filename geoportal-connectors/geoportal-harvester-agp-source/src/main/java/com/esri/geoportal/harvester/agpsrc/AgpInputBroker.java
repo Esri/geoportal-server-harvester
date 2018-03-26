@@ -231,7 +231,8 @@ import com.esri.geoportal.commons.utils.XmlUtils;
         }
 
         // Determine if this item has metadata available
-        if (definition.getEmitXml() && 
+        if (definition.getEmitXml() &&
+            definition.getExtractMetadata() &&
             Arrays.asList(nextEntry.typeKeywords).indexOf("Metadata") != -1) {
           System.out.println(String.format("Found metadata for %s, fetching...", nextEntry.id));
           try {
