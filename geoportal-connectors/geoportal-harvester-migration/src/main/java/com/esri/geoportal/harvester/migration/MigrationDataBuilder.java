@@ -69,7 +69,8 @@ import org.xml.sax.SAXException;
             definition.getEntityDefinition().getLabel(),
             data.docuuid,
             data.updateDate,
-            createSourceUri(data)
+            createSourceUri(data),
+            null, null
     );
     ref.addContext(MimeType.APPLICATION_XML, xml.getBytes("UTF-8"));
     String owner = userMap.get(data.owner);

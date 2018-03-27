@@ -21,6 +21,7 @@ import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
@@ -49,6 +50,7 @@ import org.slf4j.LoggerFactory;
   private CloseableHttpClient httpClient;
   private LinkedList<WafFolder> subFolders;
   private LinkedList<WafFile> files;
+  TaskDefinition td;
 
   
   /**
@@ -64,6 +66,7 @@ import org.slf4j.LoggerFactory;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
+    td = context.getTask().getTaskDefinition();
     CloseableHttpClient client = HttpClientBuilder.create().useSystemProperties().build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       httpClient = client;

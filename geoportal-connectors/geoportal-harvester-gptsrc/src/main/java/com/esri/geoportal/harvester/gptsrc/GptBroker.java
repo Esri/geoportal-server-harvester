@@ -24,6 +24,7 @@ import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
@@ -48,6 +49,7 @@ class GptBroker implements InputBroker {
   private final GptBrokerDefinitionAdaptor definition;
 
   private Client client;
+  private TaskDefinition td;
 
   public GptBroker(GptConnector connector, GptBrokerDefinitionAdaptor definition) {
     this.connector = connector;
@@ -57,6 +59,7 @@ class GptBroker implements InputBroker {
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
+    td = context.getTask().getTaskDefinition();
     CloseableHttpClient httpClient = HttpClientBuilder.create().useSystemProperties().build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new Client(httpClient, definition.getHostUrl(), definition.getCredentials(), definition.getIndex());
@@ -132,7 +135,7 @@ class GptBroker implements InputBroker {
         String json;
 
         EntryRef entryRef = client.readItem(id);
-        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), entryRef.getId(), entryRef.getLastModified(), entryRef.getSourceUri());
+        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), entryRef.getId(), entryRef.getLastModified(), entryRef.getSourceUri(), td.getSource().getRef(), td.getRef());
 
         if (definition.getEmitXml() && (xml = readXml(id)) != null) {
           ref.addContext(MimeType.APPLICATION_XML, xml.getBytes("UTF-8"));
