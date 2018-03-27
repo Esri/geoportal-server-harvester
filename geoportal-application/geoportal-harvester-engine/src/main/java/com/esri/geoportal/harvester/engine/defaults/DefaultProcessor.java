@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,6 +114,18 @@ public class DefaultProcessor implements Processor {
     }
     
     /**
+     * Initializes references.
+     */
+    private void initializeRefs() {
+      if(task.getTaskDefinition().getRef() == null) {
+        task.getTaskDefinition().setRef(UUID.randomUUID().toString());
+      }
+      if (task.getTaskDefinition().getSource().getRef() == null) {
+        task.getTaskDefinition().getSource().setRef(UUID.randomUUID().toString());
+      }
+    }
+    
+    /**
      * Creates instance of the process.
      *
      * @param task task
@@ -123,6 +136,8 @@ public class DefaultProcessor implements Processor {
       this.thread = new Thread(() -> {
         InitContext initContext = new SimpleInitContext(task,listeners);
         LOG.info(formatForLog("Started harvest: %s", getTitle()));
+        
+        initializeRefs();
         
         if (!task.getDataDestinations().isEmpty()) {
           try {
