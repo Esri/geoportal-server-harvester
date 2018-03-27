@@ -62,6 +62,7 @@ public final class EntityDefinition implements Serializable {
   private String label;
   private Map<String,String> properties = new LinkedHashMap<>();
   private List<String> keywords = new ArrayList<>();
+  private String ref;
 
   /**
    * Gets broker type.
@@ -126,6 +127,22 @@ public final class EntityDefinition implements Serializable {
   public void setKeywords(List<String> keywords) {
     this.keywords = keywords!=null? keywords: new ArrayList<>();
   }
+
+  /**
+   * Gets database record reference.
+   * @return database record reference or <code>null</code> if no such reference
+   */
+  public String getRef() {
+    return ref;
+  }
+
+  /**
+   * Sets database record reference.
+   * @param ref database record reference or <code>null</code> if no such reference
+   */
+  public void setRef(String ref) {
+    this.ref = ref;
+  }
   
   @Override
   public String toString() {
@@ -180,7 +197,11 @@ public final class EntityDefinition implements Serializable {
         gen.writeString(k);
       }
       gen.writeEndArray();
-      
+
+      if (value.ref !=null) {
+        gen.writeFieldName("ref");
+        gen.writeString(value.ref);
+      }
       
       gen.writeEndObject();
     }
@@ -216,6 +237,8 @@ public final class EntityDefinition implements Serializable {
           ed.keywords.add(keywords.get(i).asText());
         }
       }
+      
+      ed.ref = node.has("ref")? node.get("ref").asText(): null;
       
       return ed;
     }
