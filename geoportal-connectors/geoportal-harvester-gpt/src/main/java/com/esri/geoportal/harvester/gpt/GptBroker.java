@@ -138,6 +138,8 @@ import org.slf4j.LoggerFactory;
       data.src_uri_s = ref.getSourceUri().toASCIIString();
       data.src_lastupdate_dt = ref.getLastModifiedDate() != null ? fromatDate(ref.getLastModifiedDate()) : null;
       data.sys_owner_s = owner;
+      data.src_source_ref_s = ref.getInputBrokerRef();
+      data.src_task_ref_s = ref.getTaskRef();
 
       String xml = null;
       if (definition.getAcceptXml()) {
