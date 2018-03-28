@@ -41,6 +41,7 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -55,6 +56,8 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -98,10 +101,13 @@ import org.xml.sax.SAXException;
     try {
       // extract map of attributes (normalized names)
       MapAttribute attributes = extractMapAttributes(ref);
-
+      
       if (attributes == null) {
         throw new DataOutputException(this, String.format("Error extracting attributes from data."));
       }
+
+      System.out.println("Attributes: " + attributes.toString());
+      System.out.println("Ref map attributes " + ref.getAttributesMap().toString());
 
       // build typeKeywords array
       String src_source_type_s = URLEncoder.encode(ref.getBrokerUri().getScheme(), "UTF-8");
@@ -120,15 +126,28 @@ import org.xml.sax.SAXException;
       
       try {
 
+        System.out.println("Getting token...");
         // generate token
         if (token == null) {
           token = generateToken();
         }
-        
+        System.out.println("...got token");
+
+       
+        // String urlStr = getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null);
+        // System.out.println("WKA_RESOURCE_URL: " + Hex.encodeHexString(urlStr.getBytes()));
+        // if (urlStr == null || urlStr.trim() == "") {
+        String urlStr = ((URI)ref.getAttributesMap().get(WKAConstants.WKA_RESOURCE_URL)).toString();
+        // }
+
         // find resource URL
-        URL resourceUrl = new URL(getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null));
+        URL resourceUrl = new URL(urlStr);
+
+        System.out.println("resourceUrl: " + resourceUrl.toExternalForm());
+
         ItemType itemType = ItemType.matchPattern(resourceUrl.toExternalForm()).stream().findFirst().orElse(null);
         if (itemType == null || itemType.getDataType()!=DataType.URL) {
+          System.err.println(String.format("Skipping file %s. Data Type: %s", resourceUrl.toExternalForm(), itemType != null ? itemType.getDataType() : "null ItemType"));
           return PublishingStatus.SKIPPED;
         }
         
