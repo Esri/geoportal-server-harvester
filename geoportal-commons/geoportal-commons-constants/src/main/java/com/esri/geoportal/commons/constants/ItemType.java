@@ -110,7 +110,8 @@ public enum ItemType {
   CODE_SAMPLE("Code Sample", File),
   DESKTOP_ADD_IN("Desktop Add In", File, MimeType.APPLICATION_ESRI_ADDIN),
   EXPLORER_ADD_IN("Explorer Add In", File, MimeType.APPLICATION_ESRI_EAZ),
-  ARCGIS_PRO_ADD_IN("ArcGIS Pro Add In", File, MimeType.APPLICATION_ESRI_ADDINX);
+  ARCGIS_PRO_ADD_IN("ArcGIS Pro Add In", File, MimeType.APPLICATION_ESRI_ADDINX),
+  METADATA_XML("Document Link", URL, Pattern.compile(".+\\.xml$", Pattern.CASE_INSENSITIVE), "", MimeType.APPLICATION_XML);
 
   private final String typeName;
   private final DataType dataType;
