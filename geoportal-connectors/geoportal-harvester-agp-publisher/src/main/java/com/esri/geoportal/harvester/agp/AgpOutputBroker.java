@@ -56,8 +56,6 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -106,9 +104,6 @@ import org.xml.sax.SAXException;
         throw new DataOutputException(this, String.format("Error extracting attributes from data."));
       }
 
-      System.out.println("Attributes: " + attributes.toString());
-      System.out.println("Ref map attributes " + ref.getAttributesMap().toString());
-
       // build typeKeywords array
       String src_source_type_s = URLEncoder.encode(ref.getBrokerUri().getScheme(), "UTF-8");
       String src_source_uri_s = URLEncoder.encode(ref.getBrokerUri().toASCIIString(), "UTF-8");
@@ -126,28 +121,23 @@ import org.xml.sax.SAXException;
       
       try {
 
-        System.out.println("Getting token...");
         // generate token
         if (token == null) {
           token = generateToken();
         }
-        System.out.println("...got token");
-
        
-        // String urlStr = getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null);
-        // System.out.println("WKA_RESOURCE_URL: " + Hex.encodeHexString(urlStr.getBytes()));
-        // if (urlStr == null || urlStr.trim() == "") {
-        String urlStr = ((URI)ref.getAttributesMap().get(WKAConstants.WKA_RESOURCE_URL)).toString();
-        // }
+        String urlStr = getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null);
 
-        // find resource URL
+        // If the WKA_RESOURCE_URL is empty after parsing the XML file, see if it was set on the 
+        // DataReference directly.
+        if (urlStr == null || urlStr.isEmpty()) {
+          urlStr = ((URI)ref.getAttributesMap().get(WKAConstants.WKA_RESOURCE_URL)).toString();
+        }
+
         URL resourceUrl = new URL(urlStr);
-
-        System.out.println("resourceUrl: " + resourceUrl.toExternalForm());
 
         ItemType itemType = ItemType.matchPattern(resourceUrl.toExternalForm()).stream().findFirst().orElse(null);
         if (itemType == null || itemType.getDataType()!=DataType.URL) {
-          System.err.println(String.format("Skipping file %s. Data Type: %s", resourceUrl.toExternalForm(), itemType != null ? itemType.getDataType() : "null ItemType"));
           return PublishingStatus.SKIPPED;
         }
         
