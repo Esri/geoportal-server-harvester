@@ -24,6 +24,7 @@ import com.esri.geoportal.harvester.api.base.SimpleInitContext;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.defs.Task;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
@@ -117,11 +118,12 @@ public class DefaultProcessor implements Processor {
      * Initializes references.
      */
     private void initializeRefs() {
-      if(task.getTaskDefinition().getRef() == null) {
-        task.getTaskDefinition().setRef(UUID.randomUUID().toString());
+      if (task.getRef() == null) {
+        task.setRef(UUID.randomUUID().toString());
       }
-      if (task.getTaskDefinition().getSource().getRef() == null) {
-        task.getTaskDefinition().getSource().setRef(UUID.randomUUID().toString());
+      TaskDefinition taskDefinition = task.getTaskDefinition();
+      if (taskDefinition.getSource().getRef() == null) {
+        taskDefinition.setRef(UUID.randomUUID().toString());
       }
     }
     
