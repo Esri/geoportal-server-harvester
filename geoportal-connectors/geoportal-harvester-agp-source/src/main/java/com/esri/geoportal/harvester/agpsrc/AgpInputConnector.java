@@ -15,15 +15,18 @@
  */
 package com.esri.geoportal.harvester.agpsrc;
 
+import com.esri.geoportal.commons.agp.client.AgpClient.MetadataFormat;
 import static com.esri.geoportal.commons.constants.CredentialsConstants.*;
 import static com.esri.geoportal.harvester.agpsrc.AgpConstants.*;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
+import com.esri.geoportal.harvester.api.defs.UITemplate.Choice;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -72,6 +75,14 @@ public class AgpInputConnector implements InputConnector<InputBroker> {
       }
     });
     args.add(new UITemplate.BooleanArgument(P_EMIT_XML, bundle.getString("agpsrc.emit.xml"),false, Boolean.TRUE));
+    
+    Choice[] choices = Arrays.stream(MetadataFormat.values()).map(ch -> new Choice<String>(ch.name(), bundle.getString(String.format("agpsrc.format.%s", ch.name().toLowerCase())))).toArray(Choice[]::new);
+    args.add(new UITemplate.ChoiceArgument(P_EMIT_XML_FMT, bundle.getString("agpsrc.format"), Arrays.asList(choices)){
+      public String getDefault() {
+        return MetadataFormat.DEFAULT.name();
+      }
+    });
+    
     args.add(new UITemplate.BooleanArgument(P_EMIT_JSON, bundle.getString("agpsrc.emit.json"),false, Boolean.FALSE));
     return new UITemplate(getType(), bundle.getString("agpsrc"), args);
   }

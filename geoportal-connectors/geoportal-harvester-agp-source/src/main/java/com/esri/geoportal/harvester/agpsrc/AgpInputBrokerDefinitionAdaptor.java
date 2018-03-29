@@ -15,6 +15,8 @@
  */
 package com.esri.geoportal.harvester.agpsrc;
 
+import com.esri.geoportal.commons.agp.client.AgpClient;
+import com.esri.geoportal.commons.agp.client.AgpClient.MetadataFormat;
 import static com.esri.geoportal.harvester.agpsrc.AgpConstants.*;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
@@ -41,6 +43,7 @@ import org.apache.commons.lang3.StringUtils;
   private String folderId;
   private boolean emitXml = true;
   private boolean emitJson = false;
+  private MetadataFormat metaFormat = MetadataFormat.DEFAULT;
 
   /**
    * Creates instance of the adaptor.
@@ -64,6 +67,7 @@ import org.apache.commons.lang3.StringUtils;
       folderId = get(P_FOLDER_ID);
       emitXml = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_XML)), true);
       emitJson = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_JSON)), false);
+      metaFormat = MetadataFormat.parse(get(P_EMIT_XML_FMT), MetadataFormat.DEFAULT);
     }
   }
 
@@ -73,6 +77,7 @@ import org.apache.commons.lang3.StringUtils;
     consume(params,P_FOLDER_ID);
     consume(params,P_EMIT_XML);
     consume(params,P_EMIT_JSON);
+    consume(params,P_EMIT_XML_FMT);
     credAdaptor.override(params);
     botsAdaptor.override(params);
   }
@@ -159,6 +164,15 @@ import org.apache.commons.lang3.StringUtils;
   public void setEmitJson(boolean emitJson) {
     this.emitJson = emitJson;
     set(P_EMIT_JSON, BooleanUtils.toStringTrueFalse(emitJson));
+  }
+
+  public MetadataFormat getMetaFormat() {
+    return metaFormat;
+  }
+
+  public void setMetaFormat(MetadataFormat metaFormat) {
+    this.metaFormat = metaFormat;
+    set(P_EMIT_XML_FMT, (metaFormat != null ? metaFormat : MetadataFormat.DEFAULT).toString());
   }
   
 }
