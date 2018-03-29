@@ -35,14 +35,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestWrapper;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.client.utils.URIUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -51,6 +56,7 @@ import org.apache.http.message.BasicNameValuePair;
  */
 public class AgpClient implements Closeable {
   private static final String QUERY_EXTRAS = "-type:\"Layer\" -type: \"Map Document\" -type:\"Map Package\" -type:\"Basemap Package\" -type:\"Mobile Basemap Package\" -type:\"Mobile Map Package\" -type:\"ArcPad Package\" -type:\"Project Package\" -type:\"Project Template\" -type:\"Desktop Style\" -type:\"Pro Map\" -type:\"Layout\" -type:\"Explorer Map\" -type:\"Globe Document\" -type:\"Scene Document\" -type:\"Published Map\" -type:\"Map Template\" -type:\"Windows Mobile Package\" -type:\"Layer Package\" -type:\"Explorer Layer\" -type:\"Geoprocessing Package\" -type:\"Desktop Application Template\" -type:\"Code Sample\" -type:\"Geoprocessing Package\" -type:\"Geoprocessing Sample\" -type:\"Locator Package\" -type:\"Workflow Manager Package\" -type:\"Windows Mobile Package\" -type:\"Explorer Add In\" -type:\"Desktop Add In\" -type:\"File Geodatabase\" -type:\"Feature Collection Template\" -type:\"Code Attachment\" -type:\"Featured Items\" -type:\"Symbol Set\" -type:\"Color Set\" -type:\"Windows Viewer Add In\" -type:\"Windows Viewer Configuration\"";
+  private static final Integer DEFAULT_MAX_REDIRECTS = 5;
   
   private final URL rootUrl;
   private final SimpleCredentials credentials;
@@ -251,7 +257,7 @@ public class AgpClient implements Closeable {
     HttpGet req = new HttpGet(builder.build());
     
     try {
-      return execute(req);
+      return execute(req, 0);
     } catch (HttpResponseException ex) {
       if (ex.getStatusCode() == 500) {
         return null;
@@ -558,17 +564,52 @@ public class AgpClient implements Closeable {
   }
   
   private <T> T execute(HttpUriRequest req, Class<T> clazz) throws IOException {
-    String responseContent = execute(req);
+    String responseContent = execute(req, 0);
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     return mapper.readValue(responseContent, clazz);
   }
   
-  private String execute(HttpUriRequest req) throws IOException {
+  private String execute(HttpUriRequest req, Integer redirectDepth) throws IOException {
+    // Determine if we've reached the limit of redirection attempts
+    if (redirectDepth > DEFAULT_MAX_REDIRECTS) {
+      throw new HttpResponseException(HttpStatus.SC_GONE, "Too many redirects, aborting");
+    }
+
     try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
       if (httpResponse.getStatusLine().getStatusCode()>=400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+      } else if (httpResponse.getStatusLine().getStatusCode() >= 300) {
+        // See if we can redirect the command
+        Header locationHeader = httpResponse.getFirstHeader("Location");
+        if (locationHeader != null) {
+          try {
+            HttpRequestWrapper newReq = HttpRequestWrapper.wrap(req);
+
+            // Determine if this is a relataive redirection
+            URI redirUrl = new URI(locationHeader.getValue());
+            if (!redirUrl.isAbsolute()) {
+              HttpHost target = URIUtils.extractHost(newReq.getURI());
+
+              redirUrl = URI.create(
+                String.format(
+                  "%s://%s%s",
+                  target.getSchemeName(),
+                  target.toHostString(),
+                  locationHeader.getValue()
+                )
+              );
+            }
+            
+            newReq.setURI(redirUrl);
+
+            return execute(newReq, ++redirectDepth);
+          } catch (Exception e) {
+            e.printStackTrace();
+            throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+          }
+        }
       }
       return IOUtils.toString(contentStream, "UTF-8");
     }
