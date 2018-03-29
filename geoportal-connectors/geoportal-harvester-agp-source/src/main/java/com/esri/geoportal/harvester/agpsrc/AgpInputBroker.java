@@ -22,7 +22,6 @@ import com.esri.geoportal.commons.agp.client.ItemEntry;
 import com.esri.geoportal.commons.agp.client.QueryResponse;
 import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.constants.MimeType;
-import com.esri.geoportal.commons.constants.MimeTypeUtils;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.meta.AttributeUtils;
 import com.esri.geoportal.commons.meta.MapAttribute;
@@ -32,8 +31,6 @@ import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.Initializable.InitContext;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.commons.meta.util.WKAConstants;
-import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
-import static com.esri.geoportal.commons.utils.HttpClientContextBuilder.createHttpClientContext;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -46,11 +43,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -60,15 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import java.util.Date;
-
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.Header;
-import org.apache.http.client.HttpResponseException;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import com.esri.geoportal.commons.utils.XmlUtils;
@@ -229,19 +215,7 @@ import com.esri.geoportal.commons.utils.XmlUtils;
         if (nextEntry==null) {
             throw new DataInputException(AgpInputBroker.this, String.format("Error reading content."));
         }
-
-        // Determine if this item has metadata available
-        if (definition.getEmitXml() &&
-            definition.getExtractMetadata() &&
-            Arrays.asList(nextEntry.typeKeywords).indexOf("Metadata") != -1) {
-          System.out.println(String.format("Found metadata for %s, fetching...", nextEntry.id));
-          try {
-            return getItemMetadata(nextEntry.id);
-          } catch(Exception ex) {
-            System.out.println("Exception getting metadata for " + nextEntry.id + ", generating standard metadata...");
-          }
-        }
-
+        
         Properties props = new Properties();
         if (nextEntry.id!=null) {
           props.put(WKAConstants.WKA_IDENTIFIER, nextEntry.id);
@@ -265,14 +239,22 @@ import com.esri.geoportal.commons.utils.XmlUtils;
           props.put(WKAConstants.WKA_BBOX, sBox);
         }
         
-        MapAttribute attr = AttributeUtils.fromProperties(props);
-        Document document = metaBuilder.create(attr);
-        byte [] bytes = XmlUtils.toString(document).getBytes("UTF-8");
-
         SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), nextEntry.id, new Date(nextEntry.modified), URI.create(nextEntry.id));
+        
         if (definition.getEmitXml()) {
-          ref.addContext(MimeType.APPLICATION_XML, bytes);
+          String orgMeta = null;
+          if (Arrays.stream(nextEntry.typeKeywords).anyMatch((String a) -> a.equalsIgnoreCase("metadata")) && (orgMeta = client.readItemMetadata(nextEntry.id, AgpClient.MetadataFormat.DEFAULT, generateToken(1))) != null) {
+            // explicit metadata found
+            ref.addContext(MimeType.APPLICATION_XML, orgMeta.getBytes("UTF-8"));
+          } else {
+            // generate metadata from properties
+            MapAttribute attr = AttributeUtils.fromProperties(props);
+            Document document = metaBuilder.create(attr);
+            byte [] bytes = XmlUtils.toString(document).getBytes("UTF-8");
+            ref.addContext(MimeType.APPLICATION_XML, bytes);
+          }
         }
+        
         if (definition.getEmitJson()) {
           ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(nextEntry).getBytes("UTF-8"));
         }
@@ -294,71 +276,6 @@ import com.esri.geoportal.commons.utils.XmlUtils;
         from += size;
         return content!=null && content.results!=null && content.results.length>0? Arrays.asList(content.results): null;
       }
-    }
-
-    /**
-     * Gets the metadata for a specific item.
-     * 
-     * @param itemId Portal Id of the item to fetch.
-     */
-    private SimpleDataReference getItemMetadata(String itemId) throws URISyntaxException, IOException {
-      /*
-        This isn't in the AgpClient because it doesn't really fit in with the 
-        AgpClient's design. All of the AgpClient's calls are for JSON responses,
-        which are parsed by Jackson. This metadata call returns raw XML, which we
-        want to store as-is.
-      */
-      SimpleDataReference ref = null;
-
-      // Create an HTTP client for getting the metadata
-      CloseableHttpClient httpClient = HttpClientBuilder.create().useSystemProperties().build();
-
-      // Set up the url for the metadata
-      URIBuilder builder = new URIBuilder();
-      builder.setScheme(definition.getHostUrl().toURI().getScheme())
-          .setHost(definition.getHostUrl().toURI().getHost())
-          .setPort(definition.getHostUrl().toURI().getPort())
-          .setPath(definition.getHostUrl().toURI().getPath() + "/sharing/rest/content/items/" + itemId + "/info/metadata/metadata.xml");
-
-      System.out.println(builder.build());
-
-      // Set up the request
-      HttpGet method = new HttpGet(builder.build());
-      method.setConfig(DEFAULT_REQUEST_CONFIG);
-      
-      // Set up credendials (if necessary)
-      HttpClientContext context = definition.getCredentials()!=null && !definition.getCredentials().isEmpty()? createHttpClientContext(builder.build().toURL(), definition.getCredentials()): null;
-
-      // Request the metadata
-      try (CloseableHttpResponse httpResponse = httpClient.execute(method,context); InputStream input = httpResponse.getEntity().getContent();) {
-        // Check response code
-        if (httpResponse.getStatusLine().getStatusCode() >= 400) {
-          throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
-        }
-
-        // Read  in the last modified date (if available)
-        Date lastModifiedDate = null;
-        try {
-          Header lastModifiedHeader = httpResponse.getFirstHeader("Last-Modified");
-          if (lastModifiedHeader != null) {
-            lastModifiedDate = Date.from(ZonedDateTime.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(lastModifiedHeader.getValue())).toInstant());
-          }
-        } catch (Exception ex) {
-          // Do nothing...missing modified date header doesn't stop processing. 
-        }
- 
-        ref = new SimpleDataReference(
-          builder.build(), 
-          definition.getEntityDefinition().getLabel(), 
-          itemId, 
-          lastModifiedDate, 
-          URI.create(itemId)
-        );
-
-        ref.addContext(MimeType.APPLICATION_XML, IOUtils.toByteArray(input));
-      }
-
-      return ref;
     }
     
   }

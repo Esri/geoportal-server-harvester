@@ -350,7 +350,7 @@ html,body {
 }
 
 .h-task-editor {
-  
+  min-width: 600px;
 }
 
 .h-task-editor-brokers {
@@ -363,7 +363,7 @@ html,body {
 
 .h-task-editor-scroll {
   height: 400px; 
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .h-task-editor-cell-caption {
@@ -384,7 +384,7 @@ html,body {
 }
 
 .h-task-editor-table {
-  
+  width: 100%;
 }
 
 .h-task-editor-content {
@@ -395,6 +395,7 @@ html,body {
   border-style: solid;
   border-color: lightgrey;
   border-width: 1px;
+  width: 50%;
 }
 
 .h-task-editor-header {
