@@ -242,13 +242,20 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
           props.put(WKAConstants.WKA_BBOX, sBox);
         }
         
-        MapAttribute attr = AttributeUtils.fromProperties(props);
-        Document document = metaBuilder.create(attr);
-        byte [] bytes = XmlUtils.toString(document).getBytes("UTF-8");
-
         SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), nextEntry.id, new Date(nextEntry.modified), URI.create(nextEntry.id), td.getSource().getRef(), td.getRef());
+        
         if (definition.getEmitXml()) {
-          ref.addContext(MimeType.APPLICATION_XML, bytes);
+          String orgMeta = null;
+          if (Arrays.stream(nextEntry.typeKeywords).anyMatch((String a) -> a.equalsIgnoreCase("metadata")) && (orgMeta = client.readItemMetadata(nextEntry.id, AgpClient.MetadataFormat.DEFAULT, generateToken(1))) != null) {
+            // explicit metadata found
+            ref.addContext(MimeType.APPLICATION_XML, orgMeta.getBytes("UTF-8"));
+          } else {
+            // generate metadata from properties
+            MapAttribute attr = AttributeUtils.fromProperties(props);
+            Document document = metaBuilder.create(attr);
+            byte [] bytes = XmlUtils.toString(document).getBytes("UTF-8");
+            ref.addContext(MimeType.APPLICATION_XML, bytes);
+          }
         }
         if (definition.getEmitJson()) {
           ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(nextEntry).getBytes("UTF-8"));

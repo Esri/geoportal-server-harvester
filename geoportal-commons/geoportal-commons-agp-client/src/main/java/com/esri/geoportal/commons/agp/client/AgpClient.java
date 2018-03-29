@@ -223,7 +223,6 @@ public class AgpClient implements Closeable {
   public ItemEntry readItem(String itemId, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(itemInfoUri(itemId));
     
-    
     builder.setParameter("f", "json");
     if (token!=null) {
       builder.setParameter("token", token);
@@ -231,6 +230,34 @@ public class AgpClient implements Closeable {
     HttpGet req = new HttpGet(builder.build());
     
     return execute(req,ItemEntry.class);
+  }
+  
+  /**
+   * Reads item metadata.
+   * @param itemId item id
+   * @param format metadata format
+   * @param token token
+   * @return item metadata if available
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public String readItemMetadata(String itemId, MetadataFormat format, String token) throws IOException, URISyntaxException {
+    URIBuilder builder = new URIBuilder(itemMetaUri(itemId));
+    
+    builder.setParameter("format", (format != null ? format : MetadataFormat.DEFAULT).toString());
+    if (token!=null) {
+      builder.setParameter("token", token);
+    }
+    HttpGet req = new HttpGet(builder.build());
+    
+    try {
+      return execute(req);
+    } catch (HttpResponseException ex) {
+      if (ex.getStatusCode() == 500) {
+        return null;
+      }
+      throw ex;
+    }
   }
   
   /**
@@ -453,7 +480,16 @@ public class AgpClient implements Closeable {
     builder.setScheme(rootUrl.toURI().getScheme())
            .setHost(rootUrl.toURI().getHost())
            .setPort(rootUrl.toURI().getPort())
-           .setPath(rootUrl.toURI().getPath() + "sharing/content/items/" + itemId);
+           .setPath(rootUrl.toURI().getPath() + "sharing/content/items/" + itemId );
+    return builder.build();
+  }
+  
+  private URI itemMetaUri(String itemId) throws URISyntaxException {
+    URIBuilder builder = new URIBuilder();
+    builder.setScheme(rootUrl.toURI().getScheme())
+           .setHost(rootUrl.toURI().getHost())
+           .setPort(rootUrl.toURI().getPort())
+           .setPath(rootUrl.toURI().getPath() + "sharing/content/items/" + itemId + "/info/metadata/metadata.xml");
     return builder.build();
   }
   
@@ -522,16 +558,19 @@ public class AgpClient implements Closeable {
   }
   
   private <T> T execute(HttpUriRequest req, Class<T> clazz) throws IOException {
-
+    String responseContent = execute(req);
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    return mapper.readValue(responseContent, clazz);
+  }
+  
+  private String execute(HttpUriRequest req) throws IOException {
     try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
       if (httpResponse.getStatusLine().getStatusCode()>=400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
-      String responseContent = IOUtils.toString(contentStream, "UTF-8");
-      ObjectMapper mapper = new ObjectMapper();
-      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-      return mapper.readValue(responseContent, clazz);
+      return IOUtils.toString(contentStream, "UTF-8");
     }
   }
 
@@ -540,6 +579,22 @@ public class AgpClient implements Closeable {
       return new URL(rootUrl.toExternalForm().replaceAll("/*$", "/"));
     } catch (MalformedURLException ex) {
       return rootUrl;
+    }
+  }
+  
+  /**
+   * Metadata format.
+   */
+  public static enum MetadataFormat {
+    DEFAULT, ISO19115, FGDC, INSPIRE;
+    
+    @Override
+    public String toString() {
+      return name().toLowerCase();
+    }
+    
+    public static MetadataFormat parse(String fmt, MetadataFormat def) {
+      return Arrays.stream(MetadataFormat.values()).filter(f -> f.name().equalsIgnoreCase(fmt)).findFirst().orElse(def);
     }
   }
 }
