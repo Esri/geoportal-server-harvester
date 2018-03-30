@@ -15,7 +15,6 @@
  */
 package com.esri.geoportal.harvester.agpsrc;
 
-import com.esri.geoportal.commons.agp.client.AgpClient;
 import com.esri.geoportal.commons.agp.client.AgpClient.MetadataFormat;
 import static com.esri.geoportal.harvester.agpsrc.AgpConstants.*;
 import com.esri.geoportal.commons.robots.BotsConfig;

@@ -125,7 +125,7 @@ public class DefaultExecutionService implements ExecutionService {
     
     Processor processor = newProcessor(taskDefinition.getProcessor());
     
-    return new Task(processor, dataSource, dataDestinations, taskDefinition.getKeywords(), taskDefinition.isIncremental(), taskDefinition.isIgnoreRobotsTxt());
+    return new Task(taskDefinition.getRef(), processor, dataSource, dataDestinations, taskDefinition.getKeywords(), taskDefinition.isIncremental(), taskDefinition.isIgnoreRobotsTxt());
   }
   
   /**

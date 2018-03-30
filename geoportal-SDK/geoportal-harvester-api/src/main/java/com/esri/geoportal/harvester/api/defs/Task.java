@@ -34,9 +34,11 @@ public final class Task {
   private final List<String> keywords;
   private final boolean incremental;
   private final boolean ignoreRobotsTxt;
+  private String ref;
   
   /**
    * Creates instance of the task.
+   * @param ref task reference
    * @param processor processor
    * @param dataSource data source
    * @param dataDestinations data destination
@@ -44,7 +46,8 @@ public final class Task {
    * @param incremental incremental flag
    * @param ignoreRobotsTxt ignore robots flag
    */
-  public Task(Processor processor, InputBroker dataSource, List<Link> dataDestinations, List<String> keyywords, boolean incremental, boolean ignoreRobotsTxt) {
+  public Task(String ref, Processor processor, InputBroker dataSource, List<Link> dataDestinations, List<String> keyywords, boolean incremental, boolean ignoreRobotsTxt) {
+    this.ref = ref;
     this.processor = processor;
     this.dataSource = dataSource;
     this.dataDestinations = dataDestinations;
@@ -55,12 +58,29 @@ public final class Task {
   
   /**
    * Creates instance of the task.
+   * @param ref task reference
    * @param processor processor
    * @param dataSource data source
    * @param dataDestinations data destination
    */
-  public Task(Processor processor, InputBroker dataSource, List<Link> dataDestinations) {
-    this(processor, dataSource, dataDestinations, Collections.emptyList(), false, false);
+  public Task(String ref, Processor processor, InputBroker dataSource, List<Link> dataDestinations) {
+    this(ref, processor, dataSource, dataDestinations, Collections.emptyList(), false, false);
+  }
+
+  /**
+   * Sets task reference.
+   * @return task reference
+   */
+  public String getRef() {
+    return ref;
+  }
+
+  /**
+   * Gets task reference.
+   * @param ref task reference
+   */
+  public void setRef(String ref) {
+    this.ref = ref;
   }
 
   /**
@@ -75,6 +95,7 @@ public final class Task {
     taskDefinition.setKeywords(keywords);
     taskDefinition.setIncremental(incremental);
     taskDefinition.setIgnoreRobotsTxt(ignoreRobotsTxt);
+    taskDefinition.setRef(getRef());
     return taskDefinition;
   }
 

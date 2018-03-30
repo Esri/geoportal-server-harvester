@@ -36,6 +36,8 @@ public final class SimpleDataReference implements DataReference {
   private final String id;
   private final Date lastModifiedDate;
   private final URI sourceUri;
+  private final String inputBrokerRef;
+  private final String taskRef;
   
   // data
   private final Map<MimeType,byte []> content = new HashMap<>();
@@ -48,13 +50,17 @@ public final class SimpleDataReference implements DataReference {
    * @param id record id
    * @param lastModifiedDate last modified date
    * @param sourceUri source URI
+   * @param inputBrokerRef input broker reference or <code>null</code> if ad-hoc
+   * @param taskRef task reference of <code>null</code> if ad-hoc
    */
-  public SimpleDataReference(URI brokerUri, String brokerName, String id, Date lastModifiedDate, URI sourceUri) {
+  public SimpleDataReference(URI brokerUri, String brokerName, String id, Date lastModifiedDate, URI sourceUri, String inputBrokerRef, String taskRef) {
     this.brokerUri = brokerUri;
     this.brokerName = brokerName;
     this.id = id;
     this.lastModifiedDate = lastModifiedDate;
     this.sourceUri = sourceUri;
+    this.inputBrokerRef = inputBrokerRef;
+    this.taskRef = taskRef;
   }
 
   /**
@@ -115,6 +121,16 @@ public final class SimpleDataReference implements DataReference {
   @Override
   public DataReference getOriginDataReference() {
     return null;
+  }
+
+  @Override
+  public String getInputBrokerRef() {
+    return inputBrokerRef;
+  }
+
+  @Override
+  public String getTaskRef() {
+    return taskRef;
   }
   
   @Override

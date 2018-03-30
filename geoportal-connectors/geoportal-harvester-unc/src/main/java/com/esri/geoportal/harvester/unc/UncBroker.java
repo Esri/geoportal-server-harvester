@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.unc;
 
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
@@ -37,6 +38,8 @@ import java.util.LinkedList;
   private LinkedList<UncFolder> subFolders;
   private LinkedList<UncFile> files;
   
+  TaskDefinition td;
+  
   /**
    * Creates instance of the broker.
    * @param connector connector
@@ -50,6 +53,7 @@ import java.util.LinkedList;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
+    td = context.getTask().getTaskDefinition();
   }
 
   @Override

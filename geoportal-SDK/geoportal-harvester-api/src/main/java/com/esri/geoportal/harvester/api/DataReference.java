@@ -84,4 +84,16 @@ public interface DataReference extends Serializable {
    * @return origin data reference
    */
   DataReference getOriginDataReference();
+  
+  /**
+   * Gets input broker database reference.
+   * @return input broker reference or <code>null</code> if ad-hoc
+   */
+  String getInputBrokerRef();
+  
+  /**
+   * Gets task database reference.
+   * @return task reference of <code>null</code> if ad-hoc
+   */
+  String getTaskRef();
 }

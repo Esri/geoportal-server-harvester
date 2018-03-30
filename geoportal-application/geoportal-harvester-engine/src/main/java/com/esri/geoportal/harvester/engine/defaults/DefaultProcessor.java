@@ -24,6 +24,7 @@ import com.esri.geoportal.harvester.api.base.SimpleInitContext;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.defs.Task;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,6 +115,19 @@ public class DefaultProcessor implements Processor {
     }
     
     /**
+     * Initializes references.
+     */
+    private void initializeRefs() {
+      if (task.getRef() == null) {
+        task.setRef(UUID.randomUUID().toString());
+      }
+      TaskDefinition taskDefinition = task.getTaskDefinition();
+      if (taskDefinition.getSource().getRef() == null) {
+        taskDefinition.setRef(UUID.randomUUID().toString());
+      }
+    }
+    
+    /**
      * Creates instance of the process.
      *
      * @param task task
@@ -123,6 +138,8 @@ public class DefaultProcessor implements Processor {
       this.thread = new Thread(() -> {
         InitContext initContext = new SimpleInitContext(task,listeners);
         LOG.info(formatForLog("Started harvest: %s", getTitle()));
+        
+        initializeRefs();
         
         if (!task.getDataDestinations().isEmpty()) {
           try {

@@ -59,6 +59,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import com.esri.geoportal.commons.utils.XmlUtils;
 import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 
 /**
  * Ags broker.
@@ -72,6 +73,7 @@ import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
   private final MetaBuilder metaBuilder;
   private final GeometryService gs;
   private AgsClient client;
+  private TaskDefinition td;
 
   /**
    * Creates instance of the broker.
@@ -101,6 +103,7 @@ import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
+    td = context.getTask().getTaskDefinition();
     CloseableHttpClient httpclient = HttpClientBuilder.create().useSystemProperties().build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new AgsClient(httpclient, definition.getHostUrl());
@@ -225,7 +228,7 @@ import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
         Document document = metaBuilder.create(attrs);
         byte [] bytes = XmlUtils.toString(document).getBytes("UTF-8");
         
-        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(),  next.url, null, URI.create(next.url));
+        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(),  next.url, null, URI.create(next.url), td.getSource().getRef(), td.getRef());
         if (definition.getEmitXml()) {
           ref.addContext(MimeType.APPLICATION_XML, bytes);
         }

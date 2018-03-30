@@ -31,6 +31,7 @@ public final class TaskDefinition implements Serializable {
   private List<String> keywords = new ArrayList<>();
   private boolean incremental;
   private boolean ignoreRobotsTxt;
+  private String ref;
 
   /**
    * Gets processor definition.
@@ -126,6 +127,22 @@ public final class TaskDefinition implements Serializable {
    */
   public void setIgnoreRobotsTxt(boolean ignoreRobotsTxt) {
     this.ignoreRobotsTxt = ignoreRobotsTxt;
+  }
+
+  /**
+   * Gets database record reference.
+   * @return database record reference or <code>null</code> if no such reference
+   */
+  public String getRef() {
+    return ref;
+  }
+
+  /**
+   * Sets database record reference.
+   * @param ref database record reference or <code>null</code> if no such reference
+   */
+  public void setRef(String ref) {
+    this.ref = ref;
   }
   
   @Override
