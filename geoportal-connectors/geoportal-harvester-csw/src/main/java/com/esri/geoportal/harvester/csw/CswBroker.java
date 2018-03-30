@@ -29,6 +29,7 @@ import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.IOException;
 import java.net.URI;
@@ -53,6 +54,7 @@ import org.slf4j.LoggerFactory;
   private IRecord nextRecord;
   private int start = 1;
   private boolean noMore;
+  private TaskDefinition td;
 
   /**
    * Creates instance of the broker.
@@ -67,6 +69,7 @@ import org.slf4j.LoggerFactory;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
+    td = context.getTask().getTaskDefinition();
     httpclient = HttpClientBuilder.create().useSystemProperties().build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new Client(httpclient, definition.getHostUrl(), definition.getProfile(), definition.getCredentials());
@@ -172,7 +175,7 @@ import org.slf4j.LoggerFactory;
         IRecord rec = nextRecord;
         nextRecord=null;
         String metadata = client.readMetadata(rec.getId());
-        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), rec.getId(), rec.getLastModifiedDate(), new URI("uuid", rec.getId(), null));
+        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), rec.getId(), rec.getLastModifiedDate(), new URI("uuid", rec.getId(), null), td.getSource().getRef(), td.getRef());
         ref.addContext(MimeType.APPLICATION_XML, metadata.getBytes("UTF-8"));
         return ref;
       } catch (Exception ex) {

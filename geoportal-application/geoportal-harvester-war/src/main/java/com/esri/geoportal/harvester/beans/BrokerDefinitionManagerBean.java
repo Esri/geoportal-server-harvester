@@ -75,6 +75,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
   @Override
   public UUID create(EntityDefinition brokerDef) throws CrudlException {
     UUID id = UUID.randomUUID();
+    brokerDef.setRef(id.toString());
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("INSERT INTO BROKERS (brokerDefinition,id) VALUES (?,?)");
@@ -90,6 +91,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
 
   @Override
   public boolean update(UUID id, EntityDefinition brokerDef) throws CrudlException {
+    brokerDef.setRef(id.toString());
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("UPDATE BROKERS SET brokerDefinition = ? WHERE ID = ?");
@@ -112,7 +114,9 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
       ResultSet rs = st.executeQuery();
       if (rs.next()) {
         try {
-          return deserialize(rs.getString("brokerDefinition"), EntityDefinition.class);
+          EntityDefinition brokerDef = deserialize(rs.getString("brokerDefinition"), EntityDefinition.class);
+          brokerDef.setRef(id.toString());
+          return brokerDef;
         } catch (IOException | SQLException ex) {
           LOG.warn("Error reading broker definition", ex);
         }
@@ -149,6 +153,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
         try {
           UUID id = UUID.fromString(rs.getString("id"));
           EntityDefinition td = deserialize(rs.getString("brokerDefinition"), EntityDefinition.class);
+          td.setRef(id.toString());
           map.put(id, td);
         } catch (IOException | SQLException ex) {
           LOG.warn("Error reading broker definition", ex);

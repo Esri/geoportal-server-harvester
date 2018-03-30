@@ -75,6 +75,7 @@ public class TaskManagerBean implements TaskManager {
   @Override
   public UUID create(TaskDefinition taskDef) throws CrudlException {
     UUID id = UUID.randomUUID();
+    taskDef.setRef(id.toString());
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("INSERT INTO TASKS (taskDefinition,id) VALUES (?,?)");
@@ -90,6 +91,7 @@ public class TaskManagerBean implements TaskManager {
 
   @Override
   public boolean update(UUID id, TaskDefinition taskDef) throws CrudlException {
+    taskDef.setRef(id.toString());
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("UPDATE TASKS SET taskDefinition = ? WHERE ID = ?");
@@ -112,7 +114,9 @@ public class TaskManagerBean implements TaskManager {
       ResultSet rs = st.executeQuery();
       if (rs.next()) {
         try {
-          return deserialize(rs.getString("taskDefinition"), TaskDefinition.class);
+          TaskDefinition taskDef = deserialize(rs.getString("taskDefinition"), TaskDefinition.class);
+          taskDef.setRef(id.toString());
+          return taskDef;
         } catch (IOException | SQLException ex) {
           LOG.warn("Error reading task definition", ex);
         }
@@ -149,6 +153,7 @@ public class TaskManagerBean implements TaskManager {
         try {
           UUID id = UUID.fromString(rs.getString("id"));
           TaskDefinition td = deserialize(rs.getString("taskDefinition"), TaskDefinition.class);
+          td.setRef(id.toString());
           map.put(id, td);
         } catch (IOException | SQLException ex) {
           LOG.warn("Error reading task definition", ex);

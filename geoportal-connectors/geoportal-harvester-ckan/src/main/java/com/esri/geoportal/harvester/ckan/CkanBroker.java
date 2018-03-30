@@ -69,6 +69,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import com.esri.geoportal.commons.utils.XmlUtils;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 
 /**
  * CKAN broker.
@@ -82,6 +83,7 @@ public class CkanBroker implements InputBroker {
   
   protected CloseableHttpClient httpClient;
   private Client client;
+  private TaskDefinition td;
  
   private static final ObjectMapper mapper = new ObjectMapper();
   static {
@@ -105,6 +107,7 @@ public class CkanBroker implements InputBroker {
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
+    td = context.getTask().getTaskDefinition();
     CloseableHttpClient http = HttpClientBuilder.create().useSystemProperties().build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       httpClient = http;
@@ -250,7 +253,7 @@ public class CkanBroker implements InputBroker {
         String id = firstNonBlank(dataSet.id);
         Content content = createContent(dataSet);
 
-        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, parseIsoDate(dataSet.metadata_modified), URI.create(id));
+        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, parseIsoDate(dataSet.metadata_modified), URI.create(id), td.getSource().getRef(), td.getRef());
         
         if (definition.getEmitXml()) {
           if (Arrays.asList(new MimeType[]{MimeType.APPLICATION_XML,MimeType.TEXT_XML}).contains(content.getContentType())) {

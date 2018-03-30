@@ -58,6 +58,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import com.esri.geoportal.commons.utils.XmlUtils;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 
 /**
  * ArcGIS Portal output broker.
@@ -70,6 +71,7 @@ import com.esri.geoportal.commons.utils.XmlUtils;
   private final AgpInputBrokerDefinitionAdaptor definition;
   private final MetaBuilder metaBuilder;
   private AgpClient client;
+  private TaskDefinition td;
  
   private static final ObjectMapper mapper = new ObjectMapper();
   static {
@@ -127,6 +129,7 @@ import com.esri.geoportal.commons.utils.XmlUtils;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
+    td = context.getTask().getTaskDefinition();
     CloseableHttpClient httpclient = HttpClientBuilder.create().useSystemProperties().build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new AgpClient(httpclient, definition.getHostUrl(),definition.getCredentials());
@@ -239,7 +242,7 @@ import com.esri.geoportal.commons.utils.XmlUtils;
           props.put(WKAConstants.WKA_BBOX, sBox);
         }
         
-        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), nextEntry.id, new Date(nextEntry.modified), URI.create(nextEntry.id));
+        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), nextEntry.id, new Date(nextEntry.modified), URI.create(nextEntry.id), td.getSource().getRef(), td.getRef());
         
         if (definition.getEmitXml()) {
           String orgMeta = null;
@@ -254,7 +257,6 @@ import com.esri.geoportal.commons.utils.XmlUtils;
             ref.addContext(MimeType.APPLICATION_XML, bytes);
           }
         }
-        
         if (definition.getEmitJson()) {
           ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(nextEntry).getBytes("UTF-8"));
         }

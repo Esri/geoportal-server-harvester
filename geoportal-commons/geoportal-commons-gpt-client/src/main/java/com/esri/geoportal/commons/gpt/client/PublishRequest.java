@@ -25,4 +25,6 @@ public final class PublishRequest {
   public String src_uri_s;
   public String src_lastupdate_dt;
   public String sys_owner_s;
+  public String src_source_ref_s;
+  public String src_task_ref_s;
 }

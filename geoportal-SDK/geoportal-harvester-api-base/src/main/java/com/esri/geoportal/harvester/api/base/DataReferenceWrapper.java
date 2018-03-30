@@ -107,6 +107,16 @@ public class DataReferenceWrapper implements DataReference {
   }
 
   @Override
+  public String getInputBrokerRef() {
+    return baseRef.getInputBrokerRef();
+  }
+
+  @Override
+  public String getTaskRef() {
+    return baseRef.getTaskRef();
+  }
+
+  @Override
   public String toString() {
     return baseRef.toString();
   }
