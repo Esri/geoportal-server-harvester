@@ -556,17 +556,20 @@ public class Client implements Closeable {
     if (searchContext._scroll_id == null) {
       node.put("size", size);
       if (term!=null && value!=null) {
-        ObjectNode match = mapper.createObjectNode();
-        match.put(term, value);
         ObjectNode query = mapper.createObjectNode();
-        query.set("match", match);
         node.set("query", query);
+        
+        ObjectNode match = mapper.createObjectNode();
+        query.set("match", match);
+        
+        match.put(term, value);
       }
     } else {
       node.put("scroll", "1m");
       node.put("scroll_id", searchContext._scroll_id);
     }
-    return new StringEntity(node.asText(), ContentType.APPLICATION_JSON);
+    
+    return new StringEntity(node.toString(), ContentType.APPLICATION_JSON);
   }
 
   private URI createQueryUri(SearchContext searchContext) throws IOException, URISyntaxException {
