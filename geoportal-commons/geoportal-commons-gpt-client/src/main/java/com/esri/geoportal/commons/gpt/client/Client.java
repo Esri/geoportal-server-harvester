@@ -55,6 +55,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -147,12 +148,6 @@ public class Client implements Closeable {
               Double ymin = fullExtent.path("ymin").asDouble();
               Double xmax = fullExtent.path("xmax").asDouble();
               Double ymax = fullExtent.path("ymax").asDouble();
-
-              /*
-              MultiPoint mp = new MultiPoint();
-              mp.add(xmin, ymin);
-              mp.add(xmax, ymax);
-              */
 
               ObjectNode envelope_geo = mapper.createObjectNode();
               envelope_geo.put("type", "envelope");
@@ -516,16 +511,18 @@ public class Client implements Closeable {
    * @throws URISyntaxException if URL has invalid syntax
    */
   private QueryResponse query(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
-    URI uri = createQueryUri(term, value, size, searchContext);
+    URI uri = createQueryUri(searchContext);
+    HttpEntity httpEntity = createQueryEntity(term, value, size, searchContext);
     try {
-      QueryResponse response = query(uri);
+      QueryResponse response = query(uri, httpEntity);
       searchContext._scroll_id = response._scroll_id;
       return response;
     } catch (HttpResponseException ex) {
       if (ex.getStatusCode() == 401) {
         clearToken();
-        uri = createQueryUri(term, value, size, searchContext);
-        QueryResponse response = query(uri);
+        uri = createQueryUri(searchContext);
+        httpEntity = createQueryEntity(term, value, size, searchContext);
+        QueryResponse response = query(uri, httpEntity);
         searchContext._scroll_id = response._scroll_id;
         return response;
       } else {
@@ -538,24 +535,46 @@ public class Client implements Closeable {
     tokenInfo = null;
   }
 
-  private QueryResponse query(URI uri) throws IOException, URISyntaxException {
-    HttpGet get = new HttpGet(uri);
-    get.setConfig(DEFAULT_REQUEST_CONFIG);
-    get.setHeader("Content-Type", "application/json");
-    get.setHeader("User-Agent", HttpConstants.getUserAgent());
+  private QueryResponse query(URI uri, HttpEntity httpEntity) throws IOException, URISyntaxException {
+    HttpPost request = new HttpPost(uri);
+    request.setEntity(httpEntity);
+    
+    request.setConfig(DEFAULT_REQUEST_CONFIG);
+    request.setHeader("Content-Type", "application/json");
+    request.setHeader("User-Agent", HttpConstants.getUserAgent());
 
-    return execute(get, QueryResponse.class);
+    return execute(request, QueryResponse.class);
   }
 
   private String createElasticSearchUrl() {
     return ELASTIC_SEARCH_URL.replaceAll("\\{metadata\\}", index);
   }
+  
+  private HttpEntity createQueryEntity(String term, String value, long size, SearchContext searchContext) {
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode node = mapper.createObjectNode();
+    if (searchContext._scroll_id == null) {
+      node.put("size", size);
+      if (term!=null && value!=null) {
+        ObjectNode query = mapper.createObjectNode();
+        node.set("query", query);
+        
+        ObjectNode match = mapper.createObjectNode();
+        query.set("match", match);
+        
+        match.put(term, value);
+      }
+    } else {
+      node.put("scroll", "1m");
+      node.put("scroll_id", searchContext._scroll_id);
+    }
+    
+    return new StringEntity(node.toString(), ContentType.APPLICATION_JSON);
+  }
 
-  private URI createQueryUri(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
+  private URI createQueryUri(SearchContext searchContext) throws IOException, URISyntaxException {
     if (searchContext._scroll_id == null) {
       return new URIBuilder(url.toURI().resolve(createElasticSearchUrl()))
-              .addParameter("q", term != null && value != null ? String.format("%s:\"%s\"", term, value) : "*:*")
-              .addParameter("size", Long.toString(size))
               .addParameter("scroll", "1m")
               .addParameter("access_token", getAccessToken())
               .build();
