@@ -29,7 +29,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -54,7 +53,6 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
@@ -150,12 +148,6 @@ public class Client implements Closeable {
               Double ymin = fullExtent.path("ymin").asDouble();
               Double xmax = fullExtent.path("xmax").asDouble();
               Double ymax = fullExtent.path("ymax").asDouble();
-
-              /*
-              MultiPoint mp = new MultiPoint();
-              mp.add(xmin, ymin);
-              mp.add(xmax, ymax);
-              */
 
               ObjectNode envelope_geo = mapper.createObjectNode();
               envelope_geo.put("type", "envelope");
@@ -519,7 +511,7 @@ public class Client implements Closeable {
    * @throws URISyntaxException if URL has invalid syntax
    */
   private QueryResponse query(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
-    URI uri = createQueryUri(term, value, size, searchContext);
+    URI uri = createQueryUri(searchContext);
     HttpEntity httpEntity = createQueryEntity(term, value, size, searchContext);
     try {
       QueryResponse response = query(uri, httpEntity);
@@ -528,7 +520,7 @@ public class Client implements Closeable {
     } catch (HttpResponseException ex) {
       if (ex.getStatusCode() == 401) {
         clearToken();
-        uri = createQueryUri(term, value, size, searchContext);
+        uri = createQueryUri(searchContext);
         httpEntity = createQueryEntity(term, value, size, searchContext);
         QueryResponse response = query(uri, httpEntity);
         searchContext._scroll_id = response._scroll_id;
@@ -577,13 +569,9 @@ public class Client implements Closeable {
     return new StringEntity(node.asText(), ContentType.APPLICATION_JSON);
   }
 
-  private URI createQueryUri(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
+  private URI createQueryUri(SearchContext searchContext) throws IOException, URISyntaxException {
     if (searchContext._scroll_id == null) {
       return new URIBuilder(url.toURI().resolve(createElasticSearchUrl()))
-              /*
-              .addParameter("q", term != null && value != null ? String.format("%s:\"%s\"", term, value) : "*:*")
-              .addParameter("size", Long.toString(size))
-              */
               .addParameter("scroll", "1m")
               .addParameter("access_token", getAccessToken())
               .build();
