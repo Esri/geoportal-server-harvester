@@ -21,6 +21,7 @@ package com.esri.geoportal.harvester.agpsrc;
 /*package*/ final class AgpConstants {
   public static final String P_HOST_URL    = "agp-host-url";
   public static final String P_FOLDER_ID   = "agp-folder-id";
+  public static final String P_EXTRACT_META= "agp-extract-metadata";
   public static final String P_EMIT_XML    = "agp-emit-xml";
   public static final String P_EMIT_XML_FMT= "agp-emit-xml-fmt";
   public static final String P_EMIT_JSON   = "agp-emit-json";

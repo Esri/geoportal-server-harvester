@@ -41,6 +41,7 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -98,7 +99,7 @@ import org.xml.sax.SAXException;
     try {
       // extract map of attributes (normalized names)
       MapAttribute attributes = extractMapAttributes(ref);
-
+      
       if (attributes == null) {
         throw new DataOutputException(this, String.format("Error extracting attributes from data."));
       }
@@ -124,9 +125,17 @@ import org.xml.sax.SAXException;
         if (token == null) {
           token = generateToken();
         }
-        
-        // find resource URL
-        URL resourceUrl = new URL(getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null));
+       
+        String urlStr = getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null);
+
+        // If the WKA_RESOURCE_URL is empty after parsing the XML file, see if it was set on the 
+        // DataReference directly.
+        if (urlStr == null || urlStr.isEmpty()) {
+          urlStr = ((URI)ref.getAttributesMap().get(WKAConstants.WKA_RESOURCE_URL)).toString();
+        }
+
+        URL resourceUrl = new URL(urlStr);
+
         ItemType itemType = ItemType.matchPattern(resourceUrl.toExternalForm()).stream().findFirst().orElse(null);
         if (itemType == null || itemType.getDataType()!=DataType.URL) {
           return PublishingStatus.SKIPPED;
