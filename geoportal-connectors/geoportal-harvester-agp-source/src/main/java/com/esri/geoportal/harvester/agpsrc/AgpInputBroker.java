@@ -132,10 +132,10 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
     td = context.getTask().getTaskDefinition();
     CloseableHttpClient httpclient = HttpClientBuilder.create().useSystemProperties().build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
-      client = new AgpClient(httpclient, definition.getHostUrl(),definition.getCredentials());
+      client = new AgpClient(httpclient, definition.getHostUrl(),definition.getCredentials(), definition.getMaxRedirects());
     } else {
       Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getHostUrl());
-      client = new AgpClient(new BotsHttpClient(httpclient,bots), definition.getHostUrl(), definition.getCredentials());
+      client = new AgpClient(new BotsHttpClient(httpclient,bots), definition.getHostUrl(), definition.getCredentials(), definition.getMaxRedirects());
     }
     
     try {

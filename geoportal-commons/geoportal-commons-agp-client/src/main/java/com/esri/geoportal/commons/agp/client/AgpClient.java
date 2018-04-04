@@ -61,6 +61,7 @@ public class AgpClient implements Closeable {
   private final URL rootUrl;
   private final SimpleCredentials credentials;
   private final CloseableHttpClient httpClient;
+  private final Integer maxRedirects;
   
   /**
    * Creates instance of the client.
@@ -69,9 +70,14 @@ public class AgpClient implements Closeable {
    * @param credentials credentials
    */
   public AgpClient(CloseableHttpClient httpClient, URL rootUrl, SimpleCredentials credentials) {
+    this(httpClient, rootUrl, credentials, DEFAULT_MAX_REDIRECTS);
+  }
+
+  public AgpClient(CloseableHttpClient httpClient, URL rootUrl, SimpleCredentials credentials, Integer maxRedirects) {
     this.rootUrl = adjustUrl(rootUrl);
     this.credentials = credentials;
     this.httpClient = httpClient;
+    this.maxRedirects = maxRedirects;
   }
 
   @Override
@@ -573,7 +579,7 @@ public class AgpClient implements Closeable {
   
   private String execute(HttpUriRequest req, Integer redirectDepth) throws IOException {
     // Determine if we've reached the limit of redirection attempts
-    if (redirectDepth > DEFAULT_MAX_REDIRECTS) {
+    if (redirectDepth > this.maxRedirects) {
       throw new HttpResponseException(HttpStatus.SC_GONE, "Too many redirects, aborting");
     }
 

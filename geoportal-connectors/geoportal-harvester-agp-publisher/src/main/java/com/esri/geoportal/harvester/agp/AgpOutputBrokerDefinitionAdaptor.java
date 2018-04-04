@@ -25,17 +25,20 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * ArcGIS Portal definition adaptor.
  */
 /*package*/ class AgpOutputBrokerDefinitionAdaptor  extends BrokerDefinitionAdaptor {
+  private static final Integer DEFAULT_MAX_REDIRECTS = 5;
 
   private final CredentialsDefinitionAdaptor credAdaptor;
   
   private URL hostUrl;
   private String folderId;
   private boolean cleanup;
+  private Integer maxRedirects;
 
   /**
    * Creates instance of the adaptor.
@@ -57,6 +60,7 @@ import org.apache.commons.lang3.StringUtils;
       }
       folderId = get(P_FOLDER_ID);
       cleanup  = Boolean.parseBoolean(get(P_FOLDER_CLEANUP));
+      maxRedirects = NumberUtils.toInt(get(P_MAX_REDIRECTS), DEFAULT_MAX_REDIRECTS);
     }
   }
 
@@ -65,6 +69,7 @@ import org.apache.commons.lang3.StringUtils;
     consume(params,P_HOST_URL);
     consume(params,P_FOLDER_ID);
     consume(params,P_FOLDER_CLEANUP);
+    consume(params, P_MAX_REDIRECTS);
     credAdaptor.override(params);
   }
   
@@ -134,6 +139,20 @@ import org.apache.commons.lang3.StringUtils;
     this.cleanup = cleanup;
     set(P_FOLDER_CLEANUP, Boolean.toString(cleanup));
   }
+
+/**
+ * @return the maxRedirects
+ */
+public Integer getMaxRedirects() {
+	return maxRedirects;
+}
+
+/**
+ * @param maxRedirects the maxRedirects to set
+ */
+public void setMaxRedirects(Integer maxRedirects) {
+	this.maxRedirects = maxRedirects;
+}
   
   
 }
