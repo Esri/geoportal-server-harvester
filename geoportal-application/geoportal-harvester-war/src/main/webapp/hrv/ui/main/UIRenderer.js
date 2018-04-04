@@ -28,13 +28,14 @@ define(["dojo/_base/declare",
         "dijit/form/CheckBox",
         "dijit/form/TimeTextBox",
         "dijit/form/RadioButton",
+        "dijit/form/NumberTextBox",
         "dijit/form/Form",
         "dojox/html/entities",
         "hrv/utils/TextScrambler"
       ],
   function(declare,i18n,
            lang,array,domConstruct,domAttr,html,number,
-           Select,ValidationTextBox,CheckBox,TimeTextBox,RadioButton,Form,
+           Select,ValidationTextBox,CheckBox,TimeTextBox,RadioButton,NumberTextBox,Form,
            entities,TextScrambler
           ){
   
@@ -75,6 +76,7 @@ define(["dojo/_base/declare",
           case "bool": return this.renderBool(placeholderNode,arg);
           case "temporal": return this.renderTime(placeholderNode,arg);
           case "periodical": return this.renderPeriod(placeholderNode,arg);
+          case "integer": return this.renderInteger(placeholderNode, arg);
           default: 
             console.error("Unsupported argument type:", arg.type);
             return {
@@ -110,6 +112,29 @@ define(["dojo/_base/declare",
             input.destroy();
           } 
         };
+      },
+
+      renderInteger: function (placeholderNode, arg) {
+        var input = new NumberTextBox({
+          name: arg.name,
+          required: arg.required
+        }).placeAt(placeholderNode);
+
+        input.set("value", arg.defaultValue ? Number(arg.defaultValue) : 0);
+
+        input.startup();
+
+        return {
+          init: function (values) {
+            input.set("value", Number(values[arg.name]));
+          },
+          read: function (values) {
+            values[arg.name] = input.get("value");
+          },
+          destroy: function () {
+            input.destroy();
+          }
+        }
       },
       
       renderChoice: function(placeholderNode,arg) {
