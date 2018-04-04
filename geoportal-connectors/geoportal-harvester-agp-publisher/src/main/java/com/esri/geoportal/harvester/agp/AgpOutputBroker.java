@@ -363,7 +363,7 @@ import org.xml.sax.SAXException;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
-    this.client = new AgpClient(HttpClientBuilder.create().useSystemProperties().build(), definition.getHostUrl(),definition.getCredentials());
+    this.client = new AgpClient(HttpClientBuilder.create().useSystemProperties().build(), definition.getHostUrl(),definition.getCredentials(), definition.getMaxRedirects());
     if(definition.getCleanup()) {
       context.addListener(new BaseProcessInstanceListener() {
         @Override
