@@ -57,6 +57,7 @@
   <bean class="com.esri.geoportal.harvester.unc.UncConnector"/>
   <bean class="com.esri.geoportal.harvester.waf.WafConnector"/>
   <bean class="com.esri.geoportal.harvester.migration.MigrationConnector"/>
+  <bean class="com.esri.geoportal.harvester.sink.SinkConnector"/>
   
   <!-- Triggers -->
   <bean class="com.esri.geoportal.harvester.engine.triggers.NowTrigger"/>
