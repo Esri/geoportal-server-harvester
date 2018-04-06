@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.harvester.sink;
+package com.esri.geoportal.harvester.sink;
 
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -24,13 +24,16 @@ import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.LinkedList;
 
 /**
- * UNC broker.
+ * Sink broker.
  */
 /*package*/ class SinkBroker implements InputBroker {
   private final SinkConnector connector;
   private final SinkBrokerDefinitionAdaptor definition;
+
+  private LinkedList<SinkFile> files;
   
   TaskDefinition td;
   

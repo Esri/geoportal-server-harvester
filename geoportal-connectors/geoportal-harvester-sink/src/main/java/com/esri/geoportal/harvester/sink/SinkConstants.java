@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.harvester.sink;
+package com.esri.geoportal.harvester.sink;
 
 /**
- * UNC constants.
+ * Sink constants.
  */
 /*package*/ final class SinkConstants {
-  public static final String P_ROOT_FOLDER    = "sink-root-folder";
+  public static final String P_ROOT_FOLDER    = "sink-drop-folder";
 }

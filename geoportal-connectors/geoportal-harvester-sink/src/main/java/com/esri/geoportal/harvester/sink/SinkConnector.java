@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.harvester.sink;
+package com.esri.geoportal.harvester.sink;
 
-import static com.esri.geoportal.geoportal.harvester.sink.SinkConstants.P_ROOT_FOLDER;
+import static com.esri.geoportal.harvester.sink.SinkConstants.P_ROOT_FOLDER;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -42,7 +42,7 @@ public class SinkConnector implements InputConnector<InputBroker> {
   public UITemplate getTemplate(Locale locale) {
     ResourceBundle bundle = ResourceBundle.getBundle("SinkResource", locale);
     List<UITemplate.Argument> args = new ArrayList<>();
-    args.add(new UITemplate.StringArgument(P_ROOT_FOLDER, bundle.getString("sink.rootFolder"), true){
+    args.add(new UITemplate.StringArgument(P_ROOT_FOLDER, bundle.getString("sink.dropFolder"), true){
       @Override
       public String getHint() {
         return bundle.getString("sink.hint");

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.harvester.sink;
+package com.esri.geoportal.harvester.sink;
 
-import static com.esri.geoportal.geoportal.harvester.sink.SinkConstants.P_ROOT_FOLDER;
+import static com.esri.geoportal.harvester.sink.SinkConstants.P_ROOT_FOLDER;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -24,7 +24,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * UNC broker definition adaptor.
+ * Sink broker definition adaptor.
  */
 public class SinkBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   
