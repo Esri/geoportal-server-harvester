@@ -19,5 +19,5 @@ package com.esri.geoportal.harvester.sink;
  * Sink constants.
  */
 /*package*/ final class SinkConstants {
-  public static final String P_ROOT_FOLDER    = "sink-drop-folder";
+  public static final String P_DROP_FOLDER    = "sink-drop-folder";
 }

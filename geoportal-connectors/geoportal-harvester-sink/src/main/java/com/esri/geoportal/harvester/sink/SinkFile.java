@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Date;
 import org.apache.commons.io.IOUtils;
 
@@ -52,11 +53,19 @@ import org.apache.commons.io.IOUtils;
   public SimpleDataReference readContent() throws IOException, URISyntaxException {
     Date lastModifiedDate = readLastModifiedDate();
     MimeType contentType = readContentType();
-    try (InputStream input = Files.newInputStream(file)) {
+    try (InputStream input = Files.newInputStream(file, StandardOpenOption.READ)) {
       SimpleDataReference ref = new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), file.toAbsolutePath().toString(), lastModifiedDate, file.toUri(), broker.td.getSource().getRef(), broker.td.getRef());
       ref.addContext(contentType, IOUtils.toByteArray(input));
       return ref;
     }
+  }
+  
+  /**
+   * Deletes file.
+   * @throws IOException if unable to delete file.
+   */
+  public void delete() throws IOException {
+    file.toFile().delete();
   }
 
   /**

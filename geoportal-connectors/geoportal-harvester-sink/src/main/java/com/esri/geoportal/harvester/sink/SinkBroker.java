@@ -22,20 +22,40 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.FileSystemException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Sink broker.
  */
 /*package*/ class SinkBroker implements InputBroker {
+  private static final Logger LOG = LoggerFactory.getLogger(SinkBroker.class);
   private final SinkConnector connector;
   private final SinkBrokerDefinitionAdaptor definition;
 
-  private LinkedList<SinkFile> files;
+  private LinkedList<SinkFile> files = new LinkedList<>();
   
   TaskDefinition td;
+  private Path dropPath;
+  private WatchService watchService;
+  private Thread watchThread;
+  private Object lock = new Object();
   
   /**
    * Creates instance of the broker.
@@ -51,11 +71,46 @@ import java.util.LinkedList;
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     td = context.getTask().getTaskDefinition();
+    dropPath = Paths.get(definition.getRootFolder().getAbsolutePath());
+    try {
+      watchService = FileSystems.getDefault().newWatchService();
+      dropPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
+      watchThread = new Thread(() -> {
+        WatchKey watchKey;
+        try {
+          do {
+            watchKey = watchService.take();
+            watchKey.pollEvents();
+            
+            synchronized(lock) {
+              lock.notifyAll();
+            }
+
+            watchKey.reset();
+          } while (!Thread.interrupted());
+        } catch (InterruptedException ex) {
+          // ignore
+        }
+      }, String.format("Folder watching thread on %s", dropPath.toString()));
+      watchThread.start();
+    } catch (IOException ex) {
+      throw new DataProcessorException(String.format("Error creating folder watch service."), ex);
+    }
   }
 
   @Override
   public void terminate() {
-    // nothing to terminate
+    if (watchService != null) {
+      try {
+        watchService.close();
+      } catch (IOException ex) {
+        LOG.warn(String.format("Error terminating broker: %s", definition.toString()), ex);
+      }
+    }
+    
+    if (watchThread != null) {
+      watchThread.interrupt();
+    }
   }
 
   @Override
@@ -99,14 +154,46 @@ import java.util.LinkedList;
     }
     
     
+    private List<SinkFile> listFiles() throws IOException {
+      Pattern pattern = Pattern.compile(".*\\.xml$", Pattern.CASE_INSENSITIVE);
+      return Files.list(dropPath).filter(path -> pattern.matcher(path.toString()).matches()).map(path -> new SinkFile(SinkBroker.this, path)).collect(Collectors.toList());
+    }
+    
     @Override
     public boolean hasNext() throws DataInputException {
-      return false;
+      try {
+        if (files!=null && !files.isEmpty()) {
+          return true;
+        }
+        
+        files.addAll(listFiles());
+        
+        if (!files.isEmpty()) {
+          return true;
+        }
+        
+        synchronized(lock) {
+          lock.wait();
+        }
+        
+        return hasNext();
+      } catch (InterruptedException ex) {
+        return false;
+      } catch (IOException ex) {
+        throw new DataInputException(SinkBroker.this, "Error reading data.", ex);
+      }
     }
 
     @Override
     public DataReference next() throws DataInputException {
-      throw new DataInputException(SinkBroker.this, "Error reading data.");
+      try {
+        SinkFile file = files.poll();
+        DataReference ref = file.readContent();
+        file.delete();
+        return ref;
+      } catch (IOException|URISyntaxException ex) {
+        throw new DataInputException(SinkBroker.this, "Error reading data.", ex);
+      }
     }
   }
   

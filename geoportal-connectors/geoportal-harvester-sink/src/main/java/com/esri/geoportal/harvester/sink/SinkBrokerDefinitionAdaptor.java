@@ -15,20 +15,20 @@
  */
 package com.esri.geoportal.harvester.sink;
 
-import static com.esri.geoportal.harvester.sink.SinkConstants.P_ROOT_FOLDER;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.io.File;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import static com.esri.geoportal.harvester.sink.SinkConstants.P_DROP_FOLDER;
 
 /**
  * Sink broker definition adaptor.
  */
 public class SinkBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   
-  private File rootFolder;
+  private File dropFolder;
 
   /**
    * Creates instance of the adaptor.
@@ -43,16 +43,16 @@ public class SinkBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
       throw new InvalidDefinitionException("Broker definition doesn't match");
     } else {
       try {
-        rootFolder = new File(get(P_ROOT_FOLDER));
+        dropFolder = new File(get(P_DROP_FOLDER));
       } catch (Exception ex) {
-        throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_ROOT_FOLDER, get(P_ROOT_FOLDER)), ex);
+        throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_DROP_FOLDER, get(P_DROP_FOLDER)), ex);
       }
     }
   }
 
   @Override
   public void override(Map<String, String> params) {
-    consume(params,P_ROOT_FOLDER);
+    consume(params,P_DROP_FOLDER);
   }
   
   /**
@@ -60,7 +60,7 @@ public class SinkBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    * @return root folder
    */
   public File getRootFolder() {
-    return rootFolder;
+    return dropFolder;
   }
   
   /**
@@ -68,8 +68,8 @@ public class SinkBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    * @param rootFolder host URL
    */
   public void setRootFolder(File rootFolder) {
-    this.rootFolder = rootFolder;
-    set(P_ROOT_FOLDER, rootFolder.getAbsolutePath());
+    this.dropFolder = rootFolder;
+    set(P_DROP_FOLDER, rootFolder.getAbsolutePath());
   }
   
 }
