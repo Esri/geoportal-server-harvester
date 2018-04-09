@@ -41,8 +41,10 @@ import org.apache.commons.cli.ParseException;
  * Command line application.
  */
 public class Application {
+  private static final String DEFAULT_GEOMETRY_SERVICE = "https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer";
   private static final String version = "2.0.0";
-  private static final String geometryServiceUrl = "https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer";
+
+  private String geometryServiceUrl = DEFAULT_GEOMETRY_SERVICE;
 
   public static void main(String[] args) {
     Application app = new Application();
@@ -55,6 +57,7 @@ public class Application {
     
     try {
       CommandLine cli = parser.parse(options, args);
+      
       if (cli.getOptions().length==0 || cli.hasOption('h') || cli.hasOption("v")) {
         if (cli.hasOption("v")) {
           printVersion();
@@ -62,20 +65,28 @@ public class Application {
           printHeader();
           printHelp(options);
         }
-      } else if (cli.hasOption('f')) {
-        String fileName = cli.getOptionValue('f');
-        File file = new File(fileName);
-        try (InputStream inputStream = new FileInputStream(file)) {
-          TaskDefinition taskDefinition = deserialize(inputStream,TaskDefinition.class);
-          harvest(taskDefinition);
-        }
-      } else if (cli.hasOption('t')) {
-        String sTaskDef = cli.getOptionValue('t');
-        TaskDefinition taskDefinition = deserialize(sTaskDef,TaskDefinition.class);
-        harvest(taskDefinition);
       } else {
-        printHeader();
-        printHelp(options);
+        // See if the geometry service is configured
+        if (cli.hasOption('g')) {
+          String geoUrl = cli.getOptionValue('g');
+          this.geometryServiceUrl = geoUrl;
+        } 
+
+        if (cli.hasOption('f')) {
+          String fileName = cli.getOptionValue('f');
+          File file = new File(fileName);
+          try (InputStream inputStream = new FileInputStream(file)) {
+            TaskDefinition taskDefinition = deserialize(inputStream,TaskDefinition.class);
+            harvest(taskDefinition);
+          }
+        } else if (cli.hasOption('t')) {
+          String sTaskDef = cli.getOptionValue('t');
+          TaskDefinition taskDefinition = deserialize(sTaskDef,TaskDefinition.class);
+          harvest(taskDefinition);
+        } else {
+          printHeader();
+          printHelp(options);
+        }
       }
     } catch (IOException|DataProcessorException|InvalidDefinitionException ex) {
       ex.printStackTrace(System.err);
@@ -105,6 +116,8 @@ public class Application {
     Option verbose = new Option("V", "verbose", false, "be extra verbose");
     Option file = new Option("f", "file", true, "executes task defined in the file");
     Option task = new Option("t", "task", true, "executes task defined as JSON");
+    Option geo = new Option("g", "geometry", true, "url to accessible geometry service");
+    geo.setArgName("url");
     
     Options options = new Options();
     options.addOption(help);
@@ -112,12 +125,13 @@ public class Application {
     options.addOption(verbose);
     options.addOption(file);
     options.addOption(task);
+    options.addOption(geo);
     
     return options;
   }
 
   protected void harvest(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
-    Bootstrap boot = new Bootstrap(geometryServiceUrl, new MemReportManager());
+    Bootstrap boot = new Bootstrap(this.geometryServiceUrl, new MemReportManager());
     Engine engine = boot.createEngine();
     IteratorContext iterCtx = new SimpleIteratorContext();
 
