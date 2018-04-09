@@ -59,11 +59,16 @@ define(["dojo/_base/declare",
               domStyle.set(this.progressNode,"display",result.status==="working"? "inline": "none");
               if (result.status==="working" && result.statistics) {
                 var now = new Date();
-                var start = new Date(result.statistics.startDate);
-                var duration = (now-start)>0? (now-start)/1000/60: 0;
-                var velocity = result.statistics.acquired>0 && duration>0? Math.round(result.statistics.acquired/duration): null;
-                var progress = ""+result.statistics.acquired + (velocity? " ("+velocity+"/"+this.i18n.processes.min+")": "");
-                html.set(this.progressNode, progress);
+                if (this.data.taskDefinition.source.type !== "SINK") {
+                  var start = new Date(result.statistics.startDate);
+                  var duration = (now-start)>0? (now-start)/1000/60: 0;
+                  var velocity = result.statistics.acquired>0 && duration>0? Math.round(result.statistics.acquired/duration): null;
+                  var progress = ""+result.statistics.acquired + (velocity? " ("+velocity+"/"+this.i18n.processes.min+")": "");
+                  html.set(this.progressNode, progress);
+                } else {
+                  var progress = ""+result.statistics.acquired;
+                  html.set(this.progressNode, progress);
+                }
               }
               if (result.status==="working" || result.status==="aborting") {
                 setTimeout(update,2000);
