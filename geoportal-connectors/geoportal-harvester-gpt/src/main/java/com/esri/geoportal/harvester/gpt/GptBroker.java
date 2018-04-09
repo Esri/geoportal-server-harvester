@@ -83,7 +83,10 @@ import org.slf4j.LoggerFactory;
     try {
       client = new Client(definition.getHostUrl(), definition.getCredentials(), definition.getIndex());
 
-      if (definition.getCleanup()) {
+      if (!context.canCleanup()) {
+        preventCleanup = true;
+      }
+      if (definition.getCleanup() && !preventCleanup) {
         context.addListener(new BaseProcessInstanceListener() {
           @Override
           public void onError(DataException ex) {

@@ -67,6 +67,7 @@ import org.slf4j.LoggerFactory;
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
+    context.preventCleanup();
     definition.override(context.getParams());
     td = context.getTask().getTaskDefinition();
     dropPath = Paths.get(definition.getRootFolder().getAbsolutePath());

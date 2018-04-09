@@ -28,6 +28,7 @@ import java.util.Map;
 public class SimpleInitContext implements Broker.InitContext {
   private final Task task;
   private final List<Listener> listeners;
+  private boolean preventCleanup;
 
   /**
    * Creates instance of the context.
@@ -52,6 +53,16 @@ public class SimpleInitContext implements Broker.InitContext {
   @Override
   public void addListener(Listener listener) {
     listeners.add(listener);
+  }
+
+  @Override
+  public boolean canCleanup() {
+    return !preventCleanup;
+  }
+
+  @Override
+  public void preventCleanup() {
+    preventCleanup = true;
   }
   
 }
