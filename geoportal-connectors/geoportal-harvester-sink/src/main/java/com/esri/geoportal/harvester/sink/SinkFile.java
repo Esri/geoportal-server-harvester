@@ -18,12 +18,13 @@ package com.esri.geoportal.harvester.sink;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.constants.MimeTypeUtils;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.Date;
 import org.apache.commons.io.IOUtils;
 
@@ -53,19 +54,43 @@ import org.apache.commons.io.IOUtils;
   public SimpleDataReference readContent() throws IOException, URISyntaxException {
     Date lastModifiedDate = readLastModifiedDate();
     MimeType contentType = readContentType();
-    try (InputStream input = Files.newInputStream(file, StandardOpenOption.READ)) {
+    try (InputStream input = attemptToOpenStream(5, 1000);) {
       SimpleDataReference ref = new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), file.toAbsolutePath().toString(), lastModifiedDate, file.toUri(), broker.td.getSource().getRef(), broker.td.getRef());
       ref.addContext(contentType, IOUtils.toByteArray(input));
       return ref;
+    } finally {
+      // once file is read, delete it
+      Files.delete(file);
     }
   }
   
   /**
-   * Deletes file.
-   * @throws IOException if unable to delete file.
+   * Attempts to open a file
+   * @param attempts number of attempts
+   * @param mills delay between consecutive attempts
+   * @return input stream
+   * @throws IOException if all attempts fail
    */
-  public void delete() throws IOException {
-    file.toFile().delete();
+  private InputStream attemptToOpenStream(int attempts, long mills) throws IOException {
+    while (true) {
+      attempts--;
+      try {
+        // it should be open at the first attempt
+        return new FileInputStream(file.toFile());
+      } catch (FileNotFoundException ex) {
+        // if not check if maximum number of attempts has been exhausted...
+        if (attempts <= 0) {
+          // ...then throw exceptiion
+          throw ex;
+        }
+        // otherwise wait and try again latter
+        try {
+          Thread.sleep(mills);
+        } catch (InterruptedException e) {
+          
+        }
+      }
+    }
   }
 
   /**

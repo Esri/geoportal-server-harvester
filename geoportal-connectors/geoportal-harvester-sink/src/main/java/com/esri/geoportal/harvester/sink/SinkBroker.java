@@ -25,13 +25,11 @@ import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.FileSystemException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.LinkedList;
@@ -188,9 +186,7 @@ import org.slf4j.LoggerFactory;
     public DataReference next() throws DataInputException {
       try {
         SinkFile file = files.poll();
-        DataReference ref = file.readContent();
-        file.delete();
-        return ref;
+        return file.readContent();
       } catch (IOException|URISyntaxException ex) {
         throw new DataInputException(SinkBroker.this, "Error reading data.", ex);
       }
