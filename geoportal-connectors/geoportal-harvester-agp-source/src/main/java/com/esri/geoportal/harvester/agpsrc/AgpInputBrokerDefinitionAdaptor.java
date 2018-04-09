@@ -29,11 +29,14 @@ import java.net.URL;
 import java.util.Map;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * ArcGIS Portal definition adaptor.
  */
 /*package*/ class AgpInputBrokerDefinitionAdaptor  extends BrokerDefinitionAdaptor {
+
+  private static final Integer DEFAULT_MAX_REDIRECTS = 5;
 
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private final CredentialsDefinitionAdaptor credAdaptor;
@@ -43,6 +46,7 @@ import org.apache.commons.lang3.StringUtils;
   private boolean emitXml = true;
   private boolean emitJson = false;
   private MetadataFormat metaFormat = MetadataFormat.DEFAULT;
+  private Integer maxRedirects;
 
   /**
    * Creates instance of the adaptor.
@@ -67,6 +71,7 @@ import org.apache.commons.lang3.StringUtils;
       emitXml = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_XML)), true);
       emitJson = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_JSON)), false);
       metaFormat = MetadataFormat.parse(get(P_EMIT_XML_FMT), MetadataFormat.DEFAULT);
+      maxRedirects = NumberUtils.toInt(get(P_MAX_REDIRECTS), DEFAULT_MAX_REDIRECTS);
     }
   }
 
@@ -77,6 +82,7 @@ import org.apache.commons.lang3.StringUtils;
     consume(params,P_EMIT_XML);
     consume(params,P_EMIT_JSON);
     consume(params,P_EMIT_XML_FMT);
+    consume(params, P_MAX_REDIRECTS);
     credAdaptor.override(params);
     botsAdaptor.override(params);
   }
@@ -172,6 +178,20 @@ import org.apache.commons.lang3.StringUtils;
   public void setMetaFormat(MetadataFormat metaFormat) {
     this.metaFormat = metaFormat;
     set(P_EMIT_XML_FMT, (metaFormat != null ? metaFormat : MetadataFormat.DEFAULT).toString());
+  }
+
+  /**
+   * @return the maxRedirects
+   */
+  public Integer getMaxRedirects() {
+    return maxRedirects;
+  }
+
+  /**
+   * @param maxRedirects the maxRedirects to set
+   */
+  public void setMaxRedirects(Integer maxRedirects) {
+    this.maxRedirects = maxRedirects;
   }
   
 }
