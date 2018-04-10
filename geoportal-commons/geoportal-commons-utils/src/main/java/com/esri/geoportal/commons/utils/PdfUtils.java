@@ -31,7 +31,7 @@ public class PdfUtils {
     private static final Logger LOG = LoggerFactory.getLogger(PdfUtils.class);
 
     public static final String PROP_TITLE = "title";
-    public static final String PROP_DESCRIPTION = "description";
+    public static final String PROP_SUBJECT = "description";
 
     public static Properties readMetadata(InputStream rawBytes) throws IOException {
         Properties ret = new Properties();
@@ -53,7 +53,7 @@ public class PdfUtils {
                         ret.put(PROP_TITLE, info.getTitle());
                     }
                     if (info.getSubject() != null) {
-                        ret.put(PROP_DESCRIPTION, info.getSubject());
+                        ret.put(PROP_SUBJECT, info.getSubject());
                     }
                 } else {
                     LOG.warn("Got null metadata for PDF file");

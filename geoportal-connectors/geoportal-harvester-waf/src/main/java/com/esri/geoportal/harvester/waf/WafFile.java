@@ -103,7 +103,8 @@ import org.w3c.dom.Document;
 
         Properties props = new Properties();
         props.put(WKAConstants.WKA_TITLE, metaProps.getOrDefault(PdfUtils.PROP_TITLE, fileUrl.getFile()));
-        props.put(WKAConstants.WKA_DESCRIPTION, metaProps.getOrDefault(PdfUtils.PROP_DESCRIPTION, "<no description>"));
+        props.put(WKAConstants.WKA_DESCRIPTION, metaProps.getOrDefault(PdfUtils.PROP_SUBJECT, "<no description>"));
+        props.put(WKAConstants.WKA_RESOURCE_URL, fileUrl.toExternalForm());
         
         try {
           MapAttribute attr = AttributeUtils.fromProperties(props);
