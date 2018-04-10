@@ -21,9 +21,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
-import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,14 +40,11 @@ public class PdfUtils {
 
             // See if we can read the PDF
             if (!document.isEncrypted()) {
-                // Get the metadata
-                PDDocumentCatalog catalog = document.getDocumentCatalog();
-                PDMetadata metadata = catalog.getMetadata();
+                // Get document metadata
+                PDDocumentInformation info = document.getDocumentInformation();
 
-                if (metadata != null) {
-                    // Get document metadata
-                    PDDocumentInformation info = document.getDocumentInformation();
-
+                if (info != null) {
+                    
                     if (info.getTitle() != null) {
                         ret.put(PROP_TITLE, info.getTitle());
                     }
