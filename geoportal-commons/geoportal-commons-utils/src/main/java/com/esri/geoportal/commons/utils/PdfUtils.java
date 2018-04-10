@@ -32,6 +32,7 @@ public class PdfUtils {
 
     public static final String PROP_TITLE = "title";
     public static final String PROP_SUBJECT = "description";
+    public static final String PROP_MODIFICATION_DATE = "modification_date";
 
     public static Properties readMetadata(InputStream rawBytes) throws IOException {
         Properties ret = new Properties();
@@ -54,6 +55,9 @@ public class PdfUtils {
                     }
                     if (info.getSubject() != null) {
                         ret.put(PROP_SUBJECT, info.getSubject());
+                    }
+                    if (info.getModificationDate() != null) {
+                        ret.put(PROP_MODIFICATION_DATE, info.getModificationDate().getTime());
                     }
                 } else {
                     LOG.warn("Got null metadata for PDF file");
