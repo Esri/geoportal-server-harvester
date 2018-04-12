@@ -25,13 +25,24 @@ import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Utilities for reading PDF file metadata
+ */
 public class PdfUtils {
     private static final Logger LOG = LoggerFactory.getLogger(PdfUtils.class);
 
+    // Metadata properties read from PDF file
     public static final String PROP_TITLE = "title";
     public static final String PROP_SUBJECT = "description";
     public static final String PROP_MODIFICATION_DATE = "modification_date";
 
+    /**
+     * Reads metadata values from a PDF file.
+     * 
+     * @param rawBytes the PDF to read
+     * @return metadata properties or null if the PDF cannot be read.
+     * @throws IOException on parsing error
+     */
     public static Properties readMetadata(InputStream rawBytes) throws IOException {
         Properties ret = new Properties();
 
