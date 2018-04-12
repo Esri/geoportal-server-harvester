@@ -101,19 +101,23 @@ import org.w3c.dom.Document;
       if (readBody && MimeType.APPLICATION_PDF.equals(contentType)) {
         Properties metaProps = PdfUtils.readMetadata(input);
 
-        Properties props = new Properties();
-        props.put(WKAConstants.WKA_TITLE, metaProps.getOrDefault(PdfUtils.PROP_TITLE, fileUrl.getFile()));
-        props.put(WKAConstants.WKA_DESCRIPTION, metaProps.getOrDefault(PdfUtils.PROP_SUBJECT, "<no description>"));
-        props.put(WKAConstants.WKA_MODIFIED, metaProps.getOrDefault(PdfUtils.PROP_MODIFICATION_DATE, lastModifiedDate));
-        props.put(WKAConstants.WKA_RESOURCE_URL, fileUrl.toExternalForm());
-        
-        try {
-          MapAttribute attr = AttributeUtils.fromProperties(props);
-          Document document = new SimpleDcMetaBuilder().create(attr);
-          byte [] bytes = XmlUtils.toString(document).getBytes("UTF-8");
-          ref.addContext(MimeType.APPLICATION_XML, bytes);
-        } catch (MetaException | TransformerException ex) {
-          throw new IOException(ex);
+        if (metaProps != null) {
+          Properties props = new Properties();
+          props.put(WKAConstants.WKA_TITLE, metaProps.getOrDefault(PdfUtils.PROP_TITLE, fileUrl.getFile()));
+          props.put(WKAConstants.WKA_DESCRIPTION, metaProps.getOrDefault(PdfUtils.PROP_SUBJECT, "<no description>"));
+          props.put(WKAConstants.WKA_MODIFIED, metaProps.getOrDefault(PdfUtils.PROP_MODIFICATION_DATE, lastModifiedDate));
+          props.put(WKAConstants.WKA_RESOURCE_URL, fileUrl.toExternalForm());
+          
+          try {
+            MapAttribute attr = AttributeUtils.fromProperties(props);
+            Document document = new SimpleDcMetaBuilder().create(attr);
+            byte [] bytes = XmlUtils.toString(document).getBytes("UTF-8");
+            ref.addContext(MimeType.APPLICATION_XML, bytes);
+          } catch (MetaException | TransformerException ex) {
+            throw new IOException(ex);
+          }
+        } else {
+          ref.addContext(contentType, readBody? IOUtils.toByteArray(input): null);
         }
       } else {
         ref.addContext(contentType, readBody? IOUtils.toByteArray(input): null);
