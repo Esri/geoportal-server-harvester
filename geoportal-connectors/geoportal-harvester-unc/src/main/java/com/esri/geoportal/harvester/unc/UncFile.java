@@ -77,7 +77,7 @@ import org.w3c.dom.Document;
           props.put(WKAConstants.WKA_TITLE, metaProps.getOrDefault(PdfUtils.PROP_TITLE, file.getFileName().toString()));
           props.put(WKAConstants.WKA_DESCRIPTION, metaProps.getOrDefault(PdfUtils.PROP_SUBJECT, "<no description>"));
           props.put(WKAConstants.WKA_MODIFIED, metaProps.getOrDefault(PdfUtils.PROP_MODIFICATION_DATE, lastModifiedDate));
-          props.put(WKAConstants.WKA_RESOURCE_URL, file.toAbsolutePath().toString());
+          props.put(WKAConstants.WKA_RESOURCE_URL, file.toUri().toString());
 
           try {
             MapAttribute attr = AttributeUtils.fromProperties(props);
