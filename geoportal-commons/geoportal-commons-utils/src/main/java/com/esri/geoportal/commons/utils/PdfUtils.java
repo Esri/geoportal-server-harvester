@@ -17,7 +17,6 @@
 package com.esri.geoportal.commons.utils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -43,7 +42,7 @@ public class PdfUtils {
      * @return metadata properties or null if the PDF cannot be read.
      * @throws IOException on parsing error
      */
-    public static Properties readMetadata(InputStream rawBytes) throws IOException {
+    public static Properties readMetadata(byte[] rawBytes) throws IOException {
         Properties ret = new Properties();
 
         // Attempt to read in the PDF file

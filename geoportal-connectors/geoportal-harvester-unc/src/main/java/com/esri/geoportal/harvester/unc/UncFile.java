@@ -70,7 +70,7 @@ import org.w3c.dom.Document;
 
       // Determine if we're looking at a PDF file
       if (MimeType.APPLICATION_PDF.equals(contentType)) {
-        Properties metaProps = PdfUtils.readMetadata(input);
+        Properties metaProps = PdfUtils.readMetadata(IOUtils.toByteArray(input));
         
         if (metaProps != null) {
           Properties props = new Properties();
@@ -87,12 +87,11 @@ import org.w3c.dom.Document;
           } catch (MetaException | TransformerException ex) {
             throw new IOException(ex);
           }
-        } else {
-          ref.addContext(contentType, IOUtils.toByteArray(input));  
-        }
-      } else {
-        ref.addContext(contentType, IOUtils.toByteArray(input));
+        } 
       }
+
+      ref.addContext(contentType, IOUtils.toByteArray(input));
+      
       return ref;
     }
   }

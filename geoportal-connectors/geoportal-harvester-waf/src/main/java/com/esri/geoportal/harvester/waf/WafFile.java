@@ -99,7 +99,7 @@ import org.w3c.dom.Document;
       
       // Determine if we're looking at a PDF file
       if (readBody && MimeType.APPLICATION_PDF.equals(contentType)) {
-        Properties metaProps = PdfUtils.readMetadata(input);
+        Properties metaProps = PdfUtils.readMetadata(IOUtils.toByteArray(input));
 
         if (metaProps != null) {
           Properties props = new Properties();
@@ -116,12 +116,10 @@ import org.w3c.dom.Document;
           } catch (MetaException | TransformerException ex) {
             throw new IOException(ex);
           }
-        } else {
-          ref.addContext(contentType, readBody? IOUtils.toByteArray(input): null);
         }
-      } else {
-        ref.addContext(contentType, readBody? IOUtils.toByteArray(input): null);
-      }
+      } 
+      
+      ref.addContext(contentType, readBody? IOUtils.toByteArray(input): null);
 
       // Adding in resource map attributes for saving to AGP...
       ref.getAttributesMap().put(WKAConstants.WKA_RESOURCE_URL, fileUrl.toURI());
