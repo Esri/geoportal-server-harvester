@@ -42,7 +42,7 @@ public class PdfUtils {
      * @return metadata properties or null if the PDF cannot be read.
      * @throws IOException on parsing error
      */
-    public static Properties readMetadata(byte[] rawBytes) throws IOException {
+    public static Properties readMetadata(byte[] rawBytes, String defaultTitle) throws IOException {
         Properties ret = new Properties();
 
         // Attempt to read in the PDF file
@@ -57,12 +57,20 @@ public class PdfUtils {
                     
                     if (info.getTitle() != null) {
                         ret.put(PROP_TITLE, info.getTitle());
+                    } else {
+                        ret.put(PROP_TITLE, defaultTitle);
                     }
+
                     if (info.getSubject() != null) {
                         ret.put(PROP_SUBJECT, info.getSubject());
+                    } else {
+                        ret.put(PROP_SUBJECT, "<no description/subject>");
                     }
+
                     if (info.getModificationDate() != null) {
                         ret.put(PROP_MODIFICATION_DATE, info.getModificationDate().getTime());
+                    } else {
+                        ret.put(PROP_MODIFICATION_DATE, info.getCreationDate().getTime());
                     }
                 } else {
                     LOG.warn("Got null metadata for PDF file");

@@ -99,13 +99,13 @@ import org.w3c.dom.Document;
       
       // Determine if we're looking at a PDF file
       if (readBody && MimeType.APPLICATION_PDF.equals(contentType)) {
-        Properties metaProps = PdfUtils.readMetadata(IOUtils.toByteArray(input));
+        Properties metaProps = PdfUtils.readMetadata(IOUtils.toByteArray(input), fileUrl.getFile());
 
         if (metaProps != null) {
           Properties props = new Properties();
-          props.put(WKAConstants.WKA_TITLE, metaProps.getOrDefault(PdfUtils.PROP_TITLE, fileUrl.getFile()));
-          props.put(WKAConstants.WKA_DESCRIPTION, metaProps.getOrDefault(PdfUtils.PROP_SUBJECT, "<no description>"));
-          props.put(WKAConstants.WKA_MODIFIED, metaProps.getOrDefault(PdfUtils.PROP_MODIFICATION_DATE, lastModifiedDate));
+          props.put(WKAConstants.WKA_TITLE, metaProps.get(PdfUtils.PROP_TITLE));
+          props.put(WKAConstants.WKA_DESCRIPTION, metaProps.get(PdfUtils.PROP_SUBJECT));
+          props.put(WKAConstants.WKA_MODIFIED, metaProps.get(PdfUtils.PROP_MODIFICATION_DATE));
           props.put(WKAConstants.WKA_RESOURCE_URL, fileUrl.toExternalForm());
           
           try {
