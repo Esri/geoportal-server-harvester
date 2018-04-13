@@ -39,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
   private String index;
   private boolean emitXml = true;
   private boolean emitJson = false;
+  private boolean translatePdf = true;
 
   /**
    * Creates instance of the adaptor.
@@ -66,6 +67,7 @@ import org.apache.commons.lang3.StringUtils;
       index  = get(P_INDEX);
       emitXml = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_ACCEPT_XML)), true);
       emitJson = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_ACCEPT_JSON)), false);
+      translatePdf = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_TRANSLATE_PDF)), true);
     }
   }
 
@@ -180,5 +182,20 @@ import org.apache.commons.lang3.StringUtils;
   public void setEmitJson(boolean emitJson) {
     this.emitJson = emitJson;
     set(P_ACCEPT_JSON, BooleanUtils.toStringTrueFalse(emitJson));
+  }
+
+  /**
+   * @return the translatePdf
+   */
+  public boolean isTranslatePdf() {
+    return translatePdf;
+  }
+
+  /**
+   * @param translatePdf the translatePdf to set
+   */
+  public void setTranslatePdf(boolean translatePdf) {
+    this.translatePdf = translatePdf;
+    set(P_TRANSLATE_PDF, BooleanUtils.toStringTrueFalse(translatePdf));
   }
 }

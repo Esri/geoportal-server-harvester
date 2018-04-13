@@ -146,7 +146,7 @@ import org.slf4j.LoggerFactory;
       String xml = null;
       if (definition.getAcceptXml()) {
         byte[] content = null;
-        if (ref.getContent(MimeType.APPLICATION_PDF) != null) {
+        if (ref.getContent(MimeType.APPLICATION_PDF) != null && definition.isTranslatePdf()) {
           content = PdfUtils.generateMetadataXML(ref.getContent(MimeType.APPLICATION_PDF), ref.getSourceUri().getPath(), ref.getSourceUri().toASCIIString()); 
         } else {
           content = ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML);
