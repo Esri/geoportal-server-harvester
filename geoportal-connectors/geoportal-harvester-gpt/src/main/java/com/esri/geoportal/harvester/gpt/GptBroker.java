@@ -19,6 +19,7 @@ import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.gpt.client.Client;
 import com.esri.geoportal.commons.gpt.client.PublishRequest;
 import com.esri.geoportal.commons.gpt.client.PublishResponse;
+import com.esri.geoportal.commons.pdf.PdfUtils;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
@@ -39,6 +40,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import org.apache.xmpbox.type.MIMEType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,7 +146,13 @@ import org.slf4j.LoggerFactory;
 
       String xml = null;
       if (definition.getAcceptXml()) {
-        byte[] content = ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML);
+        byte[] content = null;
+        if (ref.getContent(MimeType.APPLICATION_PDF) != null) {
+          content = PdfUtils.generateMetadataXML(ref.getContent(MimeType.APPLICATION_PDF), ref.getSourceUri().getPath(), ref.getSourceUri().toASCIIString()); 
+        } else {
+          content = ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML);
+        }
+
         if (content != null) {
           xml = new String(content, "UTF-8");
           if (xml.startsWith(SBOM)) {

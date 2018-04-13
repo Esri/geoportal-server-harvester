@@ -15,18 +15,15 @@
  */
 package com.esri.geoportal.harvester.unc;
 
+import com.esri.geoportal.harvester.api.base.SimpleDataReference;
+import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.constants.MimeTypeUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
-
-import com.esri.geoportal.commons.constants.MimeType;
-import com.esri.geoportal.commons.constants.MimeTypeUtils;
-import com.esri.geoportal.commons.pdf.PdfUtils;
-import com.esri.geoportal.harvester.api.base.SimpleDataReference;
-
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -57,15 +54,7 @@ import org.apache.commons.io.IOUtils;
     MimeType contentType = readContentType();
     try (InputStream input = Files.newInputStream(file)) {
       SimpleDataReference ref = new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), file.toAbsolutePath().toString(), lastModifiedDate, file.toUri(), broker.td.getSource().getRef(), broker.td.getRef());
-
-      // Determine if we're looking at a PDF file
-      if (MimeType.APPLICATION_PDF.equals(contentType)) {
-        byte[] metaXml = PdfUtils.generateMetadataXML(IOUtils.toByteArray(input), file.getFileName().toString(), file.toAbsolutePath().toString());
-        ref.addContext(MimeType.APPLICATION_XML, metaXml);
-      }
-
       ref.addContext(contentType, IOUtils.toByteArray(input));
-      
       return ref;
     }
   }

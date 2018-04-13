@@ -15,25 +15,23 @@
  */
 package com.esri.geoportal.harvester.waf;
 
+import com.esri.geoportal.commons.constants.HttpConstants;
+import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.constants.MimeTypeUtils;
+import com.esri.geoportal.commons.meta.util.WKAConstants;
+
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import static com.esri.geoportal.commons.utils.HttpClientContextBuilder.createHttpClientContext;
-
+import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-
-import com.esri.geoportal.commons.constants.HttpConstants;
-import com.esri.geoportal.commons.constants.MimeType;
-import com.esri.geoportal.commons.constants.MimeTypeUtils;
-import com.esri.geoportal.commons.meta.util.WKAConstants;
-import com.esri.geoportal.commons.pdf.PdfUtils;
-import com.esri.geoportal.commons.utils.SimpleCredentials;
-import com.esri.geoportal.harvester.api.base.SimpleDataReference;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -87,13 +85,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
       MimeType contentType = readContentType(httpResponse);
       boolean readBody = since==null || lastModifiedDate==null || lastModifiedDate.getTime()>=since.getTime();
       SimpleDataReference ref = new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), fileUrl.toExternalForm(), lastModifiedDate, fileUrl.toURI(), broker.td.getSource().getRef(), broker.td.getRef());
-      
-      // Determine if we're looking at a PDF file
-      if (readBody && MimeType.APPLICATION_PDF.equals(contentType)) {
-        byte[] metaXml = PdfUtils.generateMetadataXML(IOUtils.toByteArray(input), fileUrl.getFile(), fileUrl.toExternalForm());
-        ref.addContext(MimeType.APPLICATION_XML, metaXml);
-      } 
-      
       ref.addContext(contentType, readBody? IOUtils.toByteArray(input): null);
 
       // Adding in resource map attributes for saving to AGP...
