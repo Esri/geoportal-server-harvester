@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.esri.geoportal.commons.utils;
+package com.esri.geoportal.commons.pdf;
 
 import java.io.IOException;
 import java.util.Properties;

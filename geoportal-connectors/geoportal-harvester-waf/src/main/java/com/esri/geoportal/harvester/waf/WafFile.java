@@ -37,7 +37,7 @@ import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaException;
 import com.esri.geoportal.commons.meta.util.WKAConstants;
 import com.esri.geoportal.commons.meta.xml.SimpleDcMetaBuilder;
-import com.esri.geoportal.commons.utils.PdfUtils;
+import com.esri.geoportal.commons.pdf.PdfUtils;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.commons.utils.XmlUtils;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
