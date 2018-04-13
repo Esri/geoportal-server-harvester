@@ -21,23 +21,13 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
-import java.util.Properties;
-
-import javax.xml.transform.TransformerException;
 
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.constants.MimeTypeUtils;
-import com.esri.geoportal.commons.meta.AttributeUtils;
-import com.esri.geoportal.commons.meta.MapAttribute;
-import com.esri.geoportal.commons.meta.MetaException;
-import com.esri.geoportal.commons.meta.util.WKAConstants;
-import com.esri.geoportal.commons.meta.xml.SimpleDcMetaBuilder;
 import com.esri.geoportal.commons.pdf.PdfUtils;
-import com.esri.geoportal.commons.utils.XmlUtils;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 
 import org.apache.commons.io.IOUtils;
-import org.w3c.dom.Document;
 
 /**
  * UNC file.
@@ -70,24 +60,8 @@ import org.w3c.dom.Document;
 
       // Determine if we're looking at a PDF file
       if (MimeType.APPLICATION_PDF.equals(contentType)) {
-        Properties metaProps = PdfUtils.readMetadata(IOUtils.toByteArray(input), file.getFileName().toString());
-        
-        if (metaProps != null) {
-          Properties props = new Properties();
-          props.put(WKAConstants.WKA_TITLE, metaProps.get(PdfUtils.PROP_TITLE));
-          props.put(WKAConstants.WKA_DESCRIPTION, metaProps.get(PdfUtils.PROP_SUBJECT));
-          props.put(WKAConstants.WKA_MODIFIED, metaProps.get(PdfUtils.PROP_MODIFICATION_DATE));
-          props.put(WKAConstants.WKA_RESOURCE_URL, file.toUri().toString());
-
-          try {
-            MapAttribute attr = AttributeUtils.fromProperties(props);
-            Document document = new SimpleDcMetaBuilder().create(attr);
-            byte [] bytes = XmlUtils.toString(document).getBytes("UTF-8");
-            ref.addContext(MimeType.APPLICATION_XML, bytes);
-          } catch (MetaException | TransformerException ex) {
-            throw new IOException(ex);
-          }
-        } 
+        byte[] metaXml = PdfUtils.generateMetadataXML(IOUtils.toByteArray(input), file.getFileName().toString(), file.toAbsolutePath().toString());
+        ref.addContext(MimeType.APPLICATION_XML, metaXml);
       }
 
       ref.addContext(contentType, IOUtils.toByteArray(input));

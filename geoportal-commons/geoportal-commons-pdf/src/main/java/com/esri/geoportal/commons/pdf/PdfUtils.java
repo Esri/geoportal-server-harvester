@@ -19,10 +19,20 @@ package com.esri.geoportal.commons.pdf;
 import java.io.IOException;
 import java.util.Properties;
 
+import javax.xml.transform.TransformerException;
+
+import com.esri.geoportal.commons.meta.AttributeUtils;
+import com.esri.geoportal.commons.meta.MapAttribute;
+import com.esri.geoportal.commons.meta.MetaException;
+import com.esri.geoportal.commons.meta.util.WKAConstants;
+import com.esri.geoportal.commons.meta.xml.SimpleDcMetaBuilder;
+import com.esri.geoportal.commons.utils.XmlUtils;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 /**
  * Utilities for reading PDF file metadata
@@ -54,7 +64,7 @@ public class PdfUtils {
                 PDDocumentInformation info = document.getDocumentInformation();
 
                 if (info != null) {
-                    
+
                     if (info.getTitle() != null) {
                         ret.put(PROP_TITLE, info.getTitle());
                     } else {
@@ -88,5 +98,28 @@ public class PdfUtils {
         }
 
         return ret;
+    }
+
+    public static byte[] generateMetadataXML(byte[] pdfBytes, String fileName, String url) throws IOException {
+        byte[] bytes = null;
+        Properties metaProps = readMetadata(pdfBytes, fileName);
+
+        if (metaProps != null) {
+            Properties props = new Properties();
+            props.put(WKAConstants.WKA_TITLE, metaProps.get(PdfUtils.PROP_TITLE));
+            props.put(WKAConstants.WKA_DESCRIPTION, metaProps.get(PdfUtils.PROP_SUBJECT));
+            props.put(WKAConstants.WKA_MODIFIED, metaProps.get(PdfUtils.PROP_MODIFICATION_DATE));
+            props.put(WKAConstants.WKA_RESOURCE_URL, url);
+
+            try {
+                MapAttribute attr = AttributeUtils.fromProperties(props);
+                Document document = new SimpleDcMetaBuilder().create(attr);
+                bytes = XmlUtils.toString(document).getBytes("UTF-8");
+            } catch (MetaException | TransformerException ex) {
+                throw new IOException(ex);
+            }
+        }
+
+        return bytes;
     }
 }
