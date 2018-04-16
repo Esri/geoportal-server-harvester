@@ -74,7 +74,15 @@ public class PdfUtils {
                     if (info.getSubject() != null) {
                         ret.put(PROP_SUBJECT, info.getSubject());
                     } else {
-                        ret.put(PROP_SUBJECT, "<no description/subject>");
+                        
+                        StringBuilder psudoSubject = new StringBuilder("");
+                        psudoSubject.append("\nAuthor: " + info.getAuthor());
+                        psudoSubject.append("\nCreator: " + info.getCreator());
+                        psudoSubject.append("\nProducer: " + info.getProducer());
+                        psudoSubject.append("\nCreation Date: " + info.getCreationDate().getTime());
+                        psudoSubject.append("\nModification Date: " + info.getModificationDate().getTime());
+
+                        ret.put(PROP_SUBJECT, psudoSubject.toString());
                     }
 
                     if (info.getModificationDate() != null) {
