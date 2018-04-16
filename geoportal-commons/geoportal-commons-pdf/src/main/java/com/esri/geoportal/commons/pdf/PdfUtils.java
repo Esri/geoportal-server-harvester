@@ -79,8 +79,6 @@ public class PdfUtils {
                         psudoSubject.append("\nAuthor: " + info.getAuthor());
                         psudoSubject.append("\nCreator: " + info.getCreator());
                         psudoSubject.append("\nProducer: " + info.getProducer());
-                        psudoSubject.append("\nCreation Date: " + info.getCreationDate().getTime());
-                        psudoSubject.append("\nModification Date: " + info.getModificationDate().getTime());
 
                         ret.put(PROP_SUBJECT, psudoSubject.toString());
                     }
