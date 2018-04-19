@@ -409,7 +409,7 @@ public class AgpClient implements Closeable {
     builder.setParameter("num", Long.toString(num));
     builder.setParameter("start", Long.toString(start));
     
-    String type = Arrays.stream(Config.readTypes()).map(s->StringUtils.trimToNull(s)).filter(s->s != null).collect(Collectors.joining(" OR "));
+    String type = Arrays.stream(Config.readTypes()).map(s->StringUtils.trimToNull(s)).filter(s->s != null).collect(Collectors.joining(") OR type: ("));
     String q = String.format("type: (%s)", type);
     builder.setParameter("q", q);
     
