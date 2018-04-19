@@ -41,3 +41,7 @@
 /geoportal-connectors/geoportal-harvester-migration/target/
 /geoportal-commons/geoportal-commons-geometry/target/
 /geoportal-commons/geoportal-commons-dcat/target/
+
+.project
+.classpath
+.settings/
