@@ -28,8 +28,14 @@ import com.esri.geoportal.commons.meta.util.WKAConstants;
 import com.esri.geoportal.commons.meta.xml.SimpleDcMetaBuilder;
 import com.esri.geoportal.commons.utils.XmlUtils;
 
+import org.apache.pdfbox.cos.COSArray;
+import org.apache.pdfbox.cos.COSBase;
+import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.cos.COSObject;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -92,7 +98,46 @@ public class PdfUtils {
                     LOG.warn("Got null metadata for PDF file");
                     return null;
                 }
+                
+                COSObject measure = document.getDocument().getObjectByType(COSName.getPDFName("Measure"));
+                if (measure != null) {
+                    System.out.println("Found Measure element");
+                    // COSDictionary dictionary = (COSDictionary) measure;
+                    COSBase coords = measure.getItem(COSName.getPDFName("GPTS"));
+                    System.out.printf("\tCoordinates: %s\n", coords.toString());
+                }
 
+                PDPage page = document.getPage(0);
+                if (page.getCOSObject().containsKey(COSName.getPDFName("LGIDict"))) {
+                    System.out.println("Found LGI dictionary");
+                    COSArray lgi = (COSArray) page.getCOSObject().getDictionaryObject("LGIDict");
+                    lgi.iterator().forEachRemaining(item -> {
+                        // System.out.println("\t" + item.toString());
+                        COSDictionary dictionary = (COSDictionary) item;
+                        if (dictionary.containsKey("CTM")) {
+                            System.out.println("\tCTM");
+
+                            COSArray ctm = (COSArray) dictionary.getDictionaryObject("CTM");
+                            for (int i = 0; i < ctm.toList().size(); i += 2) {
+                                System.out.printf("\t\t%s %s\n", ctm.get(i), ctm.get(i+1));
+                            }
+                        }
+
+                        if (dictionary.containsKey("Neatline")) {
+                            System.out.println("\tNeatline");
+                            // System.out.println("\t\t" + dictionary.getDictionaryObject("Neatline"));
+                            COSArray neatline = (COSArray) dictionary.getDictionaryObject("Neatline");
+                            for (int i = 0; i < neatline.toList().size(); i += 2) {
+                                System.out.printf("\t\t%s, %s\n", neatline.get(i), neatline.get(i+1));
+                            }
+                        }
+
+                        if (dictionary.containsKey("Projection")) {
+                            System.out.println("\tProjection");
+                            System.out.println("\t\t" + dictionary.getDictionaryObject("Projection"));
+                        }
+                    });
+                }
             } else {
                 LOG.warn("Cannot read encrypted PDF file");
                 return null;
