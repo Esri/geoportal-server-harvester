@@ -33,6 +33,7 @@ import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.cos.COSObject;
+import org.apache.pdfbox.cos.COSString;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -109,34 +110,7 @@ public class PdfUtils {
 
                 PDPage page = document.getPage(0);
                 if (page.getCOSObject().containsKey(COSName.getPDFName("LGIDict"))) {
-                    System.out.println("Found LGI dictionary");
-                    COSArray lgi = (COSArray) page.getCOSObject().getDictionaryObject("LGIDict");
-                    lgi.iterator().forEachRemaining(item -> {
-                        // System.out.println("\t" + item.toString());
-                        COSDictionary dictionary = (COSDictionary) item;
-                        if (dictionary.containsKey("CTM")) {
-                            System.out.println("\tCTM");
-
-                            COSArray ctm = (COSArray) dictionary.getDictionaryObject("CTM");
-                            for (int i = 0; i < ctm.toList().size(); i += 2) {
-                                System.out.printf("\t\t%s %s\n", ctm.get(i), ctm.get(i+1));
-                            }
-                        }
-
-                        if (dictionary.containsKey("Neatline")) {
-                            System.out.println("\tNeatline");
-                            // System.out.println("\t\t" + dictionary.getDictionaryObject("Neatline"));
-                            COSArray neatline = (COSArray) dictionary.getDictionaryObject("Neatline");
-                            for (int i = 0; i < neatline.toList().size(); i += 2) {
-                                System.out.printf("\t\t%s, %s\n", neatline.get(i), neatline.get(i+1));
-                            }
-                        }
-
-                        if (dictionary.containsKey("Projection")) {
-                            System.out.println("\tProjection");
-                            System.out.println("\t\t" + dictionary.getDictionaryObject("Projection"));
-                        }
-                    });
+                    extractGeoPDFProps(page);
                 }
             } else {
                 LOG.warn("Cannot read encrypted PDF file");
@@ -150,6 +124,74 @@ public class PdfUtils {
 
         return ret;
     }
+
+	private static void extractGeoPDFProps(PDPage page) {
+        LOG.info("Found LGI dictionary");
+        
+        COSArray lgi = (COSArray) page.getCOSObject().getDictionaryObject("LGIDict");
+
+        lgi.iterator().forEachRemaining(item -> {
+
+            // Set up the Coordinate Transformation Matrix
+            Double [][] ctmValues = null;
+
+            COSDictionary dictionary = (COSDictionary) item;
+            if (dictionary.containsKey("CTM")) {
+                System.out.println("\tCTM");
+                ctmValues = new Double[3][3];
+                ctmValues[0][2] = 0.0;
+                ctmValues[1][2] = 0.0;
+                ctmValues[2][2] = 1.0; 
+
+                COSArray ctm = (COSArray) dictionary.getDictionaryObject("CTM");
+                for (int i = 0; i < ctm.toList().size(); i += 2) {
+                    int ctmRow = i / 2;
+                    ctmValues[ctmRow][0] = Double.parseDouble(((COSString)ctm.get(i)).getString());
+                    ctmValues[ctmRow][1] = Double.parseDouble(((COSString)ctm.get(i + 1)).getString());
+                    System.out.printf("\t\t%s %s\n", ctm.get(i), ctm.get(i+1));
+                }
+            }
+
+            Double[][] neatLineValues =  null;
+            int neatLineLength = 0;
+
+            if (dictionary.containsKey("Neatline")) {
+                System.out.println("\tNeatline");
+
+                COSArray neatline = (COSArray) dictionary.getDictionaryObject("Neatline");
+                neatLineLength = neatline.toList().size();
+                neatLineValues = new Double[neatLineLength / 2][3];
+
+                for (int i = 0; i < neatline.toList().size(); i += 2) {
+                    int neatLineRow = i / 2;
+                    neatLineValues[neatLineRow][0] = Double.parseDouble(((COSString)neatline.get(i)).getString());
+                    neatLineValues[neatLineRow][1] = Double.parseDouble(((COSString)neatline.get(i + 1)).getString());
+                    neatLineValues[neatLineRow][2] = 1.0;
+                    System.out.printf("\t\t%s, %s\n", neatline.get(i), neatline.get(i+1));
+                }
+            }
+
+            if  (ctmValues != null && neatLineValues != null) {
+                System.out.println("\tPrinting Coordinates");
+                // Transform the PDF coordinates to geospatial ones
+                Double [][] resultCoords = new Double[neatLineLength / 2][3];
+                for (int z = 0; z < neatLineLength / 2; z ++) {
+                    System.out.print("\t\t");
+                    for (int i = 0; i < 3; i++) {
+                        resultCoords[z][i] = neatLineValues[z][0] * ctmValues[0][i] + neatLineValues[z][1] * ctmValues[1][i] + neatLineValues[z][2] * ctmValues[2][i];
+                        System.out.print(resultCoords[z][i]);
+                        System.out.print("\t");
+                    }
+                    System.out.print("\n");
+                }
+            }
+
+            if (dictionary.containsKey("Projection")) {
+                System.out.println("\tProjection");
+                System.out.println("\t\t" + dictionary.getDictionaryObject("Projection"));
+            }
+        });
+	}
 
     public static byte[] generateMetadataXML(byte[] pdfBytes, String fileName, String url) throws IOException {
         byte[] bytes = null;
