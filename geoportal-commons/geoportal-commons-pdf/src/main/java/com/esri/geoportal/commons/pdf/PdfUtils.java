@@ -18,7 +18,9 @@ package com.esri.geoportal.commons.pdf;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -61,6 +63,7 @@ public class PdfUtils {
     public static final String PROP_TITLE = "title";
     public static final String PROP_SUBJECT = "description";
     public static final String PROP_MODIFICATION_DATE = "modification_date";
+    public static final String PROP_BBOX = "bounding_box";
 
     /**
      * Reads metadata values from a PDF file.
@@ -113,15 +116,20 @@ public class PdfUtils {
                 COSObject measure = document.getDocument().getObjectByType(COSName.getPDFName("Measure"));
                 if (measure != null) {
                     System.out.println("Found Measure element");
-                    // COSDictionary dictionary = (COSDictionary) measure;
+                    // TODO get bounding box coordinates
                     COSBase coords = measure.getItem(COSName.getPDFName("GPTS"));
                     System.out.printf("\tCoordinates: %s\n", coords.toString());
+                } else {
+                    PDPage page = document.getPage(0);
+                    if (page.getCOSObject().containsKey(COSName.getPDFName("LGIDict"))) {
+                        String bbox = extractGeoPDFProps(page);
+                        if (bbox != null) {
+                            ret.put(PROP_BBOX, bbox);
+                        }
+                    }
                 }
 
-                PDPage page = document.getPage(0);
-                if (page.getCOSObject().containsKey(COSName.getPDFName("LGIDict"))) {
-                    extractGeoPDFProps(page);
-                }
+                
             } else {
                 LOG.warn("Cannot read encrypted PDF file");
                 return null;
@@ -135,12 +143,16 @@ public class PdfUtils {
         return ret;
     }
 
-	private static void extractGeoPDFProps(PDPage page) {
+	private static String extractGeoPDFProps(PDPage page) {
         LOG.info("Found LGI dictionary");
         
         COSArray lgi = (COSArray) page.getCOSObject().getDictionaryObject("LGIDict");
 
+        List<String> bBoxes = new ArrayList<>();
+
         lgi.iterator().forEachRemaining(item -> {
+
+            String currentBbox = null;
 
             // Set up the Coordinate Transformation Matrix
             Double [][] ctmValues = null;
@@ -200,7 +212,6 @@ public class PdfUtils {
                 String wkt = getProjectionWKT((COSDictionary)dictionary.getDictionaryObject("Projection"));
 
                 if (wkt != null) {
-
                     try (GeometryService svc = new GeometryService(HttpClients.custom().useSystemProperties().build(), new URL("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer"));) {
                         MultiPoint reproj = svc.project(mp, wkt, 4326);
                         
@@ -228,15 +239,18 @@ public class PdfUtils {
                             }
                         }
 
-                        System.out.printf("\n%s %s %s %s\n", xMin, yMin, xMax, yMax);
+                        currentBbox = String.format("%s %s, %s %s", xMin, yMin, xMax, yMax);
 
                     } catch (Exception e) {
                         LOG.error("Exception reprojecting geometry", e);
                     }
-                    
                 }
             }
+
+            bBoxes.add(currentBbox);
         });
+
+        return bBoxes.get(0);
     }
 
     private static final String PROJ_WKT_TEMPLATE = "PROJCS[\"${name}\", ${geo_cs}, ${projection}, ${parameters}, ${linear_unit}]";
@@ -299,6 +313,7 @@ public class PdfUtils {
             props.put(WKAConstants.WKA_TITLE, metaProps.get(PdfUtils.PROP_TITLE));
             props.put(WKAConstants.WKA_DESCRIPTION, metaProps.get(PdfUtils.PROP_SUBJECT));
             props.put(WKAConstants.WKA_MODIFIED, metaProps.get(PdfUtils.PROP_MODIFICATION_DATE));
+            props.put(WKAConstants.WKA_BBOX, metaProps.getOrDefault(PdfUtils.PROP_BBOX, "0 0, 0 0"));
             props.put(WKAConstants.WKA_RESOURCE_URL, url);
 
             try {
