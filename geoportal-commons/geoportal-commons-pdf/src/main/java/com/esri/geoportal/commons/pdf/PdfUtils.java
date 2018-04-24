@@ -17,17 +17,27 @@
 package com.esri.geoportal.commons.pdf;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
 
+import com.esri.core.geometry.MultiPoint;
+import com.esri.core.geometry.Point;
 import com.esri.geoportal.commons.meta.AttributeUtils;
 import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaException;
 import com.esri.geoportal.commons.meta.util.WKAConstants;
 import com.esri.geoportal.commons.meta.xml.SimpleDcMetaBuilder;
 import com.esri.geoportal.commons.utils.XmlUtils;
+import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
 
+import org.apache.commons.text.StrSubstitutor;
+import org.apache.commons.text.StringSubstitutor;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSDictionary;
@@ -171,27 +181,114 @@ public class PdfUtils {
                 }
             }
 
+            MultiPoint mp = new MultiPoint();
+
             if  (ctmValues != null && neatLineValues != null) {
-                System.out.println("\tPrinting Coordinates");
                 // Transform the PDF coordinates to geospatial ones
                 Double [][] resultCoords = new Double[neatLineLength / 2][3];
                 for (int z = 0; z < neatLineLength / 2; z ++) {
-                    System.out.print("\t\t");
                     for (int i = 0; i < 3; i++) {
                         resultCoords[z][i] = neatLineValues[z][0] * ctmValues[0][i] + neatLineValues[z][1] * ctmValues[1][i] + neatLineValues[z][2] * ctmValues[2][i];
-                        System.out.print(resultCoords[z][i]);
-                        System.out.print("\t");
                     }
-                    System.out.print("\n");
+
+                    // Set up the multipoint object
+                    mp.add(resultCoords[z][0], resultCoords[z][1]);
                 }
             }
 
             if (dictionary.containsKey("Projection")) {
-                System.out.println("\tProjection");
-                System.out.println("\t\t" + dictionary.getDictionaryObject("Projection"));
+                String wkt = getProjectionWKT((COSDictionary)dictionary.getDictionaryObject("Projection"));
+
+                if (wkt != null) {
+
+                    try (GeometryService svc = new GeometryService(HttpClients.custom().useSystemProperties().build(), new URL("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer"));) {
+                        MultiPoint reproj = svc.project(mp, wkt, 4326);
+                        
+                        int count = reproj.getPointCount();
+                        Double xMax = -Double.MAX_VALUE;
+                        Double yMax = -Double.MAX_VALUE;
+                        Double xMin = Double.MAX_VALUE;
+                        Double yMin = Double.MAX_VALUE;
+
+                        for (int i = 0; i < count; i++) {
+                            Point pt = reproj.getPoint(i);
+                            
+                            if (pt.getX() > xMax) {
+                                xMax = pt.getX();
+                            }
+                            if (pt.getX() < xMin) {
+                                xMin = pt.getX();
+                            }
+
+                            if (pt.getY() > yMax) {
+                                yMax = pt.getY();
+                            }
+                            if (pt.getY() < yMin) {
+                                yMin = pt.getY();
+                            }
+                        }
+
+                        System.out.printf("\n%s %s %s %s\n", xMin, yMin, xMax, yMax);
+
+                    } catch (Exception e) {
+                        LOG.error("Exception reprojecting geometry", e);
+                    }
+                    
+                }
             }
         });
-	}
+    }
+
+    private static final String PROJ_WKT_TEMPLATE = "PROJCS[\"${name}\", ${geo_cs}, ${projection}, ${parameters}, ${linear_unit}]";
+    private static final String GEO_WKT_TEMPLATE = "GEOGCS[\"${name}\", ${datum}, ${prime_meridian}, ${angular_unit}]";
+    private static final String DATUM_TEMPLATE = "DATUM[\"${name}\", ${spheroid} ${to_wgs84}]";
+    
+    private static String getProjectionWKT(COSDictionary projectionDictionary) {
+        Map<String,String> tokens = new HashMap<>();
+
+        String type = projectionDictionary.getString("Type");
+        String projectionType = projectionDictionary.getString("ProjectionType");
+        tokens.put("name", projectionType);
+
+        System.out.println("Projection Type: " + projectionType);
+
+        if ("UT".equalsIgnoreCase(projectionType)) {
+            String parameterString = "PARAMETER[\"zone\", ${zone}]";
+            // Map<String,String> zone = 
+        } else if ("LE".equalsIgnoreCase(projectionType)) {
+            tokens.put("projection", "PROJECTION[\"Lambert_Conformal_Conic\"]");
+            
+            // Set up the projection parameters
+            Properties parameters = new Properties();
+            parameters.put("Central_Meridian", projectionDictionary.getString("CentralMeridian"));
+            parameters.put("Latitude_Of_Origin", projectionDictionary.getString("OriginLatitude"));
+            parameters.put("Standard_Parallel_1", projectionDictionary.getString("StandardParallelOne"));
+            parameters.put("Standard_Parallel_2", projectionDictionary.getString("StandardParallelTwo"));
+            parameters.put("False_Easting", projectionDictionary.getString("FalseEasting"));
+            parameters.put("False_Northing", projectionDictionary.getString("FalseNorthing"));
+
+            String paramsString = parameters.entrySet().stream().map(entry -> "PARAMETER[\""+ entry.getKey() + "\", "+ entry.getValue() + "]").collect(Collectors.joining(","));
+            tokens.put("parameters", paramsString);
+
+            tokens.put("linear_unit", "UNIT[\"Meter\",1.0]");
+
+            // Get the datum
+            COSBase datumObj = projectionDictionary.getDictionaryObject("Datum");
+            if (datumObj instanceof COSString) {
+                String datum = ((COSString) datumObj).getString();
+
+                // TODO datum lookup
+                String geogcs = "GEOGCS[\"GCS_North_American_1927\",DATUM[\"D_North_American_1927\",SPHEROID[\"Clarke_1866\",6378206.4,294.9786982]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]]";
+                tokens.put("geo_cs", geogcs);
+            }
+
+             // StrSubstitutor subber = new StrSubstitutor(tokens);
+            StringSubstitutor subber = new StringSubstitutor(tokens);
+            return subber.replace(PROJ_WKT_TEMPLATE);            
+        }
+
+        return null;
+    }
 
     public static byte[] generateMetadataXML(byte[] pdfBytes, String fileName, String url) throws IOException {
         byte[] bytes = null;

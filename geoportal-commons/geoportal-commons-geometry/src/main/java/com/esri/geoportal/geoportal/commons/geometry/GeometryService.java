@@ -31,6 +31,8 @@ import java.util.AbstractList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -65,6 +67,32 @@ public class GeometryService implements Closeable {
     params.put("inSR", Integer.toString(fromWkid));
     params.put("outSR", Integer.toString(toWkid));
     params.put("geometries", createGeometries(mp));
+    
+    HttpEntity entrity = new UrlEncodedFormEntity(params.entrySet().stream()
+            .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()), "UTF-8");
+    request.setEntity(entrity);
+    
+    try (CloseableHttpResponse httpResponse = httpClient.execute(request); InputStream contentStream = httpResponse.getEntity().getContent();) {
+      if (httpResponse.getStatusLine().getStatusCode()>=400) {
+        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+      }
+      MultiPointGeometry geom = mapper.readValue(contentStream, MultiPointGeometry.class);
+      MultiPoint result  = new MultiPoint();
+      geom.geometries[0].points.forEach(pt->result.add(pt[0], pt[1]));
+      return result;
+    }
+  }
+
+  public MultiPoint project(MultiPoint mp, String fromWkt, int toWkid) throws IOException, URISyntaxException {
+    HttpPost request = new HttpPost(createProjectUrl().toURI());
+    
+    HashMap<String, String> params = new HashMap<>();
+    params.put("f", "json");
+    params.put("inSR", String.format("{\"wkt\": \"%s\"}", fromWkt.replaceAll("\"", "\\\\\"")));
+    params.put("outSR", Integer.toString(toWkid));
+    params.put("geometries", createGeometries(mp));
+    // System.out.println("Geometries: " + params.get("geometries"));
+    // System.out.println("WKT: " + params.get("inSR"));
     
     HttpEntity entrity = new UrlEncodedFormEntity(params.entrySet().stream()
             .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()), "UTF-8");
