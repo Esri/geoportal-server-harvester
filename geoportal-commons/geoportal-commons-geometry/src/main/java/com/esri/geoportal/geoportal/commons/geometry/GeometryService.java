@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -91,8 +90,6 @@ public class GeometryService implements Closeable {
     params.put("inSR", String.format("{\"wkt\": \"%s\"}", fromWkt.replaceAll("\"", "\\\\\"")));
     params.put("outSR", Integer.toString(toWkid));
     params.put("geometries", createGeometries(mp));
-    // System.out.println("Geometries: " + params.get("geometries"));
-    // System.out.println("WKT: " + params.get("inSR"));
     
     HttpEntity entrity = new UrlEncodedFormEntity(params.entrySet().stream()
             .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()), "UTF-8");
