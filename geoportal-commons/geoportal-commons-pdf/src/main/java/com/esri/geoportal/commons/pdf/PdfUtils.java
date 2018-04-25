@@ -17,8 +17,6 @@
 package com.esri.geoportal.commons.pdf;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,17 +36,12 @@ import com.esri.geoportal.commons.meta.util.WKAConstants;
 import com.esri.geoportal.commons.meta.xml.SimpleDcMetaBuilder;
 import com.esri.geoportal.commons.utils.XmlUtils;
 import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
-import com.fasterxml.jackson.databind.ser.std.ClassSerializer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.text.StrSubstitutor;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSDictionary;
-import org.apache.pdfbox.cos.COSFloat;
-import org.apache.pdfbox.cos.COSInteger;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.cos.COSObject;
 import org.apache.pdfbox.cos.COSString;
@@ -147,9 +140,39 @@ public class PdfUtils {
                 COSObject measure = document.getDocument().getObjectByType(COSName.getPDFName("Measure"));
                 if (measure != null) {
                     System.out.println("Found Measure element");
-                    // TODO get bounding box coordinates
-                    COSBase coords = measure.getItem(COSName.getPDFName("GPTS"));
-                    System.out.printf("\tCoordinates: %s\n", coords.toString());
+                    COSDictionary dictionary = (COSDictionary) measure.getObject();
+
+                    float[] coords = ((COSArray) dictionary.getItem("GPTS")).toFloatArray();
+                    
+                    // Calculate the bounding box...
+                    Float xMin = Float.MAX_VALUE;
+                    Float yMin = Float.MAX_VALUE;
+                    Float xMax = -Float.MAX_VALUE;
+                    Float yMax = -Float.MAX_VALUE;
+
+                    for (int i = 0; i < coords.length; i += 2) {
+                        float y = coords[i];
+                        float x = coords[i+1];
+
+                        if (x > xMax) {
+                            xMax = x;
+                        }
+                        if (x < xMin) {
+                            xMin = x;
+                        }
+
+                        if (y > yMax) {
+                            yMax = y;
+                        }
+                        if (y < yMin) {
+                            yMin = y;
+                        }
+                    }
+                    String bbox = generateBbox(xMin, yMin, xMax, yMax);
+                    System.out.println("Coords: " + bbox);
+
+                    ret.put(PROP_BBOX,  bbox);
+
                 } else {
                     PDPage page = document.getPage(0);
                     if (page.getCOSObject().containsKey(COSName.getPDFName("LGIDict"))) {
@@ -271,7 +294,7 @@ public class PdfUtils {
                                 }
                             }
 
-                            currentBbox = String.format("%s %s, %s %s", xMin, yMin, xMax, yMax);
+                            currentBbox = generateBbox(xMin, yMin, xMax, yMax);
 
                         } catch (Exception e) {
                             LOG.error("Exception reprojecting geometry, skipping this geopdf dictionary instance...", e);
@@ -387,4 +410,11 @@ public class PdfUtils {
         return parameters.entrySet().stream().map(entry -> "PARAMETER[\""+ entry.getKey() + "\", "+ entry.getValue() + "]").collect(Collectors.joining(","));
     }
 
+    private static String generateBbox (Float xMin, Float yMin, Float xMax, Float yMax) {
+        return generateBbox(xMin.doubleValue(), yMin.doubleValue(), xMax.doubleValue(), yMax.doubleValue());
+    }
+
+    private static String generateBbox (Double xMin, Double yMin, Double xMax, Double yMax) {
+        return String.format("%s %s, %s %s", yMin, xMin, yMax, xMax);
+    }
 }
