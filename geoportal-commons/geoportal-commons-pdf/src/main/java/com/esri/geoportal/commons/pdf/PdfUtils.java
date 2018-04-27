@@ -278,6 +278,7 @@ public class PdfUtils {
 
                         // Get the wkt for the geospatial coordinate system
                         String wkt = datumTranslation(projectionDictionary.getItem("Datum"));
+
                         if (zone != null && hemisphere != null && wkt != null) {
                             // Generate a list of UTM strings
                             List<String> utmCoords = new ArrayList<>();
@@ -296,6 +297,7 @@ public class PdfUtils {
                             }
                         } else {
                             LOG.warn("Missing UTM argument: zone: {}, hemisphere: {}, datum: {}", zone, hemisphere, wkt);
+                            System.out.println(projectionDictionary);
                         }
                     } else {
 
@@ -322,7 +324,9 @@ public class PdfUtils {
                     }
                 }
 
-                bBoxes.add(currentBbox);
+                if (currentBbox != null) {
+                    bBoxes.add(currentBbox);
+                }
             } catch (IOException e) {
                 LOG.error("Exception parsing PDF, ", e);
             } 
@@ -332,13 +336,9 @@ public class PdfUtils {
     }
 
     private static final String PROJ_WKT_TEMPLATE = "PROJCS[\"${name}\", ${geo_cs}, ${projection}, ${parameters}, ${linear_unit}]";
-    private static final String GEO_WKT_TEMPLATE = "GEOGCS[\"${name}\", ${datum}, ${prime_meridian}, ${angular_unit}]";
-    private static final String DATUM_TEMPLATE = "DATUM[\"${name}\", ${spheroid} ${to_wgs84}]";
     
     private static String getProjectionWKT(COSDictionary projectionDictionary, String projectionType) throws IOException {
         Map<String,String> tokens = new HashMap<>();
-
-        String type = projectionDictionary.getString("Type");
         
         tokens.put("name", projectionType);
 
@@ -393,6 +393,9 @@ public class PdfUtils {
             } else if (datumKey.startsWith("WG") || datumKey.equals("WE")) {
                 return "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]]";
             }
+        } else if (datumObj instanceof COSDictionary) {
+            // System.out.println(datumObj);
+            return "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]]";
         }
 
 		return null;
