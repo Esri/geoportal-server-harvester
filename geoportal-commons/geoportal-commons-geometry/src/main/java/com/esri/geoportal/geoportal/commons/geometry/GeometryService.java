@@ -59,7 +59,6 @@ public class GeometryService implements Closeable {
   }
   
   public MultiPoint project(MultiPoint mp, int fromWkid, int toWkid) throws IOException, URISyntaxException {
-    HttpPost request = new HttpPost(createProjectUrl().toURI());
     
     HashMap<String, String> params = new HashMap<>();
     params.put("f", "json");
@@ -67,23 +66,10 @@ public class GeometryService implements Closeable {
     params.put("outSR", Integer.toString(toWkid));
     params.put("geometries", createGeometries(mp));
     
-    HttpEntity entrity = new UrlEncodedFormEntity(params.entrySet().stream()
-            .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()), "UTF-8");
-    request.setEntity(entrity);
-    
-    try (CloseableHttpResponse httpResponse = httpClient.execute(request); InputStream contentStream = httpResponse.getEntity().getContent();) {
-      if (httpResponse.getStatusLine().getStatusCode()>=400) {
-        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
-      }
-      MultiPointGeometry geom = mapper.readValue(contentStream, MultiPointGeometry.class);
-      MultiPoint result  = new MultiPoint();
-      geom.geometries[0].points.forEach(pt->result.add(pt[0], pt[1]));
-      return result;
-    }
+    return callProjectService(params);
   }
 
   public MultiPoint project(MultiPoint mp, String fromWkt, int toWkid) throws IOException, URISyntaxException {
-    HttpPost request = new HttpPost(createProjectUrl().toURI());
     
     HashMap<String, String> params = new HashMap<>();
     params.put("f", "json");
@@ -91,6 +77,12 @@ public class GeometryService implements Closeable {
     params.put("outSR", Integer.toString(toWkid));
     params.put("geometries", createGeometries(mp));
     
+    return callProjectService(params);
+  }
+
+  private MultiPoint callProjectService(HashMap<String, String> params) throws IOException, URISyntaxException {
+    HttpPost request = new HttpPost(createProjectUrl().toURI());
+
     HttpEntity entrity = new UrlEncodedFormEntity(params.entrySet().stream()
             .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()), "UTF-8");
     request.setEntity(entrity);
@@ -125,7 +117,6 @@ public class GeometryService implements Closeable {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
 
-      // System.out.println(IOUtils.readLines(contentStream));
       FromGeoCoordinateStringResponse response = mapper.readValue(contentStream, FromGeoCoordinateStringResponse.class);
       return response.toMultipointGeometry();
     }
