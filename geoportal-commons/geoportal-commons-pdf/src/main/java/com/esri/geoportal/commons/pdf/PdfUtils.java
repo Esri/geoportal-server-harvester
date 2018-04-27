@@ -59,7 +59,8 @@ import org.w3c.dom.Document;
  */
 public class PdfUtils {
 
-	private static final String DEFAULT_GEOMETRY_SERVICE = "https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer";
+    private static final String DEFAULT_GEOMETRY_SERVICE = "https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer";
+    private static final String DEFAULT_BBOX = "-90 -180, 90 180";
 
 	private static final int WGS84_WKID = 4326;
 
@@ -84,7 +85,7 @@ public class PdfUtils {
             props.put(WKAConstants.WKA_TITLE, metaProps.get(PdfUtils.PROP_TITLE));
             props.put(WKAConstants.WKA_DESCRIPTION, metaProps.get(PdfUtils.PROP_SUBJECT));
             props.put(WKAConstants.WKA_MODIFIED, metaProps.get(PdfUtils.PROP_MODIFICATION_DATE));
-            props.put(WKAConstants.WKA_BBOX, metaProps.getOrDefault(PdfUtils.PROP_BBOX, "0 0, 0 0"));
+            props.put(WKAConstants.WKA_BBOX, metaProps.getOrDefault(PdfUtils.PROP_BBOX, DEFAULT_BBOX));
             props.put(WKAConstants.WKA_RESOURCE_URL, url);
 
             try {
