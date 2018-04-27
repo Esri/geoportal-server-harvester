@@ -57,6 +57,7 @@ import org.slf4j.LoggerFactory;
   private final Set<String> existing = new HashSet<>();
   private Client client;
   private volatile boolean preventCleanup;
+  private final String geometryServiceUrl;
 
   private static String generateSBOM() {
     try {
@@ -74,9 +75,10 @@ import org.slf4j.LoggerFactory;
    * @param definition definition
    * @param client client
    */
-  public GptBroker(GptConnector connector, GptBrokerDefinitionAdaptor definition) {
+  public GptBroker(GptConnector connector, GptBrokerDefinitionAdaptor definition, String geometryServiceUrl) {
     this.connector = connector;
     this.definition = definition;
+    this.geometryServiceUrl = geometryServiceUrl;
   }
 
   @Override
@@ -147,7 +149,7 @@ import org.slf4j.LoggerFactory;
       if (definition.getAcceptXml()) {
         byte[] content = null;
         if (ref.getContent(MimeType.APPLICATION_PDF) != null && definition.isTranslatePdf()) {
-          content = PdfUtils.generateMetadataXML(ref.getContent(MimeType.APPLICATION_PDF), ref.getSourceUri().getPath(), ref.getSourceUri().toASCIIString()); 
+          content = PdfUtils.generateMetadataXML(ref.getContent(MimeType.APPLICATION_PDF), ref.getSourceUri().getPath(), ref.getSourceUri().toASCIIString(), geometryServiceUrl); 
         } else {
           content = ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML);
         }

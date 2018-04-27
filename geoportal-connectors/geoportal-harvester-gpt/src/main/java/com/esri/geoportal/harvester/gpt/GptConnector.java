@@ -33,6 +33,17 @@ import java.util.ResourceBundle;
  */
 public class GptConnector implements OutputConnector<OutputBroker> {
   public static final String TYPE = "GPT";
+  private static final String DEFAULT_GEOMETRY_SERVICE = "https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer";
+
+  private final String geometryServiceUrl;
+
+  public GptConnector() {
+    this.geometryServiceUrl = DEFAULT_GEOMETRY_SERVICE;
+  }
+
+  public GptConnector(String geometryServiceUrl) {
+    this.geometryServiceUrl = geometryServiceUrl;
+  }
 
   @Override
   public String getType() {
@@ -65,7 +76,7 @@ public class GptConnector implements OutputConnector<OutputBroker> {
 
   @Override
   public OutputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
-    return new GptBroker(this, new GptBrokerDefinitionAdaptor(definition));
+    return new GptBroker(this, new GptBrokerDefinitionAdaptor(definition), geometryServiceUrl);
   }
   
 }
