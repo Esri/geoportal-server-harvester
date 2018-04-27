@@ -105,9 +105,38 @@ public class GeometryService implements Closeable {
       return result;
     }
   }
+
+  public MultiPoint fromGeoCoordinateString(List<String> coordinateStrings, String conversionType, int toWkid) throws IOException, URISyntaxException {
+    HttpPost request = new HttpPost(createFromGeoCoordinateStringUrl().toURI());
+
+    HashMap<String, String> params = new HashMap<>();
+    params.put("f", "json");
+    params.put("sr", Integer.toString(toWkid));
+    params.put("strings", String.format("[\"%s\"]", String.join("\",\"", coordinateStrings)));
+    params.put("conversionType", "UTM");
+    params.put("coversionMode", "utmDefault");
+
+    HttpEntity entity = new UrlEncodedFormEntity(params.entrySet().stream()
+      .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()), "UTF-8");
+    request.setEntity(entity);
+    
+    try (CloseableHttpResponse httpResponse = httpClient.execute(request); InputStream contentStream = httpResponse.getEntity().getContent();) {
+      if (httpResponse.getStatusLine().getStatusCode()>=400) {
+        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+      }
+
+      // System.out.println(IOUtils.readLines(contentStream));
+      FromGeoCoordinateStringResponse response = mapper.readValue(contentStream, FromGeoCoordinateStringResponse.class);
+      return response.toMultipointGeometry();
+    }
+  }
   
   private URL createProjectUrl() throws MalformedURLException {
     return new URL(geometryServiceUrl.toExternalForm().replaceAll("/*$", "/project"));
+  }
+
+  private URL createFromGeoCoordinateStringUrl() throws MalformedURLException {
+    return new URL(geometryServiceUrl.toExternalForm().replaceAll("/*$", "/fromGeoCoordinateString"));
   }
   
   private static String createGeometries(MultiPoint mp) throws JsonProcessingException {
@@ -145,6 +174,20 @@ public class GeometryService implements Closeable {
     @Override
     public int size() {
       return mp.getPointCount();
+    }
+  }
+
+  private static final class FromGeoCoordinateStringResponse {
+    public List<Double[]> coordinates;
+
+    public MultiPoint toMultipointGeometry () {
+      MultiPoint mp = new MultiPoint();
+
+      coordinates.forEach(pointSet -> {
+        mp.add(pointSet[0], pointSet[1]);
+      });
+
+      return mp;
     }
   }
 }

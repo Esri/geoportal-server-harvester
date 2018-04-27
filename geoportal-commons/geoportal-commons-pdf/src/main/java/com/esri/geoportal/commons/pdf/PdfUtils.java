@@ -29,6 +29,7 @@ import javax.xml.transform.TransformerException;
 
 import com.esri.core.geometry.MultiPoint;
 import com.esri.core.geometry.Point;
+import com.esri.core.geometry.Point2D;
 import com.esri.geoportal.commons.meta.AttributeUtils;
 import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaException;
@@ -57,7 +58,10 @@ import org.w3c.dom.Document;
  * Utilities for reading PDF file metadata
  */
 public class PdfUtils {
-    private static final Logger LOG = LoggerFactory.getLogger(PdfUtils.class);
+
+	private static final int WGS84_WKID = 4326;
+
+	private static final Logger LOG = LoggerFactory.getLogger(PdfUtils.class);
 
     // Metadata properties read from PDF file
     public static final String PROP_TITLE = "title";
@@ -264,41 +268,56 @@ public class PdfUtils {
                 }
 
                 if (dictionary.containsKey("Projection")) {
-                    String wkt = getProjectionWKT((COSDictionary)dictionary.getDictionaryObject("Projection"));
+                    COSDictionary projectionDictionary = (COSDictionary)dictionary.getDictionaryObject("Projection");
+                    String projectionType = projectionDictionary.getString("ProjectionType");
 
-                    if (wkt != null) {
-                        try (GeometryService svc = new GeometryService(HttpClients.custom().useSystemProperties().build(), new URL("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer"));) {
-                            MultiPoint reproj = svc.project(mp, wkt, 4326);
-                            
-                            int count = reproj.getPointCount();
-                            Double xMax = -Double.MAX_VALUE;
-                            Double yMax = -Double.MAX_VALUE;
-                            Double xMin = Double.MAX_VALUE;
-                            Double yMin = Double.MAX_VALUE;
+                    // UTM projections require slightly different processing
+                    if ("UT".equals(projectionType)) {
+                        String zone = Integer.toString(projectionDictionary.getInt("Zone"));
+                        String hemisphere = projectionDictionary.getString("Hemisphere");
 
-                            for (int i = 0; i < count; i++) {
-                                Point pt = reproj.getPoint(i);
-                                
-                                if (pt.getX() > xMax) {
-                                    xMax = pt.getX();
-                                }
-                                if (pt.getX() < xMin) {
-                                    xMin = pt.getX();
-                                }
-
-                                if (pt.getY() > yMax) {
-                                    yMax = pt.getY();
-                                }
-                                if (pt.getY() < yMin) {
-                                    yMin = pt.getY();
-                                }
+                        // Get the wkt for the geospatial coordinate system
+                        String wkt = datumTranslation(projectionDictionary.getItem("Datum"));
+                        if (zone != null && hemisphere != null && wkt != null) {
+                            // Generate a list of UTM strings
+                            List<String> utmCoords = new ArrayList<>();
+                            for (Point2D pt : mp.getCoordinates2D()) {
+                                String coord = String.format("%s%s %s %s", zone, hemisphere, Math.round(pt.x), Math.round(pt.y));
+                                utmCoords.add(coord);
                             }
 
-                            currentBbox = generateBbox(xMin, yMin, xMax, yMax);
+                            try (GeometryService svc = new GeometryService(HttpClients.custom().useSystemProperties().build(), new URL("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer"));) {
+                                MultiPoint reproj = svc.fromGeoCoordinateString(utmCoords, "utmDefault", WGS84_WKID);
 
-                        } catch (Exception e) {
-                            LOG.error("Exception reprojecting geometry, skipping this geopdf dictionary instance...", e);
-                            // throw new IOException(e);
+                                currentBbox = generateBbox(reproj);
+                            } catch (Exception e) {
+                                LOG.error("Exception reprojecting geometry, skipping this geopdf dictionary instance...", e);
+                                // throw new IOException(e);
+                            }
+                        } else {
+                            LOG.warn("Missing UTM argument: zone: {}, hemisphere: {}, datum: {}", zone, hemisphere, wkt);
+                        }
+                    } else {
+
+                        // Generate Well Known Text for projection and re-projects the points to WGS 84
+                        String wkt = getProjectionWKT(projectionDictionary, projectionType);
+
+                        if (wkt != null) {
+                            try (GeometryService svc = new GeometryService(HttpClients.custom().useSystemProperties().build(), new URL("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer"));) {
+                                MultiPoint reproj = svc.project(mp, wkt, WGS84_WKID);
+
+                                currentBbox = generateBbox(reproj);
+
+                            } catch (Exception e) {
+                                LOG.error("Exception reprojecting geometry, skipping this geopdf dictionary instance...", e);
+                                // throw new IOException(e);
+                            }
+                        } else {
+                            // Print out translated coordinates for debugging purposes
+                            System.out.println("Translated Coordinates");
+                            for (Point2D pt : mp.getCoordinates2D()) {
+                                System.out.println(String.format("\t%s, %s", pt.x, pt.y));
+                            }
                         }
                     }
                 }
@@ -316,11 +335,11 @@ public class PdfUtils {
     private static final String GEO_WKT_TEMPLATE = "GEOGCS[\"${name}\", ${datum}, ${prime_meridian}, ${angular_unit}]";
     private static final String DATUM_TEMPLATE = "DATUM[\"${name}\", ${spheroid} ${to_wgs84}]";
     
-    private static String getProjectionWKT(COSDictionary projectionDictionary) throws IOException {
+    private static String getProjectionWKT(COSDictionary projectionDictionary, String projectionType) throws IOException {
         Map<String,String> tokens = new HashMap<>();
 
         String type = projectionDictionary.getString("Type");
-        String projectionType = projectionDictionary.getString("ProjectionType");
+        
         tokens.put("name", projectionType);
 
         System.out.println("Projection Type: " + projectionType);
@@ -371,7 +390,7 @@ public class PdfUtils {
 
             if (datumKey.startsWith("NAS")) {
                 return "GEOGCS[\"GCS_North_American_1927\",DATUM[\"D_North_American_1927\",SPHEROID[\"Clarke_1866\",6378206.4,294.9786982]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]]";
-            } else if (datumKey.startsWith("WG")) {
+            } else if (datumKey.startsWith("WG") || datumKey.equals("WE")) {
                 return "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]]";
             }
         }
@@ -408,6 +427,34 @@ public class PdfUtils {
         }
 
         return parameters.entrySet().stream().map(entry -> "PARAMETER[\""+ entry.getKey() + "\", "+ entry.getValue() + "]").collect(Collectors.joining(","));
+    }
+
+    private static final String generateBbox(MultiPoint points) {
+        int count = points.getPointCount();
+        Double xMax = -Double.MAX_VALUE;
+        Double yMax = -Double.MAX_VALUE;
+        Double xMin = Double.MAX_VALUE;
+        Double yMin = Double.MAX_VALUE;
+
+        for (int i = 0; i < count; i++) {
+            Point pt = points.getPoint(i);
+            
+            if (pt.getX() > xMax) {
+                xMax = pt.getX();
+            }
+            if (pt.getX() < xMin) {
+                xMin = pt.getX();
+            }
+
+            if (pt.getY() > yMax) {
+                yMax = pt.getY();
+            }
+            if (pt.getY() < yMin) {
+                yMin = pt.getY();
+            }
+        }
+
+        return generateBbox(xMin, yMin, xMax, yMax);
     }
 
     private static String generateBbox (Float xMin, Float yMin, Float xMax, Float yMax) {
