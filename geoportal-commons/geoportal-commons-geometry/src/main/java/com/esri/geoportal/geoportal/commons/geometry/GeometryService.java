@@ -58,6 +58,15 @@ public class GeometryService implements Closeable {
     this.geometryServiceUrl = geometryServiceUrl;
   }
   
+  /**
+   * Projects the given multipoint geometry from one coordinate system to another
+   * 
+   * @param mp the points to project
+   * @param fromWkid the coordinate sytem {@code mp}'s points are in
+   * @param toWkid the coordinate system to project into
+   * 
+   * @return the reprojected points
+   */
   public MultiPoint project(MultiPoint mp, int fromWkid, int toWkid) throws IOException, URISyntaxException {
     
     HashMap<String, String> params = new HashMap<>();
@@ -69,6 +78,15 @@ public class GeometryService implements Closeable {
     return callProjectService(params);
   }
 
+  /**
+   * Projects the given multipoint geometry from one coordinate system to another
+   * 
+   * @param mp the points to project
+   * @param fromWkt the coordinate sytem {@code mp}'s points are in
+   * @param toWkid the coordinate system to project into
+   * 
+   * @return the reprojected points
+   */
   public MultiPoint project(MultiPoint mp, String fromWkt, int toWkid) throws IOException, URISyntaxException {
     
     HashMap<String, String> params = new HashMap<>();
@@ -80,6 +98,13 @@ public class GeometryService implements Closeable {
     return callProjectService(params);
   }
 
+  /**
+   * Calls the projection service with the given parameters
+   * 
+   * @param params the parameters for the projection call
+   * 
+   * @return the reprojected points
+   */
   private MultiPoint callProjectService(HashMap<String, String> params) throws IOException, URISyntaxException {
     HttpPost request = new HttpPost(createProjectUrl().toURI());
 
@@ -98,7 +123,15 @@ public class GeometryService implements Closeable {
     }
   }
 
-  public MultiPoint fromGeoCoordinateString(List<String> coordinateStrings, String conversionType, int toWkid) throws IOException, URISyntaxException {
+  /**
+   * Translates UTM points from a string into lat lon values
+   * 
+   * @param coordinateStrings the points to translate, in the format {@code <grid><hemisphere> <easting> <northing>} E.G. {@code 18N 60000 80000}
+   * @param toWkid the coordinate system to translate into
+   * 
+   * @return the translated points
+   */
+  public MultiPoint fromGeoCoordinateString(List<String> coordinateStrings, int toWkid) throws IOException, URISyntaxException {
     HttpPost request = new HttpPost(createFromGeoCoordinateStringUrl().toURI());
 
     HashMap<String, String> params = new HashMap<>();

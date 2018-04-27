@@ -60,10 +60,10 @@ import org.w3c.dom.Document;
 public class PdfUtils {
 
     private static final String DEFAULT_GEOMETRY_SERVICE = "https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer";
+    private static final String PROJ_WKT_TEMPLATE = "PROJCS[\"${name}\", ${geo_cs}, ${projection}, ${parameters}, ${linear_unit}]";
     private static final String DEFAULT_BBOX = "-90 -180, 90 180";
-
-	private static final int WGS84_WKID = 4326;
-
+    private static final int WGS84_WKID = 4326;
+    
     private static final Logger LOG = LoggerFactory.getLogger(PdfUtils.class);
 
     // Metadata properties read from PDF file
@@ -72,14 +72,38 @@ public class PdfUtils {
     public static final String PROP_MODIFICATION_DATE = "modification_date";
     public static final String PROP_BBOX = "bounding_box";
 
+    /**
+     * Generates a Dublin-Core XML string from the given PDF's metadata.
+     * 
+     * This version uses ArcGIS online to project Geospatial PDF and GeoPDF coordinates.
+     * 
+     * @param pdfBytes the PDF file to parse
+     * @param fileName the name of the PDF file. Used if the PDF metadata doesn't specify a title.
+     * @param url the source location of the PDF file. Used to set the XML's "resource URL".
+     * 
+     * @return Dublin-Core XML metadata
+     */
     public static byte[] generateMetadataXML(byte[] pdfBytes, String fileName, String url) throws IOException {
         return generateMetadataXML(pdfBytes, fileName, url, DEFAULT_GEOMETRY_SERVICE);
     }
 
+    /**
+     * Generates a Dublin-Core XML string from the given PDF's metadata.
+     * 
+     * @param pdfBytes the PDF file to parse
+     * @param fileName the name of the PDF file. Used if the PDF metadata doesn't specify a title.
+     * @param url the source location of the PDF file. Used to set the XML's "resource URL".
+     * @param geometryServiceUrl url of a <a href="https://developers.arcgis.com/rest/services-reference/geometry-service.htm">geometry service</a> for reprojecting coordinates. 
+     * 
+     * @return Dublin-Core XML metadata
+     */
     public static byte[] generateMetadataXML(byte[] pdfBytes, String fileName, String url, String geometryServiceUrl) throws IOException {
         byte[] bytes = null;
+
+        // Read in the PDF metadata.
         Properties metaProps = readMetadata(pdfBytes, fileName, geometryServiceUrl);
 
+        // Build out the XML metadata
         if (metaProps != null) {
             Properties props = new Properties();
             props.put(WKAConstants.WKA_TITLE, metaProps.get(PdfUtils.PROP_TITLE));
@@ -104,7 +128,11 @@ public class PdfUtils {
      * Reads metadata values from a PDF file.
      * 
      * @param rawBytes the PDF to read
+     * @param defaultTitle title to be used if the PDF metadata doesn't have one
+     * @param geometryServiceUrl url of a <a href="https://developers.arcgis.com/rest/services-reference/geometry-service.htm">geometry service</a> for reprojecting coordinates. 
+     * 
      * @return metadata properties or null if the PDF cannot be read.
+     * 
      * @throws IOException on parsing error
      */
     public static Properties readMetadata(byte[] rawBytes, String defaultTitle, String geometryServiceUrl) throws IOException {
@@ -148,9 +176,11 @@ public class PdfUtils {
                     return null;
                 }
 
+                // Attempt to read in geospatial PDF data
                 COSObject measure = document.getDocument().getObjectByType(COSName.getPDFName("Measure"));
                 String bBox = null;
                 if (measure != null) {
+                    // This is a Geospatial PDF (i.e. Adobe's standard)
                     COSDictionary dictionary = (COSDictionary) measure.getObject();
 
                     float[] coords = ((COSArray) dictionary.getItem("GPTS")).toFloatArray();
@@ -159,6 +189,7 @@ public class PdfUtils {
                 } else {
                     PDPage page = document.getPage(0);
                     if (page.getCOSObject().containsKey(COSName.getPDFName("LGIDict"))) {
+                        // This is a GeoPDF (i.e. TerraGo's standard)
                         bBox = extractGeoPDFProps(page, geometryServiceUrl);
                     }
                 }
@@ -180,8 +211,20 @@ public class PdfUtils {
         return ret;
     }
 
+    /**
+     * Extracts the geospatial metadata from a GeoPDF
+     * 
+     * @param page the PDF page to read geospatial metadata from
+     * @param geometryServiceUrl url of a <a href="https://developers.arcgis.com/rest/services-reference/geometry-service.htm">geometry service</a> for reprojecting coordinates. 
+     * 
+     * @see <a href="https://www.loc.gov/preservation/digital/formats/fdd/fdd000312.shtml">Library of Congress information on GeoPDF</a>
+     * @see <a href="https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf">The PDF specification</a>, section 8, for instructions for translating coordinates.
+     * 
+     * @returns the bounding box of the GeoPDF as "yMin xMin, yMax xMax"
+     */
     private static String extractGeoPDFProps(PDPage page, String geometryServiceUrl) {
 
+        // The LGI dictionary is an array, we'll loop through all entries and pull the first one for a bounding box
         COSArray lgi = (COSArray) page.getCOSObject().getDictionaryObject("LGIDict");
 
         List<String> bBoxes = new ArrayList<>();
@@ -190,12 +233,14 @@ public class PdfUtils {
 
             String currentBbox = null;
 
-            // Set up the Coordinate Transformation Matrix
+            // Set up the Coordinate Transformation Matrix (used to translate PDF coords to geo coords)
             Double[][] ctmValues = null;
 
             COSDictionary dictionary = (COSDictionary) item;
             if (dictionary.containsKey("CTM")) {
                 ctmValues = new Double[3][3];
+
+                // The last column in the matrix is always constant
                 ctmValues[0][2] = 0.0;
                 ctmValues[1][2] = 0.0;
                 ctmValues[2][2] = 1.0;
@@ -208,9 +253,9 @@ public class PdfUtils {
                 }
             }
 
+            // Get the neatline (i.e. the bounding box in *PDF* coordinates)
             Double[][] neatLineValues = null;
             int neatLineLength = 0;
-
             if (dictionary.containsKey("Neatline")) {
 
                 COSArray neatline = (COSArray) dictionary.getDictionaryObject("Neatline");
@@ -225,27 +270,26 @@ public class PdfUtils {
                 }
             }
 
+            // Translate the PDF coordinates to Geospatial coordintates by multiplying the two matricies
             MultiPoint mp = new MultiPoint();
-
             if (ctmValues != null && neatLineValues != null) {
-                // Transform the PDF coordinates to geospatial ones
                 Double[][] resultCoords = new Double[neatLineLength / 2][3];
                 for (int z = 0; z < neatLineLength / 2; z++) {
                     for (int i = 0; i < 3; i++) {
                         resultCoords[z][i] = neatLineValues[z][0] * ctmValues[0][i]
                                 + neatLineValues[z][1] * ctmValues[1][i] + neatLineValues[z][2] * ctmValues[2][i];
                     }
-
-                    // Set up the multipoint object
                     mp.add(resultCoords[z][0], resultCoords[z][1]);
                 }
             }
 
+            // Project the geospatial coordinates to WGS84 for the Dublin-Core metadata
             if (dictionary.containsKey("Projection")) {
                 COSDictionary projectionDictionary = (COSDictionary) dictionary.getDictionaryObject("Projection");
                 String projectionType = projectionDictionary.getString("ProjectionType");
 
                 try (GeometryService svc = new GeometryService(HttpClients.custom().useSystemProperties().build(), new URL(geometryServiceUrl));) {
+
                     // UTM projections require slightly different processing
                     if ("UT".equals(projectionType)) {
                         String zone = Integer.toString(projectionDictionary.getInt("Zone"));
@@ -263,7 +307,7 @@ public class PdfUtils {
                                 utmCoords.add(coord);
                             }
 
-                            MultiPoint reproj = svc.fromGeoCoordinateString(utmCoords, "utmDefault", WGS84_WKID);
+                            MultiPoint reproj = svc.fromGeoCoordinateString(utmCoords, WGS84_WKID);
 
                             currentBbox = generateBbox(reproj);
 
@@ -273,7 +317,6 @@ public class PdfUtils {
                             LOG.debug("Projection dictionary {}", projectionDictionary);
                         }
                     } else {
-
                         // Generate Well Known Text for projection and re-projects the points to WGS 84
                         String wkt = getProjectionWKT(projectionDictionary, projectionType);
 
@@ -291,8 +334,8 @@ public class PdfUtils {
                         }
                     }
                 } catch (Exception e) {
+                    // If something goes wrong, just try the next set of coordinates
                     LOG.error("Exception reprojecting geometry, skipping this geopdf dictionary instance...", e);
-                    // throw new IOException(e);
                 }
             }
 
@@ -305,14 +348,24 @@ public class PdfUtils {
         return bBoxes.get(0);
     }
 
-    private static final String PROJ_WKT_TEMPLATE = "PROJCS[\"${name}\", ${geo_cs}, ${projection}, ${parameters}, ${linear_unit}]";
-
+    /**
+     * Generates the projection Well-Known Text (WKT) for reprojecting the geospatial points
+     * 
+     * @see <a href="http://www.geoapi.org/2.0/javadoc/org/opengis/referencing/doc-files/WKT.html">The WKT specification</a>, specifically the "Coordinate System WKT".
+     * @see <a href="https://www.loc.gov/preservation/digital/formats/fdd/fdd000312.shtml">The GeoPDF specification</a> for the projection dictionary properties/parameters.
+     * 
+     * @param projectionDictionary the PDF Carousel Object Structure (COS) dictionary for the GeoPDF
+     * @param projectionType the projection algorithm to use
+     * 
+     * @returns the WKT for the projection
+     */
     private static String getProjectionWKT(COSDictionary projectionDictionary, String projectionType)
             throws IOException {
         Map<String, String> tokens = new HashMap<>();
 
         tokens.put("name", projectionType);
 
+        // Different projection algorithms require different parameters 
         if ("LE".equalsIgnoreCase(projectionType)) {
             tokens.put("projection", "PROJECTION[\"Lambert_Conformal_Conic\"]");
 
@@ -345,9 +398,17 @@ public class PdfUtils {
             return subber.replace(PROJ_WKT_TEMPLATE);
         }
 
+        // Returning null bypasses projection
         return null;
     }
 
+    /**
+     * Returns a datum string for the projection.
+     * 
+     * @param datumObj the "Datum" property in the GeoPDF's projection dictionary
+     * 
+     * @returns the datum string. If it can't determine the appropriate string, defaults to WGS 84.
+     */
     private static String datumTranslation(COSBase datumObj) {
 
         if (datumObj instanceof COSString) {
@@ -358,12 +419,21 @@ public class PdfUtils {
             } else if (datumKey.startsWith("WG") || datumKey.equals("WE")) {
                 return "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]]";
             }
+
+            // TODO Add more datum keys, from the GeoPDF specification
         } 
 
         LOG.warn("Assuming WGS84 for GeoPDF datum...");
         return "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]]";
     }
 
+    /**
+     * Generates the list of "PARAMETER" entries in the WKT.
+     * 
+     * @param projectionDictionary the GeoPDF projection dictionary
+     * 
+     * @returns string of WKT parameters
+     */
     private static String generateWKTParameters(COSDictionary projectionDictionary) throws IOException {
         // Set up the projection parameters
         Properties parameters = new Properties();
@@ -397,6 +467,13 @@ public class PdfUtils {
                 .collect(Collectors.joining(","));
     }
 
+    /**
+     * Generates a bounding-box string from the given set of points
+     * 
+     * @param points the points to find a bounding-box for
+     * 
+     * @returns a bounding box string in the form "latMin lonMin, latMax lonMax"
+     */
     private static final String generateBbox(MultiPoint points) {
         int count = points.getPointCount();
         Double xMax = -Double.MAX_VALUE;
@@ -425,6 +502,13 @@ public class PdfUtils {
         return String.format("%s %s, %s %s", yMin, xMin, yMax, xMax);
     }
 
+    /**
+     * Generates a bounding box for the given set of points
+     * 
+     * @param points array of points in the form {@code [lat1, lon1, lat2, lon2, ...]}
+     * 
+     * @returns a bounding box string in the form "latMin lonMin, latMax lonMax"
+     */
     private static final String generateBbox(float [] points) {
         MultiPoint mp = new MultiPoint();
 
