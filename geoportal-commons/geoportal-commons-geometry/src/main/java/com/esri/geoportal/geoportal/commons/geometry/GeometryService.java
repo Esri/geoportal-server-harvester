@@ -31,6 +31,7 @@ import java.util.AbstractList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -57,8 +58,16 @@ public class GeometryService implements Closeable {
     this.geometryServiceUrl = geometryServiceUrl;
   }
   
+  /**
+   * Projects the given multipoint geometry from one coordinate system to another
+   * 
+   * @param mp the points to project
+   * @param fromWkid the coordinate sytem {@code mp}'s points are in
+   * @param toWkid the coordinate system to project into
+   * 
+   * @return the reprojected points
+   */
   public MultiPoint project(MultiPoint mp, int fromWkid, int toWkid) throws IOException, URISyntaxException {
-    HttpPost request = new HttpPost(createProjectUrl().toURI());
     
     HashMap<String, String> params = new HashMap<>();
     params.put("f", "json");
@@ -66,6 +75,39 @@ public class GeometryService implements Closeable {
     params.put("outSR", Integer.toString(toWkid));
     params.put("geometries", createGeometries(mp));
     
+    return callProjectService(params);
+  }
+
+  /**
+   * Projects the given multipoint geometry from one coordinate system to another
+   * 
+   * @param mp the points to project
+   * @param fromWkt the coordinate sytem {@code mp}'s points are in
+   * @param toWkid the coordinate system to project into
+   * 
+   * @return the reprojected points
+   */
+  public MultiPoint project(MultiPoint mp, String fromWkt, int toWkid) throws IOException, URISyntaxException {
+    
+    HashMap<String, String> params = new HashMap<>();
+    params.put("f", "json");
+    params.put("inSR", String.format("{\"wkt\": \"%s\"}", fromWkt.replaceAll("\"", "\\\\\"")));
+    params.put("outSR", Integer.toString(toWkid));
+    params.put("geometries", createGeometries(mp));
+    
+    return callProjectService(params);
+  }
+
+  /**
+   * Calls the projection service with the given parameters
+   * 
+   * @param params the parameters for the projection call
+   * 
+   * @return the reprojected points
+   */
+  private MultiPoint callProjectService(HashMap<String, String> params) throws IOException, URISyntaxException {
+    HttpPost request = new HttpPost(createProjectUrl().toURI());
+
     HttpEntity entrity = new UrlEncodedFormEntity(params.entrySet().stream()
             .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()), "UTF-8");
     request.setEntity(entrity);
@@ -80,9 +122,45 @@ public class GeometryService implements Closeable {
       return result;
     }
   }
+
+  /**
+   * Translates UTM points from a string into lat lon values
+   * 
+   * @param coordinateStrings the points to translate, in the format {@code <grid><hemisphere> <easting> <northing>} E.G. {@code 18N 60000 80000}
+   * @param toWkid the coordinate system to translate into
+   * 
+   * @return the translated points
+   */
+  public MultiPoint fromGeoCoordinateString(List<String> coordinateStrings, int toWkid) throws IOException, URISyntaxException {
+    HttpPost request = new HttpPost(createFromGeoCoordinateStringUrl().toURI());
+
+    HashMap<String, String> params = new HashMap<>();
+    params.put("f", "json");
+    params.put("sr", Integer.toString(toWkid));
+    params.put("strings", String.format("[\"%s\"]", String.join("\",\"", coordinateStrings)));
+    params.put("conversionType", "UTM");
+    params.put("coversionMode", "utmDefault");
+
+    HttpEntity entity = new UrlEncodedFormEntity(params.entrySet().stream()
+      .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()), "UTF-8");
+    request.setEntity(entity);
+    
+    try (CloseableHttpResponse httpResponse = httpClient.execute(request); InputStream contentStream = httpResponse.getEntity().getContent();) {
+      if (httpResponse.getStatusLine().getStatusCode()>=400) {
+        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+      }
+
+      FromGeoCoordinateStringResponse response = mapper.readValue(contentStream, FromGeoCoordinateStringResponse.class);
+      return response.toMultipointGeometry();
+    }
+  }
   
   private URL createProjectUrl() throws MalformedURLException {
     return new URL(geometryServiceUrl.toExternalForm().replaceAll("/*$", "/project"));
+  }
+
+  private URL createFromGeoCoordinateStringUrl() throws MalformedURLException {
+    return new URL(geometryServiceUrl.toExternalForm().replaceAll("/*$", "/fromGeoCoordinateString"));
   }
   
   private static String createGeometries(MultiPoint mp) throws JsonProcessingException {
@@ -120,6 +198,20 @@ public class GeometryService implements Closeable {
     @Override
     public int size() {
       return mp.getPointCount();
+    }
+  }
+
+  private static final class FromGeoCoordinateStringResponse {
+    public List<Double[]> coordinates;
+
+    public MultiPoint toMultipointGeometry () {
+      MultiPoint mp = new MultiPoint();
+
+      coordinates.forEach(pointSet -> {
+        mp.add(pointSet[0], pointSet[1]);
+      });
+
+      return mp;
     }
   }
 }

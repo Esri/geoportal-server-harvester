@@ -13,6 +13,7 @@
 /geoportal-application/geoportal-harvester-war/target/
 /geoportal-commons/target/
 /geoportal-commons/geoportal-commons-utils/target/
+/geoportal-commons/geoportal-commons-pdf/target/
 /geoportal-commons/geoportal-commons-robots/target/
 /geoportal-commons/geoportal-commons-csw-client/target/
 /geoportal-commons/geoportal-commons-gpt-client/target/
@@ -40,3 +41,7 @@
 /geoportal-connectors/geoportal-harvester-migration/target/
 /geoportal-commons/geoportal-commons-geometry/target/
 /geoportal-commons/geoportal-commons-dcat/target/
+
+.project
+.classpath
+.settings/

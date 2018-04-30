@@ -19,6 +19,7 @@ import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.gpt.client.Client;
 import com.esri.geoportal.commons.gpt.client.PublishRequest;
 import com.esri.geoportal.commons.gpt.client.PublishResponse;
+import com.esri.geoportal.commons.pdf.PdfUtils;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
@@ -39,6 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +57,7 @@ import org.slf4j.LoggerFactory;
   private final Set<String> existing = new HashSet<>();
   private Client client;
   private volatile boolean preventCleanup;
+  private final String geometryServiceUrl;
 
   private static String generateSBOM() {
     try {
@@ -72,9 +75,10 @@ import org.slf4j.LoggerFactory;
    * @param definition definition
    * @param client client
    */
-  public GptBroker(GptConnector connector, GptBrokerDefinitionAdaptor definition) {
+  public GptBroker(GptConnector connector, GptBrokerDefinitionAdaptor definition, String geometryServiceUrl) {
     this.connector = connector;
     this.definition = definition;
+    this.geometryServiceUrl = geometryServiceUrl;
   }
 
   @Override
@@ -143,7 +147,13 @@ import org.slf4j.LoggerFactory;
 
       String xml = null;
       if (definition.getAcceptXml()) {
-        byte[] content = ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML);
+        byte[] content = null;
+        if (ref.getContent(MimeType.APPLICATION_PDF) != null && definition.isTranslatePdf()) {
+          content = PdfUtils.generateMetadataXML(ref.getContent(MimeType.APPLICATION_PDF), ref.getSourceUri().getPath(), ref.getSourceUri().toASCIIString(), geometryServiceUrl); 
+        } else {
+          content = ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML);
+        }
+
         if (content != null) {
           xml = new String(content, "UTF-8");
           if (xml.startsWith(SBOM)) {
