@@ -33,6 +33,17 @@ import java.util.ResourceBundle;
  */
 public class GptConnector implements OutputConnector<OutputBroker> {
   public static final String TYPE = "GPT";
+  private static final String DEFAULT_GEOMETRY_SERVICE = "https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer";
+
+  private final String geometryServiceUrl;
+
+  public GptConnector() {
+    this.geometryServiceUrl = DEFAULT_GEOMETRY_SERVICE;
+  }
+
+  public GptConnector(String geometryServiceUrl) {
+    this.geometryServiceUrl = geometryServiceUrl;
+  }
 
   @Override
   public String getType() {
@@ -59,12 +70,13 @@ public class GptConnector implements OutputConnector<OutputBroker> {
     arguments.add(new UITemplate.BooleanArgument(P_CLEANUP, bundle.getString("gpt.cleanup")));
     arguments.add(new UITemplate.BooleanArgument(P_ACCEPT_XML, bundle.getString("gpt.accept.xml"),false, Boolean.TRUE));
     arguments.add(new UITemplate.BooleanArgument(P_ACCEPT_JSON, bundle.getString("gpt.accept.json"),false, Boolean.FALSE));
+    arguments.add(new UITemplate.BooleanArgument(P_TRANSLATE_PDF, bundle.getString("gpt.translate.pdf"),false, Boolean.TRUE));
     return new UITemplate(getType(), bundle.getString("gpt"), arguments);
   }
 
   @Override
   public OutputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
-    return new GptBroker(this, new GptBrokerDefinitionAdaptor(definition));
+    return new GptBroker(this, new GptBrokerDefinitionAdaptor(definition), geometryServiceUrl);
   }
   
 }

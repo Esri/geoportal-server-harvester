@@ -21,7 +21,8 @@
         <module>geoportal-commons-constants</module>
         <module>geoportal-commons-ckan-client</module>
         <module>geoportal-commons-geometry</module>
-    </modules>
+        <module>geoportal-commons-pdf</module>
+  </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
