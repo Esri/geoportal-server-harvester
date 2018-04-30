@@ -72,7 +72,10 @@ import org.slf4j.LoggerFactory;
       String sspRoot = StringUtils.defaultIfEmpty(ssp.getHost(), ssp.getPath());
       Path brokerRootFolder = definition.getRootFolder().toPath().toRealPath().resolve(sspRoot);
       Files.createDirectories(brokerRootFolder);
-      if (definition.getCleanup()) {
+      if (!context.canCleanup()) {
+        preventCleanup = true;
+      }
+      if (definition.getCleanup() && !preventCleanup) {
         context.addListener(new BaseProcessInstanceListener() {
           @Override
           public void onError(DataException ex) {

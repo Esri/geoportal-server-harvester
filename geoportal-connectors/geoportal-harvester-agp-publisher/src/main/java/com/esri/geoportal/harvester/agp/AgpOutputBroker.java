@@ -364,7 +364,11 @@ import org.xml.sax.SAXException;
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     this.client = new AgpClient(HttpClientBuilder.create().useSystemProperties().build(), definition.getHostUrl(),definition.getCredentials(), definition.getMaxRedirects());
-    if(definition.getCleanup()) {
+
+    if (!context.canCleanup()) {
+      preventCleanup = true;
+    }
+    if (definition.getCleanup() && !preventCleanup) {
       context.addListener(new BaseProcessInstanceListener() {
         @Override
         public void onError(DataException ex) {

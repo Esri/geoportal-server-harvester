@@ -58,5 +58,16 @@ public interface Initializable {
      * @param listener listener
      */
     void addListener(Listener listener);
+    
+    /**
+     * Checks if cleanup is allowed.
+     * @return <code>true</code> if cleanup is allowed
+     */
+    boolean canCleanup();
+    
+    /**
+     * Makes cleanup disabled.
+     */
+    void preventCleanup();
   }
 }

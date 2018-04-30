@@ -71,6 +71,7 @@ import com.esri.geoportal.harvester.unc.UncConnector;
 import com.esri.geoportal.harvester.waf.WafConnector;
 import com.esri.geoportal.harvester.api.ex.*;
 import com.esri.geoportal.harvester.engine.defaults.DefaultProcessor;
+import com.esri.geoportal.harvester.sink.SinkConnector;
 import java.io.IOException;
 import java.net.URL;
 import javax.xml.transform.TransformerConfigurationException;
@@ -262,6 +263,7 @@ public class Bootstrap {
       inboundConnectorRegistry.put(CswConnector.TYPE, new CswConnector());
       inboundConnectorRegistry.put(WafConnector.TYPE, new WafConnector());
       inboundConnectorRegistry.put(UncConnector.TYPE, new UncConnector());
+      inboundConnectorRegistry.put(SinkConnector.TYPE, new SinkConnector());
       inboundConnectorRegistry.put(AgpInputConnector.TYPE, new AgpInputConnector(metaBuilder));
       inboundConnectorRegistry.put(AgsConnector.TYPE, new AgsConnector(metaBuilder, new GeometryService(HttpClients.custom().useSystemProperties().build(), new URL(geometryServiceUrl))));
       inboundConnectorRegistry.put(GptConnector.TYPE, new GptConnector());
