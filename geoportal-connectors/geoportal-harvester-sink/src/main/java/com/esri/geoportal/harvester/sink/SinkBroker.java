@@ -87,7 +87,7 @@ import org.slf4j.LoggerFactory;
 
             watchKey.reset();
           } while (!Thread.interrupted());
-        } catch (InterruptedException ex) {
+        } catch (Exception ex) {
           // ignore
         }
       }, String.format("Folder watching thread on %s", dropPath.toString()));
