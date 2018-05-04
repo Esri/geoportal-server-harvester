@@ -26,6 +26,7 @@ import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -76,7 +77,7 @@ import org.slf4j.LoggerFactory;
         }
         if (Files.isDirectory(f)) {
           subFolders.add(new UncFolder(broker, f, matchPattern, since));
-        } else if (Files.isRegularFile(f) && matchFileName(f, matchPattern)) {
+        } else if (Files.isRegularFile(f) && multiMatchFileName(f, matchPattern)) {
           if (since==null)
             files.add(new UncFile(broker, f));
           else {
@@ -132,7 +133,19 @@ import org.slf4j.LoggerFactory;
   /**
    * Matches file
    * @param file file
-   * @param pattern match patter (glob)
+   * @param patterns comma separated match patterns (glob)
+   * @return <code>true</code> if URL matches the pattern
+   */
+  private boolean multiMatchFileName(Path path, String patterns) {
+    return Arrays.stream(patterns.split(","))
+            .map(pattern -> StringUtils.trimToEmpty(pattern))
+            .anyMatch(pattern -> this.matchFileName(path, pattern));
+  }
+  
+  /**
+   * Matches file
+   * @param file file
+   * @param pattern match pattern (glob)
    * @return <code>true</code> if URL matches the pattern
    */
   private boolean matchFileName(Path path, String pattern) {
