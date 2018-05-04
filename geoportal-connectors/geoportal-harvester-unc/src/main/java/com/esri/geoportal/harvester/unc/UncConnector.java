@@ -45,10 +45,15 @@ public class UncConnector implements InputConnector<InputBroker> {
     args.add(new UITemplate.StringArgument(P_ROOT_FOLDER, bundle.getString("unc.rootFolder"), true){
       @Override
       public String getHint() {
-        return bundle.getString("unc.hint");
+        return bundle.getString("unc.rootFolder.hint");
       }
     });
-    args.add(new UITemplate.StringArgument(P_PATTERN, bundle.getString("unc.pattern")));
+    args.add(new UITemplate.StringArgument(P_PATTERN, bundle.getString("unc.pattern")) {
+      @Override
+      public String getHint() {
+        return bundle.getString("unc.pattern.hint");
+      }
+    });
     return new UITemplate(getType(), bundle.getString("unc"), args);
   }
 

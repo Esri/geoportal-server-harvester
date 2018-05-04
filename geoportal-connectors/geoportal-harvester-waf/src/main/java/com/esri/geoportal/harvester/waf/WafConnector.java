@@ -47,10 +47,15 @@ public class WafConnector implements InputConnector<InputBroker> {
     args.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("waf.url"), true){
       @Override
       public String getHint() {
-        return bundle.getString("waf.hint");
+        return bundle.getString("waf.url.hint");
       }
     });
-    args.add(new UITemplate.StringArgument(P_PATTERN, bundle.getString("waf.pattern")));
+    args.add(new UITemplate.StringArgument(P_PATTERN, bundle.getString("waf.pattern")){
+      @Override
+      public String getHint() {
+        return bundle.getString("waf.pattern.hint");
+      }
+    });
     args.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("waf.username"), false));
     args.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("waf.password"), false) {
       public boolean isPassword() {

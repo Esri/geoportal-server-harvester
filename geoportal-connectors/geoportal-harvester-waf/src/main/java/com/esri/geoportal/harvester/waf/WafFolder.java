@@ -80,7 +80,7 @@ import org.slf4j.LoggerFactory;
       urls.forEach(u -> {
         if (u.toExternalForm().endsWith("/") || !cutOff(u.toExternalForm(),"/").contains(".")) {
           subFolders.add(new WafFolder(broker, u, matchPattern, creds));
-        } else if (matchUrl(u,matchPattern)) {
+        } else if (multiMatchUrl(u,matchPattern)) {
           files.add(new WafFile(broker, u, creds));
         }
       });
@@ -118,6 +118,18 @@ import org.slf4j.LoggerFactory;
   private String cutOff(String s, String cut) {
     int lastIndex = s.lastIndexOf(cut);
     return lastIndex>=0? s.substring(lastIndex+1): s;
+  }
+  
+  /**
+   * Matches file
+   * @param file file
+   * @param patterns comma separated match patterns (glob)
+   * @return <code>true</code> if URL matches the pattern
+   */
+  private boolean multiMatchUrl(URL u, String patterns) {
+    return Arrays.stream(patterns.split(","))
+            .map(pattern -> StringUtils.trimToEmpty(pattern))
+            .anyMatch(pattern -> this.matchUrl(u, pattern));
   }
   
   /**

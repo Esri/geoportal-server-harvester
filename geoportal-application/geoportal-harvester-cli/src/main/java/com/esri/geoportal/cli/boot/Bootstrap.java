@@ -263,7 +263,7 @@ public class Bootstrap {
       inboundConnectorRegistry.put(CswConnector.TYPE, new CswConnector());
       inboundConnectorRegistry.put(WafConnector.TYPE, new WafConnector());
       inboundConnectorRegistry.put(UncConnector.TYPE, new UncConnector());
-      inboundConnectorRegistry.put(SinkConnector.TYPE, new SinkConnector());
+      inboundConnectorRegistry.put(SinkConnector.TYPE, new SinkConnector(5, 1000));
       inboundConnectorRegistry.put(AgpInputConnector.TYPE, new AgpInputConnector(metaBuilder));
       inboundConnectorRegistry.put(AgsConnector.TYPE, new AgsConnector(metaBuilder, new GeometryService(HttpClients.custom().useSystemProperties().build(), new URL(geometryServiceUrl))));
       inboundConnectorRegistry.put(GptConnector.TYPE, new GptConnector());

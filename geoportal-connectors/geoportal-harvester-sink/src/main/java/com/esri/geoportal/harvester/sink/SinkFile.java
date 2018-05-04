@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
@@ -32,6 +33,7 @@ import org.apache.commons.io.IOUtils;
  * Sink file.
  */
 /*package*/ class SinkFile {
+  private final SinkContext ctx;
   private final SinkBroker broker;
   private final Path file;
 
@@ -40,7 +42,8 @@ import org.apache.commons.io.IOUtils;
    * @param broker broker
    * @param file file
    */
-  public SinkFile(SinkBroker broker, Path file) {
+  public SinkFile(SinkContext ctx, SinkBroker broker, Path file) {
+    this.ctx = ctx;
     this.broker = broker;
     this.file = file;
   }
@@ -54,13 +57,13 @@ import org.apache.commons.io.IOUtils;
   public SimpleDataReference readContent() throws IOException, URISyntaxException {
     Date lastModifiedDate = readLastModifiedDate();
     MimeType contentType = readContentType();
-    try (InputStream input = attemptToOpenStream(5, 1000);) {
+    try (InputStream input = attemptToOpenStream(ctx.attemptCount, ctx.attemptDelay);) {
       SimpleDataReference ref = new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), file.toAbsolutePath().toString(), lastModifiedDate, file.toUri(), broker.td.getSource().getRef(), broker.td.getRef());
       ref.addContext(contentType, IOUtils.toByteArray(input));
       return ref;
     } finally {
       // once file is read, delete it
-      Files.delete(file);
+      attemptToDeleteFile(ctx.attemptCount, ctx.attemptDelay);
     }
   }
   
@@ -87,7 +90,35 @@ import org.apache.commons.io.IOUtils;
         try {
           Thread.sleep(mills);
         } catch (InterruptedException e) {
-          
+          // ignore
+        }
+      }
+    }
+  }
+  
+  /**
+   * Attempts to delete file
+   * @param attempts number of attempts
+   * @param mills delay between consecutive attempts
+   * @throws IOException if all attempts fail
+   */
+  private void attemptToDeleteFile(int attempts, long mills) throws IOException {
+    while (true) {
+      attempts--;
+      try {
+        Files.delete(file);
+        return;
+      } catch (FileSystemException ex) {
+        // if not check if maximum number of attempts has been exhausted...
+        if (attempts <= 0) {
+          // ...then throw exceptiion
+          throw ex;
+        }
+        // otherwise wait and try again latter
+        try {
+          Thread.sleep(mills);
+        } catch (InterruptedException e) {
+          // ignore
         }
       }
     }
