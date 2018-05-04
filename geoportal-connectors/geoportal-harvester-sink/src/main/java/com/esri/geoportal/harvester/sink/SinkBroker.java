@@ -155,7 +155,7 @@ import org.slf4j.LoggerFactory;
     
     private List<SinkFile> listFiles() throws IOException {
       Pattern pattern = Pattern.compile(".*\\.xml$", Pattern.CASE_INSENSITIVE);
-      return Files.list(dropPath).filter(path -> pattern.matcher(path.toString()).matches()).map(path -> new SinkFile(SinkBroker.this, path)).collect(Collectors.toList());
+      return Files.list(dropPath).filter(path -> pattern.matcher(path.toString()).matches()).map(path -> new SinkFile(connector.getCtx(), SinkBroker.this, path)).collect(Collectors.toList());
     }
     
     @Override
