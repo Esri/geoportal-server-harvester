@@ -32,10 +32,28 @@ import static com.esri.geoportal.harvester.sink.SinkConstants.P_DROP_FOLDER;
  */
 public class SinkConnector implements InputConnector<InputBroker> {
   public static final String TYPE = "SINK";
+  private final SinkContext ctx;
+
+  /**
+   * Creates instance of the connector.
+   * @param attemptCount number of IO attempts
+   * @param attemptDelay delay between IO attempts
+   */
+  public SinkConnector(int attemptCount, int attemptDelay) {
+    this.ctx = new SinkContext(attemptCount, attemptDelay);
+  }
 
   @Override
   public String getType() {
     return TYPE;
+  }
+
+  /**
+   * Gets sink context.
+   * @return sink context
+   */
+  public SinkContext getCtx() {
+    return ctx;
   }
   
   @Override

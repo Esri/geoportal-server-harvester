@@ -33,6 +33,7 @@ import org.apache.commons.io.IOUtils;
  * Sink file.
  */
 /*package*/ class SinkFile {
+  private final SinkContext ctx;
   private final SinkBroker broker;
   private final Path file;
 
@@ -41,7 +42,8 @@ import org.apache.commons.io.IOUtils;
    * @param broker broker
    * @param file file
    */
-  public SinkFile(SinkBroker broker, Path file) {
+  public SinkFile(SinkContext ctx, SinkBroker broker, Path file) {
+    this.ctx = ctx;
     this.broker = broker;
     this.file = file;
   }
@@ -55,13 +57,13 @@ import org.apache.commons.io.IOUtils;
   public SimpleDataReference readContent() throws IOException, URISyntaxException {
     Date lastModifiedDate = readLastModifiedDate();
     MimeType contentType = readContentType();
-    try (InputStream input = attemptToOpenStream(5, 1000);) {
+    try (InputStream input = attemptToOpenStream(ctx.attemptCount, ctx.attemptDelay);) {
       SimpleDataReference ref = new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), file.toAbsolutePath().toString(), lastModifiedDate, file.toUri(), broker.td.getSource().getRef(), broker.td.getRef());
       ref.addContext(contentType, IOUtils.toByteArray(input));
       return ref;
     } finally {
       // once file is read, delete it
-      attemptToDeleteFile(5, 1000);
+      attemptToDeleteFile(ctx.attemptCount, ctx.attemptDelay);
     }
   }
   

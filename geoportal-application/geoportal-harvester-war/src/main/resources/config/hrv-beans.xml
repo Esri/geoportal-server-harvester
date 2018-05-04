@@ -57,7 +57,10 @@
   <bean class="com.esri.geoportal.harvester.unc.UncConnector"/>
   <bean class="com.esri.geoportal.harvester.waf.WafConnector"/>
   <bean class="com.esri.geoportal.harvester.migration.MigrationConnector"/>
-  <bean class="com.esri.geoportal.harvester.sink.SinkConnector"/>
+  <bean class="com.esri.geoportal.harvester.sink.SinkConnector">
+    <constructor-arg value="${sink.attempt.count}"/>
+    <constructor-arg value="${sink.attempt.delay}"/>
+  </bean>
   
   <!-- Triggers -->
   <bean class="com.esri.geoportal.harvester.engine.triggers.NowTrigger"/>
