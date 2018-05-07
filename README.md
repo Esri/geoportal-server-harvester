@@ -1,5 +1,5 @@
 # geoportal-server-harvester
-As part of the evolution of Geoportal Server, the harvesting capability has been separated into its own module. This because there are use cases where the harvesting can be used as a stand-alone broker between catalogs of content. 
+As part of the evolution of Geoportal Server, the harvesting capability has been separated into its own module. This is because there are use cases where the harvesting can be used as a stand-alone broker between catalogs of content. 
 
 This repository thus contains the harvesting capability, while it's sibling [geoportal-server-catalog](https://github.com/Esri/geoportal-server-catalog) is the new catalog of Geoportal Server.
 
@@ -8,7 +8,7 @@ For details about geoportal server harvester, please visit the [wiki](https://gi
 To report an issue, please go to [issues](https://github.com/Esri/geoportal-server-harvester/issues).
 
 ## Releases and Downloads
-- 2.5.2 - Released February 23, 2018, click [here](https://github.com/Esri/geoportal-server-harvester/releases) for release notes and downloads.  
+- 2.6.0 - Released May 7, 2018, click [here](https://github.com/Esri/geoportal-server-harvester/releases) for release notes and downloads. 
 
 ## Features
 
@@ -27,7 +27,7 @@ Deploying war file:
 
 ## Requirements
 
-* Java JDK 1.8 or higher
+* Java JDK 1.8.x
 * Apache Tomcat 8 or higher
 
 ## Contributing
