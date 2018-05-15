@@ -499,7 +499,7 @@ public class PdfUtils {
             }
         }
 
-        return String.format("%s %s, %s %s", yMin, xMin, yMax, xMax);
+        return String.format("%s %s, %s %s", xMin, yMin, xMax, yMax);
     }
 
     /**
