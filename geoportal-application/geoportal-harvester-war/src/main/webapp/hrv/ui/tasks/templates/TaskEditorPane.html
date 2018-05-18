@@ -1,5 +1,10 @@
 <div class="h-task-editor" data-dojo-attach-point="contentNode">
   <div data-dojo-type="dijit/form/Form" data-dojo-attach-point="formWidget" data-dojo-id="taskForm" encType="multipart/form-data" action="" method="">
+    <div class="h-task-editor-name-section">
+      <label class="h-task-editor-name-label" for="name">${i18n.tasks.editor.name}</label>
+      <input class="h-task-editor-name-value" id="name" data-dojo-attach-point="taskName" type="text"/>
+    </div>
+    
     <div style="display: table" class="h-task-editor-table">
       <div style="display: table-row" class="h-task-editor-row h-task-editor-header">
         <span style="display: table-cell" class="h-task-editor-cell h-task-editor-cell-caption">${i18n.tasks.editor.inputs}</span>

@@ -81,7 +81,8 @@ define({
         caption: "Task",
         submit: "Submit",
         inputs: "Inputs:",
-        outputs: "Outputs:"
+        outputs: "Outputs:",
+        name: "Name:"
       },
       events: {
         caption: "History",

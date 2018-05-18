@@ -410,6 +410,18 @@ html,body {
   
 }
 
+.h-task-editor-name-section {
+  margin-bottom: 1em;
+}
+
+.h-task-editor-name-label {
+  margin-right: 1em;
+}
+
+.h-task-editor-name-value {
+  width: 240px;
+}
+
 .h-history-content {
   display: table;
 }
