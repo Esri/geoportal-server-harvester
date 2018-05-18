@@ -25,6 +25,7 @@ import java.util.List;
  * {@link com.esri.geoportal.harvester.api.defs.Task}.
  */
 public final class TaskDefinition implements Serializable {
+  private String name;
   private EntityDefinition processor;
   private EntityDefinition source;
   private List<LinkDefinition> destinations;
@@ -32,6 +33,22 @@ public final class TaskDefinition implements Serializable {
   private boolean incremental;
   private boolean ignoreRobotsTxt;
   private String ref;
+
+  /**
+   * Gets task name.
+   * @return name
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * Sets task name.
+   * @param name name
+   */
+  public void setName(String name) {
+    this.name = name;
+  }
 
   /**
    * Gets processor definition.
@@ -147,7 +164,7 @@ public final class TaskDefinition implements Serializable {
   
   @Override
   public String toString() {
-    return String.format("PROCESSOR: %s, SOURCE: %s, DESTINATIONS: %s, INCREMENTAL: %b, IGNOREROBOTSTXT: %b", processor, source, destinations!=null? destinations: null, incremental, ignoreRobotsTxt);
+    return String.format("NAME: %s, PROCESSOR: %s, SOURCE: %s, DESTINATIONS: %s, INCREMENTAL: %b, IGNOREROBOTSTXT: %b", name, processor, source, destinations!=null? destinations: null, incremental, ignoreRobotsTxt);
   }
   
   @Override

@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
  * created based on the {@link com.esri.geoportal.harvester.api.defs.TaskDefinition}.
  */
 public final class Task {
+  private final String name;
   private final Processor processor;
   private final InputBroker dataSource;
   private final List<Link> dataDestinations;
@@ -38,6 +39,7 @@ public final class Task {
   
   /**
    * Creates instance of the task.
+   * @param name name
    * @param ref task reference
    * @param processor processor
    * @param dataSource data source
@@ -46,7 +48,8 @@ public final class Task {
    * @param incremental incremental flag
    * @param ignoreRobotsTxt ignore robots flag
    */
-  public Task(String ref, Processor processor, InputBroker dataSource, List<Link> dataDestinations, List<String> keyywords, boolean incremental, boolean ignoreRobotsTxt) {
+  public Task(String name, String ref, Processor processor, InputBroker dataSource, List<Link> dataDestinations, List<String> keyywords, boolean incremental, boolean ignoreRobotsTxt) {
+    this.name = name;
     this.ref = ref;
     this.processor = processor;
     this.dataSource = dataSource;
@@ -58,13 +61,22 @@ public final class Task {
   
   /**
    * Creates instance of the task.
+   * @param name name
    * @param ref task reference
    * @param processor processor
    * @param dataSource data source
    * @param dataDestinations data destination
    */
-  public Task(String ref, Processor processor, InputBroker dataSource, List<Link> dataDestinations) {
-    this(ref, processor, dataSource, dataDestinations, Collections.emptyList(), false, false);
+  public Task(String name, String ref, Processor processor, InputBroker dataSource, List<Link> dataDestinations) {
+    this(name, ref, processor, dataSource, dataDestinations, Collections.emptyList(), false, false);
+  }
+
+  /**
+   * Gets name.
+   * @return name
+   */
+  public String getName() {
+    return name;
   }
 
   /**
@@ -89,6 +101,7 @@ public final class Task {
    */
   public TaskDefinition getTaskDefinition() {
     TaskDefinition taskDefinition = new TaskDefinition();
+    taskDefinition.setName(name);
     taskDefinition.setProcessor(processor!=null? processor.getEntityDefinition(): null);
     taskDefinition.setSource(dataSource!=null? dataSource.getEntityDefinition(): null);
     taskDefinition.setDestinations(dataDestinations!=null? dataDestinations.stream().map(d->d.getLinkDefinition()).collect(Collectors.toList()): null);
