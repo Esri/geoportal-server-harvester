@@ -42,6 +42,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -212,7 +213,13 @@ public class TaskController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
       }
       MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-      headers.add("Content-disposition", String.format("attachment; filename=\"%s.json\"", taskId));
+      String fileName = StringUtils.trimToEmpty(taskDefinition.getName());
+      if (fileName.isEmpty()) {
+        fileName = taskId.toString();
+      } else {
+        fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
+      }
+      headers.add("Content-disposition", String.format("attachment; filename=\"%s.json\"", fileName));
       ObjectMapper mapper = new ObjectMapper();
       mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
