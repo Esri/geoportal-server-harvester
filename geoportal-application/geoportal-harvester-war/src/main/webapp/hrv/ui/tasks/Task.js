@@ -198,7 +198,8 @@ define(["dojo/_base/declare",
           TasksREST.update(this.data.uuid, json.stringify(taskDefinition)).then(
               lang.hitch(this, function(response){
                 this.data.taskDefinition = taskDefinition;
-                html.set(this.taskName, this.data.taskDefinition.name);
+                this.label = TaskUtils.makeLabel(this.data.taskDefinition);
+                html.set(this.taskName, this.label);
               }),
               lang.hitch(this, function(error){
                 console.error(error);
