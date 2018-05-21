@@ -24,6 +24,7 @@ define(["dojo/_base/declare",
         "dojo/_base/array",
         "dojo/string",
         "dojo/dom-attr",
+        "dojo/html",
         "dojo/topic",
         "dojo/on",
         "dojo/json",
@@ -34,15 +35,17 @@ define(["dojo/_base/declare",
         "hrv/rest/Tasks",
         "hrv/rest/Triggers",
         "hrv/ui/tasks/SchedulerEditorPane",
+        "hrv/ui/tasks/TaskRenamePane",
         "hrv/utils/TaskUtils"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,string,domAttr,topic,on,json,all,
+           lang,array,string,domAttr,html,topic,on,json,all,
            registry, Dialog,ConfirmDialog,
            TasksREST, TriggersREST,
-           SchedulerEditorPane, TaskUtils
+           SchedulerEditorPane, TaskRenamePane, 
+           TaskUtils
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
@@ -173,6 +176,44 @@ define(["dojo/_base/declare",
             topic.publish("msg",new Error("Unable to read scheduling"));
           })
         );
+      },
+      
+      _onRename: function(evt) {
+        var taskRenamePane = new TaskRenamePane(this.data);
+
+        // create editor dialog box
+        var taskRenameDialog = new Dialog({
+          title: this.i18n.tasks.renamer.caption,
+          content: taskRenamePane,
+          onHide: close
+        });
+        
+        var close = function() {
+          taskRenameDialog.destroy();
+          taskRenamePane.destroy();
+        };
+        
+        on(taskRenamePane, "rename-submit", lang.hitch(this, function(evt){
+          var taskDefinition = evt.taskDefinition;
+          TasksREST.update(this.data.uuid, json.stringify(taskDefinition)).then(
+              lang.hitch(this, function(response){
+                this.data.taskDefinition = taskDefinition;
+                this.label = TaskUtils.makeLabel(this.data.taskDefinition);
+                html.set(this.taskName, this.label);
+              }),
+              lang.hitch(this, function(error){
+                console.error(error);
+                topic.publish("msg",new Error("Unable to rename task"));
+              })
+          );
+          close();
+        }));
+        
+        on(taskRenamePane, "rename-close", lang.hitch(this, function(){
+          close();
+        }));
+        
+        taskRenameDialog.show();
       }
     });
 });

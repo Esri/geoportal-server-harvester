@@ -27,6 +27,9 @@ define(["dojo/_base/declare",
     return {
       makeLabel: function(taskDefinition,long) {
         if (taskDefinition){
+          if (taskDefinition.name && taskDefinition.name.length > 0) {
+            return taskDefinition.name;
+          }
           var sourceLabel = this._makeEntityLabel(taskDefinition.source,long);
           var destLabel = "";
           if (taskDefinition.destinations) {

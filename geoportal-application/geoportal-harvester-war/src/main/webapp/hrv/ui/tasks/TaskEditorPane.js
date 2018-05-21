@@ -24,6 +24,7 @@ define(["dojo/_base/declare",
         "dojo/_base/array",
         "dojo/query",
         "dojo/dom-construct",
+        "dojo/dom-attr",
         "dojo/topic",
         "dijit/form/CheckBox",
         "dijit/form/RadioButton",
@@ -33,7 +34,7 @@ define(["dojo/_base/declare",
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,query,domConstruct,topic,
+           lang,array,query,domConstruct,domAttr,topic,
            CheckBox,RadioButton,Form,
            BrokersREST){
   
@@ -120,6 +121,7 @@ define(["dojo/_base/declare",
       
       _onSubmit: function() {
         var taskDefinition = {
+          name: domAttr.get(this.taskName, "value"),
           source: null,
           destinations: []
         };
