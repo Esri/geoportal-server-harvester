@@ -72,6 +72,7 @@ define({
       caption: "Tasks",
       add: "Add",
       run: "run",
+      rename: "rename",
       export: "export",
       remove: "remove",
       history: "history",
@@ -83,6 +84,11 @@ define({
         inputs: "Inputs:",
         outputs: "Outputs:",
         name: "Name:"
+      },
+      renamer: {
+        caption: "Rename",
+        submit: "Submit",
+        cancel: "Cancel"
       },
       events: {
         caption: "History",

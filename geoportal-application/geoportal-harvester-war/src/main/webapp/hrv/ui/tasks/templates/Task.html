@@ -1,8 +1,9 @@
 <div class="h-task" data-dojo-attach-point="contentNode">
-  <span class="h-task-label">${label}</span>
+  <span class="h-task-label" data-dojo-attach-point="taskName">${label}</span>
   <span class="h-link h-task-run" data-dojo-attach-event="onclick:_onRun">${i18n.tasks.run}</span>
   <span class="h-link h-task-run" data-dojo-attach-event="onclick:_onSchedule">${i18n.tasks.schedule}</span>
   <span class="h-link"><a class="h-task-export" data-dojo-attach-point="exportNode" >${i18n.tasks.export}</a></span>
   <span class="h-link h-task-remove" data-dojo-attach-event="onclick:_onRemove">${i18n.tasks.remove}</span>
   <span class="h-link h-task-history" data-dojo-attach-event="onclick:_onHistory">${i18n.tasks.history}</span>
+  <span class="h-link h-task-rename" data-dojo-attach-event="onclick:_onRename">${i18n.tasks.rename}</span>
 </div>

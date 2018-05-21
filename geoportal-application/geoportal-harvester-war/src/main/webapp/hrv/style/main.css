@@ -326,6 +326,9 @@ html,body {
 .h-task-history {
 }
 
+.h-task-rename {
+}
+
 .h-tasks-content {
   display: table;
 }
@@ -420,6 +423,22 @@ html,body {
 
 .h-task-editor-name-value {
   width: 240px;
+}
+
+.h-task-renamer {
+  
+}
+
+.h-task-renamer-name-label {
+  margin-right: 1em;
+}
+
+.h-task-renamer-name-value {
+  width: 240px;
+}
+
+.h-task-renamer-footer {
+  
 }
 
 .h-history-content {
