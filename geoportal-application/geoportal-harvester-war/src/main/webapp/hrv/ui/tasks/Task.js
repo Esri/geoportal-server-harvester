@@ -202,7 +202,7 @@ define(["dojo/_base/declare",
               }),
               lang.hitch(this, function(error){
                 console.error(error);
-                topic.publish("msg",new Error("Unable rename task"));
+                topic.publish("msg",new Error("Unable to rename task"));
               })
           );
           close();
