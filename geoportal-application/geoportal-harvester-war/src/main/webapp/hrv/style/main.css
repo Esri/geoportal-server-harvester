@@ -429,6 +429,10 @@ html,body {
   
 }
 
+.h-task-renamer-name-section {
+  margin-bottom: 1em;
+}
+
 .h-task-renamer-name-label {
   margin-right: 1em;
 }
