@@ -45,3 +45,4 @@
 .project
 .classpath
 .settings/
+/geoportal-commons/geoportal-commons-oai-client/target/
