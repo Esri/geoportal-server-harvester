@@ -46,3 +46,4 @@
 .classpath
 .settings/
 /geoportal-commons/geoportal-commons-oai-client/target/
+/geoportal-connectors/geoportal-harvester-oai-pmh/target/
