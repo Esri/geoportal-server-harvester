@@ -112,14 +112,17 @@ public class Client implements Closeable {
 
       ListIdsResponse response = new ListIdsResponse();
       if (listIdentifiersNode != null) {
-        NodeList identifierNodes = (NodeList) xPath.evaluate("header[not(@status=\"deleted\")]/identifier", listIdentifiersNode, XPathConstants.NODESET);
-        if (identifierNodes != null) {
-          ArrayList<String> ids = new ArrayList<>();
-          for (int i = 0; i < identifierNodes.getLength(); i++) {
-            String identifier = identifierNodes.item(i).getTextContent();
-            ids.add(identifier);
+        NodeList headerNodes = (NodeList) xPath.evaluate("header[not(@status=\"deleted\")]", listIdentifiersNode, XPathConstants.NODESET);
+        if (headerNodes != null) {
+          ArrayList<Header> headers = new ArrayList<>();
+          for (int i = 0; i < headerNodes.getLength(); i++) {
+            Header header = new Header();
+            header.identifier = (String) xPath.evaluate("identifier", headerNodes.item(i), XPathConstants.STRING);
+            header.datestamp = (String) xPath.evaluate("datestamp", headerNodes.item(i), XPathConstants.STRING);
+            String identifier = headerNodes.item(i).getTextContent();
+            headers.add(header);
           }
-          response.ids = ids.toArray(new String[ids.size()]);
+          response.headers = headers.toArray(new Header[headers.size()]);
         }
         response.resumptionToken = (String) xPath.evaluate("resumptionTokenn", listIdentifiersNode, XPathConstants.STRING);
       }

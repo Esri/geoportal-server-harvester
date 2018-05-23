@@ -16,9 +16,9 @@
 package com.esri.geoportal.commons.oai.client;
 
 /**
- * List ids response.
+ * Header.
  */
-public class ListIdsResponse {
-  public Header [] headers;
-  public String resumptionToken;
+public class Header {
+  public String identifier;
+  public String datestamp;
 }
