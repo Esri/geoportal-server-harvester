@@ -20,6 +20,7 @@ import com.esri.geoportal.commons.gpt.client.Client;
 import com.esri.geoportal.commons.gpt.client.PublishRequest;
 import com.esri.geoportal.commons.gpt.client.PublishResponse;
 import com.esri.geoportal.commons.pdf.PdfUtils;
+import com.esri.geoportal.commons.doc.DocUtils;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
@@ -154,7 +155,7 @@ import org.slf4j.LoggerFactory;
         if (ref.getContent(MimeType.APPLICATION_PDF) != null && definition.isTranslatePdf()) {
           content = PdfUtils.generateMetadataXML(ref.getContent(MimeType.APPLICATION_PDF), ref.getSourceUri().getPath(), ref.getSourceUri().toASCIIString(), geometryServiceUrl); 
         } else {
-          content = ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML);
+          content = DocUtils.generateMetadataXML(ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML));
         }
 
         if (content != null) {
