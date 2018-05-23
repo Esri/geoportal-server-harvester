@@ -61,6 +61,7 @@
     <constructor-arg value="${sink.attempt.count}"/>
     <constructor-arg value="${sink.attempt.delay}"/>
   </bean>
+  <bean class="com.esri.geoportal.harvester.oai.pmh.OaiConnector"/>
   
   <!-- Triggers -->
   <bean class="com.esri.geoportal.harvester.engine.triggers.NowTrigger"/>

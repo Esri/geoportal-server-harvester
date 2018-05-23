@@ -71,6 +71,7 @@ import com.esri.geoportal.harvester.unc.UncConnector;
 import com.esri.geoportal.harvester.waf.WafConnector;
 import com.esri.geoportal.harvester.api.ex.*;
 import com.esri.geoportal.harvester.engine.defaults.DefaultProcessor;
+import com.esri.geoportal.harvester.oai.pmh.OaiConnector;
 import com.esri.geoportal.harvester.sink.SinkConnector;
 import java.io.IOException;
 import java.net.URL;
@@ -269,6 +270,7 @@ public class Bootstrap {
       inboundConnectorRegistry.put(GptConnector.TYPE, new GptConnector());
       inboundConnectorRegistry.put(CkanConnector.TYPE, new CkanConnector(metaBuilder));
       inboundConnectorRegistry.put(DataGovConnector.TYPE, new DataGovConnector(metaBuilder));
+      inboundConnectorRegistry.put(OaiConnector.TYPE, new OaiConnector());
     }
     
     return inboundConnectorRegistry;

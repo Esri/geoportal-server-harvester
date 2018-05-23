@@ -24,6 +24,7 @@
         <module>geoportal-harvester-ckan</module>
         <module>geoportal-harvester-migration</module>
         <module>geoportal-harvester-sink</module>
+        <module>geoportal-harvester-oai-pmh</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
