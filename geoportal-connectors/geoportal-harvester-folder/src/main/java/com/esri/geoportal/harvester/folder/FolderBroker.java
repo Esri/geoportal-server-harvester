@@ -168,10 +168,14 @@ import org.slf4j.LoggerFactory;
         fileName = fileName.getParent().resolve(fileName.getFileName() + "." + extension);
       }
     } else {
-      fileName = Paths.get(fileName.toString(), id + ".xml");
+      fileName = Paths.get(fileName.toString(), sanitizeFileName(id) + ".xml");
     }
 
     return fileName;
+  }
+  
+  private static String sanitizeFileName(String fileName) {
+    return fileName.replaceAll("[/\\?%*:|\"<>]", "_");
   }
 
   @Override
