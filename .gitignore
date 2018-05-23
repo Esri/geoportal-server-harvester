@@ -22,6 +22,7 @@
 /geoportal-connectors/geoportal-harvester-folder/target/
 /geoportal-connectors/geoportal-harvester-gpt/target/
 /geoportal-connectors/geoportal-harvester-waf/target/
+/geoportal-connectors/geoportal-harvester-sink/target/
 /geoportal-SDK/geoportal-harvester-api-base/target/
 /geoportal-connectors/target/
 /geoportal-commons/geoportal-commons-robots/nbproject/
