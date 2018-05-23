@@ -47,8 +47,8 @@ import com.esri.geoportal.commons.utils.XmlUtils;
 
 public class DocUtils {
 	
-//	static String file_pth = new String("C:\\Temp\\Files\\Army_Report.docx");
 	static String file_pth = new String("C:\\Temp\\Files\\Presentation1.pptx");
+//	static String file_pth = new String("C:\\Temp\\Files\\Army_Report.docx");
 //	static String file_pth = new String("C:\\Temp\\Files\\Scarmazzi_343971.xlsm");
 //	static String file_pth = new String("C:\\Temp\\Files\\TaxCollectionGRB_05.csv");
 //	static String file_pth = new String("C:\\Temp\\Files\\group.jpg");
@@ -69,7 +69,6 @@ public class DocUtils {
         byte[]          bytesArray      = null;
 
         try {
-   
             File file  = new File(filePath);
             bytesArray = new byte[(int) file.length()];
 
@@ -80,15 +79,13 @@ public class DocUtils {
             e.printStackTrace();
             
         } finally {
-        	
             if (fileInputStream != null) {
                 try {
                     fileInputStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
-            
+            } 
         }
 
         return bytesArray;
