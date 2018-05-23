@@ -35,6 +35,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -123,7 +124,7 @@ public class Client implements Closeable {
           }
           response.headers = headers.toArray(new Header[headers.size()]);
         }
-        response.resumptionToken = (String) xPath.evaluate("resumptionTokenn", listIdentifiersNode, XPathConstants.STRING);
+        response.resumptionToken = StringUtils.trimToNull((String) xPath.evaluate("resumptionToken", listIdentifiersNode, XPathConstants.STRING));
       }
       return response;
 
