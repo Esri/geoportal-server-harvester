@@ -13,22 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.harvester.sink;
-
 /**
- * Sink context.
+ * Sink - a drop folder observer.
  */
-/*package*/ class SinkContext {
-  public final int attemptCount;
-  public final long attemptDelay;
-
-  /**
-   * Creates instance of the sink context.
-   * @param attemptCount number of IO attempts
-   * @param attemptDelay delay between IO attempts
-   */
-  public SinkContext(int attemptCount, long attemptDelay) {
-    this.attemptCount = attemptCount;
-    this.attemptDelay = attemptDelay;
-  }
-}
+package com.esri.geoportal.harvester.sink;
