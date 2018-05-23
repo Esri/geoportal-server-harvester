@@ -119,7 +119,6 @@ public class Client implements Closeable {
             Header header = new Header();
             header.identifier = (String) xPath.evaluate("identifier", headerNodes.item(i), XPathConstants.STRING);
             header.datestamp = (String) xPath.evaluate("datestamp", headerNodes.item(i), XPathConstants.STRING);
-            String identifier = headerNodes.item(i).getTextContent();
             headers.add(header);
           }
           response.headers = headers.toArray(new Header[headers.size()]);

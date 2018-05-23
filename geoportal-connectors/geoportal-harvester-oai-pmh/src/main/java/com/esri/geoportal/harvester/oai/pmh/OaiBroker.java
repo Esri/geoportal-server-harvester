@@ -146,9 +146,12 @@ import org.xml.sax.SAXException;
         }
 
         ListIdsResponse listIds = client.listIds(resumptionToken, iteratorContext.getLastHarvestDate());
-        if (listIds!=null && listIds.headers!=null) {
+        if (listIds.headers.length>0) {
           idIter = Arrays.asList(listIds.headers).iterator();
           resumptionToken = listIds.resumptionToken;
+          return true;
+        } else if (listIds.resumptionToken!=null) {
+          return hasNext();
         }
         
         return false;
