@@ -29,6 +29,7 @@ define(["dojo/_base/declare",
         "dojo/json",
         "dojo/topic",
         "dojox/form/Uploader",
+        "dijit/form/CheckBox",
         "dijit/Dialog",
         "dijit/form/Button",
         "hrv/rest/Tasks",
@@ -39,7 +40,8 @@ define(["dojo/_base/declare",
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,domConstruct, domAttr, query, on,json,topic,Uploader,
+           lang,array,domConstruct, domAttr, query, on,json,topic,
+           Uploader,CheckBox,
            Dialog,Button,
            TasksREST,Task,TaskEditorPane,
            TaskUtils
@@ -52,7 +54,7 @@ define(["dojo/_base/declare",
     
       postCreate: function() {
         this.inherited(arguments);
-        this.load();
+        this.load(this.groupByCheckBox.get('checked'));
       },
       
       startup: function() {
@@ -61,10 +63,13 @@ define(["dojo/_base/declare",
         domAttr.set(inputNode[0], "accept", ".json");
       },
       
-      load: function() {
+      load: function(grouping) {
         domConstruct.empty(this.contentNode);
         TasksREST.list().then(
-          lang.hitch(this,this.processTasks),
+          lang.hitch(this,function(response) {
+            this.response = response;
+            this.processTasks(response, grouping);
+          }),
           lang.hitch(this,function(error){
             console.error(error);
             topic.publish("msg",new Error("Unable to access tasks information"));
@@ -72,7 +77,7 @@ define(["dojo/_base/declare",
         );
       },
       
-      processTasks: function(response) {
+      processTasks: function(response, grouping) {
         response = response.sort(function(a,b){
           var t1 = TaskUtils.makeLabel(a.taskDefinition).toLowerCase();
           var t2 = TaskUtils.makeLabel(b.taskDefinition).toLowerCase();
@@ -106,7 +111,7 @@ define(["dojo/_base/declare",
         var data = evt.data;
         TasksREST.execute(data.uuid,data.taskDefinition.ignoreRobotsTxt, data.taskDefinition.incremental).then(
           lang.hitch(this,function(){
-            this.load();
+            this.load(this.groupByCheckBox.get('checked'));
           }),
           lang.hitch(this,function(error){
             console.error(error);
@@ -137,7 +142,7 @@ define(["dojo/_base/declare",
             lang.hitch({taskEditorPane: taskEditorPane, taskEditorDialog: taskEditorDialog, self: this},function(){
               this.taskEditorDialog.destroy();
               this.taskEditorPane.destroy();
-              this.self.load();
+              this.self.load(this.self.groupByCheckBox.get('checked'));
             }),
             lang.hitch(this,function(error){
               console.error(error);
@@ -154,7 +159,12 @@ define(["dojo/_base/declare",
       },
       
       _onUpload: function(evt) {
-        this.load();
+        this.load(this.groupByCheckBox.get('checked'));
+      },
+      
+      _onGroupByClicked: function(evt) {
+        domConstruct.empty(this.contentNode);
+        this.processTasks(this.response, evt);
       }
     });
 });

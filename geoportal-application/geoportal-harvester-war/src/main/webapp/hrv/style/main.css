@@ -273,6 +273,25 @@ html,body {
   padding-left: 0.5em;
 }
 
+.h-tasks-caption-text {
+  
+}
+
+.h-tasks-caption-grouping {
+  float: right;
+  font-weight: normal;
+  margin-right: 1em;
+}
+
+.h-tasks-caption-grouping #groupBy {
+  
+}
+
+h-tasks-caption-grouping label {
+  
+}
+
+
 .h-tasks-footer > span {
   padding-right: 0.3em;
 }

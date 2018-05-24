@@ -1,5 +1,14 @@
 <div class="h-tasks" data-dojo-attach-point="contentNode">
-  <div class="h-tasks-caption" data-dojo-attach-point="captionNode">${i18n.tasks.caption}</div>
+  <div class="h-tasks-caption" data-dojo-attach-point="captionNode">
+    <span class="h-tasks-caption-text">${i18n.tasks.caption}</span>
+    <span class="h-tasks-caption-grouping">
+      <input id="groupBy" 
+             data-dojo-type="dijit/form/CheckBox" 
+             data-dojo-attach-event="onChange: _onGroupByClicked"
+             data-dojo-attach-point="groupByCheckBox"/>
+      <label for="groupBy">${i18n.tasks.groupBy}</>
+    </span>
+  </div>
   <div class="h-tasks-content" data-dojo-attach-point="contentNode"></div>
   <div class="h-tasks-footer" data-dojo-attach-point="footerNode" style="display: table;">
     <button class="h-tasks-add" data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-event="onClick:_onAdd"  style="display: table-cell;">${i18n.tasks.add}</button>
