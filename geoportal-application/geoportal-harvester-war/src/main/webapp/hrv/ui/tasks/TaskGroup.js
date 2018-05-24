@@ -52,6 +52,7 @@ define(["dojo/_base/declare",
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
+      widgets: [],
       
       constructor: function(args) {
         this.inherited(arguments);
@@ -63,8 +64,21 @@ define(["dojo/_base/declare",
         array.forEach(this.data.tasks, lang.hitch(this, this.processTask));
       },
       
+      destroy: function() {
+        this.inherited(arguments);
+        this.clear();
+      },
+      
+      clear: function() {
+        array.forEach(this.widgets, function(widget){
+          widget.destroy();
+        });
+        this.widgets = [];
+      },
+      
       processTask: function(task) {
         var widget = new Task(task);
+        this.widgets.push(widget);
         widget.placeAt(this.contentNode);
         widget.startup();
       }

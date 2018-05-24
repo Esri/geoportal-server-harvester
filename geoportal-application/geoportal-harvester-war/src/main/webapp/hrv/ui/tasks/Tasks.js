@@ -52,6 +52,7 @@ define(["dojo/_base/declare",
       i18n: i18n,
       templateString: template,
       uploader: null,
+      widgets: [],
     
       postCreate: function() {
         this.inherited(arguments);
@@ -64,8 +65,20 @@ define(["dojo/_base/declare",
         domAttr.set(inputNode[0], "accept", ".json");
       },
       
+      destroy: function() {
+        this.inherited(arguments);
+        this.clear();
+      },
+      
+      clear: function() {
+        array.forEach(this.widgets, function(widget){
+          widget.destroy();
+        });
+        this.widgets = [];
+      },
+      
       load: function(grouping) {
-        domConstruct.empty(this.contentNode);
+        this.clear();
         TasksREST.list().then(
           lang.hitch(this,function(response) {
             this.response = response;
@@ -83,16 +96,7 @@ define(["dojo/_base/declare",
           var groups = this.groupTasks(tasks);
           array.forEach(groups, lang.hitch(this, function(group){
             group.tasks = this.sortTasks(group.tasks);
-            var widget = new TaskGroup(group);
-            widget.placeAt(this.contentNode);
-            this.own(on(widget,"remove",lang.hitch(this,this._onRemove)));
-            this.own(on(widget,"run",lang.hitch(this,this._onRun)));
-            this.own(on(widget,"history",lang.hitch(this,this._onHistory)));
-            this.own(on(widget,"renamed",lang.hitch(this,function(){
-              domConstruct.empty(this.contentNode);
-              this.processTasks(this.response, this.groupByCheckBox.get('checked'));
-            })));
-            widget.startup();
+            this.processGroup(group);
           }));
         } else {
           tasks = this.sortTasks(tasks);
@@ -137,8 +141,25 @@ define(["dojo/_base/declare",
         return groupsArray;
       },
       
+      processGroup: function(group) {
+        var widget = new TaskGroup(group);
+        this.widgets.push(widget);
+        
+        widget.placeAt(this.contentNode);
+        this.own(on(widget,"remove",lang.hitch(this,this._onRemove)));
+        this.own(on(widget,"run",lang.hitch(this,this._onRun)));
+        this.own(on(widget,"history",lang.hitch(this,this._onHistory)));
+        this.own(on(widget,"renamed",lang.hitch(this,function(){
+          this.clear();
+          this.processTasks(this.response, this.groupByCheckBox.get('checked'));
+        })));
+        widget.startup();
+      },
+      
       processTask: function(task) {
         var widget = new Task(task);
+        this.widgets.push(widget);
+        
         widget.placeAt(this.contentNode);
         this.own(on(widget,"remove",lang.hitch(this,this._onRemove)));
         this.own(on(widget,"run",lang.hitch(this,this._onRun)));
@@ -185,6 +206,8 @@ define(["dojo/_base/declare",
             taskEditorPane.destroy();
           }
         });
+        this.own(taskEditorPane);
+        this.own(taskEditorDialog);
         
         // listen to "submit" button click
         this.own(on(taskEditorPane,"submit",lang.hitch(this, function(evt){
@@ -216,7 +239,7 @@ define(["dojo/_base/declare",
       },
       
       _onGroupByClicked: function(evt) {
-        domConstruct.empty(this.contentNode);
+        this.clear();
         this.processTasks(this.response, evt);
       }
     });

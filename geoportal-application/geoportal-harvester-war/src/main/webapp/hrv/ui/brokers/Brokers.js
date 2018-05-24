@@ -44,10 +44,24 @@ define(["dojo/_base/declare",
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
+      widgets: [],
     
       postCreate: function(){
+        this.inherited(arguments);
         html.set(this.captionNode,this.i18n.brokers[this.category]);
         this.load();
+      },
+      
+      destroy: function() {
+        this.inherited(arguments);
+        this.clear();
+      },
+      
+      clear: function() {
+        array.forEach(this.widgets, function(widget){
+          widget.destroy();
+        });
+        this.widgets = [];
       },
       
       load: function() {
@@ -70,12 +84,14 @@ define(["dojo/_base/declare",
           if (t1>t2) return 1;
           return 0;
         });
-        domConstruct.empty(this.contentNode);
+        this.clear();
         array.forEach(response,lang.hitch(this,this.processBroker));
       },
       
       processBroker: function(broker) {
         var widget = new Broker(broker).placeAt(this.contentNode);
+        this.widgets.push(widget);
+        
         widget.load = lang.hitch(this,this.load);
         this.own(on(widget,"remove",lang.hitch(this,this._onRemove)));
         this.own(on(widget,"edit",lang.hitch(this,this._onEdit)));
@@ -98,6 +114,8 @@ define(["dojo/_base/declare",
             brokerEditorPane.destroy();
           }
         });
+        this.own(brokerEditorPane);
+        this.own(brokerEditorDialog);
         
         // listen to "submit" button click
         this.own(on(brokerEditorPane,"submit",lang.hitch(this, function(evt){

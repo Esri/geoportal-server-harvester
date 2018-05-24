@@ -70,6 +70,8 @@ define(["dojo/_base/declare",
             this.emit("remove",{data: this.data});
           })
         });
+        
+        this.own(dlg);
         dlg.show();
       },
       
@@ -101,6 +103,8 @@ define(["dojo/_base/declare",
             incremental.destroyRecursive();
           })
         });
+        
+        this.own(dlg);
         dlg.show();
       },
       
@@ -129,6 +133,8 @@ define(["dojo/_base/declare",
               content: schedulerEditorPane,
               onHide: close
             });
+            this.own(schedulerEditorPane);
+            this.own(schedulerEditorDialog);
 
             this.own(on(schedulerEditorPane,"submit",lang.hitch(this, function(evt){
               TasksREST.triggers(this.data.uuid).then(
@@ -187,6 +193,9 @@ define(["dojo/_base/declare",
           content: taskRenamePane,
           onHide: close
         });
+        
+        this.own(taskRenamePane);
+        this.own(taskRenameDialog);
         
         var close = function() {
           taskRenameDialog.destroy();
