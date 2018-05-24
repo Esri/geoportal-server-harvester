@@ -200,6 +200,7 @@ define(["dojo/_base/declare",
                 this.data.taskDefinition = taskDefinition;
                 this.label = TaskUtils.makeLabel(this.data.taskDefinition);
                 html.set(this.taskName, this.label);
+                this.emit("renamed");
               }),
               lang.hitch(this, function(error){
                 console.error(error);

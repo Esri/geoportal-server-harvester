@@ -77,15 +77,54 @@ define(["dojo/_base/declare",
         );
       },
       
-      processTasks: function(response, grouping) {
-        response = response.sort(function(a,b){
+      processTasks: function(tasks, grouping) {
+        if (grouping) {
+          var groups = this.groupTasks(tasks);
+          array.forEach(groups, lang.hitch(this, function(group){
+            var groupTasks = this.sortTasks(group.tasks);
+            array.forEach(groupTasks,lang.hitch(this,this.processTask));
+          }));
+        } else {
+          tasks = this.sortTasks(tasks);
+          array.forEach(tasks,lang.hitch(this,this.processTask));
+        }
+      },
+      
+      sortTasks: function(tasks) {
+        return tasks.sort(function(a,b){
           var t1 = TaskUtils.makeLabel(a.taskDefinition).toLowerCase();
           var t2 = TaskUtils.makeLabel(b.taskDefinition).toLowerCase();
           if (t1<t2) return -1;
           if (t1>t2) return 1;
           return 0;
         });
-        array.forEach(response,lang.hitch(this,this.processTask));
+      },
+      
+      groupTasks: function(tasks) {
+        var groups = {};
+        array.forEach(tasks, function(task){
+          var source = task.taskDefinition.source;
+          if (!groups[source.ref]) {
+            groups[source.ref] = {commonSource: source, tasks: []};
+          }
+          groups[source.ref].tasks.push(task);
+        })
+        
+        var groupsArray = [];
+        
+        for (group in groups) {
+          groupsArray.push(groups[group]);
+        }
+        
+        groupsArray = groupsArray.sort(function(a, b) {
+          var la = a.commonSource.label.toLowerCase();
+          var lb = b.commonSource.label.toLowerCase();
+          if (la<lb) return -1;
+          if (la>lb) return 1;
+          return 0;
+        });
+        
+        return groupsArray;
       },
       
       processTask: function(task) {
@@ -94,6 +133,10 @@ define(["dojo/_base/declare",
         this.own(on(widget,"remove",lang.hitch(this,this._onRemove)));
         this.own(on(widget,"run",lang.hitch(this,this._onRun)));
         this.own(on(widget,"history",lang.hitch(this,this._onHistory)));
+        this.own(on(widget,"renamed",lang.hitch(this,function(){
+          domConstruct.empty(this.contentNode);
+          this.processTasks(this.response, this.groupByCheckBox.get('checked'));
+        })));
         widget.startup();
       },
       
