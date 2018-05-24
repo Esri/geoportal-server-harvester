@@ -104,16 +104,18 @@ public class DocUtils {
         ParseContext         context     = new ParseContext();
 	  
         try {
-        	
         	// Populate Metadata Object with Tika Parser
         	parser.parse(base_input, handler, metadata, context);
         	
+        	// Container for Metadata
         	Properties meta_props  = new Properties();
         	
+        	// Expected Harvester Properties
         	String     meta_descr  = metadata.get(TikaCoreProperties.DESCRIPTION);
         	String     meta_modif  = metadata.get(TikaCoreProperties.MODIFIED);
         	String     meta_title  = metadata.get(TikaCoreProperties.TITLE);
         	
+        	// Default Label for Undefined Tika Properties
         	DateFormat date_format = new SimpleDateFormat("yyyy/MM/dd");
         	Date       date        = new Date();
         	String     date_today  = date_format.format(date);
@@ -144,6 +146,7 @@ public class DocUtils {
         			meta_props.put(name, metadata.get(name));
         		}
         	}
+        	
         	meta_props.list(System.out);
      	
         	// Build XML as Bytes
