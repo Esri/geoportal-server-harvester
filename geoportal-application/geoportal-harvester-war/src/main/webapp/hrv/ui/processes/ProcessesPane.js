@@ -54,7 +54,7 @@ define(["dojo/_base/declare",
       
       processSingleProcess: function(info) {
         var widget = new Process(info).placeAt(this.processesNode);
-        on(widget,"reload",lang.hitch(this,this.load));
+        this.own(on(widget,"reload",lang.hitch(this,this.load)));
         widget.startup();
       },
       
@@ -90,7 +90,7 @@ define(["dojo/_base/declare",
       
       processSingleTrigger: function(info) {
         var widget = new Trigger(info).placeAt(this.triggersNode);
-        on(widget,"reload",lang.hitch(this,this.load));
+        this.own(on(widget,"reload",lang.hitch(this,this.load)));
         widget.startup();
       },
       

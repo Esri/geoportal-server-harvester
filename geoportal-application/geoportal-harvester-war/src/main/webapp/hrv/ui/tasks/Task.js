@@ -130,7 +130,7 @@ define(["dojo/_base/declare",
               onHide: close
             });
 
-            on(schedulerEditorPane,"submit",lang.hitch(this, function(evt){
+            this.own(on(schedulerEditorPane,"submit",lang.hitch(this, function(evt){
               TasksREST.triggers(this.data.uuid).then(
                 lang.hitch(this,function(triggers){
                   console.log("Triggers", triggers);
@@ -167,7 +167,7 @@ define(["dojo/_base/declare",
                   close();
                 })
               );
-            }));
+            })));
 
             schedulerEditorDialog.show();
           }),
@@ -193,7 +193,7 @@ define(["dojo/_base/declare",
           taskRenamePane.destroy();
         };
         
-        on(taskRenamePane, "rename-submit", lang.hitch(this, function(evt){
+        this.own(on(taskRenamePane, "rename-submit", lang.hitch(this, function(evt){
           var taskDefinition = evt.taskDefinition;
           TasksREST.update(this.data.uuid, json.stringify(taskDefinition)).then(
               lang.hitch(this, function(response){
@@ -207,11 +207,11 @@ define(["dojo/_base/declare",
               })
           );
           close();
-        }));
+        })));
         
-        on(taskRenamePane, "rename-close", lang.hitch(this, function(){
+        this.own(on(taskRenamePane, "rename-close", lang.hitch(this, function(){
           close();
-        }));
+        })));
         
         taskRenameDialog.show();
       }

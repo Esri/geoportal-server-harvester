@@ -77,8 +77,8 @@ define(["dojo/_base/declare",
       processBroker: function(broker) {
         var widget = new Broker(broker).placeAt(this.contentNode);
         widget.load = lang.hitch(this,this.load);
-        on(widget,"remove",lang.hitch(this,this._onRemove));
-        on(widget,"edit",lang.hitch(this,this._onEdit));
+        this.own(on(widget,"remove",lang.hitch(this,this._onRemove)));
+        this.own(on(widget,"edit",lang.hitch(this,this._onEdit)));
         widget.startup();
       },
       
@@ -100,7 +100,7 @@ define(["dojo/_base/declare",
         });
         
         // listen to "submit" button click
-        on(brokerEditorPane,"submit",lang.hitch(this, function(evt){
+        this.own(on(brokerEditorPane,"submit",lang.hitch(this, function(evt){
           var brokerDefinition = evt.brokerDefinition;
           
           // use API create new broker
@@ -115,7 +115,7 @@ define(["dojo/_base/declare",
               topic.publish("msg",new Error("Error creating broker"));
             })
           );
-        }));
+        })));
         
         brokerEditorDialog.show();
       },

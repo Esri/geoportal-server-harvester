@@ -39,9 +39,16 @@ define(["dojo/_base/declare",
       i18n: i18n,
       templateString: template,
       data: null,
+      timerHandler: 0,
       
       constructor: function(arg) {
         this.data = arg;
+      },
+      
+      destroy: function() {
+        if (this.timerHandler > 0) {
+          clearTimeout(this.timerHandler);
+        }
       },
     
       postCreate: function(){
@@ -71,7 +78,7 @@ define(["dojo/_base/declare",
                 }
               }
               if (result.status==="working" || result.status==="aborting") {
-                setTimeout(update,2000);
+                this.timerHandler = setTimeout(update,2000);
               }
             }),
             lang.hitch(this,function(error){

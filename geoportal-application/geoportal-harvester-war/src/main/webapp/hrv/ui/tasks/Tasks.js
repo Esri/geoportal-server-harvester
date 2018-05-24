@@ -86,9 +86,9 @@ define(["dojo/_base/declare",
       processTask: function(task) {
         var widget = new Task(task);
         widget.placeAt(this.contentNode);
-        on(widget,"remove",lang.hitch(this,this._onRemove));
-        on(widget,"run",lang.hitch(this,this._onRun));
-        on(widget,"history",lang.hitch(this,this._onHistory));
+        this.own(on(widget,"remove",lang.hitch(this,this._onRemove)));
+        this.own(on(widget,"run",lang.hitch(this,this._onRun)));
+        this.own(on(widget,"history",lang.hitch(this,this._onHistory)));
         widget.startup();
       },
       
@@ -129,7 +129,7 @@ define(["dojo/_base/declare",
         });
         
         // listen to "submit" button click
-        on(taskEditorPane,"submit",lang.hitch(this, function(evt){
+        this.own(on(taskEditorPane,"submit",lang.hitch(this, function(evt){
           var taskDefinition = evt.taskDefinition;
           
           // use API create new task
@@ -144,7 +144,7 @@ define(["dojo/_base/declare",
               topic.publish("msg",new Error("Error creating task"));
             })
           );
-        }));
+        })));
         
         taskEditorDialog.show();
       },
