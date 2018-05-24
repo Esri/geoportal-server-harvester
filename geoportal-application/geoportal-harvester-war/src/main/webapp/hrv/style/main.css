@@ -287,8 +287,18 @@ html,body {
   
 }
 
-h-tasks-caption-grouping label {
+.h-tasks-caption-grouping label {
   
+}
+
+.h-task-group {
+  width: 100%;
+  border-top: grey 1px solid;
+  margin-top: 1em;
+}
+
+.h-task-group-caption {
+  background-color: lightgray
 }
 
 

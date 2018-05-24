@@ -34,6 +34,7 @@ define(["dojo/_base/declare",
         "dijit/form/Button",
         "hrv/rest/Tasks",
         "hrv/ui/tasks/Task",
+        "hrv/ui/tasks/TaskGroup",
         "hrv/ui/tasks/TaskEditorPane",
         "hrv/utils/TaskUtils"
       ],
@@ -43,7 +44,7 @@ define(["dojo/_base/declare",
            lang,array,domConstruct, domAttr, query, on,json,topic,
            Uploader,CheckBox,
            Dialog,Button,
-           TasksREST,Task,TaskEditorPane,
+           TasksREST,Task,TaskGroup,TaskEditorPane,
            TaskUtils
           ){
   
@@ -81,8 +82,17 @@ define(["dojo/_base/declare",
         if (grouping) {
           var groups = this.groupTasks(tasks);
           array.forEach(groups, lang.hitch(this, function(group){
-            var groupTasks = this.sortTasks(group.tasks);
-            array.forEach(groupTasks,lang.hitch(this,this.processTask));
+            group.tasks = this.sortTasks(group.tasks);
+            var widget = new TaskGroup(group);
+            widget.placeAt(this.contentNode);
+            this.own(on(widget,"remove",lang.hitch(this,this._onRemove)));
+            this.own(on(widget,"run",lang.hitch(this,this._onRun)));
+            this.own(on(widget,"history",lang.hitch(this,this._onHistory)));
+            this.own(on(widget,"renamed",lang.hitch(this,function(){
+              domConstruct.empty(this.contentNode);
+              this.processTasks(this.response, this.groupByCheckBox.get('checked'));
+            })));
+            widget.startup();
           }));
         } else {
           tasks = this.sortTasks(tasks);
