@@ -70,6 +70,7 @@ define({
     
     tasks: {
       caption: "Tasks",
+      groupBy: "Group by input",
       add: "Add",
       run: "run",
       rename: "rename",

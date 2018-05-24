@@ -29,19 +29,22 @@ define(["dojo/_base/declare",
         "dojo/json",
         "dojo/topic",
         "dojox/form/Uploader",
+        "dijit/form/CheckBox",
         "dijit/Dialog",
         "dijit/form/Button",
         "hrv/rest/Tasks",
         "hrv/ui/tasks/Task",
+        "hrv/ui/tasks/TaskGroup",
         "hrv/ui/tasks/TaskEditorPane",
         "hrv/utils/TaskUtils"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,domConstruct, domAttr, query, on,json,topic,Uploader,
+           lang,array,domConstruct, domAttr, query, on,json,topic,
+           Uploader,CheckBox,
            Dialog,Button,
-           TasksREST,Task,TaskEditorPane,
+           TasksREST,Task,TaskGroup,TaskEditorPane,
            TaskUtils
           ){
   
@@ -52,7 +55,7 @@ define(["dojo/_base/declare",
     
       postCreate: function() {
         this.inherited(arguments);
-        this.load();
+        this.load(this.groupByCheckBox.get('checked'));
       },
       
       startup: function() {
@@ -61,10 +64,13 @@ define(["dojo/_base/declare",
         domAttr.set(inputNode[0], "accept", ".json");
       },
       
-      load: function() {
+      load: function(grouping) {
         domConstruct.empty(this.contentNode);
         TasksREST.list().then(
-          lang.hitch(this,this.processTasks),
+          lang.hitch(this,function(response) {
+            this.response = response;
+            this.processTasks(response, grouping);
+          }),
           lang.hitch(this,function(error){
             console.error(error);
             topic.publish("msg",new Error("Unable to access tasks information"));
@@ -72,15 +78,63 @@ define(["dojo/_base/declare",
         );
       },
       
-      processTasks: function(response) {
-        response = response.sort(function(a,b){
+      processTasks: function(tasks, grouping) {
+        if (grouping) {
+          var groups = this.groupTasks(tasks);
+          array.forEach(groups, lang.hitch(this, function(group){
+            group.tasks = this.sortTasks(group.tasks);
+            var widget = new TaskGroup(group);
+            widget.placeAt(this.contentNode);
+            this.own(on(widget,"remove",lang.hitch(this,this._onRemove)));
+            this.own(on(widget,"run",lang.hitch(this,this._onRun)));
+            this.own(on(widget,"history",lang.hitch(this,this._onHistory)));
+            this.own(on(widget,"renamed",lang.hitch(this,function(){
+              domConstruct.empty(this.contentNode);
+              this.processTasks(this.response, this.groupByCheckBox.get('checked'));
+            })));
+            widget.startup();
+          }));
+        } else {
+          tasks = this.sortTasks(tasks);
+          array.forEach(tasks,lang.hitch(this,this.processTask));
+        }
+      },
+      
+      sortTasks: function(tasks) {
+        return tasks.sort(function(a,b){
           var t1 = TaskUtils.makeLabel(a.taskDefinition).toLowerCase();
           var t2 = TaskUtils.makeLabel(b.taskDefinition).toLowerCase();
           if (t1<t2) return -1;
           if (t1>t2) return 1;
           return 0;
         });
-        array.forEach(response,lang.hitch(this,this.processTask));
+      },
+      
+      groupTasks: function(tasks) {
+        var groups = {};
+        array.forEach(tasks, function(task){
+          var source = task.taskDefinition.source;
+          if (!groups[source.ref]) {
+            groups[source.ref] = {commonSource: source, tasks: []};
+          }
+          groups[source.ref].tasks.push(task);
+        })
+        
+        var groupsArray = [];
+        
+        for (group in groups) {
+          groupsArray.push(groups[group]);
+        }
+        
+        groupsArray = groupsArray.sort(function(a, b) {
+          var la = a.commonSource.label.toLowerCase();
+          var lb = b.commonSource.label.toLowerCase();
+          if (la<lb) return -1;
+          if (la>lb) return 1;
+          return 0;
+        });
+        
+        return groupsArray;
       },
       
       processTask: function(task) {
@@ -89,6 +143,10 @@ define(["dojo/_base/declare",
         this.own(on(widget,"remove",lang.hitch(this,this._onRemove)));
         this.own(on(widget,"run",lang.hitch(this,this._onRun)));
         this.own(on(widget,"history",lang.hitch(this,this._onHistory)));
+        this.own(on(widget,"renamed",lang.hitch(this,function(){
+          domConstruct.empty(this.contentNode);
+          this.processTasks(this.response, this.groupByCheckBox.get('checked'));
+        })));
         widget.startup();
       },
       
@@ -106,7 +164,7 @@ define(["dojo/_base/declare",
         var data = evt.data;
         TasksREST.execute(data.uuid,data.taskDefinition.ignoreRobotsTxt, data.taskDefinition.incremental).then(
           lang.hitch(this,function(){
-            this.load();
+            this.load(this.groupByCheckBox.get('checked'));
           }),
           lang.hitch(this,function(error){
             console.error(error);
@@ -137,7 +195,7 @@ define(["dojo/_base/declare",
             lang.hitch({taskEditorPane: taskEditorPane, taskEditorDialog: taskEditorDialog, self: this},function(){
               this.taskEditorDialog.destroy();
               this.taskEditorPane.destroy();
-              this.self.load();
+              this.self.load(this.self.groupByCheckBox.get('checked'));
             }),
             lang.hitch(this,function(error){
               console.error(error);
@@ -154,7 +212,12 @@ define(["dojo/_base/declare",
       },
       
       _onUpload: function(evt) {
-        this.load();
+        this.load(this.groupByCheckBox.get('checked'));
+      },
+      
+      _onGroupByClicked: function(evt) {
+        domConstruct.empty(this.contentNode);
+        this.processTasks(this.response, evt);
       }
     });
 });
