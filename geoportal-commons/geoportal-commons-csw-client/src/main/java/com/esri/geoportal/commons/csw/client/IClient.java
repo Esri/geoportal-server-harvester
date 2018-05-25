@@ -33,6 +33,20 @@ public interface IClient {
   IRecords findRecords(int start, int max, Date from, Date to) throws Exception;
   
   /**
+   * Finds all records.
+   * @param start start record
+   * @param max number of records to return
+   * @param from optional from date
+   * @param to optional to date
+   * @param searchText search text
+   * @return records
+   * @throws Exception if finding records fails
+   */
+  default IRecords findRecords(int start, int max, Date from, Date to, String searchText) throws Exception {
+    return findRecords(start, max, from, to);
+  }
+  
+  /**
    * Reads metadata.
    * @param id id of the record
    * @return metadata
