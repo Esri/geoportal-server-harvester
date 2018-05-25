@@ -40,6 +40,7 @@ public class CswBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   private final CredentialsDefinitionAdaptor credAdaptor;
   private URL hostUrl;
   private IProfile profile;
+  private String searchText;
 
   /**
    * Creates instance of the adaptor.
@@ -67,6 +68,7 @@ public class CswBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
       if (profile == null) {
         throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_PROFILE_ID, get(P_PROFILE_ID)));
       }
+      searchText = get(P_SEARCH_TEXT);
     }
   }
 
@@ -74,6 +76,7 @@ public class CswBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public void override(Map<String, String> params) {
     consume(params,P_HOST_URL);
     consume(params,P_PROFILE_ID);
+    consume(params,P_SEARCH_TEXT);
     credAdaptor.override(params);
     botsAdaptor.override(params);
   }
@@ -114,6 +117,23 @@ public class CswBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public void setProfile(IProfile profile) {
     this.profile = profile;
     set(P_PROFILE_ID, profile.getId());
+  }
+
+  /**
+   * Gets search text.
+   * @return search text.
+   */
+  public String getSearchText() {
+    return searchText;
+  }
+
+  /**
+   * Sets search text.
+   * @param searchText search text 
+   */
+  public void setSearchText(String searchText) {
+    this.searchText = searchText;
+    set(P_SEARCH_TEXT, searchText);
   }
 
   /**

@@ -69,6 +69,7 @@ public class CswConnector implements InputConnector<InputBroker> {
         return defaultProfile!=null? defaultProfile.getId(): null;
       }
     });
+    arguments.add(new UITemplate.StringArgument(P_SEARCH_TEXT, bundle.getString("csw.search.text"), false));
     return new UITemplate(getType(), bundle.getString("csw"), arguments);
   }
 

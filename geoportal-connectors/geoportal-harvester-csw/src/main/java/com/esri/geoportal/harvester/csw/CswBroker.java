@@ -138,7 +138,7 @@ import org.slf4j.LoggerFactory;
         }
 
         if (recs==null) {
-          IRecords r = client.findRecords(start, PAGE_SIZE, iteratorContext.getLastHarvestDate(), null);
+          IRecords r = client.findRecords(start, PAGE_SIZE, iteratorContext.getLastHarvestDate(), null, definition.getSearchText());
           if (r.isEmpty()) {
             noMore = true;
           } else {

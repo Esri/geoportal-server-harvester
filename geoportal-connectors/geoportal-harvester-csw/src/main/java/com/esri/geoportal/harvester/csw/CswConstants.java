@@ -21,4 +21,5 @@ package com.esri.geoportal.harvester.csw;
 /*package*/ final class CswConstants {
   public static final String P_HOST_URL = "csw-host-url";
   public static final String P_PROFILE_ID = "csw-profile-id";
+  public static final String P_SEARCH_TEXT = "csw-search-text";
 }
