@@ -61,6 +61,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -105,9 +106,14 @@ public class Client implements IClient {
     this.profile = profile;
     this.cred = cred;
   }
-
+  
   @Override
   public IRecords findRecords(int start, int max, Date from, Date to) throws Exception {
+    return findRecords(start, max, from, to, null);
+  }
+
+  @Override
+  public IRecords findRecords(int start, int max, Date from, Date to, String searchText) throws Exception {
     LOG.debug(String.format("Executing findRecords(start=%d,max=%d)", start, max));
     
     loadCapabilities();
@@ -117,6 +123,7 @@ public class Client implements IClient {
     crt.setMaxRecords(max);
     crt.setFromDate(from);
     crt.setToDate(to);
+    crt.setSearchText(StringUtils.trimToNull(searchText));
     String requestBody = createGetRecordsRequest(crt);
     
     HttpPost post = createRecordsPostRequest(capabilites.get_getRecordsPostURL(), requestBody);
