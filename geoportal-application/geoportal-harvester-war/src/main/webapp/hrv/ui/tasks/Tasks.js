@@ -173,7 +173,9 @@ define(["dojo/_base/declare",
       
       _onRemove: function(evt) {
         TasksREST.delete(evt.data.uuid).then(
-          lang.hitch(this,this.load),
+          lang.hitch(this,function(){
+            this.load(this.groupByCheckBox.get('checked'));
+          }),
           lang.hitch(this,function(error){
             console.error(error);
             topic.publish("msg",new Error("Error removing task"));
