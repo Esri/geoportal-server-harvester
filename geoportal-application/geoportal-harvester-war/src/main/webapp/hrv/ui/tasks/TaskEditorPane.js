@@ -83,11 +83,13 @@ define(["dojo/_base/declare",
         var div = domConstruct.create("div",{class: "h-task-editor-input h-task-editor-broker"},this.inputsNode);
         var radioDiv = domConstruct.create("button",{class: "h-task-editor-input-radio"},div);
         var radio = new RadioButton({
+          id: input.uuid,
           value: input.uuid,
           name: "input",
           checked: count==0,
           brokerDefinition: input.brokerDefinition
         }, radioDiv);
+        this.own(radio);
         radio.startup();
         this.radios.push(radio);
         var label = domConstruct.create("label",{"for": input.uuid, class: "h-task-editor-input-label", innerHTML: input.brokerDefinition.label},div);
@@ -110,10 +112,12 @@ define(["dojo/_base/declare",
         var div = domConstruct.create("div",{class: "h-task-editor-output h-task-editor-broker"},this.outputsNode);
         var checkDiv = domConstruct.create("input",{class: "h-task-editor-output-check"},div);
         var check = new CheckBox({
+          id: output.uuid,
           value: output.uuid,
           name: "output",
           brokerDefinition: output.brokerDefinition
         }, checkDiv);
+        this.own(check);
         check.startup();
         this.checks.push(check);
         var label = domConstruct.create("label",{"for": output.uuid, class: "h-task-editor-output-label", innerHTML: output.brokerDefinition.label},div);
