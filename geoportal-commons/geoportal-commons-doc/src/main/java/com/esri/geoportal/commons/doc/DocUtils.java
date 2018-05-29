@@ -25,10 +25,13 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.TikaCoreProperties;
@@ -107,9 +110,18 @@ public class DocUtils {
         	// Populate Metadata Object with Tika Parser
         	parser.parse(base_input, handler, metadata, context);
         	
-        	// Container for Metadata
-        	Properties meta_props  = new Properties();
+        	// Container & Writer for Metadata
+        	Properties   meta_props = new Properties();
+        	StringWriter sw         = new StringWriter();
         	
+        	// Put Tika Metadata in Properties
+        	for(String name : metadata.names()) {
+        		if (!metadata.get(name).isEmpty()) {
+        			meta_props.put(name, metadata.get(name));
+        		}
+        	}
+        	meta_props.store(sw, "Tika Values");
+
         	// Expected Harvester Properties
         	String     meta_descr  = metadata.get(TikaCoreProperties.DESCRIPTION);
         	String     meta_modif  = metadata.get(TikaCoreProperties.MODIFIED);
@@ -123,7 +135,7 @@ public class DocUtils {
         	
         	// Check For Null Values & Set Defaults
         	if (meta_descr == null) {
-        		meta_props.put(WKAConstants.WKA_DESCRIPTION, tika_label);
+        		meta_props.put(WKAConstants.WKA_DESCRIPTION, "" + sw.toString());
         	} else {
         		meta_props.put(WKAConstants.WKA_DESCRIPTION, meta_descr);
         	}
@@ -139,15 +151,9 @@ public class DocUtils {
         	} else {
         		meta_props.put(WKAConstants.WKA_TITLE, meta_title);
         	}
-
-        	// Put Tika Information in Properties
-        	for(String name : metadata.names()) {
-        		if (!metadata.get(name).isEmpty()) {
-        			meta_props.put(name, metadata.get(name));
-        		}
-        	}
         	
-        	meta_props.list(System.out);
+//        	meta_props.list(System.out);
+//        	System.out.println(meta_props);
      	
         	// Build XML as Bytes
         	MapAttribute attr = AttributeUtils.fromProperties(meta_props);
