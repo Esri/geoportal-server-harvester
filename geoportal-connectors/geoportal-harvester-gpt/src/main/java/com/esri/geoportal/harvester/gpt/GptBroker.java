@@ -160,19 +160,12 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
         if (ref.getContent(MimeType.APPLICATION_PDF) != null && definition.isTranslatePdf()) {
         	content = PdfUtils.generateMetadataXML(ref.getContent(MimeType.APPLICATION_PDF), ref.getSourceUri().getPath(), ref.getSourceUri().toASCIIString(), geometryServiceUrl); 
         
-        } else if (first_type.endsWith("xml") == true) {
-        	LOG.info("### XML Flagged");
-        	LOG.info(String.format("### Type: %s", ref.getContentType().toArray()[0].toString()));
-        	
+        } else if (first_type.endsWith("xml") == true) {        	
         	content = ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML);
         
-        } else {
-        	LOG.info("### Other Flagged");
-        	LOG.info(String.format("### Type: %s", ref.getContentType().toArray()[0].toString()));
-        	LOG.info(String.format("### ID: %s", ref.getId()));
-        	
-            Set <MimeType> types = ref.getContentType();
-            byte[] rawContent = ref.getContent(types.toArray(new MimeType[types.size()]));
+        } else {        	
+            Set <MimeType> types      = ref.getContentType();
+            byte[]         rawContent = ref.getContent(types.toArray(new MimeType[types.size()]));
             content = DocUtils.generateMetadataXML(rawContent, new File(ref.getId()).getName());
         }
 
