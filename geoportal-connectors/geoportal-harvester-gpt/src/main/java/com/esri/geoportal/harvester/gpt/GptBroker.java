@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.gpt;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -152,15 +153,27 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
 
       String xml = null;
       if (definition.getAcceptXml()) {
-        byte[] content = null;
+    	  
+        byte[] content    = null;
+        String first_type = ref.getContentType().toArray()[0].toString(); 
+        
         if (ref.getContent(MimeType.APPLICATION_PDF) != null && definition.isTranslatePdf()) {
-          content = PdfUtils.generateMetadataXML(ref.getContent(MimeType.APPLICATION_PDF), ref.getSourceUri().getPath(), ref.getSourceUri().toASCIIString(), geometryServiceUrl); 
-        } else if (ref.getContent(MimeType.APPLICATION_XML) != null) {
+        	content = PdfUtils.generateMetadataXML(ref.getContent(MimeType.APPLICATION_PDF), ref.getSourceUri().getPath(), ref.getSourceUri().toASCIIString(), geometryServiceUrl); 
+        
+        } else if (first_type.endsWith("xml") == true) {
+        	LOG.info("### XML Flagged");
+        	LOG.info(String.format("### Type: %s", ref.getContentType().toArray()[0].toString()));
+        	
         	content = ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML);
+        
         } else {
+        	LOG.info("### Other Flagged");
+        	LOG.info(String.format("### Type: %s", ref.getContentType().toArray()[0].toString()));
+        	LOG.info(String.format("### ID: %s", ref.getId()));
+        	
             Set <MimeType> types = ref.getContentType();
             byte[] rawContent = ref.getContent(types.toArray(new MimeType[types.size()]));
-            content = DocUtils.generateMetadataXML(rawContent);
+            content = DocUtils.generateMetadataXML(rawContent, new File(ref.getId()).getName());
         }
 
         if (content != null) {

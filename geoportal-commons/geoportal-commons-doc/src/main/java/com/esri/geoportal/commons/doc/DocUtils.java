@@ -50,22 +50,32 @@ import com.esri.geoportal.commons.utils.XmlUtils;
 
 public class DocUtils {
 	
-	static String file_pth = new String("C:\\Temp\\Files\\Presentation1.pptx");
-//	static String file_pth = new String("C:\\Temp\\Files\\Army_Report.docx");
-//	static String file_pth = new String("C:\\Temp\\Files\\Scarmazzi_343971.xlsm");
-//	static String file_pth = new String("C:\\Temp\\Files\\TaxCollectionGRB_05.csv");
-//	static String file_pth = new String("C:\\Temp\\Files\\group.jpg");
+	// Local Files For Testing Porpoises 
+	static String[] file_set = {
+			"C:\\Temp\\Files\\Presentation1.pptx",
+			"C:\\Temp\\Files\\Army_Report.docx",
+			"C:\\Temp\\Files\\Scarmazzi_343971.xlsm",
+			"C:\\Temp\\Files\\TaxCollectionGRB_05.csv",
+			"C:\\Temp\\Files\\group.jpg"
+			};
 
+	// Main Used To Validate Local Files Return Bytes
     public static void main(String[] args) throws IOException, TikaException {
     	
-        byte[] in_bytes  = bytes_from_file(file_pth);
-        
-        byte[] out_bytes = generateMetadataXML(in_bytes);
-        
-        System.out.println(String.format("Bytes Returned: %s", out_bytes instanceof byte[]));
+    	for (String path: file_set) {
+    			
+    		byte[] in_bytes  = bytes_from_file(path);
+    		
+		    byte[] out_bytes = generateMetadataXML(in_bytes, new File(path).getName());
+		      
+		    System.out.println(String.format("Bytes Returned: %s", out_bytes instanceof byte[]));
+    		
+    	}
+    	
 
     }
 
+    // Method Used To Simulate Incoming Bytes
     public static byte[] bytes_from_file(String filePath) {
 
         FileInputStream fileInputStream = null;
@@ -94,17 +104,18 @@ public class DocUtils {
         return bytesArray;
     }
 
-    public static byte[] generateMetadataXML(byte[] file_bytes) throws IOException {
+    // Class Used By Geoportal Harvester
+    public static byte[] generateMetadataXML(byte[] file_bytes, String file_name) throws IOException {
     	
     	// Input & Output Variables
-    	ByteArrayInputStream base_input  = new ByteArrayInputStream(file_bytes);
-    	byte[]               xml_bytes   = null;
+    	ByteArrayInputStream base_input = new ByteArrayInputStream(file_bytes);
+    	byte[]               xml_bytes  = null;
     	
     	// Tika Parser Objects
-        Parser               parser      = new AutoDetectParser();
-        BodyContentHandler   handler     = new BodyContentHandler();
-        Metadata             metadata    = new Metadata();
-        ParseContext         context     = new ParseContext();
+        Parser               parser     = new AutoDetectParser();
+        BodyContentHandler   handler    = new BodyContentHandler();
+        Metadata             metadata   = new Metadata();
+        ParseContext         context    = new ParseContext();
 	  
         try {
         	// Populate Metadata Object with Tika Parser
@@ -147,13 +158,10 @@ public class DocUtils {
         	}
         	
         	if (meta_title == null) {
-        		meta_props.put(WKAConstants.WKA_TITLE, tika_label);
+        		meta_props.put(WKAConstants.WKA_TITLE, file_name);
         	} else {
         		meta_props.put(WKAConstants.WKA_TITLE, meta_title);
         	}
-        	
-//        	meta_props.list(System.out);
-//        	System.out.println(meta_props);
      	
         	// Build XML as Bytes
         	MapAttribute attr = AttributeUtils.fromProperties(meta_props);
