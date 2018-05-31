@@ -21,6 +21,7 @@ import com.esri.geoportal.commons.gpt.client.EntryRef;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -105,7 +106,7 @@ class GptBroker implements InputBroker {
   }
 
   @Override
-  public DataReference readContent(String id) throws DataInputException {
+  public DataContent readContent(String id) throws DataInputException {
     return readContent(id, null, null);
   }
 

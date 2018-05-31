@@ -70,6 +70,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import com.esri.geoportal.commons.utils.XmlUtils;
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 
 /**
@@ -212,7 +213,7 @@ public class CkanBroker implements InputBroker {
   }
 
   @Override
-  public DataReference readContent(String id) throws DataInputException {
+  public DataContent readContent(String id) throws DataInputException {
     try {
       Pkg pkg = client.showPackage(id);
       return createReference(pkg.result);

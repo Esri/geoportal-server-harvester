@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.waf;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -114,7 +115,7 @@ import org.slf4j.LoggerFactory;
   }
 
   @Override
-  public DataReference readContent(String id) throws DataInputException {
+  public DataContent readContent(String id) throws DataInputException {
     try {
       WafFile file = new WafFile(this, new URL(id), definition.getCredentials());
       return file.readContent(httpClient, null);

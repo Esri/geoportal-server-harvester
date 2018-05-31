@@ -58,6 +58,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import com.esri.geoportal.commons.utils.XmlUtils;
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 
 /**
@@ -168,7 +169,7 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
   }
 
   @Override
-  public DataReference readContent(String id) throws DataInputException {
+  public DataContent readContent(String id) throws DataInputException {
     try {
       ItemEntry itemEntry = client.readItem(id, client.generateToken(1).token);
       return createReference(itemEntry);

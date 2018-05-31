@@ -29,6 +29,7 @@ import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.IOException;
@@ -117,7 +118,7 @@ import org.slf4j.LoggerFactory;
   }
 
   @Override
-  public DataReference readContent(String id) throws DataInputException {
+  public DataContent readContent(String id) throws DataInputException {
     return readContent(id, null);
   }
 

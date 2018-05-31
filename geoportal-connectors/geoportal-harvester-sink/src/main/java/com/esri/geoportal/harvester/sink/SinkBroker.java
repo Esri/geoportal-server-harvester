@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.sink;
 
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
@@ -139,7 +140,7 @@ import org.slf4j.LoggerFactory;
   }
 
   @Override
-  public DataReference readContent(String id) throws DataInputException {
+  public DataContent readContent(String id) throws DataInputException {
     return null;
   }
 

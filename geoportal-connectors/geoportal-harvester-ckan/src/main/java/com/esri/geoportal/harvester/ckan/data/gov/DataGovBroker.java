@@ -20,7 +20,7 @@ import com.esri.geoportal.commons.ckan.client.Extra;
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
-import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
@@ -32,7 +32,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -83,7 +82,7 @@ import org.slf4j.LoggerFactory;
   }
 
   @Override
-  public DataReference readContent(String id) throws DataInputException {
+  public DataContent readContent(String id) throws DataInputException {
     try {
       URL xmlUrl = makeXmlUrl(id);
       Content content = createContent(xmlUrl);

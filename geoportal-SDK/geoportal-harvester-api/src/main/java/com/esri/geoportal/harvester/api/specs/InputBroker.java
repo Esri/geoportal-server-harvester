@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.api.specs;
 
 import com.esri.geoportal.harvester.api.Broker;
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import java.net.URI;
@@ -52,7 +53,7 @@ public interface InputBroker extends Broker<InputConnector> {
    * @return content
    * @throws DataInputException if error reading content
    */
-  DataReference readContent(String id) throws DataInputException;
+  DataContent readContent(String id) throws DataInputException;
   
   /**
    * Iterator.

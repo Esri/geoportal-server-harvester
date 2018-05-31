@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.unc;
 
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
@@ -88,7 +89,7 @@ import java.util.LinkedList;
   }
 
   @Override
-  public DataReference readContent(String id) throws DataInputException {
+  public DataContent readContent(String id) throws DataInputException {
     try {
       UncFile file = new UncFile(this, Paths.get(id));
       return file.readContent();

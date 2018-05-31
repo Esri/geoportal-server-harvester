@@ -59,6 +59,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import com.esri.geoportal.commons.utils.XmlUtils;
 import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import java.net.URL;
 
@@ -189,7 +190,7 @@ import java.net.URL;
   }
 
   @Override
-  public DataReference readContent(String id) throws DataInputException {
+  public DataContent readContent(String id) throws DataInputException {
     try {
       ServerResponse serverResponse = client.readServiceInformation(new URL(id));
       return createReference(serverResponse);
