@@ -111,7 +111,7 @@ class GptBroker implements InputBroker {
     try {
       SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), id, null, null, td.getSource().getRef(), td.getRef());
       ref.addContext(MimeType.APPLICATION_XML, readXml(id).getBytes("UTF-8"));
-      return readContent(id, null, null);
+      return ref;
     } catch (URISyntaxException | UnsupportedEncodingException ex) {
       throw new DataInputException(this, String.format("Error reading data %s", id), ex);
     }
