@@ -22,6 +22,7 @@ import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.commons.oai.client.Client;
 import com.esri.geoportal.commons.oai.client.Header;
 import com.esri.geoportal.commons.oai.client.ListIdsResponse;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
@@ -106,6 +107,11 @@ import org.xml.sax.SAXException;
   @Override
   public InputBroker.Iterator iterator(InputBroker.IteratorContext iteratorContext) throws DataInputException {
     return new OaiIterator(iteratorContext);
+  }
+
+  @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return true;
   }
 
   @Override

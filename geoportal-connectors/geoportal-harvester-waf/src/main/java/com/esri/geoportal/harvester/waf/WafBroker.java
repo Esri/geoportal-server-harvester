@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.waf;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
@@ -124,6 +125,11 @@ import org.slf4j.LoggerFactory;
     } catch (IOException|URISyntaxException ex) {
       throw new DataInputException(this, String.format("Error reading content: %s", id), ex);
     }
+  }
+
+  @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return definition.getCredentials()==null? true: definition.getCredentials().equals(creds);
   }
 
   /**

@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.sink;
 
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -142,6 +143,11 @@ import org.slf4j.LoggerFactory;
   @Override
   public DataContent readContent(String id) throws DataInputException {
     return null;
+  }
+
+  @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return true;
   }
 
   /**

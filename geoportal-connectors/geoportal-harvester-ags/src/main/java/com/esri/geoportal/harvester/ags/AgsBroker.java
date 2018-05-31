@@ -36,6 +36,7 @@ import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.commons.meta.util.WKAConstants;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -184,6 +185,12 @@ import java.net.URL;
     return responses;
   }
 
+
+  @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return definition.getCredentials()==null? true: definition.getCredentials().equals(creds);
+  }
+  
   @Override
   public String toString() {
     return String.format("AGS [%s]", definition.getHostUrl());

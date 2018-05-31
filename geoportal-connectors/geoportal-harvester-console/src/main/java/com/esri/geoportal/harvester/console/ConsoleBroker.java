@@ -15,6 +15,7 @@
 package com.esri.geoportal.harvester.console;
 
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -50,6 +51,11 @@ import java.io.IOException;
   @Override
   public void terminate() {
     // nothing to terminate
+  }
+
+  @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return true;
   }
 
   @Override

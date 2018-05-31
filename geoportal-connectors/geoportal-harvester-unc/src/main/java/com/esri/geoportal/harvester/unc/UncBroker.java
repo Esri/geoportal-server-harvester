@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.unc;
 
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -81,6 +82,11 @@ import java.util.LinkedList;
   @Override
   public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
     return new UncIterator(iteratorContext);
+  }
+
+  @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return true;
   }
 
   @Override

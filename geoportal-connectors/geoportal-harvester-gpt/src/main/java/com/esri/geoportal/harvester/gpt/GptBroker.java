@@ -20,6 +20,7 @@ import com.esri.geoportal.commons.gpt.client.Client;
 import com.esri.geoportal.commons.gpt.client.PublishRequest;
 import com.esri.geoportal.commons.gpt.client.PublishResponse;
 import com.esri.geoportal.commons.pdf.PdfUtils;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
@@ -203,6 +204,11 @@ import org.slf4j.LoggerFactory;
   @Override
   public EntityDefinition getEntityDefinition() {
     return definition.getEntityDefinition();
+  }
+
+  @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return definition.getCredentials()==null? true: definition.getCredentials().equals(creds);
   }
 
   @Override

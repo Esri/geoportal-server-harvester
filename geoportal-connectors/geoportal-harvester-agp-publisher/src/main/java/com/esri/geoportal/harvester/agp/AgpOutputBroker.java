@@ -31,6 +31,7 @@ import com.esri.geoportal.commons.meta.MetaException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import com.esri.geoportal.commons.meta.util.WKAConstants;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.ex.DataException;
@@ -425,6 +426,11 @@ import org.xml.sax.SAXException;
     } catch (IOException|URISyntaxException ex) {
       LOG.error(String.format("Error terminating broker."), ex);
     }
+  }
+
+  @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return definition.getCredentials()==null? true: definition.getCredentials().equals(creds);
   }
 
   private String fromatDate(Date date) {

@@ -38,6 +38,7 @@ import com.esri.geoportal.commons.ckan.client.Client;
 import com.esri.geoportal.commons.ckan.client.Dataset;
 import com.esri.geoportal.commons.ckan.client.Pkg;
 import com.esri.geoportal.commons.ckan.client.Response;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -142,6 +143,11 @@ public class CkanBroker implements InputBroker {
   @Override
   public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
     return new CkanIterator(iteratorContext);
+  }
+
+  @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return true;
   }
 
   @Override

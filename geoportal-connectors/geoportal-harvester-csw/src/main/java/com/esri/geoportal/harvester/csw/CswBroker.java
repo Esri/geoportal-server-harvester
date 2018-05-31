@@ -29,6 +29,7 @@ import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
@@ -100,6 +101,11 @@ import org.slf4j.LoggerFactory;
   @Override
   public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
     return new CswIterator(iteratorContext);
+  }
+
+  @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return definition.getCredentials()==null? true: definition.getCredentials().equals(creds);
   }
 
   @Override

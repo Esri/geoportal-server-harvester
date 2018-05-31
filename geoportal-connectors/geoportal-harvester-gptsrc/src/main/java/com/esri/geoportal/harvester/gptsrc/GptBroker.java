@@ -21,6 +21,7 @@ import com.esri.geoportal.commons.gpt.client.EntryRef;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
@@ -84,6 +85,11 @@ class GptBroker implements InputBroker {
   @Override
   public URI getBrokerUri() throws URISyntaxException {
     return new URI("GPT", definition.getHostUrl().toExternalForm(), null);
+  }
+
+  @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return definition.getCredentials()==null? true: definition.getCredentials().equals(creds);
   }
 
   @Override
