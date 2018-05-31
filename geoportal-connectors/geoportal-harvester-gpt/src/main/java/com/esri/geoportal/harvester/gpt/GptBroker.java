@@ -15,20 +15,7 @@
  */
 package com.esri.geoportal.harvester.gpt;
 
-import com.esri.geoportal.commons.constants.MimeType;
-import com.esri.geoportal.commons.gpt.client.Client;
-import com.esri.geoportal.commons.gpt.client.PublishRequest;
-import com.esri.geoportal.commons.gpt.client.PublishResponse;
-import com.esri.geoportal.commons.pdf.PdfUtils;
-import com.esri.geoportal.harvester.api.ex.DataOutputException;
-import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
-import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.PublishingStatus;
-import com.esri.geoportal.harvester.api.ex.DataException;
-import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.api.specs.OutputBroker;
-import com.esri.geoportal.harvester.api.specs.OutputConnector;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -43,6 +30,22 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.doc.DocUtils;
+import com.esri.geoportal.commons.gpt.client.Client;
+import com.esri.geoportal.commons.gpt.client.PublishRequest;
+import com.esri.geoportal.commons.gpt.client.PublishResponse;
+import com.esri.geoportal.commons.pdf.PdfUtils;
+import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.PublishingStatus;
+import com.esri.geoportal.harvester.api.ex.DataException;
+import com.esri.geoportal.harvester.api.ex.DataOutputException;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.specs.OutputBroker;
+import com.esri.geoportal.harvester.api.specs.OutputConnector;
 
 /**
  * GPT broker.
@@ -150,11 +153,20 @@ import org.slf4j.LoggerFactory;
 
       String xml = null;
       if (definition.getAcceptXml()) {
-        byte[] content = null;
+    	  
+        byte[] content    = null;
+        String first_type = ref.getContentType().toArray()[0].toString(); 
+        
         if (ref.getContent(MimeType.APPLICATION_PDF) != null && definition.isTranslatePdf()) {
-          content = PdfUtils.generateMetadataXML(ref.getContent(MimeType.APPLICATION_PDF), ref.getSourceUri().getPath(), ref.getSourceUri().toASCIIString(), geometryServiceUrl); 
-        } else {
-          content = ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML);
+        	content = PdfUtils.generateMetadataXML(ref.getContent(MimeType.APPLICATION_PDF), ref.getSourceUri().getPath(), ref.getSourceUri().toASCIIString(), geometryServiceUrl); 
+        
+        } else if (first_type.endsWith("xml") == true) {        	
+        	content = ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML);
+        
+        } else {        	
+            Set <MimeType> types      = ref.getContentType();
+            byte[]         rawContent = ref.getContent(types.toArray(new MimeType[types.size()]));
+            content = DocUtils.generateMetadataXML(rawContent, new File(ref.getId()).getName());
         }
 
         if (content != null) {
