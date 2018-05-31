@@ -216,7 +216,18 @@ public class CkanBroker implements InputBroker {
   public DataContent readContent(String id) throws DataInputException {
     try {
       Pkg pkg = client.showPackage(id);
-      return createReference(pkg.result);
+      Dataset dataSet = pkg.result;
+
+      Content content = createContent(dataSet);
+
+      SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, parseIsoDate(dataSet.metadata_modified), URI.create(id), td.getSource().getRef(), td.getRef());
+      if (Arrays.asList(new MimeType[]{MimeType.APPLICATION_JSON}).contains(content.getContentType())) {
+        ref.addContext(MimeType.APPLICATION_JSON, content.getData().getBytes("UTF-8"));
+      } else {
+        ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(dataSet).getBytes("UTF-8"));
+      }
+
+      return ref;
     } catch (IOException | URISyntaxException ex) {
       throw new DataInputException(this, String.format("Error reading data from: %s", id), ex);
     }

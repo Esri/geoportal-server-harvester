@@ -31,6 +31,7 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
@@ -107,7 +108,13 @@ class GptBroker implements InputBroker {
 
   @Override
   public DataContent readContent(String id) throws DataInputException {
-    return readContent(id, null, null);
+    try {
+      SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), id, null, null, td.getSource().getRef(), td.getRef());
+      ref.addContext(MimeType.APPLICATION_XML, readXml(id).getBytes("UTF-8"));
+      return readContent(id, null, null);
+    } catch (URISyntaxException | UnsupportedEncodingException ex) {
+      throw new DataInputException(this, String.format("Error reading data %s", id), ex);
+    }
   }
 
   private DataReference readContent(String id, Date lastModified, URI sourceUri) throws DataInputException {

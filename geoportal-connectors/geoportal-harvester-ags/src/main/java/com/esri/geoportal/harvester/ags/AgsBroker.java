@@ -193,8 +193,10 @@ import java.net.URL;
   public DataContent readContent(String id) throws DataInputException {
     try {
       ServerResponse serverResponse = client.readServiceInformation(new URL(id));
-      return createReference(serverResponse);
-    } catch (IOException | MetaException | TransformerException | URISyntaxException ex) {
+      SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), serverResponse.url, null, URI.create(serverResponse.url), td.getSource().getRef(), td.getRef());
+      ref.addContext(MimeType.APPLICATION_JSON, serverResponse.json.getBytes("UTF-8"));
+      return ref;
+    } catch (IOException | URISyntaxException ex) {
       throw new DataInputException(this, String.format("Error reading data %s", id), ex);
     }
   }

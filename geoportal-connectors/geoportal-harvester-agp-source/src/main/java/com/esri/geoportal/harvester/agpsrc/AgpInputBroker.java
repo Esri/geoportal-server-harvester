@@ -172,8 +172,10 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
   public DataContent readContent(String id) throws DataInputException {
     try {
       ItemEntry itemEntry = client.readItem(id, client.generateToken(1).token);
-      return createReference(itemEntry);
-    } catch (IOException|URISyntaxException|MetaException|TransformerException ex) {
+      SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), itemEntry.id, new Date(itemEntry.modified), URI.create(itemEntry.id), td.getSource().getRef(), td.getRef());
+      ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(itemEntry).getBytes("UTF-8"));
+      return ref;
+    } catch (IOException|URISyntaxException ex) {
       throw new DataInputException(this, String.format("Error reading data from: %s", id), ex);
     }
   }
