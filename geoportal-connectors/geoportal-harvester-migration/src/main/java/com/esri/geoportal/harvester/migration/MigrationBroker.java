@@ -106,6 +106,11 @@ import org.slf4j.LoggerFactory;
     iters.forEach(MigrationIterator::close);
     iters.clear();
   }
+
+  @Override
+  public DataReference readContent(String id) throws DataInputException {
+    return null;
+  }
   
   private Engine getEngine() {
     Engine e = Engine.ENGINES.get("DEFAULT");

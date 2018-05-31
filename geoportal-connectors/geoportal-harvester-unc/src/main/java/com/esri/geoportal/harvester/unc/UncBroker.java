@@ -87,6 +87,16 @@ import java.util.LinkedList;
     return String.format("UNC [%s]", definition.getRootFolder());
   }
 
+  @Override
+  public DataReference readContent(String id) throws DataInputException {
+    try {
+      UncFile file = new UncFile(this, Paths.get(id));
+      return file.readContent();
+    } catch (IOException|URISyntaxException ex) {
+      throw new DataInputException(this, String.format("Error reading content: %s", id), ex);
+    }
+  }
+
   /**
    * UNC iterator.
    */

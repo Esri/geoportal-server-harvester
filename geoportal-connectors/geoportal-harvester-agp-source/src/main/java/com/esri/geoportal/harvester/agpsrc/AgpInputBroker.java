@@ -167,6 +167,62 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
     }
   }
 
+  @Override
+  public DataReference readContent(String id) throws DataInputException {
+    try {
+      ItemEntry itemEntry = client.readItem(id, client.generateToken(1).token);
+      return createReference(itemEntry);
+    } catch (IOException|URISyntaxException|MetaException|TransformerException ex) {
+      throw new DataInputException(this, String.format("Error reading data from: %s", id), ex);
+    }
+  }
+
+  private DataReference createReference(ItemEntry itemEntry) throws URISyntaxException, IOException, MetaException, TransformerException {
+    Properties props = new Properties();
+    if (itemEntry.id!=null) {
+      props.put(WKAConstants.WKA_IDENTIFIER, itemEntry.id);
+    }
+    if (itemEntry.title!=null) {
+      props.put(WKAConstants.WKA_TITLE, itemEntry.title);
+    }
+    if (itemEntry.description!=null) {
+      props.put(WKAConstants.WKA_DESCRIPTION, itemEntry.description);
+    }
+    if (itemEntry.url!=null) {
+      props.put(WKAConstants.WKA_RESOURCE_URL, itemEntry.url);
+    } else if (ItemType.WEB_MAP.getTypeName().equals(itemEntry.type)) {
+      props.put(WKAConstants.WKA_RESOURCE_URL, definition.getHostUrl().toExternalForm().replaceAll("/+$", "")+"/home/webmap/viewer.html?webmap="+itemEntry.id);
+    } else {
+      props.put(WKAConstants.WKA_RESOURCE_URL, definition.getHostUrl().toExternalForm().replaceAll("/+$", "")+"/home/item.html?id="+itemEntry.id);
+    }
+
+    if (itemEntry.extent!=null && itemEntry.extent.length==2 && itemEntry.extent[0]!=null && itemEntry.extent[0].length==2 && itemEntry.extent[1]!=null && itemEntry.extent[1].length==2) {
+      String sBox = String.format("%f %f,%f %f", itemEntry.extent[0][0], itemEntry.extent[0][1], itemEntry.extent[1][0], itemEntry.extent[1][1]);
+      props.put(WKAConstants.WKA_BBOX, sBox);
+    }
+
+    SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), itemEntry.id, new Date(itemEntry.modified), URI.create(itemEntry.id), td.getSource().getRef(), td.getRef());
+
+    if (definition.getEmitXml()) {
+      String orgMeta = null;
+      if (Arrays.stream(itemEntry.typeKeywords).anyMatch((String a) -> a.equalsIgnoreCase("metadata")) && (orgMeta = client.readItemMetadata(itemEntry.id, AgpClient.MetadataFormat.DEFAULT, generateToken(1))) != null) {
+        // explicit metadata found
+        ref.addContext(MimeType.APPLICATION_XML, orgMeta.getBytes("UTF-8"));
+      } else {
+        // generate metadata from properties
+        MapAttribute attr = AttributeUtils.fromProperties(props);
+        Document document = metaBuilder.create(attr);
+        byte [] bytes = XmlUtils.toString(document).getBytes("UTF-8");
+        ref.addContext(MimeType.APPLICATION_XML, bytes);
+      }
+    }
+    if (definition.getEmitJson()) {
+      ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(itemEntry).getBytes("UTF-8"));
+    }
+
+    return ref;
+  }
+  
   private class AgpIterator implements InputBroker.Iterator {
     private final IteratorContext iteratorContext;
     private final TransformerFactory tf = TransformerFactory.newInstance();
@@ -218,51 +274,7 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
         if (nextEntry==null) {
             throw new DataInputException(AgpInputBroker.this, String.format("Error reading content."));
         }
-        
-        Properties props = new Properties();
-        if (nextEntry.id!=null) {
-          props.put(WKAConstants.WKA_IDENTIFIER, nextEntry.id);
-        }
-        if (nextEntry.title!=null) {
-          props.put(WKAConstants.WKA_TITLE, nextEntry.title);
-        }
-        if (nextEntry.description!=null) {
-          props.put(WKAConstants.WKA_DESCRIPTION, nextEntry.description);
-        }
-        if (nextEntry.url!=null) {
-          props.put(WKAConstants.WKA_RESOURCE_URL, nextEntry.url);
-        } else if (ItemType.WEB_MAP.getTypeName().equals(nextEntry.type)) {
-          props.put(WKAConstants.WKA_RESOURCE_URL, definition.getHostUrl().toExternalForm().replaceAll("/+$", "")+"/home/webmap/viewer.html?webmap="+nextEntry.id);
-        } else {
-          props.put(WKAConstants.WKA_RESOURCE_URL, definition.getHostUrl().toExternalForm().replaceAll("/+$", "")+"/home/item.html?id="+nextEntry.id);
-        }
-        
-        if (nextEntry.extent!=null && nextEntry.extent.length==2 && nextEntry.extent[0]!=null && nextEntry.extent[0].length==2 && nextEntry.extent[1]!=null && nextEntry.extent[1].length==2) {
-          String sBox = String.format("%f %f,%f %f", nextEntry.extent[0][0], nextEntry.extent[0][1], nextEntry.extent[1][0], nextEntry.extent[1][1]);
-          props.put(WKAConstants.WKA_BBOX, sBox);
-        }
-        
-        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), nextEntry.id, new Date(nextEntry.modified), URI.create(nextEntry.id), td.getSource().getRef(), td.getRef());
-        
-        if (definition.getEmitXml()) {
-          String orgMeta = null;
-          if (Arrays.stream(nextEntry.typeKeywords).anyMatch((String a) -> a.equalsIgnoreCase("metadata")) && (orgMeta = client.readItemMetadata(nextEntry.id, AgpClient.MetadataFormat.DEFAULT, generateToken(1))) != null) {
-            // explicit metadata found
-            ref.addContext(MimeType.APPLICATION_XML, orgMeta.getBytes("UTF-8"));
-          } else {
-            // generate metadata from properties
-            MapAttribute attr = AttributeUtils.fromProperties(props);
-            Document document = metaBuilder.create(attr);
-            byte [] bytes = XmlUtils.toString(document).getBytes("UTF-8");
-            ref.addContext(MimeType.APPLICATION_XML, bytes);
-          }
-        }
-        if (definition.getEmitJson()) {
-          ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(nextEntry).getBytes("UTF-8"));
-        }
-        
-        return ref;
-        
+        return createReference(nextEntry);
       } catch (MetaException|TransformerException|URISyntaxException|IOException ex) {
         throw new DataInputException(AgpInputBroker.this, String.format("Error reading next data reference."), ex);
       }

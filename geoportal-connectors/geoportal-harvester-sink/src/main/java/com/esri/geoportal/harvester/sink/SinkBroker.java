@@ -47,13 +47,13 @@ import org.slf4j.LoggerFactory;
   private final SinkConnector connector;
   private final SinkBrokerDefinitionAdaptor definition;
 
-  private LinkedList<SinkFile> files = new LinkedList<>();
+  private final LinkedList<SinkFile> files = new LinkedList<>();
   
   TaskDefinition td;
   private Path dropPath;
   private WatchService watchService;
   private Thread watchThread;
-  private Object lock = new Object();
+  private final Object lock = new Object();
   
   /**
    * Creates instance of the broker.
@@ -87,7 +87,7 @@ import org.slf4j.LoggerFactory;
 
             watchKey.reset();
           } while (!Thread.interrupted());
-        } catch (Exception ex) {
+        } catch (InterruptedException|IllegalMonitorStateException ex) {
           // ignore
         }
       }, String.format("Folder watching thread on %s", dropPath.toString()));
@@ -136,6 +136,11 @@ import org.slf4j.LoggerFactory;
   @Override
   public String toString() {
     return String.format("UNC [%s]", definition.getRootFolder());
+  }
+
+  @Override
+  public DataReference readContent(String id) throws DataInputException {
+    return null;
   }
 
   /**

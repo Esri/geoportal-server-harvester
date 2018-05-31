@@ -36,7 +36,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -120,9 +119,23 @@ import org.xml.sax.SAXException;
   public EntityDefinition getEntityDefinition() {
     return definition.getEntityDefinition();
   }
-    
-  private String firstNonBlank(String...strs) {
-    return Arrays.asList(strs).stream().filter(s->!StringUtils.isBlank(s)).findFirst().orElse(null);
+
+  @Override
+  public DataReference readContent(String id) throws DataInputException {
+    return readContent(id, null);
+  }
+
+  private DataReference readContent(String id, Date lastModified) throws DataInputException {
+    try {
+      String record = client.readRecord(id);
+
+      SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, lastModified, URI.create(id), td.getSource().getRef(), td.getRef());
+      ref.addContext(MimeType.APPLICATION_XML, record.getBytes("UTF-8"));
+
+      return ref;
+      } catch (URISyntaxException|IOException|ParserConfigurationException|SAXException|TransformerException|XPathExpressionException ex) {
+        throw new DataInputException(OaiBroker.this, String.format("Error reading data from: %s", this), ex);
+      }
   }
   
   /**
@@ -162,22 +175,12 @@ import org.xml.sax.SAXException;
 
     @Override
     public DataReference next() throws DataInputException {
-      try {
-        if (idIter==null || !idIter.hasNext()) {
-          throw new DataInputException(OaiBroker.this, String.format("No more data available"));
-        }
-        
-        Header header = idIter.next();
-        String record = client.readRecord(header.identifier);
-
-        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), header.identifier, parseIsoDate(header.datestamp), URI.create(header.identifier), td.getSource().getRef(), td.getRef());
-        ref.addContext(MimeType.APPLICATION_XML, record.getBytes("UTF-8"));
-        
-        return ref;
-        
-      } catch (URISyntaxException|IOException|ParserConfigurationException|SAXException|TransformerException|XPathExpressionException ex) {
-        throw new DataInputException(OaiBroker.this, String.format("Error reading data from: %s", this), ex);
+      if (idIter==null || !idIter.hasNext()) {
+        throw new DataInputException(OaiBroker.this, String.format("No more data available"));
       }
+
+      Header header = idIter.next();
+      return readContent(resumptionToken, parseIsoDate(header.datestamp));
     }
     
   }

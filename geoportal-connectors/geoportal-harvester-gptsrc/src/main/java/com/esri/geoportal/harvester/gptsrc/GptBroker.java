@@ -32,6 +32,7 @@ import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.List;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -103,6 +104,48 @@ class GptBroker implements InputBroker {
     return new GptIterator();
   }
 
+  @Override
+  public DataReference readContent(String id) throws DataInputException {
+    return readContent(id, null, null);
+  }
+
+  private DataReference readContent(String id, Date lastModified, URI sourceUri) throws DataInputException {
+    try {
+      String xml;
+      String json;
+
+      SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), id, lastModified, sourceUri, td.getSource().getRef(), td.getRef());
+
+      if (definition.getEmitXml() && (xml = readXml(id)) != null) {
+        ref.addContext(MimeType.APPLICATION_XML, xml.getBytes("UTF-8"));
+      }
+
+      if (definition.getEmitJson() && (json = readJson(id)) != null) {
+        ref.addContext(MimeType.APPLICATION_JSON, json.getBytes("UTF-8"));
+      }
+
+      return ref;
+    } catch (URISyntaxException | IOException ex) {
+      throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records."), ex);
+    }
+  }
+
+  private String readXml(String id) {
+    try {
+      return client.readXml(id);
+    } catch (URISyntaxException | IOException ex) {
+      return null;
+    }
+  }
+
+  private String readJson(String id) {
+    try {
+      return client.readJson(id);
+    } catch (URISyntaxException | IOException ex) {
+      return null;
+    }
+  }
+
   private class GptIterator implements InputBroker.Iterator {
 
     private java.util.Iterator<String> iter;
@@ -131,39 +174,10 @@ class GptBroker implements InputBroker {
       }
       String id = iter.next();
       try {
-        String xml;
-        String json;
-
         EntryRef entryRef = client.readItem(id);
-        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), entryRef.getId(), entryRef.getLastModified(), entryRef.getSourceUri(), td.getSource().getRef(), td.getRef());
-
-        if (definition.getEmitXml() && (xml = readXml(id)) != null) {
-          ref.addContext(MimeType.APPLICATION_XML, xml.getBytes("UTF-8"));
-        }
-
-        if (definition.getEmitJson() && (json = readJson(id)) != null) {
-          ref.addContext(MimeType.APPLICATION_JSON, json.getBytes("UTF-8"));
-        }
-
-        return ref;
+        return readContent(id, entryRef.getLastModified(), entryRef.getSourceUri());
       } catch (URISyntaxException | IOException ex) {
         throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records."), ex);
-      }
-    }
-
-    private String readXml(String id) {
-      try {
-        return client.readXml(id);
-      } catch (URISyntaxException | IOException ex) {
-        return null;
-      }
-    }
-
-    private String readJson(String id) {
-      try {
-        return client.readJson(id);
-      } catch (URISyntaxException | IOException ex) {
-        return null;
       }
     }
 

@@ -44,6 +44,7 @@ public class Client implements Closeable {
   private final Logger LOG = LoggerFactory.getLogger(Client.class);
   
   private static final String PACKAGE_LIST_URL = "/api/3/action/package_search";
+  private static final String PACKAGE_SHOW_URL = "/api/3/action/package_show";
 
   private final CloseableHttpClient httpClient;
   private final URL url;
@@ -91,7 +92,28 @@ public class Client implements Closeable {
     get.setHeader("Content-Type", "application/json; charset=UTF-8");
     get.setHeader("User-Agent", HttpConstants.getUserAgent());
     
-    return execute(get);
+    return execute(get, Response.class);
+  }
+  
+  /**
+   * Reads package information.
+   * @param id package id
+   * @return response
+   * @throws IOException if reading response fails
+   * @throws URISyntaxException if invalid URL
+   */
+  public Pkg showPackage(String id) throws IOException, URISyntaxException {
+    URI uri = createPackageShowUri(id);
+    HttpGet get = new HttpGet(uri);
+    if (apiKey!=null) {
+      get.addHeader("X-CKAN-API-Key", apiKey);
+      get.addHeader("Authorization", apiKey);
+    }
+    get.setConfig(DEFAULT_REQUEST_CONFIG);
+    get.setHeader("Content-Type", "application/json; charset=UTF-8");
+    get.setHeader("User-Agent", HttpConstants.getUserAgent());
+    
+    return execute(get, Pkg.class);
   }
   
   private URI createListPackagesUri(long rows, long start) throws IOException, URISyntaxException {
@@ -101,16 +123,22 @@ public class Client implements Closeable {
             .build();      
   }
   
-  private Response execute(HttpUriRequest req) throws IOException, URISyntaxException {
+  private URI createPackageShowUri(String id) throws IOException, URISyntaxException {
+    return new URIBuilder(url.toURI().resolve(PACKAGE_SHOW_URL))
+            .addParameter("id", id)
+            .build();      
+  }
+  
+  private <T> T execute(HttpUriRequest req, Class<T> clazz) throws IOException, URISyntaxException {
     try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
       String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
       
       if (httpResponse.getStatusLine().getStatusCode()>=400) {
-        Response value = null;
+        T value = null;
         try {
-          value = mapper.readValue(responseContent, Response.class);
+          value = mapper.readValue(responseContent, clazz);
         } catch (Exception ex) {
           throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
         }
@@ -120,7 +148,7 @@ public class Client implements Closeable {
         return value;
       }
       
-      return mapper.readValue(responseContent, Response.class);
+      return mapper.readValue(responseContent, clazz);
     }
   }
 }

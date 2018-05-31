@@ -47,6 +47,14 @@ public interface InputBroker extends Broker<InputConnector> {
   Iterator iterator(IteratorContext iteratorContext) throws DataInputException;
   
   /**
+   * Reads content for the specific id
+   * @param id id
+   * @return content
+   * @throws DataInputException if error reading content
+   */
+  DataReference readContent(String id) throws DataInputException;
+  
+  /**
    * Iterator.
    */
   interface Iterator {

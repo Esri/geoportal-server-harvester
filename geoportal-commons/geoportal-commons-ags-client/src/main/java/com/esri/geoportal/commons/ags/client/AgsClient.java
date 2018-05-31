@@ -137,6 +137,17 @@ public class AgsClient implements Closeable {
    */
   public ServerResponse readServiceInformation(String folder, ServiceInfo si) throws URISyntaxException, IOException {
     String url = rootUrl.toURI().resolve("rest/services/").resolve(StringUtils.stripToEmpty(folder)).resolve(si.name + "/" + si.type).toASCIIString();
+    return readServiceInformation(new URL(url));
+  }
+  
+  /**
+   * Reads service information.
+   *
+   * @param url service URL
+   * @return service response
+   * @throws IOException if accessing token fails
+   */
+  public ServerResponse readServiceInformation(URL url) throws IOException {
     HttpGet get = new HttpGet(url + String.format("?f=%s", "json"));
 
     try (CloseableHttpResponse httpResponse = httpClient.execute(get); InputStream contentStream = httpResponse.getEntity().getContent();) {
@@ -149,7 +160,7 @@ public class AgsClient implements Closeable {
       mapper.configure(Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
       mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
       ServerResponse response = mapper.readValue(responseContent, ServerResponse.class);
-      response.url = url;
+      response.url = url.toExternalForm();
       response.json = responseContent;
       return response;
     }
