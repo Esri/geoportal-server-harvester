@@ -167,6 +167,7 @@ public class Bootstrap {
   protected TasksService createTasksService() throws IOException, TransformerConfigurationException, XPathExpressionException {
     if (taskService==null) {
       taskService = new DefaultTasksService(
+              createInboundConnectorRegistry(),
               createTaskManager(), 
               createHistoryManager() 
       );

@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.engine.services;
 
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import com.esri.geoportal.harvester.api.ex.DataException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.engine.managers.History;
 import java.util.List;
@@ -88,4 +89,12 @@ public interface TasksService {
    * @throws DataProcessorException if accessing repository fails
    */
   void purgeHistory(UUID taskId) throws DataProcessorException;
+  /**
+   * Fetching content.
+   * @param taskId task id
+   * @param recordId record id
+   * @return content or <code>null<> if no content
+   * @throws DataException if error fetching content
+   */
+  byte[] fetchContent(UUID taskId, String recordId) throws DataException;
 }

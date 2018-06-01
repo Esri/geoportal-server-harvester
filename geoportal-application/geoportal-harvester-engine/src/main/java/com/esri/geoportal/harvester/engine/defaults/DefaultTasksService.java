@@ -15,13 +15,23 @@
  */
 package com.esri.geoportal.harvester.engine.defaults;
 
+import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.harvester.api.DataContent;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import com.esri.geoportal.harvester.api.ex.DataException;
+import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.specs.InputBroker;
+import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.engine.services.TasksService;
 import com.esri.geoportal.harvester.engine.managers.History;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.managers.TaskManager;
+import com.esri.geoportal.harvester.engine.registers.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.utils.CrudlException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -32,15 +42,18 @@ import java.util.stream.Collectors;
  * Default tasks service.
  */
 public class DefaultTasksService implements TasksService {
+  protected final InboundConnectorRegistry inboundConnectorRegistry;
   protected final TaskManager taskManager;
   protected final HistoryManager historyManager;
 
   /**
    * Creates instance of the service.
+   * @param inboundConnectorRegistry inbound connector registry.
    * @param taskManager task manager
    * @param historyManager history manager
    */
-  public DefaultTasksService(TaskManager taskManager, HistoryManager historyManager) {
+  public DefaultTasksService(InboundConnectorRegistry inboundConnectorRegistry, TaskManager taskManager, HistoryManager historyManager) {
+    this.inboundConnectorRegistry = inboundConnectorRegistry;
     this.taskManager = taskManager;
     this.historyManager = historyManager;
   }
@@ -113,5 +126,36 @@ public class DefaultTasksService implements TasksService {
     } catch (CrudlException ex) {
       throw new DataProcessorException(String.format("Error purging history for: %s", taskId), ex);
     }
+  }
+  
+  @Override
+  public byte[] fetchContent(UUID taskId, String recordId) throws DataException {
+    try {
+      TaskDefinition taskDefinition = readTaskDefinition(taskId);
+      InputBroker broker = newInputBroker(taskDefinition.getSource());
+      DataContent dataContent = broker.readContent(recordId);
+
+      MimeType mimeType = dataContent.getContentType().stream().findFirst().orElse(null);
+
+      return mimeType != null ? dataContent.getContent(mimeType) : null;
+    } catch (IOException|InvalidDefinitionException ex) {
+      throw new DataException(String.format("Error fetching content from: %s -> $s", taskId, recordId), ex);
+    }
+  }
+  
+  /**
+   * Creates new input broker.
+   * @param entityDefinition input broker definition
+   * @return input broker
+   * @throws InvalidDefinitionException if invalid definition
+   */
+  private InputBroker newInputBroker(EntityDefinition entityDefinition) throws InvalidDefinitionException {
+    InputConnector<InputBroker> dsFactory = inboundConnectorRegistry.get(entityDefinition.getType());
+
+    if (dsFactory == null) {
+      throw new InvalidDefinitionException("Invalid input broker definition");
+    }
+
+    return dsFactory.createBroker(entityDefinition);
   }
 }

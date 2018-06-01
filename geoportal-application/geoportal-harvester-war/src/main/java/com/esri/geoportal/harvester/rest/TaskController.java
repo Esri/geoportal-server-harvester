@@ -21,6 +21,7 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.support.TaskResponse;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
+import com.esri.geoportal.harvester.api.ex.DataException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.managers.History;
@@ -497,6 +498,23 @@ public class TaskController {
       }
     } catch (IOException ex) {
       LOG.error(String.format("Error uploading task"), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  
+  @RequestMapping(value = "/rest/harvester/tasks/{taskId}/record/{dataId}", method = RequestMethod.POST) 
+  public ResponseEntity<byte[]> getRecord(@PathVariable UUID taskId, @PathVariable String dataId) {
+    try {
+      TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
+      if (taskDefinition == null) {
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }
+      
+      byte[] content = engine.getTasksService().fetchContent(taskId, dataId);
+      
+      return new ResponseEntity<>(content != null? content: new byte[0], HttpStatus.OK);
+    } catch (DataException ex) {
+      LOG.error(formatForLog("Error fetching record: %s <-- %s", taskId, taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
