@@ -50,31 +50,6 @@ import com.esri.geoportal.commons.utils.XmlUtils;
 
 public class DocUtils {
 	
-	// Local Files For Testing Porpoises 
-	static String[] file_set = {
-			"C:\\Temp\\Files\\Presentation1.pptx",
-			"C:\\Temp\\Files\\Army_Report.docx",
-			"C:\\Temp\\Files\\Scarmazzi_343971.xlsm",
-			"C:\\Temp\\Files\\TaxCollectionGRB_05.csv",
-			"C:\\Temp\\Files\\group.jpg"
-			};
-
-	// Main Used To Validate Local Files Return Bytes
-    public static void main(String[] args) throws IOException, TikaException {
-    	
-    	for (String path: file_set) {
-    			
-    		byte[] in_bytes  = bytes_from_file(path);
-    		
-		    byte[] out_bytes = generateMetadataXML(in_bytes, new File(path).getName());
-		      
-		    System.out.println(String.format("Bytes Returned: %s", out_bytes instanceof byte[]));
-    		
-    	}
-    	
-
-    }
-
     // Method Used To Simulate Incoming Bytes
     public static byte[] bytes_from_file(String filePath) {
 
