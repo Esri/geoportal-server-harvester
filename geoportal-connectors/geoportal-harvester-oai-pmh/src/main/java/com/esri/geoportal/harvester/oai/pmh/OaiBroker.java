@@ -190,7 +190,7 @@ import org.xml.sax.SAXException;
       }
 
       Header header = idIter.next();
-      return readContent(resumptionToken, parseIsoDate(header.datestamp));
+      return readContent(header.identifier, parseIsoDate(header.datestamp));
     }
 
   }
