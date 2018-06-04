@@ -15,7 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine.defaults;
 
-import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.Filter;
 import com.esri.geoportal.harvester.api.FilterInstance;
@@ -32,7 +32,6 @@ import com.esri.geoportal.harvester.api.defs.LinkDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.ex.DataException;
-import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.general.Link;
@@ -50,9 +49,7 @@ import com.esri.geoportal.harvester.engine.registers.InboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.registers.OutboundConnectorRegistry;
 import com.esri.geoportal.harvester.engine.registers.ProcessorRegistry;
 import com.esri.geoportal.harvester.engine.registers.TransformerRegistry;
-import com.esri.geoportal.harvester.engine.services.ExecutionService;
 import com.esri.geoportal.harvester.engine.utils.CrudlException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -165,11 +162,15 @@ public class DefaultTasksService implements TasksService {
   }
   
   @Override
-  public DataContent fetchContent(UUID taskId, String recordId) throws DataException {
+  public DataContent fetchContent(UUID taskId, String recordId, SimpleCredentials credentials) throws DataException {
     InputBroker broker = null;
     try {
       TaskDefinition taskDefinition = readTaskDefinition(taskId);
       Task task = this.createTask(taskDefinition);
+      
+      if (!task.getDataSource().hasAccess(credentials)) {
+        // TODO indicate access denied 
+      }
       
       broker = newInputBroker(taskDefinition.getSource());
       broker.initialize(new SimpleInitContext(task, new ArrayList<>()));

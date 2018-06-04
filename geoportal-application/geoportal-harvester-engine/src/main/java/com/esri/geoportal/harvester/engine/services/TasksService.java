@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.engine.services;
 
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
@@ -105,8 +106,9 @@ public interface TasksService {
    * Fetching content.
    * @param taskId task id
    * @param recordId record id
+   * @param credentials credentials (optional)
    * @return content or <code>null<> if no content
    * @throws DataException if error fetching content
    */
-  DataContent fetchContent(UUID taskId, String recordId) throws DataException;
+  DataContent fetchContent(UUID taskId, String recordId, SimpleCredentials credentials) throws DataException;
 }

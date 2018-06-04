@@ -17,6 +17,8 @@ package com.esri.geoportal.harvester.rest;
 
 import com.esri.geoportal.commons.constants.MimeType;
 import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.esri.geoportal.commons.utils.TextScrambler;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.base.SimpleIteratorContext;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -504,15 +506,20 @@ public class TaskController {
     }
   }
   
-  @RequestMapping(value = "/rest/harvester/tasks/{taskId}/record", method = RequestMethod.GET) 
-  public ResponseEntity<byte[]> handleRecord(@PathVariable UUID taskId, @RequestParam(required = true) String dataId) {
+  @RequestMapping(value = "/rest/harvester/tasks/{taskId}/record", method = RequestMethod.POST) 
+  public ResponseEntity<byte[]> handleRecord(@PathVariable UUID taskId, @RequestParam(required = true) String dataId, @RequestParam(required = false) String userName, @RequestParam(required = false) String password) {
     try {
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
       if (taskDefinition == null) {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
       }
       
-      DataContent content = engine.getTasksService().fetchContent(taskId, dataId);
+      SimpleCredentials credentials = null;
+      if (userName!=null && password!=null) {
+        credentials = new SimpleCredentials(userName, TextScrambler.decode(password));
+      }
+      
+      DataContent content = engine.getTasksService().fetchContent(taskId, dataId, credentials);
       
       MimeType mimeType = content.getContentType().stream().findFirst().orElse(null);
       if (mimeType != null) {
