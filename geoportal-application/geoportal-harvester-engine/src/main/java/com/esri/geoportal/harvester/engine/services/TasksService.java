@@ -15,9 +15,12 @@
  */
 package com.esri.geoportal.harvester.engine.services;
 
+import com.esri.geoportal.harvester.api.DataContent;
+import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.ex.DataException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.managers.History;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +92,15 @@ public interface TasksService {
    * @throws DataProcessorException if accessing repository fails
    */
   void purgeHistory(UUID taskId) throws DataProcessorException;
+  
+  /**
+   * Creates task.
+   * @param taskDefinition task definition
+   * @return task
+   * @throws InvalidDefinitionException if invalid task definition
+   */
+  Task createTask(TaskDefinition taskDefinition) throws InvalidDefinitionException;
+  
   /**
    * Fetching content.
    * @param taskId task id
@@ -96,5 +108,5 @@ public interface TasksService {
    * @return content or <code>null<> if no content
    * @throws DataException if error fetching content
    */
-  byte[] fetchContent(UUID taskId, String recordId) throws DataException;
+  DataContent fetchContent(UUID taskId, String recordId) throws DataException;
 }

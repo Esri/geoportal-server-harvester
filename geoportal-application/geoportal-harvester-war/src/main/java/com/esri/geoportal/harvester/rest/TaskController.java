@@ -15,7 +15,9 @@
  */
 package com.esri.geoportal.harvester.rest;
 
+import com.esri.geoportal.commons.constants.MimeType;
 import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.base.SimpleIteratorContext;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.support.TaskResponse;
@@ -502,18 +504,25 @@ public class TaskController {
     }
   }
   
-  @RequestMapping(value = "/rest/harvester/tasks/{taskId}/record/{dataId}", method = RequestMethod.POST) 
-  public ResponseEntity<byte[]> getRecord(@PathVariable UUID taskId, @PathVariable String dataId) {
+  @RequestMapping(value = "/rest/harvester/tasks/{taskId}/record", method = RequestMethod.GET) 
+  public ResponseEntity<byte[]> handleRecord(@PathVariable UUID taskId, @RequestParam(required = true) String dataId) {
     try {
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
       if (taskDefinition == null) {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
       }
       
-      byte[] content = engine.getTasksService().fetchContent(taskId, dataId);
+      DataContent content = engine.getTasksService().fetchContent(taskId, dataId);
       
-      return new ResponseEntity<>(content != null? content: new byte[0], HttpStatus.OK);
-    } catch (DataException ex) {
+      MimeType mimeType = content.getContentType().stream().findFirst().orElse(null);
+      if (mimeType != null) {
+        MultiValueMap<String,String> headers = new LinkedMultiValueMap<>();
+        headers.add("Content-Type", mimeType.getName());
+        return new ResponseEntity<>(content.getContent(mimeType), headers, HttpStatus.OK);
+      } else {
+        return new ResponseEntity<>(new byte[0], HttpStatus.OK);
+      }
+    } catch (IOException|DataException ex) {
       LOG.error(formatForLog("Error fetching record: %s <-- %s", taskId, taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }

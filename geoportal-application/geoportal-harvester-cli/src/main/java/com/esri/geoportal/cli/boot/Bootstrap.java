@@ -167,7 +167,11 @@ public class Bootstrap {
   protected TasksService createTasksService() throws IOException, TransformerConfigurationException, XPathExpressionException {
     if (taskService==null) {
       taskService = new DefaultTasksService(
-              createInboundConnectorRegistry(),
+              createInboundConnectorRegistry(), 
+              createOutboundConnectorRegistry(), 
+              createTransformerRegistry(), 
+              createFilterRegistry(), 
+              createProcessorRegistry(), 
               createTaskManager(), 
               createHistoryManager() 
       );
@@ -188,16 +192,9 @@ public class Bootstrap {
   protected ExecutionService createExecutionService() throws IOException, TransformerConfigurationException, XPathExpressionException {
     if (executionService==null) {
       executionService = new DefaultExecutionService(
-              createInboundConnectorRegistry(), 
-              createOutboundConnectorRegistry(), 
-              createTransformerRegistry(), 
-              createFilterRegistry(), 
-              createProcessorRegistry(), 
-              createTriggerRegistry(), 
-              createTriggerManager(), 
-              createTriggerInstanceManager(), 
-              createHistoryManager(), 
-              createProcessesService());
+              createProcessesService(),
+              createTasksService()
+      );
     }
     return executionService;
   }
