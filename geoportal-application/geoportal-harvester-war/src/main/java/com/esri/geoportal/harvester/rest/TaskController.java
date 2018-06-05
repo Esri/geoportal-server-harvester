@@ -515,10 +515,9 @@ public class TaskController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
       }
       
-      SimpleCredentials credentials = null;
-      if (userName!=null && password!=null) {
-        credentials = new SimpleCredentials(userName, TextScrambler.decode(password));
-      }
+      SimpleCredentials credentials = !StringUtils.isBlank(userName) && !StringUtils.isBlank(password)
+              ? new SimpleCredentials(userName, TextScrambler.decode(password))
+              : null;
       
       DataContent content = engine.getTasksService().fetchContent(taskId, id, credentials);
       
