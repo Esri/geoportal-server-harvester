@@ -20,6 +20,7 @@ import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.ex.DataException;
+import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.managers.History;
@@ -108,7 +109,7 @@ public interface TasksService {
    * @param recordId record id
    * @param credentials credentials (optional)
    * @return content or <code>null<> if no content
-   * @throws DataException if error fetching content
+   * @throws DataInputException if error fetching content
    */
-  DataContent fetchContent(UUID taskId, String recordId, SimpleCredentials credentials) throws DataException;
+  DataContent fetchContent(UUID taskId, String recordId, SimpleCredentials credentials) throws DataInputException;
 }

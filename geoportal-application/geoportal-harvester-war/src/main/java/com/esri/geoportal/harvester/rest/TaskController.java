@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.HttpResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -507,7 +508,7 @@ public class TaskController {
   }
   
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/record", method = RequestMethod.POST) 
-  public ResponseEntity<byte[]> handleRecord(@PathVariable UUID taskId, @RequestParam(required = true) String dataId, @RequestParam(required = false) String userName, @RequestParam(required = false) String password) {
+  public ResponseEntity<byte[]> handleRecord(@PathVariable UUID taskId, @RequestParam(required = true) String id, @RequestParam(required = false) String userName, @RequestParam(required = false) String password) {
     try {
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
       if (taskDefinition == null) {
@@ -519,7 +520,7 @@ public class TaskController {
         credentials = new SimpleCredentials(userName, TextScrambler.decode(password));
       }
       
-      DataContent content = engine.getTasksService().fetchContent(taskId, dataId, credentials);
+      DataContent content = engine.getTasksService().fetchContent(taskId, id, credentials);
       
       MimeType mimeType = content.getContentType().stream().findFirst().orElse(null);
       if (mimeType != null) {
@@ -529,7 +530,14 @@ public class TaskController {
       } else {
         return new ResponseEntity<>(new byte[0], HttpStatus.OK);
       }
-    } catch (IOException|DataException ex) {
+    } catch (DataException ex) {
+      LOG.error(formatForLog("Error fetching record: %s <-- %s", taskId, taskId), ex);
+      if (ex.getCause() instanceof HttpResponseException) {
+        HttpResponseException cause = (HttpResponseException)ex.getCause();
+        return new ResponseEntity<>(HttpStatus.resolve(cause.getStatusCode()));
+      }
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (IOException ex) {
       LOG.error(formatForLog("Error fetching record: %s <-- %s", taskId, taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }

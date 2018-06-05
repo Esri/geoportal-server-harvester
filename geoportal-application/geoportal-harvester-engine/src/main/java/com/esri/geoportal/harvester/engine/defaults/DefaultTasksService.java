@@ -32,6 +32,7 @@ import com.esri.geoportal.harvester.api.defs.LinkDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.ex.DataException;
+import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.general.Link;
@@ -56,6 +57,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpResponseException;
 
 /**
  * Default tasks service.
@@ -162,22 +165,22 @@ public class DefaultTasksService implements TasksService {
   }
   
   @Override
-  public DataContent fetchContent(UUID taskId, String recordId, SimpleCredentials credentials) throws DataException {
+  public DataContent fetchContent(UUID taskId, String recordId, SimpleCredentials credentials) throws DataInputException {
     InputBroker broker = null;
     try {
       TaskDefinition taskDefinition = readTaskDefinition(taskId);
       Task task = this.createTask(taskDefinition);
       
       if (!task.getDataSource().hasAccess(credentials)) {
-        // TODO indicate access denied 
+        throw new HttpResponseException(HttpStatus.SC_UNAUTHORIZED, "Invalid credentials");
       }
       
       broker = newInputBroker(taskDefinition.getSource());
       broker.initialize(new SimpleInitContext(task, new ArrayList<>()));
       
       return broker.readContent(recordId);
-    } catch (InvalidDefinitionException ex) {
-      throw new DataException(String.format("Error fetching content from: %s -> $s", taskId, recordId), ex);
+    } catch (InvalidDefinitionException|DataProcessorException|HttpResponseException ex) {
+      throw new DataInputException(broker, String.format("Error fetching content from: %s -> $s", taskId, recordId), ex);
     } finally {
       if (broker!=null) {
         broker.terminate();
