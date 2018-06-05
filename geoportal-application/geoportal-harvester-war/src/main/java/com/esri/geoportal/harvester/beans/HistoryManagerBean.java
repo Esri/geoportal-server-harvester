@@ -40,6 +40,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import static com.esri.geoportal.harvester.engine.utils.JsonSerializer.deserialize;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * History manager bean.
@@ -56,11 +58,30 @@ public class HistoryManagerBean implements HistoryManager {
    */
   @PostConstruct
   public void init() {
+    initEventsTable();
+  }
+  
+  private void initEventsTable() {
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement(
                     "CREATE TABLE IF NOT EXISTS EVENTS ( id varchar(38) PRIMARY KEY, taskid varchar(38) NOT NULL, started TIMESTAMP NOT NULL, completed TIMESTAMP NOT NULL, report CLOB ) ;"
                   + "CREATE INDEX IF NOT EXISTS EVENTS_TASKID_IDX ON EVENTS(taskid);");
+        ) {
+      st.execute();
+      initFailedDataTable();
+      LOG.info("HistoryManagerBean initialized.");
+    } catch (SQLException ex) {
+      LOG.info("Error initializing history database", ex);
+    }
+  }
+  
+  private void initFailedDataTable() {
+    try (
+            Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement(
+                    "CREATE TABLE IF NOT EXISTS FAILED_DATA ( eventid varchar(38) NOT NULL, dataid varchar(256) NOT NULL ) ;"
+                  + "CREATE INDEX IF NOT EXISTS FAILED_DATA_IDX ON FAILED_DATA(eventid);");
         ) {
       st.execute();
       LOG.info("HistoryManagerBean initialized.");
@@ -99,6 +120,7 @@ public class HistoryManagerBean implements HistoryManager {
 
   @Override
   public boolean delete(UUID id) throws CrudlException {
+    deleteFailedData(id);
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("DELETE FROM EVENTS WHERE ID = ?");
@@ -207,6 +229,10 @@ public class HistoryManagerBean implements HistoryManager {
 
   @Override
   public void purgeHistory(UUID taskid) throws CrudlException {
+    History history = buildHistory(taskid);
+    for (History.Event event: history) {
+      deleteFailedData(event.getUuid());
+    }
     try (
             Connection connection = dataSource.getConnection();
             PreparedStatement st = connection.prepareStatement("DELETE FROM EVENTS WHERE taskid = ?");
@@ -215,6 +241,51 @@ public class HistoryManagerBean implements HistoryManager {
       st.executeUpdate();
     } catch (SQLException ex) {
       throw new CrudlException("Error selecting broker definition", ex);
+    }
+  }
+  
+  @Override
+  public void storeFailedDataId(UUID eventId, String dataId) throws CrudlException {
+    try (
+            Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement("INSERT INTO FAILED_DATA (eventid,id) VALUES (?,?)");
+        ) {
+      st.setString(1, eventId.toString());
+      st.setString(2, dataId);
+      st.executeUpdate();
+    } catch (SQLException ex) {
+      throw new CrudlException("Error storing failed data id", ex);
+    }
+  }
+  
+  @Override
+  public List<String> listFailedData(UUID eventId) throws CrudlException {
+    try (
+            Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement("SELECT id FROM FAILED_DATA WHARE eventid = ?");
+        ) {
+      ArrayList<String> result = new ArrayList<>();
+      st.setString(1, eventId.toString());
+      ResultSet rs = st.executeQuery();
+      while (rs.next()) {
+        String id = rs.getString(1);
+        result.add(id);
+      }
+      return result;
+    } catch (SQLException ex) {
+      throw new CrudlException("Error listing failed data", ex);
+    }
+  }
+  
+  private boolean deleteFailedData(UUID eventId) throws CrudlException {
+    try (
+            Connection connection = dataSource.getConnection();
+            PreparedStatement st = connection.prepareStatement("DELETE FROM FAILED_DATA WHERE eventid = ?");
+        ) {
+      st.setString(1, eventId.toString());
+      return st.executeUpdate() > 0;
+    } catch (SQLException ex) {
+      throw new CrudlException("Error deleting failed data", ex);
     }
   }
   
