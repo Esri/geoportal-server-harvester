@@ -151,7 +151,7 @@ import org.slf4j.LoggerFactory;
 
       String xml = null;
       if (definition.getAcceptXml()) {
-        byte[] content = null;
+        byte[] content;
         if (ref.getContent(MimeType.APPLICATION_PDF) != null && definition.isTranslatePdf()) {
           content = PdfUtils.generateMetadataXML(ref.getContent(MimeType.APPLICATION_PDF), ref.getSourceUri().getPath(), ref.getSourceUri().toASCIIString(), geometryServiceUrl); 
         } else {
@@ -179,10 +179,10 @@ import org.slf4j.LoggerFactory;
 
       PublishResponse response = client.publish(data, uuid, xml, json, definition.getForceAdd());
       if (response == null) {
-        throw new DataOutputException(this, "No response received");
+        throw new DataOutputException(this, ref.getId(), "No response received");
       }
       if (response.getError() != null) {
-        throw new DataOutputException(this, response.getError().getMessage()) {
+        throw new DataOutputException(this, ref.getId(), response.getError().getMessage()) {
           @Override
           public boolean isNegligible() {
             return true;
@@ -192,7 +192,7 @@ import org.slf4j.LoggerFactory;
       existing.remove(response.getId());
       return response.getStatus().equalsIgnoreCase("created") ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
     } catch (IOException | URISyntaxException ex) {
-      throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
+      throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
     }
   }
 

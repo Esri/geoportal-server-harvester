@@ -102,7 +102,7 @@ import org.xml.sax.SAXException;
       MapAttribute attributes = extractMapAttributes(ref);
       
       if (attributes == null) {
-        throw new DataOutputException(this, String.format("Error extracting attributes from data."));
+        throw new DataOutputException(this, ref.getId(), String.format("Error extracting attributes from data."));
       }
 
       // build typeKeywords array
@@ -158,7 +158,7 @@ import org.xml.sax.SAXException;
                   itemType, extractEnvelope(getAttributeValue(attributes, WKAConstants.WKA_BBOX, null)), typeKeywords);
 
           if (response == null || !response.success) {
-            throw new DataOutputException(this, String.format("Error adding item: %s", ref));
+            throw new DataOutputException(this, ref.getId(), String.format("Error adding item: %s", ref));
           }
           
           client.share(definition.getCredentials().getUserName(), definition.getFolderId(), response.id, true, true, null, token);
@@ -167,7 +167,7 @@ import org.xml.sax.SAXException;
         } else if (itemEntry.owner.equals(definition.getCredentials().getUserName())) {
           itemEntry = client.readItem(itemEntry.id, token);
           if (itemEntry==null) {
-            throw new DataOutputException(this, String.format("Unable to read item entry."));
+            throw new DataOutputException(this, ref.getId(), String.format("Unable to read item entry."));
           }
           // update item if does exist
           ItemResponse response = updateItem(itemEntry.id,
@@ -178,7 +178,7 @@ import org.xml.sax.SAXException;
                   resourceUrl, thumbnailUrl,
                   itemType, extractEnvelope(getAttributeValue(attributes, WKAConstants.WKA_BBOX, null)), typeKeywords);
           if (response == null || !response.success) {
-            throw new DataOutputException(this, String.format("Error updating item: %s", ref));
+            throw new DataOutputException(this, ref.getId(), String.format("Error updating item: %s", ref));
           }
           existing.remove(itemEntry.id);
           return PublishingStatus.UPDATED;
@@ -190,7 +190,7 @@ import org.xml.sax.SAXException;
       }
 
     } catch (MetaException | IOException | ParserConfigurationException | SAXException | URISyntaxException ex) {
-      throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
+      throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
     }
   }
   
