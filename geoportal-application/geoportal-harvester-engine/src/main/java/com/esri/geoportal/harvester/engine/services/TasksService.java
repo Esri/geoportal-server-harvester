@@ -89,6 +89,15 @@ public interface TasksService {
   History getHistory(UUID taskId) throws DataProcessorException;
   
   /**
+   * Gets failed documents.
+   * @param taskId task id
+   * @param eventId event id
+   * @return list of failed documents id's
+   * @throws DataProcessorException if accessing repository fails
+   */
+  List<String> getFailedDocuments(UUID taskId, UUID eventId) throws DataProcessorException;
+  
+  /**
    * Purges history for a given task.
    * @param taskId task id
    * @throws DataProcessorException if accessing repository fails

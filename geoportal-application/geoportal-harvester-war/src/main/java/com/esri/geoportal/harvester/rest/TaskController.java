@@ -255,6 +255,18 @@ public class TaskController {
     }
   }
 
+  @RequestMapping(value = "/rest/harvester/tasks/{taskId}/history/{eventId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<String>> getFailedDocuments(@PathVariable UUID taskId, @PathVariable UUID eventId) {
+    try {
+      LOG.debug(formatForLog("GET /rest/harvester/tasks/%s/history/%s", taskId, eventId));
+      List<String> failedDocuments = engine.getTasksService().getFailedDocuments(taskId, eventId);
+      return new ResponseEntity<>(failedDocuments, HttpStatus.OK);
+    } catch (DataProcessorException ex) {
+      LOG.error(formatForLog("Error getting failed documents: %s [%s]", taskId, eventId), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  
   /**
    * Gets history by task id.
    *

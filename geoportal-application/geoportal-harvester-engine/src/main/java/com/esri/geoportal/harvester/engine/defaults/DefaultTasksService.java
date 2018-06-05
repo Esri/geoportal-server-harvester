@@ -156,6 +156,15 @@ public class DefaultTasksService implements TasksService {
   }
   
   @Override
+  public List<String> getFailedDocuments(UUID taskId, UUID eventId) throws DataProcessorException {
+    try {
+      return historyManager.listFailedData(eventId);
+    } catch (CrudlException ex) {
+      throw new DataProcessorException(String.format("Error getting history for: %s", taskId), ex);
+    }
+  }
+  
+  @Override
   public void purgeHistory(UUID taskId) throws DataProcessorException {
     try {
       historyManager.purgeHistory(taskId);
