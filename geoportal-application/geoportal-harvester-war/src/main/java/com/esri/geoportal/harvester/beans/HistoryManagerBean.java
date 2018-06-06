@@ -248,7 +248,7 @@ public class HistoryManagerBean implements HistoryManager {
   public void storeFailedDataId(UUID eventId, String dataId) throws CrudlException {
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("INSERT INTO FAILED_DATA (eventid,id) VALUES (?,?)");
+            PreparedStatement st = connection.prepareStatement("INSERT INTO FAILED_DATA (eventid,dataid) VALUES (?,?)");
         ) {
       st.setString(1, eventId.toString());
       st.setString(2, dataId);
@@ -262,7 +262,7 @@ public class HistoryManagerBean implements HistoryManager {
   public List<String> listFailedData(UUID eventId) throws CrudlException {
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("SELECT id FROM FAILED_DATA WHARE eventid = ?");
+            PreparedStatement st = connection.prepareStatement("SELECT dataid FROM FAILED_DATA WHERE eventid = ?");
         ) {
       ArrayList<String> result = new ArrayList<>();
       st.setString(1, eventId.toString());

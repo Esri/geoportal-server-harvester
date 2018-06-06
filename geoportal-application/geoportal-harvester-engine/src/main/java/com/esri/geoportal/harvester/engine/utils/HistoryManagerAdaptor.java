@@ -107,7 +107,7 @@ public class HistoryManagerAdaptor extends BaseProcessInstanceListener {
     if (ex instanceof DataOutputException) {
       DataOutputException outex = (DataOutputException) ex;
       try {
-        historyManager.storeFailedDataId(uuid, outex.getDataId());
+        historyManager.storeFailedDataId(event.getUuid(), outex.getDataId());
       } catch (CrudlException ex2) {
         LOG.error(formatForLog("Error storing failed data id: %s [%s]", uuid, outex.getDataId()), ex);
       }
