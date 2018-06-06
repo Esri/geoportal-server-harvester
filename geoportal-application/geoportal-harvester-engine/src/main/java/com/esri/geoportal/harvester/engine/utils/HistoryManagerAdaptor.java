@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.engine.utils;
 
 import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
+import com.esri.geoportal.commons.utils.ExceptionUtils;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.ProcessInstance;
@@ -104,12 +105,13 @@ public class HistoryManagerAdaptor extends BaseProcessInstanceListener {
   @Override
   public void onError(DataException ex) {
     report.failed++;
-    if (ex instanceof DataOutputException) {
-      DataOutputException outex = (DataOutputException) ex;
+    Throwable dataOutputException = ExceptionUtils.unfoldCauses(ex).stream().filter((Throwable t) -> t instanceof DataOutputException).findAny().orElse(null);
+    if (dataOutputException != null) {
+      DataOutputException outex = (DataOutputException) dataOutputException;
       try {
         historyManager.storeFailedDataId(event.getUuid(), outex.getDataId());
       } catch (CrudlException ex2) {
-        LOG.error(formatForLog("Error storing failed data id: %s [%s]", uuid, outex.getDataId()), ex);
+        LOG.error(formatForLog("Error storing failed data id: %s %s [%s]", uuid, event.getUuid(), outex.getDataId()), ex);
       }
     }
   }
