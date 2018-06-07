@@ -60,6 +60,10 @@ define(["dojo/_base/declare",
       
       export: function(id) {
         return "rest/harvester/tasks/"+id+"/export";
+      },
+      
+      getFailedDocuments: function(eventId) {
+        return xhr.get("rest/harvester/tasks/failed/"+eventId, {handleAs: "json"});
       }
     };
 });

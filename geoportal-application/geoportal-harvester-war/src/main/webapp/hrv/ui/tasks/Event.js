@@ -25,7 +25,7 @@ define(["dojo/_base/declare",
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           locale
+           locale,
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
@@ -49,6 +49,10 @@ define(["dojo/_base/declare",
         } else {
           return "?";
         }
+      },
+      
+      _onFailedDetails: function(evt) {
+        this.emit("event-clicked", {data: this.data});
       }
     });
 });

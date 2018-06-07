@@ -31,7 +31,6 @@ import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.LinkDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
-import com.esri.geoportal.harvester.api.ex.DataException;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -156,11 +155,11 @@ public class DefaultTasksService implements TasksService {
   }
   
   @Override
-  public List<String> getFailedDocuments(UUID taskId, UUID eventId) throws DataProcessorException {
+  public List<String> getFailedDocuments(UUID eventId) throws DataProcessorException {
     try {
       return historyManager.listFailedData(eventId);
     } catch (CrudlException ex) {
-      throw new DataProcessorException(String.format("Error getting history for: %s", taskId), ex);
+      throw new DataProcessorException(String.format("Error getting history for: %s", eventId), ex);
     }
   }
   
