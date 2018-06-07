@@ -490,6 +490,7 @@ html,body {
 
 .h-history-failed {
   padding-left: 1em;
+  width: 100%;
 }
 
 .h-history-failed > span {
@@ -509,6 +510,7 @@ html,body {
   display: table-cell;
   padding: 0.2em;
   border-right: 1px solid grey;
+  white-space: nowrap;
 }
 
 .h-history-header .h-event-prop {
