@@ -26,6 +26,7 @@ define(["dojo/_base/declare",
         "dojo/dom-style",
         "dojo/html",
         "dojo/on",
+        "dojo/dom-construct",
         "hrv/rest/Tasks",
         "hrv/ui/tasks/Event",
         "hrv/utils/TaskUtils"
@@ -33,7 +34,7 @@ define(["dojo/_base/declare",
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,topic,domStyle,html,on,
+           lang,array,topic,domStyle,html,on,domConstruct,
            TasksREST,Event,TaskUtils
           ){
   
@@ -48,17 +49,23 @@ define(["dojo/_base/declare",
       },
       
       _onEventClicked: function(evt) {
+        domConstruct.empty(this.failedNode);
         TasksREST.getFailedDocuments(evt.data.uuid).then(lang.hitch(this, this._handleFailedDocuments), lang.hitch(this, function(error){
           console.err(error);
           topic.publish("msg",new Error("Unable to access failed documents information"));
         }));
       },
       
-      _handleFailedDocuments: function(failedDocumentsArray) {
-        console.log(failedDocumentsArray);
+      _handleFailedDocuments: function(failedDocuments) {
+        if (failedDocuments) {
+          array.forEach(failedDocuments, lang.hitch(this,function(docId) {
+            domConstruct.create("span", {innerHTML: docId}, this.failedNode);
+          }));
+        }
       },
       
       _onNav: function(evt) {
+        domConstruct.empty(this.failedNode);
         if (evt.type!=="history") {
           array.forEach(this.widgets,function(widget){
             widget.destroy();

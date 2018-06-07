@@ -15,6 +15,7 @@ html,body {
 .h-header-layout {
   height: 20px;
   background-color: #196fa6;
+  width: 100% !important;
 }
 
 .h-header {
@@ -474,8 +475,25 @@ html,body {
   
 }
 
+.h-history-body {
+  display: table;
+  width: 100%;
+}
+
+.h-history-body > div {
+  display: table-cell;
+}
+
 .h-history-content {
   display: table;
+}
+
+.h-history-failed {
+  padding-left: 1em;
+}
+
+.h-history-failed > span {
+  margin-right: 1em;
 }
 
 .h-history-header {
