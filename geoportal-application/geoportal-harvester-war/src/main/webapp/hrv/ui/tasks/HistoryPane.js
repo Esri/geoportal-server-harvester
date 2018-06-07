@@ -42,15 +42,28 @@ define(["dojo/_base/declare",
       i18n: i18n,
       templateString: template,
       widgets: [],
+      handles: [],
     
       postCreate: function(){
         topic.subscribe("nav",lang.hitch(this,this._onNav));
         this.own(on(this, "event-clicked", lang.hitch(this, this._onEventClicked)));
       },
       
-      _onEventClicked: function(evt) {
+      destroy: function() {
+        this._empty();
+      },
+      
+      _empty: function() {
+        array.forEach(this.handles, function(handle){ handle.remove(); });
+        this.handles = [];
         domConstruct.empty(this.failedNode);
-        TasksREST.getFailedDocuments(evt.data.uuid).then(lang.hitch(this, this._handleFailedDocuments), lang.hitch(this, function(error){
+      },
+      
+      _onEventClicked: function(evt) {
+        this._empty();
+        TasksREST.getFailedDocuments(evt.data.uuid).then(lang.hitch(this, function(failedDocuments) { 
+          this._handleFailedDocuments(failedDocuments); 
+        }), lang.hitch(this, function(error){
           console.err(error);
           topic.publish("msg",new Error("Unable to access failed documents information"));
         }));
@@ -58,14 +71,21 @@ define(["dojo/_base/declare",
       
       _handleFailedDocuments: function(failedDocuments) {
         if (failedDocuments) {
-          array.forEach(failedDocuments, lang.hitch(this,function(docId) {
-            domConstruct.create("span", {innerHTML: docId}, this.failedNode);
+          array.forEach(failedDocuments, lang.hitch(this,function(recordId) {
+            var span = domConstruct.create("span", {}, this.failedNode);
+            var link = domConstruct.create("a", {innerHTML: recordId, href: "#"}, span);
+            this.handles.push(on(link, "click", lang.hitch(this, function(evt){
+              console.log("Clicked failed document id", this.data, recordId);
+              TasksREST.getFailedRecord(this.data.uuid, recordId).then(function(response){
+                console.log(response);
+              });
+            })));
           }));
         }
       },
       
       _onNav: function(evt) {
-        domConstruct.empty(this.failedNode);
+        this._empty();
         if (evt.type!=="history") {
           array.forEach(this.widgets,function(widget){
             widget.destroy();
@@ -73,6 +93,7 @@ define(["dojo/_base/declare",
         }
         domStyle.set(this.domNode,"display", evt.type==="history"? "block": "none");
         if (evt.data && evt.data.taskDefinition) {
+          this.data = evt.data;
           html.set(this.labelNode, TaskUtils.makeLabel(evt.data.taskDefinition));
           TasksREST.history(evt.data.uuid).then(
             lang.hitch(this,this.processHistory),

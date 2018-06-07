@@ -64,6 +64,14 @@ define(["dojo/_base/declare",
       
       getFailedDocuments: function(eventId) {
         return xhr.get("rest/harvester/tasks/failed/"+eventId, {handleAs: "json"});
+      },
+      
+      getFailedRecord: function(taskId, recordId) {
+        return xhr.post("rest/harvester/tasks/" +taskId+ "/record", {
+          postData: "id="+recordId,
+          handleAs: "text",
+          headers: {"Content-Type": "application/json"}
+        });
       }
     };
 });
