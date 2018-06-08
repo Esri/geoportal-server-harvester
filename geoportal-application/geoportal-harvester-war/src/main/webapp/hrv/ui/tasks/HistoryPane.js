@@ -76,9 +76,19 @@ define(["dojo/_base/declare",
             var link = domConstruct.create("a", {innerHTML: recordId, href: "#"}, span);
             this.handles.push(on(link, "click", lang.hitch(this, function(evt){
               console.log("Clicked failed document id", this.data, recordId);
-              TasksREST.getFailedRecord(this.data.uuid, recordId).then(function(response){
-                console.log(response);
-              });
+              TasksREST.getFailedRecord(this.data.uuid, recordId).then(lang.hitch(this, function(response){
+                var newWindow = window.open(null, "_blank");
+                newWindow.document.open();
+                newWindow.document.write(response
+                  .replace(/&/g, "&amp;")
+                  .replace(/</g, "&lt;")
+                  .replace(/>/g, "&gt;")
+                  .replace(/"/g, "&quot;")
+                  .replace(/'/g, "&#039;")
+                );
+                newWindow.document.close();
+                newWindow.document.title = recordId;
+              }));
             })));
           }));
         }
