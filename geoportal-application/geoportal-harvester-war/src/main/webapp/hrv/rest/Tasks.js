@@ -17,9 +17,10 @@
 define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/request/xhr",
-        "dojo/Deferred"
+        "dojo/Deferred",
+        "hrv/utils/TextScrambler"
       ],
-  function(declare,lang,xhr,Deferred){
+  function(declare,lang,xhr,Deferred,TextScrambler){
   
     return {
       list: function() {
@@ -66,11 +67,15 @@ define(["dojo/_base/declare",
         return xhr.get("rest/harvester/tasks/failed/"+eventId, {handleAs: "json"});
       },
       
-      getFailedRecord: function(taskId, recordId) {
+      getFailedRecord: function(taskId, recordId, userName, password) {
         return xhr.post("rest/harvester/tasks/" +taskId+ "/record", {
-          postData: "id="+recordId,
+          data: { 
+            id: recordId,
+            userName: userName,
+            password: password ? TextScrambler.encode(password) : null
+          },
           handleAs: "text",
-          headers: {"Content-Type": "application/json"}
+          headers: {"Content-Type": "application/x-www-form-urlencoded"}
         });
       }
     };
