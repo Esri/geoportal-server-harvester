@@ -88,6 +88,9 @@ define(["dojo/_base/declare",
                 );
                 newWindow.document.close();
                 newWindow.document.title = recordId;
+              }), lang.hitch(this, function(error){
+                console.err(error);
+                topic.publish("msg",new Error("Unable to access failed documents information"));
               }));
             })));
           }));
