@@ -64,6 +64,8 @@ public class HistoryManagerAdaptor extends BaseProcessInstanceListener {
       case submitted:
         event.setUuid(UUID.randomUUID());
         event.setTaskId(uuid);
+        report.failedToHarvest = 0L;
+        report.failedToPublish = 0L;
         break;
       case working:
         if (startDate == null) {
@@ -105,14 +107,18 @@ public class HistoryManagerAdaptor extends BaseProcessInstanceListener {
   @Override
   public void onError(DataException ex) {
     report.failed++;
+    
     Throwable dataOutputException = ExceptionUtils.unfoldCauses(ex).stream().filter((Throwable t) -> t instanceof DataOutputException).findAny().orElse(null);
     if (dataOutputException != null) {
+      report.failedToPublish ++;
       DataOutputException outex = (DataOutputException) dataOutputException;
       try {
         historyManager.storeFailedDataId(event.getUuid(), outex.getDataId());
       } catch (CrudlException ex2) {
         LOG.error(formatForLog("Error storing failed data id: %s %s [%s]", uuid, event.getUuid(), outex.getDataId()), ex);
       }
+    } else {
+      report.failedToHarvest ++;
     }
   }
 

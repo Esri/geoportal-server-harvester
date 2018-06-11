@@ -75,7 +75,6 @@ define(["dojo/_base/declare",
             var span = domConstruct.create("span", {}, this.failedNode);
             var link = domConstruct.create("a", {innerHTML: recordId, href: "#"}, span);
             this.handles.push(on(link, "click", lang.hitch(this, function(evt){
-              console.log("Clicked failed document id", this.data, recordId);
               TasksREST.getFailedRecord(this.data.uuid, recordId).then(lang.hitch(this, function(response){
                 var newWindow = window.open(null, "_blank");
                 newWindow.document.open();

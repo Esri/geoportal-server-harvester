@@ -73,9 +73,13 @@ public class DefaultTasksService implements TasksService {
 
   /**
    * Creates instance of the service.
-   * @param executionService inbound connector registry.
-   * @param taskManager task manager
-   * @param historyManager history manager
+   * @param inboundConnectorRegistry inbound connectors registry
+   * @param outboundConnectorRegistry outbound connectors registry
+   * @param transformerRegistry transformer registry
+   * @param filterRegistry filter registry
+   * @param processorRegistry processor registry
+   * @param taskManager task manager task manager
+   * @param historyManager history manager history manager
    */
   public DefaultTasksService(
           InboundConnectorRegistry inboundConnectorRegistry, 
@@ -220,6 +224,7 @@ public class DefaultTasksService implements TasksService {
    * @return task
    * @throws InvalidDefinitionException  if invalid definition
    */
+  @Override
   public Task createTask(TaskDefinition taskDefinition) throws InvalidDefinitionException {
     InputBroker dataSource = newInputBroker(taskDefinition.getSource());
 
