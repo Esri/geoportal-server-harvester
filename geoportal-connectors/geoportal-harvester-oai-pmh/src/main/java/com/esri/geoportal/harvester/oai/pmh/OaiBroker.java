@@ -120,10 +120,6 @@ import org.xml.sax.SAXException;
   public EntityDefinition getEntityDefinition() {
     return definition.getEntityDefinition();
   }
-    
-  private String firstNonBlank(String...strs) {
-    return Arrays.asList(strs).stream().filter(s->!StringUtils.isBlank(s)).findFirst().orElse(null);
-  }
   
   /**
    * OAI-PMH iterator.
