@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Piotr Andzel.
+ * Copyright 2016 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,7 @@
 package com.esri.geoportal.harvester.api.ex;
 
 /**
- *
- * @author Piotr Andzel
+ * Invalid definition exception.
  */
 public class InvalidDefinitionException extends Exception {
 

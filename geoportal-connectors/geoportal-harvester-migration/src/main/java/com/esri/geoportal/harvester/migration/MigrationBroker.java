@@ -15,6 +15,8 @@
  */
 package com.esri.geoportal.harvester.migration;
 
+import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
@@ -105,6 +107,16 @@ import org.slf4j.LoggerFactory;
   public void terminate() {
     iters.forEach(MigrationIterator::close);
     iters.clear();
+  }
+
+  @Override
+  public DataContent readContent(String id) throws DataInputException {
+    return null;
+  }
+
+  @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return true;
   }
   
   private Engine getEngine() {

@@ -25,6 +25,8 @@ define(["dojo/_base/declare",
         "dojo/topic",
         "dojo/dom-style",
         "dojo/html",
+        "dojo/on",
+        "dojo/dom-construct",
         "hrv/rest/Tasks",
         "hrv/ui/tasks/Event",
         "hrv/utils/TaskUtils"
@@ -32,7 +34,7 @@ define(["dojo/_base/declare",
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,topic,domStyle,html,
+           lang,array,topic,domStyle,html,on,domConstruct,
            TasksREST,Event,TaskUtils
           ){
   
@@ -40,12 +42,62 @@ define(["dojo/_base/declare",
       i18n: i18n,
       templateString: template,
       widgets: [],
+      handles: [],
     
       postCreate: function(){
         topic.subscribe("nav",lang.hitch(this,this._onNav));
+        this.own(on(this, "event-clicked", lang.hitch(this, this._onEventClicked)));
+      },
+      
+      destroy: function() {
+        this._empty();
+      },
+      
+      _empty: function() {
+        array.forEach(this.handles, function(handle){ handle.remove(); });
+        this.handles = [];
+        domConstruct.empty(this.failedNode);
+      },
+      
+      _onEventClicked: function(evt) {
+        this._empty();
+        TasksREST.getFailedDocuments(evt.data.uuid).then(lang.hitch(this, function(failedDocuments) { 
+          this._handleFailedDocuments(failedDocuments); 
+        }), lang.hitch(this, function(error){
+          console.err(error);
+          topic.publish("msg",new Error("Unable to access failed documents information"));
+        }));
+      },
+      
+      _handleFailedDocuments: function(failedDocuments) {
+        if (failedDocuments) {
+          array.forEach(failedDocuments, lang.hitch(this,function(recordId) {
+            var span = domConstruct.create("div", {}, this.failedNode);
+            var link = domConstruct.create("a", {innerHTML: recordId, href: "#"}, span);
+            this.handles.push(on(link, "click", lang.hitch(this, function(evt){
+              TasksREST.getFailedRecord(this.data.uuid, recordId).then(lang.hitch(this, function(response){
+                var newWindow = window.open(null, "_blank");
+                newWindow.document.open();
+                newWindow.document.write(response
+                  .replace(/&/g, "&amp;")
+                  .replace(/</g, "&lt;")
+                  .replace(/>/g, "&gt;")
+                  .replace(/"/g, "&quot;")
+                  .replace(/'/g, "&#039;")
+                );
+                newWindow.document.close();
+                newWindow.document.title = recordId;
+              }), lang.hitch(this, function(error){
+                console.err(error);
+                topic.publish("msg",new Error("Unable to access failed documents information"));
+              }));
+            })));
+          }));
+        }
       },
       
       _onNav: function(evt) {
+        this._empty();
         if (evt.type!=="history") {
           array.forEach(this.widgets,function(widget){
             widget.destroy();
@@ -53,6 +105,7 @@ define(["dojo/_base/declare",
         }
         domStyle.set(this.domNode,"display", evt.type==="history"? "block": "none");
         if (evt.data && evt.data.taskDefinition) {
+          this.data = evt.data;
           html.set(this.labelNode, TaskUtils.makeLabel(evt.data.taskDefinition));
           TasksREST.history(evt.data.uuid).then(
             lang.hitch(this,this.processHistory),
@@ -65,7 +118,6 @@ define(["dojo/_base/declare",
       },
       
       processHistory: function(response) {
-        console.log(this.i18n.tasks.history.title, response);
         array.forEach(response.sort(function(l,r){return r.startTimestamp - l.startTimestamp;}),lang.hitch(this,this.processEvent));
       },
       

@@ -18,6 +18,8 @@ package com.esri.geoportal.cli.boot;
 import com.esri.geoportal.harvester.engine.managers.History;
 import com.esri.geoportal.harvester.engine.managers.HistoryManager;
 import com.esri.geoportal.harvester.engine.utils.CrudlException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -36,6 +38,15 @@ public class MemHistoryManager extends MemCruds<History.Event> implements Histor
   @Override
   public void purgeHistory(UUID taskId) throws CrudlException {
     mem.entrySet().stream().filter(e->e.getValue().getTaskId().equals(taskId)).map(e->e.getKey()).forEach(uuid->mem.remove(uuid));
+  }
+
+  @Override
+  public List<String> listFailedData(UUID eventId) throws CrudlException {
+    return new ArrayList<>();
+  }
+
+  @Override
+  public void storeFailedDataId(UUID eventId, String dataId) throws CrudlException {
   }
   
 }

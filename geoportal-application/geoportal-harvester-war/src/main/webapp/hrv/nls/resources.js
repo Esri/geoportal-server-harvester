@@ -98,7 +98,7 @@ define({
         acquired: "Acquired",
         created: "Created",
         updated: "Updated",
-        failed: "Failed"
+        failed: "Failed (in/out)"
       },
       scheduler: {
         type: "Type",

@@ -24,6 +24,7 @@ import com.esri.geoportal.harvester.api.specs.OutputBroker;
  */
 public class DataOutputException extends DataException {
   private final OutputBroker outputBroker;
+  private final String dataId;
 
   /**
    * Gets data output.
@@ -34,12 +35,11 @@ public class DataOutputException extends DataException {
   }
 
   /**
-   * Creates a new instance of <code>DataOutputException</code> without
-   * detail message.
-   * @param outputBroker output
+   * Gets data id.
+   * @return data id
    */
-  public DataOutputException(OutputBroker outputBroker) {
-    this.outputBroker = outputBroker;
+  public String getDataId() {
+    return dataId;
   }
 
   /**
@@ -47,10 +47,12 @@ public class DataOutputException extends DataException {
    * specified detail message.
    *
    * @param outputBroker output
+   * @param dataId data id
    * @param msg the detail message.
    */
-  public DataOutputException(OutputBroker outputBroker, String msg) {
+  public DataOutputException(OutputBroker outputBroker, String dataId, String msg) {
     super(msg);
+    this.dataId = dataId;
     this.outputBroker = outputBroker;
   }
 
@@ -59,11 +61,13 @@ public class DataOutputException extends DataException {
    * specified detail message.
    *
    * @param outputBroker output
+   * @param dataId data id
    * @param msg the detail message.
    * @param t cause
    */
-  public DataOutputException(OutputBroker outputBroker, String msg, Throwable t) {
+  public DataOutputException(OutputBroker outputBroker, String dataId, String msg, Throwable t) {
     super(msg,t);
+    this.dataId = dataId;
     this.outputBroker = outputBroker;
   }
 }

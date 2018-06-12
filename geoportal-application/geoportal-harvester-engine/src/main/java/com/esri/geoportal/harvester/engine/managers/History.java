@@ -141,5 +141,7 @@ public class History extends ArrayList<History.Event> {
     public long updated;
     /** number of records failed. */
     public long failed;
+    public Long failedToHarvest;
+    public Long failedToPublish;
   }
 }

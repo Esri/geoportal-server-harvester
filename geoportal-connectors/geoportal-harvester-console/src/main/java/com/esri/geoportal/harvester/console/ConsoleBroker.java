@@ -15,6 +15,7 @@
 package com.esri.geoportal.harvester.console;
 
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -53,6 +54,11 @@ import java.io.IOException;
   }
 
   @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return true;
+  }
+
+  @Override
   public PublishingStatus publish(DataReference ref) throws DataOutputException {
     try {
       counter++;
@@ -66,7 +72,7 @@ import java.io.IOException;
       
       return PublishingStatus.CREATED;
     } catch (IOException ex) {
-      throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
+      throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
     }
   }
 
