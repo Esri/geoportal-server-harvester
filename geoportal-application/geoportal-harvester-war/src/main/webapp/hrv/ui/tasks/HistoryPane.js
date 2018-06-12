@@ -72,7 +72,7 @@ define(["dojo/_base/declare",
       _handleFailedDocuments: function(failedDocuments) {
         if (failedDocuments) {
           array.forEach(failedDocuments, lang.hitch(this,function(recordId) {
-            var span = domConstruct.create("span", {}, this.failedNode);
+            var span = domConstruct.create("div", {}, this.failedNode);
             var link = domConstruct.create("a", {innerHTML: recordId, href: "#"}, span);
             this.handles.push(on(link, "click", lang.hitch(this, function(evt){
               TasksREST.getFailedRecord(this.data.uuid, recordId).then(lang.hitch(this, function(response){
