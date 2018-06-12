@@ -174,7 +174,7 @@ public class Client implements Closeable {
 
     if (resumptionToken == null || resumptionToken.isEmpty()) {
       builder.addParameter("metadataPrefix", prefix);
-      if (set != null) {
+      if (set != null && !set.isEmpty()) {
         builder.addParameter("set", set);
       }
       if (since != null) {
