@@ -17,7 +17,6 @@ package com.esri.geoportal.harvester.folderbig;
 
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.constants.MimeTypeUtils;
-import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -127,10 +126,7 @@ import static com.esri.geoportal.harvester.folderbig.PathUtil.splitPath;
     return connector;
   }
 
-  @Override
-  public boolean hasAccess(SimpleCredentials creds) {
-    return true;
-  }
+
 
   @Override
   public PublishingStatus publish(DataReference ref) throws DataOutputException {
@@ -149,7 +145,7 @@ import static com.esri.geoportal.harvester.folderbig.PathUtil.splitPath;
             existing.remove(f.toRealPath().toString());
             //return created ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
           } catch (Exception ex) {
-            throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex.getMessage());
+            throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
 
           }
         }
@@ -157,9 +153,9 @@ import static com.esri.geoportal.harvester.folderbig.PathUtil.splitPath;
         return PublishingStatus.CREATED;
 
     } catch (IOException ex) {
-      throw new DataOutputException(this, String.format("Error publishing data: %s", ref),  ex.getMessage());
+      throw new DataOutputException(this, String.format("Error publishing data: %s", ref),  ex);
     }  catch (Exception ex) {
-    throw new DataOutputException(this, String.format("Error publishing data: %s", ref),  ex.getMessage());
+    throw new DataOutputException(this, String.format("Error publishing data: %s", ref),  ex);
   }
   }
 
