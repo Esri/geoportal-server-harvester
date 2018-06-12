@@ -15,21 +15,7 @@
  */
 package com.esri.geoportal.harvester.gpt;
 
-import com.esri.geoportal.commons.constants.MimeType;
-import com.esri.geoportal.commons.gpt.client.Client;
-import com.esri.geoportal.commons.gpt.client.PublishRequest;
-import com.esri.geoportal.commons.gpt.client.PublishResponse;
-import com.esri.geoportal.commons.pdf.PdfUtils;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
-import com.esri.geoportal.harvester.api.ex.DataOutputException;
-import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
-import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.PublishingStatus;
-import com.esri.geoportal.harvester.api.ex.DataException;
-import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.api.specs.OutputBroker;
-import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
