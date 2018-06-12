@@ -30,6 +30,8 @@ public final class EventResponse {
   private final long created;
   private final long updated;
   private final long failed;
+  private final Long failedToHarvest;
+  private final Long failedToPublish;
 
   /**
    * Creates instance of the response.
@@ -40,8 +42,15 @@ public final class EventResponse {
    * @param created number of newly created records
    * @param updated number of updated records
    * @param failed number of failed records
+   * @param failedToHarvest number of records failed to harvest
+   * @param failedToPublish number of records failed to publish
    */
-  public EventResponse(UUID uuid, Date startTimestamp, Date endtTimestamp, long acquired, long created, long updated, long failed) {
+  public EventResponse(
+          UUID uuid, 
+          Date startTimestamp, 
+          Date endtTimestamp, 
+          long acquired, long created, long updated, long failed,
+          Long failedToHarvest, Long failedToPublish) {
     this.uuid = uuid;
     this.startTimestamp = startTimestamp;
     this.endTimestamp = endtTimestamp;
@@ -49,6 +58,8 @@ public final class EventResponse {
     this.created = created;
     this.updated = updated;
     this.failed = failed;
+    this.failedToHarvest = failedToHarvest;
+    this.failedToPublish = failedToPublish;
   }
   
   /**
@@ -63,7 +74,9 @@ public final class EventResponse {
             event.getReport()!=null? event.getReport().acquired: 0, 
             event.getReport()!=null? event.getReport().created: 0, 
             event.getReport()!=null? event.getReport().updated: 0, 
-            event.getReport()!=null? event.getReport().failed: 0);
+            event.getReport()!=null? event.getReport().failed: 0,
+            event.getReport()!=null? event.getReport().failedToHarvest: null,
+            event.getReport()!=null? event.getReport().failedToPublish: null);
   }
 
   /**
@@ -120,6 +133,22 @@ public final class EventResponse {
    */
   public long getFailed() {
     return failed;
+  }
+
+  /**
+   * Gets number of records failed to harvest.
+   * @return number of records failed to harvest or <code>null</code> if information not available
+   */
+  public Long getFailedToHarvest() {
+    return failedToHarvest;
+  }
+
+  /**
+   * Gets number of records failed to publish.
+   * @return number of records failed to publish or <code>null</code> if information not available
+   */
+  public Long getFailedToPublish() {
+    return failedToPublish;
   }
   
   

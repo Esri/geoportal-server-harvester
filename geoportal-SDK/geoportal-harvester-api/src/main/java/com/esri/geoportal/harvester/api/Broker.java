@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.api;
 
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 
 /**
@@ -43,4 +44,11 @@ public interface Broker<C extends Connector> extends Initializable {
    * @return connector
    */
   C getConnector();
+  
+  /**
+   * Checks if user has access to the resources.
+   * @param creds user credentials
+   * @return <code>true</code> if access is granted
+   */
+  boolean hasAccess(SimpleCredentials creds);
 }

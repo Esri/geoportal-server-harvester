@@ -29,11 +29,14 @@ import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -101,6 +104,11 @@ import org.slf4j.LoggerFactory;
   }
 
   @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return definition.getCredentials()==null? true: definition.getCredentials().equals(creds);
+  }
+
+  @Override
   public String toString() {
     return String.format("CSW [%s, %s]", definition.getHostUrl(), definition.getProfile());
   }
@@ -115,6 +123,22 @@ import org.slf4j.LoggerFactory;
     return definition.getEntityDefinition();
   }
 
+  @Override
+  public DataContent readContent(String id) throws DataInputException {
+    return readContent(id, null);
+  }
+
+  private DataReference readContent(String id, Date lastModified) throws DataInputException {
+    try {
+      String metadata = client.readMetadata(id);
+      SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), id, lastModified, new URI("uuid", id, null), td.getSource().getRef(), td.getRef());
+      ref.addContext(MimeType.APPLICATION_XML, metadata.getBytes("UTF-8"));
+      return ref;
+    } catch (Exception ex) {
+      throw new DataInputException(this, String.format("Error reading data %s", id), ex);
+    }
+  }
+  
   /**
    * CSW iterator.
    */
@@ -168,19 +192,12 @@ import org.slf4j.LoggerFactory;
 
     @Override
     public DataReference next() throws DataInputException {
-      try {
-        if (nextRecord==null) {
-          throw new DataInputException(CswBroker.this, String.format("No more records."));
-        }
-        IRecord rec = nextRecord;
-        nextRecord=null;
-        String metadata = client.readMetadata(rec.getId());
-        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), rec.getId(), rec.getLastModifiedDate(), new URI("uuid", rec.getId(), null), td.getSource().getRef(), td.getRef());
-        ref.addContext(MimeType.APPLICATION_XML, metadata.getBytes("UTF-8"));
-        return ref;
-      } catch (Exception ex) {
-        throw new DataInputException(CswBroker.this, "Error reading data.", ex);
+      if (nextRecord==null) {
+        throw new DataInputException(CswBroker.this, String.format("No more records."));
       }
+      IRecord rec = nextRecord;
+      nextRecord=null;
+      return readContent(rec.getId(), rec.getLastModifiedDate());
     }
   }
   

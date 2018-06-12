@@ -15,6 +15,8 @@
  */
 package com.esri.geoportal.harvester.unc;
 
+import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
@@ -83,8 +85,23 @@ import java.util.LinkedList;
   }
 
   @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return true;
+  }
+
+  @Override
   public String toString() {
     return String.format("UNC [%s]", definition.getRootFolder());
+  }
+
+  @Override
+  public DataContent readContent(String id) throws DataInputException {
+    try {
+      UncFile file = new UncFile(this, Paths.get(id));
+      return file.readContent();
+    } catch (IOException|URISyntaxException ex) {
+      throw new DataInputException(this, String.format("Error reading content: %s", id), ex);
+    }
   }
 
   /**

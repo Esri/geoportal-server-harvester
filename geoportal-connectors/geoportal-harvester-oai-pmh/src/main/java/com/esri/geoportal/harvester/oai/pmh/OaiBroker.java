@@ -22,6 +22,8 @@ import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.commons.oai.client.Client;
 import com.esri.geoportal.commons.oai.client.Header;
 import com.esri.geoportal.commons.oai.client.ListIdsResponse;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -36,7 +38,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -52,17 +53,19 @@ import org.xml.sax.SAXException;
  * OAI broker.
  */
 /*package*/ class OaiBroker implements InputBroker {
+
   private static final Logger LOG = LoggerFactory.getLogger(OaiBroker.class);
-  
+
   private final OaiConnector connector;
   private final OaiBrokerDefinitionAdaptor definition;
-  
+
   protected CloseableHttpClient httpClient;
   private Client client;
   private TaskDefinition td;
-  
+
   /**
    * Creates instance of the broker.
+   *
    * @param connector connector
    * @param definition definition
    */
@@ -80,14 +83,14 @@ import org.xml.sax.SAXException;
       httpClient = http;
     } else {
       Bots bots = BotsUtils.readBots(definition.getBotsConfig(), http, definition.getHostUrl());
-      httpClient = new BotsHttpClient(http,bots);
+      httpClient = new BotsHttpClient(http, bots);
     }
     client = new Client(httpClient, definition.getHostUrl(), definition.getPrefix(), definition.getSet());
   }
 
   @Override
   public void terminate() {
-    if (httpClient!=null) {
+    if (httpClient != null) {
       try {
         httpClient.close();
       } catch (IOException ex) {
@@ -98,12 +101,17 @@ import org.xml.sax.SAXException;
 
   @Override
   public URI getBrokerUri() throws URISyntaxException {
-    return new URI("OAI",definition.getHostUrl().toExternalForm(),null);
+    return new URI("OAI", definition.getHostUrl().toExternalForm(), null);
   }
 
   @Override
   public InputBroker.Iterator iterator(InputBroker.IteratorContext iteratorContext) throws DataInputException {
     return new OaiIterator(iteratorContext);
+  }
+
+  @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return true;
   }
 
   @Override
@@ -120,17 +128,32 @@ import org.xml.sax.SAXException;
   public EntityDefinition getEntityDefinition() {
     return definition.getEntityDefinition();
   }
-    
-  private String firstNonBlank(String...strs) {
-    return Arrays.asList(strs).stream().filter(s->!StringUtils.isBlank(s)).findFirst().orElse(null);
+
+  @Override
+  public DataContent readContent(String id) throws DataInputException {
+    return readContent(id, null);
   }
-  
+
+  private DataReference readContent(String id, Date lastModified) throws DataInputException {
+    try {
+      String record = client.readRecord(id);
+
+      SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, lastModified, URI.create(id), td.getSource().getRef(), td.getRef());
+      ref.addContext(MimeType.APPLICATION_XML, record.getBytes("UTF-8"));
+
+      return ref;
+    } catch (URISyntaxException | IOException | ParserConfigurationException | SAXException | TransformerException | XPathExpressionException ex) {
+      throw new DataInputException(OaiBroker.this, String.format("Error reading data from: %s", this), ex);
+    }
+  }
+
   /**
    * OAI-PMH iterator.
    */
   private class OaiIterator implements InputBroker.Iterator {
+
     private final InputBroker.IteratorContext iteratorContext;
-    
+
     private java.util.Iterator<Header> idIter;
     private String resumptionToken;
 
@@ -141,45 +164,35 @@ import org.xml.sax.SAXException;
     @Override
     public boolean hasNext() throws DataInputException {
       try {
-        if (idIter!=null && idIter.hasNext()) {
+        if (idIter != null && idIter.hasNext()) {
           return true;
         }
 
         ListIdsResponse listIds = client.listIds(resumptionToken, iteratorContext.getLastHarvestDate());
         resumptionToken = listIds.resumptionToken;
-        if (listIds.headers.length>0) {
+        if (listIds.headers.length > 0) {
           idIter = Arrays.asList(listIds.headers).iterator();
           return true;
-        } else if (listIds.resumptionToken!=null) {
+        } else if (listIds.resumptionToken != null) {
           return hasNext();
         }
-        
+
         return false;
-      } catch (IOException|URISyntaxException|ParserConfigurationException|SAXException|XPathExpressionException ex) {
+      } catch (IOException | URISyntaxException | ParserConfigurationException | SAXException | XPathExpressionException ex) {
         throw new DataInputException(OaiBroker.this, String.format("Error reading data from: %s", this), ex);
       }
     }
 
     @Override
     public DataReference next() throws DataInputException {
-      try {
-        if (idIter==null || !idIter.hasNext()) {
-          throw new DataInputException(OaiBroker.this, String.format("No more data available"));
-        }
-        
-        Header header = idIter.next();
-        String record = client.readRecord(header.identifier);
-
-        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), header.identifier, parseIsoDate(header.datestamp), URI.create(header.identifier), td.getSource().getRef(), td.getRef());
-        ref.addContext(MimeType.APPLICATION_XML, record.getBytes("UTF-8"));
-        
-        return ref;
-        
-      } catch (URISyntaxException|IOException|ParserConfigurationException|SAXException|TransformerException|XPathExpressionException ex) {
-        throw new DataInputException(OaiBroker.this, String.format("Error reading data from: %s", this), ex);
+      if (idIter == null || !idIter.hasNext()) {
+        throw new DataInputException(OaiBroker.this, String.format("No more data available"));
       }
+
+      Header header = idIter.next();
+      return readContent(header.identifier, parseIsoDate(header.datestamp));
     }
-    
+
   }
 
   /**
@@ -189,7 +202,7 @@ import org.xml.sax.SAXException;
    * @return date object or <code>null</code> if unable to parse date
    */
   private Date parseIsoDate(String strDate) {
-    if (strDate==null) {
+    if (strDate == null) {
       return null;
     }
     try {
@@ -198,16 +211,18 @@ import org.xml.sax.SAXException;
       return null;
     }
   }
-  
+
   /**
    * Content provided by the broker.
    */
   protected static final class Content {
+
     private final String data;
     private final MimeType contentType;
-    
+
     /**
      * Creates instance of the content.
+     *
      * @param data content data
      * @param contentType content type
      */
@@ -218,6 +233,7 @@ import org.xml.sax.SAXException;
 
     /**
      * Gets content data.
+     *
      * @return content data
      */
     public String getData() {
@@ -226,12 +242,13 @@ import org.xml.sax.SAXException;
 
     /**
      * Gets content type.
+     *
      * @return content type
      */
     public MimeType getContentType() {
       return contentType;
     }
-    
+
     @Override
     public String toString() {
       return String.format("[%s]: %s", contentType, data);

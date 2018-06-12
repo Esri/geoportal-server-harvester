@@ -15,8 +15,14 @@
  */
 package com.esri.geoportal.harvester.engine.services;
 
+import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.esri.geoportal.harvester.api.DataContent;
+import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import com.esri.geoportal.harvester.api.ex.DataException;
+import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.managers.History;
 import java.util.List;
 import java.util.Map;
@@ -83,9 +89,35 @@ public interface TasksService {
   History getHistory(UUID taskId) throws DataProcessorException;
   
   /**
+   * Gets failed documents.
+   * @param eventId event id
+   * @return list of failed documents id's
+   * @throws DataProcessorException if accessing repository fails
+   */
+  List<String> getFailedDocuments(UUID eventId) throws DataProcessorException;
+  
+  /**
    * Purges history for a given task.
    * @param taskId task id
    * @throws DataProcessorException if accessing repository fails
    */
   void purgeHistory(UUID taskId) throws DataProcessorException;
+  
+  /**
+   * Creates task.
+   * @param taskDefinition task definition
+   * @return task
+   * @throws InvalidDefinitionException if invalid task definition
+   */
+  Task createTask(TaskDefinition taskDefinition) throws InvalidDefinitionException;
+  
+  /**
+   * Fetching content.
+   * @param taskId task id
+   * @param recordId record id
+   * @param credentials credentials (optional)
+   * @return content or <code>null<> if no content
+   * @throws DataInputException if error fetching content
+   */
+  DataContent fetchContent(UUID taskId, String recordId, SimpleCredentials credentials) throws DataInputException;
 }

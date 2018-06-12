@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.engine.managers;
 import com.esri.geoportal.harvester.engine.utils.CrudlException;
 import java.util.UUID;
 import com.esri.geoportal.harvester.engine.utils.CrudlRepo;
+import java.util.List;
 
 /**
  * History manager.
@@ -37,4 +38,20 @@ public interface HistoryManager extends CrudlRepo<History.Event> {
    * @throws CrudlException if purging history fails
    */
   void purgeHistory(UUID taskId) throws CrudlException;
+
+  /**
+   * Lists failed data for a given event.
+   * @param eventId event id
+   * @return list of failed data
+   * @throws CrudlException if unable to read information
+   */
+  List<String> listFailedData(UUID eventId) throws CrudlException;
+
+  /**
+   * Stores failed data for a given event.
+   * @param eventId event id
+   * @param dataId data id
+   * @throws CrudlException if unable to store data
+   */
+  void storeFailedDataId(UUID eventId, String dataId) throws CrudlException;
 }

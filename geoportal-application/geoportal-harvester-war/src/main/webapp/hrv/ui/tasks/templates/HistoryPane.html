@@ -1,13 +1,19 @@
 <div class="h-history" data-dojo-attach-point="contentNode">
   <div class="h-history-caption" data-dojo-attach-point="captionNode">${i18n.tasks.events.caption}:<span data-dojo-attach-point="labelNode"></span></div>
-  <div class="h-history-content" data-dojo-attach-point="contentNode">
-    <div class="h-history-header">
-      <span class="h-event-prop">${i18n.tasks.events.startTime}</span>
-      <span class="h-event-prop">${i18n.tasks.events.endTime}</span>
-      <span class="h-event-prop">${i18n.tasks.events.acquired}</span>
-      <span class="h-event-prop">${i18n.tasks.events.created}</span>
-      <span class="h-event-prop">${i18n.tasks.events.updated}</span>
-      <span class="h-event-prop">${i18n.tasks.events.failed}</span>
+  <div class="h-history-body">
+    <div>
+      <div class="h-history-content" data-dojo-attach-point="contentNode">
+        <div class="h-history-header">
+          <span class="h-event-prop">${i18n.tasks.events.startTime}</span>
+          <span class="h-event-prop">${i18n.tasks.events.endTime}</span>
+          <span class="h-event-prop">${i18n.tasks.events.acquired}</span>
+          <span class="h-event-prop">${i18n.tasks.events.created}</span>
+          <span class="h-event-prop">${i18n.tasks.events.updated}</span>
+          <span class="h-event-prop">${i18n.tasks.events.failed}</span>
+        </div>
+      </div>
+    </div>
+    <div class="h-history-failed" data-dojo-attach-point="failedNode">
     </div>
   </div>
 </div>

@@ -20,12 +20,16 @@ define(["dojo/_base/declare",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/Event.html",
-        "dojo/date/locale"
+        "dojo/date/locale",
+        "dojo/_base/lang",
+        "dojo/on",
+        "dojo/dom-construct"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           locale
+           locale,
+           lang, on, domConstruct
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
@@ -41,6 +45,21 @@ define(["dojo/_base/declare",
       },
     
       postCreate: function(){
+        if (this.data.failedToHarvest==null || this.data.failedToPublish==null) {
+          if (this.data.failed > 0) {
+            var failedLink = domConstruct.create("a", { href: "#", innerHTML: this.data.failed}, this.failedNode);
+            this.own(on(failedLink, "click", lang.hitch(this, this._onFailedDetails)));
+          } else {
+            domConstruct.create("span", { innerHTML: this.data.failed}, this.failedNode);
+          }
+        } else {
+          if (this.data.failedToPublish > 0) {
+            var failedLink = domConstruct.create("a", { href: "#", innerHTML: "" + this.data.failedToHarvest + " / " +this.data.failedToPublish}, this.failedNode);
+            this.own(on(failedLink, "click", lang.hitch(this, this._onFailedDetails)));
+          } else {
+            domConstruct.create("span", { innerHTML: "" + this.data.failedToHarvest + " / " +this.data.failedToPublish}, this.failedNode);
+          }
+        }
       },
       
       format: function(date) {
@@ -49,6 +68,10 @@ define(["dojo/_base/declare",
         } else {
           return "?";
         }
+      },
+      
+      _onFailedDetails: function(evt) {
+        this.emit("event-clicked", {data: this.data});
       }
     });
 });
