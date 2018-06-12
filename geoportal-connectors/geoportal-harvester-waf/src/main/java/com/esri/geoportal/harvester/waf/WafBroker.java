@@ -18,6 +18,8 @@ package com.esri.geoportal.harvester.waf;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -26,6 +28,7 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -110,6 +113,25 @@ import org.slf4j.LoggerFactory;
   @Override
   public EntityDefinition getEntityDefinition() {
     return definition.getEntityDefinition();
+  }
+
+  @Override
+  public DataContent readContent(String id) throws DataInputException {
+    try {
+      WafFile file = new WafFile(this, new URL(id), definition.getCredentials());
+      return file.readContent(httpClient, null);
+    } catch (MalformedURLException ex) {
+      throw new DataInputException(this, String.format("Invalid id: %s", id), ex);
+    } catch (IOException|URISyntaxException ex) {
+      throw new DataInputException(this, String.format("Error reading content: %s", id), ex);
+    }
+  }
+
+  @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return definition.getCredentials()==null || definition.getCredentials().isEmpty()
+            ? true
+            : definition.getCredentials().equals(creds);
   }
 
   /**

@@ -15,12 +15,17 @@
  */
 package com.esri.geoportal.harvester.rest;
 
+import com.esri.geoportal.commons.constants.MimeType;
 import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.esri.geoportal.commons.utils.TextScrambler;
+import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.base.SimpleIteratorContext;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.support.TaskResponse;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
+import com.esri.geoportal.harvester.api.ex.DataException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.managers.History;
@@ -43,6 +48,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.HttpResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -249,6 +255,18 @@ public class TaskController {
     }
   }
 
+  @RequestMapping(value = "/rest/harvester/tasks/failed/{eventId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<String>> getFailedDocuments(@PathVariable UUID eventId) {
+    try {
+      LOG.debug(formatForLog("GET /rest/harvester/tasks/failed/%s", eventId));
+      List<String> failedDocuments = engine.getTasksService().getFailedDocuments(eventId);
+      return new ResponseEntity<>(failedDocuments, HttpStatus.OK);
+    } catch (DataProcessorException ex) {
+      LOG.error(formatForLog("Error getting failed documents: %s", eventId), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  
   /**
    * Gets history by task id.
    *
@@ -497,6 +515,41 @@ public class TaskController {
       }
     } catch (IOException ex) {
       LOG.error(String.format("Error uploading task"), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  
+  @RequestMapping(value = "/rest/harvester/tasks/{taskId}/record", method = RequestMethod.POST) 
+  public ResponseEntity<byte[]> handleRecord(@PathVariable UUID taskId, @RequestParam(required = true) String id, @RequestParam(required = false) String userName, @RequestParam(required = false) String password) {
+    try {
+      TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
+      if (taskDefinition == null) {
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }
+      
+      SimpleCredentials credentials = !StringUtils.isBlank(userName) && !StringUtils.isBlank(password)
+              ? new SimpleCredentials(userName, TextScrambler.decode(password))
+              : null;
+      
+      DataContent content = engine.getTasksService().fetchContent(taskId, id, credentials);
+      
+      MimeType mimeType = content.getContentType().stream().findFirst().orElse(null);
+      if (mimeType != null) {
+        MultiValueMap<String,String> headers = new LinkedMultiValueMap<>();
+        headers.add("Content-Type", mimeType.getName());
+        return new ResponseEntity<>(content.getContent(mimeType), headers, HttpStatus.OK);
+      } else {
+        return new ResponseEntity<>(new byte[0], HttpStatus.OK);
+      }
+    } catch (DataException ex) {
+      LOG.error(formatForLog("Error fetching record: %s <-- %s", taskId, taskId), ex);
+      if (ex.getCause() instanceof HttpResponseException) {
+        HttpResponseException cause = (HttpResponseException)ex.getCause();
+        return new ResponseEntity<>(HttpStatus.resolve(cause.getStatusCode()));
+      }
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (IOException ex) {
+      LOG.error(formatForLog("Error fetching record: %s <-- %s", taskId, taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

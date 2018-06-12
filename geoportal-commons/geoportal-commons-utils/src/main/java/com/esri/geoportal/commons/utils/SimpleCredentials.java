@@ -15,6 +15,8 @@
  */
 package com.esri.geoportal.commons.utils;
 
+import java.util.Objects;
+
 /**
  * Simple credentials. Credentials with user name and password.
  */
@@ -62,5 +64,25 @@ public final class SimpleCredentials {
   public String toString() {
     return String.format("%s:%s", userName, password);
   }
-  
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final SimpleCredentials other = (SimpleCredentials) obj;
+    if (!Objects.equals(this.userName, other.userName)) {
+      return false;
+    }
+    if (!Objects.equals(this.password, other.password)) {
+      return false;
+    }
+    return true;
+  }
 }

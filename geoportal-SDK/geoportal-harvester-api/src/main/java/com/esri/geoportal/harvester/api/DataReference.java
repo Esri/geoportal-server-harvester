@@ -15,19 +15,16 @@
  */
 package com.esri.geoportal.harvester.api;
 
-import com.esri.geoportal.commons.constants.MimeType;
-import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Data reference. It provides access to data itself as well as vital data 
  * information.
  */
-public interface DataReference extends Serializable {
+public interface DataReference extends Serializable, DataContent {
   
   /**
    * Gets data record id.
@@ -41,19 +38,6 @@ public interface DataReference extends Serializable {
    */
   Date getLastModifiedDate();
   
-  /**
-   * Gets content.
-   * @param mimeType required mime type
-   * @return content or <code>nulle</code> if content by the mime type unavailable
-   * @throws IOException if getting content fails
-   */
-  byte [] getContent(MimeType... mimeType) throws IOException;
-  
-  /**
-   * Gets content type.
-   * @return content type variances
-   */
-  Set<MimeType> getContentType();
   
   /**
    * Gets source URI.

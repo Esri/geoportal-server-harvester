@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.folder;
 
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.constants.MimeTypeUtils;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
@@ -135,14 +136,19 @@ import org.slf4j.LoggerFactory;
             existing.remove(f.toRealPath().toString());
             //return created ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
           } catch (Exception ex) {
-            throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
+            throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
           }
         }
       }
       return PublishingStatus.CREATED;
     } catch (IOException ex) {
-      throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
+      throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
     }
+  }
+
+  @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return true;
   }
 
   @Override

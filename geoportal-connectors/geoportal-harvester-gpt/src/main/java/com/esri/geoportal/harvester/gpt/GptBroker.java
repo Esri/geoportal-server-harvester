@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.gpt;
 
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -190,10 +191,10 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
 
       PublishResponse response = client.publish(data, uuid, xml, json, definition.getForceAdd());
       if (response == null) {
-        throw new DataOutputException(this, "No response received");
+        throw new DataOutputException(this, ref.getId(), "No response received");
       }
       if (response.getError() != null) {
-        throw new DataOutputException(this, response.getError().getMessage()) {
+        throw new DataOutputException(this, ref.getId(), response.getError().getMessage()) {
           @Override
           public boolean isNegligible() {
             return true;
@@ -203,7 +204,7 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
       existing.remove(response.getId());
       return response.getStatus().equalsIgnoreCase("created") ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
     } catch (IOException | URISyntaxException ex) {
-      throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
+      throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
     }
   }
 
@@ -215,6 +216,11 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
   @Override
   public EntityDefinition getEntityDefinition() {
     return definition.getEntityDefinition();
+  }
+
+  @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return definition.getCredentials()==null? true: definition.getCredentials().equals(creds);
   }
 
   @Override
