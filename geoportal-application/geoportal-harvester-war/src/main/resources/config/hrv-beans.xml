@@ -62,7 +62,7 @@
     <constructor-arg value="${sink.attempt.delay}"/>
   </bean>
   <bean class="com.esri.geoportal.harvester.oai.pmh.OaiConnector"/>
-  
+  <bean class="com.esri.geoportal.harvester.folderbig.FolderConnector"/>
   <!-- Triggers -->
   <bean class="com.esri.geoportal.harvester.engine.triggers.NowTrigger"/>
   <bean class="com.esri.geoportal.harvester.engine.triggers.AtTrigger"/>
