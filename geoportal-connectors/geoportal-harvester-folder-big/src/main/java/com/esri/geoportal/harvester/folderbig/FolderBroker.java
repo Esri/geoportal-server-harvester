@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.folderbig;
 
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.constants.MimeTypeUtils;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -127,6 +128,11 @@ import static com.esri.geoportal.harvester.folderbig.PathUtil.splitPath;
   }
 
   @Override
+  public boolean hasAccess(SimpleCredentials creds) {
+    return true;
+  }
+
+  @Override
   public PublishingStatus publish(DataReference ref) throws DataOutputException {
     try {
 
@@ -143,7 +149,7 @@ import static com.esri.geoportal.harvester.folderbig.PathUtil.splitPath;
             existing.remove(f.toRealPath().toString());
             //return created ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
           } catch (Exception ex) {
-            throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
+            throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex.getMessage());
 
           }
         }
@@ -151,9 +157,9 @@ import static com.esri.geoportal.harvester.folderbig.PathUtil.splitPath;
         return PublishingStatus.CREATED;
 
     } catch (IOException ex) {
-      throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
+      throw new DataOutputException(this, String.format("Error publishing data: %s", ref),  ex.getMessage());
     }  catch (Exception ex) {
-    throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex);
+    throw new DataOutputException(this, String.format("Error publishing data: %s", ref),  ex.getMessage());
   }
   }
 
@@ -163,6 +169,7 @@ import static com.esri.geoportal.harvester.folderbig.PathUtil.splitPath;
   }
   
   private Path generateFileName(URI brokerUri, URI sourceUri, String id, String extension) throws IOException {
+    id = PathUtil.sanitizeFileName(id);
     URI ssp = URI.create(brokerUri.getSchemeSpecificPart());
     String sspRoot = StringUtils.defaultIfEmpty(ssp.getHost(), ssp.getPath());
     Path brokerRootFolder = definition.getRootFolder().toPath().toRealPath().resolve(sspRoot);
