@@ -17,20 +17,31 @@ package com.esri.geoportal.harvester.oai.pmh;
 
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.http.BotsHttpClient;
-import com.esri.geoportal.commons.robots.Bots;
-import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.commons.oai.client.Client;
 import com.esri.geoportal.commons.oai.client.Header;
 import com.esri.geoportal.commons.oai.client.ListIdsResponse;
+import com.esri.geoportal.commons.robots.Bots;
+import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.Initializable;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -38,16 +49,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.esri.geoportal.harvester.api.Initializable;
-import com.esri.geoportal.harvester.api.defs.TaskDefinition;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
-import org.xml.sax.SAXException;
 
 /**
  * OAI broker.
@@ -156,6 +157,7 @@ import org.xml.sax.SAXException;
 
     private java.util.Iterator<Header> idIter;
     private String resumptionToken;
+    private boolean lastCall = false; // no resumption token
 
     public OaiIterator(InputBroker.IteratorContext iteratorContext) {
       this.iteratorContext = iteratorContext;
@@ -167,13 +169,24 @@ import org.xml.sax.SAXException;
         if (idIter != null && idIter.hasNext()) {
           return true;
         }
+        if (lastCall){
+          return false;
+        }
 
         ListIdsResponse listIds = client.listIds(resumptionToken, iteratorContext.getLastHarvestDate());
         resumptionToken = listIds.resumptionToken;
+        if (listIds.resumptionToken == null || listIds.resumptionToken.isEmpty()) {
+          lastCall = true;
+        } else  {
+          lastCall = false;
+        }
+
+
         if (listIds.headers.length > 0) {
           idIter = Arrays.asList(listIds.headers).iterator();
           return true;
         } else if (listIds.resumptionToken != null) {
+
           return hasNext();
         }
 

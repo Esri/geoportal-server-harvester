@@ -85,3 +85,4 @@ geoportal/nb-configuration.xml
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
+/geoportal-connectors/geoportal-harvester-folder-big/target/
