@@ -11,11 +11,28 @@
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
-  
   <servlet-mapping>
     <servlet-name>spring</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
+  
+  <!--
+  Filter below is an optional security feature. Uncomment to have harvester 
+  accessible only by authorised personell. Further reading:
+  - app-security.xml - configure authentication method and minimum security requirements.
+  -->
+  
+  <!--filter>
+    <filter-name>springSecurityFilterChain</filter-name>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    <async-supported>true</async-supported>
+  </filter>
+  <filter-mapping>
+    <filter-name>springSecurityFilterChain</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>ERROR</dispatcher>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping-->
   
   <session-config>
     <session-timeout>

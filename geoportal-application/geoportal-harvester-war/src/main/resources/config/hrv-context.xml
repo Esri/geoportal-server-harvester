@@ -40,7 +40,10 @@
     </bean>    
 
     <!-- Definitions of un-annotated managed beans -->
-	<import resource="hrv-beans.xml" />
+    <import resource="hrv-beans.xml" />
+
+    <!-- Security -->
+    <import resource="app-security.xml" />
     
     <!-- ADD PERSISTENCE SUPPORT HERE (jpa, hibernate, etc) -->
 
