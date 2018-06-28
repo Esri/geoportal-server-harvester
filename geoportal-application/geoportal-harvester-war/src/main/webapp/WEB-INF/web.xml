@@ -16,13 +16,7 @@
     <url-pattern>/</url-pattern>
   </servlet-mapping>
   
-  <!--
-  Filter below is an optional security feature. Uncomment to have harvester 
-  accessible only by authorised personell. Further reading:
-  - app-security.xml - configure authentication method and minimum security requirements.
-  -->
-  
-  <!--filter>
+  <filter>
     <filter-name>springSecurityFilterChain</filter-name>
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     <async-supported>true</async-supported>
@@ -32,7 +26,7 @@
     <url-pattern>/*</url-pattern>
     <dispatcher>ERROR</dispatcher>
     <dispatcher>REQUEST</dispatcher>
-  </filter-mapping-->
+  </filter-mapping>
   
   <session-config>
     <session-timeout>

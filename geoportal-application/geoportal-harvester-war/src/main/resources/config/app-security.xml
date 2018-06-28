@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans:beans 
-	xmlns:beans="http://www.springframework.org/schema/beans"
-	xmlns:security="http://www.springframework.org/schema/security"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+  xmlns:beans="http://www.springframework.org/schema/beans"
+  xmlns:security="http://www.springframework.org/schema/security"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
     http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd">
 
   <!-- One and only one of the authentication methods must be implemented. -->
@@ -15,17 +15,22 @@
   <beans:import resource="app-oauth.xml"/>
   <security:http realm="Geoportal" pattern="/**" authentication-manager-ref="authenticationManager">
     
-    <security:headers>
-       <security:frame-options policy="SAMEORIGIN"/>
-       <security:header name="Access-Control-Allow-Origin" value="*" />
-       <security:header name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With" />
-    </security:headers>
-    <security:csrf disabled="true"/>
-    <security:http-basic />
-    <security:custom-filter ref="oauthResourceFilter" before="PRE_AUTH_FILTER" />
-    
-    <!-- minimum security requirements for accessing harvester -->
-    <security:intercept-url pattern="/**" access="hasRole('PUBLISHER')" />
+  <security:headers>
+    <security:frame-options policy="SAMEORIGIN"/>
+    <security:header name="Access-Control-Allow-Origin" value="*" />
+    <security:header name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With" />
+  </security:headers>
+  <security:csrf disabled="true"/>
+  <security:http-basic />
+  <security:custom-filter ref="oauthResourceFilter" before="PRE_AUTH_FILTER" />
+
+  <!-- minimum security requirements for accessing harvester: 
+      permitAll
+      hasRole('USER')
+      hasRole('PUBLISHER')
+      hasRole('ADMIN') 
+  -->
+  <security:intercept-url pattern="/**" access="permitAll" />
     
   </security:http>
 
