@@ -13,24 +13,24 @@
   <beans:import resource="authentication-simple.xml"/>
 
   <beans:import resource="app-oauth.xml"/>
-  <security:http realm="Geoportal" pattern="/**" authentication-manager-ref="authenticationManager">
-    
-  <security:headers>
-    <security:frame-options policy="SAMEORIGIN"/>
-    <security:header name="Access-Control-Allow-Origin" value="*" />
-    <security:header name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With" />
-  </security:headers>
-  <security:csrf disabled="true"/>
-  <security:http-basic />
-  <security:custom-filter ref="oauthResourceFilter" before="PRE_AUTH_FILTER" />
+  <security:http pattern="/**" authentication-manager-ref="authenticationManager">
 
-  <!-- minimum security requirements for accessing harvester: 
-      permitAll
-      hasRole('USER')
-      hasRole('PUBLISHER')
-      hasRole('ADMIN') 
-  -->
-  <security:intercept-url pattern="/**" access="permitAll" />
+    <security:headers>
+      <security:frame-options policy="SAMEORIGIN"/>
+      <security:header name="Access-Control-Allow-Origin" value="*" />
+      <security:header name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With" />
+    </security:headers>
+    <security:csrf disabled="true"/>
+    <security:custom-filter ref="oauthResourceFilter" before="PRE_AUTH_FILTER" />
+    <security:http-basic />
+
+    <!-- minimum security requirements for accessing harvester: 
+        permitAll
+        hasRole('USER')
+        hasRole('PUBLISHER')
+        hasRole('ADMIN') 
+    -->
+    <security:intercept-url pattern="/**" access="permitAll" />
     
   </security:http>
 

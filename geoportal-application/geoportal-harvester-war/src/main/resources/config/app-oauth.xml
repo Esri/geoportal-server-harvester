@@ -25,14 +25,14 @@
   </oauth:client-details-service>
   
   <!-- OAuth2  ================================================================================= -->
-  <security:http realm="Geoportal/client" pattern="/oauth/token" 
+  <security:http pattern="/oauth/token" 
       create-session="stateless" authentication-manager-ref="oauthClientAuthenticationManager">
     <security:intercept-url pattern="/oauth/token" access="isFullyAuthenticated()"/>
     <security:anonymous enabled="false" />
     <security:csrf disabled="true"/>
-    <security:http-basic />
     <security:custom-filter ref="oauthClientCredentialsTokenEndpointFilter" after="BASIC_AUTH_FILTER" />
     <security:access-denied-handler ref="oauthAccessDeniedHandler" />
+    <security:http-basic />
   </security:http>
   <oauth:authorization-server 
       authorization-endpoint-url="/oauth/authorize"
