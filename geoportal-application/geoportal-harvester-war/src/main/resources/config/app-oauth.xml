@@ -27,7 +27,7 @@
   <!-- OAuth2  ================================================================================= -->
   <security:http pattern="/oauth/token" 
       create-session="stateless" authentication-manager-ref="oauthClientAuthenticationManager">
-    <security:intercept-url pattern="/oauth/token" access="isFullyAuthenticated()"/>
+    <security:intercept-url pattern="/oauth/token" access="permitAll"/>
     <security:anonymous enabled="false" />
     <security:csrf disabled="true"/>
     <security:custom-filter ref="oauthClientCredentialsTokenEndpointFilter" after="BASIC_AUTH_FILTER" />

@@ -21,16 +21,17 @@
       <security:header name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With" />
     </security:headers>
     <security:csrf disabled="true"/>
-    <security:custom-filter ref="oauthResourceFilter" before="PRE_AUTH_FILTER" />
-    <security:http-basic />
-
-    <!-- minimum security requirements for accessing harvester: 
-        permitAll
-        hasRole('USER')
-        hasRole('PUBLISHER')
-        hasRole('ADMIN') 
-    -->
-    <security:intercept-url pattern="/**" access="permitAll" />
+    <!--security:http-basic /-->
+    <security:form-login 
+      login-page="/login.html" login-processing-url="/login.html"
+      authentication-failure-url="/login.html?error=true"
+    />
+    <security:logout />
+    <security:intercept-url pattern="/login.html" access="permitAll" />
+    
+    <!--security:custom-filter ref="oauthResourceFilter" before="PRE_AUTH_FILTER" /-->
+    
+    <security:intercept-url pattern="/**" access="hasRole('PUBLISHER')" />
     
   </security:http>
 

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Harvester</title>
+    <style>
+      body {
+        width: 100%;
+      }
+      .h-login {
+        margin: 0 auto;
+        width: 330px;
+      }
+      .h-title {
+        height: 20px;
+        background-color: #196fa6;
+        padding: 15px;
+        color: #ffffff;
+        font-weight: 400;
+        font-size: 16px;
+      }
+      .h-error {
+        display: none;
+        background-color: #cf0000;
+        color: white;
+        padding: 10px;
+        margin-top: 5px;
+      }
+      .h-form {
+        margin-top: 30px;
+      }
+      #submit {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="h-login">
+      <div class="h-title">Login into Geoportal Server Harvester.</div>
+      <div class="h-error" id="error">Invalid credentials</div>
+      <form class="h-form" name='f' action="login.html" method='POST'>
+        <table>
+          <tr>
+            <td>User:</td>
+            <td><input type='text' name='username' value=''></td>
+          </tr>
+          <tr>
+            <td>Password:</td>
+            <td><input type='password' name='password' /></td>
+          </tr>
+          <tr>
+            <td><input id="submit" name="submit" type="submit" value="Submit" /></td>
+          </tr>
+        </table>
+      </form>
+    </div>
+    <script type="text/javascript">
+      if (location.search.replace(/^\?+/g,"").toLowerCase().split("&").includes("error=true")) {
+        var errorNode = document.getElementById("error");
+        if (errorNode) {
+          errorNode.style.display = "block";
+        }
+      }
+    </script>
+  </body>
+</html>

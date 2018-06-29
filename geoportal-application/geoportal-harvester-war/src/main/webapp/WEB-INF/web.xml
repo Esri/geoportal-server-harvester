@@ -16,7 +16,8 @@
     <url-pattern>/</url-pattern>
   </servlet-mapping>
   
-  <filter>
+  <!-- Uncomment to secure application -->
+  <!--filter>
     <filter-name>springSecurityFilterChain</filter-name>
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     <async-supported>true</async-supported>
@@ -26,7 +27,7 @@
     <url-pattern>/*</url-pattern>
     <dispatcher>ERROR</dispatcher>
     <dispatcher>REQUEST</dispatcher>
-  </filter-mapping>
+  </filter-mapping-->
   
   <session-config>
     <session-timeout>
