@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans 
+  xmlns:beans="http://www.springframework.org/schema/beans"
+  xmlns:security="http://www.springframework.org/schema/security"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+    http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd">
+
+  <!-- One and only one of the authentication methods must be implemented. -->
+  <!-- <beans:import resource="authentication-ldap.xml"/> -->
+  <!-- <beans:import resource="authentication-simple.xml"/> -->
+  <beans:import resource="authentication-simple.xml"/>
+  
+  <security:http realm="Geoportal"  pattern="/**" authentication-manager-ref="authenticationManager">
+
+    <security:headers>
+      <security:frame-options policy="SAMEORIGIN"/>
+      <security:header name="Access-Control-Allow-Origin" value="*" />
+      <security:header name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With" />
+    </security:headers>
+    <security:csrf disabled="true"/>
+    <security:form-login 
+      login-page="/login.html" login-processing-url="/login.html"
+      authentication-failure-url="/login.html?error=true"
+    />    
+    <security:logout />
+    
+    <security:intercept-url pattern="/login.html" access="permitAll" />
+    <security:intercept-url pattern="/**" access="hasRole('PUBLISHER')" />
+    
+  </security:http>
+
+</beans:beans>

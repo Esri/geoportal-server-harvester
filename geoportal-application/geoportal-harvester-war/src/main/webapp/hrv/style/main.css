@@ -24,6 +24,17 @@ html,body {
   font-size: 16px;
 }
 
+.h-header-caption {
+  
+}
+
+.h-header-logout {
+  float: right;
+  margin-right: 20px;
+  text-decoration: none;
+  color: white;
+}
+
 .h-nav-layout {
   width: 120px;
 }
