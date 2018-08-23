@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  * Content analyzer.
@@ -45,9 +46,10 @@ import java.util.regex.Pattern;
       String group = hrefMatcher.group();
       Matcher quotMatcher = quotPattern.matcher(group);
       if (quotMatcher.find()) {
-        String extractedUrl = quotMatcher.group().replaceAll("^.|.$", "").replaceAll("\\{", "%7B").replaceAll("\\}", "%7D");
+        String matchedUrl = StringEscapeUtils.unescapeHtml4(quotMatcher.group());
+        String extractedUrl = matchedUrl.replaceAll("^.|.$", "").replaceAll("\\{", "%7B").replaceAll("\\}", "%7D");
         try {
-          URL url = new URL(root,extractedUrl); //root.toURI().resolve(extractedUrl).toURL();
+          URL url = new URL(root,extractedUrl);
           if (url.toExternalForm().startsWith(root.toExternalForm()) && url.toExternalForm().length() > root.toExternalForm().length()) {
             list.add(url);
           }
