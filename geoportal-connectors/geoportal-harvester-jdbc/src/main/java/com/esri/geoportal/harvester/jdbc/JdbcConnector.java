@@ -49,6 +49,6 @@ public class JdbcConnector  implements InputConnector<InputBroker> {
     arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_USERNAME, bundle.getString("jdbc.username"), true));
     arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_PASSWORD, bundle.getString("jdbc.password"), true));
     arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_SQL_STATEMENT, bundle.getString("jdbc.sql"), true));
-    return new UITemplate(getType(), bundle.getString("migration"), arguments);
+    return new UITemplate(getType(), bundle.getString("jdbc"), arguments);
   }
 }
