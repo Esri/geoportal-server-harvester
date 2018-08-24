@@ -15,21 +15,21 @@
  */
 package com.esri.geoportal.harvester.jdbc;
 
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
+import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.util.Map;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * JDBC broker definition adaptor.
  */
 public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
+  private final CredentialsDefinitionAdaptor credAdaptor;
   private String driverClass;
   private String connection;
-  private String username;
-  private String password;
   private String sqlStatement;
 
   /**
@@ -40,6 +40,7 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    */
   public JdbcBrokerDefinitionAdaptor(EntityDefinition def) throws InvalidDefinitionException {
     super(def);
+    this.credAdaptor =new CredentialsDefinitionAdaptor(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(JdbcConnector.TYPE);
     } else if (!JdbcConnector.TYPE.equals(def.getType())) {
@@ -47,8 +48,6 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
     } else {
       driverClass = get(JdbcConstants.P_JDBC_DRIVER_CLASS);
       connection = get(JdbcConstants.P_JDBC_CONNECTION);
-      username = get(JdbcConstants.P_JDBC_USERNAME);
-      password = get(JdbcConstants.P_JDBC_PASSWORD);
       sqlStatement = get(JdbcConstants.P_JDBC_SQL_STATEMENT);
     }
   }
@@ -57,9 +56,8 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public void override(Map<String, String> params) {
     consume(params,JdbcConstants.P_JDBC_DRIVER_CLASS);
     consume(params,JdbcConstants.P_JDBC_CONNECTION);
-    consume(params,JdbcConstants.P_JDBC_USERNAME);
-    consume(params,JdbcConstants.P_JDBC_PASSWORD);
     consume(params,JdbcConstants.P_JDBC_SQL_STATEMENT);
+    credAdaptor.override(params);
   }
 
   public String getConnection() {
@@ -69,24 +67,6 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public void setConnection(String connection) {
     this.connection = connection;
     set(JdbcConstants.P_JDBC_CONNECTION, connection);
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-    set(JdbcConstants.P_JDBC_USERNAME, username);
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-    set(JdbcConstants.P_JDBC_PASSWORD, password);
   }
 
   public String getSqlStatement() {
@@ -105,5 +85,21 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public void setDriverClass(String driverClass) {
     this.driverClass = driverClass;
     set(JdbcConstants.P_JDBC_DRIVER_CLASS, driverClass);
+  }
+
+  /**
+   * Gets credentials.
+   * @return credentials
+   */
+  public SimpleCredentials getCredentials() {
+    return credAdaptor.getCredentials();
+  }
+
+  /**
+   * Sets credentials.
+   * @param cred credentials
+   */
+  public void setCredentials(SimpleCredentials cred) {
+    credAdaptor.setCredentials(cred);
   }
 }

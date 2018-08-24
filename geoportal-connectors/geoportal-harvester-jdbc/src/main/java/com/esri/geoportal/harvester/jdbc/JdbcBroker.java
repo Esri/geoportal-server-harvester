@@ -69,7 +69,7 @@ public class JdbcBroker implements InputBroker {
   public void initialize(InitContext context) throws DataProcessorException {
     try {
       Class.forName(definition.getDriverClass());
-      connection = DriverManager.getConnection(definition.getConnection(), definition.getUsername(), definition.getPassword());
+      connection = DriverManager.getConnection(definition.getConnection(), definition.getCredentials().getUserName(), definition.getCredentials().getPassword());
     } catch (ClassNotFoundException ex) {
       throw new DataProcessorException(String.format("Error loading JDBC driver class: %s", definition.getDriverClass()), ex);
     } catch (SQLException ex) {

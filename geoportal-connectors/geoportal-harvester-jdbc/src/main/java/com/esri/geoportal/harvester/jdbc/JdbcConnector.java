@@ -15,6 +15,8 @@
  */
 package com.esri.geoportal.harvester.jdbc;
 
+import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_PASSWORD;
+import static com.esri.geoportal.commons.constants.CredentialsConstants.P_CRED_USERNAME;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -47,8 +49,8 @@ public class JdbcConnector  implements InputConnector<InputBroker> {
     List<UITemplate.Argument> arguments = new ArrayList<>();
     arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_DRIVER_CLASS, bundle.getString("jdbc.driver"), true));
     arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_CONNECTION, bundle.getString("jdbc.connection"), true));
-    arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_USERNAME, bundle.getString("jdbc.username")));
-    arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_PASSWORD, bundle.getString("jdbc.password")) {
+    arguments.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("jdbc.username")));
+    arguments.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("jdbc.password")) {
       public boolean isPassword() {
         return true;
       }
