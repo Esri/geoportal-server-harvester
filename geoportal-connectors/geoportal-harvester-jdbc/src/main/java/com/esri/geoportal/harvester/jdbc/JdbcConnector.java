@@ -45,9 +45,14 @@ public class JdbcConnector  implements InputConnector<InputBroker> {
   public UITemplate getTemplate(Locale locale) {
     ResourceBundle bundle = ResourceBundle.getBundle("JdbcResource", locale);
     List<UITemplate.Argument> arguments = new ArrayList<>();
+    arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_DRIVER_CLASS, bundle.getString("jdbc.driver"), true));
     arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_CONNECTION, bundle.getString("jdbc.connection"), true));
-    arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_USERNAME, bundle.getString("jdbc.username"), true));
-    arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_PASSWORD, bundle.getString("jdbc.password"), true));
+    arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_USERNAME, bundle.getString("jdbc.username")));
+    arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_PASSWORD, bundle.getString("jdbc.password")) {
+      public boolean isPassword() {
+        return true;
+      }
+    });
     arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_SQL_STATEMENT, bundle.getString("jdbc.sql"), true));
     return new UITemplate(getType(), bundle.getString("jdbc"), arguments);
   }

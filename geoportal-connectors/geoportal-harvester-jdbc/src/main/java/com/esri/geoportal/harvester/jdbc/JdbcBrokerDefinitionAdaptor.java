@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
  * JDBC broker definition adaptor.
  */
 public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
+  private String driverClass;
   private String connection;
   private String username;
   private String password;
@@ -44,6 +45,7 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
     } else if (!JdbcConnector.TYPE.equals(def.getType())) {
       throw new InvalidDefinitionException("Broker definition doesn't match");
     } else {
+      connection = get(JdbcConstants.P_JDBC_DRIVER_CLASS);
       connection = get(JdbcConstants.P_JDBC_CONNECTION);
       username = get(JdbcConstants.P_JDBC_USERNAME);
       password = get(JdbcConstants.P_JDBC_PASSWORD);
@@ -53,6 +55,7 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
 
   @Override
   public void override(Map<String, String> params) {
+    consume(params,JdbcConstants.P_JDBC_DRIVER_CLASS);
     consume(params,JdbcConstants.P_JDBC_CONNECTION);
     consume(params,JdbcConstants.P_JDBC_USERNAME);
     consume(params,JdbcConstants.P_JDBC_PASSWORD);
@@ -93,5 +96,14 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public void setSqlStatement(String sqlStatement) {
     this.sqlStatement = sqlStatement;
     set(JdbcConstants.P_JDBC_SQL_STATEMENT, sqlStatement);
+  }
+
+  public String getDriverClass() {
+    return driverClass;
+  }
+
+  public void setDriverClass(String driverClass) {
+    this.driverClass = driverClass;
+    set(JdbcConstants.P_JDBC_DRIVER_CLASS, driverClass);
   }
 }

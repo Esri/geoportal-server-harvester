@@ -19,6 +19,7 @@ package com.esri.geoportal.harvester.jdbc;
  * JDBC constants.
  */
 /*package*/ class JdbcConstants {
+  public static String P_JDBC_DRIVER_CLASS  = "jdbc-driver";
   public static String P_JDBC_CONNECTION    = "jdbc-connection";
   public static String P_JDBC_USERNAME      = "jdbc-username";
   public static String P_JDBC_PASSWORD      = "jdbc-password";
