@@ -26,6 +26,7 @@
         <module>geoportal-harvester-sink</module>
         <module>geoportal-harvester-oai-pmh</module>
         <module>geoportal-harvester-folder-big</module>
+        <module>geoportal-harvester-jdbc</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
