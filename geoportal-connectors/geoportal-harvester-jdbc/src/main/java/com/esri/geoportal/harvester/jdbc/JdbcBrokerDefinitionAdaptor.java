@@ -45,7 +45,7 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
     } else if (!JdbcConnector.TYPE.equals(def.getType())) {
       throw new InvalidDefinitionException("Broker definition doesn't match");
     } else {
-      connection = get(JdbcConstants.P_JDBC_DRIVER_CLASS);
+      driverClass = get(JdbcConstants.P_JDBC_DRIVER_CLASS);
       connection = get(JdbcConstants.P_JDBC_CONNECTION);
       username = get(JdbcConstants.P_JDBC_USERNAME);
       password = get(JdbcConstants.P_JDBC_PASSWORD);

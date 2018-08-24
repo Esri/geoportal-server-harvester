@@ -25,6 +25,9 @@ import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +39,7 @@ public class JdbcBroker implements InputBroker {
   
   private final JdbcConnector connector;
   private final JdbcBrokerDefinitionAdaptor definition;
+  private Connection connection;
 
   public JdbcBroker(JdbcConnector connector, JdbcBrokerDefinitionAdaptor definition) {
     this.connector = connector;
@@ -63,12 +67,27 @@ public class JdbcBroker implements InputBroker {
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
-    // TODO provide implementation for initialize()
+    try {
+      Class.forName(definition.getDriverClass());
+      connection = DriverManager.getConnection(definition.getConnection(), definition.getUsername(), definition.getPassword());
+    } catch (ClassNotFoundException ex) {
+      throw new DataProcessorException(String.format("Error loading JDBC driver class: %s", definition.getDriverClass()), ex);
+    } catch (SQLException ex) {
+      throw new DataProcessorException(String.format("Error opening JDBC connection to: %s", definition.getConnection()), ex);
+    }
   }
 
   @Override
   public void terminate() {
-    // TODO provide implementation for terminate()
+    try {
+      if (connection!=null && !connection.isClosed()) {
+        connection.close();
+      }
+    } catch (SQLException ex) {
+      LOG.warn(String.format("Unexpected error closing connection to: %s", definition.getConnection()), ex);
+    } finally {
+      connection = null;
+    }
   }
   
 
