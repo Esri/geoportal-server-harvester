@@ -189,7 +189,7 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
         }
       }
 
-      PublishResponse response = client.publish(data, uuid, xml, json, definition.getForceAdd());
+      PublishResponse response = client.publish(data, ref.getAttributesMap(), uuid, xml, json, definition.getForceAdd());
       if (response == null) {
         throw new DataOutputException(this, ref.getId(), "No response received");
       }

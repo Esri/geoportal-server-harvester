@@ -230,7 +230,7 @@ public class JdbcBroker implements InputBroker {
   
   
   private String norm(String name) {
-    return StringUtils.trimToEmpty(name).replaceAll("[ ]*", "_").toLowerCase();
+    return StringUtils.trimToEmpty(name).replaceAll("\\{Blank}+", "_").toLowerCase();
   }
   
   /**
