@@ -18,7 +18,9 @@ package com.esri.geoportal.harvester.jdbc;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
@@ -39,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +57,7 @@ public class JdbcBroker implements InputBroker {
   private PreparedStatement statement;
   private ResultSet resultSet;
   private final List<SqlDataReader> readers = new ArrayList<>();
+  private TaskDefinition td;
 
   public JdbcBroker(JdbcConnector connector, JdbcBrokerDefinitionAdaptor definition) {
     this.connector = connector;
@@ -81,6 +85,7 @@ public class JdbcBroker implements InputBroker {
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
+    td = context.getTask().getTaskDefinition();
     createConnection();
     createStatement();
     createResultSet();
@@ -251,14 +256,25 @@ public class JdbcBroker implements InputBroker {
 
     @Override
     public boolean hasNext() throws DataInputException {
-      // TODO provide implementation for hasNext()
-      return false;
+      try {
+        return resultSet.next();
+      } catch (SQLException ex) {
+        throw new DataInputException(JdbcBroker.this, String.format("Error iterating data."), ex);
+      }
     }
 
     @Override
     public DataReference next() throws DataInputException {
-      // TODO provide implementation for next()
-      return null;
+      try {
+        String id = String.format("%s", Integer.toString(resultSet.getRow()));
+        DataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), id, null, new URI("uuid", id, null), td.getSource().getRef(), td.getRef());
+        for (SqlDataReader reader: readers) {
+          reader.read(ref.getAttributesMap(), resultSet);
+        }
+        return ref;
+      } catch (SQLException|URISyntaxException ex) {
+        throw new DataInputException(JdbcBroker.this, String.format("Error reading data"), ex);
+      }
     }
   }
 }
