@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,47 +175,47 @@ public class JdbcBroker implements InputBroker {
           case Types.CHAR:
           case Types.LONGVARCHAR:
           case Types.LONGNVARCHAR:
-            reader = (a,r)->a.put(columnName, r.getString(columnName));
+            reader = (a,r)->a.put(String.format("src_%s_txt", norm(columnName)), r.getString(columnName));
             break;
             
           case Types.NVARCHAR:
           case Types.NCHAR:
-            reader = (a,r)->a.put(columnName, r.getNString(columnName));
+            reader = (a,r)->a.put(String.format("src_%s_txt", norm(columnName)), r.getNString(columnName));
             break;
             
           case Types.DOUBLE:
-            reader = (a,r)->a.put(columnName, new Double(r.getDouble(columnName)));
+            reader = (a,r)->a.put(String.format("src_%s_d", norm(columnName)), new Double(r.getDouble(columnName)));
             break;
             
           case Types.FLOAT:
-            reader = (a,r)->a.put(columnName, new Double(r.getFloat(columnName)));
+            reader = (a,r)->a.put(String.format("src_%s_f", norm(columnName)), new Float(r.getFloat(columnName)));
             break;
             
           case Types.INTEGER:
           case Types.SMALLINT:
           case Types.TINYINT:
-            reader = (a,r)->a.put(columnName, new Double(r.getInt(columnName)));
+            reader = (a,r)->a.put(String.format("src_%s_i", norm(columnName)), new Long(r.getInt(columnName)));
             break;
             
           case Types.BIGINT:
           case Types.DECIMAL:
           case Types.NUMERIC:
-            reader = (a,r)->a.put(columnName, new Double(r.getBigDecimal(columnName).doubleValue()));
+            reader = (a,r)->a.put(String.format("src_%s_l", norm(columnName)), new Long(r.getBigDecimal(columnName).longValue()));
             break;
             
           case Types.BOOLEAN:
-            reader = (a,r)->a.put(columnName, new Boolean(r.getBoolean(columnName)));
+            reader = (a,r)->a.put(String.format("src_%s_b", norm(columnName)), new Boolean(r.getBoolean(columnName)));
             break;
             
             
           case Types.DATE:
-            reader = (a,r)->a.put(columnName, formatIsoDate(r.getDate(columnName)));
+            reader = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getDate(columnName)));
             break;
           case Types.TIME:
-            reader = (a,r)->a.put(columnName, formatIsoDate(r.getTime(columnName)));
+            reader = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getTime(columnName)));
             break;
           case Types.TIMESTAMP:
-            reader = (a,r)->a.put(columnName, formatIsoDate(r.getTimestamp(columnName)));
+            reader = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getTimestamp(columnName)));
             break;
         }
         
@@ -228,6 +228,10 @@ public class JdbcBroker implements InputBroker {
     }
   }
   
+  
+  private String norm(String name) {
+    return StringUtils.trimToEmpty(name).replaceAll("[ ]*", "_").toLowerCase();
+  }
   
   /**
    * Formats ISO date.
