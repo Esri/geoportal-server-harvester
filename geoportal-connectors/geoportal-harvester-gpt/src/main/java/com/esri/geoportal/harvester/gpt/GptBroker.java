@@ -156,7 +156,7 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
       if (definition.getAcceptXml()) {
     	  
         byte[] content    = null;
-        String first_type = ref.getContentType().toArray()[0].toString(); 
+        String first_type = !ref.getContentType().isEmpty() ? ref.getContentType().toArray()[0].toString() : ""; 
         
         if (ref.getContent(MimeType.APPLICATION_PDF) != null && definition.isTranslatePdf()) {
         	content = PdfUtils.generateMetadataXML(ref.getContent(MimeType.APPLICATION_PDF), ref.getSourceUri().getPath(), ref.getSourceUri().toASCIIString(), geometryServiceUrl); 
@@ -167,7 +167,7 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
         } else {        	
             Set <MimeType> types      = ref.getContentType();
             byte[]         rawContent = ref.getContent(types.toArray(new MimeType[types.size()]));
-            content = DocUtils.generateMetadataXML(rawContent, new File(ref.getId()).getName());
+            content = rawContent!=null ? DocUtils.generateMetadataXML(rawContent, new File(ref.getId()).getName()) : null;
         }
 
         if (content != null) {
