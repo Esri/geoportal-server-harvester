@@ -70,6 +70,10 @@ import org.slf4j.LoggerFactory;
     definition.override(context.getParams());
     try {
       URI ssp = URI.create(context.getTask().getDataSource().getBrokerUri().getSchemeSpecificPart());
+      // special case for "jdbc" type schema; strip off everything to rreveal host name
+      if ("jdbc".equals(ssp.getScheme())) {
+        ssp = URI.create(ssp.getSchemeSpecificPart().replaceAll(";.*$","").replaceAll("^.*?://", "").replaceAll(":.*$", ""));
+      }
       String sspRoot = StringUtils.defaultIfEmpty(ssp.getHost(), ssp.getPath());
       Path brokerRootFolder = definition.getRootFolder().toPath().toRealPath().resolve(sspRoot);
       Files.createDirectories(brokerRootFolder);
