@@ -56,6 +56,9 @@ public class JdbcConnector  implements InputConnector<InputBroker> {
       }
     });
     arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_SQL_STATEMENT, bundle.getString("jdbc.sql"), true));
+    arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_FILEID_COLUMN, bundle.getString("jdbc.fileid"), true));
+    arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_TITLE_COLUMN, bundle.getString("jdbc.title"), true));
+    arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_DESCRIPTION_COLUMN, bundle.getString("jdbc.description")));
     return new UITemplate(getType(), bundle.getString("jdbc"), arguments);
   }
 }

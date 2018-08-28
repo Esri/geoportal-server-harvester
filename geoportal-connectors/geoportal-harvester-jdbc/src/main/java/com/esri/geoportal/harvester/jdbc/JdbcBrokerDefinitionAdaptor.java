@@ -31,6 +31,9 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   private String driverClass;
   private String connection;
   private String sqlStatement;
+  private String fileIdColumn;
+  private String titleColumn;
+  private String descriptionColumn;
 
   /**
    * Creates instance of the adaptor.
@@ -49,6 +52,9 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
       driverClass = get(JdbcConstants.P_JDBC_DRIVER_CLASS);
       connection = get(JdbcConstants.P_JDBC_CONNECTION);
       sqlStatement = get(JdbcConstants.P_JDBC_SQL_STATEMENT);
+      fileIdColumn = get(JdbcConstants.P_JDBC_FILEID_COLUMN);
+      titleColumn = get(JdbcConstants.P_JDBC_TITLE_COLUMN);
+      descriptionColumn = get(JdbcConstants.P_JDBC_DESCRIPTION_COLUMN);
     }
   }
 
@@ -57,6 +63,9 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
     consume(params,JdbcConstants.P_JDBC_DRIVER_CLASS);
     consume(params,JdbcConstants.P_JDBC_CONNECTION);
     consume(params,JdbcConstants.P_JDBC_SQL_STATEMENT);
+    consume(params,JdbcConstants.P_JDBC_FILEID_COLUMN);
+    consume(params,JdbcConstants.P_JDBC_TITLE_COLUMN);
+    consume(params,JdbcConstants.P_JDBC_DESCRIPTION_COLUMN);
     credAdaptor.override(params);
   }
 
@@ -101,5 +110,32 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    */
   public void setCredentials(SimpleCredentials cred) {
     credAdaptor.setCredentials(cred);
+  }
+
+  public String getFileIdColumn() {
+    return fileIdColumn;
+  }
+
+  public void setFileIdColumn(String fileIdColumn) {
+    this.fileIdColumn = fileIdColumn;
+    set(JdbcConstants.P_JDBC_FILEID_COLUMN, fileIdColumn);
+  }
+
+  public String getTitleColumn() {
+    return titleColumn;
+  }
+
+  public void setTitleColumn(String titleColumn) {
+    this.titleColumn = titleColumn;
+    set(JdbcConstants.P_JDBC_TITLE_COLUMN, titleColumn);
+  }
+
+  public String getDescriptionColumn() {
+    return descriptionColumn;
+  }
+
+  public void setDescriptionColumn(String descriptionColumn) {
+    this.descriptionColumn = descriptionColumn;
+    set(JdbcConstants.P_JDBC_DESCRIPTION_COLUMN, descriptionColumn);
   }
 }
