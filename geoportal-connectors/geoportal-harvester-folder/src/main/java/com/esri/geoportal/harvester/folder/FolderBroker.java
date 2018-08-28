@@ -162,6 +162,10 @@ import org.slf4j.LoggerFactory;
   
   private Path generateFileName(URI brokerUri, URI sourceUri, String id, String extension) throws IOException {
     URI ssp = URI.create(brokerUri.getSchemeSpecificPart());
+    // special case for "jdbc" type schema; strip off everything to rreveal host name
+    if ("jdbc".equals(ssp.getScheme())) {
+      ssp = URI.create(ssp.getSchemeSpecificPart().replaceAll(";.*$","").replaceAll("^.*?://", "").replaceAll(":.*$", ""));
+    }
     String sspRoot = StringUtils.defaultIfEmpty(ssp.getHost(), ssp.getPath());
     Path brokerRootFolder = definition.getRootFolder().toPath().toRealPath().resolve(sspRoot);
 
