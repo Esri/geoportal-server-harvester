@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.jdbc;
 
+import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
@@ -25,6 +26,7 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
@@ -271,12 +273,13 @@ public class JdbcBroker implements InputBroker {
     public DataReference next() throws DataInputException {
       try {
         String id = String.format("%s", Integer.toString(resultSet.getRow()));
-        DataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), id, null, new URI("uuid", id, null), td.getSource().getRef(), td.getRef());
+        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), id, null, new URI("uuid", id, null), td.getSource().getRef(), td.getRef());
+        ref.addContext(MimeType.APPLICATION_JSON, "{}".getBytes("UTF-8"));
         for (SqlDataReader reader: readers) {
           reader.read(ref.getAttributesMap(), resultSet);
         }
         return ref;
-      } catch (SQLException|URISyntaxException ex) {
+      } catch (SQLException|URISyntaxException|UnsupportedEncodingException ex) {
         throw new DataInputException(JdbcBroker.this, String.format("Error reading data"), ex);
       }
     }
