@@ -36,6 +36,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -164,6 +165,61 @@ public class JdbcBroker implements InputBroker {
     }
   }
   
+  private SqlDataReader createReader(final String columnName, final int columnType) {
+    SqlDataReader reader = null;
+    
+    switch (columnType) {
+      case Types.VARCHAR:
+      case Types.CHAR:
+      case Types.LONGVARCHAR:
+      case Types.LONGNVARCHAR:
+        reader = (a,r)->a.put(String.format("src_%s_txt", norm(columnName)), r.getString(columnName));
+        break;
+
+      case Types.NVARCHAR:
+      case Types.NCHAR:
+        reader = (a,r)->a.put(String.format("src_%s_txt", norm(columnName)), r.getNString(columnName));
+        break;
+
+      case Types.DOUBLE:
+        reader = (a,r)->a.put(String.format("src_%s_d", norm(columnName)), new Double(r.getDouble(columnName)));
+        break;
+
+      case Types.FLOAT:
+        reader = (a,r)->a.put(String.format("src_%s_f", norm(columnName)), new Float(r.getFloat(columnName)));
+        break;
+
+      case Types.INTEGER:
+      case Types.SMALLINT:
+      case Types.TINYINT:
+        reader = (a,r)->a.put(String.format("src_%s_i", norm(columnName)), new Long(r.getInt(columnName)));
+        break;
+
+      case Types.BIGINT:
+      case Types.DECIMAL:
+      case Types.NUMERIC:
+        reader = (a,r)->a.put(String.format("src_%s_l", norm(columnName)), new Long(r.getBigDecimal(columnName).longValue()));
+        break;
+
+      case Types.BOOLEAN:
+        reader = (a,r)->a.put(String.format("src_%s_b", norm(columnName)), new Boolean(r.getBoolean(columnName)));
+        break;
+
+
+      case Types.DATE:
+        reader = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getDate(columnName)));
+        break;
+      case Types.TIME:
+        reader = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getTime(columnName)));
+        break;
+      case Types.TIMESTAMP:
+        reader = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getTimestamp(columnName)));
+        break;
+    }
+    
+    return reader;
+  }
+  
   private void createReaders() throws DataProcessorException {
     try {
       ResultSetMetaData metaData = resultSet.getMetaData();
@@ -171,56 +227,7 @@ public class JdbcBroker implements InputBroker {
         final String columnName = metaData.getColumnName(i);
         final int columnType = metaData.getColumnType(i);
         
-        SqlDataReader reader = null;
-        switch (columnType) {
-          case Types.VARCHAR:
-          case Types.CHAR:
-          case Types.LONGVARCHAR:
-          case Types.LONGNVARCHAR:
-            reader = (a,r)->a.put(String.format("src_%s_txt", norm(columnName)), r.getString(columnName));
-            break;
-            
-          case Types.NVARCHAR:
-          case Types.NCHAR:
-            reader = (a,r)->a.put(String.format("src_%s_txt", norm(columnName)), r.getNString(columnName));
-            break;
-            
-          case Types.DOUBLE:
-            reader = (a,r)->a.put(String.format("src_%s_d", norm(columnName)), new Double(r.getDouble(columnName)));
-            break;
-            
-          case Types.FLOAT:
-            reader = (a,r)->a.put(String.format("src_%s_f", norm(columnName)), new Float(r.getFloat(columnName)));
-            break;
-            
-          case Types.INTEGER:
-          case Types.SMALLINT:
-          case Types.TINYINT:
-            reader = (a,r)->a.put(String.format("src_%s_i", norm(columnName)), new Long(r.getInt(columnName)));
-            break;
-            
-          case Types.BIGINT:
-          case Types.DECIMAL:
-          case Types.NUMERIC:
-            reader = (a,r)->a.put(String.format("src_%s_l", norm(columnName)), new Long(r.getBigDecimal(columnName).longValue()));
-            break;
-            
-          case Types.BOOLEAN:
-            reader = (a,r)->a.put(String.format("src_%s_b", norm(columnName)), new Boolean(r.getBoolean(columnName)));
-            break;
-            
-            
-          case Types.DATE:
-            reader = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getDate(columnName)));
-            break;
-          case Types.TIME:
-            reader = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getTime(columnName)));
-            break;
-          case Types.TIMESTAMP:
-            reader = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getTimestamp(columnName)));
-            break;
-        }
-        
+        SqlDataReader reader = createReader(columnName, columnType);
         if (reader != null) {
           readers.add(reader);
         }
@@ -230,19 +237,19 @@ public class JdbcBroker implements InputBroker {
     }
   }
   
-  
   private String norm(String name) {
     return StringUtils.trimToEmpty(name).replaceAll("\\{Blank}+", "_").toLowerCase();
   }
   
-  /**
-   * Formats ISO date.
-   * @param date date to format
-   * @return ISO date
-   */
   private String formatIsoDate(Date date) {
-    ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-    return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(zonedDateTime);
+    if (date==null) return null;
+    try {
+      ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+      return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(zonedDateTime);
+    } catch (DateTimeException ex) {
+      LOG.debug(String.format("Invalid ISO date: %s", date), ex);
+      return null;
+    }
   }
   
   private interface SqlDataReader {
