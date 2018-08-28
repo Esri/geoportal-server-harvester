@@ -26,6 +26,9 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -60,6 +63,7 @@ public class JdbcBroker implements InputBroker {
   private Connection connection;
   private PreparedStatement statement;
   private ResultSet resultSet;
+  private final List<SqlStringRetriever> retrievers = new ArrayList<>();
   private final List<SqlDataInserter> inserters = new ArrayList<>();
   private TaskDefinition td;
 
@@ -93,6 +97,7 @@ public class JdbcBroker implements InputBroker {
     createConnection();
     createStatement();
     createResultSet();
+    createStringRetrievers();
     createInserters();
   }
 
@@ -188,6 +193,89 @@ public class JdbcBroker implements InputBroker {
     return null;
   }
   
+  private String safeToString(Object obj) {
+    return obj!=null? obj.toString(): "";
+  }
+  
+  private SqlStringRetriever createRetriever(final String fieldName, final String columnName, final int columnType) {
+    SqlStringRetriever retriever = null;
+    
+    switch (columnType) {
+      case Types.VARCHAR:
+      case Types.CHAR:
+      case Types.LONGVARCHAR:
+      case Types.LONGNVARCHAR:
+      case Types.NVARCHAR:
+      case Types.NCHAR:
+        retriever = (n, r)->n.put(fieldName, readValue(r, columnName, String.class));
+        break;
+
+      case Types.DOUBLE:
+        retriever = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, Double.class)));
+        break;
+
+      case Types.FLOAT:
+        retriever = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, Float.class)));
+        break;
+
+      case Types.INTEGER:
+        retriever = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, Integer.class)));
+        break;
+
+      case Types.SMALLINT:
+      case Types.TINYINT:
+        retriever = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, Short.class)));
+        break;
+
+      case Types.BIGINT:
+      case Types.DECIMAL:
+      case Types.NUMERIC:
+        retriever = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, BigDecimal.class)));
+        break;
+    
+      case Types.BOOLEAN:
+        retriever = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, Boolean.class)));
+        break;
+
+      case Types.DATE:
+        retriever = (n, r)->n.put(fieldName, formatIsoDate(r.getDate(columnName)));
+        break;
+      case Types.TIME:
+        retriever = (n, r)->n.put(fieldName, formatIsoDate(r.getTime(columnName)));
+        break;
+      case Types.TIMESTAMP:
+        retriever = (n, r)->n.put(fieldName, formatIsoDate(r.getTimestamp(columnName)));
+        break;
+    }
+    
+    return retriever;
+  }
+  
+  private void createStringRetrievers()  throws DataProcessorException {
+    try {
+      ResultSetMetaData metaData = resultSet.getMetaData();
+      for (int i=1; i<= metaData.getColumnCount(); i++) {
+        final String columnName = metaData.getColumnName(i);
+        final int columnType = metaData.getColumnType(i);
+
+        SqlStringRetriever retriever = null;
+        if (columnName.equalsIgnoreCase(definition.getFileIdColumn())) {
+          retriever = createRetriever("fileid", columnName, columnType);
+        } else if (columnName.equalsIgnoreCase(definition.getTitleColumn())) {
+          retriever = createRetriever("title", columnName, columnType);
+        } else if (columnName.equalsIgnoreCase(definition.getDescriptionColumn())) {
+          retriever = createRetriever("description", columnName, columnType);
+        }
+        
+        if (retriever!=null) {
+          retrievers.add(retriever);
+        }
+      }
+    } catch (SQLException ex) {
+      throw new DataProcessorException(String.format("Error opening JDBC connection to: %s", definition.getConnection()), ex);
+    }
+  }
+  
   private SqlDataInserter createInserter(final String columnName, final int columnType) {
     SqlDataInserter inserter = null;
     
@@ -275,6 +363,10 @@ public class JdbcBroker implements InputBroker {
     }
   }
   
+  private interface SqlStringRetriever {
+    void read(ObjectNode node, ResultSet resultSet) throws SQLException;
+  }
+  
   private interface SqlDataInserter {
     void read(Map<String,Object> attributeMap, ResultSet resultSet) throws SQLException;
   }
@@ -304,12 +396,20 @@ public class JdbcBroker implements InputBroker {
       try {
         String id = String.format("%s", Integer.toString(resultSet.getRow()));
         SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), id, null, new URI("uuid", id, null), td.getSource().getRef(), td.getRef());
-        ref.addContext(MimeType.APPLICATION_JSON, "{}".getBytes("UTF-8"));
+        
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode node = mapper.createObjectNode();
+        for (SqlStringRetriever retriever: retrievers) {
+          retriever.read(node, resultSet);
+        }
+        ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(node).getBytes("UTF-8"));
+        
         for (SqlDataInserter reader: inserters) {
           reader.read(ref.getAttributesMap(), resultSet);
         }
+        
         return ref;
-      } catch (SQLException|URISyntaxException|UnsupportedEncodingException ex) {
+      } catch (SQLException|URISyntaxException|UnsupportedEncodingException|JsonProcessingException ex) {
         throw new DataInputException(JdbcBroker.this, String.format("Error reading data"), ex);
       }
     }
