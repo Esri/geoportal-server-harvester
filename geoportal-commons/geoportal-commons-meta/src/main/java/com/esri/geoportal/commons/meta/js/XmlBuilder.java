@@ -115,6 +115,16 @@ public class XmlBuilder {
   public void writeCharacters(String text) throws XMLStreamException {
     writer.writeCharacters(escapeXml11(text));
   }
+
+  /**
+   * Sets prefix.
+   * @param prefix prefix
+   * @param uri uri
+   * @throws XMLStreamException  if setting prefix fails
+   */
+  public void setPrefix(String prefix, String uri) throws XMLStreamException {
+    writer.setPrefix(prefix, uri);
+  }
   
   
 }

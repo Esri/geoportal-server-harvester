@@ -18,6 +18,7 @@ load("classpath:meta/js/base.js");
 function create(attributes) {
   var B = newXmlBuilder();
   
+  B.setPrefix("rdf", URI.RDF);
   B.writeStartDocument();
   
   B.writeStartElement("rdf","RDF",URI.RDF);
