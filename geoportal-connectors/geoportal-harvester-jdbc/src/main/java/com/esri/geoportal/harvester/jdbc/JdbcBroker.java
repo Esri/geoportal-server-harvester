@@ -27,6 +27,7 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
@@ -165,6 +166,28 @@ public class JdbcBroker implements InputBroker {
     }
   }
   
+  private <T> T readValue(ResultSet r, String columnName, Class<T> clazz) throws SQLException {
+    switch (clazz.getSimpleName()) {
+      case "String":
+        return (T)(r.getString(columnName));
+      case "Double":
+        return (T)(new Double(r.getDouble(columnName)));
+      case "Float":
+        return (T)(new Float(r.getFloat(columnName)));
+      case "Long":
+        return (T)(new Long(r.getLong(columnName)));
+      case "Integer":
+        return (T)(new Integer(r.getInt(columnName)));
+      case "Short":
+        return (T)(new Integer(r.getShort(columnName)));
+      case "BigDecimal":
+        return (T)(r.getBigDecimal(columnName));
+      case "Boolean":
+        return (T)(new Boolean(r.getBoolean(columnName)));
+    }
+    return null;
+  }
+  
   private SqlDataInserter createInserter(final String columnName, final int columnType) {
     SqlDataInserter inserter = null;
     
@@ -173,36 +196,36 @@ public class JdbcBroker implements InputBroker {
       case Types.CHAR:
       case Types.LONGVARCHAR:
       case Types.LONGNVARCHAR:
-        inserter = (a,r)->a.put(String.format("src_%s_txt", norm(columnName)), r.getString(columnName));
-        break;
-
       case Types.NVARCHAR:
       case Types.NCHAR:
-        inserter = (a,r)->a.put(String.format("src_%s_txt", norm(columnName)), r.getNString(columnName));
+        inserter = (a,r)->a.put(String.format("src_%s_txt", norm(columnName)), readValue(r, columnName, String.class));
         break;
 
       case Types.DOUBLE:
-        inserter = (a,r)->a.put(String.format("src_%s_d", norm(columnName)), new Double(r.getDouble(columnName)));
+        inserter = (a,r)->a.put(String.format("src_%s_d", norm(columnName)), readValue(r, columnName, Double.class));
         break;
 
       case Types.FLOAT:
-        inserter = (a,r)->a.put(String.format("src_%s_f", norm(columnName)), new Float(r.getFloat(columnName)));
+        inserter = (a,r)->a.put(String.format("src_%s_f", norm(columnName)), readValue(r, columnName, Float.class));
         break;
 
       case Types.INTEGER:
+        inserter = (a,r)->a.put(String.format("src_%s_i", norm(columnName)), readValue(r, columnName, Integer.class));
+        break;
+        
       case Types.SMALLINT:
       case Types.TINYINT:
-        inserter = (a,r)->a.put(String.format("src_%s_i", norm(columnName)), new Long(r.getInt(columnName)));
+        inserter = (a,r)->a.put(String.format("src_%s_i", norm(columnName)), readValue(r, columnName, Short.class));
         break;
 
       case Types.BIGINT:
       case Types.DECIMAL:
       case Types.NUMERIC:
-        inserter = (a,r)->a.put(String.format("src_%s_l", norm(columnName)), new Long(r.getBigDecimal(columnName).longValue()));
+        inserter = (a,r)->a.put(String.format("src_%s_l", norm(columnName)), readValue(r, columnName, BigDecimal.class));
         break;
 
       case Types.BOOLEAN:
-        inserter = (a,r)->a.put(String.format("src_%s_b", norm(columnName)), new Boolean(r.getBoolean(columnName)));
+        inserter = (a,r)->a.put(String.format("src_%s_b", norm(columnName)), readValue(r, columnName, Boolean.class));
         break;
 
 
