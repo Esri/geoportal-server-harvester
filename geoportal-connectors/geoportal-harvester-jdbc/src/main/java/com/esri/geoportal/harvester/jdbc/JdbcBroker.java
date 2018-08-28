@@ -59,7 +59,7 @@ public class JdbcBroker implements InputBroker {
   private Connection connection;
   private PreparedStatement statement;
   private ResultSet resultSet;
-  private final List<SqlDataReader> readers = new ArrayList<>();
+  private final List<SqlDataInserter> inserters = new ArrayList<>();
   private TaskDefinition td;
 
   public JdbcBroker(JdbcConnector connector, JdbcBrokerDefinitionAdaptor definition) {
@@ -92,7 +92,7 @@ public class JdbcBroker implements InputBroker {
     createConnection();
     createStatement();
     createResultSet();
-    createReaders();
+    createInserters();
   }
 
   @Override
@@ -165,71 +165,71 @@ public class JdbcBroker implements InputBroker {
     }
   }
   
-  private SqlDataReader createReader(final String columnName, final int columnType) {
-    SqlDataReader reader = null;
+  private SqlDataInserter createInserter(final String columnName, final int columnType) {
+    SqlDataInserter inserter = null;
     
     switch (columnType) {
       case Types.VARCHAR:
       case Types.CHAR:
       case Types.LONGVARCHAR:
       case Types.LONGNVARCHAR:
-        reader = (a,r)->a.put(String.format("src_%s_txt", norm(columnName)), r.getString(columnName));
+        inserter = (a,r)->a.put(String.format("src_%s_txt", norm(columnName)), r.getString(columnName));
         break;
 
       case Types.NVARCHAR:
       case Types.NCHAR:
-        reader = (a,r)->a.put(String.format("src_%s_txt", norm(columnName)), r.getNString(columnName));
+        inserter = (a,r)->a.put(String.format("src_%s_txt", norm(columnName)), r.getNString(columnName));
         break;
 
       case Types.DOUBLE:
-        reader = (a,r)->a.put(String.format("src_%s_d", norm(columnName)), new Double(r.getDouble(columnName)));
+        inserter = (a,r)->a.put(String.format("src_%s_d", norm(columnName)), new Double(r.getDouble(columnName)));
         break;
 
       case Types.FLOAT:
-        reader = (a,r)->a.put(String.format("src_%s_f", norm(columnName)), new Float(r.getFloat(columnName)));
+        inserter = (a,r)->a.put(String.format("src_%s_f", norm(columnName)), new Float(r.getFloat(columnName)));
         break;
 
       case Types.INTEGER:
       case Types.SMALLINT:
       case Types.TINYINT:
-        reader = (a,r)->a.put(String.format("src_%s_i", norm(columnName)), new Long(r.getInt(columnName)));
+        inserter = (a,r)->a.put(String.format("src_%s_i", norm(columnName)), new Long(r.getInt(columnName)));
         break;
 
       case Types.BIGINT:
       case Types.DECIMAL:
       case Types.NUMERIC:
-        reader = (a,r)->a.put(String.format("src_%s_l", norm(columnName)), new Long(r.getBigDecimal(columnName).longValue()));
+        inserter = (a,r)->a.put(String.format("src_%s_l", norm(columnName)), new Long(r.getBigDecimal(columnName).longValue()));
         break;
 
       case Types.BOOLEAN:
-        reader = (a,r)->a.put(String.format("src_%s_b", norm(columnName)), new Boolean(r.getBoolean(columnName)));
+        inserter = (a,r)->a.put(String.format("src_%s_b", norm(columnName)), new Boolean(r.getBoolean(columnName)));
         break;
 
 
       case Types.DATE:
-        reader = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getDate(columnName)));
+        inserter = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getDate(columnName)));
         break;
       case Types.TIME:
-        reader = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getTime(columnName)));
+        inserter = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getTime(columnName)));
         break;
       case Types.TIMESTAMP:
-        reader = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getTimestamp(columnName)));
+        inserter = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getTimestamp(columnName)));
         break;
     }
     
-    return reader;
+    return inserter;
   }
   
-  private void createReaders() throws DataProcessorException {
+  private void createInserters() throws DataProcessorException {
     try {
       ResultSetMetaData metaData = resultSet.getMetaData();
       for (int i=1; i<= metaData.getColumnCount(); i++) {
         final String columnName = metaData.getColumnName(i);
         final int columnType = metaData.getColumnType(i);
         
-        SqlDataReader reader = createReader(columnName, columnType);
-        if (reader != null) {
-          readers.add(reader);
+        SqlDataInserter inserter = createInserter(columnName, columnType);
+        if (inserter != null) {
+          inserters.add(inserter);
         }
       }
     } catch (SQLException ex) {
@@ -252,7 +252,7 @@ public class JdbcBroker implements InputBroker {
     }
   }
   
-  private interface SqlDataReader {
+  private interface SqlDataInserter {
     void read(Map<String,Object> attributeMap, ResultSet resultSet) throws SQLException;
   }
 
@@ -282,7 +282,7 @@ public class JdbcBroker implements InputBroker {
         String id = String.format("%s", Integer.toString(resultSet.getRow()));
         SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), id, null, new URI("uuid", id, null), td.getSource().getRef(), td.getRef());
         ref.addContext(MimeType.APPLICATION_JSON, "{}".getBytes("UTF-8"));
-        for (SqlDataReader reader: readers) {
+        for (SqlDataInserter reader: inserters) {
           reader.read(ref.getAttributesMap(), resultSet);
         }
         return ref;
