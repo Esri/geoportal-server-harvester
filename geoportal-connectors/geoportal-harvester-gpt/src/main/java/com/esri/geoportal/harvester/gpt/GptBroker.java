@@ -47,6 +47,8 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * GPT broker.
@@ -156,18 +158,22 @@ import com.esri.geoportal.harvester.api.specs.OutputConnector;
       if (definition.getAcceptXml()) {
     	  
         byte[] content    = null;
-        String first_type = !ref.getContentType().isEmpty() ? ref.getContentType().toArray()[0].toString() : ""; 
         
         if (ref.getContent(MimeType.APPLICATION_PDF) != null && definition.isTranslatePdf()) {
         	content = PdfUtils.generateMetadataXML(ref.getContent(MimeType.APPLICATION_PDF), ref.getSourceUri().getPath(), ref.getSourceUri().toASCIIString(), geometryServiceUrl); 
         
-        } else if (first_type.endsWith("xml") == true) {        	
+        } else if (ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML) != null) {        	
         	content = ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML);
-        
-        } else {        	
-            Set <MimeType> types      = ref.getContentType();
-            byte[]         rawContent = ref.getContent(types.toArray(new MimeType[types.size()]));
-            content = rawContent!=null ? DocUtils.generateMetadataXML(rawContent, new File(ref.getId()).getName()) : null;
+          
+        } else {       
+            final MimeType [] toBeSkipped = new MimeType[]{MimeType.APPLICATION_PDF, MimeType.APPLICATION_XML, MimeType.TEXT_XML, MimeType.APPLICATION_JSON};
+            Set <MimeType> types      = ref.getContentType().stream()
+                    .filter(t->!Arrays.stream(toBeSkipped).anyMatch(s->s==t))
+                    .collect(Collectors.toSet());
+            if (!types.isEmpty()) {
+              byte[]         rawContent = ref.getContent(types.toArray(new MimeType[types.size()]));
+              content = rawContent!=null ? DocUtils.generateMetadataXML(rawContent, new File(ref.getId()).getName()) : null;
+            }
         }
 
         if (content != null) {
