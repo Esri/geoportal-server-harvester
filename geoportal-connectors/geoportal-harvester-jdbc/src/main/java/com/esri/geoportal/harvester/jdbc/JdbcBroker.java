@@ -27,6 +27,7 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.UnsupportedEncodingException;
@@ -363,6 +364,24 @@ public class JdbcBroker implements InputBroker {
     }
   }
   
+  private DataReference createReference(ResultSet resultSet) throws SQLException, JsonProcessingException, URISyntaxException, UnsupportedEncodingException  {
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode node = mapper.createObjectNode();
+    for (SqlStringRetriever retriever: retrievers) {
+      retriever.read(node, resultSet);
+    }
+
+    String id = node.get("fileid").textValue();
+    SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), id, null, new URI("uuid", id, null), td.getSource().getRef(), td.getRef());
+    ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(node).getBytes("UTF-8"));
+
+    for (SqlDataInserter reader: inserters) {
+      reader.read(ref.getAttributesMap(), resultSet);
+    }
+
+    return ref;
+  }
+  
   private interface SqlStringRetriever {
     void read(ObjectNode node, ResultSet resultSet) throws SQLException;
   }
@@ -394,21 +413,7 @@ public class JdbcBroker implements InputBroker {
     @Override
     public DataReference next() throws DataInputException {
       try {
-        String id = String.format("%s", Integer.toString(resultSet.getRow()));
-        SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), id, null, new URI("uuid", id, null), td.getSource().getRef(), td.getRef());
-        
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode node = mapper.createObjectNode();
-        for (SqlStringRetriever retriever: retrievers) {
-          retriever.read(node, resultSet);
-        }
-        ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(node).getBytes("UTF-8"));
-        
-        for (SqlDataInserter reader: inserters) {
-          reader.read(ref.getAttributesMap(), resultSet);
-        }
-        
-        return ref;
+        return createReference(resultSet);
       } catch (SQLException|URISyntaxException|UnsupportedEncodingException|JsonProcessingException ex) {
         throw new DataInputException(JdbcBroker.this, String.format("Error reading data"), ex);
       }
