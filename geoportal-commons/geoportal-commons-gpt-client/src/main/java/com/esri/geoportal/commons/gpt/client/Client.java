@@ -195,6 +195,7 @@ public class Client implements Closeable {
                     break;
                   case "title":
                   case "description":
+                  case "fileid":
                     s_format = "%s";
                     break;
                 }
