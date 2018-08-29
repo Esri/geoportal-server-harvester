@@ -193,6 +193,7 @@ public class Client implements Closeable {
                     s_format = "%s_s";
                     break;
                   case "title":
+                  case "description":
                     s_format = "%s";
                     break;
                 }
