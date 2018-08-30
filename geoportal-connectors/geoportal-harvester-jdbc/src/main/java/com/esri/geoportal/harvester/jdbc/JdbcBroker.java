@@ -359,7 +359,7 @@ public class JdbcBroker implements InputBroker {
       ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
       return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(zonedDateTime);
     } catch (DateTimeException ex) {
-      LOG.debug(String.format("Invalid ISO date: %s", date), ex);
+      LOG.trace(String.format("Invalid ISO date: %s", date), ex);
       return null;
     }
   }
