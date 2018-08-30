@@ -49,6 +49,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import org.apache.http.HttpStatus;
 
 /**
  * OAI-PMH client.
@@ -110,6 +111,12 @@ public class Client implements Closeable {
       Document responseDoc = parseDocument(responseContent);
 
       XPath xPath = XPathFactory.newInstance().newXPath();
+      
+      String errorCode = StringUtils.stripToNull((String)xPath.evaluate("/OAI-PMH/error/@code", responseDoc, XPathConstants.STRING));
+      if (errorCode!=null) {
+        throw new HttpResponseException(HttpStatus.SC_BAD_REQUEST, String.format("Invalid OAI-PMH response with code: %s", errorCode));
+      }
+      
       Node listIdentifiersNode = (Node) xPath.evaluate("/OAI-PMH/ListIdentifiers", responseDoc, XPathConstants.NODE);
 
       ListIdsResponse response = new ListIdsResponse();
@@ -156,6 +163,12 @@ public class Client implements Closeable {
 
       Document responseDoc = parseDocument(responseContent);
       XPath xPath = XPathFactory.newInstance().newXPath();
+      
+      String errorCode = StringUtils.stripToNull((String)xPath.evaluate("/OAI-PMH/error/@code", responseDoc, XPathConstants.STRING));
+      if (errorCode!=null) {
+        throw new HttpResponseException(HttpStatus.SC_BAD_REQUEST, String.format("Invalid OAI-PMH response with code: %s", errorCode));
+      }
+      
       Node metadataNode = (Node) xPath.evaluate("/OAI-PMH/GetRecord/record/metadata/*[1]", responseDoc, XPathConstants.NODE);
       
       if (metadataNode==null) {
