@@ -25,4 +25,5 @@ package com.esri.geoportal.harvester.jdbc;
   public static String P_JDBC_FILEID_COLUMN      = "jdbc-fileid-column";
   public static String P_JDBC_TITLE_COLUMN       = "jdbc-title-column";
   public static String P_JDBC_DESCRIPTION_COLUMN = "jdbc-description-column";
+  public static String P_JDBC_TYPES              = "jdbc-types";
 }

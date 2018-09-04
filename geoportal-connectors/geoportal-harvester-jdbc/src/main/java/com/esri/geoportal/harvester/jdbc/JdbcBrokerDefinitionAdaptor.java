@@ -34,6 +34,7 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   private String fileIdColumn;
   private String titleColumn;
   private String descriptionColumn;
+  private String types;
 
   /**
    * Creates instance of the adaptor.
@@ -55,6 +56,7 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
       fileIdColumn = get(JdbcConstants.P_JDBC_FILEID_COLUMN);
       titleColumn = get(JdbcConstants.P_JDBC_TITLE_COLUMN);
       descriptionColumn = get(JdbcConstants.P_JDBC_DESCRIPTION_COLUMN);
+      types = get(JdbcConstants.P_JDBC_TYPES);
     }
   }
 
@@ -66,6 +68,7 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
     consume(params,JdbcConstants.P_JDBC_FILEID_COLUMN);
     consume(params,JdbcConstants.P_JDBC_TITLE_COLUMN);
     consume(params,JdbcConstants.P_JDBC_DESCRIPTION_COLUMN);
+    consume(params,JdbcConstants.P_JDBC_TYPES);
     credAdaptor.override(params);
   }
 
@@ -137,5 +140,14 @@ public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public void setDescriptionColumn(String descriptionColumn) {
     this.descriptionColumn = descriptionColumn;
     set(JdbcConstants.P_JDBC_DESCRIPTION_COLUMN, descriptionColumn);
+  }
+
+  public String getTypes() {
+    return types;
+  }
+
+  public void setTypes(String types) {
+    this.types = types;
+    set(JdbcConstants.P_JDBC_TYPES, types);
   }
 }

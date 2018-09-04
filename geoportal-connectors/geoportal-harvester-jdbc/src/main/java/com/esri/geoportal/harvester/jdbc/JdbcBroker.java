@@ -27,7 +27,6 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.UnsupportedEncodingException;
@@ -46,9 +45,12 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +68,7 @@ public class JdbcBroker implements InputBroker {
   private ResultSet resultSet;
   private final List<SqlStringRetriever> retrievers = new ArrayList<>();
   private final List<SqlDataInserter> inserters = new ArrayList<>();
+  private final Map<String,String> types = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
   private TaskDefinition td;
 
   public JdbcBroker(JdbcConnector connector, JdbcBrokerDefinitionAdaptor definition) {
@@ -95,6 +98,7 @@ public class JdbcBroker implements InputBroker {
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     td = context.getTask().getTaskDefinition();
+    parseTypes();
     createConnection();
     createStatement();
     createResultSet();
@@ -141,6 +145,17 @@ public class JdbcBroker implements InputBroker {
   public DataContent readContent(String id) throws DataInputException {
     // TODO provide implementation for readContent()
     return null;
+  }
+  
+  private void parseTypes() {
+    if (definition.getTypes()!=null) {
+      Arrays.stream(definition.getTypes().split(",")).forEach(typedef -> {
+        List<String> kvp = Arrays.stream(StringUtils.trimToEmpty(typedef).split("=|:")).map(v->StringUtils.trimToEmpty(v)).collect(Collectors.toList());
+        if (kvp.size()==2) {
+          types.put(norm(kvp.get(0)), "_" + kvp.get(1).replaceAll("^_+", ""));
+        }
+      });
+    }
   }
   
   private void createConnection() throws DataProcessorException {
@@ -277,6 +292,18 @@ public class JdbcBroker implements InputBroker {
     }
   }
   
+  private String formatName(String baseFormat, String columnName) {
+    columnName = norm(columnName);
+    if (types.containsKey(columnName)) {
+      int dashIndex = baseFormat.lastIndexOf("_");
+      if (dashIndex>=0) {
+        baseFormat = baseFormat.substring(0, dashIndex);
+      }
+      baseFormat += types.get(columnName);
+    }
+    return String.format(baseFormat, columnName);
+  }
+  
   private SqlDataInserter createInserter(final String columnName, final int columnType) {
     SqlDataInserter inserter = null;
     
@@ -287,45 +314,45 @@ public class JdbcBroker implements InputBroker {
       case Types.LONGNVARCHAR:
       case Types.NVARCHAR:
       case Types.NCHAR:
-        inserter = (a,r)->a.put(String.format("src_%s_txt", norm(columnName)), readValue(r, columnName, String.class));
+        inserter = (a,r)->a.put(formatName("src_%s_txt", norm(columnName)), readValue(r, columnName, String.class));
         break;
 
       case Types.DOUBLE:
-        inserter = (a,r)->a.put(String.format("src_%s_d", norm(columnName)), readValue(r, columnName, Double.class));
+        inserter = (a,r)->a.put(formatName("src_%s_d", norm(columnName)), readValue(r, columnName, Double.class));
         break;
 
       case Types.FLOAT:
-        inserter = (a,r)->a.put(String.format("src_%s_f", norm(columnName)), readValue(r, columnName, Float.class));
+        inserter = (a,r)->a.put(formatName("src_%s_f", norm(columnName)), readValue(r, columnName, Float.class));
         break;
 
       case Types.INTEGER:
-        inserter = (a,r)->a.put(String.format("src_%s_i", norm(columnName)), readValue(r, columnName, Integer.class));
+        inserter = (a,r)->a.put(formatName("src_%s_i", norm(columnName)), readValue(r, columnName, Integer.class));
         break;
         
       case Types.SMALLINT:
       case Types.TINYINT:
-        inserter = (a,r)->a.put(String.format("src_%s_i", norm(columnName)), readValue(r, columnName, Short.class));
+        inserter = (a,r)->a.put(formatName("src_%s_i", norm(columnName)), readValue(r, columnName, Short.class));
         break;
 
       case Types.BIGINT:
       case Types.DECIMAL:
       case Types.NUMERIC:
-        inserter = (a,r)->a.put(String.format("src_%s_l", norm(columnName)), readValue(r, columnName, BigDecimal.class));
+        inserter = (a,r)->a.put(formatName("src_%s_l", norm(columnName)), readValue(r, columnName, BigDecimal.class));
         break;
 
       case Types.BOOLEAN:
-        inserter = (a,r)->a.put(String.format("src_%s_b", norm(columnName)), readValue(r, columnName, Boolean.class));
+        inserter = (a,r)->a.put(formatName("src_%s_b", norm(columnName)), readValue(r, columnName, Boolean.class));
         break;
 
 
       case Types.DATE:
-        inserter = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getDate(columnName)));
+        inserter = (a,r)->a.put(formatName("src_%s_dt", norm(columnName)), formatIsoDate(r.getDate(columnName)));
         break;
       case Types.TIME:
-        inserter = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getTime(columnName)));
+        inserter = (a,r)->a.put(formatName("src_%s_dt", norm(columnName)), formatIsoDate(r.getTime(columnName)));
         break;
       case Types.TIMESTAMP:
-        inserter = (a,r)->a.put(String.format("src_%s_dt", norm(columnName)), formatIsoDate(r.getTimestamp(columnName)));
+        inserter = (a,r)->a.put(formatName("src_%s_dt", norm(columnName)), formatIsoDate(r.getTimestamp(columnName)));
         break;
     }
     
@@ -350,7 +377,7 @@ public class JdbcBroker implements InputBroker {
   }
   
   private String norm(String name) {
-    return StringUtils.trimToEmpty(name).replaceAll("\\{Blank}+", "_").toLowerCase();
+    return StringUtils.trimToEmpty(name).replaceAll("\\p{Blank}+|_+", "_").toLowerCase();
   }
   
   private String formatIsoDate(Date date) {
