@@ -29,10 +29,15 @@ import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -51,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -262,6 +268,14 @@ public class JdbcBroker implements InputBroker {
       case Types.TIMESTAMP:
         retriever = (n, r)->n.put(fieldName, formatIsoDate(r.getTimestamp(columnName)));
         break;
+        
+      case Types.CLOB:
+        retriever = (n, r)->n.put(fieldName, formatClob(r.getClob(columnName)));
+        break;
+        
+      case Types.BLOB:
+        retriever = (n, r)->n.put(fieldName, formatBlob(r.getBlob(columnName)));
+        break;
     }
     
     return retriever;
@@ -354,6 +368,16 @@ public class JdbcBroker implements InputBroker {
       case Types.TIMESTAMP:
         inserter = (a,r)->a.put(formatName("src_%s_dt", norm(columnName)), formatIsoDate(r.getTimestamp(columnName)));
         break;
+        
+      case Types.CLOB:
+        inserter = (a,r)->a.put(formatName("src_%s_txt", norm(columnName)), formatClob(r.getClob(columnName)));
+        break;
+        
+      case Types.BLOB:
+        if (types.containsKey(norm(columnName)) && types.get(norm(columnName)).equals("_txt")) {
+          inserter = (a,r)->a.put(formatName("src_%s_txt", norm(columnName)), formatBlob(r.getBlob(columnName)));
+        }
+        break;
     }
     
     return inserter;
@@ -387,6 +411,30 @@ public class JdbcBroker implements InputBroker {
       return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(zonedDateTime);
     } catch (DateTimeException ex) {
       LOG.trace(String.format("Invalid ISO date: %s", date), ex);
+      return null;
+    }
+  }
+  
+  private String formatClob(Clob clob) {
+    if (clob==null) return null;
+    try {
+      try (Reader r = clob.getCharacterStream();) {
+        return IOUtils.toString(r);
+      }
+    } catch (Exception ex) {
+      LOG.trace(String.format("Invalid clob."), ex);
+      return null;
+    }
+  }
+  
+  private String formatBlob(Blob blob) {
+    if (blob==null) return null;
+    try {
+      try (InputStream r = blob.getBinaryStream();) {
+        return IOUtils.toString(r, "UTF-8");
+      }
+    } catch (Exception ex) {
+      LOG.trace(String.format("Invalid blob."), ex);
       return null;
     }
   }
