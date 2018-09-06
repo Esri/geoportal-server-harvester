@@ -274,6 +274,9 @@ public class JdbcBroker implements InputBroker {
         break;
         
       case Types.BLOB:
+      case Types.BINARY:
+      case Types.VARBINARY:
+      case Types.LONGVARBINARY:
         retriever = (n, r)->n.put(fieldName, formatBlob(r.getBlob(columnName)));
         break;
     }
@@ -374,6 +377,9 @@ public class JdbcBroker implements InputBroker {
         break;
         
       case Types.BLOB:
+      case Types.BINARY:
+      case Types.VARBINARY:
+      case Types.LONGVARBINARY:
         if (types.containsKey(norm(columnName)) && types.get(norm(columnName)).equals("_txt")) {
           inserter = (a,r)->a.put(formatName("src_%s_txt", norm(columnName)), formatBlob(r.getBlob(columnName)));
         }
