@@ -316,14 +316,18 @@ public class JdbcBroker implements InputBroker {
       String desiredFormat = columnMappings.get(columnName);
       if (!desiredFormat.startsWith("_")) {
         attributeNames.add(desiredFormat);
-        attributeNames.add(String.format(baseFormat, desiredFormat));
+        String suffix = "";
+        int dashIndex = baseFormat.lastIndexOf("_");
+        if (dashIndex>=0) {
+          suffix = baseFormat.substring(dashIndex);
+        }
+        attributeNames.add((desiredFormat.startsWith("src_")? "": "src_")+desiredFormat.replaceAll("(_txt|_s|_f|_d|_i|_l|_dt|_b)$", "")+suffix);
       } else {
         int dashIndex = baseFormat.lastIndexOf("_");
         if (dashIndex>=0) {
           baseFormat = baseFormat.substring(0, dashIndex);
         }
-        baseFormat += desiredFormat;
-        attributeNames.add(baseFormat + desiredFormat);
+        attributeNames.add(String.format(baseFormat + desiredFormat, columnName));
       }
     } else {
       attributeNames.add(String.format(baseFormat, columnName));
