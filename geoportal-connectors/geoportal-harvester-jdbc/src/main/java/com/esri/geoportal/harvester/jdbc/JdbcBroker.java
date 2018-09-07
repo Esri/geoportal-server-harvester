@@ -74,7 +74,7 @@ public class JdbcBroker implements InputBroker {
   private ResultSet resultSet;
   private final List<SqlStringRetriever> retrievers = new ArrayList<>();
   private final List<SqlDataInserter> inserters = new ArrayList<>();
-  private final Map<String,String> types = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+  private final Map<String,String> columnMappings = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
   private TaskDefinition td;
 
   public JdbcBroker(JdbcConnector connector, JdbcBrokerDefinitionAdaptor definition) {
@@ -104,7 +104,7 @@ public class JdbcBroker implements InputBroker {
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     td = context.getTask().getTaskDefinition();
-    parseTypes();
+    parseColumnNames();
     createConnection();
     createStatement();
     createResultSet();
@@ -153,12 +153,12 @@ public class JdbcBroker implements InputBroker {
     return null;
   }
   
-  private void parseTypes() {
+  private void parseColumnNames() {
     if (definition.getTypes()!=null) {
       Arrays.stream(definition.getTypes().split(",")).forEach(typedef -> {
         List<String> kvp = Arrays.stream(StringUtils.trimToEmpty(typedef).split("=|:")).map(v->StringUtils.trimToEmpty(v)).collect(Collectors.toList());
         if (kvp.size()==2) {
-          types.put(norm(kvp.get(0)), "_" + kvp.get(1).replaceAll("^_+", ""));
+          columnMappings.put(norm(kvp.get(0)), kvp.get(1));
         }
       });
     }
@@ -309,20 +309,30 @@ public class JdbcBroker implements InputBroker {
     }
   }
   
-  private String formatName(String baseFormat, String columnName) {
+  private List<String> createAttributeNames(String baseFormat, String columnName) {
+    List<String> attributeNames = new ArrayList<>();
     columnName = norm(columnName);
-    if (types.containsKey(columnName)) {
-      int dashIndex = baseFormat.lastIndexOf("_");
-      if (dashIndex>=0) {
-        baseFormat = baseFormat.substring(0, dashIndex);
+    if (columnMappings.containsKey(columnName)) {
+      String desiredFormat = columnMappings.get(columnName);
+      if (!desiredFormat.startsWith("_")) {
+        attributeNames.add(desiredFormat);
+        attributeNames.add(String.format(baseFormat, desiredFormat));
+      } else {
+        int dashIndex = baseFormat.lastIndexOf("_");
+        if (dashIndex>=0) {
+          baseFormat = baseFormat.substring(0, dashIndex);
+        }
+        baseFormat += desiredFormat;
+        attributeNames.add(baseFormat + desiredFormat);
       }
-      baseFormat += types.get(columnName);
+    } else {
+      attributeNames.add(String.format(baseFormat, columnName));
     }
-    return String.format(baseFormat, columnName);
+    return attributeNames;
   }
   
-  private SqlDataInserter createInserter(final String columnName, final int columnType) {
-    SqlDataInserter inserter = null;
+  private List<SqlDataInserter> createInserters(final String columnName, final int columnType) {
+    List<SqlDataInserter> inserters = new ArrayList<>();
     
     switch (columnType) {
       case Types.VARCHAR:
@@ -331,62 +341,74 @@ public class JdbcBroker implements InputBroker {
       case Types.LONGNVARCHAR:
       case Types.NVARCHAR:
       case Types.NCHAR:
-        inserter = (a,r)->a.put(formatName("src_%s_txt", norm(columnName)), readValue(r, columnName, String.class));
+        createAttributeNames("src_%s_txt", norm(columnName)).forEach(
+                name -> inserters.add((a,r)->a.put(name, readValue(r, columnName, String.class))));
         break;
 
       case Types.DOUBLE:
-        inserter = (a,r)->a.put(formatName("src_%s_d", norm(columnName)), readValue(r, columnName, Double.class));
+        createAttributeNames("src_%s_d", norm(columnName)).forEach(
+                name -> inserters.add((a,r)->a.put(name, readValue(r, columnName, Double.class))));
         break;
 
       case Types.FLOAT:
-        inserter = (a,r)->a.put(formatName("src_%s_f", norm(columnName)), readValue(r, columnName, Float.class));
+        createAttributeNames("src_%s_f", norm(columnName)).forEach(
+                name -> inserters.add((a,r)->a.put(name, readValue(r, columnName, Float.class))));
         break;
 
       case Types.INTEGER:
-        inserter = (a,r)->a.put(formatName("src_%s_i", norm(columnName)), readValue(r, columnName, Integer.class));
+        createAttributeNames("src_%s_i", norm(columnName)).forEach(
+                name -> inserters.add((a,r)->a.put(name, readValue(r, columnName, Integer.class))));
         break;
         
       case Types.SMALLINT:
       case Types.TINYINT:
-        inserter = (a,r)->a.put(formatName("src_%s_i", norm(columnName)), readValue(r, columnName, Short.class));
+        createAttributeNames("src_%s_i", norm(columnName)).forEach(
+                name -> inserters.add((a,r)->a.put(name, readValue(r, columnName, Short.class))));
         break;
 
       case Types.BIGINT:
       case Types.DECIMAL:
       case Types.NUMERIC:
-        inserter = (a,r)->a.put(formatName("src_%s_l", norm(columnName)), readValue(r, columnName, BigDecimal.class));
+        createAttributeNames("src_%s_l", norm(columnName)).forEach(
+                name -> inserters.add((a,r)->a.put(name, readValue(r, columnName, BigDecimal.class))));
         break;
 
       case Types.BOOLEAN:
-        inserter = (a,r)->a.put(formatName("src_%s_b", norm(columnName)), readValue(r, columnName, Boolean.class));
+        createAttributeNames("src_%s_b", norm(columnName)).forEach(
+                name -> inserters.add((a,r)->a.put(name, readValue(r, columnName, Boolean.class))));
         break;
 
 
       case Types.DATE:
-        inserter = (a,r)->a.put(formatName("src_%s_dt", norm(columnName)), formatIsoDate(r.getDate(columnName)));
+        createAttributeNames("src_%s_dt", norm(columnName)).forEach(
+                name -> inserters.add((a,r)->a.put(name, formatIsoDate(r.getDate(columnName)))));
         break;
       case Types.TIME:
-        inserter = (a,r)->a.put(formatName("src_%s_dt", norm(columnName)), formatIsoDate(r.getTime(columnName)));
+        createAttributeNames("src_%s_dt", norm(columnName)).forEach(
+                name -> inserters.add((a,r)->a.put(name, formatIsoDate(r.getTime(columnName)))));
         break;
       case Types.TIMESTAMP:
-        inserter = (a,r)->a.put(formatName("src_%s_dt", norm(columnName)), formatIsoDate(r.getTimestamp(columnName)));
+        createAttributeNames("src_%s_dt", norm(columnName)).forEach(
+                name -> inserters.add((a,r)->a.put(name, formatIsoDate(r.getTimestamp(columnName)))));
         break;
         
       case Types.CLOB:
-        inserter = (a,r)->a.put(formatName("src_%s_txt", norm(columnName)), formatClob(r.getClob(columnName)));
+        createAttributeNames("src_%s_txt", norm(columnName)).forEach(
+                name -> inserters.add((a,r)->a.put(name, formatClob(r.getClob(columnName)))));
         break;
         
       case Types.BLOB:
       case Types.BINARY:
       case Types.VARBINARY:
       case Types.LONGVARBINARY:
-        if (types.containsKey(norm(columnName)) && types.get(norm(columnName)).equals("_txt")) {
-          inserter = (a,r)->a.put(formatName("src_%s_txt", norm(columnName)), formatBlob(r.getBlob(columnName)));
+        if (columnMappings.containsKey(norm(columnName)) && columnMappings.get(norm(columnName)).endsWith("_txt")) {
+          createAttributeNames("src_%s_txt", norm(columnName)).forEach(
+              name -> inserters.add((a,r)->a.put(name, formatBlob(r.getBlob(columnName)))));
         }
         break;
     }
     
-    return inserter;
+    return inserters;
   }
   
   private void createInserters() throws DataProcessorException {
@@ -396,10 +418,7 @@ public class JdbcBroker implements InputBroker {
         final String columnName = metaData.getColumnName(i);
         final int columnType = metaData.getColumnType(i);
         
-        SqlDataInserter inserter = createInserter(columnName, columnType);
-        if (inserter != null) {
-          inserters.add(inserter);
-        }
+        inserters.addAll(createInserters(columnName, columnType));
       }
     } catch (SQLException ex) {
       throw new DataProcessorException(String.format("Error opening JDBC connection to: %s", definition.getConnection()), ex);
@@ -427,7 +446,7 @@ public class JdbcBroker implements InputBroker {
       try (Reader r = clob.getCharacterStream();) {
         return IOUtils.toString(r);
       }
-    } catch (Exception ex) {
+    } catch (IOException|SQLException ex) {
       LOG.trace(String.format("Invalid clob."), ex);
       return null;
     }
@@ -439,7 +458,7 @@ public class JdbcBroker implements InputBroker {
       try (InputStream r = blob.getBinaryStream();) {
         return IOUtils.toString(r, "UTF-8");
       }
-    } catch (Exception ex) {
+    } catch (IOException|SQLException ex) {
       LOG.trace(String.format("Invalid blob."), ex);
       return null;
     }

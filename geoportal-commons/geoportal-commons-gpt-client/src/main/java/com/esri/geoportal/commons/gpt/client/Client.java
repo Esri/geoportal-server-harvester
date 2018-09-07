@@ -222,8 +222,6 @@ public class Client implements Closeable {
     }
 
     for (Map.Entry<String,Object> entry: attributes.entrySet()) {
-      if (!entry.getKey().startsWith("src_")) continue;
-      
       if (entry.getValue()==null) {
         jsonRequest.putNull(entry.getKey());
       } else {
