@@ -373,7 +373,7 @@ public class JdbcBroker implements InputBroker {
       case Types.BIGINT:
       case Types.DECIMAL:
       case Types.NUMERIC:
-        createAttributeNames("src_%s_l", norm(columnName)).forEach(
+        createAttributeNames("src_%s_d", norm(columnName)).forEach(
                 name -> inserters.add((a,r)->a.put(name, readValue(r, columnName, BigDecimal.class))));
         break;
 

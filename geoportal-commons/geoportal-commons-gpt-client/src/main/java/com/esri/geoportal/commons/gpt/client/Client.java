@@ -29,6 +29,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -229,10 +231,14 @@ public class Client implements Closeable {
           jsonRequest.put(entry.getKey(), (String)entry.getValue());
         } else if(entry.getValue() instanceof Double) {
           jsonRequest.put(entry.getKey(), (Double)entry.getValue());
+        } else if(entry.getValue() instanceof BigDecimal) {
+          jsonRequest.put(entry.getKey(), ((BigDecimal)entry.getValue()).doubleValue());
         } else if(entry.getValue() instanceof Float) {
           jsonRequest.put(entry.getKey(), (Float)entry.getValue());
         } else if(entry.getValue() instanceof Long) {
           jsonRequest.put(entry.getKey(), (Long)entry.getValue());
+        } else if(entry.getValue() instanceof BigInteger) {
+          jsonRequest.put(entry.getKey(), ((BigInteger)entry.getValue()).longValue());
         } else if(entry.getValue() instanceof Integer) {
           jsonRequest.put(entry.getKey(), (Integer)entry.getValue());
         } else if(entry.getValue() instanceof Boolean) {
