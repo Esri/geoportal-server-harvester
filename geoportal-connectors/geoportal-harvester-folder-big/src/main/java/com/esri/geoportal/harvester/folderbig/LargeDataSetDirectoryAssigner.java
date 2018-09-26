@@ -253,7 +253,7 @@ public class LargeDataSetDirectoryAssigner {
     /**
      * not synchronized intentionally to be used in a single thread
      *
-     * @return
+     * @return a file
      */
     public File getNextDirPath() {
         dirFileCount++;
