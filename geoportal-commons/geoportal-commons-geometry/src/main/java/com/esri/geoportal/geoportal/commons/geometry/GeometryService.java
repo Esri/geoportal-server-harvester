@@ -183,11 +183,17 @@ public class GeometryService implements Closeable {
     httpClient.close();
   }
   
+  /**
+   * Multi-point geometry.
+   */
   public static final class MultiPointGeometry {
     public String geometryType = "esriGeometryMultipoint";
     public MultiPointGeometries [] geometries = new MultiPointGeometries[]{ new MultiPointGeometries() };
   }
   
+  /**
+   * Array of multi-point geometries.
+   */
   public static final class MultiPointGeometries {
     public List<Double[]> points;
   }
