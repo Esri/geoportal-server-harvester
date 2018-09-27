@@ -654,11 +654,17 @@ public class Client implements Closeable {
     }
   }
 
+  /**
+   * Search context.
+   */
   public static class SearchContext {
 
     public String _scroll_id;
   }
 
+  /**
+   * Access token.
+   */
   public static class Token {
 
     public String access_token;

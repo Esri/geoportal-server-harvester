@@ -1,4 +1,4 @@
-/**
+/*
  Apache License
  Version 2.0, January 2004
  http://www.apache.org/licenses/
@@ -209,7 +209,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  * Created by bozyurt on 12/1/15.
+ * Large data set directory assigner.
+ * @author bozyurt on 12/1/15
  */
 public class LargeDataSetDirectoryAssigner {
     private int maxNumOfFilesPerDir = 2000;

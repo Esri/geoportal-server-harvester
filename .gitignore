@@ -1,53 +1,8 @@
-/geoportal-adaptors/target/
-/target/
-/geoportal-application/target/
-/geoportal-SDK/target/
-/geoportal-SDK/geoportal-harvester-api/target/
-/geoportal-adaptors/geoportal-harvester-console/target/
-/geoportal-adaptors/geoportal-harvester-csw/target/
-/geoportal-adaptors/geoportal-harvester-folder/target/
-/geoportal-adaptors/geoportal-harvester-gpt/target/
-/geoportal-adaptors/geoportal-harvester-waf/target/
-/geoportal-application/geoportal-harvester-engine/target/
-/geoportal-application/geoportal-harvester-jar/target/
-/geoportal-application/geoportal-harvester-war/target/
-/geoportal-commons/target/
-/geoportal-commons/geoportal-commons-utils/target/
-/geoportal-commons/geoportal-commons-pdf/target/
-/geoportal-commons/geoportal-commons-robots/target/
-/geoportal-commons/geoportal-commons-csw-client/target/
-/geoportal-commons/geoportal-commons-gpt-client/target/
-/geoportal-connectors/geoportal-harvester-console/target/
-/geoportal-connectors/geoportal-harvester-csw/target/
-/geoportal-connectors/geoportal-harvester-folder/target/
-/geoportal-connectors/geoportal-harvester-gpt/target/
-/geoportal-connectors/geoportal-harvester-waf/target/
-/geoportal-connectors/geoportal-harvester-sink/target/
-/geoportal-SDK/geoportal-harvester-api-base/target/
-/geoportal-connectors/target/
-/geoportal-commons/geoportal-commons-robots/nbproject/
-/geoportal-commons/geoportal-commons-csw-client/nbproject/
-/geoportal-connectors/geoportal-harvester-unc/target/
-/geoportal-connectors/geoportal-harvester-agp-publisher/target/
-/geoportal-connectors/geoportal-harvester-ags/target/
-/geoportal-connectors/geoportal-harvester-agp-source/target/
-/geoportal-commons/geoportal-commons-meta/target/
-/geoportal-commons/geoportal-commons-agp-client/target/
-/geoportal-commons/geoportal-commons-ags-client/target/
-/geoportal-commons/geoportal-commons-constants/target/
-/geoportal-connectors/geoportal-harvester-gptsrc/target/
-/geoportal-application/geoportal-harvester-cli/target/
-/geoportal-connectors/geoportal-harvester-ckan/target/
-/geoportal-commons/geoportal-commons-ckan-client/target/
-/geoportal-connectors/geoportal-harvester-migration/target/
-/geoportal-commons/geoportal-commons-geometry/target/
-/geoportal-commons/geoportal-commons-dcat/target/
 
 .project
 .classpath
 .settings/
-/geoportal-commons/geoportal-commons-oai-client/target/
-/geoportal-connectors/geoportal-harvester-oai-pmh/target/
+target/
 
 ### JetBrains template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
@@ -85,4 +40,3 @@ geoportal/nb-configuration.xml
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
-/geoportal-connectors/geoportal-harvester-folder-big/target/

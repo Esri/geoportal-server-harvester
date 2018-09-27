@@ -54,6 +54,15 @@
                 <packages>com.esri.geoportal.commons.*</packages>
               </group>
             </groups>
+            <links>
+              <link>https://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/</link>
+              <link>http://esri.github.io/geometry-api-java/javadoc/</link>
+              <link>https://docs.spring.io/spring-security/site/docs/current/api/</link>
+              <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
+              <link>https://docs.spring.io/spring-ldap/docs/current/apidocs/</link>
+              <link>https://docs.oracle.com/javaee/7/api/</link>
+              <link>https://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/</link>
+            </links>
           </configuration>
         </plugin>    
       </plugins>
