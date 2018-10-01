@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-      <artifactId>geoportal-harvester</artifactId>
-      <groupId>com.esri.geoportal</groupId>
-      <version>2.6.1-SNAPSHOT</version>
-    </parent>
-    <artifactId>geoportal-commons</artifactId>
-    <packaging>pom</packaging>
-    <name>Esri :: Geoportal Server :: Harvester :: Commons</name>
-    <description>Collection of Harvester common modules.</description>
-    <modules>
-        <module>geoportal-commons-csw-client</module>
-        <module>geoportal-commons-gpt-client</module>
-        <module>geoportal-commons-robots</module>
-        <module>geoportal-commons-utils</module>
-        <module>geoportal-commons-meta</module>
-        <module>geoportal-commons-ags-client</module>
-        <module>geoportal-commons-agp-client</module>
-        <module>geoportal-commons-constants</module>
-        <module>geoportal-commons-ckan-client</module>
-        <module>geoportal-commons-geometry</module>
-        <module>geoportal-commons-pdf</module>
-        <module>geoportal-commons-oai-client</module>
-        <module>geoportal-commons-doc</module>
-    </modules>
-    <properties>
-    </properties>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>geoportal-harvester</artifactId>
+    <groupId>com.esri.geoportal</groupId>
+    <version>2.6.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>geoportal-commons</artifactId>
+  <packaging>pom</packaging>
+  <name>Esri :: Geoportal Server :: Harvester :: Commons</name>
+  <description>Collection of Harvester common modules.</description>
+  <modules>
+    <module>geoportal-commons-csw-client</module>
+    <module>geoportal-commons-gpt-client</module>
+    <module>geoportal-commons-robots</module>
+    <module>geoportal-commons-utils</module>
+    <module>geoportal-commons-meta</module>
+    <module>geoportal-commons-ags-client</module>
+    <module>geoportal-commons-agp-client</module>
+    <module>geoportal-commons-constants</module>
+    <module>geoportal-commons-ckan-client</module>
+    <module>geoportal-commons-geometry</module>
+    <module>geoportal-commons-pdf</module>
+    <module>geoportal-commons-oai-client</module>
+    <module>geoportal-commons-doc</module>
+  </modules>
+  <properties>
+  </properties>
 </project>
