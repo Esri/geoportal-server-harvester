@@ -65,83 +65,137 @@ public class ArcGISAuthenticationProviderForHarvester implements AuthenticationP
   private String rolePrefix;
   private boolean showMyProfileLink = false;
 
-  /** True if all authenticated users shoudl have a Publisher role. */
+  /** 
+   * True if all authenticated users shoudl have a Publisher role. 
+   * @return <code>true</code> if all users can publish
+   */
   public boolean getAllUsersCanPublish() {
     return allUsersCanPublish;
   }
-  /** True if all authenticated users should have a Publisher role. */
+  /** 
+   * True if all authenticated users should have a Publisher role. 
+   * @param allUsersCanPublish <code>true</code> to let all users can publish
+   */
   public void setAllUsersCanPublish(boolean allUsersCanPublish) {
     this.allUsersCanPublish = allUsersCanPublish;
   }
 
-  /** The ArcGIS application item id that will be used for OAuthe authentication. */
+  /** 
+   * The ArcGIS application item id that will be used for OAuthe authentication. 
+   * @return application id
+   */
   public String getAppId() {
     return appId;
   }
-  /** The ArcGIS application item id that will be used for OAuth authentication. */
+  /** 
+   * The ArcGIS application item id that will be used for OAuth authentication. 
+   * @param appId application id
+   */
   public void setAppId(String appId) {
     this.appId = appId;
   }
 
-  /** The ArcGIS OAuth authorize URL. */
+  /** 
+   * The ArcGIS OAuth authorize URL. 
+   * @return authorization URL
+   */
   public String getAuthorizeUrl() {
     return authorizeUrl;
   }
-  /** The ArcGIS OAuth authorize URL. */
+  /** 
+   * The ArcGIS OAuth authorize URL.
+   * @param authorizeUrl authorization URL
+   */
   public void setAuthorizeUrl(String authorizeUrl) {
     this.authorizeUrl = authorizeUrl;
   }
 
-  /** The create account URL. */
+  /** 
+   * The create account URL. 
+   * @return create account URL
+   */
   public String getCreateAccountUrl() {
     return createAccountUrl;
   }
-  /** The create account URL. */
+  /** 
+   * The create account URL. 
+   * @param createAccountUrl create account URL
+   */
   public void setCreateAccountUrl(String createAccountUrl) {
     this.createAccountUrl = createAccountUrl;
   }
   
-  /** Token expiration minutes. */
+  /** 
+   * Token expiration minutes. 
+   * @return token expiration in minutes
+   */
   public int getExpirationMinutes() {
     return expirationMinutes;
   }
-  /** Token expiration minutes. */
+  /** 
+   * Token expiration minutes. 
+   * @param expirationMinutes token expiration in minutes
+   */
   public void setExpirationMinutes(int expirationMinutes) {
     this.expirationMinutes = expirationMinutes;
   }
 
-  /** The id of the ArcGIS group containing Geoportal administrators (optional). */
+  /** 
+   * The id of the ArcGIS group containing Geoportal administrators (optional). 
+   * @return administrators group id
+   */
   public String getGeoportalAdministratorsGroupId() {
     return geoportalAdministratorsGroupId;
   }
-  /** The id of the ArcGIS group containing Geoportal administrators (optional). */
+  /** 
+   * The id of the ArcGIS group containing Geoportal administrators (optional). 
+   * @param geoportalAdministratorsGroupId administrators group id
+   */
   public void setGeoportalAdministratorsGroupId(String geoportalAdministratorsGroupId) {
     this.geoportalAdministratorsGroupId = geoportalAdministratorsGroupId;
   }
 
-  /** The id of the ArcGIS group containing Geoportal publishers (optional). */
+  /** 
+   * The id of the ArcGIS group containing Geoportal publishers (optional). 
+   * @return publishers group id
+   */
   public String getGeoportalPublishersGroupId() {
     return geoportalPublishersGroupId;
   }
-  /** The id of the ArcGIS group containing Geoportal publishers (optional). */
+  /** 
+   * The id of the ArcGIS group containing Geoportal publishers (optional). 
+   * @param geoportalPublishersGroupId publishers group id
+   */
   public void setGeoportalPublishersGroupId(String geoportalPublishersGroupId) {
     this.geoportalPublishersGroupId = geoportalPublishersGroupId;
   }
   
-  /** The Spring role prefix. */
+  /** 
+   * The Spring role prefix. 
+   * @return role prefix
+   */
   public String getRolePrefix() {
     return rolePrefix;
   }
-  /** The Spring role prefix. */
+  /** 
+   * The Spring role prefix. 
+   * @param rolePrefix role prefix
+   */
   public void setRolePrefix(String rolePrefix) {
     this.rolePrefix = rolePrefix;
   }
   
-  /** If true, show My Profile link. */
+  /** 
+   * If true, show My Profile link. 
+   * @return <code>true</code> to show 'my profile' link
+   */
   public boolean getShowMyProfileLink() {
     return showMyProfileLink;
   }
-  /** If true, show My Profile link. */
+  /** 
+   * If true, show My Profile link. 
+   * @param showMyProfileLink <code>true</code> to show 'my profile' link
+   */
   public void setShowMyProfileLink(boolean showMyProfileLink) {
     this.showMyProfileLink = showMyProfileLink;
   }
@@ -186,8 +240,8 @@ public class ArcGISAuthenticationProviderForHarvester implements AuthenticationP
     HttpHeaders headers = new HttpHeaders();
     if (referer != null) {
       headers.add("Referer",referer);
-    };
-    HttpEntity<String> requestEntity = new HttpEntity<String>(headers);
+    }
+    HttpEntity<String> requestEntity = new HttpEntity<>(headers);
     ResponseEntity<String> responseEntity = rest.exchange(url,HttpMethod.GET,requestEntity,String.class);
     String response = responseEntity.getBody();
     //System.err.println(response);;
@@ -310,7 +364,7 @@ public class ArcGISAuthenticationProviderForHarvester implements AuthenticationP
     RestTemplate rest = new RestTemplate();
     HttpHeaders headers = new HttpHeaders();
     headers.add("Content-Type","application/x-www-form-urlencoded");
-    HttpEntity<String> requestEntity = new HttpEntity<String>(content.toString(),headers);
+    HttpEntity<String> requestEntity = new HttpEntity<>(content.toString(),headers);
     ResponseEntity<String> responseEntity = rest.exchange(url,HttpMethod.POST,requestEntity,String.class);
     String response = responseEntity.getBody();
     if (!responseEntity.getStatusCode().equals(HttpStatus.OK)) {
@@ -328,7 +382,7 @@ public class ArcGISAuthenticationProviderForHarvester implements AuthenticationP
   
   /**
    * Get the ArcGIS portal URL.
-   * @return the url
+   * @return Portal URL
    */
   public String getPortalUrl() {
     String authorizeUrl = this.getAuthorizeUrl();
@@ -337,7 +391,7 @@ public class ArcGISAuthenticationProviderForHarvester implements AuthenticationP
 
   /**
    * Get the ArcGIS rest URL.
-   * @return the url
+   * @return REST URL
    */
   public String getRestUrl() {
     String authorizeUrl = this.getAuthorizeUrl();

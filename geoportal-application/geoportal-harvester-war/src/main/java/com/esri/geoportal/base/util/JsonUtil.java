@@ -47,6 +47,7 @@ public class JsonUtil {
    * Adds an error to an object.
    * @param jso the parent
    * @param message the message
+   * @return error object
    */
   public static JsonObject addError(JsonObject jso, String message) {
     if (message == null) message = "";
@@ -149,6 +150,8 @@ public class JsonUtil {
 
   /**
    * Creates a JSON string representing an error response.
+   * @param message error message
+   * @param pretty <code>true</code> for pretty formatting
    * @return the JSON string
    */
   public static String newErrorResponse(String message, boolean pretty) {

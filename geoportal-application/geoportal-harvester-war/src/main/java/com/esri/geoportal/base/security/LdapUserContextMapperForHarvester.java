@@ -42,20 +42,32 @@ public class LdapUserContextMapperForHarvester extends LdapUserDetailsMapper {
     super();
   }
   
-  /** The default role. */
+  /** 
+   * The default role. 
+   * @return default role
+   */
   public String getDefaultRole() {
     return defaultRole;
   }
-  /** The default role. */
+  /** 
+   * The default role. 
+   * @param defaultRole default roles
+   */
   public void setDefaultRole(String defaultRole) {
     this.defaultRole = defaultRole;
   }
   
-  /** Maps LDAP groups to Geoportal roles (ADMIN,PUBLISHER). */
+  /** 
+   * Maps LDAP groups to Geoportal roles (ADMIN,PUBLISHER). 
+   * @return roles
+   */
   public Map<String, String> getRoleMap() {
     return roleMap;
   }
-  /** Maps LDAP groups to Geoportal roles (ADMIN,PUBLISHER). */
+  /** 
+   * Maps LDAP groups to Geoportal roles (ADMIN,PUBLISHER). 
+   * @param roleMap roles
+   */
   public void setRoleMap(Map<String, String> roleMap) {
     this.roleMap = roleMap;
   }

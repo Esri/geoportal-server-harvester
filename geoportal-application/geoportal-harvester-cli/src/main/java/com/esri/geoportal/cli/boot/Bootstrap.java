@@ -110,7 +110,7 @@ public class Bootstrap {
   
   /**
    * Creates instance of the bootstrap.
-   * @param geometryServiceUrl
+   * @param geometryServiceUrl Esri geometry service URL
    * @param reportManager report manager
    */
   public Bootstrap(String geometryServiceUrl, ReportManager reportManager) {
