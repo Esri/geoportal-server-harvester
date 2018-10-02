@@ -13,8 +13,8 @@
 
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-        <spring.version>5.0.1.RELEASE</spring.version>
-        <springsecurity.version>5.0.1.RELEASE</springsecurity.version>
+        <spring.version>5.1.0.RELEASE</spring.version>
+        <springsecurity.version>5.1.0.RELEASE</springsecurity.version>
     </properties>
     
     <dependencies>
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.196</version>
+            <version>1.4.197</version>
         </dependency>
  
         <!-- Spring Security -->
@@ -89,12 +89,12 @@
         <dependency>
           <groupId>org.springframework.security.oauth</groupId>
           <artifactId>spring-security-oauth2</artifactId>
-          <version>2.2.0.RELEASE</version>
+          <version>2.3.3.RELEASE</version>
         </dependency>
         <dependency>
           <groupId>org.springframework.security</groupId>
           <artifactId>spring-security-jwt</artifactId>
-          <version>1.0.8.RELEASE</version>
+          <version>1.0.9.RELEASE</version>
         </dependency>
     </dependencies>
 
@@ -103,7 +103,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
+                <version>3.8.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -115,7 +115,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.2.2</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <attachClasses>true</attachClasses>
@@ -124,7 +124,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.0.2</version>
+                <version>3.1.1</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
