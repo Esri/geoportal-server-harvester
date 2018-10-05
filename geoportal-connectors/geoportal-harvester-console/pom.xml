@@ -17,8 +17,4 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
-    <properties>
-    </properties>
-    <build>
-    </build>
 </project>

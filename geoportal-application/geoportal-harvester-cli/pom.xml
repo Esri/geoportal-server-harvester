@@ -22,8 +22,6 @@
             <version>1.4</version>
         </dependency>
     </dependencies>
-    <properties>
-    </properties>
     <build>
       <plugins>
         <plugin>

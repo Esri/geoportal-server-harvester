@@ -10,8 +10,6 @@
     <packaging>jar</packaging>
     <name>Esri :: Geoportal Server :: Commons :: Utils</name>
     <description>Collection of uncategorized utility classes.</description>
-    <properties>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

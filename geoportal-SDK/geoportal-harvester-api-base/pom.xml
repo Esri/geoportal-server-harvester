@@ -10,8 +10,6 @@
     <name>Esri :: Geoportal Server :: Harvester :: Api Base</name>
     <description>Abstract implementations of API interfaces.</description>
     <packaging>jar</packaging>
-    <properties>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

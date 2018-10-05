@@ -10,6 +10,4 @@
     <packaging>jar</packaging>
     <name>Esri :: Geoportal Server :: Commons :: Constants</name>
     <description>Generic Harvester constants and definitions.</description>
-    <properties>
-    </properties>
 </project>

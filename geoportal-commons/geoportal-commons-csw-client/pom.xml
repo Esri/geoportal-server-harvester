@@ -10,8 +10,6 @@
   <name>Esri :: Geoportal Server :: Commons :: Csw Client</name>
   <description>Lightweight CSW client capable of conducting communication with the server through CSW protocol.</description>
   <packaging>jar</packaging>
-  <properties>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -31,7 +29,7 @@
     <dependency>
       <groupId>org.mock-server</groupId>
       <artifactId>mockserver-netty</artifactId>
-      <version>3.11</version>
+      <version>5.4.1</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>

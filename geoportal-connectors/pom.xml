@@ -27,6 +27,4 @@
         <module>geoportal-harvester-oai-pmh</module>
         <module>geoportal-harvester-folder-big</module>
     </modules>
-    <properties>
-    </properties>
 </project>

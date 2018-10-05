@@ -10,8 +10,6 @@
   <name>Esri :: Geoportal Server :: Commons :: OAI-PMH Client</name>
   <description>Lightweight OAI-PMH client.</description>
   <packaging>jar</packaging>
-  <properties>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

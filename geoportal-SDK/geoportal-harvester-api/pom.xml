@@ -11,8 +11,6 @@
     <description>Definitions of all basic elements of the Harvester (interfaces, final classes, etc.).</description>
     <version>2.6.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <properties>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

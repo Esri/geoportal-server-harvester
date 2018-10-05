@@ -16,10 +16,4 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
-  <properties>
-  </properties>
-  <build>
-    <plugins>
-    </plugins>
-  </build>
 </project>

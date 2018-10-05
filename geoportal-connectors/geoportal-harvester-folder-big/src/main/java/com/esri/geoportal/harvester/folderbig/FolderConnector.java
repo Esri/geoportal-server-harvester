@@ -30,7 +30,6 @@ import static com.esri.geoportal.harvester.folderbig.FolderConstants.*;
 
 /**
  * Folder connector.
- * @see com.esri.geoportal.harvester.folder API
  */
 public class FolderConnector implements OutputConnector<OutputBroker> {
   public static final String TYPE = "FOLDER-SPLIT";
