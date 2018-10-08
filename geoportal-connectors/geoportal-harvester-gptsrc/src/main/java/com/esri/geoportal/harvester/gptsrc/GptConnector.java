@@ -29,7 +29,6 @@ import java.util.ResourceBundle;
 
 /**
  * GPT connector.
- * @see com.esri.geoportal.harvester.gpt API
  */
 public class GptConnector implements InputConnector<InputBroker> {
   public static final String TYPE = "GPTSRC";

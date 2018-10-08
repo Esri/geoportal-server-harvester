@@ -28,7 +28,6 @@ import java.util.ResourceBundle;
 
 /**
  * UNC connector.
- * @see com.esri.geoportal.harvester.waf API
  */
 public class UncConnector implements InputConnector<InputBroker> {
   public static final String TYPE = "UNC";

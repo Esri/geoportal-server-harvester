@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
 /**
  * Migration connector.
  */
-/*package*/ class MigrationConnector implements InputConnector<InputBroker>{
+public class MigrationConnector implements InputConnector<InputBroker>{
   public static final String TYPE = "MIG";
 
   @Override

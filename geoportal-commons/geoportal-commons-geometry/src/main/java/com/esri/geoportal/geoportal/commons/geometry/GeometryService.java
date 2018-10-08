@@ -59,13 +59,16 @@ public class GeometryService implements Closeable {
   }
   
   /**
-   * Projects the given multipoint geometry from one coordinate system to another
+   * Projects the given multi-point geometry from one coordinate system to another
    * 
    * @param mp the points to project
-   * @param fromWkid the coordinate sytem {@code mp}'s points are in
+   * @param fromWkid the coordinate system {@code mp}'s points are in
    * @param toWkid the coordinate system to project into
    * 
-   * @return the reprojected points
+   * @return the re-projected points
+   * 
+   * @throws java.net.URISyntaxException if invalid URL for geometry service
+   * @throws java.io.IOException if error accessing geometry service online
    */
   public MultiPoint project(MultiPoint mp, int fromWkid, int toWkid) throws IOException, URISyntaxException {
     
@@ -79,13 +82,16 @@ public class GeometryService implements Closeable {
   }
 
   /**
-   * Projects the given multipoint geometry from one coordinate system to another
+   * Projects the given multi-point geometry from one coordinate system to another
    * 
    * @param mp the points to project
-   * @param fromWkt the coordinate sytem {@code mp}'s points are in
+   * @param fromWkt the coordinate system {@code mp}'s points are in
    * @param toWkid the coordinate system to project into
    * 
-   * @return the reprojected points
+   * @return the re-projected points
+   * 
+   * @throws java.net.URISyntaxException if invalid URL for geometry service
+   * @throws java.io.IOException if error accessing geometry service online
    */
   public MultiPoint project(MultiPoint mp, String fromWkt, int toWkid) throws IOException, URISyntaxException {
     
@@ -103,7 +109,7 @@ public class GeometryService implements Closeable {
    * 
    * @param params the parameters for the projection call
    * 
-   * @return the reprojected points
+   * @return the re-projected points
    */
   private MultiPoint callProjectService(HashMap<String, String> params) throws IOException, URISyntaxException {
     HttpPost request = new HttpPost(createProjectUrl().toURI());
@@ -130,6 +136,9 @@ public class GeometryService implements Closeable {
    * @param toWkid the coordinate system to translate into
    * 
    * @return the translated points
+   * 
+   * @throws java.net.URISyntaxException if invalid URL for geometry service
+   * @throws java.io.IOException if error accessing geometry service online
    */
   public MultiPoint fromGeoCoordinateString(List<String> coordinateStrings, int toWkid) throws IOException, URISyntaxException {
     HttpPost request = new HttpPost(createFromGeoCoordinateStringUrl().toURI());
@@ -174,11 +183,17 @@ public class GeometryService implements Closeable {
     httpClient.close();
   }
   
+  /**
+   * Multi-point geometry.
+   */
   public static final class MultiPointGeometry {
     public String geometryType = "esriGeometryMultipoint";
     public MultiPointGeometries [] geometries = new MultiPointGeometries[]{ new MultiPointGeometries() };
   }
   
+  /**
+   * Array of multi-point geometries.
+   */
   public static final class MultiPointGeometries {
     public List<Double[]> points;
   }

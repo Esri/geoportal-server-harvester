@@ -28,7 +28,4 @@
         <module>geoportal-harvester-folder-big</module>
         <module>geoportal-harvester-jdbc</module>
     </modules>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 </project>

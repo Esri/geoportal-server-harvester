@@ -73,15 +73,15 @@ public class PdfUtils {
     public static final String PROP_BBOX = "bounding_box";
 
     /**
-     * Generates a Dublin-Core XML string from the given PDF's metadata.
+     * Generates a Dublin-Core XML string from the given PDF's metadata.This version uses ArcGIS online to project Geospatial PDF and GeoPDF coordinates.
      * 
-     * This version uses ArcGIS online to project Geospatial PDF and GeoPDF coordinates.
      * 
      * @param pdfBytes the PDF file to parse
      * @param fileName the name of the PDF file. Used if the PDF metadata doesn't specify a title.
      * @param url the source location of the PDF file. Used to set the XML's "resource URL".
      * 
      * @return Dublin-Core XML metadata
+     * @throws java.io.IOException if error reading metadata
      */
     public static byte[] generateMetadataXML(byte[] pdfBytes, String fileName, String url) throws IOException {
         return generateMetadataXML(pdfBytes, fileName, url, DEFAULT_GEOMETRY_SERVICE);
@@ -96,6 +96,7 @@ public class PdfUtils {
      * @param geometryServiceUrl url of a <a href="https://developers.arcgis.com/rest/services-reference/geometry-service.htm">geometry service</a> for reprojecting coordinates. 
      * 
      * @return Dublin-Core XML metadata
+     * @throws java.io.IOException if error reading metadata
      */
     public static byte[] generateMetadataXML(byte[] pdfBytes, String fileName, String url, String geometryServiceUrl) throws IOException {
         byte[] bytes = null;

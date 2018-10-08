@@ -57,7 +57,7 @@ public class XmlUtils {
    * Converts XML document into the string.
    * @param document XML
    * @return XML as string
-   * @throws TransformerException 
+   * @throws TransformerException if unable to transform document to string
    */
   public static String toString(Document document) throws TransformerException {
     DOMSource domSource = new DOMSource(document);

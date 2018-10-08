@@ -48,6 +48,9 @@ import com.esri.geoportal.commons.meta.util.WKAConstants;
 import com.esri.geoportal.commons.meta.xml.SimpleDcMetaBuilder;
 import com.esri.geoportal.commons.utils.XmlUtils;
 
+/**
+ * Document processing utilities.
+ */
 public class DocUtils {
 	
     // Method Used To Simulate Incoming Bytes

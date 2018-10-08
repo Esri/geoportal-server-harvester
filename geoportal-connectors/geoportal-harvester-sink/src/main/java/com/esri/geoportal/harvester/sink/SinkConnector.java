@@ -28,7 +28,6 @@ import static com.esri.geoportal.harvester.sink.SinkConstants.P_DROP_FOLDER;
 
 /**
  * Sink connector.
- * @see com.esri.geoportal.harvester.waf API
  */
 public class SinkConnector implements InputConnector<InputBroker> {
   public static final String TYPE = "SINK";

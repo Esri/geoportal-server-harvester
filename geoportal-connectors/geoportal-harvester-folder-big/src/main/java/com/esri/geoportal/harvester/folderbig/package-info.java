@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * Local folder output.
+ * Local folder output (organized).
  * <p>
  * Allows to publish information into the local folder.
  * <p>
