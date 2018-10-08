@@ -26,7 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * JDBC broker definition adaptor.
  */
-public class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
+/*package*/ class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   private final CredentialsDefinitionAdaptor credAdaptor;
   private String driverClass;
   private String connection;

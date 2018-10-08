@@ -64,7 +64,7 @@ import org.slf4j.LoggerFactory;
 /**
  * JDBC broker.
  */
-public class JdbcBroker implements InputBroker {
+/*package*/class JdbcBroker implements InputBroker {
   private static final Logger LOG = LoggerFactory.getLogger(JdbcBroker.class);
   
   private final JdbcConnector connector;
