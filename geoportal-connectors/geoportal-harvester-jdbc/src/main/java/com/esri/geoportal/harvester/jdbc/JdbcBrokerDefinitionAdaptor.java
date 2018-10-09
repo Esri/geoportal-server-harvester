@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
   private String titleColumn;
   private String descriptionColumn;
   private String types;
+  private String script;
 
   /**
    * Creates instance of the adaptor.
@@ -57,6 +58,7 @@ import org.apache.commons.lang3.StringUtils;
       titleColumn = get(JdbcConstants.P_JDBC_TITLE_COLUMN);
       descriptionColumn = get(JdbcConstants.P_JDBC_DESCRIPTION_COLUMN);
       types = get(JdbcConstants.P_JDBC_TYPES);
+      script = get(JdbcConstants.P_JDBC_SCRIPT);
     }
   }
 
@@ -69,6 +71,7 @@ import org.apache.commons.lang3.StringUtils;
     consume(params,JdbcConstants.P_JDBC_TITLE_COLUMN);
     consume(params,JdbcConstants.P_JDBC_DESCRIPTION_COLUMN);
     consume(params,JdbcConstants.P_JDBC_TYPES);
+    consume(params,JdbcConstants.P_JDBC_SCRIPT);
     credAdaptor.override(params);
   }
 
@@ -150,4 +153,15 @@ import org.apache.commons.lang3.StringUtils;
     this.types = types;
     set(JdbcConstants.P_JDBC_TYPES, types);
   }
+
+  public String getScript() {
+    return script;
+  }
+
+  public void setScript(String script) {
+    this.script = script;
+    set(JdbcConstants.P_JDBC_SCRIPT, script);
+  }
+  
+  
 }
