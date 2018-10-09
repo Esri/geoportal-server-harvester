@@ -52,10 +52,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import javax.script.ScriptException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -76,6 +78,7 @@ import org.slf4j.LoggerFactory;
   private final List<SqlDataInserter> inserters = new ArrayList<>();
   private final Map<String,String> columnMappings = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
   private TaskDefinition td;
+  private ScriptProcessor scriptProcessor;
 
   public JdbcBroker(JdbcConnector connector, JdbcBrokerDefinitionAdaptor definition) {
     this.connector = connector;
@@ -110,6 +113,7 @@ import org.slf4j.LoggerFactory;
     createResultSet();
     createStringRetrievers();
     createInserters();
+    createScriptEngine();
   }
 
   @Override
@@ -429,6 +433,12 @@ import org.slf4j.LoggerFactory;
     }
   }
   
+  private void createScriptEngine() throws DataProcessorException {
+    if (!StringUtils.isBlank(definition.getScript())) {
+      scriptProcessor = new ScriptProcessor(definition.getScript());
+    }
+  }
+  
   private String norm(String name) {
     return StringUtils.trimToEmpty(name).replaceAll("\\p{Blank}+|_+", "_").toLowerCase();
   }
@@ -468,20 +478,34 @@ import org.slf4j.LoggerFactory;
     }
   }
   
-  private DataReference createReference(ResultSet resultSet) throws SQLException, JsonProcessingException, URISyntaxException, UnsupportedEncodingException  {
+  private DataReference createReference(ResultSet resultSet) throws SQLException, JsonProcessingException, URISyntaxException, UnsupportedEncodingException, ScriptException  {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode node = mapper.createObjectNode();
+    Map<String,Object> attr = new HashMap<>();
+    
     for (SqlStringRetriever retriever: retrievers) {
       retriever.read(node, resultSet);
     }
 
+    for (SqlDataInserter reader: inserters) {
+      reader.read(attr, resultSet);
+    }
+
+    String nodeAsJson = null;
     String id = node.get("fileid").textValue();
     SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), id, null, new URI("uuid", id, null), td.getSource().getRef(), td.getRef());
-    ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(node).getBytes("UTF-8"));
-
-    for (SqlDataInserter reader: inserters) {
-      reader.read(ref.getAttributesMap(), resultSet);
+    
+    if (scriptProcessor != null) {
+      Map data = mapper.convertValue(node, Map.class);
+      Map[] result = scriptProcessor.process(data, attr);
+      nodeAsJson = mapper.writeValueAsString(result[0]);
+      attr = result[1];
+    } else {
+      nodeAsJson = mapper.writeValueAsString(node);
     }
+    
+    ref.addContext(MimeType.APPLICATION_JSON, nodeAsJson.getBytes("UTF-8"));
+    ref.getAttributesMap().putAll(attr);
 
     return ref;
   }
@@ -518,7 +542,7 @@ import org.slf4j.LoggerFactory;
     public DataReference next() throws DataInputException {
       try {
         return createReference(resultSet);
-      } catch (SQLException|URISyntaxException|UnsupportedEncodingException|JsonProcessingException ex) {
+      } catch (SQLException|URISyntaxException|UnsupportedEncodingException|JsonProcessingException|ScriptException ex) {
         throw new DataInputException(JdbcBroker.this, String.format("Error reading data"), ex);
       }
     }
