@@ -155,6 +155,8 @@ html,body {
 }
 
 .h-broker-editor {
+  left: 600px !important;
+  top: 100px !important;
 }
 
 .h-editor-form {
