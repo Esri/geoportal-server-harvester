@@ -17,7 +17,7 @@ package com.esri.geoportal.harvester.jdbc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.HashMap;
 import java.util.Map;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -42,16 +42,22 @@ import javax.script.ScriptException;
   /**
    * Process data through the script.
    * @param data data to process
-   * @return processesd data as JSON string
+   * @return processed data as JSON string
    * @throws ScriptException if error executing script
    * @throws JsonProcessingException if error transforming JSON data
    */
-  public Map[] process(Map data, Map attr) throws ScriptException, JsonProcessingException {
+  public Data process(Data data, Map attr) throws ScriptException, JsonProcessingException {
     engine.put("data", data);
-    engine.put("attr", attr);
     engine.eval(script);
     Object dataObj = engine.get("data");
-    Object attrObj = engine.get("attr");
-    return new Map[] { (Map)dataObj, (Map)attrObj };
+    return (Data)dataObj;
+  }
+  
+  /**
+   * Data
+   */
+  public static class Data extends HashMap<String, String> {
+    public Map json;
+    public Map attr;
   }
 }

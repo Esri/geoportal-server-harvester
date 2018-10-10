@@ -26,6 +26,7 @@ import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
+import com.esri.geoportal.harvester.jdbc.ScriptProcessor.Data;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -491,15 +492,29 @@ import org.slf4j.LoggerFactory;
       reader.read(attr, resultSet);
     }
 
-    String nodeAsJson = null;
+    String nodeAsJson;
     String id = node.get("fileid").textValue();
-    SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), id, null, new URI("uuid", id, null), td.getSource().getRef(), td.getRef());
+    URI sourceUri = new URI("uuid", id, null);
+    String sourceRef = td.getSource().getRef();
+    String taskRef = td.getRef();
+    SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), id, null, sourceUri, sourceRef, taskRef);
     
     if (scriptProcessor != null) {
-      Map data = mapper.convertValue(node, Map.class);
-      Map[] result = scriptProcessor.process(data, attr);
-      nodeAsJson = mapper.writeValueAsString(result[0]);
-      attr = result[1];
+      Data data = new Data();
+      
+      data.put("brokerUri", getBrokerUri().toString());
+      data.put("label", getEntityDefinition().getLabel());
+      data.put("id", id);
+      data.put("sourceUri", sourceUri.toString());
+      data.put("sourceRef", sourceRef);
+      data.put("taskRef", taskRef);
+      
+      data.json = mapper.convertValue(node, Map.class);
+      data.attr = attr;
+      
+      data = scriptProcessor.process(data, attr);
+      nodeAsJson = mapper.writeValueAsString(data.json);
+      attr = data.attr;
     } else {
       nodeAsJson = mapper.writeValueAsString(node);
     }
