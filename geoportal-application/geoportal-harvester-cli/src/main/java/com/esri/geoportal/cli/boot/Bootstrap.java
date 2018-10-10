@@ -270,7 +270,7 @@ public class Bootstrap {
       inboundConnectorRegistry.put(CkanConnector.TYPE, new CkanConnector(metaBuilder));
       inboundConnectorRegistry.put(DataGovConnector.TYPE, new DataGovConnector(metaBuilder));
       inboundConnectorRegistry.put(OaiConnector.TYPE, new OaiConnector());
-      inboundConnectorRegistry.put(JdbcConnector.TYPE, new JdbcConnector());
+      inboundConnectorRegistry.put(JdbcConnector.TYPE, new JdbcConnector(true));
     }
     
     return inboundConnectorRegistry;

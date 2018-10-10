@@ -32,6 +32,11 @@ import java.util.ResourceBundle;
  */
 public class JdbcConnector  implements InputConnector<InputBroker> {
   public static final String TYPE = "JDBC";
+  private final boolean scriptEnabled;
+
+  public JdbcConnector(boolean scriptEnabled) {
+    this.scriptEnabled = scriptEnabled;
+  }
 
   @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
@@ -65,12 +70,14 @@ public class JdbcConnector  implements InputConnector<InputBroker> {
         return bundle.getString("jdbc.mapping.hint");
       }
     });
-    arguments.add(new UITemplate.TextArgument(JdbcConstants.P_JDBC_SCRIPT, bundle.getString("jdbc.script")){
-      @Override
-      public String getHint() {
-        return bundle.getString("jdbc.script.hint");
-      }
-    });
+    if (scriptEnabled) {
+      arguments.add(new UITemplate.TextArgument(JdbcConstants.P_JDBC_SCRIPT, bundle.getString("jdbc.script")){
+        @Override
+        public String getHint() {
+          return bundle.getString("jdbc.script.hint");
+        }
+      });
+    }
     return new UITemplate(getType(), bundle.getString("jdbc"), arguments);
   }
 }

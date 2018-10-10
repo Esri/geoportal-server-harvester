@@ -63,7 +63,9 @@
   </bean>
   <bean class="com.esri.geoportal.harvester.oai.pmh.OaiConnector"/>
   <bean class="com.esri.geoportal.harvester.folderbig.FolderConnector"/>
-  <bean class="com.esri.geoportal.harvester.jdbc.JdbcConnector"/>
+  <bean class="com.esri.geoportal.harvester.jdbc.JdbcConnector">
+    <constructor-arg value="${jdbc.script.enabled}"/>
+  </bean>
   <!-- Triggers -->
   <bean class="com.esri.geoportal.harvester.engine.triggers.NowTrigger"/>
   <bean class="com.esri.geoportal.harvester.engine.triggers.AtTrigger"/>
