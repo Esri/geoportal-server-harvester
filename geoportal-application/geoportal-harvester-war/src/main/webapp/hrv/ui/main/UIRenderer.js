@@ -29,13 +29,14 @@ define(["dojo/_base/declare",
         "dijit/form/TimeTextBox",
         "dijit/form/RadioButton",
         "dijit/form/NumberTextBox",
+        "dijit/form/Textarea",
         "dijit/form/Form",
         "dojox/html/entities",
         "hrv/utils/TextScrambler"
       ],
   function(declare,i18n,
            lang,array,domConstruct,domAttr,html,number,
-           Select,ValidationTextBox,CheckBox,TimeTextBox,RadioButton,NumberTextBox,Form,
+           Select,ValidationTextBox,CheckBox,TimeTextBox,RadioButton,NumberTextBox,Textarea,Form,
            entities,TextScrambler
           ){
   
@@ -72,6 +73,7 @@ define(["dojo/_base/declare",
         
         switch(arg.type) {
           case "string": return this.renderString(placeholderNode,arg);
+          case "text": return this.renderText(placeholderNode,arg);
           case "choice": return this.renderChoice(placeholderNode,arg);
           case "bool": return this.renderBool(placeholderNode,arg);
           case "temporal": return this.renderTime(placeholderNode,arg);
@@ -107,6 +109,29 @@ define(["dojo/_base/declare",
           },
           read: function(values) {
             values[arg.name] = !arg.password? input.get("value"): TextScrambler.encode(input.get("value"));
+          },
+          destroy: function() {
+            input.destroy();
+          } 
+        };
+      },
+      
+      renderText: function(placeholderNode,arg) {
+        var input = new Textarea({
+          name: arg.name, 
+          required: arg.required
+        }).placeAt(placeholderNode);
+        input.name = arg.name;
+        if (arg.defaultValue!=null) {
+          input.set("value", arg.defaultValue);
+        }
+        input.startup();
+        return { 
+          init: function(values) {
+            input.set("value", values[arg.name]!=null? values[arg.name]: arg.defaultValue);
+          },
+          read: function(values) {
+            values[arg.name] = input.get("value");
           },
           destroy: function() {
             input.destroy();

@@ -55,7 +55,7 @@ public class BrokerDefinitionManagerBean implements BrokerDefinitionManager {
   public void init() {
     try (
             Connection connection = dataSource.getConnection();
-            PreparedStatement st = connection.prepareStatement("CREATE TABLE IF NOT EXISTS BROKERS ( id varchar(38) PRIMARY KEY, brokerDefinition varchar(1024) NOT NULL)");
+            PreparedStatement st = connection.prepareStatement("CREATE TABLE IF NOT EXISTS BROKERS ( id varchar(38) PRIMARY KEY, brokerDefinition varchar(4096) NOT NULL)");
         ) {
       st.execute();
       LOG.info("BrokerDefinitionManagerBean initialized.");

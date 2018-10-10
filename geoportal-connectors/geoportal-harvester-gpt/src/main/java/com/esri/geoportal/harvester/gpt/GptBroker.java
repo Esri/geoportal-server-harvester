@@ -195,7 +195,7 @@ import java.util.stream.Collectors;
         }
       }
 
-      PublishResponse response = client.publish(data, uuid, xml, json, definition.getForceAdd());
+      PublishResponse response = client.publish(data, ref.getAttributesMap(), uuid, xml, json, definition.getForceAdd());
       if (response == null) {
         throw new DataOutputException(this, ref.getId(), "No response received");
       }

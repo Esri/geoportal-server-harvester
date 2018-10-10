@@ -61,6 +61,7 @@ define(["dojo/_base/declare",
         var brokerEditorDialog = new Dialog({
           title: this.i18n.brokers.editor.caption,
           content: brokerEditorPane,
+          class: "h-broker-editor",
           onHide: function() {
             brokerEditorDialog.destroy();
             brokerEditorPane.destroy();

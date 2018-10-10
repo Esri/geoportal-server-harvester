@@ -29,6 +29,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -118,6 +120,7 @@ public class Client implements Closeable {
    * Publishes a document.
    *
    * @param data data to publish
+   * @param attributes extra attributes
    * @param id custom id
    * @param xml xml
    * @param json json
@@ -126,7 +129,7 @@ public class Client implements Closeable {
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  public PublishResponse publish(PublishRequest data, String id, String xml, String json, boolean forceAdd) throws IOException, URISyntaxException {
+  public PublishResponse publish(PublishRequest data, Map<String,Object> attributes, String id, String xml, String json, boolean forceAdd) throws IOException, URISyntaxException {
 
     ObjectNode jsonRequest = mapper.convertValue(data, ObjectNode.class);
     if (xml != null) {
@@ -217,6 +220,30 @@ public class Client implements Closeable {
         }
       } catch (Exception ex) {
         LOG.debug(String.format("Invalid json received.", json), ex);
+      }
+    }
+
+    for (Map.Entry<String,Object> entry: attributes.entrySet()) {
+      if (entry.getValue()==null) {
+        jsonRequest.putNull(entry.getKey());
+      } else {
+        if (entry.getValue() instanceof String) {
+          jsonRequest.put(entry.getKey(), (String)entry.getValue());
+        } else if(entry.getValue() instanceof Double) {
+          jsonRequest.put(entry.getKey(), (Double)entry.getValue());
+        } else if(entry.getValue() instanceof BigDecimal) {
+          jsonRequest.put(entry.getKey(), ((BigDecimal)entry.getValue()).doubleValue());
+        } else if(entry.getValue() instanceof Float) {
+          jsonRequest.put(entry.getKey(), (Float)entry.getValue());
+        } else if(entry.getValue() instanceof Long) {
+          jsonRequest.put(entry.getKey(), (Long)entry.getValue());
+        } else if(entry.getValue() instanceof BigInteger) {
+          jsonRequest.put(entry.getKey(), ((BigInteger)entry.getValue()).longValue());
+        } else if(entry.getValue() instanceof Integer) {
+          jsonRequest.put(entry.getKey(), (Integer)entry.getValue());
+        } else if(entry.getValue() instanceof Boolean) {
+          jsonRequest.put(entry.getKey(), (Boolean)entry.getValue());
+        }
       }
     }
 
