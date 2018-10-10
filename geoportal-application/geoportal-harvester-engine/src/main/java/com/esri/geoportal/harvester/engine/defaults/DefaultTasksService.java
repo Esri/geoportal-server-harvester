@@ -337,9 +337,9 @@ public class DefaultTasksService implements TasksService {
       updated = true;
     }
     
-    updated |= ld.getDrains().stream()
+    updated |= ld.getDrains()!=null? ld.getDrains().stream()
             .filter(drain -> updateLinkDefinition(drain, bd))
-            .count() > 0;
+            .count() > 0: false;
     
     return updated;
   }
