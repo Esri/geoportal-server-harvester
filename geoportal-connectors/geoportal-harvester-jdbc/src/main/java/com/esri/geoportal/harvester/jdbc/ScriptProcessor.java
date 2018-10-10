@@ -30,6 +30,7 @@ import javax.script.ScriptException;
   private final ObjectMapper mapper = new ObjectMapper();
   private final ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
   private final String script;
+  private Map globals = new HashMap<>();
 
   /**
    * Creates instance of the script processor.
@@ -46,11 +47,16 @@ import javax.script.ScriptException;
    * @throws ScriptException if error executing script
    * @throws JsonProcessingException if error transforming JSON data
    */
-  public Data process(Data data, Map attr) throws ScriptException, JsonProcessingException {
+  public Data process(Data data) throws ScriptException, JsonProcessingException {
+    engine.put("globals", globals);
     engine.put("data", data);
+    
     engine.eval(script);
-    Object dataObj = engine.get("data");
-    return (Data)dataObj;
+    
+    globals = (Map)engine.get("globals");
+    data = (Data)engine.get("data");
+    
+    return data;
   }
   
   /**

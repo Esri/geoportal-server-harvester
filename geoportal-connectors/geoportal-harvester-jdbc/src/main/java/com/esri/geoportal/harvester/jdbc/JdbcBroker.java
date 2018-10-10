@@ -512,7 +512,7 @@ import org.slf4j.LoggerFactory;
       data.json = mapper.convertValue(node, Map.class);
       data.attr = attr;
       
-      data = scriptProcessor.process(data, attr);
+      data = scriptProcessor.process(data);
       nodeAsJson = mapper.writeValueAsString(data.json);
       attr = data.attr;
     } else {
