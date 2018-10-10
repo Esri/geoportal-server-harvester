@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.engine.services;
 
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.DataContent;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
@@ -119,4 +120,11 @@ public interface TasksService {
    * @throws DataInputException if error fetching content
    */
   DataContent fetchContent(UUID taskId, String recordId, SimpleCredentials credentials) throws DataInputException;
+  
+  /**
+   * Updates all tasks with new broker definition.
+   * @param brokerDefinition broker definition
+   * @throws DataProcessorException if update fails
+   */
+  void updateTaskDefinitions(EntityDefinition brokerDefinition) throws DataProcessorException;
 }

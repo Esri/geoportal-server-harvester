@@ -56,6 +56,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpResponseException;
 
@@ -201,24 +202,6 @@ public class DefaultTasksService implements TasksService {
   }
   
   /**
-   * Creates new input broker.
-   * @param entityDefinition input broker definition
-   * @return input broker
-   * @throws InvalidDefinitionException if invalid definition
-   */
-  /*
-  private InputBroker newInputBroker(EntityDefinition entityDefinition) throws InvalidDefinitionException {
-    InputConnector<InputBroker> dsFactory = executionService.get(entityDefinition.getType());
-
-    if (dsFactory == null) {
-      throw new InvalidDefinitionException("Invalid input broker definition");
-    }
-
-    return dsFactory.createBroker(entityDefinition);
-  }
-  */
-  
-  /**
    * Creates new task.
    * @param taskDefinition task definition
    * @return task
@@ -315,5 +298,49 @@ public class DefaultTasksService implements TasksService {
     }
     
     throw new InvalidDefinitionException(String.format("Error creating link action for: %s", actionDefinition.getType()));
+  }
+
+  @Override
+  public void updateTaskDefinitions(EntityDefinition brokerDefinition) throws DataProcessorException {
+    try {
+      List<Map.Entry<UUID, TaskDefinition>> selected = taskManager.list().stream()
+              .filter(entry -> updateTaskDefiniton(entry.getValue(), brokerDefinition))
+              .collect(Collectors.toList());
+      
+      for (Map.Entry<UUID, TaskDefinition> entry: selected) {
+        updateTaskDefinition(entry.getKey(), entry.getValue());
+      }
+      
+    } catch (CrudlException ex) {
+      throw new DataProcessorException(String.format("Error updating task definitions."), ex);
+    }
+  }
+  
+  private boolean updateTaskDefiniton(TaskDefinition td, EntityDefinition bd) {
+    boolean updated = false;
+    
+    if (StringUtils.compare(td.getSource().getRef(), bd.getRef())==0) {
+      td.setSource(bd);
+      updated = true;
+    }
+    
+    updated |= td.getDestinations().stream().filter(ld -> updateLinkDefinition(ld, bd)).count() > 0;
+    
+    return updated; 
+  }
+  
+  private boolean updateLinkDefinition(LinkDefinition ld, EntityDefinition bd) {
+    boolean updated = false;
+    
+    if (StringUtils.compare(ld.getAction().getRef(), bd.getRef())==0) {
+      ld.setAction(bd);
+      updated = true;
+    }
+    
+    updated |= ld.getDrains().stream()
+            .filter(drain -> updateLinkDefinition(drain, bd))
+            .count() > 0;
+    
+    return updated;
   }
 }

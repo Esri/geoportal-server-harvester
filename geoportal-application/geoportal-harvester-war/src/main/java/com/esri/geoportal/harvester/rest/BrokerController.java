@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
+import com.esri.geoportal.harvester.engine.utils.BrokerReference;
 
 /**
  * Broker controller.
@@ -161,7 +162,9 @@ public class BrokerController {
   public ResponseEntity<BrokerResponse> updateBroker(@RequestBody EntityDefinition brokerDefinition, @PathVariable UUID brokerId) {
     try {
       LOG.debug(formatForLog("PUT /rest/harvester/brokers/%s <-- %s", brokerId, brokerDefinition));
-      return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().updateBroker(brokerId, brokerDefinition, LocaleContextHolder.getLocale())), HttpStatus.OK);
+      BrokerReference brokerReference = engine.getBrokersService().updateBroker(brokerId, brokerDefinition, LocaleContextHolder.getLocale());
+      engine.getTasksService().updateTaskDefinitions(brokerDefinition);
+      return new ResponseEntity<>(BrokerResponse.createFrom(brokerReference), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(formatForLog("Error updating broker: %s <-- %s", brokerId, brokerDefinition), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
