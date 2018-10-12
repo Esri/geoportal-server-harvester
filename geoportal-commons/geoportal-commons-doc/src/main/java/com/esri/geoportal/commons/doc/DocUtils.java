@@ -30,10 +30,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -47,12 +43,15 @@ import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.util.WKAConstants;
 import com.esri.geoportal.commons.meta.xml.SimpleDcMetaBuilder;
 import com.esri.geoportal.commons.utils.XmlUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Document processing utilities.
  */
 public class DocUtils {
-	
+    private final static Logger LOG = LoggerFactory.getLogger(DocUtils.class);
+    
     // Method Used To Simulate Incoming Bytes
     public static byte[] bytes_from_file(String filePath) {
 
@@ -67,8 +66,7 @@ public class DocUtils {
             fileInputStream.read(bytesArray);
 
         } catch (IOException e) {
-            e.printStackTrace();
-            
+            LOG.error(String.format("Error reading data."), e);
         } finally {
             if (fileInputStream != null) {
                 try {
@@ -147,7 +145,7 @@ public class DocUtils {
     		xml_bytes = XmlUtils.toString(document).getBytes("UTF-8");
         		
         } catch (Exception ex) {
-        	ex.printStackTrace();
+          LOG.error(String.format("Error reading data."), ex);
         } finally {
         	base_input.close();
         }
