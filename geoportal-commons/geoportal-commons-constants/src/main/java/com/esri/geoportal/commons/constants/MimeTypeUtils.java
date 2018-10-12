@@ -66,7 +66,7 @@ public class MimeTypeUtils {
       props.entrySet().stream().forEach(e->{
         MimeType mimeType = MimeType.parse(e.getKey().toString());
         if (mimeType!=null) {
-          Arrays.asList(e.getValue().toString().split(", ")).stream().forEach(ext->{
+          Arrays.asList(e.getValue().toString().split("(,|\\p{Space})+")).stream().forEach(ext->{
             if (!mapping.containsKey(ext)) {
               mapping.put(ext, mimeType);
             }
