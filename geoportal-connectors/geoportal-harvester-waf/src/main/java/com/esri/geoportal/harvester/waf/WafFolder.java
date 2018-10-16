@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 /*package*/ class WafFolder {
   private static final Logger LOG = LoggerFactory.getLogger(WafFolder.class);
   private static final FileSystem fileSystem = FileSystems.getDefault();
-  private static final String DEFAULT_MATCH_PATTERN = "**.xml";
+  private static final String DEFAULT_MATCH_PATTERN = "";
 
   private final WafBroker broker;
   private final URL folderUrl;
@@ -80,7 +80,7 @@ import org.slf4j.LoggerFactory;
       urls.forEach(u -> {
         if (u.toExternalForm().endsWith("/") || !cutOff(u.toExternalForm(),"/").contains(".")) {
           subFolders.add(new WafFolder(broker, u, matchPattern, creds));
-        } else if (multiMatchUrl(u,matchPattern)) {
+        } else if (StringUtils.isBlank(matchPattern) || multiMatchUrl(u,matchPattern)) {
           files.add(new WafFile(broker, u, creds));
         }
       });
