@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 /*package*/ class UncFolder {
   private static final Logger LOG = LoggerFactory.getLogger(UncFolder.class);
   private static final FileSystem fileSystem = FileSystems.getDefault();
-  private static final String DEFAULT_MATCH_PATTERN = "**.xml";
+  private static final String DEFAULT_MATCH_PATTERN = "";
   
   private final UncBroker broker;
   private final Path folder;
@@ -77,7 +77,7 @@ import org.slf4j.LoggerFactory;
         }
         if (Files.isDirectory(f)) {
           subFolders.add(new UncFolder(broker, f, matchPattern, since));
-        } else if (Files.isRegularFile(f) && multiMatchFileName(f, matchPattern)) {
+        } else if (Files.isRegularFile(f) && (StringUtils.isBlank(matchPattern) || multiMatchFileName(f, matchPattern))) {
           if (since==null)
             files.add(new UncFile(broker, f));
           else {
