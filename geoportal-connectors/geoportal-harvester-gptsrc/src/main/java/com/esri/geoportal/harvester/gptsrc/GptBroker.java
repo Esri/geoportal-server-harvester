@@ -89,7 +89,7 @@ class GptBroker implements InputBroker {
 
   @Override
   public boolean hasAccess(SimpleCredentials creds) {
-    return definition.getCredentials()==null? true: definition.getCredentials().equals(creds);
+    return definition.getCredentials()==null || definition.getCredentials().isEmpty()? true: definition.getCredentials().equals(creds);
   }
 
   @Override
