@@ -64,7 +64,7 @@ define(["dojo/_base/declare",
         TasksREST.getFailedDocuments(evt.data.uuid).then(lang.hitch(this, function(failedDocuments) { 
           this._handleFailedDocuments(failedDocuments); 
         }), lang.hitch(this, function(error){
-          console.err(error);
+          console.debug(error);
           topic.publish("msg",new Error("Unable to access failed documents information"));
         }));
       },
@@ -88,7 +88,7 @@ define(["dojo/_base/declare",
                 newWindow.document.close();
                 newWindow.document.title = recordId;
               }), lang.hitch(this, function(error){
-                console.err(error);
+                console.debug(error);
                 topic.publish("msg",new Error("Unable to access failed documents information"));
               }));
             })));
