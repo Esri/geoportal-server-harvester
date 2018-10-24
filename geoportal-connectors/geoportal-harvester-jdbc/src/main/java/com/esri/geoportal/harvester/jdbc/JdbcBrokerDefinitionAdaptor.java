@@ -20,13 +20,18 @@ import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * JDBC broker definition adaptor.
  */
 /*package*/ class JdbcBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
+  private static final String [] SQL_MODYFYING_COMMANDS = {"ALTER", "CREATE", "DELETE", "DROP", "INSERT", "TRUNCATE"};
+  private static final Set<String> EXEMPT_WORDS = Arrays.stream(SQL_MODYFYING_COMMANDS).collect(Collectors.toSet());
   private final CredentialsDefinitionAdaptor credAdaptor;
   private String driverClass;
   private String connection;
@@ -59,6 +64,8 @@ import org.apache.commons.lang3.StringUtils;
       descriptionColumn = get(JdbcConstants.P_JDBC_DESCRIPTION_COLUMN);
       types = get(JdbcConstants.P_JDBC_TYPES);
       script = get(JdbcConstants.P_JDBC_SCRIPT);
+      
+      validate();
     }
   }
 
@@ -163,5 +170,13 @@ import org.apache.commons.lang3.StringUtils;
     set(JdbcConstants.P_JDBC_SCRIPT, script);
   }
   
+  private void validate() throws InvalidDefinitionException {
+    String[] words = getSqlStatement().split("\\p{Space}");
+    if (words.length > 1) {
+      if (Arrays.stream(words).anyMatch(w->EXEMPT_WORDS.contains(w.toUpperCase()))) {
+        throw new InvalidDefinitionException("Invalid SQL statement definition.");
+      }
+    }
+  }
   
 }
