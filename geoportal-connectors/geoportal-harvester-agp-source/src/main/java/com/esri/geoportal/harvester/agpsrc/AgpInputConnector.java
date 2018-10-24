@@ -48,6 +48,11 @@ public class AgpInputConnector implements InputConnector<InputBroker> {
   }
 
   @Override
+  public void validateDefinition(EntityDefinition definition) throws InvalidDefinitionException {
+    new AgpInputBrokerDefinitionAdaptor(definition);
+  }
+
+  @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new AgpInputBroker(this, new AgpInputBrokerDefinitionAdaptor(definition), metaBuilder);
   }

@@ -182,7 +182,7 @@ import org.slf4j.LoggerFactory;
   
   private void createStatement() throws DataProcessorException {
     try {
-      statement = definition.getSqlStatement().split(" ").length == 1 
+      statement = definition.getSqlStatement().split("\\p{Space}").length == 1 
               ? connection.prepareStatement(String.format("SELECT * FROM %s", definition.getSqlStatement())) 
               : connection.prepareStatement(definition.getSqlStatement());
     } catch (SQLException ex) {

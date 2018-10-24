@@ -48,6 +48,9 @@ import org.apache.commons.lang3.math.NumberUtils;
   public AgpOutputBrokerDefinitionAdaptor(EntityDefinition def) throws InvalidDefinitionException {
     super(def);
     this.credAdaptor =new CredentialsDefinitionAdaptor(def);
+    if (credAdaptor.getCredentials().isEmpty()) {
+      throw new InvalidDefinitionException("Empty credentials");
+    }
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(AgpOutputConnector.TYPE);
     } else if (!AgpOutputConnector.TYPE.equals(def.getType())) {

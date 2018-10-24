@@ -48,6 +48,9 @@ import org.apache.commons.lang3.StringUtils;
   public GptBrokerDefinitionAdaptor(EntityDefinition def) throws InvalidDefinitionException {
     super(def);
     this.credAdaptor = new CredentialsDefinitionAdaptor(def);
+    if (credAdaptor.getCredentials().isEmpty()) {
+      throw new InvalidDefinitionException("Empty credentials");
+    }
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(GptConnector.TYPE);
     } else if (!GptConnector.TYPE.equals(def.getType())) {

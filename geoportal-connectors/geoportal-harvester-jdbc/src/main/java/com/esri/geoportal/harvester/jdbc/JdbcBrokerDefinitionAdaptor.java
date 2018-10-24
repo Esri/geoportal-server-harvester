@@ -20,6 +20,7 @@ import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import java.util.Arrays;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
@@ -59,6 +60,8 @@ import org.apache.commons.lang3.StringUtils;
       descriptionColumn = get(JdbcConstants.P_JDBC_DESCRIPTION_COLUMN);
       types = get(JdbcConstants.P_JDBC_TYPES);
       script = get(JdbcConstants.P_JDBC_SCRIPT);
+      
+      validate();
     }
   }
 
@@ -163,5 +166,8 @@ import org.apache.commons.lang3.StringUtils;
     set(JdbcConstants.P_JDBC_SCRIPT, script);
   }
   
+  private void validate() throws InvalidDefinitionException {
+    JdbcValidator.validateStatement(getSqlStatement());
+  }
   
 }

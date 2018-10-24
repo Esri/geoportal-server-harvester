@@ -90,10 +90,17 @@ define(["dojo/_base/declare",
       },
       
       renderString: function(placeholderNode,arg) {
-        var input = new ValidationTextBox({
+        var input = !arg.regExp? 
+        new ValidationTextBox({
           name: arg.name, 
           required: arg.required, 
           type: arg.password? "password": "input"
+        }).placeAt(placeholderNode):
+        new ValidationTextBox({
+          name: arg.name, 
+          required: arg.required, 
+          type: arg.password? "password": "input",
+          regExp: arg.regExp
         }).placeAt(placeholderNode);
         input.name = arg.name;
         if (arg.password) {

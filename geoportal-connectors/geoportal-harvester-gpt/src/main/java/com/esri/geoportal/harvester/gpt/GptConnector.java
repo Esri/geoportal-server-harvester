@@ -75,6 +75,11 @@ public class GptConnector implements OutputConnector<OutputBroker> {
   }
 
   @Override
+  public void validateDefinition(EntityDefinition definition) throws InvalidDefinitionException {
+    new GptBrokerDefinitionAdaptor(definition);
+  }
+
+  @Override
   public OutputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new GptBroker(this, new GptBrokerDefinitionAdaptor(definition), geometryServiceUrl);
   }

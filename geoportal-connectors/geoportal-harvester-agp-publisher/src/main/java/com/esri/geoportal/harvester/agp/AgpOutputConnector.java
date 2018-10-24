@@ -45,6 +45,11 @@ public class AgpOutputConnector implements OutputConnector<OutputBroker> {
   }
 
   @Override
+  public void validateDefinition(EntityDefinition definition) throws InvalidDefinitionException {
+    new AgpOutputBrokerDefinitionAdaptor(definition);
+  }
+
+  @Override
   public OutputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new AgpOutputBroker(this, new AgpOutputBrokerDefinitionAdaptor(definition), metaAnalyzer);
   }

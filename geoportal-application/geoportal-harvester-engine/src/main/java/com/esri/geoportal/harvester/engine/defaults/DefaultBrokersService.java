@@ -15,9 +15,12 @@
  */
 package com.esri.geoportal.harvester.engine.defaults;
 
+import com.esri.geoportal.harvester.api.Connector;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.engine.services.BrokersService;
 import com.esri.geoportal.harvester.engine.managers.BrokerDefinitionManager;
 import com.esri.geoportal.harvester.engine.registers.InboundConnectorRegistry;
@@ -92,9 +95,10 @@ public class DefaultBrokersService implements BrokersService {
     BrokerReference.Category category = getBrokerCategoryByType(brokerDefinition.getType(), locale);
     if (category != null) {
       try {
+        validateDefinition(brokerDefinition);
         UUID id = brokerDefinitionManager.create(brokerDefinition);
         return new BrokerReference(id, category, brokerDefinition);
-      } catch (CrudlException ex) {
+      } catch (CrudlException|InvalidDefinitionException ex) {
         throw new DataProcessorException(String.format("Error creating broker: %s", brokerDefinition), ex);
       }
     }
@@ -104,6 +108,7 @@ public class DefaultBrokersService implements BrokersService {
   @Override
   public BrokerReference updateBroker(UUID brokerId, EntityDefinition brokerDefinition, Locale locale) throws DataProcessorException {
     try {
+      validateDefinition(brokerDefinition);
       EntityDefinition oldBrokerDef = brokerDefinitionManager.read(brokerId);
       if (oldBrokerDef != null) {
         if (!brokerDefinitionManager.update(brokerId, brokerDefinition)) {
@@ -112,7 +117,7 @@ public class DefaultBrokersService implements BrokersService {
       }
       BrokerReference.Category category = oldBrokerDef != null ? getBrokerCategoryByType(oldBrokerDef.getType(), locale) : null;
       return category != null ? new BrokerReference(brokerId, category, brokerDefinition) : null;
-    } catch (CrudlException ex) {
+    } catch (CrudlException|InvalidDefinitionException ex) {
       throw new DataProcessorException(String.format("Error updating broker: %s <-- %s", brokerId, brokerDefinition), ex);
     }
   }
@@ -158,5 +163,18 @@ public class DefaultBrokersService implements BrokersService {
     Set<String> inboundTypes = inboundConnectorRegistry.getTemplates(locale).stream().map(t -> t.getType()).collect(Collectors.toSet());
     Set<String> outboundTypes = outboundConnectorRegistry.getTemplates(locale).stream().map(t -> t.getType()).collect(Collectors.toSet());
     return inboundTypes.contains(brokerType) ? INBOUND : outboundTypes.contains(brokerType) ? OUTBOUND : null;
+  }
+  
+  private Connector<?> findConnectorByType(String type) {
+    InputConnector inputConnector = inboundConnectorRegistry.get(type);
+    return inputConnector!=null? inputConnector: outboundConnectorRegistry.get(type);
+  }
+  
+  private void validateDefinition(EntityDefinition def) throws InvalidDefinitionException {
+    Connector<?> connector = findConnectorByType(def.getType());
+    if (connector==null) {
+      throw new InvalidDefinitionException(String.format("Invalid broker type: %s", def.getType()));
+    }
+    connector.validateDefinition(def);
   }
 }

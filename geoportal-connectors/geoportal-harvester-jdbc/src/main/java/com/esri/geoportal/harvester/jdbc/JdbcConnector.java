@@ -39,6 +39,11 @@ public class JdbcConnector  implements InputConnector<InputBroker> {
   }
 
   @Override
+  public void validateDefinition(EntityDefinition definition) throws InvalidDefinitionException {
+    new JdbcBrokerDefinitionAdaptor(definition);
+  }
+
+  @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new JdbcBroker(this, new JdbcBrokerDefinitionAdaptor(definition));
   }
@@ -60,7 +65,12 @@ public class JdbcConnector  implements InputConnector<InputBroker> {
         return true;
       }
     });
-    arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_SQL_STATEMENT, bundle.getString("jdbc.sql"), true));
+    arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_SQL_STATEMENT, bundle.getString("jdbc.sql"), true) {
+      @Override
+      public String getRegExp() {
+        return JdbcValidator.getRegExp();
+      }
+    });
     arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_FILEID_COLUMN, bundle.getString("jdbc.fileid"), true));
     arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_TITLE_COLUMN, bundle.getString("jdbc.title"), true));
     arguments.add(new UITemplate.StringArgument(JdbcConstants.P_JDBC_DESCRIPTION_COLUMN, bundle.getString("jdbc.description")));

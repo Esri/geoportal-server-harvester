@@ -34,6 +34,11 @@ public class MigrationConnector implements InputConnector<InputBroker>{
   public static final String TYPE = "MIG";
 
   @Override
+  public void validateDefinition(EntityDefinition definition) throws InvalidDefinitionException {
+    new MigrationBrokerDefinitionAdaptor(definition);
+  }
+
+  @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new MigrationBroker(this, new MigrationBrokerDefinitionAdaptor(definition));
   }

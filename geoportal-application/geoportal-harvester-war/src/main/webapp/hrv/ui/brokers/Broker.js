@@ -63,6 +63,7 @@ define(["dojo/_base/declare",
           content: brokerEditorPane,
           class: "h-broker-editor",
           onHide: function() {
+            topic.publish("msg"); // clear any former errors
             brokerEditorDialog.destroy();
             brokerEditorPane.destroy();
           }
@@ -75,12 +76,13 @@ define(["dojo/_base/declare",
           // use API to update broker
           BrokersREST.update(brokerDefinition.uuid,json.stringify(brokerDefinition)).then(
             lang.hitch({brokerEditorPane: brokerEditorPane, brokerEditorDialog: brokerEditorDialog, self: this},function(){
+              topic.publish("msg"); // clear any former errors
               this.brokerEditorDialog.destroy();
               this.brokerEditorPane.destroy();
               this.self.load();
             }),
             lang.hitch(this,function(error){
-              console.error(error);
+              console.debug(error);
               topic.publish("msg",new Error("Error creating broker"));
             })
           );
