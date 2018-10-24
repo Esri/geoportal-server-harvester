@@ -39,6 +39,11 @@ public class JdbcConnector  implements InputConnector<InputBroker> {
   }
 
   @Override
+  public void validateDefinition(EntityDefinition definition) throws InvalidDefinitionException {
+    new JdbcBrokerDefinitionAdaptor(definition);
+  }
+
+  @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new JdbcBroker(this, new JdbcBrokerDefinitionAdaptor(definition));
   }

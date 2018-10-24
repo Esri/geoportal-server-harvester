@@ -54,6 +54,11 @@ public class OaiConnector implements InputConnector<InputBroker> {
   }
 
   @Override
+  public void validateDefinition(EntityDefinition definition) throws InvalidDefinitionException {
+    new OaiBrokerDefinitionAdaptor(definition);
+  }
+
+  @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new OaiBroker(this, new OaiBrokerDefinitionAdaptor(definition));
   }

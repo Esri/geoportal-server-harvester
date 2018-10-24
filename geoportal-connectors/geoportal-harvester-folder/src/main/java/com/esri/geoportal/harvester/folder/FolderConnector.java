@@ -53,6 +53,11 @@ public class FolderConnector implements OutputConnector<OutputBroker> {
   }
 
   @Override
+  public void validateDefinition(EntityDefinition definition) throws InvalidDefinitionException {
+    new FolderBrokerDefinitionAdaptor(definition);
+  }
+
+  @Override
   public OutputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new FolderBroker(this,new FolderBrokerDefinitionAdaptor(definition));
   }

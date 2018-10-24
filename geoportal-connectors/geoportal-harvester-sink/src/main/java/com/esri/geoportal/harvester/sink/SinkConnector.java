@@ -69,6 +69,11 @@ public class SinkConnector implements InputConnector<InputBroker> {
   }
 
   @Override
+  public void validateDefinition(EntityDefinition definition) throws InvalidDefinitionException {
+    new SinkBrokerDefinitionAdaptor(definition);
+  }
+
+  @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new SinkBroker(this, new SinkBrokerDefinitionAdaptor(definition));
   }

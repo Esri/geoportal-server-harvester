@@ -74,6 +74,11 @@ public class CswConnector implements InputConnector<InputBroker> {
   }
 
   @Override
+  public void validateDefinition(EntityDefinition definition) throws InvalidDefinitionException {
+    new CswBrokerDefinitionAdaptor(definition);
+  }
+
+  @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new CswBroker(this, new CswBrokerDefinitionAdaptor(definition));
   }

@@ -66,6 +66,11 @@ public class CkanConnector implements InputConnector<InputBroker> {
   }
 
   @Override
+  public void validateDefinition(EntityDefinition definition) throws InvalidDefinitionException {
+    new CkanBrokerDefinitionAdaptor(definition);
+  }
+
+  @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new CkanBroker(this, new CkanBrokerDefinitionAdaptor(definition), metaBuilder);
   }
