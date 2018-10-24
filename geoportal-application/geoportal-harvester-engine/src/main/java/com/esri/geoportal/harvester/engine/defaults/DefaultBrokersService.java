@@ -175,5 +175,6 @@ public class DefaultBrokersService implements BrokersService {
     if (connector==null) {
       throw new InvalidDefinitionException(String.format("Invalid broker type: %s", def.getType()));
     }
+    connector.validateDefinition(def);
   }
 }
