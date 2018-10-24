@@ -228,6 +228,8 @@ public final class UITemplate {
    * String argument.
    */
   public static class StringArgument extends ArgumentBase<String> {
+    private String regExp;
+    
     /**
      * Creates instance of the argument.
      * @param name type
@@ -254,6 +256,14 @@ public final class UITemplate {
      */
     public StringArgument(String name, String label, boolean required, String defaultValue) {
       super(name, label, required, defaultValue);
+    }
+
+    /**
+     * Gets optional regular expression to validate value.
+     * @return regular expression (JavaScript style) or <code>null</code>
+     */
+    public String getRegExp() {
+      return regExp;
     }
 
     @Override
