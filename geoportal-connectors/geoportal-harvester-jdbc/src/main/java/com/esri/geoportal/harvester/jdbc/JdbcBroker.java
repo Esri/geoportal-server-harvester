@@ -492,7 +492,7 @@ import org.slf4j.LoggerFactory;
   private String sanitizeXml(String xml) {
     xml = StringUtils.trimToEmpty(xml);
     if (!xml.startsWith("<?xml")) {
-      xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>" + xml;
+      xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" + xml;
     }
     return xml;
   }
