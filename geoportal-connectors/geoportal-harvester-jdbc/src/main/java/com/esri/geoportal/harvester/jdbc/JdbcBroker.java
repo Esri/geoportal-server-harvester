@@ -75,8 +75,8 @@ import org.slf4j.LoggerFactory;
   private Connection connection;
   private PreparedStatement statement;
   private ResultSet resultSet;
-  private final List<SqlStringRetriever> retrievers = new ArrayList<>();
-  private final List<SqlDataInserter> inserters = new ArrayList<>();
+  private final List<JsonPropertyInjector> jsonPropertyInjectors = new ArrayList<>();
+  private final List<AttributeInjector> attributeInjectors = new ArrayList<>();
   private final Map<String,String> columnMappings = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
   private TaskDefinition td;
   private ScriptProcessor scriptProcessor;
@@ -112,8 +112,8 @@ import org.slf4j.LoggerFactory;
     createConnection();
     createStatement();
     createResultSet();
-    createStringRetrievers();
-    createInserters();
+    createJsonPropertyInjectors();
+    createAttributeInjectors();
     createScriptEngine();
   }
 
@@ -224,8 +224,8 @@ import org.slf4j.LoggerFactory;
     return obj!=null? obj.toString(): "";
   }
   
-  private SqlStringRetriever createRetriever(final String fieldName, final String columnName, final int columnType) {
-    SqlStringRetriever retriever = null;
+  private JsonPropertyInjector createJsonPropertyInjectors(final String fieldName, final String columnName, final int columnType) {
+    JsonPropertyInjector jsonPropertyInjector = null;
     
     switch (columnType) {
       case Types.VARCHAR:
@@ -234,79 +234,79 @@ import org.slf4j.LoggerFactory;
       case Types.LONGNVARCHAR:
       case Types.NVARCHAR:
       case Types.NCHAR:
-        retriever = (n, r)->n.put(fieldName, readValue(r, columnName, String.class));
+        jsonPropertyInjector = (n, r)->n.put(fieldName, readValue(r, columnName, String.class));
         break;
 
       case Types.DOUBLE:
-        retriever = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, Double.class)));
+        jsonPropertyInjector = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, Double.class)));
         break;
 
       case Types.FLOAT:
-        retriever = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, Float.class)));
+        jsonPropertyInjector = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, Float.class)));
         break;
 
       case Types.INTEGER:
-        retriever = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, Integer.class)));
+        jsonPropertyInjector = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, Integer.class)));
         break;
 
       case Types.SMALLINT:
       case Types.TINYINT:
-        retriever = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, Short.class)));
+        jsonPropertyInjector = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, Short.class)));
         break;
 
       case Types.BIGINT:
       case Types.DECIMAL:
       case Types.NUMERIC:
-        retriever = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, BigDecimal.class)));
+        jsonPropertyInjector = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, BigDecimal.class)));
         break;
     
       case Types.BOOLEAN:
-        retriever = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, Boolean.class)));
+        jsonPropertyInjector = (n, r)->n.put(fieldName, safeToString(readValue(r, columnName, Boolean.class)));
         break;
 
       case Types.DATE:
-        retriever = (n, r)->n.put(fieldName, formatIsoDate(r.getDate(columnName)));
+        jsonPropertyInjector = (n, r)->n.put(fieldName, formatIsoDate(r.getDate(columnName)));
         break;
       case Types.TIME:
-        retriever = (n, r)->n.put(fieldName, formatIsoDate(r.getTime(columnName)));
+        jsonPropertyInjector = (n, r)->n.put(fieldName, formatIsoDate(r.getTime(columnName)));
         break;
       case Types.TIMESTAMP:
-        retriever = (n, r)->n.put(fieldName, formatIsoDate(r.getTimestamp(columnName)));
+        jsonPropertyInjector = (n, r)->n.put(fieldName, formatIsoDate(r.getTimestamp(columnName)));
         break;
         
       case Types.CLOB:
-        retriever = (n, r)->n.put(fieldName, formatClob(r.getClob(columnName)));
+        jsonPropertyInjector = (n, r)->n.put(fieldName, formatClob(r.getClob(columnName)));
         break;
         
       case Types.BLOB:
       case Types.BINARY:
       case Types.VARBINARY:
       case Types.LONGVARBINARY:
-        retriever = (n, r)->n.put(fieldName, formatBlob(r.getBlob(columnName)));
+        jsonPropertyInjector = (n, r)->n.put(fieldName, formatBlob(r.getBlob(columnName)));
         break;
     }
     
-    return retriever;
+    return jsonPropertyInjector;
   }
   
-  private void createStringRetrievers()  throws DataProcessorException {
+  private void createJsonPropertyInjectors()  throws DataProcessorException {
     try {
       ResultSetMetaData metaData = resultSet.getMetaData();
       for (int i=1; i<= metaData.getColumnCount(); i++) {
         final String columnName = metaData.getColumnName(i);
         final int columnType = metaData.getColumnType(i);
 
-        SqlStringRetriever retriever = null;
+        JsonPropertyInjector jsonPropertyInjector = null;
         if (columnName.equalsIgnoreCase(definition.getFileIdColumn())) {
-          retriever = createRetriever("fileid", columnName, columnType);
+          jsonPropertyInjector = createJsonPropertyInjectors("fileid", columnName, columnType);
         } else if (columnName.equalsIgnoreCase(definition.getTitleColumn())) {
-          retriever = createRetriever("title", columnName, columnType);
+          jsonPropertyInjector = createJsonPropertyInjectors("title", columnName, columnType);
         } else if (columnName.equalsIgnoreCase(definition.getDescriptionColumn())) {
-          retriever = createRetriever("description", columnName, columnType);
+          jsonPropertyInjector = createJsonPropertyInjectors("description", columnName, columnType);
         }
         
-        if (retriever!=null) {
-          retrievers.add(retriever);
+        if (jsonPropertyInjector!=null) {
+          jsonPropertyInjectors.add(jsonPropertyInjector);
         }
       }
     } catch (SQLException ex) {
@@ -340,8 +340,8 @@ import org.slf4j.LoggerFactory;
     return attributeNames;
   }
   
-  private List<SqlDataInserter> createInserters(final String columnName, final int columnType) {
-    List<SqlDataInserter> inserters = new ArrayList<>();
+  private List<AttributeInjector> createAttributeInjectors(final String columnName, final int columnType) {
+    List<AttributeInjector> attributeInjectors = new ArrayList<>();
     
     switch (columnType) {
       case Types.VARCHAR:
@@ -351,59 +351,75 @@ import org.slf4j.LoggerFactory;
       case Types.NVARCHAR:
       case Types.NCHAR:
         createAttributeNames("src_%s_txt", norm(columnName)).forEach(
-                name -> inserters.add((a,r)->a.put(name, readValue(r, columnName, String.class))));
+                name -> attributeInjectors.add((a,x,r)->{
+                  if (!name.endsWith("_xml")) {
+                    a.put(name, readValue(r, columnName, String.class));
+                  } else {
+                    x.xml = readValue(r, columnName, String.class);
+                  }
+                }));
         break;
 
       case Types.DOUBLE:
         createAttributeNames("src_%s_d", norm(columnName)).forEach(
-                name -> inserters.add((a,r)->a.put(name, readValue(r, columnName, Double.class))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, readValue(r, columnName, Double.class))));
         break;
 
       case Types.FLOAT:
         createAttributeNames("src_%s_f", norm(columnName)).forEach(
-                name -> inserters.add((a,r)->a.put(name, readValue(r, columnName, Float.class))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, readValue(r, columnName, Float.class))));
         break;
 
       case Types.INTEGER:
         createAttributeNames("src_%s_i", norm(columnName)).forEach(
-                name -> inserters.add((a,r)->a.put(name, readValue(r, columnName, Integer.class))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, readValue(r, columnName, Integer.class))));
         break;
         
       case Types.SMALLINT:
       case Types.TINYINT:
         createAttributeNames("src_%s_i", norm(columnName)).forEach(
-                name -> inserters.add((a,r)->a.put(name, readValue(r, columnName, Short.class))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, readValue(r, columnName, Short.class))));
         break;
 
       case Types.BIGINT:
       case Types.DECIMAL:
       case Types.NUMERIC:
         createAttributeNames("src_%s_d", norm(columnName)).forEach(
-                name -> inserters.add((a,r)->a.put(name, readValue(r, columnName, BigDecimal.class))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, readValue(r, columnName, BigDecimal.class))));
         break;
 
       case Types.BOOLEAN:
         createAttributeNames("src_%s_b", norm(columnName)).forEach(
-                name -> inserters.add((a,r)->a.put(name, readValue(r, columnName, Boolean.class))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, readValue(r, columnName, Boolean.class))));
         break;
 
 
       case Types.DATE:
         createAttributeNames("src_%s_dt", norm(columnName)).forEach(
-                name -> inserters.add((a,r)->a.put(name, formatIsoDate(r.getDate(columnName)))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, formatIsoDate(r.getDate(columnName)))));
         break;
       case Types.TIME:
         createAttributeNames("src_%s_dt", norm(columnName)).forEach(
-                name -> inserters.add((a,r)->a.put(name, formatIsoDate(r.getTime(columnName)))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, formatIsoDate(r.getTime(columnName)))));
         break;
       case Types.TIMESTAMP:
         createAttributeNames("src_%s_dt", norm(columnName)).forEach(
-                name -> inserters.add((a,r)->a.put(name, formatIsoDate(r.getTimestamp(columnName)))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, formatIsoDate(r.getTimestamp(columnName)))));
         break;
         
       case Types.CLOB:
         createAttributeNames("src_%s_txt", norm(columnName)).forEach(
-                name -> inserters.add((a,r)->a.put(name, formatClob(r.getClob(columnName)))));
+                name -> attributeInjectors.add((a,x,r)->{ 
+                  if (!name.endsWith("_xml")) {
+                    a.put(name, formatClob(r.getClob(columnName))); 
+                  } else {
+                    x.xml = formatClob(r.getClob(columnName));
+                  }
+                }));
+        break;
+        
+      case Types.SQLXML:
+        attributeInjectors.add((a,x,r)->x.xml = readValue(r,columnName,String.class));
         break;
         
       case Types.BLOB:
@@ -412,22 +428,22 @@ import org.slf4j.LoggerFactory;
       case Types.LONGVARBINARY:
         if (columnMappings.containsKey(norm(columnName)) && columnMappings.get(norm(columnName)).endsWith("_txt")) {
           createAttributeNames("src_%s_txt", norm(columnName)).forEach(
-              name -> inserters.add((a,r)->a.put(name, formatBlob(r.getBlob(columnName)))));
+              name -> attributeInjectors.add((a,x,r)->a.put(name, formatBlob(r.getBlob(columnName)))));
         }
         break;
     }
     
-    return inserters;
+    return attributeInjectors;
   }
   
-  private void createInserters() throws DataProcessorException {
+  private void createAttributeInjectors() throws DataProcessorException {
     try {
       ResultSetMetaData metaData = resultSet.getMetaData();
       for (int i=1; i<= metaData.getColumnCount(); i++) {
         final String columnName = metaData.getColumnName(i);
         final int columnType = metaData.getColumnType(i);
         
-        inserters.addAll(createInserters(columnName, columnType));
+        attributeInjectors.addAll(createAttributeInjectors(columnName, columnType));
       }
     } catch (SQLException ex) {
       throw new DataProcessorException(String.format("Error opening JDBC connection to: %s", definition.getConnection()), ex);
@@ -479,17 +495,26 @@ import org.slf4j.LoggerFactory;
     }
   }
   
+  private String sanitizeXml(String xml) {
+    xml = StringUtils.trimToEmpty(xml);
+    if (!xml.startsWith("<?xml")) {
+      xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" + xml;
+    }
+    return xml;
+  }
+  
   private DataReference createReference(ResultSet resultSet) throws SQLException, JsonProcessingException, URISyntaxException, UnsupportedEncodingException, ScriptException  {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode node = mapper.createObjectNode();
     Map<String,Object> attr = new HashMap<>();
+    XmlHolder xmlHolder = new XmlHolder();
     
-    for (SqlStringRetriever retriever: retrievers) {
-      retriever.read(node, resultSet);
+    for (JsonPropertyInjector jsonPropertyInjector: jsonPropertyInjectors) {
+      jsonPropertyInjector.inject(node, resultSet);
     }
 
-    for (SqlDataInserter reader: inserters) {
-      reader.read(attr, resultSet);
+    for (AttributeInjector attributeInjector: attributeInjectors) {
+      attributeInjector.inject(attr, xmlHolder, resultSet);
     }
 
     String nodeAsJson;
@@ -519,19 +544,27 @@ import org.slf4j.LoggerFactory;
       nodeAsJson = mapper.writeValueAsString(node);
     }
     
+    if (xmlHolder.xml!=null) {
+      ref.addContext(MimeType.APPLICATION_XML, sanitizeXml(xmlHolder.xml).getBytes("UTF-8"));
+    }
     ref.addContext(MimeType.APPLICATION_JSON, nodeAsJson.getBytes("UTF-8"));
     ref.getAttributesMap().putAll(attr);
 
     return ref;
   }
   
-  private interface SqlStringRetriever {
-    void read(ObjectNode node, ResultSet resultSet) throws SQLException;
+  private interface JsonPropertyInjector {
+    void inject(ObjectNode node, ResultSet resultSet) throws SQLException;
   }
   
-  private interface SqlDataInserter {
-    void read(Map<String,Object> attributeMap, ResultSet resultSet) throws SQLException;
+  private interface AttributeInjector {
+    void inject(Map<String,Object> attributeMap, XmlHolder xmlHolder, ResultSet resultSet) throws SQLException;
   }
+    
+  private static class XmlHolder {
+    public String xml;
+  }
+
 
   private class JdbcIterator implements InputBroker.Iterator {
     private final IteratorContext iteratorContext;
