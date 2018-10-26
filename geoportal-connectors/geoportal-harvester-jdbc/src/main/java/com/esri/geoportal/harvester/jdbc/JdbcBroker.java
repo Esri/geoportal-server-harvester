@@ -409,7 +409,13 @@ import org.slf4j.LoggerFactory;
         
       case Types.CLOB:
         createAttributeNames("src_%s_txt", norm(columnName)).forEach(
-                name -> attributeInjectors.add((a,x,r)->a.put(name, formatClob(r.getClob(columnName)))));
+                name -> attributeInjectors.add((a,x,r)->{ 
+                  if (!name.endsWith("_xml")) {
+                    a.put(name, formatClob(r.getClob(columnName))); 
+                  } else {
+                    x.xml = formatClob(r.getClob(columnName));
+                  }
+                }));
         break;
         
       case Types.SQLXML:
