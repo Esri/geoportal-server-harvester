@@ -341,7 +341,7 @@ import org.slf4j.LoggerFactory;
   }
   
   private List<AttributeInjector> createAttributeInjectors(final String columnName, final int columnType) {
-    List<AttributeInjector> attributeInjector = new ArrayList<>();
+    List<AttributeInjector> attributeInjectors = new ArrayList<>();
     
     switch (columnType) {
       case Types.VARCHAR:
@@ -351,59 +351,69 @@ import org.slf4j.LoggerFactory;
       case Types.NVARCHAR:
       case Types.NCHAR:
         createAttributeNames("src_%s_txt", norm(columnName)).forEach(
-                name -> attributeInjector.add((a,r)->a.put(name, readValue(r, columnName, String.class))));
+                name -> attributeInjectors.add((a,x,r)->{
+                  if (!name.endsWith("_xml")) {
+                    a.put(name, readValue(r, columnName, String.class));
+                  } else {
+                    x.xml = readValue(r, columnName, String.class);
+                  }
+                }));
         break;
 
       case Types.DOUBLE:
         createAttributeNames("src_%s_d", norm(columnName)).forEach(
-                name -> attributeInjector.add((a,r)->a.put(name, readValue(r, columnName, Double.class))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, readValue(r, columnName, Double.class))));
         break;
 
       case Types.FLOAT:
         createAttributeNames("src_%s_f", norm(columnName)).forEach(
-                name -> attributeInjector.add((a,r)->a.put(name, readValue(r, columnName, Float.class))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, readValue(r, columnName, Float.class))));
         break;
 
       case Types.INTEGER:
         createAttributeNames("src_%s_i", norm(columnName)).forEach(
-                name -> attributeInjector.add((a,r)->a.put(name, readValue(r, columnName, Integer.class))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, readValue(r, columnName, Integer.class))));
         break;
         
       case Types.SMALLINT:
       case Types.TINYINT:
         createAttributeNames("src_%s_i", norm(columnName)).forEach(
-                name -> attributeInjector.add((a,r)->a.put(name, readValue(r, columnName, Short.class))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, readValue(r, columnName, Short.class))));
         break;
 
       case Types.BIGINT:
       case Types.DECIMAL:
       case Types.NUMERIC:
         createAttributeNames("src_%s_d", norm(columnName)).forEach(
-                name -> attributeInjector.add((a,r)->a.put(name, readValue(r, columnName, BigDecimal.class))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, readValue(r, columnName, BigDecimal.class))));
         break;
 
       case Types.BOOLEAN:
         createAttributeNames("src_%s_b", norm(columnName)).forEach(
-                name -> attributeInjector.add((a,r)->a.put(name, readValue(r, columnName, Boolean.class))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, readValue(r, columnName, Boolean.class))));
         break;
 
 
       case Types.DATE:
         createAttributeNames("src_%s_dt", norm(columnName)).forEach(
-                name -> attributeInjector.add((a,r)->a.put(name, formatIsoDate(r.getDate(columnName)))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, formatIsoDate(r.getDate(columnName)))));
         break;
       case Types.TIME:
         createAttributeNames("src_%s_dt", norm(columnName)).forEach(
-                name -> attributeInjector.add((a,r)->a.put(name, formatIsoDate(r.getTime(columnName)))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, formatIsoDate(r.getTime(columnName)))));
         break;
       case Types.TIMESTAMP:
         createAttributeNames("src_%s_dt", norm(columnName)).forEach(
-                name -> attributeInjector.add((a,r)->a.put(name, formatIsoDate(r.getTimestamp(columnName)))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, formatIsoDate(r.getTimestamp(columnName)))));
         break;
         
       case Types.CLOB:
         createAttributeNames("src_%s_txt", norm(columnName)).forEach(
-                name -> attributeInjector.add((a,r)->a.put(name, formatClob(r.getClob(columnName)))));
+                name -> attributeInjectors.add((a,x,r)->a.put(name, formatClob(r.getClob(columnName)))));
+        break;
+        
+      case Types.SQLXML:
+        attributeInjectors.add((a,x,r)->x.xml = readValue(r,columnName,String.class));
         break;
         
       case Types.BLOB:
@@ -412,12 +422,12 @@ import org.slf4j.LoggerFactory;
       case Types.LONGVARBINARY:
         if (columnMappings.containsKey(norm(columnName)) && columnMappings.get(norm(columnName)).endsWith("_txt")) {
           createAttributeNames("src_%s_txt", norm(columnName)).forEach(
-              name -> attributeInjector.add((a,r)->a.put(name, formatBlob(r.getBlob(columnName)))));
+              name -> attributeInjectors.add((a,x,r)->a.put(name, formatBlob(r.getBlob(columnName)))));
         }
         break;
     }
     
-    return attributeInjector;
+    return attributeInjectors;
   }
   
   private void createAttributeInjectors() throws DataProcessorException {
@@ -479,17 +489,26 @@ import org.slf4j.LoggerFactory;
     }
   }
   
+  private String sanitizeXml(String xml) {
+    xml = StringUtils.trimToEmpty(xml);
+    if (!xml.startsWith("<?xml")) {
+      xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>" + xml;
+    }
+    return xml;
+  }
+  
   private DataReference createReference(ResultSet resultSet) throws SQLException, JsonProcessingException, URISyntaxException, UnsupportedEncodingException, ScriptException  {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode node = mapper.createObjectNode();
     Map<String,Object> attr = new HashMap<>();
+    XmlHolder xmlHolder = new XmlHolder();
     
     for (JsonPropertyInjector jsonPropertyInjector: jsonPropertyInjectors) {
       jsonPropertyInjector.inject(node, resultSet);
     }
 
     for (AttributeInjector attributeInjector: attributeInjectors) {
-      attributeInjector.inject(attr, resultSet);
+      attributeInjector.inject(attr, xmlHolder, resultSet);
     }
 
     String nodeAsJson;
@@ -519,6 +538,9 @@ import org.slf4j.LoggerFactory;
       nodeAsJson = mapper.writeValueAsString(node);
     }
     
+    if (xmlHolder.xml!=null) {
+      ref.addContext(MimeType.APPLICATION_XML, sanitizeXml(xmlHolder.xml).getBytes("UTF-8"));
+    }
     ref.addContext(MimeType.APPLICATION_JSON, nodeAsJson.getBytes("UTF-8"));
     ref.getAttributesMap().putAll(attr);
 
@@ -530,8 +552,13 @@ import org.slf4j.LoggerFactory;
   }
   
   private interface AttributeInjector {
-    void inject(Map<String,Object> attributeMap, ResultSet resultSet) throws SQLException;
+    void inject(Map<String,Object> attributeMap, XmlHolder xmlHolder, ResultSet resultSet) throws SQLException;
   }
+    
+  private static class XmlHolder {
+    public String xml;
+  }
+
 
   private class JdbcIterator implements InputBroker.Iterator {
     private final IteratorContext iteratorContext;
