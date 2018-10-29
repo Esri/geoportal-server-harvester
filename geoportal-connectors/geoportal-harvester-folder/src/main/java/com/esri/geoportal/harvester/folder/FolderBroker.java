@@ -182,7 +182,7 @@ import org.slf4j.LoggerFactory;
         fileName = fileName.getParent().resolve(fileName.getFileName() + "." + extension);
       }
     } else {
-      fileName = Paths.get(fileName.toString(), sanitizeFileName(id) + ".xml");
+      fileName = Paths.get(fileName.toString(), sanitizeFileName(id) + "." + extension);
     }
 
     return fileName;

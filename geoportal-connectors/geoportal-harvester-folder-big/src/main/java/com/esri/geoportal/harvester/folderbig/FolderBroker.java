@@ -208,7 +208,7 @@ import static com.esri.geoportal.harvester.folderbig.PathUtil.splitPath;
         folderName = assigner.getNextDirPath().toPath();
         resetCount = false;
       }
-      folderName = Paths.get(folderName.toString(), id + ".xml");
+      folderName = Paths.get(folderName.toString(), id + "." + extension);
     }
 
     return folderName;
