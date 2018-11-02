@@ -350,6 +350,7 @@ import org.slf4j.LoggerFactory;
       case Types.LONGNVARCHAR:
       case Types.NVARCHAR:
       case Types.NCHAR:
+      case Types.SQLXML:
         createAttributeNames("src_%s_txt", norm(columnName)).forEach(
                 name -> attributeInjectors.add((a,x,r)->{
                   if (!name.endsWith("_xml")) {
@@ -416,10 +417,6 @@ import org.slf4j.LoggerFactory;
                     x.xml = formatClob(r.getClob(columnName));
                   }
                 }));
-        break;
-        
-      case Types.SQLXML:
-        attributeInjectors.add((a,x,r)->x.xml = readValue(r,columnName,String.class));
         break;
         
       case Types.BLOB:
