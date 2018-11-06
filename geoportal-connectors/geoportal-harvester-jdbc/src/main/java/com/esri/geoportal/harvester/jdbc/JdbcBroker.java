@@ -61,6 +61,7 @@ import java.util.stream.Collectors;
 import javax.script.ScriptException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,10 +75,12 @@ import org.slf4j.LoggerFactory;
   private final JdbcBrokerDefinitionAdaptor definition;
   private Connection connection;
   private PreparedStatement statement;
+  private PreparedStatement idStatement;
   private ResultSet resultSet;
   private final List<JsonPropertyInjector> jsonPropertyInjectors = new ArrayList<>();
   private final List<AttributeInjector> attributeInjectors = new ArrayList<>();
   private final Map<String,String> columnMappings = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+  private RecordIdSetter idSetter;
   private TaskDefinition td;
   private ScriptProcessor scriptProcessor;
 
@@ -114,6 +117,7 @@ import org.slf4j.LoggerFactory;
     createResultSet();
     createJsonPropertyInjectors();
     createAttributeInjectors();
+    createRecordIdSetter();
     createScriptEngine();
   }
 
@@ -130,6 +134,14 @@ import org.slf4j.LoggerFactory;
     try {
       if (statement != null) {
         statement.close();
+      }
+    } catch (SQLException ex) {
+      LOG.warn(String.format("Unexpected error closing statement."), ex);
+    }
+
+    try {
+      if (idStatement != null) {
+        idStatement.close();
       }
     } catch (SQLException ex) {
       LOG.warn(String.format("Unexpected error closing statement."), ex);
@@ -154,8 +166,17 @@ import org.slf4j.LoggerFactory;
 
   @Override
   public DataContent readContent(String id) throws DataInputException {
-    // TODO provide implementation for readContent()
-    return null;
+    try {
+      this.idSetter.set(idStatement, id);
+      try (ResultSet resultSet = idStatement.executeQuery();) {
+        if (resultSet.next()) {
+          return createReference(resultSet);
+        }
+      }
+      return null;
+    } catch (SQLException|JsonProcessingException|URISyntaxException|ScriptException|UnsupportedEncodingException ex) {
+      throw new DataInputException(this, String.format("Error reading content for: %s", id), ex);
+    }
   }
   
   private void parseColumnNames() {
@@ -185,6 +206,10 @@ import org.slf4j.LoggerFactory;
       statement = definition.getSqlStatement().split("\\p{Space}").length == 1 
               ? connection.prepareStatement(String.format("SELECT * FROM %s", definition.getSqlStatement())) 
               : connection.prepareStatement(definition.getSqlStatement());
+      
+      idStatement = definition.getSqlStatement().split("\\p{Space}").length == 1 
+              ? connection.prepareStatement(String.format("SELECT * FROM %s WHERE %s = ?", definition.getSqlStatement(), definition.getFileIdColumn())) 
+              : connection.prepareStatement(String.format("SELECT * FROM (%s) AS data WHERE %s = ?", definition.getSqlStatement(), definition.getFileIdColumn()));
     } catch (SQLException ex) {
       throw new DataProcessorException(String.format("Error opening JDBC connection to: %s", definition.getConnection()), ex);
     }
@@ -447,6 +472,54 @@ import org.slf4j.LoggerFactory;
     }
   }
   
+  
+  private void createRecordIdSetter()  throws DataProcessorException {
+    try {
+      ResultSetMetaData metaData = resultSet.getMetaData();
+      for (int i=1; i<= metaData.getColumnCount(); i++) {
+        final String columnName = metaData.getColumnName(i);
+        final int columnType = metaData.getColumnType(i);
+
+        if (columnName.equalsIgnoreCase(definition.getFileIdColumn())) {
+          switch (columnType) {
+            case Types.VARCHAR:
+            case Types.CHAR:
+            case Types.LONGVARCHAR:
+            case Types.LONGNVARCHAR:
+            case Types.NVARCHAR:
+            case Types.NCHAR:
+            case Types.SQLXML:
+              idSetter = (st, id)-> st.setString(1, id);
+              break;
+
+            case Types.DOUBLE:
+              idSetter = (st, id)-> st.setDouble(1, NumberUtils.toDouble(id));
+              break;
+
+            case Types.FLOAT:
+              idSetter = (st, id)-> st.setFloat(1, NumberUtils.toFloat(id));
+              break;
+
+            case Types.INTEGER:
+            case Types.SMALLINT:
+            case Types.TINYINT:
+            case Types.BIGINT:
+            case Types.DECIMAL:
+            case Types.NUMERIC:
+              idSetter = (st, id)-> st.setInt(1, NumberUtils.toInt(id));
+              break;
+          }
+          break;
+        }
+      }
+      if (idSetter==null) {
+        throw new SQLException("Unsupported record primary key type.");
+      }
+    } catch (SQLException ex) {
+      throw new DataProcessorException(String.format("Error opening JDBC connection to: %s", definition.getConnection()), ex);
+    }
+  }
+  
   private void createScriptEngine() throws DataProcessorException {
     if (!StringUtils.isBlank(definition.getScript())) {
       scriptProcessor = new ScriptProcessor(definition.getScript());
@@ -550,12 +623,19 @@ import org.slf4j.LoggerFactory;
     return ref;
   }
   
+  @FunctionalInterface
   private interface JsonPropertyInjector {
     void inject(ObjectNode node, ResultSet resultSet) throws SQLException;
   }
   
+  @FunctionalInterface
   private interface AttributeInjector {
     void inject(Map<String,Object> attributeMap, XmlHolder xmlHolder, ResultSet resultSet) throws SQLException;
+  }
+  
+  @FunctionalInterface
+  private interface RecordIdSetter {
+    void set(PreparedStatement st, String id) throws SQLException;
   }
     
   private static class XmlHolder {
