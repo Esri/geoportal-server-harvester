@@ -167,10 +167,12 @@ import org.slf4j.LoggerFactory;
   @Override
   public DataContent readContent(String id) throws DataInputException {
     try {
-      this.idSetter.set(idStatement, id);
-      try (ResultSet resultSet = idStatement.executeQuery();) {
-        if (resultSet.next()) {
-          return createReference(resultSet);
+      if (idSetter != null) {
+        idSetter.set(idStatement, id);
+        try (ResultSet resultSet = idStatement.executeQuery();) {
+          if (resultSet.next()) {
+            return createReference(resultSet);
+          }
         }
       }
       return null;
@@ -511,9 +513,6 @@ import org.slf4j.LoggerFactory;
           }
           break;
         }
-      }
-      if (idSetter==null) {
-        throw new SQLException("Unsupported record primary key type.");
       }
     } catch (SQLException ex) {
       throw new DataProcessorException(String.format("Error opening JDBC connection to: %s", definition.getConnection()), ex);
