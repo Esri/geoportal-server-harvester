@@ -61,7 +61,15 @@ define(["dojo/_base/declare",
       },
       
       processConnectors: function(response) {
-        array.forEach(response,lang.hitch(this,this.processConnectorTemplate));
+        array.forEach(response.sort(function(a, b){
+          var t1 = a.label;
+          t1 = t1? t1.toLowerCase(): "";
+          var t2 = b.label;
+          t2 = t2? t2.toLowerCase(): "";
+          if (t1<t2) return -1;
+          if (t1>t2) return 1;
+          return 0;
+        }),lang.hitch(this,this.processConnectorTemplate));
         if (this.data) {
           this.typeSelector.set('value',this.data.brokerDefinition.type);
           setTimeout(lang.hitch(this,function(){
