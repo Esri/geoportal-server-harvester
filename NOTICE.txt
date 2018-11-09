@@ -1,6 +1,6 @@
 ===============================================================================
 ESRI Geoportal Server Harvester
-Copyright ©2017 Esri. 
+	Copyright ©2017 Esri. 
 ===============================================================================
 This document includes acknowledgments for the third‐parties whose software has 
 been used in permissible forms with the Geoportal Server Catalog and its related 
@@ -11,47 +11,157 @@ Please be aware that when using the Geoportal Server Catalog or its
 related products, these third‐party resources are under the protection of their
 respective license.
 
-===============================================================================
-AOP Alliance (dependency of 3rd party libraries)
--------------------------------------------------------------------------------
-LICENCE: all the source code provided by AOP Alliance is Public Domain. 
+The version number might be slightly different.
 
+===============================================================================
+JavaBeans(TM) Activation Framework (activation-1.1.1.jar)
+	Copyright (C) 1989, 1991 Free Software Foundation, Inc. 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+    License: CDDL + GPLv2 with classpath exception  https://glassfish.dev.java.net/nonav/public/CDDL+GPL.html
+===============================================================================
+===============================================================================
+Apache James :: Mime4j :: Core (apache-mime4j-core-0.8.2.jar)
+Apache James :: Mime4j :: DOM (apache-mime4j-dom-0.8.2.jar)
+	Copyright 2004-2018 The Apache Software Foundation
+	License: Apache 2.0
+===============================================================================
+ASM (asm-6.2.jar)
+	Copyright (c) 2000-2011 INRIA, France Telecom
+	License: BSD, https://asm.ow2.io/license.html
+	https://asm.ow2.io/
+===============================================================================
+Esri Geometry API For Java (esri-geometry-api-1.2.1.jar)
+-------------------------------------------------------------------------------
+	Copyright 2013-2016 Esri
+
+	Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+===============================================================================
+Bouncy Castle S/MIME API (bcmail-jdk15on-1.60.jar)
+Bouncy Castle PKIX, CMS, EAC, TSP, PKCS, OCSP, CMP, and CRMF APIs (bcpkix-jdk15on-1.56.jar)
+Bouncy Castle Provider (bcprov-jdk15on-1.60.jar)
+	Copyright (c) 2000 - 2018 The Legion of the Bouncy Castle Inc. (https://www.bouncycastle.org)
+	License: http://www.bouncycastle.org/licence.html
+===============================================================================
+Boilerpipe Boilerplate Removal and Fulltext Extraction From HTML Pages (boilerpipe-1.1.0.jar)
+	Copyright (c) 2009, 2014 Christian Kohlschütter
+	License: Apache 2.0
+	https://github.com/kohlschutter/boilerpipe
+===============================================================================
+Itadaki Jbzip2 (bzip2-0.9.1.jar)
+	License: MIT
+	https://code.google.com/archive/p/jbzip2/
+===============================================================================
+C3p0:JDBC DataSources/Resource Pools (c3p0-0.9.1.1.jar)
+	Copyright © 2015 Machinery For Change, Inc.
+	License: Eclipse Public License, GNU Library or Lesser General Public License version 2.0 (LGPLv2)
+	https://sourceforge.net/projects/c3p0/
+	https://www.mchange.com/projects/c3p0/
+===============================================================================
+CDM Core Library (cdm-4.5.5.jar)
+	Copyright 1993-2017 University Corporation for Atmospheric Research/Unidata
+	License: NetCDF C Library, https://www.unidata.ucar.edu/software/netcdf/copyright.html
+	https://www.unidata.ucar.edu/software/thredds/current/netcdf-java/documentation.htm
 ===============================================================================
 Apache Commons:
-Apache Commons Codec (dependency of 3rd party libraries)
-Apache Commons FileUpload
-Apache Commons IO
-Apache Commons Lang
-Apache Commons Text
-Logging (dependency of 3rd party libraries)
+Apache Commons Codec (dependency of 3rd party libraries) (commons-codec-1.11.jar)
+Apache Commons Collections (commons-collections4-4.2.jar)
+Apache Commons Compress (commons-compress-1.18.jar)
+Apache Commons CSV (commons-csv-1.5.jar)
+Apache Commons Exec (commons-exec-1.3.jar)
+Apache Commons FileUpload (commons-fileupload-1.3.3.jar)
+Apache Commons IO (commons-io-2.6.jar)
+Apache Commons Lang (commons-lang-2.6.jar, commons-lang3-3.8.1.jar)
+Apache Commons Text (commons-text-1.4.jar)
+Logging (dependency of 3rd party libraries) (commons-logging-1.2.jar)
 -------------------------------------------------------------------------------
-© 2002-2016 The Apache Software Foundation
-This product includes software developed by The Apache Software Foundation
-(http://www.apache.org/).
+	Copyright 2002-2017 The Apache Software Foundation
+	License: Apache-2.0
+===============================================================================
+Curvesapi (curvesapi-1.04.jar)
+	Copyright (c) 2005, Graph Builder
+	All rights reserved.
+	License: BSD-3-clause
+	https://github.com/virtuald/curvesapi
+===============================================================================
+Apache CXF Core (cxf-core-3.2.6.jar)
+Apache CXF Runtime JAX RS Frontend (cxf-rt-frontend-jaxrs-3.2.6.jar)
+Apache CXF JAX RS Client (cxf-rt-rs-client-3.2.6.jar)
+Apache CXF Runtime HTTP Transport (cxf-rt-transports-http-3.2.6.jar)
+	Copyright 2006-2018 The Apache Software Foundation
+	License: Apache-2.0
+===============================================================================
+DEC (dec-0.1.2.jar)
+	License: MIT
+	http://brotli.org/dec
+===============================================================================
+Ehcache Core (ehcache-core-2.6.2.jar)
+	© Terracotta, Inc., a wholly-owned subsidiary of Software AG USA, Inc. All rights reserved.
+	License: Apache 2.0
+	http://www.ehcache.org/
+===============================================================================
+Apache FontBox (fontbox-2.0.11.jar)
+	Copyright 2009-2018 The Apache Software Foundation
+	License: Apache 2.0	
+	https://pdfbox.apache.org/
+===============================================================================
+GeoAPI (geoapi-3.0.1.jar)
+	License: OGC copyright, https://raw.githubusercontent.com/opengeospatial/geoapi/master/LICENSE.txt  
 
-See Common Open Source Licenses section below for copy of Apache 2.0 License.
+GeoAPI - Programming interfaces for OGC/ISO standards
+http://www.geoapi.org
+
+Copyright (C) 2003-2018 Open Geospatial Consortium, Inc.
+All Rights Reserved. http://www.opengeospatial.org/ogc/legal
+
+This OGC work (including software, documents, or other related items) is being
+provided by the copyright holders under the following license. By obtaining,
+using and/or copying this work, you (the licensee) agree that you have read,
+understood, and will comply with the following terms and conditions:
+
+Permission to use, copy, and modify this software and its documentation, with
+or without modification, for any purpose and without fee or royalty is hereby
+granted, provided that you include the following on ALL copies of the software
+and documentation or portions thereof, including modifications, that you make:
+
+   1. The full text of this NOTICE in a location viewable to users of the
+      redistributed or derivative work.
+   2. Notice of any changes or modifications to the OGC files, including the
+      date changes were made. (We recommend you provide URIs to the location
+      from which the code is derived.)
+
+THIS SOFTWARE AND DOCUMENTATION IS PROVIDED "AS IS," AND COPYRIGHT HOLDERS MAKE
+NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO, WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT
+THE USE OF THE SOFTWARE OR DOCUMENTATION WILL NOT INFRINGE ANY THIRD PARTY
+PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+
+COPYRIGHT HOLDERS WILL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF ANY USE OF THE SOFTWARE OR DOCUMENTATION.
+
+The name and trademarks of copyright holders may NOT be used in advertising or
+publicity pertaining to the software without specific, written prior permission.
+Title to copyright in this software and any associated documentation will at all
+times remain with copyright holders.
 
 ===============================================================================
-Apache HttpComponents:
-Apache HttpClient
-Apache HttpCore (dependency of 3rd party libraries)
--------------------------------------------------------------------------------
-© 2005-2017 The Apache Software Foundation
-This product includes software developed by The Apache Software Foundation
-(http://www.apache.org/).
-
-See Common Open Source Licenses below for copy of Apache 2.0 License.
-
+GRIB Decoder API (grib-4.5.5.jar)
+	Copyright © 2018 UCAR
+	License: (MIT-style) netCDF C library license, https://www.unidata.ucar.edu/software/netcdf/copyright.html 
+	https://www.unidata.ucar.edu/software/thredds/current/netcdf-java/
 ===============================================================================
-Esri Geometry API For Java
--------------------------------------------------------------------------------
-Copyright 2013-2016 Esri
-
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+Gson (gson-2.8.5.jar)
+	Copyright 2008 Google Inc.
+	License: Apache-2.0
+	https://github.com/google/gson
+===============================================================================
+Guava: Google Core Libraries For Java (guava-17.0.jar)
+	Copyright Google Inc.
+	License: Apache-2.0
+	https://github.com/google/guava
 
 ===============================================================================
 H2 Database Engine
@@ -64,15 +174,117 @@ An original copy of the license agreement can be found at:
 http://www.h2database.com/html/license.html
 
 ===============================================================================
-Jackson
-Jackson Annotations 
-Jackson Core
-Jackson Databind
+Apache HttpComponents:
+Apache HttpClient (httpclient-4.5.6.jar)
+Apache HttpClient Mime (httpmime-4.5.6.jar)
+Apache HttpCore (dependency of 3rd party libraries) (httpcore-4.4.10.jar)
 -------------------------------------------------------------------------------
-License: Apache 2.0
+	Copyright © 2005-2017 The Apache Software Foundation
+	This product includes software developed by The Apache Software Foundation
+	(http://www.apache.org/).
 
-See Common Open Source Licenses section below for copy of Apache 2.0 License.
+	See Common Open Source Licenses below for copy of Apache 2.0 License.
+===============================================================================
+HttpClient Wrappers (httpservices-4.5.5.jar)
+	Copyright 1993-2017 University Corporation for Atmospheric Research/Unidata
+	License: (MIT-style) netCDF C library license, http://www.unidata.ucar.edu/software/netcdf/copyright.html
+	https://www.unidata.ucar.edu/software/thredds/current/netcdf-java/documentation.htm
+===============================================================================
+ISO Parser (isoparser-1.1.22.jar)
+	License: Apache-2.0
+	https://code.google.com/archive/p/mp4parser/
+===============================================================================
+Jackcess (jackcess-2.1.12.jar)
+Jackcess Encrypt (jackcess-encrypt-2.1.4.jar)
+	Copyright ©2005–2018 Health Market Science. All rights reserved.
+	License: Apache-2.0
+	http://jackcess.sourceforge.net/
+===============================================================================
+Jackson
+Jackson Annotations (jackson-annotations-2.9.6.jar)
+Jackson Core (jackson-core-2.9.6.jar)
+Jackson Databind (jackson-databind-2.9.7.jar)
+Data Mapper For Jackson (jackson-mapper-asl-1.9.13.jar)
+	License: Apache 2.0
+	https://github.com/FasterXML/jackson
 
+===============================================================================
+Java Advanced Imaging Image I/O Tools API Core (standalone) (jai-imageio-core-1.4.0.jar)
+	Copyright (c) 2005 Sun Microsystems, Inc. 
+	Copyright Â© 2010-2014 University of Manchester
+	Copyright Â© 2010-2015 Stian Soiland-Reyes
+	Copyright Â© 2015 Peter Hull
+	Copyright © 2015-2018 jai-imageio contributors	
+	All Rights Reserved.	
+	License: BSD-3-clause License w/nuclear disclaimer, LICENSE.txt
+	
+===============================================================================
+Java Libpst (java-libpst-0.8.1.jar)
+	License: Apache 2.0
+	https://github.com/rjohnsondev/java-libpst
+===============================================================================
+Javax Annotation API (javax.annotation-api-1.3.jar)
+	Copyright (C) 1989, 1991 Free Software Foundation, Inc. 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+    License: CDDL + GPLv2 with classpath exception  https://glassfish.dev.java.net/nonav/public/CDDL+GPL.html
+===============================================================================
+Javax WS RS API (javax.ws.rs-api-2.1.jar)
+    License: CDDL 1.1 https://oss.oracle.com/licenses/CDDL+GPL-1.1 / GPL2 w/ CPE
+===============================================================================
+JAXB API (jaxb-api-2.3.0.jar)
+JAXB Core (jaxb-core-2.3.0.jar)
+Old JAXB Runtime (jaxb-impl-2.3.0.jar)
+	Copyright (c) YYYY Oracle and/or its affiliates. All rights reserved.
+    License: CDDL 1.1 https://oss.oracle.com/licenses/CDDL+GPL-1.1 / GPL2 w/ CPE
+    https://github.com/javaee/jaxb-spec
+===============================================================================
+PDFBox JBIG2 ImageIO Plugin (jbig2-imageio-3.0.1.jar)
+    License: Apache 2.0
+===============================================================================
+"Java Concurrency In Practice" Book Annotations (jcip-annotations-1.0.jar)
+    License: public
+===============================================================================
+JCL 1.2 Implemented Over SLF4J (jcl-over-slf4j-1.7.25.jar)
+	Copyright © 2004-2017 QOS.ch
+    License: Apache 2.0
+    https://www.slf4j.org/
+===============================================================================
+JCommander (jcommander-1.35.jar)
+    License: Apache-2.0
+===============================================================================
+JDOM (jdom2-2.0.6.jar)
+	Copyright (C) 2000-2012 Jason Hunter & Brett McLaughlin.
+    License: Similar to Apache License but with the acknowledgment clause removed
+    https://raw.github.com/hunterhacker/jdom/master/LICENSE.txt
+===============================================================================
+Apache JempBox (jempbox-1.8.15.jar)
+	Copyright (c) 2006-2007, www.jempbox.org
+	All rights reserved.
+    License: Apache-2.0
+===============================================================================
+JHighlight (jhighlight-1.0.3.jar)
+	Copyright (C) 2000-2006
+	* Omnicore Software, Hans Kratz & Dennis Strein GbR,
+	* Geert Bevin <gbevin[remove] at uwyn dot com>
+	* Arnout Engelen <arnouten[remove] at bzzt dot net>
+    License: CDDL, v1.0 http://www.opensource.org/licenses/cddl1.php
+    LGPL, v2.1 or later  http://www.opensource.org/licenses/lgpl-license.php
+    https://github.com/codelibs/jhighlight
+===============================================================================
+JMatIO (jmatio-1.4.jar)
+    License: BSD http://www.linfo.org/bsdlicense.html
+===============================================================================
+Java Native Access (jna-4.3.0.jar)
+    License: LGPL, version 2.1 http://www.gnu.org/licenses/licenses.html
+    Apache License v2.0 http://www.apache.org/licenses/LICENSE-2.0.txt
+    https://github.com/java-native-access/jna
+===============================================================================
+Joda Time (joda-time-2.2.jar)
+    License: Apache-2.0
+    https://www.joda.org/joda-time/
+===============================================================================        
+JSON.simple (json-simple-1.1.1.jar)
+    License: Apache-2.0 
+    https://code.google.com/archive/p/json-simple/
 ===============================================================================
 Json (dependency of 3rd party libraries)
 http://www.json.org  
@@ -91,9 +303,95 @@ The Software shall be used for Good, not Evil.
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 
 ===============================================================================
+JSoup Java HTML Parser (jsoup-1.11.3.jar)
+	Copyright (c) 2009-2018 Jonathan Hedley <jonathan@hedley.net>
+	jsoup HTML parser © 2009 - 2018 Jonathan Hedley
+    License: MIT
+===============================================================================
+JUL to SLF4J Bridge (jul-to-slf4j-1.7.25.jar)
+ 	Copyright (c) 2004-2017 QOS.ch
+ 	All rights reserved.
+    MIT License, http://www.opensource.org/licenses/mit-license.php
+===============================================================================
+JUniversalCharDet (juniversalchardet-1.0.3.jar)
+    Mozilla Public License 1.1 (MPL 1.1), http://www.mozilla.org/MPL/MPL-1.1.html
+===============================================================================
+Java UnRar (junrar-2.0.0.jar)
+	All copyrights to RAR and the utility UnRAR are exclusively
+    owned by the author - Alexander Roshal.
+    License: UnRar License https://raw.github.com/junrar/junrar/master/license.txt
+    https://github.com/junrar/junrar
+===============================================================================
+Metadata Extractor (metadata-extractor-2.11.0.jar)
+    License: Apache-2.0
+    https://drewnoakes.com/code/exif/
+===============================================================================
+NetCDF 4 IOSP JNI Connection to C Library (netcdf4-4.5.5.jar)
+	© 2018 UCAR
+    License: (MIT-style) netCDF C library license, http://www.unidata.ucar.edu/software/netcdf/copyright.html
+    https://www.unidata.ucar.edu/software/thredds/current/netcdf-java/
+===============================================================================
+Open JSON (openjson-1.0.10.jar)
+    License: Apache-2.0
+===============================================================================
+Apache OpenNLP Tools (opennlp-tools-1.9.0.jar)
+	Copyright 2018 The Apache Software Foundation
+    License: Apache-2.0
+===============================================================================
+Parso (parso-2.0.9.jar)
+	Copyright (C) 2015 EPAM
+    License: Apache-2.0
+    https://github.com/epam/parso
+===============================================================================
+Apache PDFBox Tools (pdfbox-tools-2.0.11.jar)
+	Copyright © 2009–2018 The Apache Software Foundation
+    License: Apache-2.0
+    https://pdfbox.apache.org/
+===============================================================================
+Apache POI (poi-4.0.0.jar)
+Apache POI (poi-ooxml-4.0.0.jar)
+Apache POI (poi-ooxml-schemas-4.0.0.jar)
+Apache POI (poi-scratchpad-4.0.0.jar)
+    Copyright (c) 2004-2013 QOS.ch
+    All rights reserved. 
+    License: Apache-2.0
+    http://poi.apache.org/
+===============================================================================
+Protocol Buffers [Core] (protobuf-java-2.5.0.jar)
+    License: BSD-3-clause, http://www.opensource.org/licenses/bsd-license.php
+    https://developers.google.com/protocol-buffers/
+===============================================================================
+Quartz (quartz-2.2.0.jar)
+	Copyright (c) Terracotta, Inc.
+    License: Apache-2.0
+    http://www.quartz-scheduler.org/
+===============================================================================
+ROME (rome-1.5.1.jar)
+ROME Utilities (rome-utils-1.5.1.jar)
+	Copyright © 2017. All Rights Reserved.
+    License: Apache-2.0
+    http://rometools.github.io/rome/
+===============================================================================
+SentimentAnalysisParser (sentiment-analysis-parser-0.1.jar)
+    License: Apache-2.0
+    https://github.com/USCDataScience/SentimentAnalysisParser
+===============================================================================
+Apache SIS Features (sis-feature-0.8.jar)
+Apache SIS Metadata (sis-metadata-0.8.jar)
+Apache SIS NetCDF Storage (sis-netcdf-0.8.jar)
+Apache SIS Referencing (sis-referencing-0.8.jar)
+Apache SIS Common Storage (sis-storage-0.8.jar)
+Apache SIS Utilities (sis-utility-0.8.jar)
+	Copyright © 2013-2018 The Apache Software Foundation
+    License: Apache-2.0
+    http://sis.apache.org/
+===============================================================================
 Simple Logging Façade for Java (SLF4J):
-SLF4J API Module (dependency of 3rd party libraries)
-SLF4J JDK14 Binding
+SLF4J API Module (dependency of 3rd party libraries) (slf4j-api-1.7.25.jar)
+SLF4J JDK14 Binding (slf4j-jdk14-1.7.25.jar)
+	Copyright © 2004-2017 QOS.ch
+    License: Apache-2.0
+    https://www.slf4j.org/
 -------------------------------------------------------------------------------
 SLF4J source code and binaries are distributed under the MIT license.
 
@@ -108,223 +406,94 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  
 ===============================================================================
 Spring Framework:
-Spring AOP (dependency of 3rd party libraries)
-Spring Beans (dependency of 3rd party libraries)
-Spring Context (dependency of 3rd party libraries)
-Spring Core
-Spring Expression Language (SpEL) (dependency of 3rd party libraries)
-Spring JDBC
-Spring Transaction (dependency of 3rd party libraries)
-Spring Web MVC
-Spring Web
+Spring AOP (dependency of 3rd party libraries) (spring-aop-5.1.0.RELEASE.jar)
+Spring Beans (dependency of 3rd party libraries) (spring-beans-5.1.0.RELEASE.jar)
+Spring Context (dependency of 3rd party libraries) (spring-context-5.1.0.RELEASE.jar)
+Spring Core (spring-core-5.1.0.RELEASE.jar)
+Spring Expression Language (SpEL) (dependency of 3rd party libraries) (spring-expression-5.1.0.RELEASE.jar)
+Spring JDBC (spring-jdbc-5.1.0.RELEASE.jar)
+Spring Transaction (dependency of 3rd party libraries) (spring-tx-5.1.0.RELEASE.jar)
+Spring Web MVC (spring-webmvc-5.1.0.RELEASE.jar)
+Spring Web (spring-web-5.1.0.RELEASE.jar)
+Spring LDAP Core (spring-ldap-core-2.3.2.RELEASE.jar)
+Spring Security Config (spring-security-config-5.1.0.RELEASE.jar)
+Spring Security Core (spring-security-core-5.1.0.RELEASE.jar)
+Spring Security JWT Library (spring-security-jwt-1.0.9.RELEASE.jar)
+Spring Security LDAP (spring-security-ldap-5.1.0.RELEASE.jar)
+OAuth2 For Spring Security (spring-security-oauth2-2.3.3.RELEASE.jar)
+Spring Security Web (spring-security-web-5.1.0.RELEASE.jar)
+
+    License: Apache-2.0
+    https://github.com/spring-projects/spring-framework
 -------------------------------------------------------------------------------
 The Spring Framework is released under version 2.0 of the Apache License.
 
 See Common Open Source Licenses section below for copy of Apache 2.0 License.
 ===============================================================================
-Common Open Source Licenses
+Extension API for Stax, Java pull-parsing API (STreaming Api for Xml) (stax2-api-4.1.jar)
+	Copyright © 2010 - FasterXML.com
+    API is licensed under standard BSD license, which is compatible with all Free and Open Software (OSS) licenses.tagsoup-1.2.1.jar
+    License: BSD-2-clause
+    https://github.com/FasterXML/stax2-api
 ===============================================================================
-                                 Apache License
-                           Version 2.0, January 2004
-                        http://www.apache.org/licenses/
--------------------------------------------------------------------------------
-   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+Apache Tika Core (tika-core-1.19.jar)
+Apache Tika Parsers (tika-parsers-1.19.jar)
+	Copyright © 2018 The Apache Software Foundation
+    License: Apache-2.0
+    http://tika.apache.org/
+===============================================================================
+UDUNITS (udunits-4.5.5.jar)
+	© 2018 UCAR
+    (MIT-style) netCDF C library license http://www.unidata.ucar.edu/software/netcdf/copyright.html
+    https://www.unidata.ucar.edu/software/udunits/
+===============================================================================
+Apache UIMA UimaFIT Core (uimafit-core-2.2.0.jar)
+	Copyright © 2006-2013, The Apache Software Foundation.
+    License: Apache-2.0
+    http://uima.apache.org/
+===============================================================================
+Apache UIMA Base: uimaj-core (uimaj-core-2.9.0.jar)
+	Copyright 2006-2016 The Apache Software Foundation
+    License: Apache-2.0
+===============================================================================
+Units of Measurement API (unit-api-1.0.jar)
+    Copyright (c) 2014-2018, Jean-Marie Dautelle, Werner Keil, Otavio Santana.
+    All rights reserved.
+    BSD-3-clause 
+    http://unitsofmeasurement.github.io/unit-api/
+===============================================================================
+Ogg and Vorbis For Java, Core (vorbis-java-core-0.8.jar)
+Apache Tika Plugin For Ogg, Vorbis and FLAC (vorbis-java-tika-0.8.jar)
+	Copyright 2012 Nick Burch
+    License: Apache-2.0
+    https://github.com/Gagravarr/VorbisJava
+===============================================================================
+Woodstox (woodstox-core-5.1.0.jar)
+    License: Apache-2.0
+    https://github.com/FasterXML/woodstox
+===============================================================================
+XmlBeans (xmlbeans-3.0.1.jar)
+	Copyright © 2004-2018 The Apache Software Foundation
+    License: Apache-2.0
+    https://xmlbeans.apache.org/
+===============================================================================
+XmlSchema Core (xmlschema-core-2.2.3.jar)
+	Copyright 2004-2018 The Apache Software Foundation
+    License: Apache-2.0
+===============================================================================
+XMP Library For Java (xmpcore-5.1.3.jar)
+	Copyright (c) 2009, Adobe Systems Incorporated  All rights reserved.
+    The BSD License  https://www.adobe.com/devnet/xmp/library/eula-xmp-library-java.html
+    https://www.adobe.com/devnet/xmp.html
+===============================================================================
+XZ For Java (xz-1.8.jar)
+    License: Public Domain. This Java implementation of XZ has been put into the public domain, thus you can do whatever you want with it. All the files in the package have been written by Lasse Collin, but some files are heavily based on public domain code written by Igor Pavlov.
+    https://tukaani.org/xz/java.html
+===============================================================================
+Common Open Source Licenses
 
-   1. Definitions.
-
-      "License" shall mean the terms and conditions for use, reproduction,
-      and distribution as defined by Sections 1 through 9 of this document.
-
-      "Licensor" shall mean the copyright owner or entity authorized by
-      the copyright owner that is granting the License.
-
-      "Legal Entity" shall mean the union of the acting entity and all
-      other entities that control, are controlled by, or are under common
-      control with that entity. For the purposes of this definition,
-      "control" means (i) the power, direct or indirect, to cause the
-      direction or management of such entity, whether by contract or
-      otherwise, or (ii) ownership of fifty percent (50%) or more of the
-      outstanding shares, or (iii) beneficial ownership of such entity.
-
-      "You" (or "Your") shall mean an individual or Legal Entity
-      exercising permissions granted by this License.
-
-      "Source" form shall mean the preferred form for making modifications,
-      including but not limited to software source code, documentation
-      source, and configuration files.
-
-      "Object" form shall mean any form resulting from mechanical
-      transformation or translation of a Source form, including but
-      not limited to compiled object code, generated documentation,
-      and conversions to other media types.
-
-      "Work" shall mean the work of authorship, whether in Source or
-      Object form, made available under the License, as indicated by a
-      copyright notice that is included in or attached to the work
-      (an example is provided in the Appendix below).
-
-      "Derivative Works" shall mean any work, whether in Source or Object
-      form, that is based on (or derived from) the Work and for which the
-      editorial revisions, annotations, elaborations, or other modifications
-      represent, as a whole, an original work of authorship. For the purposes
-      of this License, Derivative Works shall not include works that remain
-      separable from, or merely link (or bind by name) to the interfaces of,
-      the Work and Derivative Works thereof.
-
-      "Contribution" shall mean any work of authorship, including
-      the original version of the Work and any modifications or additions
-      to that Work or Derivative Works thereof, that is intentionally
-      submitted to Licensor for inclusion in the Work by the copyright owner
-      or by an individual or Legal Entity authorized to submit on behalf of
-      the copyright owner. For the purposes of this definition, "submitted"
-      means any form of electronic, verbal, or written communication sent
-      to the Licensor or its representatives, including but not limited to
-      communication on electronic mailing lists, source code control systems,
-      and issue tracking systems that are managed by, or on behalf of, the
-      Licensor for the purpose of discussing and improving the Work, but
-      excluding communication that is conspicuously marked or otherwise
-      designated in writing by the copyright owner as "Not a Contribution."
-
-      "Contributor" shall mean Licensor and any individual or Legal Entity
-      on behalf of whom a Contribution has been received by Licensor and
-      subsequently incorporated within the Work.
-
-   2. Grant of Copyright License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      copyright license to reproduce, prepare Derivative Works of,
-      publicly display, publicly perform, sublicense, and distribute the
-      Work and such Derivative Works in Source or Object form.
-
-   3. Grant of Patent License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      (except as stated in this section) patent license to make, have made,
-      use, offer to sell, sell, import, and otherwise transfer the Work,
-      where such license applies only to those patent claims licensable
-      by such Contributor that are necessarily infringed by their
-      Contribution(s) alone or by combination of their Contribution(s)
-      with the Work to which such Contribution(s) was submitted. If You
-      institute patent litigation against any entity (including a
-      cross-claim or counterclaim in a lawsuit) alleging that the Work
-      or a Contribution incorporated within the Work constitutes direct
-      or contributory patent infringement, then any patent licenses
-      granted to You under this License for that Work shall terminate
-      as of the date such litigation is filed.
-
-   4. Redistribution. You may reproduce and distribute copies of the
-      Work or Derivative Works thereof in any medium, with or without
-      modifications, and in Source or Object form, provided that You
-      meet the following conditions:
-
-      (a) You must give any other recipients of the Work or
-          Derivative Works a copy of this License; and
-
-      (b) You must cause any modified files to carry prominent notices
-          stating that You changed the files; and
-
-      (c) You must retain, in the Source form of any Derivative Works
-          that You distribute, all copyright, patent, trademark, and
-          attribution notices from the Source form of the Work,
-          excluding those notices that do not pertain to any part of
-          the Derivative Works; and
-
-      (d) If the Work includes a "NOTICE" text file as part of its
-          distribution, then any Derivative Works that You distribute must
-          include a readable copy of the attribution notices contained
-          within such NOTICE file, excluding those notices that do not
-          pertain to any part of the Derivative Works, in at least one
-          of the following places: within a NOTICE text file distributed
-          as part of the Derivative Works; within the Source form or
-          documentation, if provided along with the Derivative Works; or,
-          within a display generated by the Derivative Works, if and
-          wherever such third-party notices normally appear. The contents
-          of the NOTICE file are for informational purposes only and
-          do not modify the License. You may add Your own attribution
-          notices within Derivative Works that You distribute, alongside
-          or as an addendum to the NOTICE text from the Work, provided
-          that such additional attribution notices cannot be construed
-          as modifying the License.
-
-      You may add Your own copyright statement to Your modifications and
-      may provide additional or different license terms and conditions
-      for use, reproduction, or distribution of Your modifications, or
-      for any such Derivative Works as a whole, provided Your use,
-      reproduction, and distribution of the Work otherwise complies with
-      the conditions stated in this License.
-
-   5. Submission of Contributions. Unless You explicitly state otherwise,
-      any Contribution intentionally submitted for inclusion in the Work
-      by You to the Licensor shall be under the terms and conditions of
-      this License, without any additional terms or conditions.
-      Notwithstanding the above, nothing herein shall supersede or modify
-      the terms of any separate license agreement you may have executed
-      with Licensor regarding such Contributions.
-
-   6. Trademarks. This License does not grant permission to use the trade
-      names, trademarks, service marks, or product names of the Licensor,
-      except as required for reasonable and customary use in describing the
-      origin of the Work and reproducing the content of the NOTICE file.
-
-   7. Disclaimer of Warranty. Unless required by applicable law or
-      agreed to in writing, Licensor provides the Work (and each
-      Contributor provides its Contributions) on an "AS IS" BASIS,
-      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-      implied, including, without limitation, any warranties or conditions
-      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
-      PARTICULAR PURPOSE. You are solely responsible for determining the
-      appropriateness of using or redistributing the Work and assume any
-      risks associated with Your exercise of permissions under this License.
-
-   8. Limitation of Liability. In no event and under no legal theory,
-      whether in tort (including negligence), contract, or otherwise,
-      unless required by applicable law (such as deliberate and grossly
-      negligent acts) or agreed to in writing, shall any Contributor be
-      liable to You for damages, including any direct, indirect, special,
-      incidental, or consequential damages of any character arising as a
-      result of this License or out of the use or inability to use the
-      Work (including but not limited to damages for loss of goodwill,
-      work stoppage, computer failure or malfunction, or any and all
-      other commercial damages or losses), even if such Contributor
-      has been advised of the possibility of such damages.
-
-   9. Accepting Warranty or Additional Liability. While redistributing
-      the Work or Derivative Works thereof, You may choose to offer,
-      and charge a fee for, acceptance of support, warranty, indemnity,
-      or other liability obligations and/or rights consistent with this
-      License. However, in accepting such obligations, You may act only
-      on Your own behalf and on Your sole responsibility, not on behalf
-      of any other Contributor, and only if You agree to indemnify,
-      defend, and hold each Contributor harmless for any liability
-      incurred by, or claims asserted against, such Contributor by reason
-      of your accepting any such warranty or additional liability.
-
-   END OF TERMS AND CONDITIONS
-
-   APPENDIX: How to apply the Apache License to your work.
-
-      To apply the Apache License to your work, attach the following
-      boilerplate notice, with the fields enclosed by brackets "[]"
-      replaced with your own identifying information. (Don't include
-      the brackets!)  The text should be enclosed in the appropriate
-      comment syntax for the file format. We also recommend that a
-      file or class name and description of purpose be included on the
-      same "printed page" as the copyright notice for easier
-      identification within third-party archives.
-
-   Copyright [yyyy] [name of copyright owner]
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-
+Apache-2.0: https://opensource.org/licenses/Apache-2.0
+CDDL-1.0: https://opensource.org/licenses/CDDL-1.0
+BSD-3-Clause: https://opensource.org/licenses/BSD-3-Clause
+MIT: https://opensource.org/licenses/MIT
 
