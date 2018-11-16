@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.esri.geoportal</groupId>
         <artifactId>geoportal-connectors</artifactId>
-        <version>2.6.1</version>
+        <version>2.6.2-SNAPSHOT</version>
     </parent>
     <artifactId>geoportal-harvester-jdbc</artifactId>
     <name>Esri :: Geoportal Server :: Harvester :: Data Source :: JDBC</name>
