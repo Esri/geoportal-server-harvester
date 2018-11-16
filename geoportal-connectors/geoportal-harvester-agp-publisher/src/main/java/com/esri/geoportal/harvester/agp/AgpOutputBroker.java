@@ -396,9 +396,11 @@ import org.xml.sax.SAXException;
       String folderId = StringUtils.trimToNull(definition.getFolderId());
       if (folderId!=null) {
         FolderEntry[] folders = this.client.listFolders(definition.getCredentials().getUserName(), generateToken(1));
-        FolderEntry selectedFodler = Arrays.stream(folders).filter(folder->folder.id!=null && folder.id.equals(folderId)).findFirst().orElse(
-                Arrays.stream(folders).filter(folder->folder.title!=null && folder.title.equals(folderId)).findFirst().orElse(null)
-        );
+        FolderEntry selectedFodler = folders!=null?
+                Arrays.stream(folders).filter(folder->folder.id!=null && folder.id.equals(folderId)).findFirst().orElse(
+                        Arrays.stream(folders).filter(folder->folder.title!=null && folder.title.equals(folderId)).findFirst().orElse(null)
+                ):
+                null;
         if (selectedFodler!=null) {
           definition.setFolderId(selectedFodler.id);
         } else {
