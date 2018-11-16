@@ -15,6 +15,8 @@
  */
 package com.esri.geoportal.harvester.waf;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -47,11 +49,13 @@ import java.util.regex.Pattern;
       if (quotMatcher.find()) {
         String extractedUrl = quotMatcher.group().replaceAll("^.|.$", "").replaceAll("\\{", "%7B").replaceAll("\\}", "%7D");
         try {
+          extractedUrl =  StringEscapeUtils.unescapeHtml4(extractedUrl);
           URL url = new URL(root,extractedUrl); //root.toURI().resolve(extractedUrl).toURL();
           if (url.toExternalForm().startsWith(root.toExternalForm()) && url.toExternalForm().length() > root.toExternalForm().length()) {
             list.add(url);
           }
         } catch (NullPointerException|IllegalArgumentException ex) {}
+
       }
       startIndex = hrefMatcher.end();
     }
