@@ -133,6 +133,8 @@ public class Client implements Closeable {
           response.headers = headers.toArray(new Header[headers.size()]);
         }
         response.resumptionToken = StringUtils.trimToNull((String) xPath.evaluate("resumptionToken", listIdentifiersNode, XPathConstants.STRING));
+      } else {
+        response.resumptionToken = null;
       }
       return response;
 
