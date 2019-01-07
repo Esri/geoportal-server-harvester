@@ -24,5 +24,6 @@
     <module>geoportal-commons-pdf</module>
     <module>geoportal-commons-oai-client</module>
     <module>geoportal-commons-doc</module>
+    <module>geoportal-commons-dcat-client</module>
   </modules>
 </project>
