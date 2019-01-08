@@ -229,12 +229,14 @@ import org.w3c.dom.Document;
             attributes.put(WKAConstants.WKA_IDENTIFIER, new StringAttribute(r.getIdentifier()));
             attributes.put(WKAConstants.WKA_TITLE, new StringAttribute(r.getTitle()));
             attributes.put(WKAConstants.WKA_DESCRIPTION, new StringAttribute(r.getDescription()));
+            attributes.put(WKAConstants.WKA_MODIFIED, new StringAttribute(r.getModified()));
             
             for (DcatDistribution dist: r.getDistribution()) {
               MimeType mimeType = MimeType.parse(dist.getFormat());
               if (mimeType!=null) {
                 attributes.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(StringUtils.defaultIfEmpty(dist.getAccessURL(), dist.getDownloadURL())));
                 attributes.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute(mimeType.getName()));
+                break;
               }
             }
             
