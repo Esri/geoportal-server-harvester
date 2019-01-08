@@ -15,6 +15,6 @@
  */
 
 /**
- * Raw to concrete adaptors.
+ * DCAT semantic representation of {@link com.esri.geoportal.commons.dcat.client.dcat DCAT JSON structures}
  */
 package com.esri.geoportal.commons.dcat.client.adaptors;

@@ -184,65 +184,6 @@ public interface DcatRecord {
   /**
    * Gets abstract.
    * @return abstract
-   * @deprecated not in use
    */
-  @Deprecated
   String getAbstract();
-  /**
-   * Gets access level comment.
-   * @return access level comment
-   * @deprecated not in use
-   */
-  @Deprecated
-  String getAccessLevelComment();
-  /**
-   * Gets data dictionary.
-   * @return data dictionary
-   * @deprecated not in use
-   */
-  @Deprecated
-  String getDataDictionary();
-  /**
-   * Gets web service URL.
-   * @return web service URL
-   * @deprecated not in use
-   */
-  @Deprecated
-  String getWebService();
-  /**
-   * Gets access URL.
-   * @return access URL
-   * @deprecated not in use
-   */
-  @Deprecated
-  String getAccessURL();
-  /**
-   * Gets download URL.
-   * @return download URL
-   * @deprecated not in use
-   */
-  @Deprecated
-  String getDownloadURL();
-  /**
-   * Gets format.
-   * @return format
-   * @deprecated not in use
-   */
-  @Deprecated
-  String getFormat();
-  /**
-   * Gets person.
-   * @return person
-   * @deprecated not in use
-   */
-  @Deprecated
-  String getPerson();
-  /**
-   * Gets mbox.
-   * @return mbox
-   * @deprecated not in use
-   */
-  @Deprecated
-  String getMbox();
-
 }

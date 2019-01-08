@@ -86,36 +86,6 @@ public class DcatRecordAdaptor extends DcatAdaptor implements DcatRecord {
   }
 
   @Override
-  public String getAccessLevelComment() {
-    return getString("accessLevelComment");
-  }
-
-  @Override
-  public String getDataDictionary() {
-    return getString("dataDictionary");
-  }
-
-  @Override
-  public String getWebService() {
-    return getString("webService");
-  }
-
-  @Override
-  public String getAccessURL() {
-    return getString("accessURL");
-  }
-
-  @Override
-  public String getDownloadURL() {
-    return getString("downloadURL");
-  }
-
-  @Override
-  public String getFormat() {
-    return getString("format");
-  }
-
-  @Override
   public String getSpatial() {
     return getString("spatial");
   }
@@ -133,16 +103,6 @@ public class DcatRecordAdaptor extends DcatAdaptor implements DcatRecord {
   @Override
   public DcatPublisher getPublisher() {
 	    return new DcatPublisherAdaptor(record);
-  }
-  
-  @Override
-  public String getPerson() {
-    return getString("person");
-  }
-
-  @Override
-  public String getMbox() {
-    return getString("mbox");
   }
 
   @Override

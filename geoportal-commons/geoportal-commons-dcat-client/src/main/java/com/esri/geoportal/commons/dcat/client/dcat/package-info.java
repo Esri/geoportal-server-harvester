@@ -15,6 +15,6 @@
  */
 
 /**
- * Concrete interfaces.
+ * DCAT structures expressed in {@link com.esri.geoportal.commons.dcat.client.json JSON types}
  */
 package com.esri.geoportal.commons.dcat.client.dcat;

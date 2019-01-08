@@ -15,6 +15,6 @@
  */
 
 /**
- * Raw data classes.
+ * Basic JSON types.
  */
 package com.esri.geoportal.commons.dcat.client.json;
