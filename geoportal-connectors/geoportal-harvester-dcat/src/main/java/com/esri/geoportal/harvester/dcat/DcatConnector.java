@@ -56,7 +56,7 @@ public class DcatConnector implements InputConnector<InputBroker> {
     args.add(new UITemplate.StringArgument(P_HOST_URL, bundle.getString("dcat.url"), true){
       @Override
       public String getHint() {
-        return bundle.getString("ckan.hint");
+        return bundle.getString("dcat.hint");
       }
     });
     args.add(new UITemplate.BooleanArgument(P_EMIT_XML, bundle.getString("dcat.emit.xml"),false, Boolean.TRUE));
