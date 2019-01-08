@@ -468,6 +468,10 @@ public class DcatParser {
       case BOOLEAN:
         attributes.put(attrName, new JsonAttribute(jsonReader.nextBoolean()));
         return;
+      case BEGIN_ARRAY:
+      case BEGIN_OBJECT:
+        jsonReader.skipValue();
+        return;
       case NULL:
         jsonReader.nextNull();
         return;
