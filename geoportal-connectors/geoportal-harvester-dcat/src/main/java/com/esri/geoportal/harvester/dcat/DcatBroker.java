@@ -245,7 +245,7 @@ import org.w3c.dom.Document;
             byte[] bytes = XmlUtils.toString(document).getBytes("UTF-8");
             ref.addContext(MimeType.APPLICATION_XML, bytes);
           } catch (MetaException | TransformerException | UnsupportedEncodingException ex) {
-
+            throw new DataInputException(DcatBroker.this, String.format("Error generating XML"), ex);
           }
         }
         
