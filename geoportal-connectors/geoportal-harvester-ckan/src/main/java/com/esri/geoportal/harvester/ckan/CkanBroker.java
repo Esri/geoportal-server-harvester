@@ -36,6 +36,7 @@ import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.commons.ckan.client.Client;
 import com.esri.geoportal.commons.ckan.client.Dataset;
+import com.esri.geoportal.commons.ckan.client.ListResponse;
 import com.esri.geoportal.commons.ckan.client.Pkg;
 import com.esri.geoportal.commons.ckan.client.Response;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
@@ -73,6 +74,8 @@ import org.w3c.dom.Document;
 import com.esri.geoportal.commons.utils.XmlUtils;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import java.util.stream.Collectors;
+import static com.esri.geoportal.commons.utils.UriUtils.*;
 
 /**
  * CKAN broker.
@@ -222,7 +225,7 @@ public class CkanBroker implements InputBroker {
   public DataContent readContent(String id) throws DataInputException {
     try {
       Pkg pkg = client.showPackage(id);
-      Dataset dataSet = pkg.result;
+      Dataset dataSet = pkg.result[0];
 
       Content content = createContent(dataSet);
 
@@ -278,7 +281,7 @@ public class CkanBroker implements InputBroker {
     String id = firstNonBlank(dataSet.id);
     Content content = createContent(dataSet);
 
-    SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, parseIsoDate(dataSet.metadata_modified), URI.create(id), td.getSource().getRef(), td.getRef());
+    SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, parseIsoDate(dataSet.metadata_modified), URI.create(escapeUri(id)), td.getSource().getRef(), td.getRef());
 
     if (definition.getEmitXml()) {
       if (Arrays.asList(new MimeType[]{MimeType.APPLICATION_XML, MimeType.TEXT_XML}).contains(content.getContentType())) {
@@ -297,6 +300,10 @@ public class CkanBroker implements InputBroker {
     return ref;
   }
 
+  private interface DatasetProvider {
+    public List<Dataset> get() throws IOException, URISyntaxException;
+  }
+  
   /**
    * CKAN iterator.
    */
@@ -304,34 +311,78 @@ public class CkanBroker implements InputBroker {
 
     private final IteratorContext iteratorContext;
 
-    private java.util.Iterator<Dataset> dataSetsIter;
+    private java.util.Iterator<DatasetProvider> providerIter;
+    private java.util.Iterator<Dataset> dataIter;
 
     private final int limit = 10;
     private int offset = 0;
+    private boolean lastPage;
 
     public CkanIterator(IteratorContext iteratorContext) {
       this.iteratorContext = iteratorContext;
     }
 
+    private void listPackages() throws IOException, URISyntaxException {
+      try {
+        Response response = client.listPackages(limit, offset);
+
+        if (response != null && response.result != null && response.result.results != null && !response.result.results.isEmpty()) {
+          List<DatasetProvider> providers = response.result.results.stream().map((Dataset ds) -> new DatasetProvider() {
+            public List<Dataset> get() { 
+              return Arrays.asList(new Dataset[]{ds}); 
+            }
+          }).collect(Collectors.toList());
+          providerIter = providers.iterator();
+          offset += limit;
+        } else {
+          lastPage = true;
+        }
+        
+      } catch (IOException ex) {
+        lastPage = true;
+        ListResponse response = client.listPackages();
+        
+        if (response != null && response.result!=null) {
+          ArrayList<DatasetProvider> list = new ArrayList<>();
+          for (String id: response.result) {
+            list.add(new DatasetProvider() {
+              @Override
+              public List<Dataset> get() throws IOException, URISyntaxException {
+                List<Dataset> datasets = new ArrayList<>();
+                Pkg pkg = client.showPackage(id);
+                if (pkg!=null && pkg.result!=null) {
+                  for (Dataset ds: pkg.result) {
+                    datasets.add(ds);
+                  }
+                }
+                return datasets;
+              }
+            });
+          }
+          providerIter = list.iterator();
+        }
+      }
+    }
+    
     @Override
     public boolean hasNext() throws DataInputException {
       try {
-        if (dataSetsIter != null && dataSetsIter.hasNext()) {
+        if (dataIter != null && dataIter.hasNext()) {
           return true;
         }
-
-        Response response = client.listPackages(limit, offset);
-        offset += limit;
-
-        if (response != null && response.result != null && response.result.results != null) {
-          List<Dataset> results = response.result.results;
-          if (results != null && results.size() > 0) {
-            dataSetsIter = results.iterator();
-            return hasNext();
-          }
+        
+        if (providerIter != null && providerIter.hasNext()) {
+          dataIter = providerIter.next().get().iterator();
+          return hasNext();
+        }
+        
+        if (lastPage) {
+          return false;
         }
 
-        return false;
+        listPackages();
+
+        return hasNext();
       } catch (IOException | URISyntaxException ex) {
         throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
       }
@@ -341,14 +392,13 @@ public class CkanBroker implements InputBroker {
     public DataReference next() throws DataInputException {
       try {
 
-        Dataset dataSet = dataSetsIter.next();
+        Dataset dataSet = dataIter.next();
         return createReference(dataSet);
 
       } catch (URISyntaxException | UnsupportedEncodingException | IllegalArgumentException | JsonProcessingException ex) {
         throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
       }
     }
-
   }
 
   /**

@@ -43,7 +43,8 @@ import org.slf4j.LoggerFactory;
 public class Client implements Closeable {
   private final Logger LOG = LoggerFactory.getLogger(Client.class);
   
-  private static final String PACKAGE_LIST_URL = "/api/3/action/package_search";
+  private static final String PACKAGE_SEARCH_URL = "/api/3/action/package_search";
+  private static final String PACKAGE_LIST_URL = "/api/3/action/package_list";
   private static final String PACKAGE_SHOW_URL = "/api/3/action/package_show";
 
   private final CloseableHttpClient httpClient;
@@ -96,6 +97,26 @@ public class Client implements Closeable {
   }
   
   /**
+   * Lists packages.
+   * @return response
+   * @throws IOException if reading response fails
+   * @throws URISyntaxException if invalid URL
+   */
+  public ListResponse listPackages() throws IOException, URISyntaxException {
+    URI uri = createListPackagesUri();
+    HttpGet get = new HttpGet(uri);
+    if (apiKey!=null) {
+      get.addHeader("X-CKAN-API-Key", apiKey);
+      get.addHeader("Authorization", apiKey);
+    }
+    get.setConfig(DEFAULT_REQUEST_CONFIG);
+    get.setHeader("Content-Type", "application/json; charset=UTF-8");
+    get.setHeader("User-Agent", HttpConstants.getUserAgent());
+    
+    return execute(get, ListResponse.class);
+  }
+  
+  /**
    * Reads package information.
    * @param id package id
    * @return response
@@ -117,9 +138,14 @@ public class Client implements Closeable {
   }
   
   private URI createListPackagesUri(long rows, long start) throws IOException, URISyntaxException {
-    return new URIBuilder(url.toURI().resolve(PACKAGE_LIST_URL))
+    return new URIBuilder(url.toURI().resolve(PACKAGE_SEARCH_URL))
             .addParameter("rows", Long.toString(rows))
             .addParameter("start", Long.toString(start))
+            .build();      
+  }
+  
+  private URI createListPackagesUri() throws IOException, URISyntaxException {
+    return new URIBuilder(url.toURI().resolve(PACKAGE_LIST_URL))
             .build();      
   }
   

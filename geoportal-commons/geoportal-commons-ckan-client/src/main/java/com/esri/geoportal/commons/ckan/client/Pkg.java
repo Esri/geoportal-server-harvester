@@ -15,11 +15,48 @@
  */
 package com.esri.geoportal.commons.ckan.client;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Package result.
  */
 public class Pkg {
-  public Long count;
-  public String sort;
-  public Dataset result;
+  private static final ObjectMapper mapper = new ObjectMapper();
+  static {
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+  }
+  
+  public Boolean success;
+  public Dataset [] result;
+  
+  public void setResult(Object data) {
+    if (data instanceof List) {
+      
+      // data is a list of maps; ieach map holds attributes of a dataset
+      List ldata = (List)data;
+      ArrayList<Dataset> list = new ArrayList<>();
+      for (Object o: ldata) {
+        if (o instanceof Map) {
+          Map mo = (Map)o;
+          list.add(mapper.convertValue(mo, Dataset.class));
+        }
+      }
+      result = list.toArray(new Dataset[list.size()]);
+      
+    } else if (data instanceof Map) {
+      
+      // data is a map of attributes of a single dataset
+      Map mdata = (Map)data;
+      result = new Dataset[] { mapper.convertValue(mdata, Dataset.class) };
+      
+    } else if (data instanceof Dataset){
+      
+      // data is a Dataset object
+      result = new Dataset[] { (Dataset)data };
+    }
+  }
 }
