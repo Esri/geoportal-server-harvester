@@ -159,9 +159,10 @@ import org.w3c.dom.Document;
   }
 
   private void copyContentToFile(File outputFile) throws IOException {
-    OutputStream outputStream = new FileOutputStream(outputFile);
     HttpGet request = new HttpGet(definition.getHostUrl().toExternalForm());
-    try (CloseableHttpResponse response = httpClient.execute(request);
+    try (
+            OutputStream outputStream = new FileOutputStream(outputFile);
+            CloseableHttpResponse response = httpClient.execute(request);
             InputStream inputStream = response.getEntity().getContent();) {
       IOUtils.copy(inputStream, outputStream);
     }
@@ -200,13 +201,12 @@ import org.w3c.dom.Document;
         iterator = adaptor.iterator();
       }
 
-      boolean more = iterator.hasNext();
-
-      if (!more) {
+      boolean hasMore = iterator.hasNext();
+      if (!hasMore) {
         close();
       }
-
-      return more;
+      
+      return hasMore;
     }
 
     @Override
@@ -295,7 +295,9 @@ import org.w3c.dom.Document;
       }
       if (tempFile != null) {
         try {
-          tempFile.delete();
+          if (!tempFile.delete()) {
+            tempFile.deleteOnExit();
+          }
         } catch (Exception ex) {
           // ignore
         }
