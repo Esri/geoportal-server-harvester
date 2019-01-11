@@ -15,18 +15,24 @@
  */
 package com.esri.geoportal.harvester.dcat;
 
+import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.constants.MimeTypeUtils;
 import com.esri.geoportal.commons.dcat.client.DcatParser;
 import com.esri.geoportal.commons.dcat.client.DcatParserAdaptor;
 import com.esri.geoportal.commons.dcat.client.dcat.DcatDistribution;
 import com.esri.geoportal.commons.dcat.client.dcat.DcatRecord;
 import com.esri.geoportal.commons.http.BotsHttpClient;
+import com.esri.geoportal.commons.meta.ArrayAttribute;
 import com.esri.geoportal.commons.meta.Attribute;
 import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.commons.meta.MetaException;
 import com.esri.geoportal.commons.meta.StringAttribute;
 import com.esri.geoportal.commons.meta.util.WKAConstants;
+import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_REFERENCES;
+import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_RESOURCE_URL;
+import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_RESOURCE_URL_SCHEME;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
@@ -58,7 +64,10 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.xml.transform.TransformerException;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -231,13 +240,32 @@ import org.w3c.dom.Document;
             attributes.put(WKAConstants.WKA_DESCRIPTION, new StringAttribute(r.getDescription()));
             attributes.put(WKAConstants.WKA_MODIFIED, new StringAttribute(r.getModified()));
             
+            final List<Attribute> references = new ArrayList<>();
             for (DcatDistribution dist: r.getDistribution()) {
-              MimeType mimeType = MimeType.parse(dist.getFormat());
-              if (mimeType!=null) {
-                attributes.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(StringUtils.defaultIfEmpty(dist.getAccessURL(), dist.getDownloadURL())));
-                attributes.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute(mimeType.getName()));
-                break;
+              String url = StringUtils.trimToNull(StringUtils.defaultIfEmpty(dist.getAccessURL(), dist.getDownloadURL()));
+              if (url!=null) {
+                HashMap<String, Attribute> reference = new HashMap<>();
+                MimeType mimeType = MimeType.parse(dist.getFormat());
+                if (mimeType!=null) {
+                  reference.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(url));
+                  reference.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute(generateSchemeName(mimeType)));
+                } else {
+                  String schemeName = generateSchemeName(url);
+                  if (schemeName!=null) {
+                    reference.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(url));
+                    reference.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute(schemeName));
+                  }
+                }
               }
+            }
+            if (references.size() == 1) {
+              Map<String, Attribute> namedAttributes = references.get(0).getNamedAttributes();
+              attributes.put(WKA_RESOURCE_URL, namedAttributes.get(WKA_RESOURCE_URL));
+              if (namedAttributes.containsKey(WKA_RESOURCE_URL_SCHEME)) {
+                attributes.put(WKA_RESOURCE_URL_SCHEME, namedAttributes.get(WKA_RESOURCE_URL_SCHEME));
+              }
+            } else if (!references.isEmpty()) {
+              attributes.put(WKA_REFERENCES, new ArrayAttribute(references));
             }
             
             MapAttribute attrs = new MapAttribute(attributes);
@@ -299,5 +327,28 @@ import org.w3c.dom.Document;
   public DataContent readContent(String id) throws DataInputException {
     // TODO: provide DCAT iterator implementation
     return null;
+  }
+
+  private String generateSchemeName(String url) {
+    String serviceType = url != null ? ItemType.matchPattern(url).stream()
+            .filter(it -> it.getServiceType() != null)
+            .map(ItemType::getServiceType)
+            .findFirst().orElse(null) : null;
+    if (serviceType != null) {
+      return "urn:x-esri:specification:ServiceType:ArcGIS:" + serviceType;
+    }
+    if (url != null) {
+      int idx = url.lastIndexOf(".");
+      if (idx >= 0) {
+        String ext = url.substring(idx + 1);
+        MimeType mimeType = MimeTypeUtils.mapExtension(ext);
+        return generateSchemeName(mimeType);
+      }
+    }
+    return null;
+  }
+  
+  private String generateSchemeName(MimeType mimeType) {
+    return mimeType!=null? "urn:" + mimeType.getName(): null;
   }
 }
