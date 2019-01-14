@@ -36,6 +36,7 @@ import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_RESOURCE_URL
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.esri.geoportal.commons.utils.UriUtils;
 import com.esri.geoportal.commons.utils.XmlUtils;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
@@ -218,7 +219,7 @@ import org.w3c.dom.Document;
                 definition.getEntityDefinition().getLabel(),
                 r.getIdentifier(),
                 null,
-                URI.create(r.getIdentifier()),
+                URI.create(UriUtils.escapeUri(r.getIdentifier())),
                 td.getSource().getRef(), 
                 td.getRef());
         
