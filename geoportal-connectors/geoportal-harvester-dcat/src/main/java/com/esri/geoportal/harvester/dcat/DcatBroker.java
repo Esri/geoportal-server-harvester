@@ -142,7 +142,6 @@ import org.w3c.dom.Document;
 
   @Override
   public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
-    // TODO: provide DCAT iterator implementation
     File tempFile = null;
     try {
       tempFile = File.createTempFile("dcat-", "json");
