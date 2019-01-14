@@ -66,6 +66,9 @@
   <bean class="com.esri.geoportal.harvester.jdbc.JdbcConnector">
     <constructor-arg value="${jdbc.script.enabled}"/>
   </bean>
+  <bean class="com.esri.geoportal.harvester.dcat.DcatConnector">
+    <constructor-arg ref="metaBuilder"/>
+  </bean>
   <!-- Triggers -->
   <bean class="com.esri.geoportal.harvester.engine.triggers.NowTrigger"/>
   <bean class="com.esri.geoportal.harvester.engine.triggers.AtTrigger"/>
