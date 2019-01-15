@@ -151,9 +151,7 @@ import org.w3c.dom.Document;
 
       return new DcatIter(tempFile, input);
     } catch (IOException ex) {
-      if (tempFile != null) {
-        tempFile.delete();
-      }
+      safeDeleteFile(tempFile);
       throw new DataInputException(this, String.format("Error reading content of %s", definition.getHostUrl().toExternalForm()), ex);
     }
   }
@@ -165,6 +163,18 @@ import org.w3c.dom.Document;
             CloseableHttpResponse response = httpClient.execute(request);
             InputStream inputStream = response.getEntity().getContent();) {
       IOUtils.copy(inputStream, outputStream);
+    }
+  }
+  
+  private void safeDeleteFile(File file) {
+    if (file != null) {
+      try {
+        if (!file.delete()) {
+          file.deleteOnExit();
+        }
+      } catch (Exception ex) {
+        // ignore
+      }
     }
   }
 
@@ -293,15 +303,7 @@ import org.w3c.dom.Document;
           // ignore
         }
       }
-      if (tempFile != null) {
-        try {
-          if (!tempFile.delete()) {
-            tempFile.deleteOnExit();
-          }
-        } catch (Exception ex) {
-          // ignore
-        }
-      }
+      safeDeleteFile(tempFile);
     }
   }
 
