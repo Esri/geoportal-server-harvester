@@ -108,10 +108,10 @@ public class DefaultProcessor implements Processor {
      * Terminates all tasks
      */
     private void terminate() {
-      if (!Thread.currentThread().isInterrupted()) {
-        task.getDataDestinations().stream().forEach(Link::terminate);
+      //if (!Thread.currentThread().isInterrupted()) {
         task.getDataSource().terminate();
-      }
+        task.getDataDestinations().stream().forEach(Link::terminate);
+      //}
     }
     
     /**

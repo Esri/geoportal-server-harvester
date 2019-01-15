@@ -86,6 +86,7 @@ import org.w3c.dom.Document;
   private final DcatConnector connector;
   private final DcatBrokerDefinitionAdaptor definition;
   private final MetaBuilder metaBuilder;
+  private final ArrayList<DcatIter> iterators = new ArrayList<>();
 
   protected CloseableHttpClient httpClient;
   protected TaskDefinition td;
@@ -126,6 +127,8 @@ import org.w3c.dom.Document;
 
   @Override
   public void terminate() {
+    new ArrayList<>(iterators).forEach(DcatIter::close);
+    
     if (httpClient != null) {
       try {
         httpClient.close();
@@ -149,12 +152,15 @@ import org.w3c.dom.Document;
 
       InputStream input = new FileInputStream(tempFile);
 
-      return new DcatIter(input) {
+      DcatIter iter =  new DcatIter(input) {
         @Override
         protected void onNoMore() {
           safeDeleteFile(f);
+          iterators.remove(this);
         }
       };
+      iterators.add(iter);
+      return iter;
     } catch (IOException ex) {
       safeDeleteFile(tempFile);
       throw new DataInputException(this, String.format("Error reading content of %s", definition.getHostUrl().toExternalForm()), ex);
@@ -201,7 +207,7 @@ import org.w3c.dom.Document;
         try {
           parser = new DcatParser(input);
         } catch (IOException ex) {
-          noMore();
+          close();
           throw new DataInputException(DcatBroker.this, String.format("Error parsing DCAT file"), ex);
         }
       }
@@ -216,7 +222,7 @@ import org.w3c.dom.Document;
 
       boolean hasMore = iterator.hasNext();
       if (!hasMore) {
-        noMore();
+        close();
       }
       
       return hasMore;
@@ -300,7 +306,7 @@ import org.w3c.dom.Document;
       
     }
 
-    private void noMore() {
+    private void close() {
       adaptor = null;
       parser = null;
       if (input != null) {

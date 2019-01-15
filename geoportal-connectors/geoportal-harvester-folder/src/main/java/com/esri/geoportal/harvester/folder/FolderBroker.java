@@ -140,7 +140,9 @@ import org.slf4j.LoggerFactory;
             existing.remove(f.toRealPath().toString());
             //return created ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
           } catch (Exception ex) {
-            throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
+            if (!Thread.currentThread().isInterrupted()) {
+              throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
+            }
           }
         }
       }
