@@ -144,12 +144,17 @@ import org.w3c.dom.Document;
   public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
     File tempFile = null;
     try {
-      tempFile = File.createTempFile("dcat-", "json");
+      final File f = tempFile = File.createTempFile("dcat-", "json");
       copyContentToFile(tempFile);
 
       InputStream input = new FileInputStream(tempFile);
 
-      return new DcatIter(tempFile, input);
+      return new DcatIter(input) {
+        @Override
+        protected void onNoMore() {
+          safeDeleteFile(f);
+        }
+      };
     } catch (IOException ex) {
       safeDeleteFile(tempFile);
       throw new DataInputException(this, String.format("Error reading content of %s", definition.getHostUrl().toExternalForm()), ex);
@@ -180,15 +185,13 @@ import org.w3c.dom.Document;
 
   private class DcatIter implements InputBroker.Iterator {
 
-    private final File tempFile;
     private final InputStream input;
 
     private DcatParser parser;
     private DcatParserAdaptor adaptor;
     private java.util.Iterator<DcatRecord> iterator;
 
-    public DcatIter(File tempFile, InputStream input) {
-      this.tempFile = tempFile;
+    public DcatIter(InputStream input) {
       this.input = input;
     }
 
@@ -198,8 +201,8 @@ import org.w3c.dom.Document;
         try {
           parser = new DcatParser(input);
         } catch (IOException ex) {
-          close();
-          throw new DataInputException(DcatBroker.this, String.format("Error parsing DCAT file %s", tempFile.toString()), ex);
+          noMore();
+          throw new DataInputException(DcatBroker.this, String.format("Error parsing DCAT file"), ex);
         }
       }
 
@@ -213,7 +216,7 @@ import org.w3c.dom.Document;
 
       boolean hasMore = iterator.hasNext();
       if (!hasMore) {
-        close();
+        noMore();
       }
       
       return hasMore;
@@ -292,8 +295,12 @@ import org.w3c.dom.Document;
         throw new DataInputException(DcatBroker.this, String.format("Error creating data for %s", r.getIdentifier()), ex);
       }
     }
+    
+    protected void onNoMore() {
+      
+    }
 
-    private void close() {
+    private void noMore() {
       adaptor = null;
       parser = null;
       if (input != null) {
@@ -303,7 +310,7 @@ import org.w3c.dom.Document;
           // ignore
         }
       }
-      safeDeleteFile(tempFile);
+      onNoMore();
     }
   }
 
