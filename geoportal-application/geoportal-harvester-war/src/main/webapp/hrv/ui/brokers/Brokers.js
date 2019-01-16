@@ -62,6 +62,7 @@ define(["dojo/_base/declare",
           widget.destroy();
         });
         this.widgets = [];
+        topic.publish("msg");
       },
       
       load: function() {
