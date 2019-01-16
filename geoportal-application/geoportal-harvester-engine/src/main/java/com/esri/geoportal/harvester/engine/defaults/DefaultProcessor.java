@@ -108,10 +108,8 @@ public class DefaultProcessor implements Processor {
      * Terminates all tasks
      */
     private void terminate() {
-      //if (!Thread.currentThread().isInterrupted()) {
-        task.getDataSource().terminate();
-        task.getDataDestinations().stream().forEach(Link::terminate);
-      //}
+      task.getDataSource().terminate();
+      task.getDataDestinations().stream().forEach(Link::terminate);
     }
     
     /**
@@ -151,8 +149,10 @@ public class DefaultProcessor implements Processor {
               if (Thread.currentThread().isInterrupted()) {
                 break;
               }
+              
               DataReference dataReference = iterator.next();
               onAcquire(dataReference);
+              
               task.getDataDestinations().stream().forEach((d) -> {
                 try {
                   PublishingStatus status = d.push(dataReference);

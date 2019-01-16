@@ -65,6 +65,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -128,7 +129,7 @@ import org.w3c.dom.Document;
   @Override
   public void terminate() {
     new ArrayList<>(iterators).forEach(DcatIter::close);
-    
+
     if (httpClient != null) {
       try {
         httpClient.close();
@@ -145,46 +146,47 @@ import org.w3c.dom.Document;
 
   @Override
   public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
-    File tempFile = null;
+    final File file = downloadFile(definition.getHostUrl());
     try {
-      final File f = tempFile = File.createTempFile("dcat-", "json");
-      copyContentToFile(tempFile);
 
-      InputStream input = new FileInputStream(tempFile);
-
-      DcatIter iter =  new DcatIter(input) {
+      DcatIter iter = new DcatIter(new FileInputStream(file)) {
         @Override
-        protected void onNoMore() {
-          safeDeleteFile(f);
+        protected void onClose() {
+          safeDeleteFile(file);
           iterators.remove(this);
         }
       };
+
       iterators.add(iter);
       return iter;
     } catch (IOException ex) {
-      safeDeleteFile(tempFile);
+      safeDeleteFile(file);
       throw new DataInputException(this, String.format("Error reading content of %s", definition.getHostUrl().toExternalForm()), ex);
     }
   }
 
-  private void copyContentToFile(File outputFile) throws IOException {
-    HttpGet request = new HttpGet(definition.getHostUrl().toExternalForm());
-    try (
-            OutputStream outputStream = new FileOutputStream(outputFile);
-            CloseableHttpResponse response = httpClient.execute(request);
-            InputStream inputStream = response.getEntity().getContent();) {
-      IOUtils.copy(inputStream, outputStream);
+  private File downloadFile(URL fileToDownload) throws DataInputException {
+    try {
+      File tempFile = File.createTempFile("dcat-", "json");
+      HttpGet request = new HttpGet(fileToDownload.toExternalForm());
+      try (
+              OutputStream outputStream = new FileOutputStream(tempFile);
+              CloseableHttpResponse response = httpClient.execute(request);
+              InputStream inputStream = response.getEntity().getContent();) {
+        IOUtils.copy(inputStream, outputStream);
+      }
+      return tempFile;
+    } catch (IOException ex) {
+      throw new DataInputException(this, String.format("Error downloading DCAT file: %s", definition.getHostUrl().toExternalForm()), ex);
     }
   }
-  
+
   private void safeDeleteFile(File file) {
     if (file != null) {
       try {
-        if (!file.delete()) {
-          file.deleteOnExit();
-        }
+        file.delete();
       } catch (Exception ex) {
-        // ignore
+        LOG.debug("Error deleting dcat temporary file", ex);
       }
     }
   }
@@ -224,7 +226,7 @@ import org.w3c.dom.Document;
       if (!hasMore) {
         close();
       }
-      
+
       return hasMore;
     }
 
@@ -238,9 +240,9 @@ import org.w3c.dom.Document;
                 r.getIdentifier(),
                 null,
                 URI.create(UriUtils.escapeUri(r.getIdentifier())),
-                td.getSource().getRef(), 
+                td.getSource().getRef(),
                 td.getRef());
-        
+
         if (definition.getEmitJson()) {
           try {
             String json = mapper.writeValueAsString(r);
@@ -250,7 +252,7 @@ import org.w3c.dom.Document;
             throw new DataInputException(DcatBroker.this, String.format("Error generating JSON"), ex);
           }
         }
-        
+
         if (definition.getEmitXml()) {
           try {
             HashMap<String, Attribute> attributes = new HashMap<>();
@@ -258,25 +260,28 @@ import org.w3c.dom.Document;
             attributes.put(WKAConstants.WKA_TITLE, new StringAttribute(r.getTitle()));
             attributes.put(WKAConstants.WKA_DESCRIPTION, new StringAttribute(r.getDescription()));
             attributes.put(WKAConstants.WKA_MODIFIED, new StringAttribute(r.getModified()));
-            
+
+            // collect URL's and types from all available distributions
             final List<Attribute> references = new ArrayList<>();
-            for (DcatDistribution dist: r.getDistribution()) {
+            for (DcatDistribution dist : r.getDistribution()) {
               String url = StringUtils.trimToNull(StringUtils.defaultIfEmpty(dist.getAccessURL(), dist.getDownloadURL()));
-              if (url!=null) {
+              if (url != null) {
                 HashMap<String, Attribute> reference = new HashMap<>();
                 MimeType mimeType = MimeType.parse(dist.getFormat());
-                if (mimeType!=null) {
+                if (mimeType != null) {
                   reference.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(url));
                   reference.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute(generateSchemeName(mimeType)));
                 } else {
                   String schemeName = generateSchemeName(url);
-                  if (schemeName!=null) {
+                  if (schemeName != null) {
                     reference.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(url));
                     reference.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute(schemeName));
                   }
                 }
               }
             }
+
+            // produce attribute(s) depending if there is one or more than one references
             if (references.size() == 1) {
               Map<String, Attribute> namedAttributes = references.get(0).getNamedAttributes();
               attributes.put(WKA_RESOURCE_URL, namedAttributes.get(WKA_RESOURCE_URL));
@@ -286,24 +291,25 @@ import org.w3c.dom.Document;
             } else if (!references.isEmpty()) {
               attributes.put(WKA_REFERENCES, new ArrayAttribute(references));
             }
-            
+
             MapAttribute attrs = new MapAttribute(attributes);
             Document document = metaBuilder.create(attrs);
             byte[] bytes = XmlUtils.toString(document).getBytes("UTF-8");
             ref.addContext(MimeType.APPLICATION_XML, bytes);
+
           } catch (MetaException | TransformerException | UnsupportedEncodingException ex) {
             throw new DataInputException(DcatBroker.this, String.format("Error generating XML"), ex);
           }
         }
-        
+
         return ref;
       } catch (URISyntaxException ex) {
         throw new DataInputException(DcatBroker.this, String.format("Error creating data for %s", r.getIdentifier()), ex);
       }
     }
-    
-    protected void onNoMore() {
-      
+
+    protected void onClose() {
+      // called upon closing iterator
     }
 
     private void close() {
@@ -313,10 +319,10 @@ import org.w3c.dom.Document;
         try {
           input.close();
         } catch (IOException ex) {
-          // ignore
+          LOG.debug("Error closing dcat iterator.", ex);
         }
       }
-      onNoMore();
+      onClose();
     }
   }
 
@@ -364,8 +370,8 @@ import org.w3c.dom.Document;
     }
     return null;
   }
-  
+
   private String generateSchemeName(MimeType mimeType) {
-    return mimeType!=null? "urn:" + mimeType.getName(): null;
+    return mimeType != null ? "urn:" + mimeType.getName() : null;
   }
 }
