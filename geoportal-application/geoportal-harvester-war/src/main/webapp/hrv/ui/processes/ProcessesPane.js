@@ -72,14 +72,14 @@ define(["dojo/_base/declare",
         ProcessesREST.list().then(
           lang.hitch(this,this.processProcesses),
           lang.hitch(this,function(error){
-            topic.publish("msg",this.i18n.processes.errors.loading);
+            topic.publish("msg", new Error(this.i18n.processes.errors.loading));
           })
         );
 
         TriggersREST.list().then(
           lang.hitch(this,this.processTriggers),
           lang.hitch(this,function(error){
-            topic.publish("msg",this.i18n.triggers.errors.loading);
+            topic.publish("msg", new Error(this.i18n.triggers.errors.loading));
           })
         );
       },

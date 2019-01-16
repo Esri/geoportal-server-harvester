@@ -65,7 +65,7 @@ define(["dojo/_base/declare",
           this._handleFailedDocuments(failedDocuments); 
         }), lang.hitch(this, function(error){
           console.debug(error);
-          topic.publish("msg",new Error("Unable to access failed documents information"));
+          topic.publish("msg", new Error(this.i18n.tasks.errors.accessFialed));
         }));
       },
       
@@ -89,7 +89,7 @@ define(["dojo/_base/declare",
                 newWindow.document.title = recordId;
               }), lang.hitch(this, function(error){
                 console.debug(error);
-                topic.publish("msg",new Error("Unable to access failed documents information"));
+                topic.publish("msg",topic.publish("msg", new Error(this.i18n.tasks.errors.accessFialed)));
               }));
             })));
           }));
@@ -111,7 +111,7 @@ define(["dojo/_base/declare",
             lang.hitch(this,this.processHistory),
             lang.hitch(this,function(error){
               console.error(error);
-              topic.publish("msg",new Error("Unable to access history information"));
+              topic.publish("msg",topic.publish("msg", new Error(this.i18n.tasks.errors.accessHistory)));
             })
           );
         }

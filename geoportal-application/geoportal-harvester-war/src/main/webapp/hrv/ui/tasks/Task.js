@@ -154,7 +154,7 @@ define(["dojo/_base/declare",
                         }),
                         lang.hitch(this,function(error){
                           console.error(error);
-                          topic.publish("msg",new Error("Unable to schedule task"));
+                          topic.publish("msg", new Error(this.i18n.tasks.errors.schedule));
                           close();
                         })
                       );
@@ -163,13 +163,13 @@ define(["dojo/_base/declare",
                     }
                   }),lang.hitch(this,function(error){
                     console.error(error);
-                    topic.publish("msg",new Error("Unable to delete current task triggers"));
+                    topic.publish("msg", new Error(this.i18n.tasks.errors.triggersDelete));
                     close();
                   }));
                 }),
                 lang.hitch(this,function(error){
                   console.error(error);
-                  topic.publish("msg",new Error("Unable to access tasks information"));
+                  topic.publish("msg", new Error(this.i18n.tasks.errors.accessInfo));
                   close();
                 })
               );
@@ -179,7 +179,7 @@ define(["dojo/_base/declare",
           }),
           lang.hitch(this,function(error){
             console.error(error);
-            topic.publish("msg",new Error("Unable to read scheduling"));
+            topic.publish("msg", new Error(this.i18n.tasks.errors.readScheduling));
           })
         );
       },
@@ -213,7 +213,7 @@ define(["dojo/_base/declare",
               }),
               lang.hitch(this, function(error){
                 console.error(error);
-                topic.publish("msg",new Error("Unable to rename task"));
+                topic.publish("msg", new Error(this.i18n.tasks.errors.rename));
               })
           );
           close();

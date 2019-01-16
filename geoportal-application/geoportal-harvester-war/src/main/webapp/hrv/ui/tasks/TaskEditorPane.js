@@ -54,13 +54,13 @@ define(["dojo/_base/declare",
         BrokersREST.input().then(
           lang.hitch(this,this.processInputs),
           lang.hitch(this,function(error){
-            topic.publish("msg",this.i18n.brokers.editor.errors.connectorsLoadingErrors.inbound);
+            topic.publish("msg", new Error(this.i18n.brokers.errors.inbound));
           })
         );
         BrokersREST.output().then(
           lang.hitch(this,this.processOutputs),
           lang.hitch(this,function(error){
-            topic.publish("msg",this.i18n.brokers.editor.errors.connectorsLoadingErrors.outbound);
+            topic.publish("msg", new Error(this.i18n.brokers.errors.outbound));
           })
         );
       },
@@ -86,7 +86,7 @@ define(["dojo/_base/declare",
           id: input.uuid,
           value: input.uuid,
           name: "input",
-          checked: count==0,
+          checked: count===0,
           brokerDefinition: input.brokerDefinition
         }, radioDiv);
         this.own(radio);

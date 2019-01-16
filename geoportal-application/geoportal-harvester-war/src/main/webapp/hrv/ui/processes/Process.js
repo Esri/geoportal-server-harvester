@@ -82,7 +82,7 @@ define(["dojo/_base/declare",
               }
             }),
             lang.hitch(this,function(error){
-              topic.publish("msg",this.i18n.processes.errors.canceling);
+              topic.publish("msg", new Error(this.i18n.processes.errors.canceling));
             })
         );
         });
@@ -98,7 +98,7 @@ define(["dojo/_base/declare",
         ProcessesREST.abort(this.data.uuid).then(
             lang.hitch(this,this._onCanceled),
             lang.hitch(this,function(error){
-              topic.publish("msg",this.i18n.processes.errors.canceling);
+              topic.publish("msg", new Error(this.i18n.processes.errors.canceling));
             })
         );
       },

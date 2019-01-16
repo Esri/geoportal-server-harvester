@@ -56,7 +56,7 @@ define(["dojo/_base/declare",
         TriggersREST.types().then(
           lang.hitch(this,this.processTypes),
           lang.hitch(this,function(error){
-            topic.publish("msg",this.i18n.tasks.errors.typesLoadingError);
+            topic.publish("msg", new Error(this.i18n.tasks.errors.typesLoadingError));
           })
         );
       },

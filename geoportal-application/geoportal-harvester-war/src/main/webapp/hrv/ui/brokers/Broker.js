@@ -83,7 +83,7 @@ define(["dojo/_base/declare",
             }),
             lang.hitch(this,function(error){
               console.debug(error);
-              topic.publish("msg",new Error("Error creating broker"));
+              topic.publish("msg", new Error(this.i18n.brokers.errors.creating));
             })
           );
         })));

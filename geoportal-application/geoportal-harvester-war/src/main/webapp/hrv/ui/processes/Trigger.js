@@ -58,7 +58,7 @@ define(["dojo/_base/declare",
             TriggersREST.delete(this.data.uuid).then(
                 lang.hitch(this,this._onCanceled),
                 lang.hitch(this,function(error){
-                  topic.publish("msg",this.i18n.triggers.errors.canceling);
+                  topic.publish("msg", new Error(this.i18n.triggers.errors.canceling));
                 })
             );
           })

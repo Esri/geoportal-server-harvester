@@ -55,17 +55,19 @@ define({
         caption: "Broker",
         type: "Type:",
         title: "Title:",
-        submit: "Submit",
-        errors: {
-          connectorsLoadingErrors: {
-            inbound: "Error loading inbound connectors",
-            outbound: "Error loading outbound connectors"
-          }
-        }
+        submit: "Submit"
       },
       removeDialog: {
         title: "Delete adaptor?",
         content: "Please, confirm deletion of the broker:<br>${title}"
+      },
+      errors: {
+        inbound: "Error loading inbound connectors",
+        outbound: "Error loading outbound connectors",
+        access: "Unable to access brokers information",
+        creating: "Error creating broker",
+        removing: "Error removing broker",
+        schedule: "Unable to schedule task"
       }
     },
     
@@ -116,7 +118,16 @@ define({
         incremental: "Incremental"
       },
       errors: {
-        typesLoadingError: "Unable to load trigger types."
+        typesLoadingError: "Unable to load trigger types.",
+        accessFialed: "Unable to access failed documents information",
+        accessHistory: "Unable to access history information",
+        accessInfo: "Unable to access tasks information",
+        triggersDelete: "Unable to delete current task triggers",
+        readScheduling: "Unable to read scheduling",
+        rename: "Unable to rename task",
+        remove: "Error removing task",
+        execute: "Error executing task",
+        create: "Error creating task"
       }
     },
     

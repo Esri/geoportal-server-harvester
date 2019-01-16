@@ -86,7 +86,7 @@ define(["dojo/_base/declare",
           }),
           lang.hitch(this,function(error){
             console.error(error);
-            topic.publish("msg",new Error("Unable to access tasks information"));
+            topic.publish("msg", new Error(this.i18n.tasks.errors.accessInfo));
           })
         );
       },
@@ -122,7 +122,7 @@ define(["dojo/_base/declare",
             groups[source.ref] = {commonSource: source, tasks: []};
           }
           groups[source.ref].tasks.push(task);
-        })
+        });
         
         var groupsArray = [];
         
@@ -178,7 +178,7 @@ define(["dojo/_base/declare",
           }),
           lang.hitch(this,function(error){
             console.error(error);
-            topic.publish("msg",new Error("Error removing task"));
+            topic.publish("msg", new Error(this.i18n.tasks.errors.remove));
           })
         );
       },
@@ -191,7 +191,7 @@ define(["dojo/_base/declare",
           }),
           lang.hitch(this,function(error){
             console.error(error);
-            topic.publish("msg",new Error("Error executing task"));
+            topic.publish("msg", new Error(this.i18n.tasks.errors.execute));
           })
         );
       },
@@ -224,7 +224,7 @@ define(["dojo/_base/declare",
             }),
             lang.hitch(this,function(error){
               console.error(error);
-              topic.publish("msg",new Error("Error creating task"));
+              topic.publish("msg", new Error(this.i18n.tasks.errors.create));
             })
           );
         })));

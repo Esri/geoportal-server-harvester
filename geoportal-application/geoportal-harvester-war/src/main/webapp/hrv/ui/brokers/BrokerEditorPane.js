@@ -52,7 +52,7 @@ define(["dojo/_base/declare",
         ConnectorsREST[this.category]().then(
           lang.hitch(this,this.processConnectors),
           lang.hitch(this,function(error){
-            topic.publish("msg",this.i18n.brokers.editor.errors.connectorsLoadingErrors[this.category]);
+            topic.publish("msg",this.i18n.brokers.errors[this.category]);
           })
         );
         if (this.data) {
