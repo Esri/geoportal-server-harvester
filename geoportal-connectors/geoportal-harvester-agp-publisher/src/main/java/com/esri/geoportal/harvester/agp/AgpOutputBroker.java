@@ -173,7 +173,8 @@ import org.xml.sax.SAXException;
                   itemType, extractEnvelope(getAttributeValue(attributes, WKAConstants.WKA_BBOX, null)), typeKeywords);
 
           if (response == null || !response.success) {
-            throw new DataOutputException(this, ref.getId(), String.format("Error adding item: %s", ref));
+            String error = response!=null && response.error!=null && response.error.message!=null? response.error.message: null;
+            throw new DataOutputException(this, ref.getId(), String.format("Error adding item: %s%s", ref, error!=null? "; "+error: ""));
           }
           
           client.share(definition.getCredentials().getUserName(), definition.getFolderId(), response.id, true, true, null, token);
