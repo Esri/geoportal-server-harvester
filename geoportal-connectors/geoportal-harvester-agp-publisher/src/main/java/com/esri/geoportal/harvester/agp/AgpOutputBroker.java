@@ -143,8 +143,18 @@ import org.xml.sax.SAXException;
                 ItemType.matchPattern(resourceUrl.toExternalForm()).stream()
         ).findFirst().orElse(null);
         
-        if (itemType == null || itemType.getDataType()!=DataType.URL) {
+        if (itemType == null) {
           return PublishingStatus.SKIPPED;
+        }
+        
+        switch (itemType.getDataType()) {
+          case Text:
+            return PublishingStatus.SKIPPED;
+          case File:
+            if (!itemType.hasUniqueMimeType()) {
+              return PublishingStatus.SKIPPED;
+            }
+            break;
         }
         
         // find thumbnail URL

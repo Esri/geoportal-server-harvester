@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * Item types.
@@ -172,6 +173,23 @@ public enum ItemType {
    */
   public String getServiceType() {
     return serviceType;
+  }
+  
+  public boolean hasUniqueMimeType() {
+    if (getMimeTypes()==null || getMimeTypes().length==0) {
+      return true;
+    }
+    return Stream.of(ItemType.values())
+            .filter(it -> it!=this)
+            .filter(it -> {
+              if (it.getMimeTypes()==null) {
+                return false;
+              }
+              return Stream.of(it.getMimeTypes()).filter(mt -> {
+                return Stream.of(this.getMimeTypes()).filter(x -> x==mt).count() > 0;
+              }).count() > 0;
+             })
+            .count() == 0;
   }
   
   /**
