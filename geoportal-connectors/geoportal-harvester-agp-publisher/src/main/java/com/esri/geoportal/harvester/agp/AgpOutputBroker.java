@@ -54,6 +54,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -137,7 +138,11 @@ import org.xml.sax.SAXException;
 
         URL resourceUrl = new URL(urlStr);
 
-        ItemType itemType = ItemType.matchPattern(resourceUrl.toExternalForm()).stream().findFirst().orElse(null);
+        ItemType itemType = Stream.concat(
+                ItemType.matchExt(resourceUrl.toExternalForm().substring(resourceUrl.toExternalForm().lastIndexOf(".")+1)).stream(), 
+                ItemType.matchPattern(resourceUrl.toExternalForm()).stream()
+        ).findFirst().orElse(null);
+        
         if (itemType == null || itemType.getDataType()!=DataType.URL) {
           return PublishingStatus.SKIPPED;
         }
