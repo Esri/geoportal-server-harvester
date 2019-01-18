@@ -30,24 +30,27 @@ import org.apache.commons.lang3.math.NumberUtils;
 /**
  * ArcGIS Portal definition adaptor.
  */
-/*package*/ class AgpOutputBrokerDefinitionAdaptor  extends BrokerDefinitionAdaptor {
+/*package*/ class AgpOutputBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
+
   private static final Integer DEFAULT_MAX_REDIRECTS = 5;
 
   private final CredentialsDefinitionAdaptor credAdaptor;
-  
+
   private URL hostUrl;
   private String folderId;
   private boolean cleanup;
   private Integer maxRedirects;
+  private boolean uploadFiles;
 
   /**
    * Creates instance of the adaptor.
+   *
    * @param def broker definition
    * @throws IllegalArgumentException if invalid broker definition
    */
   public AgpOutputBrokerDefinitionAdaptor(EntityDefinition def) throws InvalidDefinitionException {
     super(def);
-    this.credAdaptor =new CredentialsDefinitionAdaptor(def);
+    this.credAdaptor = new CredentialsDefinitionAdaptor(def);
     if (credAdaptor.getCredentials().isEmpty()) {
       throw new InvalidDefinitionException("Empty credentials");
     }
@@ -59,33 +62,37 @@ import org.apache.commons.lang3.math.NumberUtils;
       try {
         hostUrl = new URL(get(P_HOST_URL));
       } catch (MalformedURLException ex) {
-        throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
+        throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL, get(P_HOST_URL)), ex);
       }
       folderId = get(P_FOLDER_ID);
-      cleanup  = Boolean.parseBoolean(get(P_FOLDER_CLEANUP));
+      cleanup = Boolean.parseBoolean(get(P_FOLDER_CLEANUP));
       maxRedirects = NumberUtils.toInt(get(P_MAX_REDIRECTS), DEFAULT_MAX_REDIRECTS);
+      uploadFiles = Boolean.parseBoolean(get(P_UPLOAD));
     }
   }
 
   @Override
   public void override(Map<String, String> params) {
-    consume(params,P_HOST_URL);
-    consume(params,P_FOLDER_ID);
-    consume(params,P_FOLDER_CLEANUP);
+    consume(params, P_HOST_URL);
+    consume(params, P_FOLDER_ID);
+    consume(params, P_FOLDER_CLEANUP);
     consume(params, P_MAX_REDIRECTS);
+    consume(params, P_UPLOAD);
     credAdaptor.override(params);
   }
-  
+
   /**
    * Gets host URL.
+   *
    * @return host URL
    */
   public URL getHostUrl() {
     return hostUrl;
   }
-  
+
   /**
    * Sets host URL
+   *
    * @param url host URL
    */
   public void setHostUrl(URL url) {
@@ -95,6 +102,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 
   /**
    * Gets folder id.
+   *
    * @return folder id
    */
   public String getFolderId() {
@@ -103,7 +111,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 
   /**
    * Sets folder id.
-   * @param folderId folder id 
+   *
+   * @param folderId folder id
    */
   public void setFolderId(String folderId) {
     this.folderId = folderId;
@@ -112,6 +121,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 
   /**
    * Gets credentials.
+   *
    * @return credentials
    */
   public SimpleCredentials getCredentials() {
@@ -120,6 +130,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 
   /**
    * Sets credentials.
+   *
    * @param cred credentials
    */
   public void setCredentials(SimpleCredentials cred) {
@@ -128,6 +139,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 
   /**
    * Gets permission to cleanup.
+   *
    * @return <code>true</code> if cleanup permitted
    */
   public boolean getCleanup() {
@@ -136,6 +148,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 
   /**
    * Sets permission to cleanup.
+   *
    * @param cleanup <code>true</code> to permit cleanup
    */
   public void setCleanup(boolean cleanup) {
@@ -143,19 +156,30 @@ import org.apache.commons.lang3.math.NumberUtils;
     set(P_FOLDER_CLEANUP, Boolean.toString(cleanup));
   }
 
-/**
- * @return the maxRedirects
- */
-public Integer getMaxRedirects() {
-	return maxRedirects;
-}
+  /**
+   * Gets maximum of redirects.
+   * @return the maxRedirects
+   */
+  public Integer getMaxRedirects() {
+    return maxRedirects;
+  }
 
-/**
- * @param maxRedirects the maxRedirects to set
- */
-public void setMaxRedirects(Integer maxRedirects) {
-	this.maxRedirects = maxRedirects;
-}
-  
-  
+  /**
+   * Sets maximum of redirects.
+   * @param maxRedirects the maxRedirects to set
+   */
+  public void setMaxRedirects(Integer maxRedirects) {
+    this.maxRedirects = maxRedirects;
+    set(P_MAX_REDIRECTS, Integer.toString(maxRedirects));
+  }
+
+  public boolean isUploadFiles() {
+    return uploadFiles;
+  }
+
+  public void setUploadFiles(boolean uploadFiles) {
+    this.uploadFiles = uploadFiles;
+    set(P_UPLOAD, Boolean.toString(uploadFiles));
+  }
+
 }

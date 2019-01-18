@@ -77,7 +77,8 @@ public class AgpOutputConnector implements OutputConnector<OutputBroker> {
       }
     });
     args.add(new UITemplate.IntegerArgument(P_MAX_REDIRECTS, bundle.getString("agp.max.redirects"), false, 5));
-    args.add(new UITemplate.BooleanArgument(P_FOLDER_CLEANUP, "Perform cleanup"));
+    args.add(new UITemplate.BooleanArgument(P_FOLDER_CLEANUP, bundle.getString("agp.cleanup")));
+    args.add(new UITemplate.BooleanArgument(P_UPLOAD, bundle.getString("agp.upload")));
     return new UITemplate(getType(), bundle.getString("agp"), args);
   }
   

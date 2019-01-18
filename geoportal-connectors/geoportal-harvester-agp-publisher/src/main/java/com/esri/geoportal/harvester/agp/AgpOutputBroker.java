@@ -39,7 +39,11 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -58,8 +62,12 @@ import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +86,7 @@ import org.xml.sax.SAXException;
   private final AgpOutputConnector connector;
   private final AgpOutputBrokerDefinitionAdaptor definition;
   private final MetaAnalyzer metaAnalyzer;
+  private CloseableHttpClient httpClient;
   private AgpClient client;
   private String token;
   private final Set<String> existing = new HashSet<>();
@@ -98,6 +107,8 @@ import org.xml.sax.SAXException;
 
   @Override
   public PublishingStatus publish(DataReference ref) throws DataOutputException {
+    File fileToUpload = null;
+    
     try {
       // extract map of attributes (normalized names)
       MapAttribute attributes = extractMapAttributes(ref);
@@ -138,6 +149,14 @@ import org.xml.sax.SAXException;
       // skip if no item type
       if (itemType == null) {
         return PublishingStatus.SKIPPED;
+      }
+      
+      // download file
+      String fileName = null;
+      if (itemType.getDataType() == DataType.File && definition.isUploadFiles()) {
+        FileName fn = getFileNameFromUrl(resourceUrl);
+        fileName = fn.getFullName();
+        fileToUpload = downloadFile(new URL(resourceUrl), fn);
       }
 
       try {
@@ -209,6 +228,10 @@ import org.xml.sax.SAXException;
 
     } catch (MetaException | IOException | ParserConfigurationException | SAXException | URISyntaxException ex) {
       throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
+    } finally {
+      if (fileToUpload!=null) {
+        fileToUpload.delete();
+      }
     }
   }
   private ItemType createItemType(String resourceUrl) {
@@ -414,7 +437,8 @@ import org.xml.sax.SAXException;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
-    this.client = new AgpClient(HttpClientBuilder.create().useSystemProperties().build(), definition.getHostUrl(), definition.getCredentials(), definition.getMaxRedirects());
+    this.httpClient = HttpClientBuilder.create().useSystemProperties().build();
+    this.client = new AgpClient(httpClient, definition.getHostUrl(), definition.getCredentials(), definition.getMaxRedirects());
 
     if (!context.canCleanup()) {
       preventCleanup = true;
@@ -490,4 +514,54 @@ import org.xml.sax.SAXException;
     return FORMATTER.format(zonedDateTime);
   }
 
+  private File downloadFile(URL fileToDownload, FileName fileName) throws IOException {
+    
+    File tempFile = File.createTempFile(fileName.name + "-", "." + fileName.ext);
+    
+    HttpGet request = new HttpGet(fileToDownload.toExternalForm());
+    try (
+            OutputStream outputStream = new FileOutputStream(tempFile);
+            CloseableHttpResponse response = httpClient.execute(request);
+            InputStream inputStream = response.getEntity().getContent();) {
+      IOUtils.copy(inputStream, outputStream);
+    }
+    return tempFile;
+  }
+
+  private FileName getFileNameFromUrl(String resourceUrl) {
+    String path = resourceUrl;
+    String fullName = path.substring(path.lastIndexOf("/")+1);
+    String ext = fullName.substring(fullName.lastIndexOf(".")+1);
+    String name = ext.length() < fullName.length()? fullName.substring(0, fullName.lastIndexOf(".")): fullName;
+    if (ext.equals(name))
+      ext = null;
+    
+    return new FileName(name, ext);
+  }
+  
+  private static class FileName {
+    public final String name;
+    public final String ext;
+
+    public FileName(String name, String ext) {
+      this.name = name;
+      this.ext = ext;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public String getExt() {
+      return ext;
+    }
+    
+    public String getFullName() {
+      return ext!=null? name + "." + ext: name;
+    }
+    
+    public String toString() {
+      return getFullName();
+    }
+  }
 }

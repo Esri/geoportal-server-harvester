@@ -108,7 +108,7 @@ public class AgpClient implements Closeable {
     HttpPost req = new HttpPost(builder.build());
     
     Map<String, String> params = makeStdParams(title, description, itemType, thumbnailUrl, extent, typeKeywords, tags, token);
-    params.put("url", url.toExternalForm());
+    params.put(itemType.getDataType().name().toLowerCase(), url.toExternalForm());
     
     req.setEntity(createEntity(params));
 
@@ -139,7 +139,7 @@ public class AgpClient implements Closeable {
     HttpPost req = new HttpPost(builder.build());
     
     Map<String, String> params = makeStdParams(title, description, itemType, thumbnailUrl, extent, typeKeywords, tags, token);
-    params.put("url", url.toExternalForm());
+    params.put(itemType.getDataType().name().toLowerCase(), url.toExternalForm());
     
     req.setEntity(createEntity(params));
 
