@@ -87,52 +87,6 @@ public class AgpClient implements Closeable {
 
   /**
    * Adds item.
-   * @param owner owner
-   * @param folderId folder id (optional)
-   * @param title title
-   * @param description description
-   * @param text text
-   * @param thumbnailUrl thumbnail url
-   * @param itemType item type (must be a URL type)
-   * @param extent extent
-   * @param typeKeywords type keywords
-   * @param tags tags tags
-   * @param token token
-   * @return add item response
-   * @throws URISyntaxException if invalid URL
-   * @throws IOException if operation fails
-   */
-  public ItemResponse addItem(String owner, String folderId, String title, String description, String text, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
-    URIBuilder builder = new URIBuilder(addItemUri(owner, StringUtils.trimToNull(folderId)));
-    
-    HttpPost req = new HttpPost(builder.build());
-    HashMap<String, String> params = new HashMap<>();
-    params.put("f", "json");
-    params.put("title", title);
-    params.put("description", description);
-    params.put("type", itemType.getTypeName());
-    params.put("text", text);
-    if (thumbnailUrl!=null) {
-      params.put("thumbnailurl", thumbnailUrl.toExternalForm());
-    }
-    if (extent!=null && extent.length==4) {
-      params.put("extent",Arrays.asList(extent).stream().map(Object::toString).collect(Collectors.joining(",")));
-    }
-    if (typeKeywords!=null) {
-      params.put("typeKeywords", Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")));
-    }
-    if (tags!=null) {
-      params.put("tags", Arrays.asList(tags).stream().collect(Collectors.joining(",")));
-    }
-    params.put("token", token);
-    
-    req.setEntity(createEntity(params));
-
-    return execute(req,ItemResponse.class);
-  }
-
-  /**
-   * Adds item.
    * @param owner user name
    * @param folderId folder id (optional)
    * @param title title
@@ -152,25 +106,70 @@ public class AgpClient implements Closeable {
     URIBuilder builder = new URIBuilder(addItemUri(owner, StringUtils.trimToNull(folderId)));
     
     HttpPost req = new HttpPost(builder.build());
-    HashMap<String, String> params = new HashMap<>();
-    params.put("f", "json");
-    params.put("title", title);
-    params.put("description", description);
-    params.put("type", itemType.getTypeName());
+    
+    Map<String, String> params = makeStdParams(title, description, itemType, thumbnailUrl, extent, typeKeywords, tags, token);
     params.put("url", url.toExternalForm());
-    if (thumbnailUrl!=null) {
-      params.put("thumbnailurl", thumbnailUrl.toExternalForm());
-    }
-    if (extent!=null && extent.length==4) {
-      params.put("extent",Arrays.asList(extent).stream().map(Object::toString).collect(Collectors.joining(",")));
-    }
-    if (typeKeywords!=null) {
-      params.put("typeKeywords", Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")));
-    }
-    if (tags!=null) {
-      params.put("tags", Arrays.asList(tags).stream().collect(Collectors.joining(",")));
-    }
-    params.put("token", token);
+    
+    req.setEntity(createEntity(params));
+
+    return execute(req,ItemResponse.class);
+  }
+  
+  /**
+   * Adds item.
+   * @param owner user name
+   * @param folderId folder id (optional)
+   * @param itemId item id
+   * @param title title
+   * @param description description
+   * @param url URL
+   * @param thumbnailUrl thumbnail URL
+   * @param itemType item type (must be a URL type)
+   * @param extent extent
+   * @param typeKeywords type keywords
+   * @param tags tags tags
+   * @param token token
+   * @return add item response
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+    URIBuilder builder = new URIBuilder(updateItemUri(owner, StringUtils.trimToNull(folderId), itemId));
+    
+    HttpPost req = new HttpPost(builder.build());
+    
+    Map<String, String> params = makeStdParams(title, description, itemType, thumbnailUrl, extent, typeKeywords, tags, token);
+    params.put("url", url.toExternalForm());
+    
+    req.setEntity(createEntity(params));
+
+    return execute(req,ItemResponse.class);
+  }
+
+  /**
+   * Adds item.
+   * @param owner owner
+   * @param folderId folder id (optional)
+   * @param title title
+   * @param description description
+   * @param text text
+   * @param thumbnailUrl thumbnail url
+   * @param itemType item type (must be a URL type)
+   * @param extent extent
+   * @param typeKeywords type keywords
+   * @param tags tags tags
+   * @param token token
+   * @return add item response
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public ItemResponse addItem(String owner, String folderId, String title, String description, String text, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+    URIBuilder builder = new URIBuilder(addItemUri(owner, StringUtils.trimToNull(folderId)));
+    
+    HttpPost req = new HttpPost(builder.build());
+    
+    Map<String, String> params = makeStdParams(title, description, itemType, thumbnailUrl, extent, typeKeywords, tags, token);
+    params.put("text", text);
     
     req.setEntity(createEntity(params));
 
@@ -199,12 +198,21 @@ public class AgpClient implements Closeable {
     URIBuilder builder = new URIBuilder(updateItemUri(owner, StringUtils.trimToNull(folderId), itemId));
     
     HttpPost req = new HttpPost(builder.build());
+    
+    Map<String, String> params = makeStdParams(title, description, itemType, thumbnailUrl, extent, typeKeywords, tags, token);
+    params.put("text", text);
+    
+    req.setEntity(createEntity(params));
+
+    return execute(req,ItemResponse.class);
+  }
+  
+  private Map<String, String> makeStdParams(String title, String description, ItemType itemType, URL thumbnailUrl, Double [] extent, String [] typeKeywords, String [] tags, String token) {
     HashMap<String, String> params = new HashMap<>();
     params.put("f", "json");
     params.put("title", title);
     params.put("description", description);
     params.put("type", itemType.getTypeName());
-    params.put("text", text);
     if (thumbnailUrl!=null) {
       params.put("thumbnailurl", thumbnailUrl.toExternalForm());
     }
@@ -219,9 +227,7 @@ public class AgpClient implements Closeable {
     }
     params.put("token", token);
     
-    req.setEntity(createEntity(params));
-
-    return execute(req,ItemResponse.class);
+    return params;
   }
 
   /**
@@ -270,53 +276,6 @@ public class AgpClient implements Closeable {
       }
       throw ex;
     }
-  }
-  
-  /**
-   * Adds item.
-   * @param owner user name
-   * @param folderId folder id (optional)
-   * @param itemId item id
-   * @param title title
-   * @param description description
-   * @param url URL
-   * @param thumbnailUrl thumbnail URL
-   * @param itemType item type (must be a URL type)
-   * @param extent extent
-   * @param typeKeywords type keywords
-   * @param tags tags tags
-   * @param token token
-   * @return add item response
-   * @throws URISyntaxException if invalid URL
-   * @throws IOException if operation fails
-   */
-  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
-    URIBuilder builder = new URIBuilder(updateItemUri(owner, StringUtils.trimToNull(folderId), itemId));
-    
-    HttpPost req = new HttpPost(builder.build());
-    HashMap<String, String> params = new HashMap<>();
-    params.put("f", "json");
-    params.put("title", title);
-    params.put("description", description);
-    params.put("type", itemType.getTypeName());
-    params.put("url", url.toExternalForm());
-    if (thumbnailUrl!=null) {
-      params.put("thumbnailurl", thumbnailUrl.toExternalForm());
-    }
-    if (extent!=null && extent.length==4) {
-      params.put("extent",Arrays.asList(extent).stream().map(Object::toString).collect(Collectors.joining(",")));
-    }
-    if (typeKeywords!=null) {
-      params.put("typeKeywords", Arrays.asList(typeKeywords).stream().collect(Collectors.joining(",")));
-    }
-    if (tags!=null) {
-      params.put("tags", Arrays.asList(tags).stream().collect(Collectors.joining(",")));
-    }
-    params.put("token", token);
-    
-    req.setEntity(createEntity(params));
-
-    return execute(req,ItemResponse.class);
   }
   
   /**
