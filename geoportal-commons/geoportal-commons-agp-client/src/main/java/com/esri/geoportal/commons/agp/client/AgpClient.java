@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -97,12 +98,13 @@ public class AgpClient implements Closeable {
    * @param extent extent
    * @param typeKeywords type keywords
    * @param tags tags tags
+   * @param fileToUpload the file to be uploaded
    * @param token token
    * @return add item response
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse addItem(String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+  public ItemResponse addItem(String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, File fileToUpload, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(addItemUri(owner, StringUtils.trimToNull(folderId)));
     
     HttpPost req = new HttpPost(builder.build());
@@ -128,12 +130,13 @@ public class AgpClient implements Closeable {
    * @param extent extent
    * @param typeKeywords type keywords
    * @param tags tags tags
+   * @param fileToUpload the file to be uploaded
    * @param token token
    * @return add item response
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
+  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, File fileToUpload, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(updateItemUri(owner, StringUtils.trimToNull(folderId), itemId));
     
     HttpPost req = new HttpPost(builder.build());

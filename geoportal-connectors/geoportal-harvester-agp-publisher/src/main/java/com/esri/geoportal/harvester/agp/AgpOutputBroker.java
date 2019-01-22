@@ -178,7 +178,8 @@ import org.xml.sax.SAXException;
                   sThumbnailUrl != null ? new URL(sThumbnailUrl) : null,
                   itemType,
                   extractEnvelope(bbox),
-                  typeKeywords
+                  typeKeywords,
+                  fileToUpload
           );
 
           if (response == null || !response.success) {
@@ -208,7 +209,8 @@ import org.xml.sax.SAXException;
                   sThumbnailUrl != null ? new URL(sThumbnailUrl) : null,
                   itemType,
                   extractEnvelope(bbox),
-                  typeKeywords
+                  typeKeywords,
+                  fileToUpload
           );
 
           if (response == null || !response.success) {
@@ -333,7 +335,7 @@ import org.xml.sax.SAXException;
     return attributes;
   }
 
-  private ItemResponse addItem(String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double[] envelope, String[] typeKeywords) throws IOException, URISyntaxException {
+  private ItemResponse addItem(String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double[] envelope, String[] typeKeywords, File fileToUpload) throws IOException, URISyntaxException {
     if (token == null) {
       token = generateToken();
     }
@@ -341,29 +343,29 @@ import org.xml.sax.SAXException;
             title,
             description,
             url, thumbnailUrl,
-            itemType, envelope, typeKeywords, token);
+            itemType, envelope, typeKeywords, fileToUpload, token);
     if (response.error != null && response.error.code == 498) {
       token = generateToken();
       response = addItem(
               title,
               description,
               url, thumbnailUrl,
-              itemType, envelope, typeKeywords, token);
+              itemType, envelope, typeKeywords, fileToUpload, token);
     }
     return response;
   }
 
-  private ItemResponse addItem(String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double[] envelope, String[] typeKeywords, String token) throws IOException, URISyntaxException {
+  private ItemResponse addItem(String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double[] envelope, String[] typeKeywords, File fileToUpload, String token) throws IOException, URISyntaxException {
     return client.addItem(
             definition.getCredentials().getUserName(),
             definition.getFolderId(),
             title,
             description,
             url, thumbnailUrl,
-            itemType, envelope, typeKeywords, null, token);
+            itemType, envelope, typeKeywords, null, fileToUpload, token);
   }
 
-  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double[] envelope, String[] typeKeywords) throws IOException, URISyntaxException {
+  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double[] envelope, String[] typeKeywords, File fileToUpload) throws IOException, URISyntaxException {
     if (token == null) {
       token = generateToken();
     }
@@ -374,7 +376,7 @@ import org.xml.sax.SAXException;
             title,
             description,
             url, thumbnailUrl,
-            itemType, envelope, typeKeywords, token);
+            itemType, envelope, typeKeywords, fileToUpload, token);
     if (response.error != null && response.error.code == 498) {
       token = generateToken();
       response = updateItem(
@@ -384,12 +386,12 @@ import org.xml.sax.SAXException;
               title,
               description,
               url, thumbnailUrl,
-              itemType, envelope, typeKeywords, token);
+              itemType, envelope, typeKeywords, fileToUpload, token);
     }
     return response;
   }
 
-  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double[] envelope, String[] typeKeywords, String token) throws IOException, URISyntaxException {
+  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double[] envelope, String[] typeKeywords, File fileToUpload, String token) throws IOException, URISyntaxException {
     return client.updateItem(
             owner,
             folderId,
@@ -397,7 +399,7 @@ import org.xml.sax.SAXException;
             title,
             description,
             url, thumbnailUrl,
-            itemType, envelope, typeKeywords, null, token);
+            itemType, envelope, typeKeywords, null, fileToUpload, token);
   }
 
   private DeleteResponse deleteItem(String id, String owner, String folderId) throws URISyntaxException, IOException {
