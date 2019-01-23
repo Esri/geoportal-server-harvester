@@ -141,7 +141,9 @@ import org.xml.sax.SAXException;
       // If the WKA_RESOURCE_URL is empty after parsing the XML file, see if it was set on the 
       // DataReference directly.
       if (resourceUrl == null || resourceUrl.isEmpty()) {
-        resourceUrl = ((URI) ref.getAttributesMap().get(WKAConstants.WKA_RESOURCE_URL)).toString();
+        if (ref.getAttributesMap().get(WKAConstants.WKA_RESOURCE_URL) != null) {
+          resourceUrl = ref.getAttributesMap().get(WKAConstants.WKA_RESOURCE_URL).toString();
+        }
       }
 
       // check if the item is eligible for publishing
