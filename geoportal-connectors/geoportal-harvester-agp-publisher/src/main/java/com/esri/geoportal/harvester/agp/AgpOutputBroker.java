@@ -46,7 +46,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -150,14 +149,13 @@ import org.xml.sax.SAXException;
       ItemType itemType = createItemType(resourceUrl);
       // skip if no item type
       if (itemType == null) {
+        LOG.debug(String.format("Resource '%s' skipped for unrecognized item type", title));
         return PublishingStatus.SKIPPED;
       }
       
       // download file
-      String fileName = null;
       if (itemType.getDataType() == DataType.File && definition.isUploadFiles()) {
         FileName fn = getFileNameFromUrl(resourceUrl);
-        fileName = fn.getFullName();
         fileToUpload = downloadFile(new URL(resourceUrl), fn);
       }
 
