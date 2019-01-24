@@ -505,7 +505,9 @@ import org.xml.sax.SAXException;
           deleteItem(item.id, item.owner, item.ownerFolder);
         }
       }
-      client.close();
+      if (client!=null) {
+        client.close();
+      }
     } catch (IOException | URISyntaxException ex) {
       LOG.error(String.format("Error terminating broker."), ex);
     }
