@@ -119,7 +119,7 @@ public class AgpClient implements Closeable {
     
     Map<String, String> params = makeStdParams(title, description, itemType, thumbnailUrl, extent, typeKeywords, tags, token);
     if (!multipart) {
-      params.put(itemType.getDataType().name().toLowerCase(), url.toExternalForm());
+      params.put("url", url.toExternalForm());
     }
     
     req.setEntity(multipart? createEntity(params, fileToUpload): createEntity(params));
@@ -154,7 +154,7 @@ public class AgpClient implements Closeable {
     
     Map<String, String> params = makeStdParams(title, description, itemType, thumbnailUrl, extent, typeKeywords, tags, token);
     if (!multipart) {
-      params.put(itemType.getDataType().name().toLowerCase(), url.toExternalForm());
+      params.put("url", url.toExternalForm());
     }
     
     req.setEntity(multipart? createEntity(params, fileToUpload): createEntity(params));
