@@ -149,7 +149,7 @@ import org.xml.sax.SAXException;
       ItemType itemType = createItemType(resourceUrl);
       // skip if no item type
       if (itemType == null) {
-        LOG.debug(String.format("Resource '%s' skipped for unrecognized item type", title));
+        LOG.info(String.format("Resource '%s' with resource url '%s' skipped for unrecognized item type", title, resourceUrl));
         return PublishingStatus.SKIPPED;
       }
       
@@ -159,7 +159,7 @@ import org.xml.sax.SAXException;
           FileName fn = getFileNameFromUrl(resourceUrl);
           fileToUpload = downloadFile(new URL(resourceUrl), fn);
         } catch (IOException ex) {
-          LOG.debug(String.format("Error downloading file %s. Registering URL only.", resourceUrl), ex);
+          LOG.warn(String.format("Error downloading file '%s'. Registering URL only.", resourceUrl), ex);
           fileToUpload = null;
         }
       }
