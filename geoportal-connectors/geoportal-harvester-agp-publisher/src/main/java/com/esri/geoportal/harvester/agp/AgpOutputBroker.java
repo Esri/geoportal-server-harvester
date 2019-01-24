@@ -155,8 +155,13 @@ import org.xml.sax.SAXException;
       
       // download file
       if (itemType.getDataType() == DataType.File && definition.isUploadFiles()) {
-        FileName fn = getFileNameFromUrl(resourceUrl);
-        fileToUpload = downloadFile(new URL(resourceUrl), fn);
+        try {
+          FileName fn = getFileNameFromUrl(resourceUrl);
+          fileToUpload = downloadFile(new URL(resourceUrl), fn);
+        } catch (IOException ex) {
+          LOG.debug(String.format("Error downloading file %s. Registering URL only.", resourceUrl), ex);
+          fileToUpload = null;
+        }
       }
 
       try {
