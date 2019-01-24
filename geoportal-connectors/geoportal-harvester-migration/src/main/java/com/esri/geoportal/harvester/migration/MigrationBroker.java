@@ -46,7 +46,6 @@ import org.slf4j.LoggerFactory;
  */
 /*package*/ class MigrationBroker implements InputBroker {
   private static final Logger LOG = LoggerFactory.getLogger(MigrationBroker.class);
-  private static final int PAGE_SIZE = 10;
 
   private final MigrationConnector connector;
   private final MigrationBrokerDefinitionAdaptor definition;
