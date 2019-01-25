@@ -24,6 +24,7 @@ import com.esri.geoportal.commons.agp.client.ItemResponse;
 import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.agp.client.QueryResponse;
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.meta.ArrayAttribute;
 import com.esri.geoportal.commons.meta.Attribute;
 import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaAnalyzer;
@@ -137,16 +138,29 @@ import org.xml.sax.SAXException;
       String resourceUrl = getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null);
       String bbox = getAttributeValue(attributes, WKAConstants.WKA_BBOX, null);
 
+      // check if the item is eligible for publishing
+      ItemType itemType = createItemType(resourceUrl);
+      
       // If the WKA_RESOURCE_URL is empty after parsing the XML file, see if it was set on the 
       // DataReference directly.
-      if (resourceUrl == null || resourceUrl.isEmpty()) {
-        if (ref.getAttributesMap().get(WKAConstants.WKA_RESOURCE_URL) != null) {
-          resourceUrl = ref.getAttributesMap().get(WKAConstants.WKA_RESOURCE_URL).toString();
+      if (itemType==null) {
+        if (ref.getAttributesMap().get(WKAConstants.WKA_REFERENCES) != null && ref.getAttributesMap().get(WKAConstants.WKA_REFERENCES) instanceof ArrayAttribute) {
+          ArrayAttribute references = (ArrayAttribute)ref.getAttributesMap().get(WKAConstants.WKA_REFERENCES);
+          for (Attribute reference: references.getAttributes()) {
+            Attribute refUrlAttribute = reference.getNamedAttributes().get(WKAConstants.WKA_RESOURCE_URL);
+            if (refUrlAttribute!=null) {
+              String refUrl = refUrlAttribute.getValue();
+              ItemType it = createItemType(refUrl);
+              if (it!=null) {
+                resourceUrl = refUrl;
+                itemType = it;
+                break;
+              }
+            }
+          }
         }
       }
 
-      // check if the item is eligible for publishing
-      ItemType itemType = createItemType(resourceUrl);
       // skip if no item type
       if (itemType == null) {
         LOG.debug(String.format("Resource '%s' with resource url '%s' skipped for unrecognized item type", title, resourceUrl));
