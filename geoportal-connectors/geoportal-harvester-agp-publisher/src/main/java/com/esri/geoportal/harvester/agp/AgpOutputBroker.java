@@ -583,6 +583,7 @@ import org.xml.sax.SAXException;
       return ext!=null? name + "." + ext: name;
     }
     
+    @Override
     public String toString() {
       return getFullName();
     }

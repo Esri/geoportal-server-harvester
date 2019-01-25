@@ -15,9 +15,7 @@
  */
 package com.esri.geoportal.commons.meta;
 
-import java.util.Arrays;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Attribute.
