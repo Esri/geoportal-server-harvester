@@ -71,10 +71,9 @@ public class DcatParserAdaptor implements Iterable<DcatRecord> {
   
   /**
    * Called upon parsing exception thrown during iteration.
-   * @param ex 
+   * @param ex exception to handle
    */
   protected void onException(Exception ex) {
-    // TODO: override if needed
     LOGGER.log(Level.SEVERE, "Error parsing DCAT response.", ex);
   }
   
