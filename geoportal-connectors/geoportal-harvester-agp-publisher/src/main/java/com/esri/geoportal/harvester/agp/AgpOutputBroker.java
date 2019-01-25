@@ -24,6 +24,7 @@ import com.esri.geoportal.commons.agp.client.ItemResponse;
 import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.agp.client.QueryResponse;
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.meta.ArrayAttribute;
 import com.esri.geoportal.commons.meta.Attribute;
 import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaAnalyzer;
@@ -140,8 +141,18 @@ import org.xml.sax.SAXException;
       // If the WKA_RESOURCE_URL is empty after parsing the XML file, see if it was set on the 
       // DataReference directly.
       if (resourceUrl == null || resourceUrl.isEmpty()) {
-        if (ref.getAttributesMap().get(WKAConstants.WKA_RESOURCE_URL) != null) {
-          resourceUrl = ref.getAttributesMap().get(WKAConstants.WKA_RESOURCE_URL).toString();
+        if (ref.getAttributesMap().get(WKAConstants.WKA_REFERENCES) != null && ref.getAttributesMap().get(WKAConstants.WKA_REFERENCES) instanceof ArrayAttribute) {
+          ArrayAttribute references = (ArrayAttribute)ref.getAttributesMap().get(WKAConstants.WKA_REFERENCES);
+          for (Attribute reference: references.getAttributes()) {
+            Attribute refUrlAttribute = reference.getNamedAttributes().get(WKAConstants.WKA_RESOURCE_URL);
+            if (refUrlAttribute!=null) {
+              String refUrl = refUrlAttribute.getValue();
+              if (createItemType(refUrl)!=null && createItemType(refUrl).hasUniqueMimeType()) {
+                resourceUrl = refUrl;
+                break;
+              }
+            }
+          }
         }
       }
 
