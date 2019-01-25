@@ -149,7 +149,7 @@ import org.xml.sax.SAXException;
       ItemType itemType = createItemType(resourceUrl);
       // skip if no item type
       if (itemType == null) {
-        LOG.info(String.format("Resource '%s' with resource url '%s' skipped for unrecognized item type", title, resourceUrl));
+        LOG.debug(String.format("Resource '%s' with resource url '%s' skipped for unrecognized item type", title, resourceUrl));
         return PublishingStatus.SKIPPED;
       }
       
