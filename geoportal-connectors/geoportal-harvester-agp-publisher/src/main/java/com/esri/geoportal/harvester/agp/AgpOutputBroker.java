@@ -24,6 +24,7 @@ import com.esri.geoportal.commons.agp.client.ItemResponse;
 import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.agp.client.QueryResponse;
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.meta.ArrayAttribute;
 import com.esri.geoportal.commons.meta.Attribute;
 import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaAnalyzer;
@@ -39,10 +40,13 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -54,11 +58,16 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +86,7 @@ import org.xml.sax.SAXException;
   private final AgpOutputConnector connector;
   private final AgpOutputBrokerDefinitionAdaptor definition;
   private final MetaAnalyzer metaAnalyzer;
+  private CloseableHttpClient httpClient;
   private AgpClient client;
   private String token;
   private final Set<String> existing = new HashSet<>();
@@ -94,13 +104,15 @@ import org.xml.sax.SAXException;
     this.definition = definition;
     this.metaAnalyzer = metaAnalyzer;
   }
-  
+
   @Override
   public PublishingStatus publish(DataReference ref) throws DataOutputException {
+    File fileToUpload = null;
+    
     try {
       // extract map of attributes (normalized names)
       MapAttribute attributes = extractMapAttributes(ref);
-      
+
       if (attributes == null) {
         throw new DataOutputException(this, ref.getId(), String.format("Error extracting attributes from data."));
       }
@@ -119,68 +131,114 @@ import org.xml.sax.SAXException;
         String.format("src_uri_s=%s", src_uri_s),
         String.format("src_lastupdate_dt=%s", src_lastupdate_dt)
       };
+
+      String title = getAttributeValue(attributes, WKAConstants.WKA_TITLE, null);
+      String description = getAttributeValue(attributes, WKAConstants.WKA_DESCRIPTION, null);
+      String sThumbnailUrl = StringUtils.trimToNull(getAttributeValue(attributes, WKAConstants.WKA_THUMBNAIL_URL, null));
+      String resourceUrl = getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null);
+      String bbox = getAttributeValue(attributes, WKAConstants.WKA_BBOX, null);
+
+      // check if the item is eligible for publishing
+      ItemType itemType = createItemType(resourceUrl);
       
+      // If the WKA_RESOURCE_URL is empty after parsing the XML file, see if it was set on the 
+      // DataReference directly.
+      if (itemType==null) {
+        if (ref.getAttributesMap().get(WKAConstants.WKA_REFERENCES) != null && ref.getAttributesMap().get(WKAConstants.WKA_REFERENCES) instanceof ArrayAttribute) {
+          ArrayAttribute references = (ArrayAttribute)ref.getAttributesMap().get(WKAConstants.WKA_REFERENCES);
+          for (Attribute reference: references.getAttributes()) {
+            Attribute refUrlAttribute = reference.getNamedAttributes().get(WKAConstants.WKA_RESOURCE_URL);
+            if (refUrlAttribute!=null) {
+              String refUrl = refUrlAttribute.getValue();
+              ItemType it = createItemType(refUrl);
+              if (it!=null) {
+                resourceUrl = refUrl;
+                itemType = it;
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      // skip if no item type
+      if (itemType == null) {
+        LOG.debug(String.format("Resource '%s' with resource url '%s' skipped for unrecognized item type", title, resourceUrl));
+        return PublishingStatus.SKIPPED;
+      }
+      
+      // download file
+      if (itemType.getDataType() == DataType.File && definition.isUploadFiles()) {
+        try {
+          FileName fn = getFileNameFromUrl(resourceUrl);
+          fileToUpload = downloadFile(new URL(resourceUrl), fn);
+        } catch (IOException ex) {
+          LOG.warn(String.format("Error downloading file '%s'. Registering URL only.", resourceUrl), ex);
+          fileToUpload = null;
+        }
+      }
+
       try {
 
         // generate token
         if (token == null) {
           token = generateToken();
         }
-       
-        String urlStr = getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null);
-
-        // If the WKA_RESOURCE_URL is empty after parsing the XML file, see if it was set on the 
-        // DataReference directly.
-        if (urlStr == null || urlStr.isEmpty()) {
-          urlStr = ((URI)ref.getAttributesMap().get(WKAConstants.WKA_RESOURCE_URL)).toString();
-        }
-
-        URL resourceUrl = new URL(urlStr);
-
-        ItemType itemType = ItemType.matchPattern(resourceUrl.toExternalForm()).stream().findFirst().orElse(null);
-        if (itemType == null || itemType.getDataType()!=DataType.URL) {
-          return PublishingStatus.SKIPPED;
-        }
-        
-        // find thumbnail URL
-        String sThumbnailUrl = StringUtils.trimToNull(getAttributeValue(attributes, WKAConstants.WKA_THUMBNAIL_URL, null));
-        URL thumbnailUrl = sThumbnailUrl!=null? new URL(sThumbnailUrl): null;
 
         // check if item exists
-        QueryResponse search = client.search(String.format("typekeywords:%s", String.format("src_uri_s=%s", src_uri_s)), 0, 0, token);
-        ItemEntry itemEntry = search!=null && search.results!=null && search.results.length>0? search.results[0]: null;
-        
-        if (itemEntry==null) {
+        ItemEntry itemEntry = searchForItem(src_uri_s);
+
+        if (itemEntry == null) {
           // add item if doesn't exist
-          ItemResponse response = addItem(getAttributeValue(attributes, WKAConstants.WKA_TITLE, null),
-                  getAttributeValue(attributes, WKAConstants.WKA_DESCRIPTION, null),
-                  resourceUrl, thumbnailUrl, 
-                  itemType, extractEnvelope(getAttributeValue(attributes, WKAConstants.WKA_BBOX, null)), typeKeywords);
+          ItemResponse response = addItem(
+                  title,
+                  description,
+                  new URL(resourceUrl),
+                  sThumbnailUrl != null ? new URL(sThumbnailUrl) : null,
+                  itemType,
+                  extractEnvelope(bbox),
+                  typeKeywords,
+                  fileToUpload
+          );
 
           if (response == null || !response.success) {
-            throw new DataOutputException(this, ref.getId(), String.format("Error adding item: %s", ref));
+            String error = response != null && response.error != null && response.error.message != null ? response.error.message : null;
+            throw new DataOutputException(this, ref.getId(), String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
           }
-          
+
           client.share(definition.getCredentials().getUserName(), definition.getFolderId(), response.id, true, true, null, token);
 
           return PublishingStatus.CREATED;
+
         } else if (itemEntry.owner.equals(definition.getCredentials().getUserName())) {
+
           itemEntry = client.readItem(itemEntry.id, token);
-          if (itemEntry==null) {
+          if (itemEntry == null) {
             throw new DataOutputException(this, ref.getId(), String.format("Unable to read item entry."));
           }
+
           // update item if does exist
-          ItemResponse response = updateItem(itemEntry.id,
+          ItemResponse response = updateItem(
+                  itemEntry.id,
                   itemEntry.owner,
                   itemEntry.ownerFolder,
-                  getAttributeValue(attributes, WKAConstants.WKA_TITLE, null),
-                  getAttributeValue(attributes, WKAConstants.WKA_DESCRIPTION, null),
-                  resourceUrl, thumbnailUrl,
-                  itemType, extractEnvelope(getAttributeValue(attributes, WKAConstants.WKA_BBOX, null)), typeKeywords);
+                  title,
+                  description,
+                  new URL(resourceUrl),
+                  sThumbnailUrl != null ? new URL(sThumbnailUrl) : null,
+                  itemType,
+                  extractEnvelope(bbox),
+                  typeKeywords,
+                  fileToUpload
+          );
+
           if (response == null || !response.success) {
-            throw new DataOutputException(this, ref.getId(), String.format("Error updating item: %s", ref));
+            String error = response != null && response.error != null && response.error.message != null ? response.error.message : null;
+            throw new DataOutputException(this, ref.getId(), String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
           }
+
           existing.remove(itemEntry.id);
+
           return PublishingStatus.UPDATED;
         } else {
           return PublishingStatus.SKIPPED;
@@ -191,107 +249,143 @@ import org.xml.sax.SAXException;
 
     } catch (MetaException | IOException | ParserConfigurationException | SAXException | URISyntaxException ex) {
       throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
+    } finally {
+      if (fileToUpload!=null) {
+        fileToUpload.delete();
+      }
     }
   }
-  
-  private Double [] extractEnvelope(String sBbox) {
-    Double [] envelope = null;
-    if (sBbox!=null) {
+  private ItemType createItemType(String resourceUrl) {
+
+    // check if the item is eligible for publishing
+    ItemType itemType = Stream.concat(
+            ItemType.matchExt(resourceUrl.substring(resourceUrl.lastIndexOf(".") + 1)).stream(),
+            ItemType.matchPattern(resourceUrl).stream()
+    ).findFirst().orElse(null);
+
+    if (itemType == null) {
+      return null;
+    }
+
+    switch (itemType.getDataType()) {
+      case Text:
+        return null;
+      case File:
+        if (!itemType.hasUniqueMimeType()) {
+          return null;
+        }
+        break;
+    }
+
+    return itemType;
+  }
+
+  private ItemEntry searchForItem(String src_uri_s) throws URISyntaxException, IOException {
+
+    QueryResponse search = client.search(String.format("typekeywords:%s", String.format("src_uri_s=%s", src_uri_s)), 0, 0, token);
+    ItemEntry itemEntry = search != null && search.results != null && search.results.length > 0 ? search.results[0] : null;
+    
+    return itemEntry;
+  }
+
+  private Double[] extractEnvelope(String sBbox) {
+    Double[] envelope = null;
+    if (sBbox != null) {
       String[] corners = sBbox.split(",");
-      if (corners!=null && corners.length==2) {
-        String [] minXminY = corners[0].split(" ");
-        String [] maxXmaxY = corners[1].split(" ");
-        if (minXminY!=null && minXminY.length==2 && maxXmaxY!=null && maxXmaxY.length==2) {
+      if (corners != null && corners.length == 2) {
+        String[] minXminY = corners[0].split(" ");
+        String[] maxXmaxY = corners[1].split(" ");
+        if (minXminY != null && minXminY.length == 2 && maxXmaxY != null && maxXmaxY.length == 2) {
           minXminY[0] = StringUtils.trimToEmpty(minXminY[0]);
           minXminY[1] = StringUtils.trimToEmpty(minXminY[1]);
           maxXmaxY[0] = StringUtils.trimToEmpty(maxXmaxY[0]);
           maxXmaxY[1] = StringUtils.trimToEmpty(maxXmaxY[1]);
 
-          Double minX = NumberUtils.isNumber(minXminY[0])? NumberUtils.createDouble(minXminY[0]): null;
-          Double minY = NumberUtils.isNumber(minXminY[1])? NumberUtils.createDouble(minXminY[1]): null;
-          Double maxX = NumberUtils.isNumber(maxXmaxY[0])? NumberUtils.createDouble(maxXmaxY[0]): null;
-          Double maxY = NumberUtils.isNumber(maxXmaxY[1])? NumberUtils.createDouble(maxXmaxY[1]): null;
+          Double minX = NumberUtils.isNumber(minXminY[0]) ? NumberUtils.createDouble(minXminY[0]) : null;
+          Double minY = NumberUtils.isNumber(minXminY[1]) ? NumberUtils.createDouble(minXminY[1]) : null;
+          Double maxX = NumberUtils.isNumber(maxXmaxY[0]) ? NumberUtils.createDouble(maxXmaxY[0]) : null;
+          Double maxY = NumberUtils.isNumber(maxXmaxY[1]) ? NumberUtils.createDouble(maxXmaxY[1]) : null;
 
-          if (minX!=null && minY!=null && maxX!=null && maxY!=null) {
-            envelope = new Double[]{minX,minY,maxX,maxY};
+          if (minX != null && minY != null && maxX != null && maxY != null) {
+            envelope = new Double[]{minX, minY, maxX, maxY};
           }
         }
       }
     }
     return envelope;
   }
-  
+
   private String getAttributeValue(MapAttribute attributes, String attributeName, String defaultValue) {
     Attribute attr = attributes.getNamedAttributes().get(attributeName);
     return attr != null ? attr.getValue() : defaultValue;
   }
 
   private MapAttribute extractMapAttributes(DataReference ref) throws MetaException, IOException, ParserConfigurationException, SAXException {
-      MapAttribute attributes = ref.getAttributesMap().values().stream()
-              .filter(o -> o instanceof MapAttribute)
-              .map(o -> (MapAttribute) o)
+    MapAttribute attributes = ref.getAttributesMap().values().stream()
+            .filter(o -> o instanceof MapAttribute)
+            .map(o -> (MapAttribute) o)
+            .findFirst()
+            .orElse(null);
+    if (attributes == null) {
+      Document doc = ref.getAttributesMap().values().stream()
+              .filter(o -> o instanceof Document)
+              .map(o -> (Document) o)
               .findFirst()
               .orElse(null);
-      if (attributes == null) {
-        Document doc = ref.getAttributesMap().values().stream()
-                .filter(o -> o instanceof Document)
-                .map(o -> (Document) o)
-                .findFirst()
-                .orElse(null);
-        if (doc != null) {
+      if (doc != null) {
+        attributes = metaAnalyzer.extract(doc);
+      } else {
+        if (ref.getContentType().contains(MimeType.APPLICATION_XML) || ref.getContentType().contains(MimeType.TEXT_XML)) {
+          String sXml = new String(ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML), "UTF-8");
+          DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+          factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+          factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+          factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+          factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+          factory.setXIncludeAware(false);
+          factory.setExpandEntityReferences(false);
+          factory.setNamespaceAware(true);
+          DocumentBuilder builder = factory.newDocumentBuilder();
+          doc = builder.parse(new InputSource(new StringReader(sXml)));
           attributes = metaAnalyzer.extract(doc);
-        } else {
-          if (ref.getContentType().contains(MimeType.APPLICATION_XML) || ref.getContentType().contains(MimeType.TEXT_XML)) {
-            String sXml = new String(ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML), "UTF-8");
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            factory.setXIncludeAware(false);
-            factory.setExpandEntityReferences(false);
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            doc = builder.parse(new InputSource(new StringReader(sXml)));
-            attributes = metaAnalyzer.extract(doc);
-          }
         }
       }
-      return attributes;
+    }
+    return attributes;
   }
 
-  private ItemResponse addItem(String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] envelope, String[] typeKeywords) throws IOException, URISyntaxException {
-    if (token==null) {
+  private ItemResponse addItem(String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double[] envelope, String[] typeKeywords, File fileToUpload) throws IOException, URISyntaxException {
+    if (token == null) {
       token = generateToken();
     }
     ItemResponse response = addItem(
             title,
             description,
             url, thumbnailUrl,
-            itemType, envelope, typeKeywords, token);
+            itemType, envelope, typeKeywords, fileToUpload, token);
     if (response.error != null && response.error.code == 498) {
       token = generateToken();
       response = addItem(
               title,
               description,
               url, thumbnailUrl,
-              itemType, envelope, typeKeywords, token);
+              itemType, envelope, typeKeywords, fileToUpload, token);
     }
     return response;
   }
 
-  private ItemResponse addItem(String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] envelope, String[] typeKeywords, String token) throws IOException, URISyntaxException {
+  private ItemResponse addItem(String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double[] envelope, String[] typeKeywords, File fileToUpload, String token) throws IOException, URISyntaxException {
     return client.addItem(
             definition.getCredentials().getUserName(),
             definition.getFolderId(),
             title,
             description,
             url, thumbnailUrl,
-            itemType, envelope, typeKeywords, null, token);
+            itemType, envelope, typeKeywords, null, fileToUpload, token);
   }
 
-  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] envelope, String[] typeKeywords) throws IOException, URISyntaxException {
-    if (token==null) {
+  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double[] envelope, String[] typeKeywords, File fileToUpload) throws IOException, URISyntaxException {
+    if (token == null) {
       token = generateToken();
     }
     ItemResponse response = updateItem(
@@ -300,8 +394,8 @@ import org.xml.sax.SAXException;
             folderId,
             title,
             description,
-            url, thumbnailUrl, 
-            itemType, envelope, typeKeywords, token);
+            url, thumbnailUrl,
+            itemType, envelope, typeKeywords, fileToUpload, token);
     if (response.error != null && response.error.code == 498) {
       token = generateToken();
       response = updateItem(
@@ -310,13 +404,13 @@ import org.xml.sax.SAXException;
               folderId,
               title,
               description,
-              url, thumbnailUrl, 
-              itemType, envelope, typeKeywords, token);
+              url, thumbnailUrl,
+              itemType, envelope, typeKeywords, fileToUpload, token);
     }
     return response;
   }
 
-  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] envelope, String[] typeKeywords, String token) throws IOException, URISyntaxException {
+  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double[] envelope, String[] typeKeywords, File fileToUpload, String token) throws IOException, URISyntaxException {
     return client.updateItem(
             owner,
             folderId,
@@ -324,11 +418,11 @@ import org.xml.sax.SAXException;
             title,
             description,
             url, thumbnailUrl,
-            itemType, envelope, typeKeywords, null, token);
+            itemType, envelope, typeKeywords, null, fileToUpload, token);
   }
-  
+
   private DeleteResponse deleteItem(String id, String owner, String folderId) throws URISyntaxException, IOException {
-    if (token==null) {
+    if (token == null) {
       token = generateToken();
     }
     DeleteResponse response = deleteItem(id, owner, folderId, token);
@@ -338,7 +432,7 @@ import org.xml.sax.SAXException;
     }
     return response;
   }
-  
+
   private DeleteResponse deleteItem(String id, String owner, String folderId, String token) throws URISyntaxException, IOException {
     return client.delete(id, owner, folderId, token);
   }
@@ -364,7 +458,8 @@ import org.xml.sax.SAXException;
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
-    this.client = new AgpClient(HttpClientBuilder.create().useSystemProperties().build(), definition.getHostUrl(),definition.getCredentials(), definition.getMaxRedirects());
+    this.httpClient = HttpClientBuilder.create().useSystemProperties().build();
+    this.client = new AgpClient(httpClient, definition.getHostUrl(), definition.getCredentials(), definition.getMaxRedirects());
 
     if (!context.canCleanup()) {
       preventCleanup = true;
@@ -379,29 +474,29 @@ import org.xml.sax.SAXException;
       try {
         String src_source_uri_s = URLEncoder.encode(context.getTask().getDataSource().getBrokerUri().toASCIIString(), "UTF-8");
         QueryResponse search = client.search(String.format("typekeywords:%s", String.format("src_source_uri_s=%s", src_source_uri_s)), 0, 0, generateToken(1));
-        while (search!=null && search.results!=null && search.results.length>0) {
-          existing.addAll(Arrays.asList(search.results).stream().map(i->i.id).collect(Collectors.toList()));
-          if (search.nextStart>0) {
+        while (search != null && search.results != null && search.results.length > 0) {
+          existing.addAll(Arrays.asList(search.results).stream().map(i -> i.id).collect(Collectors.toList()));
+          if (search.nextStart > 0) {
             search = client.search(String.format("typekeywords:%s", String.format("src_source_uri_s=%s", src_source_uri_s)), 0, search.nextStart, generateToken(1));
           } else {
             break;
           }
         }
-      } catch (URISyntaxException|IOException ex) {
+      } catch (URISyntaxException | IOException ex) {
         throw new DataProcessorException(String.format("Error collecting ids of existing items."), ex);
       }
     }
-    
+
     try {
       String folderId = StringUtils.trimToNull(definition.getFolderId());
-      if (folderId!=null) {
+      if (folderId != null) {
         FolderEntry[] folders = this.client.listFolders(definition.getCredentials().getUserName(), generateToken(1));
-        FolderEntry selectedFodler = folders!=null?
-                Arrays.stream(folders).filter(folder->folder.id!=null && folder.id.equals(folderId)).findFirst().orElse(
-                        Arrays.stream(folders).filter(folder->folder.title!=null && folder.title.equals(folderId)).findFirst().orElse(null)
-                ):
-                null;
-        if (selectedFodler!=null) {
+        FolderEntry selectedFodler = folders != null
+                ? Arrays.stream(folders).filter(folder -> folder.id != null && folder.id.equals(folderId)).findFirst().orElse(
+                        Arrays.stream(folders).filter(folder -> folder.title != null && folder.title.equals(folderId)).findFirst().orElse(null)
+                )
+                : null;
+        if (selectedFodler != null) {
           definition.setFolderId(selectedFodler.id);
         } else {
           definition.setFolderId(null);
@@ -409,7 +504,7 @@ import org.xml.sax.SAXException;
       } else {
         definition.setFolderId(null);
       }
-    } catch (IOException|URISyntaxException ex) {
+    } catch (IOException | URISyntaxException ex) {
       throw new DataProcessorException(String.format("Error listing folders for user: %s", definition.getCredentials().getUserName()), ex);
     }
   }
@@ -417,22 +512,24 @@ import org.xml.sax.SAXException;
   @Override
   public void terminate() {
     try {
-      if(definition.getCleanup() && !preventCleanup) {
+      if (definition.getCleanup() && !preventCleanup) {
         token = generateToken();
-        for (String id: existing) {
+        for (String id : existing) {
           ItemEntry item = client.readItem(id, token);
           deleteItem(item.id, item.owner, item.ownerFolder);
         }
       }
-      client.close();
-    } catch (IOException|URISyntaxException ex) {
+      if (client!=null) {
+        client.close();
+      }
+    } catch (IOException | URISyntaxException ex) {
       LOG.error(String.format("Error terminating broker."), ex);
     }
   }
 
   @Override
   public boolean hasAccess(SimpleCredentials creds) {
-    return definition.getCredentials()==null || definition.getCredentials().isEmpty()? true: definition.getCredentials().equals(creds);
+    return definition.getCredentials() == null || definition.getCredentials().isEmpty() ? true : definition.getCredentials().equals(creds);
   }
 
   private String fromatDate(Date date) {
@@ -440,4 +537,55 @@ import org.xml.sax.SAXException;
     return FORMATTER.format(zonedDateTime);
   }
 
+  private File downloadFile(URL fileToDownload, FileName fileName) throws IOException {
+    
+    File tempFile = File.createTempFile(fileName.name + "-", "." + fileName.ext);
+    
+    HttpGet request = new HttpGet(fileToDownload.toExternalForm());
+    try (
+            OutputStream outputStream = new FileOutputStream(tempFile);
+            CloseableHttpResponse response = httpClient.execute(request);
+            InputStream inputStream = response.getEntity().getContent();) {
+      IOUtils.copy(inputStream, outputStream);
+    }
+    return tempFile;
+  }
+
+  private FileName getFileNameFromUrl(String resourceUrl) {
+    String path = resourceUrl;
+    String fullName = path.substring(path.lastIndexOf("/")+1);
+    String ext = fullName.substring(fullName.lastIndexOf(".")+1);
+    String name = ext.length() < fullName.length()? fullName.substring(0, fullName.lastIndexOf(".")): fullName;
+    if (ext.equals(name))
+      ext = null;
+    
+    return new FileName(name, ext);
+  }
+  
+  private static class FileName {
+    public final String name;
+    public final String ext;
+
+    public FileName(String name, String ext) {
+      this.name = name;
+      this.ext = ext;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public String getExt() {
+      return ext;
+    }
+    
+    public String getFullName() {
+      return ext!=null? name + "." + ext: name;
+    }
+    
+    @Override
+    public String toString() {
+      return getFullName();
+    }
+  }
 }

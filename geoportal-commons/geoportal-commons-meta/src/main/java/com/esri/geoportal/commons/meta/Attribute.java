@@ -15,9 +15,14 @@
  */
 package com.esri.geoportal.commons.meta;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 /**
  * Attribute.
@@ -58,4 +63,32 @@ public interface Attribute {
    * @return array of attributes
    */
   default Attribute[] getAttributes() { return null; }
+  
+  /**
+   * Scans attribute for matching sub-attributes.
+   * @param pred predicate
+   * @return stream of matching attributes
+   */
+  default Stream<Map.Entry<String, Attribute>> scan(Predicate<Map.Entry<String, Attribute>> pred) {
+    ArrayList<Map.Entry<String, Attribute>> attributes = new ArrayList<>();
+    
+    Map.Entry<String, Attribute> thisAttribute = new ImmutablePair<>(null, this);
+    if (pred.test(thisAttribute)) {
+      attributes.add(thisAttribute);
+    }
+    
+    Map<String, Attribute> namedAttributes = getNamedAttributes();
+    if (namedAttributes!=null) {
+      attributes.addAll(namedAttributes.entrySet().stream().filter(e->pred.test(e)).collect(Collectors.toList()));
+      attributes.addAll(namedAttributes.entrySet().stream().flatMap(e->e.getValue().scan(pred)).collect(Collectors.toList()));
+    }
+    
+    Attribute[] arrAttributes = getAttributes();
+    if (arrAttributes!=null) {
+      attributes.addAll(Arrays.stream(arrAttributes).map(attr->new ImmutablePair<String,Attribute>(null, attr)).filter(e->pred.test(e)).collect(Collectors.toList()));
+      attributes.addAll(Arrays.stream(arrAttributes).flatMap(attr->attr.scan(pred)).collect(Collectors.toList()));
+    }
+    
+    return attributes.stream();
+  }
 }

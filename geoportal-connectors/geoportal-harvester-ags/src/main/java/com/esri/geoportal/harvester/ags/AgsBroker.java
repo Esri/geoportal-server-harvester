@@ -119,10 +119,12 @@ import java.net.URL;
 
   @Override
   public void terminate() {
-    try {
-      client.close();
-    } catch (IOException ex) {
-      LOG.error(String.format("Error terminating broker."), ex);
+    if (client!=null) {
+      try {
+        client.close();
+      } catch (IOException ex) {
+        LOG.error(String.format("Error terminating broker."), ex);
+      }
     }
   }
 
