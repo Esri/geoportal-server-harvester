@@ -24,6 +24,7 @@ import com.esri.geoportal.commons.agp.client.ItemResponse;
 import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.agp.client.QueryResponse;
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.doc.DocUtils;
 import com.esri.geoportal.commons.meta.ArrayAttribute;
 import com.esri.geoportal.commons.meta.Attribute;
 import com.esri.geoportal.commons.meta.MapAttribute;
@@ -32,6 +33,7 @@ import com.esri.geoportal.commons.meta.MetaException;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import com.esri.geoportal.commons.meta.util.WKAConstants;
+import com.esri.geoportal.commons.pdf.PdfUtils;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
@@ -86,6 +88,7 @@ import org.xml.sax.SAXException;
   private final AgpOutputConnector connector;
   private final AgpOutputBrokerDefinitionAdaptor definition;
   private final MetaAnalyzer metaAnalyzer;
+  private final String geometryServiceUrl;
   private CloseableHttpClient httpClient;
   private AgpClient client;
   private String token;
@@ -99,19 +102,41 @@ import org.xml.sax.SAXException;
    * @param definition
    * @param metaAnalyzer
    */
-  public AgpOutputBroker(AgpOutputConnector connector, AgpOutputBrokerDefinitionAdaptor definition, MetaAnalyzer metaAnalyzer) {
+  public AgpOutputBroker(AgpOutputConnector connector, AgpOutputBrokerDefinitionAdaptor definition, MetaAnalyzer metaAnalyzer, String geometryServiceUrl) {
     this.connector = connector;
     this.definition = definition;
     this.metaAnalyzer = metaAnalyzer;
+    this.geometryServiceUrl = geometryServiceUrl;
   }
 
   @Override
   public PublishingStatus publish(DataReference ref) throws DataOutputException {
     File fileToUpload = null;
+    boolean deleteTempFile = false;
     
     try {
+
+      byte[] content    = null;
+
+      if (ref.getContent(MimeType.APPLICATION_PDF) != null) {
+        content = PdfUtils.generateMetadataXML(ref.getContent(MimeType.APPLICATION_PDF), ref.getSourceUri().getPath(), ref.getSourceUri().toASCIIString(), geometryServiceUrl); 
+        
+      } else if (ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML) != null) {        	
+        content = ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML);
+
+      } else {       
+          final MimeType [] toBeSkipped = new MimeType[]{MimeType.APPLICATION_PDF, MimeType.APPLICATION_XML, MimeType.TEXT_XML, MimeType.APPLICATION_JSON};
+          Set <MimeType> types      = ref.getContentType().stream()
+                  .filter(t->!Arrays.stream(toBeSkipped).anyMatch(s->s==t))
+                  .collect(Collectors.toSet());
+          if (!types.isEmpty()) {
+            byte[]         rawContent = ref.getContent(types.toArray(new MimeType[types.size()]));
+            content = rawContent!=null ? DocUtils.generateMetadataXML(rawContent, new File(ref.getId()).getName()) : null;
+          }
+      }
+        
       // extract map of attributes (normalized names)
-      MapAttribute attributes = extractMapAttributes(ref);
+      MapAttribute attributes = extractMapAttributes(ref, content);
 
       if (attributes == null) {
         throw new DataOutputException(this, ref.getId(), String.format("Error extracting attributes from data."));
@@ -170,8 +195,13 @@ import org.xml.sax.SAXException;
       // download file
       if (itemType.getDataType() == DataType.File && definition.isUploadFiles()) {
         try {
-          FileName fn = getFileNameFromUrl(resourceUrl);
-          fileToUpload = downloadFile(new URL(resourceUrl), fn);
+          if (new File(resourceUrl.replaceAll("^file://", "")).exists()) {
+            fileToUpload = new File(resourceUrl.replaceAll("^file://", ""));
+          } else {
+            FileName fn = getFileNameFromUrl(resourceUrl);
+            fileToUpload = downloadFile(new URL(resourceUrl), fn);
+            deleteTempFile = true;
+          }
         } catch (IOException ex) {
           LOG.warn(String.format("Error downloading file '%s'. Registering URL only.", resourceUrl), ex);
           fileToUpload = null;
@@ -250,7 +280,7 @@ import org.xml.sax.SAXException;
     } catch (MetaException | IOException | ParserConfigurationException | SAXException | URISyntaxException ex) {
       throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
     } finally {
-      if (fileToUpload!=null) {
+      if (fileToUpload!=null && deleteTempFile) {
         fileToUpload.delete();
       }
     }
@@ -320,7 +350,7 @@ import org.xml.sax.SAXException;
     return attr != null ? attr.getValue() : defaultValue;
   }
 
-  private MapAttribute extractMapAttributes(DataReference ref) throws MetaException, IOException, ParserConfigurationException, SAXException {
+  private MapAttribute extractMapAttributes(DataReference ref, byte [] content) throws MetaException, IOException, ParserConfigurationException, SAXException {
     MapAttribute attributes = ref.getAttributesMap().values().stream()
             .filter(o -> o instanceof MapAttribute)
             .map(o -> (MapAttribute) o)
@@ -337,6 +367,19 @@ import org.xml.sax.SAXException;
       } else {
         if (ref.getContentType().contains(MimeType.APPLICATION_XML) || ref.getContentType().contains(MimeType.TEXT_XML)) {
           String sXml = new String(ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML), "UTF-8");
+          DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+          factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+          factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+          factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+          factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+          factory.setXIncludeAware(false);
+          factory.setExpandEntityReferences(false);
+          factory.setNamespaceAware(true);
+          DocumentBuilder builder = factory.newDocumentBuilder();
+          doc = builder.parse(new InputSource(new StringReader(sXml)));
+          attributes = metaAnalyzer.extract(doc);
+        } else if (content!=null) {
+          String sXml = new String(content, "UTF-8");
           DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
           factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
           factory.setFeature("http://xml.org/sax/features/external-general-entities", false);

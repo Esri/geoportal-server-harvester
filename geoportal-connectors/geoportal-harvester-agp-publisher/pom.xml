@@ -21,5 +21,15 @@
             <artifactId>harvester-api-base</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>geoportal-commons-pdf</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>geoportal-commons-doc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>
