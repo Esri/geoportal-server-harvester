@@ -36,6 +36,7 @@
   <!-- Connectors -->
   <bean class="com.esri.geoportal.harvester.agp.AgpOutputConnector">
     <constructor-arg ref="metaAnalyzer"/>
+    <constructor-arg value="${geometry.service.url}"/>
   </bean>
   <bean class="com.esri.geoportal.harvester.agpsrc.AgpInputConnector">
     <constructor-arg ref="metaBuilder"/>
@@ -53,7 +54,9 @@
   <bean class="com.esri.geoportal.harvester.gptsrc.GptConnector"/>
   <bean class="com.esri.geoportal.harvester.csw.CswConnector"/>
   <bean class="com.esri.geoportal.harvester.folder.FolderConnector"/>
-  <bean class="com.esri.geoportal.harvester.gpt.GptConnector"/>
+  <bean class="com.esri.geoportal.harvester.gpt.GptConnector">
+    <constructor-arg value="${geometry.service.url}"/>
+  </bean>
   <bean class="com.esri.geoportal.harvester.unc.UncConnector"/>
   <bean class="com.esri.geoportal.harvester.waf.WafConnector"/>
   <bean class="com.esri.geoportal.harvester.migration.MigrationConnector"/>

@@ -27,21 +27,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * ArcGIS Portal output connector.
  */
 public class AgpOutputConnector implements OutputConnector<OutputBroker> {
   public static final String TYPE = "AGP-OUT";
+  private static final String DEFAULT_GEOMETRY_SERVICE = "https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer";
   
   private final MetaAnalyzer metaAnalyzer;
+  private final String geometryServiceUrl;
 
   /**
    * Creates instance of the connector.
    * @param metaAnalyzer meta analyzer
    */
-  public AgpOutputConnector(MetaAnalyzer metaAnalyzer) {
+  public AgpOutputConnector(MetaAnalyzer metaAnalyzer, String geometryServiceUrl) {
     this.metaAnalyzer = metaAnalyzer;
+    this.geometryServiceUrl = StringUtils.defaultIfBlank(geometryServiceUrl, DEFAULT_GEOMETRY_SERVICE);
   }
 
   @Override
@@ -51,7 +55,7 @@ public class AgpOutputConnector implements OutputConnector<OutputBroker> {
 
   @Override
   public OutputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
-    return new AgpOutputBroker(this, new AgpOutputBrokerDefinitionAdaptor(definition), metaAnalyzer);
+    return new AgpOutputBroker(this, new AgpOutputBrokerDefinitionAdaptor(definition), metaAnalyzer, geometryServiceUrl);
   }
 
   @Override

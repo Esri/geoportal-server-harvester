@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * GPT connector.
@@ -42,7 +43,7 @@ public class GptConnector implements OutputConnector<OutputBroker> {
   }
 
   public GptConnector(String geometryServiceUrl) {
-    this.geometryServiceUrl = geometryServiceUrl;
+    this.geometryServiceUrl = StringUtils.defaultIfBlank(geometryServiceUrl, DEFAULT_GEOMETRY_SERVICE);
   }
 
   @Override
