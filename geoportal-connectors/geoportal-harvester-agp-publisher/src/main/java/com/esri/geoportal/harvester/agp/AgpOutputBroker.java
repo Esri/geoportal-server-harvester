@@ -112,6 +112,7 @@ import org.xml.sax.SAXException;
   @Override
   public PublishingStatus publish(DataReference ref) throws DataOutputException {
     File fileToUpload = null;
+    boolean deleteTempFile = false;
     
     try {
 
@@ -194,8 +195,13 @@ import org.xml.sax.SAXException;
       // download file
       if (itemType.getDataType() == DataType.File && definition.isUploadFiles()) {
         try {
-          FileName fn = getFileNameFromUrl(resourceUrl);
-          fileToUpload = downloadFile(new URL(resourceUrl), fn);
+          if (new File(resourceUrl.replaceAll("^file://", "")).exists()) {
+            fileToUpload = new File(resourceUrl.replaceAll("^file://", ""));
+          } else {
+            FileName fn = getFileNameFromUrl(resourceUrl);
+            fileToUpload = downloadFile(new URL(resourceUrl), fn);
+            deleteTempFile = true;
+          }
         } catch (IOException ex) {
           LOG.warn(String.format("Error downloading file '%s'. Registering URL only.", resourceUrl), ex);
           fileToUpload = null;
@@ -274,7 +280,7 @@ import org.xml.sax.SAXException;
     } catch (MetaException | IOException | ParserConfigurationException | SAXException | URISyntaxException ex) {
       throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
     } finally {
-      if (fileToUpload!=null) {
+      if (fileToUpload!=null && deleteTempFile) {
         fileToUpload.delete();
       }
     }
