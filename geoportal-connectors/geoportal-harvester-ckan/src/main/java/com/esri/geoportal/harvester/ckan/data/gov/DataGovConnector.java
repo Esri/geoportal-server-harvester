@@ -80,6 +80,11 @@ public class DataGovConnector extends CkanConnector {
   }
 
   @Override
+  public void validateDefinition(EntityDefinition definition) throws InvalidDefinitionException {
+    new DataGovBrokerDefinitionAdaptor(definition);
+  }
+
+  @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new DataGovBroker(this, new DataGovBrokerDefinitionAdaptor(definition), metaBuilder);
   }
