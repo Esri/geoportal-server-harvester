@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.ckan.data.gov;
 import com.esri.geoportal.commons.ckan.client.Dataset;
 import com.esri.geoportal.commons.ckan.client.Extra;
 import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.harvester.api.DataContent;
@@ -85,7 +86,7 @@ import org.slf4j.LoggerFactory;
   public DataContent readContent(String id) throws DataInputException {
     try {
       URL xmlUrl = makeXmlUrl(id);
-      Content content = createContent(xmlUrl);
+      Content content = createContent(xmlUrl, null);
       SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, null, URI.create(id), td.getSource().getRef(), td.getRef());
       ref.addContext(MimeType.APPLICATION_XML, content.getData().getBytes("UTF-8"));
       return ref;
@@ -94,14 +95,14 @@ import org.slf4j.LoggerFactory;
     }
   }
 
-  private Content createContent(URL xmlUrl) throws URISyntaxException, IOException {
+  private Content createContent(URL xmlUrl, MapAttribute attributes) throws URISyntaxException, IOException {
     HttpGet req = new HttpGet(xmlUrl.toURI());
     try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
       String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
 
-      return new Content(responseContent, readContentType(httpResponse));
+      return new Content(responseContent, readContentType(httpResponse), attributes);
     }
   }
   
@@ -112,7 +113,7 @@ import org.slf4j.LoggerFactory;
       if (oid!=null) {
         try {
           URL xmlUrl = makeXmlUrl(oid);
-          return createContent(xmlUrl);
+          return createContent(xmlUrl, super.createContent(dataSet).getAttributes());
         } catch(URISyntaxException|IOException ex) {
           throw new DataInputException(this, String.format("Error reading metadata for object: %s", oid), ex);
         }

@@ -49,6 +49,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -56,6 +57,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -286,6 +288,8 @@ import org.xml.sax.SAXException;
     }
   }
   private ItemType createItemType(String resourceUrl) {
+    
+    resourceUrl = StringUtils.trimToEmpty(resourceUrl);
 
     // check if the item is eligible for publishing
     ItemType itemType = Stream.concat(
@@ -355,45 +359,46 @@ import org.xml.sax.SAXException;
             .filter(o -> o instanceof MapAttribute)
             .map(o -> (MapAttribute) o)
             .findFirst()
+            .orElse(new MapAttribute(Collections.emptyMap()));
+    
+    Document doc = ref.getAttributesMap().values().stream()
+            .filter(o -> o instanceof Document)
+            .map(o -> (Document) o)
+            .findFirst()
             .orElse(null);
-    if (attributes == null) {
-      Document doc = ref.getAttributesMap().values().stream()
-              .filter(o -> o instanceof Document)
-              .map(o -> (Document) o)
-              .findFirst()
-              .orElse(null);
-      if (doc != null) {
-        attributes = metaAnalyzer.extract(doc);
-      } else {
-        if (ref.getContentType().contains(MimeType.APPLICATION_XML) || ref.getContentType().contains(MimeType.TEXT_XML)) {
-          String sXml = new String(ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML), "UTF-8");
-          DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-          factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-          factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-          factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-          factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-          factory.setXIncludeAware(false);
-          factory.setExpandEntityReferences(false);
-          factory.setNamespaceAware(true);
-          DocumentBuilder builder = factory.newDocumentBuilder();
-          doc = builder.parse(new InputSource(new StringReader(sXml)));
-          attributes = metaAnalyzer.extract(doc);
-        } else if (content!=null) {
-          String sXml = new String(content, "UTF-8");
-          DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-          factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-          factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-          factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-          factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-          factory.setXIncludeAware(false);
-          factory.setExpandEntityReferences(false);
-          factory.setNamespaceAware(true);
-          DocumentBuilder builder = factory.newDocumentBuilder();
-          doc = builder.parse(new InputSource(new StringReader(sXml)));
-          attributes = metaAnalyzer.extract(doc);
-        }
+    
+    if (doc != null) {
+      attributes.getNamedAttributes().putAll(metaAnalyzer.extract(doc).getNamedAttributes());
+    } else {
+      if (ref.getContentType().contains(MimeType.APPLICATION_XML) || ref.getContentType().contains(MimeType.TEXT_XML)) {
+        String sXml = new String(ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML), "UTF-8");
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        factory.setXIncludeAware(false);
+        factory.setExpandEntityReferences(false);
+        factory.setNamespaceAware(true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        doc = builder.parse(new InputSource(new StringReader(sXml)));
+        attributes.getNamedAttributes().putAll(metaAnalyzer.extract(doc).getNamedAttributes());
+      } else if (content!=null) {
+        String sXml = new String(content, "UTF-8");
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        factory.setXIncludeAware(false);
+        factory.setExpandEntityReferences(false);
+        factory.setNamespaceAware(true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        doc = builder.parse(new InputSource(new StringReader(sXml)));
+        attributes.getNamedAttributes().putAll(metaAnalyzer.extract(doc).getNamedAttributes());
       }
     }
+      
     return attributes;
   }
 
@@ -580,11 +585,13 @@ import org.xml.sax.SAXException;
     return FORMATTER.format(zonedDateTime);
   }
 
-  private File downloadFile(URL fileToDownload, FileName fileName) throws IOException {
+  private File downloadFile(URL fileToDownload, FileName fileName) throws IOException, URISyntaxException {
     
     File tempFile = File.createTempFile(fileName.name + "-", "." + fileName.ext);
     
-    HttpGet request = new HttpGet(fileToDownload.toExternalForm());
+    URI uri  = new URI(fileToDownload.getProtocol(), fileToDownload.getAuthority(), fileToDownload.getHost(), fileToDownload.getPort(), fileToDownload.getPath(), fileToDownload.getQuery(), fileToDownload.getRef());
+    
+    HttpGet request = new HttpGet(uri);
     try (
             OutputStream outputStream = new FileOutputStream(tempFile);
             CloseableHttpResponse response = httpClient.execute(request);

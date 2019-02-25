@@ -211,7 +211,7 @@ public class CkanBroker implements InputBroker {
 
       Document document = metaBuilder.create(new MapAttribute(attrs));
 
-      return new Content(XmlUtils.toString(document), MimeType.APPLICATION_XML);
+      return new Content(XmlUtils.toString(document), MimeType.APPLICATION_XML, new MapAttribute(attrs));
     } catch (MetaException | TransformerException ex) {
       throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
     }
@@ -234,6 +234,10 @@ public class CkanBroker implements InputBroker {
         ref.addContext(MimeType.APPLICATION_JSON, content.getData().getBytes("UTF-8"));
       } else {
         ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(dataSet).getBytes("UTF-8"));
+      }
+      
+      if (content.getAttributes()!=null) {
+        ref.getAttributesMap().put("properties", content.getAttributes());
       }
 
       return ref;
@@ -295,6 +299,10 @@ public class CkanBroker implements InputBroker {
       } else {
         ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(dataSet).getBytes("UTF-8"));
       }
+    }
+    
+    if (content.getAttributes()!=null) {
+      ref.getAttributesMap().put("properties",content.getAttributes());
     }
 
     return ref;
@@ -408,16 +416,19 @@ public class CkanBroker implements InputBroker {
 
     private final String data;
     private final MimeType contentType;
+    private final MapAttribute attributes;
 
     /**
      * Creates instance of the content.
      *
      * @param data content data
      * @param contentType content type
+     * @param attributes attributes
      */
-    public Content(String data, MimeType contentType) {
+    public Content(String data, MimeType contentType, MapAttribute attributes) {
       this.data = data;
       this.contentType = contentType;
+      this.attributes = attributes;
     }
 
     /**
@@ -436,6 +447,14 @@ public class CkanBroker implements InputBroker {
      */
     public MimeType getContentType() {
       return contentType;
+    }
+
+    /**
+     * Gets attributes.
+     * @return attributes
+     */
+    public MapAttribute getAttributes() {
+      return attributes;
     }
 
     @Override
