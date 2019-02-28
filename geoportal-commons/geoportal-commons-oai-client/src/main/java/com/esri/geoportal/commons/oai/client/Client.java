@@ -49,7 +49,9 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.utils.DateUtils;
 
 /**
  * OAI-PMH client.
@@ -88,6 +90,7 @@ public class Client implements Closeable {
 
   /**
    * Lists all available ids.
+   *
    * @param resumptionToken resumption token or <code>null</code>
    * @param since since date or <code>null</code>
    * @return list of the ids with the resumption token to continue
@@ -103,6 +106,22 @@ public class Client implements Closeable {
       String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
+      
+      if (httpResponse.getStatusLine().getStatusCode()==429 || httpResponse.getStatusLine().getStatusCode()==503) {
+        Date retryAfter = getRetryAfter(httpResponse);
+        if (retryAfter!=null) {
+          long delay = retryAfter.getTime()-System.currentTimeMillis();
+          if (delay>0) {
+            LOG.debug(String.format("Harvestiong suspended for %d milliseconds.", delay));
+            try {
+              Thread.sleep(delay);
+            } catch (InterruptedException ex) {
+              // ignore
+            }
+          }
+          return listIds(resumptionToken, since);
+        }
+      }
 
       if (httpResponse.getStatusLine().getStatusCode() >= 400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
@@ -111,12 +130,12 @@ public class Client implements Closeable {
       Document responseDoc = parseDocument(responseContent);
 
       XPath xPath = XPathFactory.newInstance().newXPath();
-      
-      String errorCode = StringUtils.stripToNull((String)xPath.evaluate("/OAI-PMH/error/@code", responseDoc, XPathConstants.STRING));
-      if (errorCode!=null) {
+
+      String errorCode = StringUtils.stripToNull((String) xPath.evaluate("/OAI-PMH/error/@code", responseDoc, XPathConstants.STRING));
+      if (errorCode != null) {
         throw new HttpResponseException(HttpStatus.SC_BAD_REQUEST, String.format("Invalid OAI-PMH response with code: %s", errorCode));
       }
-      
+
       Node listIdentifiersNode = (Node) xPath.evaluate("/OAI-PMH/ListIdentifiers", responseDoc, XPathConstants.NODE);
 
       ListIdsResponse response = new ListIdsResponse();
@@ -143,6 +162,7 @@ public class Client implements Closeable {
 
   /**
    * Reads record.
+   *
    * @param id records id
    * @return record
    * @throws IOException if error reading record
@@ -158,6 +178,22 @@ public class Client implements Closeable {
       String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
+      
+      if (httpResponse.getStatusLine().getStatusCode()==429 || httpResponse.getStatusLine().getStatusCode()==503) {
+        Date retryAfter = getRetryAfter(httpResponse);
+        if (retryAfter!=null) {
+          long delay = retryAfter.getTime()-System.currentTimeMillis();
+          if (delay>0) {
+            LOG.debug(String.format("Harvestiong suspended for %d milliseconds.", delay));
+            try {
+              Thread.sleep(delay);
+            } catch (InterruptedException ex) {
+              // ignore
+            }
+          }
+          return readRecord(id);
+        }
+      }
 
       if (httpResponse.getStatusLine().getStatusCode() >= 400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
@@ -165,18 +201,18 @@ public class Client implements Closeable {
 
       Document responseDoc = parseDocument(responseContent);
       XPath xPath = XPathFactory.newInstance().newXPath();
-      
-      String errorCode = StringUtils.stripToNull((String)xPath.evaluate("/OAI-PMH/error/@code", responseDoc, XPathConstants.STRING));
-      if (errorCode!=null) {
+
+      String errorCode = StringUtils.stripToNull((String) xPath.evaluate("/OAI-PMH/error/@code", responseDoc, XPathConstants.STRING));
+      if (errorCode != null) {
         throw new HttpResponseException(HttpStatus.SC_BAD_REQUEST, String.format("Invalid OAI-PMH response with code: %s", errorCode));
       }
-      
+
       Node metadataNode = (Node) xPath.evaluate("/OAI-PMH/GetRecord/record/metadata/*[1]", responseDoc, XPathConstants.NODE);
-      
-      if (metadataNode==null) {
+
+      if (metadataNode == null) {
         throw new IOException("Error reading metadata");
       }
-      
+
       Document metadataDocument = emptyDocument();
       metadataDocument.appendChild(metadataDocument.importNode(metadataNode, true));
 
@@ -217,11 +253,26 @@ public class Client implements Closeable {
     InputSource is = new InputSource(new StringReader(document));
     return builder.parse(is);
   }
-  
+
   private Document emptyDocument() throws ParserConfigurationException {
     DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
     DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-    Document metadataDocument = docBuilder.newDocument();        
+    Document metadataDocument = docBuilder.newDocument();
     return metadataDocument;
+  }
+
+  private Date getRetryAfter(HttpResponse response) {
+    org.apache.http.Header retryAfterHeader = response.getFirstHeader("Retry-After");
+    if (retryAfterHeader != null) {
+      Date parseDate = DateUtils.parseDate(retryAfterHeader.getValue());
+      if (parseDate!=null) {
+        return parseDate;
+      }
+      try {
+        return new Date(System.currentTimeMillis() + 1000L * Integer.valueOf(retryAfterHeader.getValue()));
+      } catch (NumberFormatException e) {
+      }
+    }
+    return null;
   }
 }
