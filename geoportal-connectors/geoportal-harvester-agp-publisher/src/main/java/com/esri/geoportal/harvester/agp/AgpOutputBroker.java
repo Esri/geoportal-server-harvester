@@ -57,8 +57,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -359,7 +359,7 @@ import org.xml.sax.SAXException;
             .filter(o -> o instanceof MapAttribute)
             .map(o -> (MapAttribute) o)
             .findFirst()
-            .orElse(new MapAttribute(Collections.emptyMap()));
+            .orElse(new MapAttribute(new HashMap<String, Attribute>()));
     
     Document doc = ref.getAttributesMap().values().stream()
             .filter(o -> o instanceof Document)
