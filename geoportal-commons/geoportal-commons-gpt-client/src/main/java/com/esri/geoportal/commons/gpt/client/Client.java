@@ -330,12 +330,12 @@ public class Client implements Closeable {
         JsonNode root = mapper.readTree(content);
         if (root.isObject() && root.has("_source") && root.get("_source").isObject() && root.get("_source").has("_json")) {
           JsonNode json = root.get("_source").get("_json");
-          content = mapper.writeValueAsString(json);
+          return mapper.writeValueAsString(json);
         }
       } catch (IOException ex) {
-        // ignore; return original content
+        // ignore
       }
-      return content;
+      return null;
     } catch (HttpResponseException ex) {
       if (ex.getStatusCode() == 401) {
         clearToken();
