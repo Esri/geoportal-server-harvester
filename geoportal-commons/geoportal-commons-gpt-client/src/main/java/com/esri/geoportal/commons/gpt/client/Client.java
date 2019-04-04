@@ -325,7 +325,17 @@ public class Client implements Closeable {
   public String readJson(String id) throws URISyntaxException, IOException {
     URI jsonUri = createJsonUri(id);
     try {
-      return readContent(jsonUri);
+      String content = readContent(jsonUri);
+      try {
+        JsonNode root = mapper.readTree(content);
+        if (root.isObject() && root.has("_source") && root.get("_source").isObject() && root.get("_source").has("_json")) {
+          JsonNode json = root.get("_source").get("_json");
+          content = mapper.writeValueAsString(json);
+        }
+      } catch (IOException ex) {
+        // ignore; return original content
+      }
+      return content;
     } catch (HttpResponseException ex) {
       if (ex.getStatusCode() == 401) {
         clearToken();
@@ -482,7 +492,7 @@ public class Client implements Closeable {
   }
 
   private URI createJsonUri(String id) throws URISyntaxException, IOException {
-    return new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/json"))
+    return new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id))
             .addParameter("access_token", getAccessToken())
             .build();
   }
