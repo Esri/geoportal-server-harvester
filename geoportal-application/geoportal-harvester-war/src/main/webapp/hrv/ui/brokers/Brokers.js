@@ -29,6 +29,7 @@ define(["dojo/_base/declare",
         "dojo/topic",
         "dijit/Dialog",
         "dijit/form/Button",
+        "dijit/form/CheckBox",
         "hrv/rest/Brokers",
         "hrv/ui/brokers/Broker",
         "hrv/ui/brokers/BrokerEditorPane"
@@ -37,7 +38,7 @@ define(["dojo/_base/declare",
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
            lang,array,on,html,domConstruct,json,topic,
-           Dialog,Button,
+           Dialog,Button,CheckBox,
            BrokersREST,Broker,BrokerEditorPane
           ){
   
@@ -45,11 +46,12 @@ define(["dojo/_base/declare",
       i18n: i18n,
       templateString: template,
       widgets: [],
+      response: null,
     
       postCreate: function(){
         this.inherited(arguments);
         html.set(this.captionNode,this.i18n.brokers[this.category]);
-        this.load();
+        this.load(this.groupByCheckBox.get('checked'));
       },
       
       destroy: function() {
@@ -62,12 +64,16 @@ define(["dojo/_base/declare",
           widget.destroy();
         });
         this.widgets = [];
+        domConstruct.empty(this.contentNode);
         topic.publish("msg");
       },
       
-      load: function() {
+      load: function(grouping) {
         BrokersREST[this.category]().then(
-          lang.hitch(this,this.processBrokers),
+          lang.hitch(this,function(response){ 
+            this.response = response;
+            this.processBrokers(response, grouping); 
+          }),
           lang.hitch(this,function(error){
             console.error(error);
             topic.publish("msg", new Error(this.i18n.brokers.errors.access));
@@ -75,22 +81,73 @@ define(["dojo/_base/declare",
         );
       },
       
-      processBrokers: function(response) {
-        response = response.sort(function(a,b){
-          var t1 = a.brokerDefinition.label;
-          t1 = t1? t1.toLowerCase(): "";
-          var t2 = b.brokerDefinition.label;
-          t2 = t2? t2.toLowerCase(): "";
-          if (t1<t2) return -1;
-          if (t1>t2) return 1;
-          return 0;
-        });
-        this.clear();
-        array.forEach(response,lang.hitch(this,this.processBroker));
+      compareBrokerDefinitons: function(bd1, bd2) {
+        var t1 = bd1.label;
+        t1 = t1? t1.toLowerCase(): "";
+        var t2 = bd2.label;
+        t2 = t2? t2.toLowerCase(): "";
+        if (t1<t2) return -1;
+        if (t1>t2) return 1;
+        return 0;
       },
       
-      processBroker: function(broker) {
-        var widget = new Broker(broker).placeAt(this.contentNode);
+      processGroup: function(group) {
+        if (group.brokers.length > 0) {
+          var brokers = group.brokers.sort(lang.hitch(this, function(a,b){
+            return this.compareBrokerDefinitons(a.brokerDefinition, b.brokerDefinition);
+          }));
+          
+          var placeholder = domConstruct.create("div", {class: "h-broker-group"}, this.contentNode);
+          array.forEach(brokers, lang.hitch(this, function(broker){
+            this.processBroker(placeholder, broker); 
+          }));
+        }
+      },
+      
+      processBrokers: function(response, grouping) {
+        if (grouping) {
+          
+          var groups = {};
+          array.forEach(response, function(broker){ 
+            var group = [];
+            if (groups[broker.brokerDefinition.type]) {
+              group = groups[broker.brokerDefinition.type];
+            } else {
+              groups[broker.brokerDefinition.type] = group;
+            }
+            group.push(broker);
+          });
+          
+          var groupsArray = [];
+          for (group in groups) {
+            groupsArray.push({
+              group: group,
+              brokers: groups[group]
+            });
+          }
+          groupsArray = groupsArray.sort(function(g1, g2){
+            return g1.group.localeCompare(g2.group);
+          });
+          
+          this.clear();
+          array.forEach(groupsArray, lang.hitch(this, this.processGroup));
+          
+        } else {
+          
+          response = response.sort(lang.hitch(this, function(a,b){
+            return this.compareBrokerDefinitons(a.brokerDefinition, b.brokerDefinition);
+          }));
+          this.clear();
+          array.forEach(response,lang.hitch(this,function(broker){ 
+            this.processBroker(this.contentNode, broker); 
+          }));
+          
+        }
+        
+      },
+      
+      processBroker: function(placeholder, broker) {
+        var widget = new Broker(broker).placeAt(placeholder);
         this.widgets.push(widget);
         
         widget.load = lang.hitch(this,this.load);
@@ -153,6 +210,11 @@ define(["dojo/_base/declare",
             topic.publish("msg", new Error(this.i18n.brokers.errors.creating));
           })
         );
+      },
+      
+      _onGroupByClicked: function(evt) {
+        this.clear();
+        this.processBrokers(this.response, evt);
       }
     });
 });

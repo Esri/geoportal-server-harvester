@@ -33,7 +33,7 @@ define({
     },
     
     header: {
-      caption: "Geoportal Server Harvester ver. 2.6.1",
+      caption: "Geoportal Server Harvester ver. 2.6.3",
       logout: "Log out"
     },
     
@@ -45,6 +45,7 @@ define({
     },
     
     brokers: {
+      groupBy: "Group by type",
       input: "Input brokers",
       output: "Output brokers",
       edit: "edit",

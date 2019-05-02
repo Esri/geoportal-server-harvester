@@ -69,6 +69,10 @@ html,body {
   margin-bottom: 2em;
 }
 
+.h-brokers-footer {
+  margin-top: 2em;
+}
+
 .h-brokers-content {
   display: table;
 }
@@ -78,6 +82,22 @@ html,body {
   font-weight: bold;
   background-color: lightgray;
   padding-left: 0.5em;
+}
+
+.h-brokers-caption-text {
+  
+}
+
+.h-brokers-caption-grouping {
+  float: right;
+  font-weight: normal;
+  margin-right: 1em;
+}
+
+.h-broker-group {
+  border-bottom: lightgray 1px solid;
+  padding-bottom: 1em;
+  padding-top: 1em;
 }
 
 .h-broker {
@@ -94,11 +114,13 @@ html,body {
 }
 
 .h-broker-type {
+  min-width: 70px;
 }
 
 .h-broker-label {
   font-weight: bold;
   padding-left: 0.5em;
+  min-width: 150px;
 }
 
 .h-broker-edit {
