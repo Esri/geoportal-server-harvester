@@ -185,7 +185,7 @@ define(["dojo/_base/declare",
             lang.hitch({brokerEditorPane: brokerEditorPane, brokerEditorDialog: brokerEditorDialog, self: this},function(){
               this.brokerEditorDialog.destroy();
               this.brokerEditorPane.destroy();
-              this.self.load(this.groupByCheckBox.get('checked'));
+              this.self.load(this.self.groupByCheckBox.get('checked'));
             }),
             lang.hitch(this,function(error){
               console.error(error);
