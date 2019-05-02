@@ -37,6 +37,7 @@ import com.esri.geoportal.commons.meta.util.WKAConstants;
 import com.esri.geoportal.commons.meta.xml.SimpleDcMetaBuilder;
 import com.esri.geoportal.commons.utils.XmlUtils;
 import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
+import org.apache.commons.lang.StringUtils;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.http.impl.client.HttpClients;
@@ -107,11 +108,13 @@ public class PdfUtils {
         // Build out the XML metadata
         if (metaProps != null) {
             Properties props = new Properties();
-            props.put(WKAConstants.WKA_TITLE, metaProps.get(PdfUtils.PROP_TITLE));
-            props.put(WKAConstants.WKA_DESCRIPTION, metaProps.get(PdfUtils.PROP_SUBJECT));
-            props.put(WKAConstants.WKA_MODIFIED, metaProps.get(PdfUtils.PROP_MODIFICATION_DATE));
-            props.put(WKAConstants.WKA_BBOX, metaProps.getOrDefault(PdfUtils.PROP_BBOX, DEFAULT_BBOX));
-            props.put(WKAConstants.WKA_RESOURCE_URL, url);
+            SafeProperties safe = new SafeProperties(props);
+            
+            safe.put(WKAConstants.WKA_TITLE, metaProps.get(PdfUtils.PROP_TITLE));
+            safe.put(WKAConstants.WKA_DESCRIPTION, metaProps.get(PdfUtils.PROP_SUBJECT));
+            safe.put(WKAConstants.WKA_MODIFIED, metaProps.get(PdfUtils.PROP_MODIFICATION_DATE));
+            safe.put(WKAConstants.WKA_BBOX, metaProps.getOrDefault(PdfUtils.PROP_BBOX, DEFAULT_BBOX));
+            safe.put(WKAConstants.WKA_RESOURCE_URL, url);
 
             try {
                 MapAttribute attr = AttributeUtils.fromProperties(props);
@@ -169,7 +172,7 @@ public class PdfUtils {
 
                     if (info.getModificationDate() != null) {
                         ret.put(PROP_MODIFICATION_DATE, info.getModificationDate().getTime());
-                    } else {
+                    } else if (info.getCreationDate() != null) {
                         ret.put(PROP_MODIFICATION_DATE, info.getCreationDate().getTime());
                     }
                 } else {
@@ -518,5 +521,19 @@ public class PdfUtils {
         }
 
         return generateBbox(mp);
+    }
+    
+    private static class SafeProperties {
+      private final Properties props;
+
+      public SafeProperties(Properties props) {
+        this.props = props;
+      }
+      
+      public void put(String name, Object value) {
+        if (!StringUtils.isBlank(name) && value!=null) {
+          props.put(name, value);
+        }
+      }
     }
 }
