@@ -185,7 +185,7 @@ define(["dojo/_base/declare",
             lang.hitch({brokerEditorPane: brokerEditorPane, brokerEditorDialog: brokerEditorDialog, self: this},function(){
               this.brokerEditorDialog.destroy();
               this.brokerEditorPane.destroy();
-              this.self.load();
+              this.self.load(this.groupByCheckBox.get('checked'));
             }),
             lang.hitch(this,function(error){
               console.error(error);
@@ -203,7 +203,7 @@ define(["dojo/_base/declare",
         // use API to remove broker
         BrokersREST.delete(uuid).then(
           lang.hitch(this,function(){
-            this.load();
+            this.load(this.groupByCheckBox.get('checked'));
           }),
           lang.hitch(this,function(error){
             console.error(error);
