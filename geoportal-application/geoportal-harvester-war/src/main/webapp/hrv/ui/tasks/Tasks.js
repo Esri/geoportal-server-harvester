@@ -103,6 +103,7 @@ define(["dojo/_base/declare",
           tasks = this.sortTasks(tasks);
           array.forEach(tasks,lang.hitch(this,this.processTask));
         }
+        topic.publish("triggers.list");
       },
       
       sortTasks: function(tasks) {

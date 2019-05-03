@@ -45,7 +45,10 @@ define(["dojo/_base/declare",
       templateString: template,
     
       postCreate: function(){
-        topic.subscribe("nav",lang.hitch(this,this._onNav));
+        this.own(topic.subscribe("nav",lang.hitch(this,this._onNav)));
+        this.own(topic.subscribe("triggers.list", lang.hitch(this, function(){
+          this.loadTriggers();
+        })));
       },
       
       processProcesses: function(response) {
@@ -66,8 +69,12 @@ define(["dojo/_base/declare",
       },
       
       load: function() {
+        this.loadProcesses();
+        this.loadTriggers();
+      },
+      
+      loadProcesses: function() {
         domConstruct.empty(this.processesNode);
-        domConstruct.empty(this.triggersNode);
 
         ProcessesREST.list().then(
           lang.hitch(this,this.processProcesses),
@@ -75,6 +82,10 @@ define(["dojo/_base/declare",
             topic.publish("msg", new Error(this.i18n.processes.errors.loading));
           })
         );
+      },
+      
+      loadTriggers: function() {
+        domConstruct.empty(this.triggersNode);
 
         TriggersREST.list().then(
           lang.hitch(this,this.processTriggers),
@@ -85,7 +96,9 @@ define(["dojo/_base/declare",
       },
       
       processTriggers: function(response) {
+        this.triggers = response;
         array.forEach(response,lang.hitch(this,this.processSingleTrigger));
+        topic.publish("triggers.update", this.triggers);
       },
       
       processSingleTrigger: function(info) {

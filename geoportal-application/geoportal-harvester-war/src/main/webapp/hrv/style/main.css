@@ -412,6 +412,11 @@ html,body {
   padding-left: 0.5em;
 }
 
+.h-task-scheduled {
+  min-width: 8px;
+  font-weight: bolder;
+}
+
 .h-task-edit {
   text-decoration: underline;
   cursor: pointer;

@@ -59,6 +59,14 @@ define(["dojo/_base/declare",
     
       postCreate: function(){
         domAttr.set(this.exportNode,"href",TasksREST.export(this.data.uuid));
+        this.own(topic.subscribe("triggers.update", lang.hitch(this, function(triggers){
+          var scheduled = !!triggers.find(lang.hitch(this, function(trigger){return trigger.taskId===this.data.uuid}));
+          this.showTriggerMark(scheduled);
+        })));
+      },
+      
+      showTriggerMark: function(show) {
+        html.set(this.scheduledNode, show? "»": "");
       },
       
       _onRemove: function() {
@@ -139,7 +147,6 @@ define(["dojo/_base/declare",
             this.own(on(schedulerEditorPane,"submit",lang.hitch(this, function(evt){
               TasksREST.triggers(this.data.uuid).then(
                 lang.hitch(this,function(triggers){
-                  console.log("Triggers", triggers);
 
                   var deferred = [];
                   array.forEach(triggers,lang.hitch(this,function(trigger){
@@ -151,6 +158,7 @@ define(["dojo/_base/declare",
                       TasksREST.schedule(this.data.uuid,json.stringify(evt.triggerDefinition), evt.ignoreRobots, evt.incremental).then(
                         lang.hitch(this,function(response){
                           close();
+                          this.showTriggerMark(true);
                         }),
                         lang.hitch(this,function(error){
                           console.error(error);
@@ -160,6 +168,7 @@ define(["dojo/_base/declare",
                       );
                     } else {
                       close();
+                      this.showTriggerMark(false);
                     }
                   }),lang.hitch(this,function(error){
                     console.error(error);
