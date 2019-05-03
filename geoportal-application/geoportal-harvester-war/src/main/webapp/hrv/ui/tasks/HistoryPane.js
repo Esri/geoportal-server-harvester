@@ -45,7 +45,7 @@ define(["dojo/_base/declare",
       handles: [],
     
       postCreate: function(){
-        topic.subscribe("nav",lang.hitch(this,this._onNav));
+        this.own(topic.subscribe("nav",lang.hitch(this,this._onNav)));
         this.own(on(this, "event-clicked", lang.hitch(this, this._onEventClicked)));
       },
       

@@ -37,7 +37,7 @@ define(["dojo/_base/declare",
       templateString: template,
     
       postCreate: function(){
-        topic.subscribe("nav",lang.hitch(this,this._onNav));
+        this.own(topic.subscribe("nav",lang.hitch(this,this._onNav)));
       },
       
       _onNav: function(evt) {
