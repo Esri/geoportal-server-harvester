@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -196,7 +197,12 @@ public class Client implements IClient {
 
         if (!intermediateResult.isEmpty()) {
           try {
-            Transformer tr = TransformerFactory.newInstance().newTransformer();
+            TransformerFactory trFactory = TransformerFactory.newInstance();
+            trFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            trFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            trFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+      
+            Transformer tr = trFactory.newTransformer();
             tr.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
             tr.setOutputProperty(OutputKeys.INDENT, "yes");
 
