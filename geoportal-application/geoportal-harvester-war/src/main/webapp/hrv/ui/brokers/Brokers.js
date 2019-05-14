@@ -69,6 +69,9 @@ define(["dojo/_base/declare",
       },
       
       load: function(grouping) {
+        if (grouping===undefined) {
+          grouping = this.groupByCheckBox.get('checked');
+        }
         BrokersREST[this.category]().then(
           lang.hitch(this,function(response){ 
             this.response = response;
@@ -203,7 +206,7 @@ define(["dojo/_base/declare",
         // use API to remove broker
         BrokersREST.delete(uuid).then(
           lang.hitch(this,function(){
-            this.load(this.groupByCheckBox.get('checked'));
+            this.load();
           }),
           lang.hitch(this,function(error){
             console.error(error);
