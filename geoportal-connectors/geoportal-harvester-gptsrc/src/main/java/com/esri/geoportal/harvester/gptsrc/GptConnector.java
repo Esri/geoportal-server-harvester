@@ -48,8 +48,8 @@ public class GptConnector implements InputConnector<InputBroker> {
         return bundle.getString("gptsrc.hint");
       }
     });
-    arguments.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("gptsrc.username"), true));
-    arguments.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("gptsrc.password"), true) {
+    arguments.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("gptsrc.username")));
+    arguments.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("gptsrc.password")) {
       public boolean isPassword() {
         return true;
       }
