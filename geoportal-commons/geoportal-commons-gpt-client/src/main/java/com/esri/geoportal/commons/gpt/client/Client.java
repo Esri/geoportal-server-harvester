@@ -612,18 +612,22 @@ public class Client implements Closeable {
   }
 
   private URI createQueryUri(SearchContext searchContext) throws IOException, URISyntaxException {
+    URIBuilder builder;
+    
     if (searchContext._scroll_id == null) {
-      return new URIBuilder(url.toURI().resolve(createElasticSearchUrl()))
-              .addParameter("scroll", "1m")
-              .addParameter("access_token", getAccessToken())
-              .build();
+      builder = new URIBuilder(url.toURI().resolve(createElasticSearchUrl()))
+              .addParameter("scroll", "1m");
     } else {
-      return new URIBuilder(url.toURI().resolve(ELASTIC_SCROLL_URL))
+      builder = new URIBuilder(url.toURI().resolve(ELASTIC_SCROLL_URL))
               .addParameter("scroll_id", searchContext._scroll_id)
-              .addParameter("scroll", "1m")
-              .addParameter("access_token", getAccessToken())
-              .build();
+              .addParameter("scroll", "1m");
     }
+    
+    if (cred!=null && !cred.isEmpty()) {
+      builder = builder.addParameter("access_token", getAccessToken());
+    }
+    
+    return builder.build();
   }
 
   private <T> T execute(HttpUriRequest req, Class<T> clazz) throws IOException, URISyntaxException {
