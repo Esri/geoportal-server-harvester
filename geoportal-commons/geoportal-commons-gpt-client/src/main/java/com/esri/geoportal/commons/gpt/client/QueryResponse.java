@@ -84,9 +84,8 @@ import java.util.List;
             hits.hits.add(hit);
           }
         }
-        
-        //hits.hits = mapper.treeToValue(hitsNode, List.class);
       }
+      
       return hits;
     }
     
