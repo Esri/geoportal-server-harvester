@@ -129,7 +129,7 @@ public class Client implements Closeable {
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  public PublishResponse publish(PublishRequest data, Map<String,Object> attributes, String id, String xml, String json, boolean forceAdd) throws IOException, URISyntaxException {
+  public PublishResponse publish(PublishRequest data, Map<String, Object> attributes, String id, String xml, String json, boolean forceAdd) throws IOException, URISyntaxException {
 
     ObjectNode jsonRequest = mapper.convertValue(data, ObjectNode.class);
     if (xml != null) {
@@ -162,16 +162,16 @@ public class Client implements Closeable {
               northEast.add(xmax);
               northEast.add(ymax);
               envelope_geo.set("coordinates", coordinates);
-              
+
               jsonRequest.set("envelope_geo", envelope_geo);
-              
+
               double lon = (xmin + xmax) / 2.0;
               double lat = (ymin + ymax) / 2.0;
-              
+
               ObjectNode envelope_cen_pt = mapper.createObjectNode();
               envelope_cen_pt.put("lon", lon);
               envelope_cen_pt.put("lat", lat);
-              
+
               jsonRequest.set("envelope_cen_pt", envelope_cen_pt);
             }
 
@@ -223,26 +223,26 @@ public class Client implements Closeable {
       }
     }
 
-    for (Map.Entry<String,Object> entry: attributes.entrySet()) {
-      if (entry.getValue()==null) {
+    for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+      if (entry.getValue() == null) {
         jsonRequest.putNull(entry.getKey());
       } else {
         if (entry.getValue() instanceof String) {
-          jsonRequest.put(entry.getKey(), (String)entry.getValue());
-        } else if(entry.getValue() instanceof Double) {
-          jsonRequest.put(entry.getKey(), (Double)entry.getValue());
-        } else if(entry.getValue() instanceof BigDecimal) {
-          jsonRequest.put(entry.getKey(), ((BigDecimal)entry.getValue()).doubleValue());
-        } else if(entry.getValue() instanceof Float) {
-          jsonRequest.put(entry.getKey(), (Float)entry.getValue());
-        } else if(entry.getValue() instanceof Long) {
-          jsonRequest.put(entry.getKey(), (Long)entry.getValue());
-        } else if(entry.getValue() instanceof BigInteger) {
-          jsonRequest.put(entry.getKey(), ((BigInteger)entry.getValue()).longValue());
-        } else if(entry.getValue() instanceof Integer) {
-          jsonRequest.put(entry.getKey(), (Integer)entry.getValue());
-        } else if(entry.getValue() instanceof Boolean) {
-          jsonRequest.put(entry.getKey(), (Boolean)entry.getValue());
+          jsonRequest.put(entry.getKey(), (String) entry.getValue());
+        } else if (entry.getValue() instanceof Double) {
+          jsonRequest.put(entry.getKey(), (Double) entry.getValue());
+        } else if (entry.getValue() instanceof BigDecimal) {
+          jsonRequest.put(entry.getKey(), ((BigDecimal) entry.getValue()).doubleValue());
+        } else if (entry.getValue() instanceof Float) {
+          jsonRequest.put(entry.getKey(), (Float) entry.getValue());
+        } else if (entry.getValue() instanceof Long) {
+          jsonRequest.put(entry.getKey(), (Long) entry.getValue());
+        } else if (entry.getValue() instanceof BigInteger) {
+          jsonRequest.put(entry.getKey(), ((BigInteger) entry.getValue()).longValue());
+        } else if (entry.getValue() instanceof Integer) {
+          jsonRequest.put(entry.getKey(), (Integer) entry.getValue());
+        } else if (entry.getValue() instanceof Boolean) {
+          jsonRequest.put(entry.getKey(), (Boolean) entry.getValue());
         }
       }
     }
@@ -552,20 +552,26 @@ public class Client implements Closeable {
   private QueryResponse query(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
     URI uri = createQueryUri(searchContext);
     HttpEntity httpEntity = createQueryEntity(term, value, size, searchContext);
+    QueryResponse response = null;
     try {
-      QueryResponse response = query(uri, httpEntity);
-      searchContext._scroll_id = response._scroll_id;
+      response = query(uri, httpEntity);
       return response;
     } catch (HttpResponseException ex) {
       if (ex.getStatusCode() == 401) {
         clearToken();
         uri = createQueryUri(searchContext);
         httpEntity = createQueryEntity(term, value, size, searchContext);
-        QueryResponse response = query(uri, httpEntity);
-        searchContext._scroll_id = response._scroll_id;
+        response = query(uri, httpEntity);
         return response;
       } else {
         throw ex;
+      }
+    } finally {
+      deleteScroll(searchContext._scroll_id);
+      if (response!=null) {
+        searchContext._scroll_id = response._scroll_id;
+      } else {
+        searchContext._scroll_id = null;
       }
     }
   }
@@ -577,7 +583,7 @@ public class Client implements Closeable {
   private QueryResponse query(URI uri, HttpEntity httpEntity) throws IOException, URISyntaxException {
     HttpPost request = new HttpPost(uri);
     request.setEntity(httpEntity);
-    
+
     request.setConfig(DEFAULT_REQUEST_CONFIG);
     request.setHeader("Content-Type", "application/json");
     request.setHeader("User-Agent", HttpConstants.getUserAgent());
@@ -588,32 +594,32 @@ public class Client implements Closeable {
   private String createElasticSearchUrl() {
     return ELASTIC_SEARCH_URL.replaceAll("\\{metadata\\}", index);
   }
-  
+
   private HttpEntity createQueryEntity(String term, String value, long size, SearchContext searchContext) {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode node = mapper.createObjectNode();
     if (searchContext._scroll_id == null) {
       node.put("size", size);
-      if (term!=null && value!=null) {
+      if (term != null && value != null) {
         ObjectNode query = mapper.createObjectNode();
         node.set("query", query);
-        
+
         ObjectNode match = mapper.createObjectNode();
         query.set("match", match);
-        
+
         match.put(term, value);
       }
     } else {
       node.put("scroll", "1m");
       node.put("scroll_id", searchContext._scroll_id);
     }
-    
+
     return new StringEntity(node.toString(), ContentType.APPLICATION_JSON);
   }
 
   private URI createQueryUri(SearchContext searchContext) throws IOException, URISyntaxException {
     URIBuilder builder;
-    
+
     if (searchContext._scroll_id == null) {
       builder = new URIBuilder(url.toURI().resolve(createElasticSearchUrl()))
               .addParameter("scroll", "1m");
@@ -622,11 +628,11 @@ public class Client implements Closeable {
               .addParameter("scroll_id", searchContext._scroll_id)
               .addParameter("scroll", "1m");
     }
-    
-    if (cred!=null && !cred.isEmpty()) {
+
+    if (cred != null && !cred.isEmpty()) {
       builder = builder.addParameter("access_token", getAccessToken());
     }
-    
+
     return builder.build();
   }
 
@@ -657,7 +663,7 @@ public class Client implements Closeable {
     LocalDateTime now = LocalDateTime.now();
     if (tokenInfo == null || tokenInfo.validTill.minusSeconds(60).isBefore(now)) {
       Token token = generateToken();
-      if (token.access_token==null) {
+      if (token.access_token == null) {
         throw new IOException("Error obtaining access token");
       }
       TokenInfo ti = new TokenInfo();
@@ -688,16 +694,29 @@ public class Client implements Closeable {
     return execute(post, Token.class);
   }
 
+  private void deleteScroll(String scroll) {
+    try {
+      if (scroll != null) {
+        HttpDelete del = new HttpDelete(url.toURI().resolve(String.format("%s/%s", ELASTIC_SCROLL_URL, scroll)));
+        try (CloseableHttpResponse httpResponse = httpClient.execute(del);InputStream contentStream = httpResponse.getEntity().getContent();) {
+          String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
+          String responseContent = IOUtils.toString(contentStream, "UTF-8");
+          LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
+        }
+      }
+    } catch (Exception ex) {}
+  }
+  
   @Override
   public void close() throws IOException {
     if (httpClient instanceof Closeable) {
       ((Closeable) httpClient).close();
     }
   }
-
-  /**
-   * Search context.
-   */
+    
+    /**
+     * Search context.
+     */
   public static class SearchContext {
 
     public String _scroll_id;
