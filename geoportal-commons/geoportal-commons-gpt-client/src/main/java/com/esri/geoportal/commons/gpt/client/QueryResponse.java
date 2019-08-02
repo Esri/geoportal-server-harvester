@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -71,9 +72,20 @@ import java.util.List;
         }
       }
       
-      if (node.has("hits")) {
+      if (node.has("hits") && node.get("hits").isArray()) {
         JsonNode hitsNode = node.get("hits");
-        hits.hits = mapper.treeToValue(hitsNode, List.class);
+        for (int i=0; i<hitsNode.size(); i++) {
+          JsonNode hitNode = hitsNode.get(i);
+          Hit hit = mapper.treeToValue(hitNode, Hit.class);
+          if (hit!=null) {
+            if (hits.hits==null) {
+              hits.hits = new ArrayList<>();
+            }
+            hits.hits.add(hit);
+          }
+        }
+        
+        //hits.hits = mapper.treeToValue(hitsNode, List.class);
       }
       return hits;
     }
