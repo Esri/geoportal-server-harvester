@@ -534,6 +534,9 @@ public class Client implements Closeable {
                 .map(h -> h._id)
                 .filter(id -> id != null)
                 .collect(Collectors.toList()));
+        if (response.hits.hits.size() < size) {
+          break;
+        }
       }
     }
 
