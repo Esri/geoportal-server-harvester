@@ -520,20 +520,21 @@ public class Client implements Closeable {
    */
   private List<String> queryIds(String term, String value, long size) throws IOException, URISyntaxException {
     ArrayList<String> ids = new ArrayList<>();
-    SearchContext searchContext = new SearchContext();
-
-    while (true) {
-      QueryResponse response = query(term, value, size, searchContext);
-      if (Thread.currentThread().isInterrupted()) {
-        break;
+    
+    try (SearchContext searchContext = new SearchContext();) {
+      while (true) {
+        QueryResponse response = query(term, value, size, searchContext);
+        if (Thread.currentThread().isInterrupted()) {
+          break;
+        }
+        if (!response.hasHits()) {
+          break;
+        }
+        ids.addAll(response.hits.hits.stream()
+                .map(h -> h._id)
+                .filter(id -> id != null)
+                .collect(Collectors.toList()));
       }
-      if (response.hits == null || response.hits.hits == null || response.hits.hits.isEmpty()) {
-        break;
-      }
-      ids.addAll(response.hits.hits.stream()
-              .map(h -> h._id)
-              .filter(id -> id != null)
-              .collect(Collectors.toList()));
     }
 
     return ids;
@@ -567,12 +568,7 @@ public class Client implements Closeable {
         throw ex;
       }
     } finally {
-      deleteScroll(searchContext._scroll_id);
-      if (response!=null) {
-        searchContext._scroll_id = response._scroll_id;
-      } else {
-        searchContext._scroll_id = null;
-      }
+      searchContext.setScroll(response!=null && response.hasHits()? response._scroll_id: null);
     }
   }
 
@@ -693,19 +689,6 @@ public class Client implements Closeable {
 
     return execute(post, Token.class);
   }
-
-  private void deleteScroll(String scroll) {
-    try {
-      if (scroll != null) {
-        HttpDelete del = new HttpDelete(url.toURI().resolve(String.format("%s/%s", ELASTIC_SCROLL_URL, scroll)));
-        try (CloseableHttpResponse httpResponse = httpClient.execute(del);InputStream contentStream = httpResponse.getEntity().getContent();) {
-          String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
-          String responseContent = IOUtils.toString(contentStream, "UTF-8");
-          LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
-        }
-      }
-    } catch (Exception ex) {}
-  }
   
   @Override
   public void close() throws IOException {
@@ -717,9 +700,36 @@ public class Client implements Closeable {
     /**
      * Search context.
      */
-  public static class SearchContext {
-
+  private class SearchContext implements Closeable {
     public String _scroll_id;
+
+    @Override
+    public void close() throws IOException {
+      releaseScroll();
+    }
+    
+    public void releaseScroll() {
+      try {
+        if (_scroll_id != null) {
+          HttpDelete del = new HttpDelete(url.toURI().resolve(String.format("%s/%s", ELASTIC_SCROLL_URL, _scroll_id)));
+          try (CloseableHttpResponse httpResponse = httpClient.execute(del);) {
+            if (httpResponse.getStatusLine().getStatusCode()!=200) {
+              throw new IOException(String.format("Received %d with the attempt to delete scroll context.", httpResponse.getStatusLine().getStatusCode()));
+            }
+          }
+        }
+      } catch (Exception ex) {
+        LOG.warn(String.format("Error deleting scroll context: %s", _scroll_id));
+      } finally {
+        _scroll_id = null;
+      }
+    }
+    
+    public void setScroll(String scroll_id) {
+      releaseScroll();
+      this._scroll_id = scroll_id;
+    }
+    
   }
 
   /**

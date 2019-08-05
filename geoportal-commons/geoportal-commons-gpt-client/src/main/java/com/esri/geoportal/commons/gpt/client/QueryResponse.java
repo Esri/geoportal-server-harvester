@@ -41,6 +41,10 @@ import java.util.List;
   public String _scroll_id;
   public Hits hits;
  
+  public boolean hasHits() {
+    return hits!=null && hits.hits!=null && !hits.hits.isEmpty();
+  }
+  
   @JsonDeserialize(using = QueryResponse.HitsDeserializer.class)
   public static final class Hits {
     public long total;
