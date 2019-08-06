@@ -37,13 +37,14 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -70,12 +71,12 @@ import org.slf4j.LoggerFactory;
  */
 public class Client implements Closeable {
 
-  private final Logger LOG = LoggerFactory.getLogger(Client.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Client.class);
+  private static final int BATCH_SIZE = 500;
 
   private static final String DEFAULT_INDEX = "metadata";
   private static final String REST_ITEM_URL = "rest/metadata/item";
   private static final String ELASTIC_SEARCH_URL = "elastic/{metadata}/item/_search";
-  private static final String ELASTIC_SCROLL_URL = "elastic/_search/scroll";
   private static final String TOKEN_URL = "oauth/token";
 
   private final CloseableHttpClient httpClient;
@@ -250,7 +251,7 @@ public class Client implements Closeable {
     String strRequest = mapper.writeValueAsString(jsonRequest);
     StringEntity entity = new StringEntity(strRequest, "UTF-8");
 
-    List<String> ids = !forceAdd ? queryIds(data.src_uri_s) : Collections.emptyList();
+    List<String> ids = !forceAdd ? queryIds("src_uri_s", data.src_uri_s, 1) : Collections.emptyList();
 
     URI pubUri = id != null ? createItemUri(id) : !ids.isEmpty() ? createItemUri(ids.get(0)) : createItemsUri();
     try {
@@ -264,31 +265,6 @@ public class Client implements Closeable {
         throw ex;
       }
     }
-  }
-
-  private PublishResponse publish(URI uri, StringEntity entity, String owner) throws IOException, URISyntaxException {
-    HttpPut put = new HttpPut(uri);
-    put.setConfig(DEFAULT_REQUEST_CONFIG);
-    put.setEntity(entity);
-    put.setHeader("Content-Type", "application/json; charset=UTF-8");
-    put.setHeader("User-Agent", HttpConstants.getUserAgent());
-
-    PublishResponse response = execute(put, PublishResponse.class);
-    if (response.getError() == null && owner != null) {
-      changeOwner(response.getId(), owner);
-    }
-
-    return response;
-  }
-
-  private PublishResponse changeOwner(String id, String owner) throws IOException, URISyntaxException {
-    URI uri = createChangeOwnerUri(id, owner);
-    HttpPut put = new HttpPut(uri);
-    put.setConfig(DEFAULT_REQUEST_CONFIG);
-    put.setHeader("Content-Type", "application/json; charset=UTF-8");
-    put.setHeader("User-Agent", HttpConstants.getUserAgent());
-
-    return execute(put, PublishResponse.class);
   }
 
   /**
@@ -347,22 +323,6 @@ public class Client implements Closeable {
     }
   }
 
-  private String readContent(URI uri) throws URISyntaxException, IOException {
-    HttpGet get = new HttpGet(uri);
-    get.setConfig(DEFAULT_REQUEST_CONFIG);
-    get.setHeader("User-Agent", HttpConstants.getUserAgent());
-
-    try (CloseableHttpResponse httpResponse = httpClient.execute(get); InputStream contentStream = httpResponse.getEntity().getContent();) {
-      if (httpResponse.getStatusLine().getStatusCode() >= 400) {
-        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
-      }
-      String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
-      String responseContent = IOUtils.toString(contentStream, "UTF-8");
-      LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
-      return responseContent;
-    }
-  }
-
   /**
    * Reads metadata.
    *
@@ -386,14 +346,6 @@ public class Client implements Closeable {
     }
   }
 
-  private EntryRef readItem(URI uri) throws URISyntaxException, IOException {
-    HttpGet get = new HttpGet(uri);
-    get.setConfig(DEFAULT_REQUEST_CONFIG);
-    get.setHeader("User-Agent", HttpConstants.getUserAgent());
-    Hit hit = execute(get, Hit.class);
-    return new EntryRef(hit._id, readUri(hit._source, uri), readLastUpdated(hit._source, new Date()));
-  }
-
   /**
    * Returns listIds of ids.
    *
@@ -402,27 +354,14 @@ public class Client implements Closeable {
    * @throws URISyntaxException if URL has invalid syntax
    */
   public List<String> listIds() throws URISyntaxException, IOException {
-    return queryIds(null, null, 200);
+    return queryIds(null, null, BATCH_SIZE);
   }
-
-  private URI readUri(QueryResponse.Source source, URI defUri) {
-    if (source != null && source.src_uri_s != null) {
-      try {
-        return new URI(source.src_uri_s);
-      } catch (Exception ex) {
-      }
+  
+  @Override
+  public void close() throws IOException {
+    if (httpClient instanceof Closeable) {
+      ((Closeable) httpClient).close();
     }
-    return defUri;
-  }
-
-  private Date readLastUpdated(QueryResponse.Source source, Date defDate) {
-    if (source != null && source.src_lastupdate_dt != null) {
-      try {
-        return Date.from(ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(source.src_lastupdate_dt)).toInstant());
-      } catch (Exception ex) {
-      }
-    }
-    return defDate;
   }
 
   /**
@@ -434,7 +373,7 @@ public class Client implements Closeable {
    * @throws URISyntaxException if URL has invalid syntax
    */
   public List<String> queryBySource(String src_source_uri_s) throws IOException, URISyntaxException {
-    return queryIds("src_source_uri_s", src_source_uri_s, 200);
+    return queryIds("src_source_uri_s", src_source_uri_s, BATCH_SIZE);
   }
 
   /**
@@ -458,6 +397,75 @@ public class Client implements Closeable {
         throw ex;
       }
     }
+  }
+
+  private PublishResponse publish(URI uri, StringEntity entity, String owner) throws IOException, URISyntaxException {
+    HttpPut put = new HttpPut(uri);
+    put.setConfig(DEFAULT_REQUEST_CONFIG);
+    put.setEntity(entity);
+    put.setHeader("Content-Type", "application/json; charset=UTF-8");
+    put.setHeader("User-Agent", HttpConstants.getUserAgent());
+
+    PublishResponse response = execute(put, PublishResponse.class);
+    if (response.getError() == null && owner != null) {
+      changeOwner(response.getId(), owner);
+    }
+
+    return response;
+  }
+
+  private EntryRef readItem(URI uri) throws URISyntaxException, IOException {
+    HttpGet get = new HttpGet(uri);
+    get.setConfig(DEFAULT_REQUEST_CONFIG);
+    get.setHeader("User-Agent", HttpConstants.getUserAgent());
+    Hit hit = execute(get, Hit.class);
+    return new EntryRef(hit._id, readUri(hit._source, uri), readLastUpdated(hit._source, new Date()));
+  }
+
+  private String readContent(URI uri) throws URISyntaxException, IOException {
+    HttpGet get = new HttpGet(uri);
+    get.setConfig(DEFAULT_REQUEST_CONFIG);
+    get.setHeader("User-Agent", HttpConstants.getUserAgent());
+
+    try (CloseableHttpResponse httpResponse = httpClient.execute(get); InputStream contentStream = httpResponse.getEntity().getContent();) {
+      if (httpResponse.getStatusLine().getStatusCode() >= 400) {
+        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+      }
+      String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
+      String responseContent = IOUtils.toString(contentStream, "UTF-8");
+      LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
+      return responseContent;
+    }
+  }
+
+  private PublishResponse changeOwner(String id, String owner) throws IOException, URISyntaxException {
+    URI uri = createChangeOwnerUri(id, owner);
+    HttpPut put = new HttpPut(uri);
+    put.setConfig(DEFAULT_REQUEST_CONFIG);
+    put.setHeader("Content-Type", "application/json; charset=UTF-8");
+    put.setHeader("User-Agent", HttpConstants.getUserAgent());
+
+    return execute(put, PublishResponse.class);
+  }
+
+  private URI readUri(QueryResponse.Source source, URI defUri) {
+    if (source != null && source.src_uri_s != null) {
+      try {
+        return new URI(source.src_uri_s);
+      } catch (Exception ex) {
+      }
+    }
+    return defUri;
+  }
+
+  private Date readLastUpdated(QueryResponse.Source source, Date defDate) {
+    if (source != null && source.src_lastupdate_dt != null) {
+      try {
+        return Date.from(ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(source.src_lastupdate_dt)).toInstant());
+      } catch (Exception ex) {
+      }
+    }
+    return defDate;
   }
 
   private PublishResponse delete(URI uri) throws URISyntaxException, IOException {
@@ -498,87 +506,80 @@ public class Client implements Closeable {
   }
 
   /**
-   * Query items by src_uri_s.
-   *
-   * @param src_uri_s query
-   * @return query response
-   * @throws IOException if reading response fails
-   * @throws URISyntaxException if URL has invalid syntax
-   */
-  private List<String> queryIds(String src_uri_s) throws IOException, URISyntaxException {
-    return queryIds("src_uri_s", src_uri_s, 5);
-  }
-
-  /**
    * Query ids.
    *
    * @param term term to query
    * @param value value of the term
+   * @param batchSize batch size (note: size 1 indicates looking for the first only)
    * @return listIds of ids
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  private List<String> queryIds(String term, String value, long size) throws IOException, URISyntaxException {
-    ArrayList<String> ids = new ArrayList<>();
+  private List<String> queryIds(String term, String value, long batchSize) throws IOException, URISyntaxException {
+    Set<String> ids = new HashSet<>();
+    String search_after = null;
     
-    try (SearchContext searchContext = new SearchContext();) {
-      while (true) {
-        QueryResponse response = query(term, value, size, searchContext);
-        if (Thread.currentThread().isInterrupted()) {
-          break;
-        }
-        if (!response.hasHits()) {
-          break;
-        }
-        ids.addAll(response.hits.hits.stream()
-                .map(h -> h._id)
-                .filter(id -> id != null)
-                .collect(Collectors.toList()));
-        if (response.hits.hits.size() < size) {
-          break;
-        }
+    do {
+      ObjectNode root = mapper.createObjectNode();
+      root.put("size", batchSize);
+      root.set("_source", mapper.createArrayNode().add("_id"));
+      root.set("sort", mapper.createArrayNode().add(mapper.createObjectNode().put("_id", "asc")));
+      if (search_after!=null) {
+        root.set("search_after", mapper.createArrayNode().add(search_after));
       }
-    }
-
-    return ids;
-  }
-
-  /**
-   * Query items.
-   *
-   * @param term term name
-   * @param value value of the term
-   * @param size size
-   * @return query response
-   * @throws IOException if reading response fails
-   * @throws URISyntaxException if URL has invalid syntax
-   */
-  private QueryResponse query(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
-    URI uri = createQueryUri(searchContext);
-    HttpEntity httpEntity = createQueryEntity(term, value, size, searchContext);
-    QueryResponse response = null;
-    try {
-      response = query(uri, httpEntity);
-      return response;
-    } catch (HttpResponseException ex) {
-      if (ex.getStatusCode() == 401) {
-        clearToken();
-        uri = createQueryUri(searchContext);
-        httpEntity = createQueryEntity(term, value, size, searchContext);
-        response = query(uri, httpEntity);
-        return response;
-      } else {
-        throw ex;
+      if (term!=null && value!=null) {
+        root.set("query", mapper.createObjectNode().set("match", mapper.createObjectNode().put(term, value)));
       }
-    } finally {
-      searchContext.setScroll(response!=null && response.hasHits()? response._scroll_id: null);
-    }
+
+      String json = mapper.writeValueAsString(root);
+      HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+      URIBuilder builder = new URIBuilder(url.toURI().resolve(createElasticSearchUrl()));
+      if (cred != null && !cred.isEmpty()) {
+        builder = builder.addParameter("access_token", getAccessToken());
+      }
+
+      QueryResponse response = query(builder, entity);
+
+      search_after = null;
+      if (response!=null && response.hasHits()) {
+        List<String> responseIds = response.hits.hits.stream().map(hit->hit._id).collect(Collectors.toList());
+        ids.addAll(responseIds);
+
+        // if argument 'size' is 1 that means looking for the first one only; otherwise looking for every possible
+        search_after = batchSize > 1? responseIds.get(responseIds.size()-1): null;
+      }
+    } while (search_after!=null);
+
+    return ids.stream().collect(Collectors.toList());
   }
 
   private void clearToken() {
     tokenInfo = null;
   }
 
+  private QueryResponse query(URIBuilder builder, HttpEntity entity) throws IOException, URISyntaxException {
+    if (cred != null && !cred.isEmpty()) {
+      builder = builder.addParameter("access_token", getAccessToken());
+    }
+
+    QueryResponse response = null;
+    try {
+      response = query(builder.build(), entity);
+    } catch (HttpResponseException ex) {
+      if (ex.getStatusCode() == 401) {
+        clearToken();
+        if (cred != null && !cred.isEmpty()) {
+          builder = builder.addParameter("access_token", getAccessToken());
+        }
+        response = query(builder.build(), entity);
+      } else {
+        throw ex;
+      }
+    }
+
+    return response;
+  }
+  
   private QueryResponse query(URI uri, HttpEntity httpEntity) throws IOException, URISyntaxException {
     HttpPost request = new HttpPost(uri);
     request.setEntity(httpEntity);
@@ -592,47 +593,6 @@ public class Client implements Closeable {
 
   private String createElasticSearchUrl() {
     return ELASTIC_SEARCH_URL.replaceAll("\\{metadata\\}", index);
-  }
-
-  private HttpEntity createQueryEntity(String term, String value, long size, SearchContext searchContext) {
-    ObjectMapper mapper = new ObjectMapper();
-    ObjectNode node = mapper.createObjectNode();
-    if (searchContext._scroll_id == null) {
-      node.put("size", size);
-      if (term != null && value != null) {
-        ObjectNode query = mapper.createObjectNode();
-        node.set("query", query);
-
-        ObjectNode match = mapper.createObjectNode();
-        query.set("match", match);
-
-        match.put(term, value);
-      }
-    } else {
-      node.put("scroll", "1m");
-      node.put("scroll_id", searchContext._scroll_id);
-    }
-
-    return new StringEntity(node.toString(), ContentType.APPLICATION_JSON);
-  }
-
-  private URI createQueryUri(SearchContext searchContext) throws IOException, URISyntaxException {
-    URIBuilder builder;
-
-    if (searchContext._scroll_id == null) {
-      builder = new URIBuilder(url.toURI().resolve(createElasticSearchUrl()))
-              .addParameter("scroll", "1m");
-    } else {
-      builder = new URIBuilder(url.toURI().resolve(ELASTIC_SCROLL_URL))
-              .addParameter("scroll_id", searchContext._scroll_id)
-              .addParameter("scroll", "1m");
-    }
-
-    if (cred != null && !cred.isEmpty()) {
-      builder = builder.addParameter("access_token", getAccessToken());
-    }
-
-    return builder.build();
   }
 
   private <T> T execute(HttpUriRequest req, Class<T> clazz) throws IOException, URISyntaxException {
@@ -691,48 +651,6 @@ public class Client implements Closeable {
     post.setEntity(entity);
 
     return execute(post, Token.class);
-  }
-  
-  @Override
-  public void close() throws IOException {
-    if (httpClient instanceof Closeable) {
-      ((Closeable) httpClient).close();
-    }
-  }
-    
-    /**
-     * Search context.
-     */
-  private class SearchContext implements Closeable {
-    public String _scroll_id;
-
-    @Override
-    public void close() throws IOException {
-      releaseScroll();
-    }
-    
-    public void releaseScroll() {
-      try {
-        if (_scroll_id != null) {
-          HttpDelete del = new HttpDelete(url.toURI().resolve(String.format("%s/%s", ELASTIC_SCROLL_URL, _scroll_id)));
-          try (CloseableHttpResponse httpResponse = httpClient.execute(del);) {
-            if (httpResponse.getStatusLine().getStatusCode()!=200) {
-              throw new IOException(String.format("Received %d with the attempt to delete scroll context.", httpResponse.getStatusLine().getStatusCode()));
-            }
-          }
-        }
-      } catch (Exception ex) {
-        LOG.warn(String.format("Error deleting scroll context: %s", _scroll_id));
-      } finally {
-        _scroll_id = null;
-      }
-    }
-    
-    public void setScroll(String scroll_id) {
-      releaseScroll();
-      this._scroll_id = scroll_id;
-    }
-    
   }
 
   /**
