@@ -267,21 +267,6 @@ public class Client implements Closeable {
     }
   }
 
-  private PublishResponse publish(URI uri, StringEntity entity, String owner) throws IOException, URISyntaxException {
-    HttpPut put = new HttpPut(uri);
-    put.setConfig(DEFAULT_REQUEST_CONFIG);
-    put.setEntity(entity);
-    put.setHeader("Content-Type", "application/json; charset=UTF-8");
-    put.setHeader("User-Agent", HttpConstants.getUserAgent());
-
-    PublishResponse response = execute(put, PublishResponse.class);
-    if (response.getError() == null && owner != null) {
-      changeOwner(response.getId(), owner);
-    }
-
-    return response;
-  }
-
   /**
    * Reads metadata.
    *
@@ -361,14 +346,6 @@ public class Client implements Closeable {
     }
   }
 
-  private EntryRef readItem(URI uri) throws URISyntaxException, IOException {
-    HttpGet get = new HttpGet(uri);
-    get.setConfig(DEFAULT_REQUEST_CONFIG);
-    get.setHeader("User-Agent", HttpConstants.getUserAgent());
-    Hit hit = execute(get, Hit.class);
-    return new EntryRef(hit._id, readUri(hit._source, uri), readLastUpdated(hit._source, new Date()));
-  }
-
   /**
    * Returns listIds of ids.
    *
@@ -378,6 +355,71 @@ public class Client implements Closeable {
    */
   public List<String> listIds() throws URISyntaxException, IOException {
     return queryIds(null, null, BATCH_SIZE);
+  }
+  
+  @Override
+  public void close() throws IOException {
+    if (httpClient instanceof Closeable) {
+      ((Closeable) httpClient).close();
+    }
+  }
+
+  /**
+   * Query items by src_source_uri_s.
+   *
+   * @param src_source_uri_s query
+   * @return query response
+   * @throws IOException if reading response fails
+   * @throws URISyntaxException if URL has invalid syntax
+   */
+  public List<String> queryBySource(String src_source_uri_s) throws IOException, URISyntaxException {
+    return queryIds("src_source_uri_s", src_source_uri_s, BATCH_SIZE);
+  }
+
+  /**
+   * Deletes record by id.
+   *
+   * @param id record id
+   * @return publish response
+   * @throws IOException if reading response fails
+   * @throws URISyntaxException if URL has invalid syntax
+   */
+  public PublishResponse delete(String id) throws URISyntaxException, IOException {
+    URI deleteUri = createItemUri(id);
+    try {
+      return delete(deleteUri);
+    } catch (HttpResponseException ex) {
+      if (ex.getStatusCode() == 401) {
+        clearToken();
+        deleteUri = createItemUri(id);
+        return delete(deleteUri);
+      } else {
+        throw ex;
+      }
+    }
+  }
+
+  private PublishResponse publish(URI uri, StringEntity entity, String owner) throws IOException, URISyntaxException {
+    HttpPut put = new HttpPut(uri);
+    put.setConfig(DEFAULT_REQUEST_CONFIG);
+    put.setEntity(entity);
+    put.setHeader("Content-Type", "application/json; charset=UTF-8");
+    put.setHeader("User-Agent", HttpConstants.getUserAgent());
+
+    PublishResponse response = execute(put, PublishResponse.class);
+    if (response.getError() == null && owner != null) {
+      changeOwner(response.getId(), owner);
+    }
+
+    return response;
+  }
+
+  private EntryRef readItem(URI uri) throws URISyntaxException, IOException {
+    HttpGet get = new HttpGet(uri);
+    get.setConfig(DEFAULT_REQUEST_CONFIG);
+    get.setHeader("User-Agent", HttpConstants.getUserAgent());
+    Hit hit = execute(get, Hit.class);
+    return new EntryRef(hit._id, readUri(hit._source, uri), readLastUpdated(hit._source, new Date()));
   }
 
   private String readContent(URI uri) throws URISyntaxException, IOException {
@@ -424,41 +466,6 @@ public class Client implements Closeable {
       }
     }
     return defDate;
-  }
-
-  /**
-   * Query items by src_source_uri_s.
-   *
-   * @param src_source_uri_s query
-   * @return query response
-   * @throws IOException if reading response fails
-   * @throws URISyntaxException if URL has invalid syntax
-   */
-  public List<String> queryBySource(String src_source_uri_s) throws IOException, URISyntaxException {
-    return queryIds("src_source_uri_s", src_source_uri_s, BATCH_SIZE);
-  }
-
-  /**
-   * Deletes record by id.
-   *
-   * @param id record id
-   * @return publish response
-   * @throws IOException if reading response fails
-   * @throws URISyntaxException if URL has invalid syntax
-   */
-  public PublishResponse delete(String id) throws URISyntaxException, IOException {
-    URI deleteUri = createItemUri(id);
-    try {
-      return delete(deleteUri);
-    } catch (HttpResponseException ex) {
-      if (ex.getStatusCode() == 401) {
-        clearToken();
-        deleteUri = createItemUri(id);
-        return delete(deleteUri);
-      } else {
-        throw ex;
-      }
-    }
   }
 
   private PublishResponse delete(URI uri) throws URISyntaxException, IOException {
@@ -642,13 +649,6 @@ public class Client implements Closeable {
     post.setEntity(entity);
 
     return execute(post, Token.class);
-  }
-  
-  @Override
-  public void close() throws IOException {
-    if (httpClient instanceof Closeable) {
-      ((Closeable) httpClient).close();
-    }
   }
 
   /**
