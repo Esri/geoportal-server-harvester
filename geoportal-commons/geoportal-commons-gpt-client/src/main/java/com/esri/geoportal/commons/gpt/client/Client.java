@@ -251,7 +251,7 @@ public class Client implements Closeable {
     String strRequest = mapper.writeValueAsString(jsonRequest);
     StringEntity entity = new StringEntity(strRequest, "UTF-8");
 
-    List<String> ids = !forceAdd ? queryIds("src_uri_s", data.src_uri_s, BATCH_SIZE) : Collections.emptyList();
+    List<String> ids = !forceAdd ? queryIds("src_uri_s", data.src_uri_s, 1) : Collections.emptyList();
 
     URI pubUri = id != null ? createItemUri(id) : !ids.isEmpty() ? createItemUri(ids.get(0)) : createItemsUri();
     try {
@@ -510,17 +510,18 @@ public class Client implements Closeable {
    *
    * @param term term to query
    * @param value value of the term
+   * @param batchSize batch size (note: size 1 indicates looking for the first only)
    * @return listIds of ids
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  private List<String> queryIds(String term, String value, long size) throws IOException, URISyntaxException {
+  private List<String> queryIds(String term, String value, long batchSize) throws IOException, URISyntaxException {
     Set<String> ids = new HashSet<>();
     String search_after = null;
     
     do {
       ObjectNode root = mapper.createObjectNode();
-      root.put("size", size);
+      root.put("size", batchSize);
       root.set("_source", mapper.createArrayNode().add("_id"));
       root.set("sort", mapper.createArrayNode().add(mapper.createObjectNode().put("_id", "asc")));
       if (search_after!=null) {
@@ -544,7 +545,8 @@ public class Client implements Closeable {
         List<String> responseIds = response.hits.hits.stream().map(hit->hit._id).collect(Collectors.toList());
         ids.addAll(responseIds);
 
-        search_after = ids.size()<response.hits.total && response.hits.hits.size()>=size? responseIds.get(responseIds.size()-1): null;
+        // if argument 'size' is 1 that means looking for the first one only; otherwise looking for every possible
+        search_after = batchSize > 1? responseIds.get(responseIds.size()-1): null;
       }
     } while (search_after!=null);
 
