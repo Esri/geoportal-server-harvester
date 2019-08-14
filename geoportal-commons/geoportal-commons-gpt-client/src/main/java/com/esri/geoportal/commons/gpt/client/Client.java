@@ -519,24 +519,26 @@ public class Client implements Closeable {
     Set<String> ids = new HashSet<>();
     String search_after = null;
     
+    ObjectNode root = mapper.createObjectNode();
+    root.put("size", batchSize);
+    root.set("_source", mapper.createArrayNode().add("_id"));
+    root.set("sort", mapper.createArrayNode().add(mapper.createObjectNode().put("_id", "asc")));
+    if (term!=null && value!=null) {
+      root.set("query", mapper.createObjectNode().set("match", mapper.createObjectNode().put(term, value)));
+    }
+    
+    URIBuilder builder = new URIBuilder(url.toURI().resolve(createElasticSearchUrl()));
+    if (cred != null && !cred.isEmpty()) {
+      builder = builder.addParameter("access_token", getAccessToken());
+    }
+    
     do {
-      ObjectNode root = mapper.createObjectNode();
-      root.put("size", batchSize);
-      root.set("_source", mapper.createArrayNode().add("_id"));
-      root.set("sort", mapper.createArrayNode().add(mapper.createObjectNode().put("_id", "asc")));
       if (search_after!=null) {
         root.set("search_after", mapper.createArrayNode().add(search_after));
-      }
-      if (term!=null && value!=null) {
-        root.set("query", mapper.createObjectNode().set("match", mapper.createObjectNode().put(term, value)));
       }
 
       String json = mapper.writeValueAsString(root);
       HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-      URIBuilder builder = new URIBuilder(url.toURI().resolve(createElasticSearchUrl()));
-      if (cred != null && !cred.isEmpty()) {
-        builder = builder.addParameter("access_token", getAccessToken());
-      }
 
       QueryResponse response = query(builder, entity);
 
@@ -548,7 +550,7 @@ public class Client implements Closeable {
         // if argument 'size' is 1 that means looking for the first one only; otherwise looking for every possible
         search_after = batchSize > 1? responseIds.get(responseIds.size()-1): null;
       }
-    } while (search_after!=null);
+    } while (search_after!=null && !Thread.currentThread().isInterrupted());
 
     return ids.stream().collect(Collectors.toList());
   }
