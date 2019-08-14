@@ -37,6 +37,7 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -77,6 +78,7 @@ public class Client implements Closeable {
   private static final String DEFAULT_INDEX = "metadata";
   private static final String REST_ITEM_URL = "rest/metadata/item";
   private static final String ELASTIC_SEARCH_URL = "elastic/{metadata}/item/_search";
+  private static final String ELASTIC_SCROLL_URL = "elastic/_search/scroll";
   private static final String TOKEN_URL = "oauth/token";
 
   private final CloseableHttpClient httpClient;
@@ -356,7 +358,7 @@ public class Client implements Closeable {
   public List<String> listIds() throws URISyntaxException, IOException {
     return queryIds(null, null, BATCH_SIZE);
   }
-  
+
   @Override
   public void close() throws IOException {
     if (httpClient instanceof Closeable) {
@@ -510,7 +512,8 @@ public class Client implements Closeable {
    *
    * @param term term to query
    * @param value value of the term
-   * @param batchSize batch size (note: size 1 indicates looking for the first only)
+   * @param batchSize batch size (note: size 1 indicates looking for the first
+   * only)
    * @return listIds of ids
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
@@ -518,22 +521,22 @@ public class Client implements Closeable {
   private List<String> queryIds(String term, String value, long batchSize) throws IOException, URISyntaxException {
     Set<String> ids = new HashSet<>();
     String search_after = null;
-    
+
     ObjectNode root = mapper.createObjectNode();
     root.put("size", batchSize);
     root.set("_source", mapper.createArrayNode().add("_id"));
     root.set("sort", mapper.createArrayNode().add(mapper.createObjectNode().put("_id", "asc")));
-    if (term!=null && value!=null) {
+    if (term != null && value != null) {
       root.set("query", mapper.createObjectNode().set("match", mapper.createObjectNode().put(term, value)));
     }
-    
-    URIBuilder builder = new URIBuilder(url.toURI().resolve(createElasticSearchUrl()));
-    if (cred != null && !cred.isEmpty()) {
-      builder = builder.addParameter("access_token", getAccessToken());
-    }
-    
+
     do {
-      if (search_after!=null) {
+      URIBuilder builder = new URIBuilder(url.toURI().resolve(createElasticSearchUrl()));
+      if (cred != null && !cred.isEmpty()) {
+        builder = builder.addParameter("access_token", getAccessToken());
+      }
+    
+      if (search_after != null) {
         root.set("search_after", mapper.createArrayNode().add(search_after));
       }
 
@@ -541,22 +544,69 @@ public class Client implements Closeable {
       HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 
       QueryResponse response = query(builder, entity);
+      if (response!=null && response.status!=null && response.status==400 && search_after==null) {
+        // This indicates it could be an old version of Elastic Search behind the Geoportal.
+        // Fall back to using scroll API
+        return queryIdsScroll(term, value, batchSize);
+      }
 
       search_after = null;
-      if (response!=null && response.hasHits()) {
-        List<String> responseIds = response.hits.hits.stream().map(hit->hit._id).collect(Collectors.toList());
+      if (response != null && response.hasHits()) {
+        List<String> responseIds = response.hits.hits.stream().map(hit -> hit._id).collect(Collectors.toList());
         ids.addAll(responseIds);
 
         // if argument 'size' is 1 that means looking for the first one only; otherwise looking for every possible
-        search_after = batchSize > 1? responseIds.get(responseIds.size()-1): null;
+        search_after = batchSize > 1 ? responseIds.get(responseIds.size() - 1) : null;
       }
-    } while (search_after!=null && !Thread.currentThread().isInterrupted());
+    } while (search_after != null && !Thread.currentThread().isInterrupted());
 
     return ids.stream().collect(Collectors.toList());
   }
 
+  private List<String> queryIdsScroll(String term, String value, long size) throws IOException, URISyntaxException {
+    ArrayList<String> ids = new ArrayList<>();
+    SearchContext searchContext = new SearchContext();
+
+    while (!Thread.currentThread().isInterrupted()) {
+      QueryResponse response = query(term, value, size, searchContext);
+      if (Thread.currentThread().isInterrupted()) {
+        break;
+      }
+      if (response.hits == null || response.hits.hits == null || response.hits.hits.isEmpty()) {
+        break;
+      }
+      ids.addAll(response.hits.hits.stream()
+              .map(h -> h._id)
+              .filter(id -> id != null)
+              .collect(Collectors.toList()));
+    }
+
+    return ids;
+  }
+
   private void clearToken() {
     tokenInfo = null;
+  }
+
+  private QueryResponse query(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
+    URI uri = createQueryUri(searchContext);
+    HttpEntity httpEntity = createQueryEntity(term, value, size, searchContext);
+    try {
+      QueryResponse response = query(uri, httpEntity);
+      searchContext._scroll_id = response._scroll_id;
+      return response;
+    } catch (HttpResponseException ex) {
+      if (ex.getStatusCode() == 401) {
+        clearToken();
+        uri = createQueryUri(searchContext);
+        httpEntity = createQueryEntity(term, value, size, searchContext);
+        QueryResponse response = query(uri, httpEntity);
+        searchContext._scroll_id = response._scroll_id;
+        return response;
+      } else {
+        throw ex;
+      }
+    }
   }
 
   private QueryResponse query(URIBuilder builder, HttpEntity entity) throws IOException, URISyntaxException {
@@ -581,7 +631,7 @@ public class Client implements Closeable {
 
     return response;
   }
-  
+
   private QueryResponse query(URI uri, HttpEntity httpEntity) throws IOException, URISyntaxException {
     HttpPost request = new HttpPost(uri);
     request.setEntity(httpEntity);
@@ -595,6 +645,47 @@ public class Client implements Closeable {
 
   private String createElasticSearchUrl() {
     return ELASTIC_SEARCH_URL.replaceAll("\\{metadata\\}", index);
+  }
+
+  private HttpEntity createQueryEntity(String term, String value, long size, SearchContext searchContext) {
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode node = mapper.createObjectNode();
+    if (searchContext._scroll_id == null) {
+      node.put("size", size);
+      if (term != null && value != null) {
+        ObjectNode query = mapper.createObjectNode();
+        node.set("query", query);
+
+        ObjectNode match = mapper.createObjectNode();
+        query.set("match", match);
+
+        match.put(term, value);
+      }
+    } else {
+      node.put("scroll", "1m");
+      node.put("scroll_id", searchContext._scroll_id);
+    }
+
+    return new StringEntity(node.toString(), ContentType.APPLICATION_JSON);
+  }
+
+  private URI createQueryUri(SearchContext searchContext) throws IOException, URISyntaxException {
+    URIBuilder builder;
+
+    if (searchContext._scroll_id == null) {
+      builder = new URIBuilder(url.toURI().resolve(createElasticSearchUrl()))
+              .addParameter("scroll", "1m");
+    } else {
+      builder = new URIBuilder(url.toURI().resolve(ELASTIC_SCROLL_URL))
+              .addParameter("scroll_id", searchContext._scroll_id)
+              .addParameter("scroll", "1m");
+    }
+
+    if (cred != null && !cred.isEmpty()) {
+      builder = builder.addParameter("access_token", getAccessToken());
+    }
+
+    return builder.build();
   }
 
   private <T> T execute(HttpUriRequest req, Class<T> clazz) throws IOException, URISyntaxException {
@@ -653,6 +744,14 @@ public class Client implements Closeable {
     post.setEntity(entity);
 
     return execute(post, Token.class);
+  }
+
+  /**
+   * Search context.
+   */
+  public static class SearchContext {
+
+    public String _scroll_id;
   }
 
   /**

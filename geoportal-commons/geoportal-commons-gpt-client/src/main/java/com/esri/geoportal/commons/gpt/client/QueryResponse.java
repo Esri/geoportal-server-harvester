@@ -40,6 +40,7 @@ import java.util.List;
     
   public String _scroll_id;
   public Hits hits;
+  public Integer status;
  
   public boolean hasHits() {
     return hits!=null && hits.hits!=null && !hits.hits.isEmpty();
