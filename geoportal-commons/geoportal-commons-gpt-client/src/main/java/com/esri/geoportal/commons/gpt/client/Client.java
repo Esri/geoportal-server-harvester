@@ -478,15 +478,19 @@ public class Client implements Closeable {
   }
 
   private URI createItemsUri() throws URISyntaxException, IOException {
-    return new URIBuilder(url.toURI().resolve(REST_ITEM_URL))
-            .addParameter("access_token", getAccessToken())
-            .build();
+    URIBuilder b = new URIBuilder(url.toURI().resolve(REST_ITEM_URL));
+    if (cred != null && !cred.isEmpty()) {
+      b.addParameter("access_token", getAccessToken());
+    }
+    return b.build();
   }
 
   private URI createItemUri(String id) throws URISyntaxException, IOException {
-    return new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id))
-            .addParameter("access_token", getAccessToken())
-            .build();
+    URIBuilder b = new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id));
+    if (cred != null && !cred.isEmpty()) {
+      b.addParameter("access_token", getAccessToken());
+    }
+    return b.build();
   }
 
   private URI createChangeOwnerUri(String id, String owner) throws URISyntaxException, IOException {
@@ -496,15 +500,19 @@ public class Client implements Closeable {
   }
 
   private URI createXmlUri(String id) throws URISyntaxException, IOException {
-    return new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/xml"))
-            .addParameter("access_token", getAccessToken())
-            .build();
+    URIBuilder b = new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/xml"));
+    if (cred != null && !cred.isEmpty()) {
+      b.addParameter("access_token", getAccessToken());
+    }
+    return b.build();
   }
 
   private URI createJsonUri(String id) throws URISyntaxException, IOException {
-    return new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id))
-            .addParameter("access_token", getAccessToken())
-            .build();
+    URIBuilder b = new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id));
+    if (cred != null && !cred.isEmpty()) {
+      b.addParameter("access_token", getAccessToken());
+    }
+    return b.build();
   }
 
   /**
