@@ -26,8 +26,9 @@ import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.time.Duration;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
@@ -160,11 +161,12 @@ public class PeriodTrigger implements Trigger {
           future = service.submit(runnable);
         } else {
           TemporalAmount tempAmt = parseTemporalAmount(triggerDefinition.getProperties().get(T_PERIOD));
-          Instant due = (Instant)tempAmt.addTo(lastHarvest.toInstant());
+          LocalDateTime lh = LocalDateTime.ofInstant(lastHarvest.toInstant(), ZoneId.systemDefault() );
+          LocalDateTime nh = lh.plus(tempAmt);
+          long delay = (nh.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - lh.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())/1000/60;
           
-          long delay = (due.toEpochMilli()-new Date().getTime())/1000/60;
           if (delay>0) {
-            LOG.info(String.format("Task is scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition()));
+            LOG.info(String.format("Task is scheduled to be run in %d minutes: %s", delay, triggerDefinition.getTaskDefinition()));
             future = service.schedule(runnable, delay, TimeUnit.MINUTES);
           } else {
             LOG.info(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition()));
