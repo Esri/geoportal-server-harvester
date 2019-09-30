@@ -42,6 +42,7 @@ public class AgpOutputConnector implements OutputConnector<OutputBroker> {
   /**
    * Creates instance of the connector.
    * @param metaAnalyzer meta analyzer
+   * @param geometryServiceUrl geometry service URL
    */
   public AgpOutputConnector(MetaAnalyzer metaAnalyzer, String geometryServiceUrl) {
     this.metaAnalyzer = metaAnalyzer;
