@@ -56,17 +56,20 @@ import org.apache.http.impl.client.CloseableHttpClient;
    * @throws URISyntaxException if invalid URL
    */
   public List<URL> scrap(URL root) throws IOException, URISyntaxException {
-    ContentAnalyzer analyzer = new ContentAnalyzer(root);
     HttpGet method = new HttpGet(root.toExternalForm());
     method.setConfig(DEFAULT_REQUEST_CONFIG);
     method.setHeader("User-Agent", HttpConstants.getUserAgent());
-    HttpClientContext context = creds!=null && !creds.isEmpty()? createHttpClientContext(root, creds): null;
+    HttpClientContext context = createHttpClientContext(root, creds);
     
     try (CloseableHttpResponse httpResponse = httpClient.execute(method, context); InputStream input = httpResponse.getEntity().getContent();) {
       if (httpResponse.getStatusLine().getStatusCode()>=400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
       String content = IOUtils.toString(input, "UTF-8");
+      if (context.getRedirectLocations()!=null && !context.getRedirectLocations().isEmpty()) {
+        root = context.getRedirectLocations().get(context.getRedirectLocations().size() - 1).toURL();
+      }
+      ContentAnalyzer analyzer = new ContentAnalyzer(root);
       return analyzer.analyze(content);
     }
   }
