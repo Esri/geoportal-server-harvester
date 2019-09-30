@@ -193,7 +193,7 @@ define(["dojo/_base/declare",
           }),
           lang.hitch(this,function(error){
             console.error(error);
-            topic.publish("msg", new Error(this.i18n.tasks.errors.execute));
+            topic.publish("msg", new Error(this.i18n.tasks.errors.execute + ": " + data.taskDefinition.name));
           })
         );
       },
