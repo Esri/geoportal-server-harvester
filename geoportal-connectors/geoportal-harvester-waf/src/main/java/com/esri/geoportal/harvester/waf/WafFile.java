@@ -26,7 +26,6 @@ import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.ZonedDateTime;
@@ -80,6 +79,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
     try (CloseableHttpResponse httpResponse = httpClient.execute(method,context); InputStream input = httpResponse.getEntity().getContent();) {
       if (httpResponse.getStatusLine().getStatusCode()>=400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+      }
+      if (Thread.currentThread().isInterrupted()) {
+        return new SimpleDataReference(broker.getBrokerUri(), broker.getEntityDefinition().getLabel(), fileUrl.toExternalForm(), null, fileUrl.toURI(), broker.td.getSource().getRef(), broker.td.getRef());
       }
       Date lastModifiedDate = readLastModifiedDate(httpResponse);
       MimeType contentType = readContentType(httpResponse);
