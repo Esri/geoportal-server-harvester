@@ -32,6 +32,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -152,6 +153,9 @@ import org.slf4j.LoggerFactory;
     
     @Override
     public boolean hasNext() throws DataInputException {
+      if (Thread.currentThread().isInterrupted()) {
+        return false;
+      }
 
       try {
         if (files!=null && !files.isEmpty()) {

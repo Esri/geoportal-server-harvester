@@ -39,9 +39,12 @@ public class HttpClientContextBuilder {
    */
   public static HttpClientContext createHttpClientContext(URL url, SimpleCredentials cred) {
     HttpHost targetHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
-    CredentialsProvider credsProvider = new BasicCredentialsProvider();
-    credsProvider.setCredentials(new AuthScope(targetHost.getHostName(), targetHost.getPort()),
-            new UsernamePasswordCredentials(cred.getUserName(),cred.getPassword()));    
+    CredentialsProvider credsProvider = null;
+    if (cred!=null && !cred.isEmpty()) {
+      credsProvider = new BasicCredentialsProvider();
+      credsProvider.setCredentials(new AuthScope(targetHost.getHostName(), targetHost.getPort()),
+              new UsernamePasswordCredentials(cred.getUserName(),cred.getPassword()));    
+    }
     
     // Create AuthCache instance
     AuthCache authCache = new BasicAuthCache();
@@ -51,7 +54,9 @@ public class HttpClientContextBuilder {
 
     // Add AuthCache to the execution context
     HttpClientContext context = HttpClientContext.create();
-    context.setCredentialsProvider(credsProvider);
+    if (credsProvider!=null) {
+      context.setCredentialsProvider(credsProvider);
+    }
     context.setAuthCache(authCache);
     
     return context;

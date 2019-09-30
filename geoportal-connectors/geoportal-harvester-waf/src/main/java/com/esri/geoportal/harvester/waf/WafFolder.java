@@ -18,6 +18,8 @@ package com.esri.geoportal.harvester.waf;
 import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileSystem;
@@ -26,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -76,14 +79,16 @@ import org.slf4j.LoggerFactory;
     
     try {
       List<URL> urls = scrapper.scrap(folderUrl);
-
-      urls.forEach(u -> {
+      for (URL u: urls) {
+        if (Thread.currentThread().isInterrupted()) {
+          return new WafFolderContent(this, Collections.emptyList(), Collections.emptyList());
+        }
         if (u.toExternalForm().endsWith("/") || !cutOff(u.toExternalForm(),"/").contains(".")) {
           subFolders.add(new WafFolder(broker, u, matchPattern, creds));
         } else if (StringUtils.isBlank(matchPattern) || multiMatchUrl(u,matchPattern)) {
           files.add(new WafFile(broker, u, creds));
         }
-      });
+      }
     } catch (HttpResponseException ex) {
       if (ex.getStatusCode()!=403) {
         throw ex;
