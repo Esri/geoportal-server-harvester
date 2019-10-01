@@ -33,7 +33,7 @@ define({
     },
     
     header: {
-      caption: "Geoportal Server Harvester ver. 2.6.3",
+      caption: "Geoportal Server Harvester ver. 2.6.4",
       logout: "Log out"
     },
     
