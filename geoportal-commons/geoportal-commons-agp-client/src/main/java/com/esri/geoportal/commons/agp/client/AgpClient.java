@@ -434,8 +434,7 @@ public class AgpClient implements Closeable {
       params.put("username", StringUtils.trimToEmpty(credentials.getUserName()));
       params.put("password", StringUtils.trimToEmpty(credentials.getPassword()));
     }
-    params.put("client", "referer");
-    params.put("referer", InetAddress.getLocalHost().getHostAddress());
+    params.put("client", "requestip");
     params.put("expiration", Integer.toString(minutes));
     
     req.setEntity(createEntity(params));
