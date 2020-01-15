@@ -81,8 +81,7 @@ public class AgsClient implements Closeable {
       params.put("username", StringUtils.trimToEmpty(credentials.getUserName()));
       params.put("password", StringUtils.trimToEmpty(credentials.getPassword()));
     }
-    params.put("client", "ip");
-    params.put("ip", InetAddress.getLocalHost().getHostAddress());
+    params.put("client", "requestip");
     params.put("expiration", Integer.toString(minutes));
     HttpEntity entity = new UrlEncodedFormEntity(params.entrySet().stream()
             .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()));
