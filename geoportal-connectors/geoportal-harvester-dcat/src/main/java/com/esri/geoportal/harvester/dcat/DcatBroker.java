@@ -72,7 +72,7 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.transform.TransformerException;
 import org.apache.commons.compress.utils.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.w3c.dom.Document;
