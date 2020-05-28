@@ -28,4 +28,5 @@ public final class PublishRequest {
   public String sys_owner_txt;
   public String src_source_ref_s;
   public String src_task_ref_s;
+  public String app_editor_s;
 }

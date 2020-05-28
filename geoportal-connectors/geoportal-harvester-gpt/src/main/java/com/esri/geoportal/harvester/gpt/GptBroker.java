@@ -154,6 +154,7 @@ import java.util.stream.Collectors;
       data.sys_owner_txt = owner;
       data.src_source_ref_s = ref.getInputBrokerRef()!=null? ref.getInputBrokerRef().replaceAll("-", ""): null;
       data.src_task_ref_s = ref.getTaskRef()!=null? ref.getTaskRef().replaceAll("-", ""): null;
+      data.app_editor_s = definition.isEditable()? "gxe": null;
 
       String xml = null;
       if (definition.getAcceptXml()) {

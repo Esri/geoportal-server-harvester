@@ -40,6 +40,7 @@ import org.apache.commons.lang3.StringUtils;
   private boolean emitXml = true;
   private boolean emitJson = false;
   private boolean translatePdf = true;
+  private boolean editable = false;
 
   /**
    * Creates instance of the adaptor.
@@ -71,6 +72,7 @@ import org.apache.commons.lang3.StringUtils;
       emitXml = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_ACCEPT_XML)), true);
       emitJson = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_ACCEPT_JSON)), false);
       translatePdf = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_TRANSLATE_PDF)), true);
+      editable = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EDITABLE)), false);
     }
   }
 
@@ -82,6 +84,8 @@ import org.apache.commons.lang3.StringUtils;
     consume(params,P_INDEX);
     consume(params,P_ACCEPT_XML);
     consume(params,P_ACCEPT_JSON);
+    consume(params,P_TRANSLATE_PDF);
+    consume(params,P_EDITABLE);
     credAdaptor.override(params);
   }
 
@@ -200,5 +204,20 @@ import org.apache.commons.lang3.StringUtils;
   public void setTranslatePdf(boolean translatePdf) {
     this.translatePdf = translatePdf;
     set(P_TRANSLATE_PDF, BooleanUtils.toStringTrueFalse(translatePdf));
+  }
+
+  /**
+   * @return the editable
+   */
+  public boolean isEditable() {
+    return editable;
+  }
+
+  /**
+   * @param editable the editable to set
+   */
+  public void setEditable(boolean editable) {
+    this.editable = editable;
+    set(P_EDITABLE, BooleanUtils.toStringTrueFalse(editable));
   }
 }
