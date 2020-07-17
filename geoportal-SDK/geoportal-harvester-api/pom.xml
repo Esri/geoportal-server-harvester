@@ -4,12 +4,12 @@
     <parent>
       <artifactId>geoportal-SDK</artifactId>
       <groupId>com.esri.geoportal</groupId>
-      <version>3.6.4</version>
+      <version>3.6.5-SNAPSHOT</version>
     </parent>
     <artifactId>harvester-api</artifactId>
     <name>Esri :: Geoportal Server :: Harvester :: Api</name>
     <description>Definitions of all basic elements of the Harvester (interfaces, final classes, etc.).</description>
-    <version>3.6.4</version>
+    <version>3.6.5-SNAPSHOT</version>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

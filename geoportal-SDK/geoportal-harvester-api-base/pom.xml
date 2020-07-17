@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.esri.geoportal</groupId>
         <artifactId>geoportal-SDK</artifactId>
-        <version>3.6.4</version>
+        <version>3.6.5-SNAPSHOT</version>
     </parent>
     <artifactId>harvester-api-base</artifactId>
     <name>Esri :: Geoportal Server :: Harvester :: Api Base</name>

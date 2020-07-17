@@ -4,7 +4,7 @@
   <parent>
     <artifactId>geoportal-harvester</artifactId>
     <groupId>com.esri.geoportal</groupId>
-    <version>3.6.4</version>
+    <version>3.6.5-SNAPSHOT</version>
   </parent>
   <artifactId>geoportal-commons</artifactId>
   <packaging>pom</packaging>
