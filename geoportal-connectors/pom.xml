@@ -28,5 +28,6 @@
         <module>geoportal-harvester-folder-big</module>
         <module>geoportal-harvester-jdbc</module>
         <module>geoportal-harvester-dcat</module>
+        <module>geoportal-harvester-thredds</module>
     </modules>
 </project>
