@@ -55,14 +55,18 @@ public class Client implements Closeable {
   private final CloseableHttpClient httpClient;
   private final URL url;
 
-//  public static void main(String[] args) throws Exception {
-//    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+  public static void main(String[] args) throws Exception {
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 //    Client client = new Client(httpClient, new URL("https://chlthredds.erdc.dren.mil/thredds/catalog/wis/Atlantic/ST41001/1980/catalog.xml"));
-//    Content content = client.listContent(null);
-//    
-//    System.out.println("Ready...");
-//  }
-//
+    Client client = new Client(httpClient, new URL("https://data.nodc.noaa.gov/thredds/catalog.xml"));
+    Content content = client.listItems(null);
+    
+    System.out.println(content.url);
+    System.out.println(content.records);
+    System.out.println(content.folders);
+    System.out.println("Ready...");
+  }
+
   /**
    * Creates instance of the client.
    *
@@ -74,13 +78,11 @@ public class Client implements Closeable {
     this.url = url;
   }
 
-  public Content listContent(URL url) throws IOException, URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException {
-    ArrayList<URL> records = new ArrayList<>();
+  public Content listItems(URL url) throws IOException, URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException {
+    ArrayList<Record> records = new ArrayList<>();
     ArrayList<URL> folders = new ArrayList<>();
 
-    url = url != null ? url : this.url;
-
-    Document doc = readContent(url);
+    Document doc = readContent(url != null ? url : this.url);
 
     XPath xPath = XPathFactory.newInstance().newXPath();
     Node ndCatalog = (Node)xPath.evaluate("/catalog", doc, XPathConstants.NODE);
@@ -88,19 +90,18 @@ public class Client implements Closeable {
     String iso = StringUtils.trimToEmpty((String) xPath.evaluate("//service[@serviceType='ISO']/@base", ndCatalog, XPathConstants.STRING));
     if (!iso.isEmpty()) {
       // creating TFiles only if iso exist
-      URL baseUrl = new URL(this.url.toExternalForm());
-      baseUrl = new URL(baseUrl, iso);
+      URL baseUrl = new URL(this.url, iso);
     
       NodeList ndDatasets = (NodeList)xPath.evaluate("//dataset[string-length(normalize-space(@urlPath))>0]", ndCatalog, XPathConstants.NODESET);
       for (int i=0; i < ndDatasets.getLength(); i++){
         Node ndDataset = ndDatasets.item(i);
-        String URL = (String)xPath.evaluate("@urlPath",ndDataset,XPathConstants.STRING);
+        String urlPath = (String)xPath.evaluate("@urlPath",ndDataset,XPathConstants.STRING);
         String ID = (String)xPath.evaluate("@ID",ndDataset,XPathConstants.STRING);
-        if (!URL.isEmpty()) {
-          URL datasetUrl = new URL(baseUrl, URL);
+        if (!urlPath.isEmpty()) {
+          URL datasetUrl = new URL(baseUrl, urlPath);
           URIBuilder builder = new URIBuilder(datasetUrl.toURI());
           URL fetchUrl = builder.addParameter("catalog", this.url.toExternalForm()).addParameter("dataset", ID).build().toURL();
-          records.add(fetchUrl);
+          records.add(new Record(ID, fetchUrl));
         }
       }
     }
@@ -117,7 +118,7 @@ public class Client implements Closeable {
     return new Content(url, records, folders);
   }
 
-  private Document readContent(URL url) throws URISyntaxException, IOException, ParserConfigurationException, SAXException {
+  public Document readContent(URL url) throws URISyntaxException, IOException, ParserConfigurationException, SAXException {
     HttpGet method = new HttpGet(url.toURI());
     try (CloseableHttpResponse httpResponse = httpClient.execute(method); InputStream responseInputStream = httpResponse.getEntity().getContent();) {
       if (httpResponse.getStatusLine().getStatusCode() >= 400) {
@@ -129,7 +130,7 @@ public class Client implements Closeable {
           if (httpResponse2.getStatusLine().getStatusCode() >= 400) {
             throw new HttpResponseException(httpResponse2.getStatusLine().getStatusCode(), httpResponse2.getStatusLine().getReasonPhrase());
           }
-          return readContentFromStream(responseInputStream);
+          return readContentFromStream(responseInputStream2);
         }
       } else {
         return readContentFromStream(responseInputStream);

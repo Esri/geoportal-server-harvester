@@ -16,6 +16,7 @@
 package com.esri.geoportal.commons.thredds.client;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ import java.util.List;
  */
 public class Content {
     public final URL url;
-    public final List<URL> records;
+    public final List<Record> records;
     public final List<URL> folders;
     
 
@@ -33,10 +34,13 @@ public class Content {
      * @param records list of record URL's
      * @param folders list of sub-folders URL's
      */
-    public Content(URL url, List<URL> records, List<URL> folders) {
+    public Content(URL url, List<Record> records, List<URL> folders) {
+        if (url==null) {
+          throw new IllegalArgumentException(String.format("Missing url"));
+        }
         this.url = url;
-        this.records = records;
-        this.folders = folders;
+        this.records = records!=null? records: new ArrayList<>();
+        this.folders = folders!=null? folders: new ArrayList<>();
     }
     
 }

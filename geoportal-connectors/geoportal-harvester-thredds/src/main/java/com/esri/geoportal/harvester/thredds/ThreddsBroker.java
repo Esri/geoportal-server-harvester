@@ -21,6 +21,9 @@ import com.esri.geoportal.commons.constants.MimeTypeUtils;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
+import com.esri.geoportal.commons.thredds.client.Client;
+import com.esri.geoportal.commons.thredds.client.Content;
+import com.esri.geoportal.commons.thredds.client.Record;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
@@ -41,8 +44,10 @@ import org.slf4j.LoggerFactory;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
-import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * THREDDS broker.
@@ -56,6 +61,7 @@ import java.util.ArrayList;
   private final ArrayList<ThreddsIter> iterators = new ArrayList<>();
 
   protected CloseableHttpClient httpClient;
+  private Client client;
   protected TaskDefinition td;
 
   private static final ObjectMapper mapper = new ObjectMapper();
@@ -88,13 +94,20 @@ import java.util.ArrayList;
       Bots bots = BotsUtils.readBots(definition.getBotsConfig(), http, definition.getHostUrl());
       httpClient = new BotsHttpClient(http, bots);
     }
+    client = new Client(httpClient, definition.getHostUrl());
   }
 
   @Override
   public void terminate() {
     new ArrayList<>(iterators).forEach(ThreddsIter::close);
 
-    if (httpClient != null) {
+    if (client!=null) {
+      try {
+        client.close();
+      } catch (IOException ex) {
+        LOG.error(String.format("Error terminating broker."), ex);
+      }
+    } else if (httpClient != null) {
       try {
         httpClient.close();
       } catch (IOException ex) {
@@ -110,7 +123,7 @@ import java.util.ArrayList;
 
   @Override
   public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
-    ThreddsIter iter = new ThreddsIter(null) {
+    ThreddsIter iter = new ThreddsIter() {
       @Override
       protected void onClose() {
         iterators.remove(this);
@@ -122,16 +135,37 @@ import java.util.ArrayList;
   }
 
   private class ThreddsIter implements InputBroker.Iterator {
-    private final InputStream input;
+    private LinkedList<URL> folders;
+    private java.util.Iterator<Record> recordsIter;
 
-
-    public ThreddsIter(InputStream input) {
-        this.input = input;
+    public ThreddsIter() {
     }
 
     @Override
     public boolean hasNext() throws DataInputException {
-        return false;
+      try {
+        if (folders==null) {
+          Content content = client.listItems(definition.getHostUrl());
+          folders.addAll(content.folders);
+          recordsIter = content.records.iterator();
+          
+          return hasNext();
+        }
+        
+        if (recordsIter==null || !recordsIter.hasNext()) {
+          if (folders==null || folders.isEmpty()) return false;
+          
+          Content content = client.listItems(folders.pollFirst());
+          folders.addAll(content.folders);
+          recordsIter = content.records.iterator();
+          
+          return hasNext();
+        }
+          
+        return recordsIter.hasNext();
+      } catch (Exception ex) {
+        throw new DataInputException(ThreddsBroker.this, String.format("Error retrieving content."), ex);
+      }
     }
 
     @Override
@@ -144,13 +178,6 @@ import java.util.ArrayList;
     }
 
     private void close() {
-      if (input != null) {
-        try {
-          input.close();
-        } catch (IOException ex) {
-          LOG.debug("Error closing THREDDS iterator.", ex);
-        }
-      }
       onClose();
     }
   }
