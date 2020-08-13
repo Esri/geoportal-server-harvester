@@ -55,18 +55,6 @@ public class Client implements Closeable {
   private final CloseableHttpClient httpClient;
   private final URL url;
 
-  public static void main(String[] args) throws Exception {
-    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-//    Client client = new Client(httpClient, new URL("https://chlthredds.erdc.dren.mil/thredds/catalog/wis/Atlantic/ST41001/1980/catalog.xml"));
-    Client client = new Client(httpClient, new URL("https://data.nodc.noaa.gov/thredds/catalog.xml"));
-    Catalog content = client.readCatalog(null);
-    
-    System.out.println(content.url);
-    System.out.println(content.records);
-    System.out.println(content.folders);
-    System.out.println("Ready...");
-  }
-
   /**
    * Creates instance of the client.
    *
