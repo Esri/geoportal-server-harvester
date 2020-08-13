@@ -75,69 +75,74 @@ public class Client implements Closeable {
     this.url = url;
   }
 
-  public Catalog readCatalog(URL url) throws IOException, URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException {
-    if (url==null) {
+  public Catalog readCatalog(URL url) throws URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException {
+    if (url == null) {
       throw new IllegalArgumentException("Missing url");
     }
     
     ArrayList<Record> records = new ArrayList<>();
     ArrayList<URL> folders = new ArrayList<>();
 
-    Document doc = readContent(url != null ? url : this.url);
+    try {
 
-    XPath xPath = XPathFactory.newInstance().newXPath();
-    Node ndCatalog = (Node)xPath.evaluate("/catalog", doc, XPathConstants.NODE);
-    
-    String iso = StringUtils.trimToEmpty((String) xPath.evaluate("//service[@serviceType='ISO']/@base", ndCatalog, XPathConstants.STRING));
-    if (!iso.isEmpty()) {
-      // creating TFiles only if iso exist
-      URL baseUrl = new URL(this.url, iso);
-    
-      NodeList ndDatasets = (NodeList)xPath.evaluate("//dataset[string-length(normalize-space(@urlPath))>0]", ndCatalog, XPathConstants.NODESET);
-      for (int i=0; i < ndDatasets.getLength(); i++){
-        Node ndDataset = ndDatasets.item(i);
-        String urlPath = (String)xPath.evaluate("@urlPath",ndDataset,XPathConstants.STRING);
-        String ID = (String)xPath.evaluate("@ID",ndDataset,XPathConstants.STRING);
-        if (!urlPath.isEmpty()) {
-          URL datasetUrl = new URL(baseUrl, urlPath);
-          URIBuilder builder = new URIBuilder(datasetUrl.toURI());
-          URI fetchUrl = builder.addParameter("catalog", this.url.toExternalForm()).addParameter("dataset", ID).build();
-          records.add(new Record(url, ID, fetchUrl));
+      Document doc = readContent(url != null ? url : this.url);
+
+      XPath xPath = XPathFactory.newInstance().newXPath();
+      Node ndCatalog = (Node) xPath.evaluate("/catalog", doc, XPathConstants.NODE);
+
+      String iso = StringUtils.trimToEmpty((String) xPath.evaluate("//service[@serviceType='ISO']/@base", ndCatalog, XPathConstants.STRING));
+      if (!iso.isEmpty()) {
+        // creating TFiles only if iso exist
+        URL baseUrl = new URL(this.url, iso);
+
+        NodeList ndDatasets = (NodeList) xPath.evaluate("//dataset[string-length(normalize-space(@urlPath))>0]", ndCatalog, XPathConstants.NODESET);
+        for (int i = 0; i < ndDatasets.getLength(); i++) {
+          Node ndDataset = ndDatasets.item(i);
+          String urlPath = (String) xPath.evaluate("@urlPath", ndDataset, XPathConstants.STRING);
+          String ID = (String) xPath.evaluate("@ID", ndDataset, XPathConstants.STRING);
+          if (!urlPath.isEmpty()) {
+            URL datasetUrl = new URL(baseUrl, urlPath);
+            URIBuilder builder = new URIBuilder(datasetUrl.toURI());
+            URI fetchUrl = builder.addParameter("catalog", this.url.toExternalForm()).addParameter("dataset", ID).build();
+            records.add(new Record(url, ID, fetchUrl));
+          }
         }
       }
+
+      NodeList ndCatalogRefs = (NodeList) xPath.evaluate("//catalogRef/@href", ndCatalog, XPathConstants.NODESET);
+      for (int i = 0; i < ndCatalogRefs.getLength(); i++) {
+        Node ndCatalogRef = ndCatalogRefs.item(i);
+        String catalogRefUrl = StringUtils.trimToEmpty(ndCatalogRef.getNodeValue());
+        URL catalogUrl = new URL(this.url, catalogRefUrl);
+        folders.add(catalogUrl);
+      }
+    } catch (IOException ignore) {
     }
-    
-    NodeList ndCatalogRefs = (NodeList)xPath.evaluate("//catalogRef/@href", ndCatalog, XPathConstants.NODESET);
-    for (int i=0; i < ndCatalogRefs.getLength(); i++){
-      Node ndCatalogRef = ndCatalogRefs.item(i);
-      String catalogRefUrl = StringUtils.trimToEmpty(ndCatalogRef.getNodeValue());
-      URL catalogUrl = new URL(this.url, catalogRefUrl);
-      folders.add(catalogUrl);
-    }
-    
+
     return new Catalog(url, records, folders);
   }
-  
+
   public Content fetchContent(Record rec, Date since) throws IOException {
     HttpGet method = new HttpGet(rec.uri);
     method.setConfig(DEFAULT_REQUEST_CONFIG);
     method.setHeader("User-Agent", HttpConstants.getUserAgent());
-    
+
     try (CloseableHttpResponse httpResponse = httpClient.execute(method); InputStream input = httpResponse.getEntity().getContent();) {
-      if (httpResponse.getStatusLine().getStatusCode()>=400) {
+      if (httpResponse.getStatusLine().getStatusCode() >= 400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
       Date lastModifiedDate = readLastModifiedDate(httpResponse);
       MimeType contentType = readContentType(httpResponse, url);
-      boolean readBody = since==null || lastModifiedDate==null || lastModifiedDate.getTime()>=since.getTime();
-      byte [] body = readBody? IOUtils.toByteArray(input): null;
-      
+      boolean readBody = since == null || lastModifiedDate == null || lastModifiedDate.getTime() >= since.getTime();
+      byte[] body = readBody ? IOUtils.toByteArray(input) : null;
+
       return new Content(rec, lastModifiedDate, contentType, body);
     }
   }
-  
+
   /**
    * Reads content type.
+   *
    * @param response HTTP response
    * @return content type or <code>null</code> if unable to read content type
    */
@@ -145,13 +150,13 @@ public class Client implements Closeable {
     try {
       Header contentTypeHeader = response.getFirstHeader("Content-Type");
       MimeType contentType = null;
-      if (contentTypeHeader!=null) {
+      if (contentTypeHeader != null) {
         contentType = MimeType.parse(contentTypeHeader.getValue());
       }
-      if (contentType==null) {
+      if (contentType == null) {
         String strFileUrl = url.toExternalForm();
         int lastDotIndex = strFileUrl.lastIndexOf(".");
-        String ext = lastDotIndex>=0? strFileUrl.substring(lastDotIndex+1): "";
+        String ext = lastDotIndex >= 0 ? strFileUrl.substring(lastDotIndex + 1) : "";
         contentType = MimeTypeUtils.mapExtension(ext);
       }
       return contentType;
@@ -162,6 +167,7 @@ public class Client implements Closeable {
 
   /**
    * Reads last modified date.
+   *
    * @param response HTTP response
    * @return last modified date or <code>null</code> if unavailable
    */
@@ -169,8 +175,8 @@ public class Client implements Closeable {
     try {
       Header lastModifedHeader = response.getFirstHeader("Last-Modified");
       return lastModifedHeader != null
-              ? Date.from(ZonedDateTime.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(lastModifedHeader.getValue())).toInstant())
-              : null;
+        ? Date.from(ZonedDateTime.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(lastModifedHeader.getValue())).toInstant())
+        : null;
     } catch (Exception ex) {
       return null;
     }

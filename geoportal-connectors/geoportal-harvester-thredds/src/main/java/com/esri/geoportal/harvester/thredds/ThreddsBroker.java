@@ -129,7 +129,8 @@ import java.util.List;
     private final URI brokerUri;
     private final IteratorContext iteratorContext;
     private LinkedList<URL> folders;
-    private java.util.Iterator<Content> contentIter;
+    private java.util.Iterator<Record> recIter;
+    private Content nextContent;
 
     public ThreddsIter(URI brokerUri, IteratorContext iteratorContext) {
       this.brokerUri = brokerUri;
@@ -138,29 +139,44 @@ import java.util.List;
 
     @Override
     public boolean hasNext() throws DataInputException {
+      if (nextContent!=null) return true;
+      
       try {
         if (folders==null) {
           Catalog content = client.readCatalog(definition.getHostUrl());
           folders = new LinkedList<>(content.folders);
-          contentIter = readContents(content.records).iterator();
+          recIter = content.records.iterator();
           
           return hasNext();
         }
         
-        if (contentIter==null || !contentIter.hasNext()) {
+        if (recIter==null || !recIter.hasNext()) {
           if (folders==null || folders.isEmpty()) return false;
           
           Catalog content = client.readCatalog(folders.pollFirst());
           folders.addAll(content.folders);
-          contentIter = readContents(content.records).iterator();
+          recIter = content.records.iterator();
           
           return hasNext();
         }
           
-        return contentIter.hasNext();
+        nextContent = readContent(recIter.next());
+        if (nextContent==null) return hasNext();
+        
+        return true;
       } catch (Exception ex) {
         throw new DataInputException(ThreddsBroker.this, String.format("Error retrieving content."), ex);
       }
+    }
+    
+    private Content readContent(Record rec) {
+        try {
+          Content content = client.fetchContent(rec, iteratorContext.getLastHarvestDate());
+          if (content!=null && content.body!=null) {
+            return content;
+          }
+        } catch (IOException ignore) {} 
+        return null;
     }
 
     private List<Content> readContents(List<Record> records) {
@@ -178,19 +194,19 @@ import java.util.List;
     
     @Override
     public DataReference next() throws DataInputException {
-      if (contentIter==null || !contentIter.hasNext()) {
+      if (nextContent==null) {
         throw new DataInputException(ThreddsBroker.this, String.format("No more records."));
       }
-      Content content = contentIter.next();
       SimpleDataReference ref = new SimpleDataReference(
         brokerUri, 
         ThreddsBroker.this.getEntityDefinition().getLabel(), 
-        content.record.id, 
-        content.lastModifiedDate, 
-        content.record.uri, 
+        nextContent.record.id, 
+        nextContent.lastModifiedDate, 
+        nextContent.record.uri, 
         ThreddsBroker.this.td.getSource().getRef(), 
         ThreddsBroker.this.td.getRef()
       );
+      nextContent = null;
       return ref;
     }
 
