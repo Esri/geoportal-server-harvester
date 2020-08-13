@@ -15,17 +15,14 @@
  */
 package com.esri.geoportal.harvester.thredds;
 
-import com.esri.geoportal.commons.constants.HttpConstants;
-import com.esri.geoportal.commons.constants.MimeType;
-import com.esri.geoportal.commons.constants.MimeTypeUtils;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.meta.util.WKAConstants;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.commons.thredds.client.Client;
 import com.esri.geoportal.commons.thredds.client.Catalog;
+import com.esri.geoportal.commons.thredds.client.Content;
 import com.esri.geoportal.commons.thredds.client.Record;
-import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
@@ -43,19 +40,10 @@ import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
-import java.io.InputStream;
 import java.net.URL;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpResponseException;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 
 /**
  * THREDDS broker.
@@ -179,7 +167,7 @@ import org.apache.http.client.methods.HttpGet;
       try {
         return readContent(rec.url, rec.id, iteratorContext.getLastHarvestDate());
       } catch (IOException|URISyntaxException ex) {
-        throw new DataInputException(ThreddsBroker.this, String.format("Error reading content forL ", rec.id), ex);
+        throw new DataInputException(ThreddsBroker.this, String.format("Error reading content for %s (%s) ", rec.id, rec.url), ex);
       }
     }
 
@@ -230,67 +218,13 @@ import org.apache.http.client.methods.HttpGet;
    * @throws URISyntaxException if file url is an invalid URI
    */
   private SimpleDataReference readContent(URL url, String id, Date since) throws IOException, URISyntaxException {
-    HttpGet method = new HttpGet(url.toURI());
-    method.setConfig(DEFAULT_REQUEST_CONFIG);
-    method.setHeader("User-Agent", HttpConstants.getUserAgent());
+    Content content = client.fetchContent(url, id, since);
     
-    try (CloseableHttpResponse httpResponse = httpClient.execute(method); InputStream input = httpResponse.getEntity().getContent();) {
-      if (httpResponse.getStatusLine().getStatusCode()>=400) {
-        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
-      }
-      if (Thread.currentThread().isInterrupted()) {
-        return new SimpleDataReference(this.getBrokerUri(), this.getEntityDefinition().getLabel(), url.toExternalForm(), null, url.toURI(), this.td.getSource().getRef(), this.td.getRef());
-      }
-      Date lastModifiedDate = readLastModifiedDate(httpResponse);
-      MimeType contentType = readContentType(httpResponse, url);
-      boolean readBody = since==null || lastModifiedDate==null || lastModifiedDate.getTime()>=since.getTime();
-      SimpleDataReference ref = new SimpleDataReference(this.getBrokerUri(), this.getEntityDefinition().getLabel(), id, lastModifiedDate, url.toURI(), this.td.getSource().getRef(), this.td.getRef());
-      ref.addContext(contentType, readBody? IOUtils.toByteArray(input): null);
-
-      // Adding in resource map attributes for saving to AGP...
-      ref.getAttributesMap().put(WKAConstants.WKA_RESOURCE_URL, url.toURI());
-
-      return ref;
-    }
+    SimpleDataReference ref = new SimpleDataReference(this.getBrokerUri(), this.getEntityDefinition().getLabel(), content.id, content.lastModifiedDate, url.toURI(), this.td.getSource().getRef(), this.td.getRef());
+    ref.addContext(content.contentType, content.body);
+    ref.getAttributesMap().put(WKAConstants.WKA_RESOURCE_URL, url.toURI());
+    
+    return ref;
   }
   
-  /**
-   * Reads content type.
-   * @param response HTTP response
-   * @return content type or <code>null</code> if unable to read content type
-   */
-  private MimeType readContentType(HttpResponse response, URL url) {
-    try {
-      Header contentTypeHeader = response.getFirstHeader("Content-Type");
-      MimeType contentType = null;
-      if (contentTypeHeader!=null) {
-        contentType = MimeType.parse(contentTypeHeader.getValue());
-      }
-      if (contentType==null) {
-        String strFileUrl = url.toExternalForm();
-        int lastDotIndex = strFileUrl.lastIndexOf(".");
-        String ext = lastDotIndex>=0? strFileUrl.substring(lastDotIndex+1): "";
-        contentType = MimeTypeUtils.mapExtension(ext);
-      }
-      return contentType;
-    } catch (Exception ex) {
-      return null;
-    }
-  }
-
-  /**
-   * Reads last modified date.
-   * @param response HTTP response
-   * @return last modified date or <code>null</code> if unavailable
-   */
-  private Date readLastModifiedDate(HttpResponse response) {
-    try {
-      Header lastModifedHeader = response.getFirstHeader("Last-Modified");
-      return lastModifedHeader != null
-              ? Date.from(ZonedDateTime.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(lastModifedHeader.getValue())).toInstant())
-              : null;
-    } catch (Exception ex) {
-      return null;
-    }
-  }
 }

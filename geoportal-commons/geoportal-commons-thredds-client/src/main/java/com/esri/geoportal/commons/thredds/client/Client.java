@@ -15,6 +15,10 @@
  */
 package com.esri.geoportal.commons.thredds.client;
 
+import com.esri.geoportal.commons.constants.HttpConstants;
+import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.constants.MimeTypeUtils;
+import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +26,10 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,7 +37,10 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -107,6 +117,64 @@ public class Client implements Closeable {
     }
     
     return new Catalog(url, records, folders);
+  }
+  
+  public Content fetchContent(URL url, String id, Date since) throws URISyntaxException, IOException {
+    HttpGet method = new HttpGet(url.toURI());
+    method.setConfig(DEFAULT_REQUEST_CONFIG);
+    method.setHeader("User-Agent", HttpConstants.getUserAgent());
+    
+    try (CloseableHttpResponse httpResponse = httpClient.execute(method); InputStream input = httpResponse.getEntity().getContent();) {
+      if (httpResponse.getStatusLine().getStatusCode()>=400) {
+        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+      }
+      Date lastModifiedDate = readLastModifiedDate(httpResponse);
+      MimeType contentType = readContentType(httpResponse, url);
+      boolean readBody = since==null || lastModifiedDate==null || lastModifiedDate.getTime()>=since.getTime();
+      byte [] body = readBody? IOUtils.toByteArray(input): null;
+      
+      return new Content(id, url, lastModifiedDate, contentType, body);
+    }
+  }
+  
+  /**
+   * Reads content type.
+   * @param response HTTP response
+   * @return content type or <code>null</code> if unable to read content type
+   */
+  private MimeType readContentType(HttpResponse response, URL url) {
+    try {
+      Header contentTypeHeader = response.getFirstHeader("Content-Type");
+      MimeType contentType = null;
+      if (contentTypeHeader!=null) {
+        contentType = MimeType.parse(contentTypeHeader.getValue());
+      }
+      if (contentType==null) {
+        String strFileUrl = url.toExternalForm();
+        int lastDotIndex = strFileUrl.lastIndexOf(".");
+        String ext = lastDotIndex>=0? strFileUrl.substring(lastDotIndex+1): "";
+        contentType = MimeTypeUtils.mapExtension(ext);
+      }
+      return contentType;
+    } catch (Exception ex) {
+      return null;
+    }
+  }
+
+  /**
+   * Reads last modified date.
+   * @param response HTTP response
+   * @return last modified date or <code>null</code> if unavailable
+   */
+  private Date readLastModifiedDate(HttpResponse response) {
+    try {
+      Header lastModifedHeader = response.getFirstHeader("Last-Modified");
+      return lastModifedHeader != null
+              ? Date.from(ZonedDateTime.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(lastModifedHeader.getValue())).toInstant())
+              : null;
+    } catch (Exception ex) {
+      return null;
+    }
   }
 
   private Document readContent(URL url) throws URISyntaxException, IOException, ParserConfigurationException, SAXException {
