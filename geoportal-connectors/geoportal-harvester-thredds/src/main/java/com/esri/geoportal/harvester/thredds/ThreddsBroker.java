@@ -16,7 +16,6 @@
 package com.esri.geoportal.harvester.thredds;
 
 import com.esri.geoportal.commons.http.BotsHttpClient;
-import com.esri.geoportal.commons.meta.util.WKAConstants;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.commons.thredds.client.Client;
@@ -42,8 +41,8 @@ import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * THREDDS broker.
@@ -111,23 +110,29 @@ import java.util.LinkedList;
 
   @Override
   public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
-    ThreddsIter iter = new ThreddsIter(iteratorContext) {
-      @Override
-      protected void onClose() {
-        iterators.remove(this);
-      }
-    };
+    try {
+      ThreddsIter iter = new ThreddsIter(this.getBrokerUri(), iteratorContext) {
+        @Override
+        protected void onClose() {
+          iterators.remove(this);
+        }
+      };
 
-    iterators.add(iter);
+      iterators.add(iter);
     return iter;
+    } catch (URISyntaxException ex) {
+      throw new DataInputException(this, String.format("Invalid broker uri"), ex);
+    }
   }
 
   private class ThreddsIter implements InputBroker.Iterator {
+    private final URI brokerUri;
     private final IteratorContext iteratorContext;
     private LinkedList<URL> folders;
-    private java.util.Iterator<Record> recordsIter;
+    private java.util.Iterator<Content> contentIter;
 
-    public ThreddsIter(IteratorContext iteratorContext) {
+    public ThreddsIter(URI brokerUri, IteratorContext iteratorContext) {
+      this.brokerUri = brokerUri;
       this.iteratorContext = iteratorContext;
     }
 
@@ -137,38 +142,56 @@ import java.util.LinkedList;
         if (folders==null) {
           Catalog content = client.readCatalog(definition.getHostUrl());
           folders = new LinkedList<>(content.folders);
-          recordsIter = content.records.iterator();
+          contentIter = readContents(content.records).iterator();
           
           return hasNext();
         }
         
-        if (recordsIter==null || !recordsIter.hasNext()) {
+        if (contentIter==null || !contentIter.hasNext()) {
           if (folders==null || folders.isEmpty()) return false;
           
           Catalog content = client.readCatalog(folders.pollFirst());
           folders.addAll(content.folders);
-          recordsIter = content.records.iterator();
+          contentIter = readContents(content.records).iterator();
           
           return hasNext();
         }
           
-        return recordsIter.hasNext();
+        return contentIter.hasNext();
       } catch (Exception ex) {
         throw new DataInputException(ThreddsBroker.this, String.format("Error retrieving content."), ex);
       }
     }
 
+    private List<Content> readContents(List<Record> records) {
+      ArrayList<Content> contents = new ArrayList<>();
+      for (Record rec: records) {
+        try {
+          Content content = client.fetchContent(rec, iteratorContext.getLastHarvestDate());
+          if (content!=null && content.body!=null) {
+            contents.add(content);
+          }
+        } catch (IOException ignore) {} 
+      }
+      return contents;
+    }
+    
     @Override
     public DataReference next() throws DataInputException {
-      if (recordsIter==null || !recordsIter.hasNext()) {
+      if (contentIter==null || !contentIter.hasNext()) {
         throw new DataInputException(ThreddsBroker.this, String.format("No more records."));
       }
-      Record rec = recordsIter.next();
-      try {
-        return readContent(rec.url, rec.id, iteratorContext.getLastHarvestDate());
-      } catch (IOException|URISyntaxException ex) {
-        throw new DataInputException(ThreddsBroker.this, String.format("Error reading content for %s (%s) ", rec.id, rec.url), ex);
-      }
+      Content content = contentIter.next();
+      SimpleDataReference ref = new SimpleDataReference(
+        brokerUri, 
+        ThreddsBroker.this.getEntityDefinition().getLabel(), 
+        content.record.id, 
+        content.lastModifiedDate, 
+        content.record.uri, 
+        ThreddsBroker.this.td.getSource().getRef(), 
+        ThreddsBroker.this.td.getRef()
+      );
+      return ref;
     }
 
     protected void onClose() {
@@ -202,29 +225,7 @@ import java.util.LinkedList;
 
   @Override
   public DataContent readContent(String id) throws DataInputException {
-    try {
-      return readContent(new URL(id), id, null);
-    } catch (IOException|URISyntaxException ex) {
-      throw new DataInputException(this, String.format("Error reading content for: %s", id), ex);
-    }
-  }
-
-  /**
-   * Reads content.
-   * @param httpClient HTTP client
-   * @param since since date
-   * @return content reference
-   * @throws IOException if reading content fails
-   * @throws URISyntaxException if file url is an invalid URI
-   */
-  private SimpleDataReference readContent(URL url, String id, Date since) throws IOException, URISyntaxException {
-    Content content = client.fetchContent(url, id, since);
-    
-    SimpleDataReference ref = new SimpleDataReference(this.getBrokerUri(), this.getEntityDefinition().getLabel(), content.id, content.lastModifiedDate, url.toURI(), this.td.getSource().getRef(), this.td.getRef());
-    ref.addContext(content.contentType, content.body);
-    ref.getAttributesMap().put(WKAConstants.WKA_RESOURCE_URL, url.toURI());
-    
-    return ref;
+    return null;
   }
   
 }

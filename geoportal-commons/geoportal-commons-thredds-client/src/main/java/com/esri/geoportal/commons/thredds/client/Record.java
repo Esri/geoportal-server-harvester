@@ -15,29 +15,35 @@
  */
 package com.esri.geoportal.commons.thredds.client;
 
+import java.net.URI;
 import java.net.URL;
 
 /**
  * Record
  */
 public class Record {
+  public final URL catalog;
   public final String id;
-  public final URL url;
+  public final URI uri;
 
   /**
    * Creates instance of the record.
    * @param id id
-   * @param url url
+   * @param url uri
    */
-  public Record(String id, URL url) {
+  public Record(URL catalog, String id, URI uri) {
+    if (catalog==null) {
+      throw new IllegalArgumentException("Empty catalog");
+    }
     if (id==null) {
       throw new IllegalArgumentException("Empty id");
     }
-    if (url==null) {
-      throw new IllegalArgumentException("Empty url");
+    if (uri==null) {
+      throw new IllegalArgumentException("Empty uri");
     }
+    this.catalog = catalog;
     this.id = id;
-    this.url = url;
+    this.uri = uri;
   }
   
   

@@ -16,28 +16,22 @@
 package com.esri.geoportal.commons.thredds.client;
 
 import com.esri.geoportal.commons.constants.MimeType;
-import java.net.URL;
 import java.util.Date;
 
 /**
  * Content.
  */
 public class Content {
-  public final String id;
-  public final URL url;
+  public final Record record;
   public final Date lastModifiedDate;
   public final MimeType contentType;
   public final byte [] body;
 
-  public Content(String id, URL url, Date lastModifiedDate, MimeType contentType, byte [] body) {
-    if (id==null) {
-      throw new IllegalArgumentException("Missing id");
+  public Content(Record record, Date lastModifiedDate, MimeType contentType, byte [] body) {
+    if (record==null) {
+      throw new IllegalArgumentException("Missing record");
     }
-    if (url==null) {
-      throw new IllegalArgumentException("Missing url");
-    }
-    this.id = id;
-    this.url = url;
+    this.record = record;
     this.lastModifiedDate = lastModifiedDate;
     this.contentType = contentType;
     this.body = body;

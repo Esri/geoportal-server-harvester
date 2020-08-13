@@ -46,7 +46,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -102,8 +101,8 @@ public class Client implements Closeable {
         if (!urlPath.isEmpty()) {
           URL datasetUrl = new URL(baseUrl, urlPath);
           URIBuilder builder = new URIBuilder(datasetUrl.toURI());
-          URL fetchUrl = builder.addParameter("catalog", this.url.toExternalForm()).addParameter("dataset", ID).build().toURL();
-          records.add(new Record(ID, fetchUrl));
+          URI fetchUrl = builder.addParameter("catalog", this.url.toExternalForm()).addParameter("dataset", ID).build();
+          records.add(new Record(url, ID, fetchUrl));
         }
       }
     }
@@ -119,8 +118,8 @@ public class Client implements Closeable {
     return new Catalog(url, records, folders);
   }
   
-  public Content fetchContent(URL url, String id, Date since) throws URISyntaxException, IOException {
-    HttpGet method = new HttpGet(url.toURI());
+  public Content fetchContent(Record rec, Date since) throws IOException {
+    HttpGet method = new HttpGet(rec.uri);
     method.setConfig(DEFAULT_REQUEST_CONFIG);
     method.setHeader("User-Agent", HttpConstants.getUserAgent());
     
@@ -133,7 +132,7 @@ public class Client implements Closeable {
       boolean readBody = since==null || lastModifiedDate==null || lastModifiedDate.getTime()>=since.getTime();
       byte [] body = readBody? IOUtils.toByteArray(input): null;
       
-      return new Content(id, url, lastModifiedDate, contentType, body);
+      return new Content(rec, lastModifiedDate, contentType, body);
     }
   }
   
