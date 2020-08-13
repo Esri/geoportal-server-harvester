@@ -148,7 +148,7 @@ import org.apache.http.client.methods.HttpGet;
       try {
         if (folders==null) {
           Catalog content = client.readCatalog(definition.getHostUrl());
-          folders.addAll(content.folders);
+          folders = new LinkedList<>(content.folders);
           recordsIter = content.records.iterator();
           
           return hasNext();
