@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Content of the catalog.
+ * Catalog of the catalog.
  */
-public class Content {
+public class Catalog {
     public final URL url;
     public final List<Record> records;
     public final List<URL> folders;
@@ -34,7 +34,7 @@ public class Content {
      * @param records list of record URL's
      * @param folders list of sub-folders URL's
      */
-    public Content(URL url, List<Record> records, List<URL> folders) {
+    public Catalog(URL url, List<Record> records, List<URL> folders) {
         if (url==null) {
           throw new IllegalArgumentException(String.format("Missing url"));
         }

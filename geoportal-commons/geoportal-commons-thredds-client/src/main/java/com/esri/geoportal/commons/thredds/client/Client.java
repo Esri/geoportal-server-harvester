@@ -59,7 +59,7 @@ public class Client implements Closeable {
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 //    Client client = new Client(httpClient, new URL("https://chlthredds.erdc.dren.mil/thredds/catalog/wis/Atlantic/ST41001/1980/catalog.xml"));
     Client client = new Client(httpClient, new URL("https://data.nodc.noaa.gov/thredds/catalog.xml"));
-    Content content = client.listItems(null);
+    Catalog content = client.readCatalog(null);
     
     System.out.println(content.url);
     System.out.println(content.records);
@@ -78,7 +78,11 @@ public class Client implements Closeable {
     this.url = url;
   }
 
-  public Content listItems(URL url) throws IOException, URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException {
+  public Catalog readCatalog(URL url) throws IOException, URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException {
+    if (url==null) {
+      throw new IllegalArgumentException("Missing url");
+    }
+    
     ArrayList<Record> records = new ArrayList<>();
     ArrayList<URL> folders = new ArrayList<>();
 
@@ -114,11 +118,10 @@ public class Client implements Closeable {
       folders.add(catalogUrl);
     }
     
-    
-    return new Content(url, records, folders);
+    return new Catalog(url, records, folders);
   }
 
-  public Document readContent(URL url) throws URISyntaxException, IOException, ParserConfigurationException, SAXException {
+  private Document readContent(URL url) throws URISyntaxException, IOException, ParserConfigurationException, SAXException {
     HttpGet method = new HttpGet(url.toURI());
     try (CloseableHttpResponse httpResponse = httpClient.execute(method); InputStream responseInputStream = httpResponse.getEntity().getContent();) {
       if (httpResponse.getStatusLine().getStatusCode() >= 400) {

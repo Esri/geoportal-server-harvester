@@ -15,25 +15,23 @@
  */
 package com.esri.geoportal.harvester.thredds;
 
-import com.esri.geoportal.commons.constants.ItemType;
+import com.esri.geoportal.commons.constants.HttpConstants;
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.constants.MimeTypeUtils;
 import com.esri.geoportal.commons.http.BotsHttpClient;
+import com.esri.geoportal.commons.meta.util.WKAConstants;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.commons.thredds.client.Client;
-import com.esri.geoportal.commons.thredds.client.Content;
+import com.esri.geoportal.commons.thredds.client.Catalog;
 import com.esri.geoportal.commons.thredds.client.Record;
+import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -43,11 +41,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import java.io.InputStream;
 import java.net.URL;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpResponseException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 
 /**
  * THREDDS broker.
@@ -63,14 +71,6 @@ import java.util.List;
   protected CloseableHttpClient httpClient;
   private Client client;
   protected TaskDefinition td;
-
-  private static final ObjectMapper mapper = new ObjectMapper();
-
-  static {
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    mapper.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-  }
 
   /**
    * Creates instance of the broker.
@@ -123,7 +123,7 @@ import java.util.List;
 
   @Override
   public Iterator iterator(IteratorContext iteratorContext) throws DataInputException {
-    ThreddsIter iter = new ThreddsIter() {
+    ThreddsIter iter = new ThreddsIter(iteratorContext) {
       @Override
       protected void onClose() {
         iterators.remove(this);
@@ -135,17 +135,19 @@ import java.util.List;
   }
 
   private class ThreddsIter implements InputBroker.Iterator {
+    private final IteratorContext iteratorContext;
     private LinkedList<URL> folders;
     private java.util.Iterator<Record> recordsIter;
 
-    public ThreddsIter() {
+    public ThreddsIter(IteratorContext iteratorContext) {
+      this.iteratorContext = iteratorContext;
     }
 
     @Override
     public boolean hasNext() throws DataInputException {
       try {
         if (folders==null) {
-          Content content = client.listItems(definition.getHostUrl());
+          Catalog content = client.readCatalog(definition.getHostUrl());
           folders.addAll(content.folders);
           recordsIter = content.records.iterator();
           
@@ -155,7 +157,7 @@ import java.util.List;
         if (recordsIter==null || !recordsIter.hasNext()) {
           if (folders==null || folders.isEmpty()) return false;
           
-          Content content = client.listItems(folders.pollFirst());
+          Catalog content = client.readCatalog(folders.pollFirst());
           folders.addAll(content.folders);
           recordsIter = content.records.iterator();
           
@@ -170,7 +172,15 @@ import java.util.List;
 
     @Override
     public DataReference next() throws DataInputException {
-        return null;
+      if (recordsIter==null || !recordsIter.hasNext()) {
+        throw new DataInputException(ThreddsBroker.this, String.format("No more records."));
+      }
+      Record rec = recordsIter.next();
+      try {
+        return readContent(rec.url, rec.id, iteratorContext.getLastHarvestDate());
+      } catch (IOException|URISyntaxException ex) {
+        throw new DataInputException(ThreddsBroker.this, String.format("Error reading content forL ", rec.id), ex);
+      }
     }
 
     protected void onClose() {
@@ -204,30 +214,83 @@ import java.util.List;
 
   @Override
   public DataContent readContent(String id) throws DataInputException {
-    // TODO: provide THREDDS iterator implementation
-    return null;
+    try {
+      return readContent(new URL(id), id, null);
+    } catch (IOException|URISyntaxException ex) {
+      throw new DataInputException(this, String.format("Error reading content for: %s", id), ex);
+    }
   }
 
-  private String generateSchemeName(String url) {
-    String serviceType = url != null ? ItemType.matchPattern(url).stream()
-            .filter(it -> it.getServiceType() != null)
-            .map(ItemType::getServiceType)
-            .findFirst().orElse(null) : null;
-    if (serviceType != null) {
-      return "urn:x-esri:specification:ServiceType:ArcGIS:" + serviceType;
-    }
-    if (url != null) {
-      int idx = url.lastIndexOf(".");
-      if (idx >= 0) {
-        String ext = url.substring(idx + 1);
-        MimeType mimeType = MimeTypeUtils.mapExtension(ext);
-        return generateSchemeName(mimeType);
+  /**
+   * Reads content.
+   * @param httpClient HTTP client
+   * @param since since date
+   * @return content reference
+   * @throws IOException if reading content fails
+   * @throws URISyntaxException if file url is an invalid URI
+   */
+  private SimpleDataReference readContent(URL url, String id, Date since) throws IOException, URISyntaxException {
+    HttpGet method = new HttpGet(url.toURI());
+    method.setConfig(DEFAULT_REQUEST_CONFIG);
+    method.setHeader("User-Agent", HttpConstants.getUserAgent());
+    
+    try (CloseableHttpResponse httpResponse = httpClient.execute(method); InputStream input = httpResponse.getEntity().getContent();) {
+      if (httpResponse.getStatusLine().getStatusCode()>=400) {
+        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
+      if (Thread.currentThread().isInterrupted()) {
+        return new SimpleDataReference(this.getBrokerUri(), this.getEntityDefinition().getLabel(), url.toExternalForm(), null, url.toURI(), this.td.getSource().getRef(), this.td.getRef());
+      }
+      Date lastModifiedDate = readLastModifiedDate(httpResponse);
+      MimeType contentType = readContentType(httpResponse, url);
+      boolean readBody = since==null || lastModifiedDate==null || lastModifiedDate.getTime()>=since.getTime();
+      SimpleDataReference ref = new SimpleDataReference(this.getBrokerUri(), this.getEntityDefinition().getLabel(), id, lastModifiedDate, url.toURI(), this.td.getSource().getRef(), this.td.getRef());
+      ref.addContext(contentType, readBody? IOUtils.toByteArray(input): null);
+
+      // Adding in resource map attributes for saving to AGP...
+      ref.getAttributesMap().put(WKAConstants.WKA_RESOURCE_URL, url.toURI());
+
+      return ref;
     }
-    return null;
+  }
+  
+  /**
+   * Reads content type.
+   * @param response HTTP response
+   * @return content type or <code>null</code> if unable to read content type
+   */
+  private MimeType readContentType(HttpResponse response, URL url) {
+    try {
+      Header contentTypeHeader = response.getFirstHeader("Content-Type");
+      MimeType contentType = null;
+      if (contentTypeHeader!=null) {
+        contentType = MimeType.parse(contentTypeHeader.getValue());
+      }
+      if (contentType==null) {
+        String strFileUrl = url.toExternalForm();
+        int lastDotIndex = strFileUrl.lastIndexOf(".");
+        String ext = lastDotIndex>=0? strFileUrl.substring(lastDotIndex+1): "";
+        contentType = MimeTypeUtils.mapExtension(ext);
+      }
+      return contentType;
+    } catch (Exception ex) {
+      return null;
+    }
   }
 
-  private String generateSchemeName(MimeType mimeType) {
-    return mimeType != null ? "urn:" + mimeType.getName() : null;
+  /**
+   * Reads last modified date.
+   * @param response HTTP response
+   * @return last modified date or <code>null</code> if unavailable
+   */
+  private Date readLastModifiedDate(HttpResponse response) {
+    try {
+      Header lastModifedHeader = response.getFirstHeader("Last-Modified");
+      return lastModifedHeader != null
+              ? Date.from(ZonedDateTime.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(lastModifedHeader.getValue())).toInstant())
+              : null;
+    } catch (Exception ex) {
+      return null;
+    }
   }
 }
