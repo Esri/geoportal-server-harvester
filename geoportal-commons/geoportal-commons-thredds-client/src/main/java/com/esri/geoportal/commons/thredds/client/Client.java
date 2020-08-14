@@ -30,6 +30,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.function.Predicate;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -122,7 +123,7 @@ public class Client implements Closeable {
     return new Catalog(url, records, folders);
   }
 
-  public Content fetchContent(Record rec, Date since) throws IOException {
+  public Content fetchContent(Record rec, Predicate<Content> bodyDownloadPredicate) throws IOException {
     HttpGet method = new HttpGet(rec.uri);
     method.setConfig(DEFAULT_REQUEST_CONFIG);
     method.setHeader("User-Agent", HttpConstants.getUserAgent());
@@ -133,9 +134,11 @@ public class Client implements Closeable {
       }
       Date lastModifiedDate = readLastModifiedDate(httpResponse);
       MimeType contentType = readContentType(httpResponse, url);
-      boolean readBody = since == null || lastModifiedDate == null || lastModifiedDate.getTime() >= since.getTime();
-      byte[] body = readBody ? IOUtils.toByteArray(input) : null;
+      
+      Content preDownload = new Content(rec, lastModifiedDate, contentType);
 
+      byte[] body = bodyDownloadPredicate.test(preDownload) ? IOUtils.toByteArray(input) : null;
+      
       return new Content(rec, lastModifiedDate, contentType, body);
     }
   }

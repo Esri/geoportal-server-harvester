@@ -37,5 +37,9 @@ public class Content {
     this.body = body;
   }
   
+
+  public Content(Record record, Date lastModifiedDate, MimeType contentType) {
+    this(record, lastModifiedDate, contentType, null);
+  }
   
 }

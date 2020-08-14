@@ -174,7 +174,7 @@ import java.util.stream.Collectors;
     
     private List<URL> selectFolders(List<URL> fld) {
       fld.stream().filter(url -> visitedFolders.contains(url)).forEach(url -> {
-        LOG.debug(String.format("Skipping duplicated sub-catalog: %s", url));
+        LOG.info(String.format("Skipping duplicated sub-catalog: %s", url));
       });
       fld = fld.stream().filter(url -> !visitedFolders.contains(url)).collect(Collectors.toList());
       visitedFolders.addAll(fld);
@@ -183,11 +183,13 @@ import java.util.stream.Collectors;
     
     private Content readContent(Record rec) {
         try {
-          Content content = client.fetchContent(rec, iteratorContext.getLastHarvestDate());
+          Content content = client.fetchContent(rec, preDownload -> iteratorContext.getLastHarvestDate() == null || preDownload.lastModifiedDate == null || preDownload.lastModifiedDate.getTime() >= iteratorContext.getLastHarvestDate().getTime());
           if (content!=null && content.body!=null) {
             return content;
           }
-        } catch (IOException ignore) {} 
+        } catch (IOException ignore) {
+          LOG.debug(String.format("Error reading record %s (%s)", rec.id, rec.uri), ignore);
+        } 
         return null;
     }
     
