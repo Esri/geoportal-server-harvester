@@ -118,6 +118,7 @@ public class Client implements Closeable {
         folders.add(catalogUrl);
       }
     } catch (IOException ignore) {
+      LOG.debug(String.format("Error reading content from %s", url), ignore);
     }
 
     return new Catalog(url, records, folders);
@@ -132,8 +133,8 @@ public class Client implements Closeable {
       if (httpResponse.getStatusLine().getStatusCode() >= 400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
-      Date lastModifiedDate = readLastModifiedDate(httpResponse);
-      MimeType contentType = readContentType(httpResponse, url);
+      Date lastModifiedDate = readLastModifiedDate(httpResponse, rec.uri);
+      MimeType contentType = readContentType(httpResponse, rec.uri);
       
       Content preDownload = new Content(rec, lastModifiedDate, contentType);
 
@@ -149,7 +150,7 @@ public class Client implements Closeable {
    * @param response HTTP response
    * @return content type or <code>null</code> if unable to read content type
    */
-  private MimeType readContentType(HttpResponse response, URL url) {
+  private MimeType readContentType(HttpResponse response, URI url) {
     try {
       Header contentTypeHeader = response.getFirstHeader("Content-Type");
       MimeType contentType = null;
@@ -157,13 +158,14 @@ public class Client implements Closeable {
         contentType = MimeType.parse(contentTypeHeader.getValue());
       }
       if (contentType == null) {
-        String strFileUrl = url.toExternalForm();
+        String strFileUrl = url.toASCIIString();
         int lastDotIndex = strFileUrl.lastIndexOf(".");
         String ext = lastDotIndex >= 0 ? strFileUrl.substring(lastDotIndex + 1) : "";
         contentType = MimeTypeUtils.mapExtension(ext);
       }
       return contentType;
     } catch (Exception ex) {
+      LOG.debug(String.format("Error readinig content type of %s", url));
       return null;
     }
   }
@@ -174,13 +176,14 @@ public class Client implements Closeable {
    * @param response HTTP response
    * @return last modified date or <code>null</code> if unavailable
    */
-  private Date readLastModifiedDate(HttpResponse response) {
+  private Date readLastModifiedDate(HttpResponse response, URI url) {
     try {
       Header lastModifedHeader = response.getFirstHeader("Last-Modified");
       return lastModifedHeader != null
         ? Date.from(ZonedDateTime.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(lastModifedHeader.getValue())).toInstant())
         : null;
     } catch (Exception ex) {
+      LOG.debug(String.format("Error readinig last modified date of %s", url));
       return null;
     }
   }

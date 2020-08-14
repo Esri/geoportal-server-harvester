@@ -174,7 +174,7 @@ import java.util.stream.Collectors;
     
     private List<URL> selectFolders(List<URL> fld) {
       fld.stream().filter(url -> visitedFolders.contains(url)).forEach(url -> {
-        LOG.info(String.format("Skipping duplicated sub-catalog: %s", url));
+        LOG.debug(String.format("Skipping duplicated sub-catalog: %s", url));
       });
       fld = fld.stream().filter(url -> !visitedFolders.contains(url)).collect(Collectors.toList());
       visitedFolders.addAll(fld);
