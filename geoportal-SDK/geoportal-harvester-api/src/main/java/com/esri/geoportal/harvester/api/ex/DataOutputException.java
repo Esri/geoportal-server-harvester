@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.api.ex;
 
+import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 
 /**
@@ -23,8 +24,8 @@ import com.esri.geoportal.harvester.api.specs.OutputBroker;
  * Exception associated with output broker.
  */
 public class DataOutputException extends DataException {
-  private final OutputBroker outputBroker;
-  private final String dataId;
+  protected final OutputBroker outputBroker;
+  protected final DataReference ref;
 
   /**
    * Gets data output.
@@ -39,7 +40,7 @@ public class DataOutputException extends DataException {
    * @return data id
    */
   public String getDataId() {
-    return dataId;
+    return ref.getId();
   }
 
   /**
@@ -47,13 +48,13 @@ public class DataOutputException extends DataException {
    * specified detail message.
    *
    * @param outputBroker output
-   * @param dataId data id
+   * @param ref data reference
    * @param msg the detail message.
    */
-  public DataOutputException(OutputBroker outputBroker, String dataId, String msg) {
+  public DataOutputException(OutputBroker outputBroker, DataReference ref, String msg) {
     super(msg);
-    this.dataId = dataId;
     this.outputBroker = outputBroker;
+    this.ref = ref;
   }
 
   /**
@@ -61,13 +62,13 @@ public class DataOutputException extends DataException {
    * specified detail message.
    *
    * @param outputBroker output
-   * @param dataId data id
+   * @param ref data reference
    * @param msg the detail message.
    * @param t cause
    */
-  public DataOutputException(OutputBroker outputBroker, String dataId, String msg, Throwable t) {
+  public DataOutputException(OutputBroker outputBroker, DataReference ref, String msg, Throwable t) {
     super(msg,t);
-    this.dataId = dataId;
     this.outputBroker = outputBroker;
+    this.ref = ref;
   }
 }

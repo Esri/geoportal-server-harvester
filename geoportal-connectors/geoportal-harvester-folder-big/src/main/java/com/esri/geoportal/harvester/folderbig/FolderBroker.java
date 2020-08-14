@@ -150,7 +150,7 @@ import static com.esri.geoportal.harvester.folderbig.PathUtil.splitPath;
             existing.remove(f.toRealPath().toString());
             //return created ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
           } catch (Exception ex) {
-            throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex.getMessage());
+            throw new DataOutputException(this, ref, ex.getMessage());
 
           }
         }
@@ -158,9 +158,9 @@ import static com.esri.geoportal.harvester.folderbig.PathUtil.splitPath;
         return PublishingStatus.CREATED;
 
     } catch (IOException ex) {
-      throw new DataOutputException(this, String.format("Error publishing data: %s", ref),  ex.getMessage());
+      throw new DataOutputException(this, ref, ex.getMessage());
     }  catch (Exception ex) {
-    throw new DataOutputException(this, String.format("Error publishing data: %s", ref),  ex.getMessage());
+    throw new DataOutputException(this, ref, ex.getMessage());
   }
   }
 

@@ -141,14 +141,14 @@ import org.slf4j.LoggerFactory;
             //return created ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
           } catch (Exception ex) {
             if (!Thread.currentThread().isInterrupted()) {
-              throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
+              throw new DataOutputException(this, ref, String.format("Error publishing data: %s", ref), ex);
             }
           }
         }
       }
       return PublishingStatus.CREATED;
     } catch (IOException ex) {
-      throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
+      throw new DataOutputException(this, ref, String.format("Error publishing data: %s", ref), ex);
     }
   }
 
