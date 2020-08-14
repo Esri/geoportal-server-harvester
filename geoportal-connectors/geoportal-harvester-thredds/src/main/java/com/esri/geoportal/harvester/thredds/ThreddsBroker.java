@@ -207,6 +207,7 @@ import java.util.stream.Collectors;
         ThreddsBroker.this.td.getSource().getRef(), 
         ThreddsBroker.this.td.getRef()
       );
+      ref.addContext(nextContent.contentType, nextContent.body);
       nextContent = null;
       return ref;
     }
