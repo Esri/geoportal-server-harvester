@@ -41,8 +41,10 @@ import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * THREDDS broker.
@@ -119,7 +121,7 @@ import java.util.List;
       };
 
       iterators.add(iter);
-    return iter;
+      return iter;
     } catch (URISyntaxException ex) {
       throw new DataInputException(this, String.format("Invalid broker uri"), ex);
     }
@@ -128,6 +130,7 @@ import java.util.List;
   private class ThreddsIter implements InputBroker.Iterator {
     private final URI brokerUri;
     private final IteratorContext iteratorContext;
+    private final HashSet<URL> visitedFolders = new HashSet<>();
     private LinkedList<URL> folders;
     private java.util.Iterator<Record> recIter;
     private Content nextContent;
@@ -144,7 +147,7 @@ import java.util.List;
       try {
         if (folders==null) {
           Catalog content = client.readCatalog(definition.getHostUrl());
-          folders = new LinkedList<>(content.folders);
+          folders = new LinkedList<>(selectFolders(content.folders));
           recIter = content.records.iterator();
           
           return hasNext();
@@ -154,7 +157,7 @@ import java.util.List;
           if (folders==null || folders.isEmpty()) return false;
           
           Catalog content = client.readCatalog(folders.pollFirst());
-          folders.addAll(content.folders);
+          folders.addAll(selectFolders(content.folders));
           recIter = content.records.iterator();
           
           return hasNext();
@@ -169,6 +172,15 @@ import java.util.List;
       }
     }
     
+    private List<URL> selectFolders(List<URL> fld) {
+      fld.stream().filter(url -> visitedFolders.contains(url)).forEach(url -> {
+        LOG.debug(String.format("Skipping duplicated sub-catalog: %s", url));
+      });
+      fld = fld.stream().filter(url -> !visitedFolders.contains(url)).collect(Collectors.toList());
+      visitedFolders.addAll(fld);
+      return fld;
+    }
+    
     private Content readContent(Record rec) {
         try {
           Content content = client.fetchContent(rec, iteratorContext.getLastHarvestDate());
@@ -177,19 +189,6 @@ import java.util.List;
           }
         } catch (IOException ignore) {} 
         return null;
-    }
-
-    private List<Content> readContents(List<Record> records) {
-      ArrayList<Content> contents = new ArrayList<>();
-      for (Record rec: records) {
-        try {
-          Content content = client.fetchContent(rec, iteratorContext.getLastHarvestDate());
-          if (content!=null && content.body!=null) {
-            contents.add(content);
-          }
-        } catch (IOException ignore) {} 
-      }
-      return contents;
     }
     
     @Override
