@@ -30,6 +30,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.function.Predicate;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -142,6 +143,27 @@ public class Client implements Closeable {
       
       return new Content(rec, lastModifiedDate, contentType, body);
     }
+  }
+  
+  public Record findRecord(String id) throws URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException {
+    return findRecord(url, id, new HashSet<>());
+  }
+  
+  private Record findRecord(URL catalogUrl, String id, HashSet<URL> visitedCatalogs) throws URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException {
+    if (visitedCatalogs.contains(catalogUrl)) return null;
+    visitedCatalogs.add(catalogUrl);
+    
+    Catalog catalog = readCatalog(catalogUrl);
+    if (catalog!=null) {
+      Record record = catalog.records.stream().filter(rec -> rec.id.equals(id)).findFirst().orElse(null);
+      if (record!=null) return record;
+      for (URL subCatalogUrl: catalog.folders) {
+        record = findRecord(subCatalogUrl, id, visitedCatalogs);
+        if (record!=null) return record;
+      }
+    }
+    
+    return null;
   }
 
   /**

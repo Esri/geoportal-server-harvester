@@ -182,6 +182,7 @@ public class DefaultTasksService implements TasksService {
     InputBroker broker = null;
     try {
       TaskDefinition taskDefinition = readTaskDefinition(taskId);
+      taskDefinition.setIgnoreRobotsTxt(true);
       Task task = this.createTask(taskDefinition);
       
       if (!task.getDataSource().hasAccess(credentials)) {

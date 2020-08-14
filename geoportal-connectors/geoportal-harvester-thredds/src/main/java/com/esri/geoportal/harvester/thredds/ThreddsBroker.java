@@ -45,6 +45,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import org.xml.sax.SAXException;
 
 /**
  * THREDDS broker.
@@ -90,7 +93,7 @@ import java.util.stream.Collectors;
   public void terminate() {
     new ArrayList<>(iterators).forEach(ThreddsIter::close);
 
-    if (client!=null) {
+    if (client != null) {
       try {
         client.close();
       } catch (IOException ex) {
@@ -128,6 +131,7 @@ import java.util.stream.Collectors;
   }
 
   private class ThreddsIter implements InputBroker.Iterator {
+
     private final URI brokerUri;
     private final IteratorContext iteratorContext;
     private final HashSet<URL> visitedFolders = new HashSet<>();
@@ -142,36 +146,42 @@ import java.util.stream.Collectors;
 
     @Override
     public boolean hasNext() throws DataInputException {
-      if (nextContent!=null) return true;
-      
+      if (nextContent != null) {
+        return true;
+      }
+
       try {
-        if (folders==null) {
+        if (folders == null) {
           Catalog content = client.readCatalog(definition.getHostUrl());
           folders = new LinkedList<>(selectFolders(content.folders));
           recIter = content.records.iterator();
-          
+
           return hasNext();
         }
-        
-        if (recIter==null || !recIter.hasNext()) {
-          if (folders==null || folders.isEmpty()) return false;
-          
+
+        if (recIter == null || !recIter.hasNext()) {
+          if (folders == null || folders.isEmpty()) {
+            return false;
+          }
+
           Catalog content = client.readCatalog(folders.pollFirst());
           folders.addAll(selectFolders(content.folders));
           recIter = content.records.iterator();
-          
+
           return hasNext();
         }
-          
+
         nextContent = readContent(recIter.next());
-        if (nextContent==null) return hasNext();
-        
+        if (nextContent == null) {
+          return hasNext();
+        }
+
         return true;
       } catch (Exception ex) {
         throw new DataInputException(ThreddsBroker.this, String.format("Error retrieving content."), ex);
       }
     }
-    
+
     private List<URL> selectFolders(List<URL> fld) {
       fld.stream().filter(url -> visitedFolders.contains(url)).forEach(url -> {
         LOG.debug(String.format("Skipping duplicated sub-catalog: %s", url));
@@ -180,34 +190,25 @@ import java.util.stream.Collectors;
       visitedFolders.addAll(fld);
       return fld;
     }
-    
+
     private Content readContent(Record rec) {
-        try {
-          Content content = client.fetchContent(rec, preDownload -> iteratorContext.getLastHarvestDate() == null || preDownload.lastModifiedDate == null || preDownload.lastModifiedDate.getTime() >= iteratorContext.getLastHarvestDate().getTime());
-          if (content!=null && content.body!=null) {
-            return content;
-          }
-        } catch (IOException ignore) {
-          LOG.debug(String.format("Error reading record %s (%s)", rec.id, rec.uri), ignore);
-        } 
-        return null;
+      try {
+        Content content = client.fetchContent(rec, preDownload -> iteratorContext.getLastHarvestDate() == null || preDownload.lastModifiedDate == null || preDownload.lastModifiedDate.getTime() >= iteratorContext.getLastHarvestDate().getTime());
+        if (content != null && content.body != null) {
+          return content;
+        }
+      } catch (IOException ignore) {
+        LOG.debug(String.format("Error reading record %s (%s)", rec.id, rec.uri), ignore);
+      }
+      return null;
     }
-    
+
     @Override
     public DataReference next() throws DataInputException {
-      if (nextContent==null) {
+      if (nextContent == null) {
         throw new DataInputException(ThreddsBroker.this, String.format("No more records."));
       }
-      SimpleDataReference ref = new SimpleDataReference(
-        brokerUri, 
-        ThreddsBroker.this.getEntityDefinition().getLabel(), 
-        nextContent.record.id, 
-        nextContent.lastModifiedDate, 
-        nextContent.record.uri, 
-        ThreddsBroker.this.td.getSource().getRef(), 
-        ThreddsBroker.this.td.getRef()
-      );
-      ref.addContext(nextContent.contentType, nextContent.body);
+      DataReference ref = makeReference(brokerUri, nextContent);
       nextContent = null;
       return ref;
     }
@@ -219,6 +220,20 @@ import java.util.stream.Collectors;
     private void close() {
       onClose();
     }
+  }
+  
+  private DataReference makeReference(URI brokerUri, Content content) {
+    SimpleDataReference ref = new SimpleDataReference(
+      brokerUri,
+      ThreddsBroker.this.getEntityDefinition().getLabel(),
+      content.record.id,
+      content.lastModifiedDate,
+      content.record.uri,
+      ThreddsBroker.this.td.getSource().getRef(),
+      ThreddsBroker.this.td.getRef()
+    );
+    ref.addContext(content.contentType, content.body);
+    return ref;
   }
 
   @Override
@@ -243,7 +258,16 @@ import java.util.stream.Collectors;
 
   @Override
   public DataContent readContent(String id) throws DataInputException {
-    return null;
+    try {
+      Record rec = client.findRecord(id);
+      if (rec != null) {
+        Content content = client.fetchContent(rec, cont -> true);
+        return makeReference(getBrokerUri(), content);
+      }
+      return null;
+    } catch (IOException|URISyntaxException|ParserConfigurationException|SAXException|XPathExpressionException ex) {
+      throw new DataInputException(this, String.format("Error reading content for %s", id), ex);
+    }
   }
-  
+
 }
