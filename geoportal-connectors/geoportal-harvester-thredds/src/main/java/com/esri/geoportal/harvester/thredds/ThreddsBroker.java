@@ -15,12 +15,14 @@
  */
 package com.esri.geoportal.harvester.thredds;
 
+import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.commons.thredds.client.Client;
 import com.esri.geoportal.commons.thredds.client.Catalog;
 import com.esri.geoportal.commons.thredds.client.Content;
+import com.esri.geoportal.commons.thredds.client.ContentData;
 import com.esri.geoportal.commons.thredds.client.Record;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -41,9 +43,11 @@ import com.esri.geoportal.harvester.api.base.SimpleDataReference;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -177,7 +181,7 @@ import org.xml.sax.SAXException;
         }
 
         return true;
-      } catch (Exception ex) {
+      } catch (DataInputException | URISyntaxException | ParserConfigurationException | XPathExpressionException | SAXException ex) {
         throw new DataInputException(ThreddsBroker.this, String.format("Error retrieving content."), ex);
       }
     }
@@ -231,7 +235,13 @@ import org.xml.sax.SAXException;
       content.record.uri,
       ThreddsBroker.this.td.getSource().getRef(),
       ThreddsBroker.this.td.getRef()
-    );
+    ) {
+      @Override
+      public String getFetchableId() {
+        return super.getSourceUri().toASCIIString();
+      }
+      
+    };
     ref.addContext(content.contentType, content.body);
     return ref;
   }
@@ -259,13 +269,20 @@ import org.xml.sax.SAXException;
   @Override
   public DataContent readContent(String id) throws DataInputException {
     try {
-      Record rec = client.findRecord(id);
-      if (rec != null) {
-        Content content = client.fetchContent(rec, cont -> true);
-        return makeReference(getBrokerUri(), content);
-      }
-      return null;
-    } catch (IOException|URISyntaxException|ParserConfigurationException|SAXException|XPathExpressionException ex) {
+      ContentData content = client.fetchContentData(new URI(id), cont -> true);
+      return new DataContent() {
+        @Override
+        public byte[] getContent(MimeType... mimeType) throws IOException {
+          return content.body;
+        }
+
+        @Override
+        public Set<MimeType> getContentType() {
+          return new HashSet<>(Arrays.asList(new MimeType[]{content.contentType}));
+        }
+        
+      };
+    } catch (IOException|URISyntaxException ex) {
       throw new DataInputException(this, String.format("Error reading content for %s", id), ex);
     }
   }

@@ -19,25 +19,21 @@ import com.esri.geoportal.commons.constants.MimeType;
 import java.util.Date;
 
 /**
- * Content.
+ * Content data.
  */
-public class Content extends ContentData {
-  public final Record record;
+public class ContentData {
+  public final Date lastModifiedDate;
+  public final MimeType contentType;
+  public final byte [] body;
 
-  public Content(Record record, Date lastModifiedDate, MimeType contentType, byte [] body) {
-    super(lastModifiedDate, contentType, body);
-    if (record==null) {
-      throw new IllegalArgumentException("Missing record");
-    }
-    this.record = record;
+  public ContentData(Date lastModifiedDate, MimeType contentType, byte [] body) {
+    this.lastModifiedDate = lastModifiedDate;
+    this.contentType = contentType;
+    this.body = body;
   }
 
-  public Content(Record record, Date lastModifiedDate, MimeType contentType) {
-    this(record, lastModifiedDate, contentType, null);
-  }
-
-  public Content(Record record, ContentData contentData) {
-    this(record, contentData.lastModifiedDate, contentData.contentType, contentData.body);
+  public ContentData(Date lastModifiedDate, MimeType contentType) {
+    this(lastModifiedDate, contentType, null);
   }
   
 }

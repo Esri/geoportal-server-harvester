@@ -44,6 +44,16 @@ public class DataOutputException extends DataException {
   }
 
   /**
+   * Gets fetchable data id.
+   * Fetchable data id is a convenient id used to fetch a single data from the source.
+   * @return fetchable data id
+   */
+  public String getFetchableDataId() {
+    return ref.getFetchableId();
+  }
+
+
+  /**
    * Constructs an instance of <code>DataOutputException</code> with the
    * specified detail message.
    *

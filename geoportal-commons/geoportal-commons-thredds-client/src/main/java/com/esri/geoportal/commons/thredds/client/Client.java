@@ -125,8 +125,13 @@ public class Client implements Closeable {
     return new Catalog(url, records, folders);
   }
 
-  public Content fetchContent(Record rec, Predicate<Content> bodyDownloadPredicate) throws IOException {
-    HttpGet method = new HttpGet(rec.uri);
+  public Content fetchContent(Record rec, Predicate<ContentData> bodyDownloadPredicate) throws IOException {
+    ContentData contentData = fetchContentData(rec.uri, bodyDownloadPredicate);
+    return new Content(rec, contentData);
+  }
+
+  public ContentData fetchContentData(URI uri, Predicate<ContentData> bodyDownloadPredicate) throws IOException {
+    HttpGet method = new HttpGet(uri);
     method.setConfig(DEFAULT_REQUEST_CONFIG);
     method.setHeader("User-Agent", HttpConstants.getUserAgent());
 
@@ -134,36 +139,15 @@ public class Client implements Closeable {
       if (httpResponse.getStatusLine().getStatusCode() >= 400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
-      Date lastModifiedDate = readLastModifiedDate(httpResponse, rec.uri);
-      MimeType contentType = readContentType(httpResponse, rec.uri);
+      Date lastModifiedDate = readLastModifiedDate(httpResponse, uri);
+      MimeType contentType = readContentType(httpResponse, uri);
       
-      Content preDownload = new Content(rec, lastModifiedDate, contentType);
+      ContentData preDownload = new ContentData(lastModifiedDate, contentType);
 
       byte[] body = bodyDownloadPredicate.test(preDownload) ? IOUtils.toByteArray(input) : null;
       
-      return new Content(rec, lastModifiedDate, contentType, body);
+      return new ContentData(lastModifiedDate, contentType, body);
     }
-  }
-  
-  public Record findRecord(String id) throws URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException {
-    return findRecord(url, id, new HashSet<>());
-  }
-  
-  private Record findRecord(URL catalogUrl, String id, HashSet<URL> visitedCatalogs) throws URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException {
-    if (visitedCatalogs.contains(catalogUrl)) return null;
-    visitedCatalogs.add(catalogUrl);
-    
-    Catalog catalog = readCatalog(catalogUrl);
-    if (catalog!=null) {
-      Record record = catalog.records.stream().filter(rec -> rec.id.equals(id)).findFirst().orElse(null);
-      if (record!=null) return record;
-      for (URL subCatalogUrl: catalog.folders) {
-        record = findRecord(subCatalogUrl, id, visitedCatalogs);
-        if (record!=null) return record;
-      }
-    }
-    
-    return null;
   }
 
   /**
