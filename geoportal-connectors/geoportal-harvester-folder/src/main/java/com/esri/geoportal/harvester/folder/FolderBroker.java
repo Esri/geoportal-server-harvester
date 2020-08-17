@@ -180,7 +180,7 @@ import org.slf4j.LoggerFactory;
       for (String sf : subFolder) {
         fileName = Paths.get(fileName.toString(), sf);
       }
-      if (!fileName.getFileName().toString().contains(".")) {
+      if (!fileName.getFileName().toString().endsWith(extension)) {
         fileName = fileName.getParent().resolve(fileName.getFileName() + "." + extension);
       }
     } else {

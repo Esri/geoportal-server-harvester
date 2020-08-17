@@ -197,7 +197,7 @@ import static com.esri.geoportal.harvester.folderbig.PathUtil.splitPath;
 
       }
       folderName =Paths.get(folderName.toString(), subFolder.get(subFolder.size() - 1));
-      if (!folderName.getFileName().toString().contains(".")) {
+      if (!folderName.getFileName().toString().endsWith(extension)) {
         folderName = folderName.getParent().resolve(folderName.getFileName() + "." + extension);
       }
     } else {
