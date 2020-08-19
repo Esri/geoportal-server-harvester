@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * You may obtain a copyResources of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -26,12 +26,12 @@ import org.apache.commons.io.FileUtils;
 /**
  * Resource folder copier.
  */
-public class ResourceFolderCopier {
-  private static final Logger LOG = Logger.getLogger(ResourceFolderCopier.class.getName());
+public class ResourceUtils {
+  private static final Logger LOG = Logger.getLogger(ResourceUtils.class.getName());
   
-  public static void copy(String resourceFolder, File destinationFolder) {
+  public static void copyResources(String resourceFolder, File destinationFolder) {
     ClassLoader loader = Thread.currentThread().getContextClassLoader();
-    URL url = loader.getResource(Constants.CONFIG_FOLDER_PATH);
+    URL url = loader.getResource(resourceFolder);
     String path = url.getPath();
     File[] files = new File(path).listFiles();
 
