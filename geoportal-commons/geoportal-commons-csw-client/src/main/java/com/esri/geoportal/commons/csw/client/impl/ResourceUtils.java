@@ -29,6 +29,13 @@ import org.apache.commons.io.FileUtils;
 public class ResourceUtils {
   private static final Logger LOG = Logger.getLogger(ResourceUtils.class.getName());
   
+  public static void copyResources(String resourceFolder, String destinationFolder) {
+    File folder = destinationFolder.startsWith("~")?
+      new File(System.getProperty("user.home"), destinationFolder.substring(1)):
+      new File(destinationFolder);
+    copyResources(resourceFolder, folder);
+  }
+  
   public static void copyResources(String resourceFolder, File destinationFolder) {
     ClassLoader loader = Thread.currentThread().getContextClassLoader();
     URL url = loader.getResource(resourceFolder);
