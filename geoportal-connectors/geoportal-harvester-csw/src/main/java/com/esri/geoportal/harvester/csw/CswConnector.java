@@ -20,6 +20,7 @@ import static com.esri.geoportal.harvester.csw.CswConstants.*;
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.impl.ProfilesProvider;
+import com.esri.geoportal.commons.csw.client.impl.ProfilesService;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.defs.UITemplate.Choice;
@@ -39,8 +40,10 @@ import java.util.ResourceBundle;
 public class CswConnector implements InputConnector<InputBroker> {
   public static final String TYPE = "CSW";
   private final IProfiles profiles;
+  private final ProfilesService profilesService;
 
-  public CswConnector(String cswProfilesFolder) {
+  public CswConnector(ProfilesService profilesService, String cswProfilesFolder) {
+    this.profilesService = profilesService;
     this.profiles = new ProfilesProvider(cswProfilesFolder).newProfiles();
   }
  

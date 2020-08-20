@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.cli.boot;
 
+import com.esri.geoportal.commons.csw.client.impl.ProfilesService;
 import com.esri.geoportal.commons.meta.MetaAnalyzer;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.commons.meta.util.MultiMetaAnalyzerWrapper;
@@ -108,6 +109,7 @@ public class Bootstrap {
   private TasksService taskService;
   private TemplatesService templatesService;
   private TriggersService triggersService;
+  private ProfilesService profilesService;
   private final String geometryServiceUrl;
   private final String cswProfilesFolder;
   
@@ -262,13 +264,16 @@ public class Bootstrap {
       inboundConnectorRegistry = new InboundConnectorRegistry();
 
       MetaBuilder metaBuilder = new SimpleDcMetaBuilder();
+      GeometryService geometryService = new GeometryService(HttpClients.custom().useSystemProperties().build(), new URL(geometryServiceUrl));
+      ProfilesService profilesService = new ProfilesService(cswProfilesFolder);
+      profilesService.init();
 
-      inboundConnectorRegistry.put(CswConnector.TYPE, new CswConnector(this.cswProfilesFolder));
+      inboundConnectorRegistry.put(CswConnector.TYPE, new CswConnector(profilesService, this.cswProfilesFolder));
       inboundConnectorRegistry.put(WafConnector.TYPE, new WafConnector());
       inboundConnectorRegistry.put(UncConnector.TYPE, new UncConnector());
       inboundConnectorRegistry.put(SinkConnector.TYPE, new SinkConnector(5, 1000));
       inboundConnectorRegistry.put(AgpInputConnector.TYPE, new AgpInputConnector(metaBuilder));
-      inboundConnectorRegistry.put(AgsConnector.TYPE, new AgsConnector(metaBuilder, new GeometryService(HttpClients.custom().useSystemProperties().build(), new URL(geometryServiceUrl))));
+      inboundConnectorRegistry.put(AgsConnector.TYPE, new AgsConnector(metaBuilder, geometryService));
       inboundConnectorRegistry.put(GptConnector.TYPE, new GptConnector());
       inboundConnectorRegistry.put(CkanConnector.TYPE, new CkanConnector(metaBuilder));
       inboundConnectorRegistry.put(DataGovConnector.TYPE, new DataGovConnector(metaBuilder));
