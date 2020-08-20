@@ -57,6 +57,26 @@ public class ProfilesService {
   }
   
   public void initialize() throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
+    loadProfiles();
+  }
+  
+  public Templates getTemplate(String path) throws IOException, TransformerConfigurationException {
+    Templates template = cache.get(path);
+    if (template==null) {
+      try (InputStream xsltStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path)) {
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        template = transformerFactory.newTemplates(new StreamSource(xsltStream));
+        cache.put(path, template);
+      }
+    }
+    return template;
+  }
+  
+  public IProfiles newProfiles() {
+    return profiles;
+  }
+  
+  private void loadProfiles() throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
     LOG.info(String.format("Loading CSW profiles"));
     try (InputStream profilesXml = Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_FILE_PATH);) {
       DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -103,22 +123,6 @@ public class ProfilesService {
       }
     }
     LOG.info(String.format("CSW profiles loaded."));
-  }
-  
-  public Templates getTemplate(String path) throws IOException, TransformerConfigurationException {
-    Templates template = cache.get(path);
-    if (template==null) {
-      try (InputStream xsltStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path)) {
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        template = transformerFactory.newTemplates(new StreamSource(xsltStream));
-        cache.put(path, template);
-      }
-    }
-    return template;
-  }
-  
-  public IProfiles newProfiles() {
-    return profiles;
   }
   
 }
