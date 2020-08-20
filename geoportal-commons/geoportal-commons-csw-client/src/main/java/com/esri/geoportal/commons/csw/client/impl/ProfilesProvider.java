@@ -16,11 +16,14 @@
 package com.esri.geoportal.commons.csw.client.impl;
 
 import com.esri.geoportal.commons.csw.client.IProfiles;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Profiles provider.
  */
 public class ProfilesProvider {
+  private static final Logger LOG = LoggerFactory.getLogger(ProfilesProvider.class);
   private final String cswProfilesFolder;
   private IProfiles profiles;
 
@@ -42,6 +45,7 @@ public class ProfilesProvider {
         ProfilesLoader loader = new ProfilesLoader();
         profiles = loader.load();
       } catch (Exception ex) {
+        LOG.error(String.format("Error providing profiles."), ex);
       }
     }
     return profiles;
