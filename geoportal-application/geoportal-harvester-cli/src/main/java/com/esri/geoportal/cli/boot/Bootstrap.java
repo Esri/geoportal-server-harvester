@@ -109,14 +109,16 @@ public class Bootstrap {
   private TemplatesService templatesService;
   private TriggersService triggersService;
   private final String geometryServiceUrl;
+  private final String cswProfilesFolder;
   
   /**
    * Creates instance of the bootstrap.
    * @param geometryServiceUrl Esri geometry service URL
    * @param reportManager report manager
    */
-  public Bootstrap(String geometryServiceUrl, ReportManager reportManager) {
+  public Bootstrap(String geometryServiceUrl, String cswProfilesFolder, ReportManager reportManager) {
     this.geometryServiceUrl = geometryServiceUrl;
+    this.cswProfilesFolder = cswProfilesFolder;
     this.reportManager = reportManager;
   }
   
@@ -261,7 +263,7 @@ public class Bootstrap {
 
       MetaBuilder metaBuilder = new SimpleDcMetaBuilder();
 
-      inboundConnectorRegistry.put(CswConnector.TYPE, new CswConnector());
+      inboundConnectorRegistry.put(CswConnector.TYPE, new CswConnector(this.cswProfilesFolder));
       inboundConnectorRegistry.put(WafConnector.TYPE, new WafConnector());
       inboundConnectorRegistry.put(UncConnector.TYPE, new UncConnector());
       inboundConnectorRegistry.put(SinkConnector.TYPE, new SinkConnector(5, 1000));

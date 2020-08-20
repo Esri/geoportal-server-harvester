@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.migration;
 
 import com.esri.geoportal.commons.csw.client.impl.Profiles;
 import com.esri.geoportal.commons.csw.client.impl.ProfilesLoader;
+import com.esri.geoportal.commons.csw.client.impl.ProfilesProvider;
 import com.esri.geoportal.harvester.ags.AgsBrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -171,7 +172,7 @@ import org.xml.sax.SAXException;
     public EntityDefinition buildDefinition(MigrationHarvestSite site) throws InvalidDefinitionException {
       try {
         EntityDefinition entityDefinition = new EntityDefinition();
-        CswBrokerDefinitionAdaptor adaptor = new CswBrokerDefinitionAdaptor(entityDefinition);
+        CswBrokerDefinitionAdaptor adaptor = new CswBrokerDefinitionAdaptor(new ProfilesProvider().newProfiles(), entityDefinition);
         int queryIdx = site.host.indexOf("?");
         String cswUrl = queryIdx >= 0 ? site.host.substring(0, queryIdx) : site.host;
         adaptor.setHostUrl(new URL(cswUrl));

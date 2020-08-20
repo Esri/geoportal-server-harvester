@@ -52,7 +52,9 @@
     <constructor-arg ref="metaBuilder"/>
   </bean>
   <bean class="com.esri.geoportal.harvester.gptsrc.GptConnector"/>
-  <bean class="com.esri.geoportal.harvester.csw.CswConnector"/>
+  <bean class="com.esri.geoportal.harvester.csw.CswConnector">
+    <constructor-arg value="${csw.profiles.folder}"/>
+  </bean>
   <bean class="com.esri.geoportal.harvester.folder.FolderConnector"/>
   <bean class="com.esri.geoportal.harvester.gpt.GptConnector">
     <constructor-arg value="${geometry.service.url}"/>

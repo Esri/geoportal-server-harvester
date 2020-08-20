@@ -38,7 +38,12 @@ import java.util.ResourceBundle;
  */
 public class CswConnector implements InputConnector<InputBroker> {
   public static final String TYPE = "CSW";
+  private final IProfiles profiles;
 
+  public CswConnector(String cswProfilesFolder) {
+    this.profiles = new ProfilesProvider(cswProfilesFolder).newProfiles();
+  }
+ 
   @Override
   public String getType() {
     return TYPE;
@@ -60,8 +65,6 @@ public class CswConnector implements InputConnector<InputBroker> {
         return true;
       }
     });
-    ProfilesProvider of = new ProfilesProvider();
-    IProfiles profiles = of.newProfiles();
     Choice<String>[] choices = profiles.listAll().stream().map(p->new Choice<String>(p.getId(),p.getName())).toArray(Choice[]::new);
     arguments.add(new UITemplate.ChoiceArgument(P_PROFILE_ID, bundle.getString("csw.profile"), Arrays.asList(choices)){
       public String getDefault() {
@@ -75,11 +78,11 @@ public class CswConnector implements InputConnector<InputBroker> {
 
   @Override
   public void validateDefinition(EntityDefinition definition) throws InvalidDefinitionException {
-    new CswBrokerDefinitionAdaptor(definition);
+    new CswBrokerDefinitionAdaptor(profiles, definition);
   }
 
   @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
-    return new CswBroker(this, new CswBrokerDefinitionAdaptor(definition));
+    return new CswBroker(this, new CswBrokerDefinitionAdaptor(profiles, definition));
   }
 }

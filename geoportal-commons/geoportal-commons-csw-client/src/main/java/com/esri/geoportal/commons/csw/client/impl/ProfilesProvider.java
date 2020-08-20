@@ -21,8 +21,17 @@ import com.esri.geoportal.commons.csw.client.IProfiles;
  * Profiles provider.
  */
 public class ProfilesProvider {
+  private final String cswProfilesFolder;
   private IProfiles profiles;
-  
+
+  public ProfilesProvider(String cswProfilesFolder) {
+    this.cswProfilesFolder = cswProfilesFolder;
+  }
+
+  public ProfilesProvider() {
+    this.cswProfilesFolder = null;
+  }
+    
   /**
    * Gets new instance of the profiles.
    * @return profiles

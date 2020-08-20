@@ -36,6 +36,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Command line application.
@@ -45,6 +46,7 @@ public class Application {
   private static final String version = "2.6.4";
 
   private String geometryServiceUrl = DEFAULT_GEOMETRY_SERVICE;
+  private String cswProfilesFolder = null;
 
   public static void main(String[] args) {
     Application app = new Application();
@@ -71,6 +73,11 @@ public class Application {
           String geoUrl = cli.getOptionValue('g');
           this.geometryServiceUrl = geoUrl;
         } 
+        
+        if (cli.hasOption('p')) {
+          String cswProfilesFolder = StringUtils.trimToNull(cli.getOptionValue('p'));
+          this.cswProfilesFolder = cswProfilesFolder;
+        }
 
         if (cli.hasOption('f')) {
           String fileName = cli.getOptionValue('f');
@@ -117,6 +124,7 @@ public class Application {
     Option file = new Option("f", "file", true, "executes task defined in the file");
     Option task = new Option("t", "task", true, "executes task defined as JSON");
     Option geo = new Option("g", "geometry", true, "url to accessible geometry service");
+    Option csw = new Option("p", "profiles", true, "location of the profiles");
     geo.setArgName("url");
     
     Options options = new Options();
@@ -126,12 +134,13 @@ public class Application {
     options.addOption(file);
     options.addOption(task);
     options.addOption(geo);
+    options.addOption(csw);
     
     return options;
   }
 
   protected void harvest(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
-    Bootstrap boot = new Bootstrap(this.geometryServiceUrl, new MemReportManager());
+    Bootstrap boot = new Bootstrap(this.geometryServiceUrl, this.cswProfilesFolder, new MemReportManager());
     Engine engine = boot.createEngine();
     IteratorContext iterCtx = new SimpleIteratorContext();
 
