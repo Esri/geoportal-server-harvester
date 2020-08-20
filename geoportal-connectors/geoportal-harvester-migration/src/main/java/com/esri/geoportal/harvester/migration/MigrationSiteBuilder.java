@@ -15,9 +15,7 @@
  */
 package com.esri.geoportal.harvester.migration;
 
-import com.esri.geoportal.commons.csw.client.impl.Profiles;
-import com.esri.geoportal.commons.csw.client.impl.ProfilesLoader;
-import com.esri.geoportal.commons.csw.client.impl.ProfilesProvider;
+import com.esri.geoportal.commons.csw.client.impl.ProfilesService;
 import com.esri.geoportal.harvester.ags.AgsBrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -53,35 +51,22 @@ import org.xml.sax.SAXException;
  */
 /*package*/ class MigrationSiteBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(MigrationSiteBuilder.class);
-  private static Profiles profiles = new Profiles();
-  
-  static {
-    try {
-      ProfilesLoader profilesLoader = new ProfilesLoader();
-      profiles = profilesLoader.load();
-    } catch (Exception ex) {
-      LOG.warn(String.format("Error loading CSW profiles."), ex);
-    }
-  }
 
   private final Engine engine;
 
   private final Map<String, AdaptorDefinitonBuilder> builders = new HashMap<>();
-
-  {
-    builders.put("WAF", new WafDefinitionBuilder());
-    builders.put("CKAN", new CkanDefinitionBuilder());
-    builders.put("CSW", new CswDefinitionBuilder());
-    builders.put("ARCGIS", new ArcgisDefinitionBuilder());
-  }
 
   /**
    * Creates instance of the builder.
    *
    * @param engine engine
    */
-  public MigrationSiteBuilder(Engine engine) {
+  public MigrationSiteBuilder(ProfilesService profilesService, Engine engine) {
     this.engine = engine;
+    builders.put("WAF", new WafDefinitionBuilder());
+    builders.put("CKAN", new CkanDefinitionBuilder());
+    builders.put("ARCGIS", new ArcgisDefinitionBuilder());
+    builders.put("CSW", new CswDefinitionBuilder(profilesService));
   }
   
   public void buildSite(MigrationHarvestSite site) throws DataProcessorException {
@@ -167,18 +152,24 @@ import org.xml.sax.SAXException;
   }
 
   private static class CswDefinitionBuilder implements AdaptorDefinitonBuilder {
+    
+    private final ProfilesService profilesService;
+
+    public CswDefinitionBuilder(ProfilesService profilesService) {
+      this.profilesService = profilesService;
+    }
 
     @Override
     public EntityDefinition buildDefinition(MigrationHarvestSite site) throws InvalidDefinitionException {
       try {
         EntityDefinition entityDefinition = new EntityDefinition();
-        CswBrokerDefinitionAdaptor adaptor = new CswBrokerDefinitionAdaptor(new ProfilesProvider().newProfiles(), entityDefinition);
+        CswBrokerDefinitionAdaptor adaptor = new CswBrokerDefinitionAdaptor(profilesService.newProfiles(), entityDefinition);
         int queryIdx = site.host.indexOf("?");
         String cswUrl = queryIdx >= 0 ? site.host.substring(0, queryIdx) : site.host;
         adaptor.setHostUrl(new URL(cswUrl));
         
         String profileId = getProfileId(site.protocol);
-        adaptor.setProfile(profiles.getProfileById(profileId));
+        adaptor.setProfile(profilesService.newProfiles().getProfileById(profileId));
         
         return entityDefinition;
       } catch (ParserConfigurationException|SAXException|XPathExpressionException|IOException ex) {

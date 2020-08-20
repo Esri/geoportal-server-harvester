@@ -16,6 +16,7 @@
 package com.esri.geoportal.commons.csw.client.impl;
 
 import com.esri.geoportal.commons.csw.client.IProfile;
+import com.esri.geoportal.commons.csw.client.IProfiles;
 import java.util.List;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -28,7 +29,10 @@ public class ProfilesTest {
 
   @Test
   public void testProfiles() throws Exception {
-    Profiles profiles = new ProfilesLoader().load();
+    ProfilesService profilesService = new ProfilesService(null);
+    profilesService.initialize();;
+    
+    IProfiles profiles = profilesService.newProfiles();
     
     IProfile defaultProfile = profiles.getDefaultProfile();
     

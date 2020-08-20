@@ -8,7 +8,7 @@
   <bean class="com.esri.geoportal.harvester.beans.GeometryServiceBean" id="geometryService" destroy-method="close">
     <constructor-arg value="${geometry.service.url}"/>
   </bean>
-  <bean class="com.esri.geoportal.commons.csw.client.impl.ProfilesService" id="profilesService" init-method="init">
+  <bean class="com.esri.geoportal.harvester.beans.ProfilesServiceBean" id="profilesService" init-method="init">
     <constructor-arg value="${csw.profiles.folder}"/>
   </bean>
   

@@ -86,6 +86,7 @@ import org.xml.sax.SAXException;
 public class Client implements IClient {
 
   private final Logger LOG = LoggerFactory.getLogger(Client.class);
+  private final ProfilesService profilesService;
   private final CloseableHttpClient httpClient;
   private final URL baseUrl;
   private final IProfile profile;
@@ -101,7 +102,8 @@ public class Client implements IClient {
    * @param profile CSW profile
    * @param cred credentials
    */
-  public Client(CloseableHttpClient httpClient, URL baseUrl, IProfile profile, SimpleCredentials cred) {
+  public Client(ProfilesService profilesService, CloseableHttpClient httpClient, URL baseUrl, IProfile profile, SimpleCredentials cred) {
+    this.profilesService = profilesService;
     this.httpClient = httpClient;
     this.baseUrl = baseUrl;
     this.profile = profile;
@@ -168,7 +170,7 @@ public class Client implements IClient {
       }
     
       // create transformer
-      Templates template = TemplatesManager.getInstance().getTemplate(profile.getMetadataxslt());
+      Templates template = profilesService.getTemplate(profile.getMetadataxslt());
       Transformer transformer = template.newTransformer();
 
       try (ByteArrayInputStream contentStream = new ByteArrayInputStream(response.getBytes("UTF-8"));) {
@@ -270,7 +272,7 @@ public class Client implements IClient {
     String internalRequestXml = createInternalXmlRequest(criteria);
 
     // create transformer
-    Templates template = TemplatesManager.getInstance().getTemplate(Constants.CONFIG_FOLDER_PATH + "/" + profile.getGetRecordsReqXslt());
+    Templates template = profilesService.getTemplate(Constants.CONFIG_FOLDER_PATH + "/" + profile.getGetRecordsReqXslt());
     Transformer transformer = template.newTransformer();
 
     try (ByteArrayInputStream internalRequestInputStream = new ByteArrayInputStream(internalRequestXml.getBytes("UTF-8"));) {
@@ -310,7 +312,7 @@ public class Client implements IClient {
     ArrayList<IRecord> records = new ArrayList<>();
 
     // create transformer
-    Templates template = TemplatesManager.getInstance().getTemplate(profile.getResponsexslt());
+    Templates template = profilesService.getTemplate(profile.getResponsexslt());
     Transformer transformer = template.newTransformer();
 
     // perform transformation

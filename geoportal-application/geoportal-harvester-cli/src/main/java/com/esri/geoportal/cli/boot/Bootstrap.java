@@ -78,9 +78,11 @@ import com.esri.geoportal.harvester.jdbc.JdbcConnector;
 import com.esri.geoportal.harvester.dcat.DcatConnector;
 import java.io.IOException;
 import java.net.URL;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import org.apache.http.impl.client.HttpClients;
+import org.xml.sax.SAXException;
 
 /**
  * Bootstrap.
@@ -129,7 +131,7 @@ public class Bootstrap {
    * @return engine.
    * @throws com.esri.geoportal.harvester.api.ex.DataProcessorException if error creating engine
    */
-  public Engine createEngine() throws DataProcessorException {
+  public Engine createEngine() throws DataProcessorException, ParserConfigurationException, SAXException {
     try {
       DefaultEngine engine = new DefaultEngine(
               createTemplatesService(), 
@@ -147,7 +149,7 @@ public class Bootstrap {
   }
   
   // <editor-fold defaultstate="collapsed" desc="services factories">
-  protected BrokersService createBrokersService() throws IOException, TransformerConfigurationException, XPathExpressionException {
+  protected BrokersService createBrokersService() throws IOException, TransformerConfigurationException, XPathExpressionException, ParserConfigurationException, SAXException {
     if (brokerService==null) {
       brokerService = new DefaultBrokersService(
               createInboundConnectorRegistry(), 
@@ -157,7 +159,7 @@ public class Bootstrap {
     return brokerService;
   }
   
-  protected TemplatesService createTemplatesService() throws IOException, TransformerConfigurationException, XPathExpressionException {
+  protected TemplatesService createTemplatesService() throws IOException, TransformerConfigurationException, XPathExpressionException, ParserConfigurationException, SAXException {
     if (templatesService==null) {
       templatesService = new DefaultTemplatesService(
               createInboundConnectorRegistry(), 
@@ -170,7 +172,7 @@ public class Bootstrap {
     return templatesService;
   }
   
-  protected TasksService createTasksService() throws IOException, TransformerConfigurationException, XPathExpressionException {
+  protected TasksService createTasksService() throws IOException, TransformerConfigurationException, XPathExpressionException, ParserConfigurationException, SAXException {
     if (taskService==null) {
       taskService = new DefaultTasksService(
               createInboundConnectorRegistry(), 
@@ -195,7 +197,7 @@ public class Bootstrap {
     return processesService;
   }
   
-  protected ExecutionService createExecutionService() throws IOException, TransformerConfigurationException, XPathExpressionException {
+  protected ExecutionService createExecutionService() throws IOException, TransformerConfigurationException, XPathExpressionException, ParserConfigurationException, SAXException {
     if (executionService==null) {
       executionService = new DefaultExecutionService(
               createProcessesService(),
@@ -205,7 +207,7 @@ public class Bootstrap {
     return executionService;
   }
   
-  protected TriggersService createTriggersService() throws IOException, TransformerConfigurationException, XPathExpressionException {
+  protected TriggersService createTriggersService() throws IOException, TransformerConfigurationException, XPathExpressionException, ParserConfigurationException, SAXException {
     if (triggersService==null) {
       triggersService = new DefaultTriggersService(
               createTriggerRegistry(), 
@@ -259,14 +261,14 @@ public class Bootstrap {
     return filterRegistry;
   }
   
-  protected InboundConnectorRegistry createInboundConnectorRegistry() throws IOException, TransformerConfigurationException {
+  protected InboundConnectorRegistry createInboundConnectorRegistry() throws IOException, TransformerConfigurationException, ParserConfigurationException, SAXException, XPathExpressionException {
     if (inboundConnectorRegistry==null) {
       inboundConnectorRegistry = new InboundConnectorRegistry();
 
       MetaBuilder metaBuilder = new SimpleDcMetaBuilder();
       GeometryService geometryService = new GeometryService(HttpClients.custom().useSystemProperties().build(), new URL(geometryServiceUrl));
       ProfilesService profilesService = new ProfilesService(cswProfilesFolder);
-      profilesService.init();
+      profilesService.initialize();
 
       inboundConnectorRegistry.put(CswConnector.TYPE, new CswConnector(profilesService, this.cswProfilesFolder));
       inboundConnectorRegistry.put(WafConnector.TYPE, new WafConnector());

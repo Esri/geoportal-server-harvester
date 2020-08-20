@@ -39,6 +39,10 @@ public class MigrationConnector implements InputConnector<InputBroker>{
     this.profilesService = profilesService;
   }
 
+  public ProfilesService getProfilesService() {
+    return profilesService;
+  }
+
   @Override
   public void validateDefinition(EntityDefinition definition) throws InvalidDefinitionException {
     new MigrationBrokerDefinitionAdaptor(definition);

@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -37,6 +38,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
+import org.xml.sax.SAXException;
 
 /**
  * Command line application.
@@ -95,7 +97,7 @@ public class Application {
           printHelp(options);
         }
       }
-    } catch (IOException|DataProcessorException|InvalidDefinitionException ex) {
+    } catch (IOException|DataProcessorException|InvalidDefinitionException|ParserConfigurationException|SAXException ex) {
       ex.printStackTrace(System.err);
     } catch (ParseException ex) {
       printHeader();
@@ -139,7 +141,7 @@ public class Application {
     return options;
   }
 
-  protected void harvest(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
+  protected void harvest(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException, ParserConfigurationException, SAXException {
     Bootstrap boot = new Bootstrap(this.geometryServiceUrl, this.cswProfilesFolder, new MemReportManager());
     Engine engine = boot.createEngine();
     IteratorContext iterCtx = new SimpleIteratorContext();

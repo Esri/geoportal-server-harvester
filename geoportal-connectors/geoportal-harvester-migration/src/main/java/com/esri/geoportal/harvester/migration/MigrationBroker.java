@@ -156,7 +156,7 @@ import org.slf4j.LoggerFactory;
             PreparedStatement st = makeSitesStatement(conn);
             ResultSet rs = st.executeQuery();
         ) {
-      MigrationSiteBuilder builder = new MigrationSiteBuilder(getEngine());
+      MigrationSiteBuilder builder = new MigrationSiteBuilder(connector.getProfilesService(), getEngine());
       while (rs.next()) {
         MigrationHarvestSite hs = new MigrationHarvestSite();
         
