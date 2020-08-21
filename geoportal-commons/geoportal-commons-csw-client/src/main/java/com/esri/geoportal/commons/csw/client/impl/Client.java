@@ -165,7 +165,7 @@ public class Client implements IClient {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
       String response = IOUtils.toString(responseStream, "UTF-8");
-      if (CONFIG_FOLDER_PATH.equals(profile.getMetadataxslt())) {
+      if (profile.getMetadataxslt()==null || profile.getMetadataxslt().isBlank()) {
         return response;
       }
     
@@ -272,7 +272,7 @@ public class Client implements IClient {
     String internalRequestXml = createInternalXmlRequest(criteria);
 
     // create transformer
-    Templates template = profilesService.getTemplate(Constants.CONFIG_FOLDER_PATH + "/" + profile.getGetRecordsReqXslt());
+    Templates template = profilesService.getTemplate(profile.getGetRecordsReqXslt());
     Transformer transformer = template.newTransformer();
 
     try (ByteArrayInputStream internalRequestInputStream = new ByteArrayInputStream(internalRequestXml.getBytes("UTF-8"));) {

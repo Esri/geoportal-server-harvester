@@ -46,14 +46,16 @@ import org.xml.sax.SAXException;
  */
 public class ProfilesService {
   private static final Logger LOG = LoggerFactory.getLogger(ProfilesService.class);
-  private static final String CONFIG_FILE_PATH = CONFIG_FOLDER_PATH+"/CSWProfiles.xml";
+  private static final String CONFIG_FILE = "/CSWProfiles.xml";
+  private static final String CONFIG_FILE_PATH = CONFIG_FOLDER_PATH + CONFIG_FILE;
   
-  private final String cswProfilesFolder;
   private final Profiles profiles = new Profiles();
   private final Map<String,Templates> cache = new TreeMap<>();
+  private final StreamOpener streamOpener;
 
   public ProfilesService(String cswProfilesFolder) {
-    this.cswProfilesFolder = cswProfilesFolder;
+    cswProfilesFolder = StringUtils.trimToNull(cswProfilesFolder);
+    this.streamOpener = cswProfilesFolder==null? new StreamOpener.ResourceOpener(): new StreamOpener.FolderOpener(cswProfilesFolder);
   }
   
   public void initialize() throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
@@ -63,7 +65,7 @@ public class ProfilesService {
   public Templates getTemplate(String path) throws IOException, TransformerConfigurationException {
     Templates template = cache.get(path);
     if (template==null) {
-      try (InputStream xsltStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path)) {
+      try (InputStream xsltStream = streamOpener.open(path)) {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         template = transformerFactory.newTemplates(new StreamSource(xsltStream));
         cache.put(path, template);
@@ -78,7 +80,7 @@ public class ProfilesService {
   
   private void loadProfiles() throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
     LOG.info(String.format("Loading CSW profiles"));
-    try (InputStream profilesXml = Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_FILE_PATH);) {
+    try (InputStream profilesXml = streamOpener.open(CONFIG_FILE)) {
       DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
       builderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
       builderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);

@@ -169,12 +169,12 @@ public class Profile implements IProfile {
 
   @Override
   public String getResponsexslt() {
-    return Constants.CONFIG_FOLDER_PATH + "/" + getGetRecordsRspXslt();
+    return getGetRecordsRspXslt();
   }
 
   @Override
   public String getMetadataxslt() {
-    return Constants.CONFIG_FOLDER_PATH + "/" + getGetRecordByIdRspXslt();
+    return getGetRecordByIdRspXslt();
   }
 
   /**

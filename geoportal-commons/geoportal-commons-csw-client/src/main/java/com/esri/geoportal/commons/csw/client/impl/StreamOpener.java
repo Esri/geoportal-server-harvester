@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.commons.csw.client.impl;
 
+import static com.esri.geoportal.commons.csw.client.impl.Constants.CONFIG_FOLDER_PATH;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,16 +25,29 @@ import java.io.InputStream;
  * Stream opener.
  */
 public interface StreamOpener {
-  InputStream open(String path) throws IOException;
+  InputStream open(String fileName) throws IOException;
   
-  StreamOpener RESOURCE_OPENER = path -> {
-    return Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
-  };
+  class ResourceOpener implements StreamOpener {
+
+    @Override
+    public InputStream open(String fileName) throws IOException {
+      return Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_FOLDER_PATH + "/" + fileName.replaceAll("^/+", ""));
+    }
+    
+  }
   
-  StreamOpener FILE_OPENER = path -> {
-    File file = path.startsWith("~")?
-      new File(System.getProperty("user.home"), path.substring(1)):
-      new File(path);
-    return new FileInputStream(file);
-  };
+  class FolderOpener implements StreamOpener {
+    private final File root;
+    
+    public FolderOpener(String root) {
+      this.root = root.startsWith("~")? 
+        new File(System.getProperty("user.home"), root.substring(1)): 
+        new File(root);
+    }
+
+    @Override
+    public InputStream open(String fileName) throws IOException {
+      return new FileInputStream(new File(root, fileName));
+    }
+  } 
 }
