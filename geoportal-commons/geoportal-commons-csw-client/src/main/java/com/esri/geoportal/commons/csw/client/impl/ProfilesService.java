@@ -16,7 +16,9 @@
 package com.esri.geoportal.commons.csw.client.impl;
 
 import com.esri.geoportal.commons.csw.client.IProfiles;
+import static com.esri.geoportal.commons.csw.client.impl.Constants.CONFIG_FILE;
 import static com.esri.geoportal.commons.csw.client.impl.Constants.CONFIG_FOLDER_PATH;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -46,19 +48,25 @@ import org.xml.sax.SAXException;
  */
 public class ProfilesService {
   private static final Logger LOG = LoggerFactory.getLogger(ProfilesService.class);
-  private static final String CONFIG_FILE = "/CSWProfiles.xml";
-  private static final String CONFIG_FILE_PATH = CONFIG_FOLDER_PATH + CONFIG_FILE;
   
   private final Profiles profiles = new Profiles();
   private final Map<String,Templates> cache = new TreeMap<>();
+  private final String cswProfilesFolder;
   private final StreamOpener streamOpener;
 
   public ProfilesService(String cswProfilesFolder) {
-    cswProfilesFolder = StringUtils.trimToNull(cswProfilesFolder);
-    this.streamOpener = cswProfilesFolder==null? new StreamOpener.ResourceOpener(): new StreamOpener.FolderOpener(cswProfilesFolder);
+    this.cswProfilesFolder = StringUtils.trimToNull(cswProfilesFolder);
+    this.streamOpener = this.cswProfilesFolder==null? 
+      new StreamOpener.ResourceOpener(): 
+      new StreamOpener.FolderOpener(this.cswProfilesFolder);
   }
   
   public void initialize() throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
+    if (this.cswProfilesFolder!=null) {
+      if (!new File(this.cswProfilesFolder).exists() || !new File(this.cswProfilesFolder, Constants.CONFIG_FILE).exists()) {
+        ResourceUtils.copyResources(CONFIG_FOLDER_PATH, this.cswProfilesFolder);
+      }
+    }
     loadProfiles();
   }
   
@@ -80,6 +88,7 @@ public class ProfilesService {
   
   private void loadProfiles() throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
     LOG.info(String.format("Loading CSW profiles"));
+    
     try (InputStream profilesXml = streamOpener.open(CONFIG_FILE)) {
       DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
       builderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
@@ -111,7 +120,7 @@ public class ProfilesService {
         String getRecordByIdReqKVP = StringUtils.trimToEmpty((String)xpath.evaluate("GetRecordByID/RequestKVPs", profileNode, XPathConstants.STRING));
         String getRecordByIdRspXslt = StringUtils.trimToEmpty((String)xpath.evaluate("GetRecordByID/XSLTransformations/Response", profileNode, XPathConstants.STRING));
         
-        Profile prof = new Profile();
+        Profile prof = new Profile(streamOpener);
         prof.setId(id);
         prof.setName(name);
         prof.setDescription(description);
@@ -124,6 +133,7 @@ public class ProfilesService {
         profiles.add(prof);
       }
     }
+    
     LOG.info(String.format("CSW profiles loaded."));
   }
   

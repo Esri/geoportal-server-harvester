@@ -23,7 +23,6 @@ import com.esri.geoportal.commons.csw.client.ICriteria;
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IRecord;
 import com.esri.geoportal.commons.csw.client.IRecords;
-import static com.esri.geoportal.commons.csw.client.impl.Constants.CONFIG_FOLDER_PATH;
 import static com.esri.geoportal.commons.csw.client.impl.Constants.SCHEME_METADATA_DOCUMENT;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
