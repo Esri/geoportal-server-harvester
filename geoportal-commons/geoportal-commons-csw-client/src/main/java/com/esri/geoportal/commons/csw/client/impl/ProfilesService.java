@@ -55,7 +55,7 @@ public class ProfilesService {
   private final StreamOpener streamOpener;
 
   public ProfilesService(String cswProfilesFolder) {
-    this.cswProfilesFolder = StringUtils.trimToNull(cswProfilesFolder);
+    this.cswProfilesFolder = ResourceUtils.resolveDestinationFolder(cswProfilesFolder);
     this.streamOpener = this.cswProfilesFolder==null? 
       new StreamOpener.ResourceOpener(): 
       new StreamOpener.FolderOpener(this.cswProfilesFolder);
@@ -87,7 +87,7 @@ public class ProfilesService {
   }
   
   private void loadProfiles() throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
-    LOG.info(String.format("Loading CSW profiles"));
+    LOG.info(String.format("Loading CSW profiles from %s", this.streamOpener));
     
     try (InputStream profilesXml = streamOpener.open(CONFIG_FILE)) {
       DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();

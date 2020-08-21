@@ -17,14 +17,10 @@ package com.esri.geoportal.commons.csw.client.impl;
 
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-import org.xml.sax.SAXException;
 
 /**
  * Profiles implementation.

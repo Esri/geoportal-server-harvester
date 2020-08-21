@@ -34,20 +34,26 @@ public interface StreamOpener {
       return Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_FOLDER_PATH + "/" + fileName.replaceAll("^/+", ""));
     }
     
+    public String toString() {
+      return "boundled resource";
+    }
+    
   }
   
   class FolderOpener implements StreamOpener {
     private final File root;
     
     public FolderOpener(String root) {
-      this.root = root.startsWith("~")? 
-        new File(System.getProperty("user.home"), root.substring(1)): 
-        new File(root);
+      this.root = new File(ResourceUtils.resolveDestinationFolder(root));
     }
 
     @Override
     public InputStream open(String fileName) throws IOException {
       return new FileInputStream(new File(root, fileName));
+    }
+    
+    public String toString() {
+      return root.getAbsolutePath();
     }
   } 
 }

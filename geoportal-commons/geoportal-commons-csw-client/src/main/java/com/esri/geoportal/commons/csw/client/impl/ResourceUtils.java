@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Resource folder copier.
@@ -33,10 +34,16 @@ import org.apache.commons.io.FileUtils;
 public class ResourceUtils {
   private static final Logger LOG = Logger.getLogger(ResourceUtils.class.getName());
   
+  public static String resolveDestinationFolder(String destinationFolder) {
+    destinationFolder = StringUtils.trimToNull(destinationFolder);
+    if (destinationFolder!=null && destinationFolder.startsWith("~")) {
+      destinationFolder = new File(System.getProperty("user.home"), destinationFolder.substring(1)).getAbsolutePath();
+    }
+    return destinationFolder;
+  }
+  
   public static void copyResources(String resourceFolder, String destinationFolder) throws IOException {
-    File folder = destinationFolder.startsWith("~")?
-      new File(System.getProperty("user.home"), destinationFolder.substring(1)):
-      new File(destinationFolder);
+    File folder = new File(resolveDestinationFolder(destinationFolder));
     copyResources(resourceFolder, folder);
   }
   
