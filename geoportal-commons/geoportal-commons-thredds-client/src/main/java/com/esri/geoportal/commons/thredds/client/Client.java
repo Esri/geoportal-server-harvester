@@ -99,6 +99,9 @@ public class Client implements Closeable {
 
         NodeList ndDatasets = (NodeList) xPath.evaluate("//dataset[string-length(normalize-space(@urlPath))>0]", ndCatalog, XPathConstants.NODESET);
         for (int i = 0; i < ndDatasets.getLength(); i++) {
+          if (Thread.currentThread().isInterrupted()) {
+            break;
+          }
           Node ndDataset = ndDatasets.item(i);
           String urlPath = (String) xPath.evaluate("@urlPath", ndDataset, XPathConstants.STRING);
           String ID = (String) xPath.evaluate("@ID", ndDataset, XPathConstants.STRING);
@@ -113,6 +116,9 @@ public class Client implements Closeable {
 
       NodeList ndCatalogRefs = (NodeList) xPath.evaluate("//catalogRef/@href", ndCatalog, XPathConstants.NODESET);
       for (int i = 0; i < ndCatalogRefs.getLength(); i++) {
+        if (Thread.currentThread().isInterrupted()) {
+          break;
+        }
         Node ndCatalogRef = ndCatalogRefs.item(i);
         String catalogRefUrl = StringUtils.trimToEmpty(ndCatalogRef.getNodeValue());
         URL catalogUrl = new URL(this.url, catalogRefUrl);

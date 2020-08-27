@@ -163,6 +163,9 @@ import org.xml.sax.SAXException;
         }
 
         while (!recIter.hasNext()) {
+          if (Thread.currentThread().isInterrupted()) {
+            return false;
+          }
           if (folders.isEmpty()) {
             return false;
           }
@@ -174,6 +177,9 @@ import org.xml.sax.SAXException;
         }
 
         do {
+          if (Thread.currentThread().isInterrupted()) {
+            return false;
+          }
           nextContent = readContent(recIter.next());
           if (nextContent!=null) {
             return true;
