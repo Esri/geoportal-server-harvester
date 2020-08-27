@@ -55,7 +55,7 @@ public class ThreddsConnector implements InputConnector<InputBroker> {
       }
     });
     args.add(new UITemplate.BooleanArgument(P_EMIT_XML, bundle.getString("thredds.emit.xml"),false, Boolean.TRUE));
-    args.add(new UITemplate.BooleanArgument(P_EMIT_JSON, bundle.getString("thredds.emit.json"),false, Boolean.TRUE));
+    args.add(new UITemplate.BooleanArgument(P_EMIT_JSON, bundle.getString("thredds.emit.json"),false, Boolean.FALSE));
     return new UITemplate(getType(), bundle.getString("thredds"), args);
   }
 
