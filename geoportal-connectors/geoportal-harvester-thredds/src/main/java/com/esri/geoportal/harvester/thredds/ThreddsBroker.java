@@ -157,30 +157,30 @@ import org.xml.sax.SAXException;
       try {
         if (folders == null) {
           Catalog content = client.readCatalog(definition.getHostUrl());
+          
           folders = new LinkedList<>(selectFolders(content.folders));
           recIter = content.records.iterator();
-
-          return hasNext();
         }
 
-        if (recIter == null || !recIter.hasNext()) {
-          if (folders == null || folders.isEmpty()) {
+        while (!recIter.hasNext()) {
+          if (folders.isEmpty()) {
             return false;
           }
 
           Catalog content = client.readCatalog(folders.pollFirst());
+          
           folders.addAll(selectFolders(content.folders));
           recIter = content.records.iterator();
-
-          return hasNext();
         }
 
-        nextContent = readContent(recIter.next());
-        if (nextContent == null) {
-          return hasNext();
-        }
+        do {
+          nextContent = readContent(recIter.next());
+          if (nextContent!=null) {
+            return true;
+          }
+        } while (recIter.hasNext());
 
-        return true;
+        return hasNext();
       } catch (DataInputException | URISyntaxException | ParserConfigurationException | XPathExpressionException | SAXException ex) {
         throw new DataInputException(ThreddsBroker.this, String.format("Error retrieving content."), ex);
       }
