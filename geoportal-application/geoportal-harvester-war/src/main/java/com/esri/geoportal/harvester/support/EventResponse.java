@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.support;
 
 import com.esri.geoportal.harvester.engine.managers.History;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -32,6 +33,7 @@ public final class EventResponse {
   private final long failed;
   private final Long failedToHarvest;
   private final Long failedToPublish;
+  private final List<String> details;
 
   /**
    * Creates instance of the response.
@@ -50,7 +52,8 @@ public final class EventResponse {
           Date startTimestamp, 
           Date endtTimestamp, 
           long acquired, long created, long updated, long failed,
-          Long failedToHarvest, Long failedToPublish) {
+          Long failedToHarvest, Long failedToPublish,
+          List<String> details) {
     this.uuid = uuid;
     this.startTimestamp = startTimestamp;
     this.endTimestamp = endtTimestamp;
@@ -60,6 +63,7 @@ public final class EventResponse {
     this.failed = failed;
     this.failedToHarvest = failedToHarvest;
     this.failedToPublish = failedToPublish;
+    this.details = details;
   }
   
   /**
@@ -76,7 +80,8 @@ public final class EventResponse {
             event.getReport()!=null? event.getReport().updated: 0, 
             event.getReport()!=null? event.getReport().failed: 0,
             event.getReport()!=null? event.getReport().failedToHarvest: null,
-            event.getReport()!=null? event.getReport().failedToPublish: null);
+            event.getReport()!=null? event.getReport().failedToPublish: null,
+            event.getReport()!=null? event.getReport().details: null);
   }
 
   /**

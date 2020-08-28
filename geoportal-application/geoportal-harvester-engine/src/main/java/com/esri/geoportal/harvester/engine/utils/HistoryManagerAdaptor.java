@@ -107,6 +107,7 @@ public class HistoryManagerAdaptor extends BaseProcessInstanceListener {
   @Override
   public void onError(DataException ex) {
     report.failed++;
+    report.details.add(ex.getMessage());
     
     Throwable dataOutputException = ExceptionUtils.unfoldCauses(ex).stream().filter((Throwable t) -> t instanceof DataOutputException).findAny().orElse(null);
     if (dataOutputException != null) {
