@@ -16,9 +16,9 @@
 package com.esri.geoportal.harvester.engine.managers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,6 +145,9 @@ public class History extends ArrayList<History.Event> {
     public long failed;
     public Long failedToHarvest;
     public Long failedToPublish;
-    public List<String> details = Arrays.asList(new String[]{});
+    /*
+     Details as pair (message,count)
+    */
+    public Map<String, Integer> details = new HashMap<>();
   }
 }

@@ -16,9 +16,11 @@
 package com.esri.geoportal.harvester.support;
 
 import com.esri.geoportal.harvester.engine.managers.History;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Event response.
@@ -81,7 +83,7 @@ public final class EventResponse {
             event.getReport()!=null? event.getReport().failed: 0,
             event.getReport()!=null? event.getReport().failedToHarvest: null,
             event.getReport()!=null? event.getReport().failedToPublish: null,
-            event.getReport()!=null? event.getReport().details: null);
+            event.getReport()!=null? event.getReport().details.keySet().stream().collect(Collectors.toList()): null);
   }
 
   /**
