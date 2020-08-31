@@ -157,6 +157,14 @@ public final class EventResponse {
   public Long getFailedToPublish() {
     return failedToPublish;
   }
+
+  /**
+   * Gest details.
+   * @return details
+   */
+  public List<String> getDetails() {
+    return details;
+  }
   
   
 }
