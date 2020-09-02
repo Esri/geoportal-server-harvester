@@ -553,6 +553,14 @@ html,body {
   white-space: nowrap;
 }
 
+.h-event-more {
+  float: right;
+}
+
+.h-event-details {
+  
+}
+
 .h-history-header .h-event-prop {
   border-bottom: 1px solid black;
 }
