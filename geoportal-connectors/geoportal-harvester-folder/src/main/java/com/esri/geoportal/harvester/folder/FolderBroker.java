@@ -141,14 +141,14 @@ import org.slf4j.LoggerFactory;
             //return created ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
           } catch (Exception ex) {
             if (!Thread.currentThread().isInterrupted()) {
-              throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
+              throw new DataOutputException(this, ref, String.format("Error publishing data: %s", ref), ex);
             }
           }
         }
       }
       return PublishingStatus.CREATED;
     } catch (IOException ex) {
-      throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
+      throw new DataOutputException(this, ref, String.format("Error publishing data: %s", ref), ex);
     }
   }
 
@@ -180,7 +180,7 @@ import org.slf4j.LoggerFactory;
       for (String sf : subFolder) {
         fileName = Paths.get(fileName.toString(), sf);
       }
-      if (!fileName.getFileName().toString().contains(".")) {
+      if (!fileName.getFileName().toString().endsWith(extension)) {
         fileName = fileName.getParent().resolve(fileName.getFileName() + "." + extension);
       }
     } else {

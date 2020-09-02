@@ -150,7 +150,7 @@ import static com.esri.geoportal.harvester.folderbig.PathUtil.splitPath;
             existing.remove(f.toRealPath().toString());
             //return created ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
           } catch (Exception ex) {
-            throw new DataOutputException(this, String.format("Error publishing data: %s", ref), ex.getMessage());
+            throw new DataOutputException(this, ref, ex.getMessage());
 
           }
         }
@@ -158,9 +158,9 @@ import static com.esri.geoportal.harvester.folderbig.PathUtil.splitPath;
         return PublishingStatus.CREATED;
 
     } catch (IOException ex) {
-      throw new DataOutputException(this, String.format("Error publishing data: %s", ref),  ex.getMessage());
+      throw new DataOutputException(this, ref, ex.getMessage());
     }  catch (Exception ex) {
-    throw new DataOutputException(this, String.format("Error publishing data: %s", ref),  ex.getMessage());
+    throw new DataOutputException(this, ref, ex.getMessage());
   }
   }
 
@@ -197,7 +197,7 @@ import static com.esri.geoportal.harvester.folderbig.PathUtil.splitPath;
 
       }
       folderName =Paths.get(folderName.toString(), subFolder.get(subFolder.size() - 1));
-      if (!folderName.getFileName().toString().contains(".")) {
+      if (!folderName.getFileName().toString().endsWith(extension)) {
         folderName = folderName.getParent().resolve(folderName.getFileName() + "." + extension);
       }
     } else {

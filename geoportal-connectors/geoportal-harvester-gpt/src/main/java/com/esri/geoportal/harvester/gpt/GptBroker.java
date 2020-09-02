@@ -199,10 +199,10 @@ import java.util.stream.Collectors;
 
       PublishResponse response = client.publish(data, ref.getAttributesMap(), uuid, xml, json, definition.getForceAdd());
       if (response == null) {
-        throw new DataOutputException(this, ref.getId(), "No response received");
+        throw new DataOutputException(this, ref, "No response received");
       }
       if (response.getError() != null) {
-        throw new DataOutputException(this, ref.getId(), response.getError().getMessage()) {
+        throw new DataOutputException(this, ref, response.getError().getMessage()) {
           @Override
           public boolean isNegligible() {
             return true;
@@ -212,7 +212,7 @@ import java.util.stream.Collectors;
       existing.remove(response.getId());
       return response.getStatus().equalsIgnoreCase("created") ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
     } catch (IOException | URISyntaxException ex) {
-      throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
+      throw new DataOutputException(this, ref, String.format("Error publishing data: %s", ref), ex);
     }
   }
 

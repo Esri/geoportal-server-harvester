@@ -72,6 +72,8 @@
   <bean class="com.esri.geoportal.harvester.dcat.DcatConnector">
     <constructor-arg ref="metaBuilder"/>
   </bean>
+  <bean class="com.esri.geoportal.harvester.thredds.ThreddsConnector"/>
+  
   <!-- Triggers -->
   <bean class="com.esri.geoportal.harvester.engine.triggers.NowTrigger"/>
   <bean class="com.esri.geoportal.harvester.engine.triggers.AtTrigger"/>

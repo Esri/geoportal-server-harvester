@@ -27,7 +27,7 @@ import java.util.Set;
 /**
  * Simple data reference.
  */
-public final class SimpleDataReference implements DataReference {
+public class SimpleDataReference implements DataReference {
   private static final long serialVersionUID = 1L;
   
   // info
@@ -84,6 +84,11 @@ public final class SimpleDataReference implements DataReference {
 
   @Override
   public String getId() {
+    return id;
+  }
+
+  @Override
+  public String getFetchableId() {
     return id;
   }
 

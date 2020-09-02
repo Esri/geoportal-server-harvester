@@ -77,6 +77,11 @@ public class DataReferenceWrapper implements DataReference {
   }
 
   @Override
+  public String getFetchableId() {
+    return baseRef.getFetchableId();
+  }
+
+  @Override
   public Date getLastModifiedDate() {
     return baseRef.getLastModifiedDate();
   }

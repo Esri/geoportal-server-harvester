@@ -141,7 +141,7 @@ import org.xml.sax.SAXException;
       MapAttribute attributes = extractMapAttributes(ref, content);
 
       if (attributes == null) {
-        throw new DataOutputException(this, ref.getId(), String.format("Error extracting attributes from data."));
+        throw new DataOutputException(this, ref, String.format("Error extracting attributes from data."));
       }
 
       // build typeKeywords array
@@ -235,7 +235,7 @@ import org.xml.sax.SAXException;
 
           if (response == null || !response.success) {
             String error = response != null && response.error != null && response.error.message != null ? response.error.message : null;
-            throw new DataOutputException(this, ref.getId(), String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
+            throw new DataOutputException(this, ref, String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
           }
 
           client.share(definition.getCredentials().getUserName(), definition.getFolderId(), response.id, true, true, null, token);
@@ -246,7 +246,7 @@ import org.xml.sax.SAXException;
 
           itemEntry = client.readItem(itemEntry.id, token);
           if (itemEntry == null) {
-            throw new DataOutputException(this, ref.getId(), String.format("Unable to read item entry."));
+            throw new DataOutputException(this, ref, String.format("Unable to read item entry."));
           }
 
           // update item if does exist
@@ -266,7 +266,7 @@ import org.xml.sax.SAXException;
 
           if (response == null || !response.success) {
             String error = response != null && response.error != null && response.error.message != null ? response.error.message : null;
-            throw new DataOutputException(this, ref.getId(), String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
+            throw new DataOutputException(this, ref, String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
           }
 
           existing.remove(itemEntry.id);
@@ -280,7 +280,7 @@ import org.xml.sax.SAXException;
       }
 
     } catch (MetaException | IOException | ParserConfigurationException | SAXException | URISyntaxException ex) {
-      throw new DataOutputException(this, ref.getId(), String.format("Error publishing data: %s", ref), ex);
+      throw new DataOutputException(this, ref, String.format("Error publishing data: %s", ref), ex);
     } finally {
       if (fileToUpload!=null && deleteTempFile) {
         fileToUpload.delete();
