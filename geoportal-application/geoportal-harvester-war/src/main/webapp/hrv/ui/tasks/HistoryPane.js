@@ -47,6 +47,7 @@ define(["dojo/_base/declare",
       postCreate: function(){
         this.own(topic.subscribe("nav",lang.hitch(this,this._onNav)));
         this.own(on(this, "event-clicked", lang.hitch(this, this._onEventClicked)));
+        this.own(on(this, "more-clicked", lang.hitch(this, this._onMoreClicked)));
       },
       
       destroy: function() {
@@ -67,6 +68,18 @@ define(["dojo/_base/declare",
           console.debug(error);
           topic.publish("msg", new Error(this.i18n.tasks.errors.accessFialed));
         }));
+      },
+      
+      _onMoreClicked: function(evt) {
+        this._empty();
+        var data = evt.data;
+        if (data && data.details && data.details.length > 0) {
+          array.forEach(data.details, lang.hitch(this, function(details){
+            var span = domConstruct.create("div", {}, this.failedNode);
+            var detailsNode = domConstruct.create("div", {innerHTML: details, className: "h-event-details"}, span);
+          }));
+        }
+        console.log("More clicked", evt.data);
       },
       
       _handleFailedDocuments: function(failedDocuments) {

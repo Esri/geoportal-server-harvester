@@ -110,6 +110,9 @@ public enum MimeType {
    * @return mime type or default mime type
    */
   public static MimeType parse(String strMimeType, MimeType defaultMimeType) {
+    if (strMimeType!=null) {
+      strMimeType = strMimeType.split(";")[0];
+    }
     for (MimeType mime: values()) {
       if (mime.getName().equals(strMimeType)) {
         return mime;

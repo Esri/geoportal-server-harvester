@@ -37,6 +37,7 @@ define(["dojo/_base/declare",
       templateString: template,
       startTime: null,
       endTime: null,
+      hasDetails: false,
       
       constructor: function(args) {
         this.data = args;
@@ -45,6 +46,9 @@ define(["dojo/_base/declare",
       },
     
       postCreate: function(){
+        if (this.data.details && this.data.details.length > 0) {
+          this.hasDetails = true;
+        }
         if (this.data.failedToHarvest==null || this.data.failedToPublish==null) {
           if (this.data.failed > 0) {
             var failedLink = domConstruct.create("a", { href: "#", innerHTML: this.data.failed}, this.failedNode);
@@ -60,6 +64,10 @@ define(["dojo/_base/declare",
             domConstruct.create("span", { innerHTML: "" + this.data.failedToHarvest + " / " +this.data.failedToPublish}, this.failedNode);
           }
         }
+        if (this.hasDetails) {
+          var moreLink = domConstruct.create("a", { href: "#", innerHTML: "[?]", className: "h-event-more"}, this.failedNode);
+          this.own(on(moreLink, "click", lang.hitch(this, this._onMore)));
+        }
       },
       
       format: function(date) {
@@ -72,6 +80,10 @@ define(["dojo/_base/declare",
       
       _onFailedDetails: function(evt) {
         this.emit("event-clicked", {data: this.data});
+      },
+      
+      _onMore: function(evt) {
+        this.emit("more-clicked", {data: this.data});
       }
     });
 });

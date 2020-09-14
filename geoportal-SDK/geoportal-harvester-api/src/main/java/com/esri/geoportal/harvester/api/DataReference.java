@@ -33,11 +33,17 @@ public interface DataReference extends Serializable, DataContent {
   String getId();
   
   /**
+   * Gets fetchable data record id.
+   * Fetchable data id is a convenient id used to fetch a single data from the source.
+   * @return fetchable data record id
+   */
+  String getFetchableId();
+  
+  /**
    * Gets last modified date.
    * @return last modified date or <code>null</code> if no date information available
    */
   Date getLastModifiedDate();
-  
   
   /**
    * Gets source URI.
