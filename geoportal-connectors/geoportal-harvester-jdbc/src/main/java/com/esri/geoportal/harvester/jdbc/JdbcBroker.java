@@ -57,6 +57,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.script.ScriptException;
 import org.apache.commons.io.IOUtils;
@@ -70,6 +74,11 @@ import org.slf4j.LoggerFactory;
  */
 /*package*/class JdbcBroker implements InputBroker {
   private static final Logger LOG = LoggerFactory.getLogger(JdbcBroker.class);
+  private static final Pattern BRACKETS_PATTERN;
+  
+  static {
+    BRACKETS_PATTERN = Pattern.compile("\\[[^]]*\\]");
+  }
   
   private final JdbcConnector connector;
   private final JdbcBrokerDefinitionAdaptor definition;
@@ -80,6 +89,7 @@ import org.slf4j.LoggerFactory;
   private final List<JsonPropertyInjector> jsonPropertyInjectors = new ArrayList<>();
   private final List<AttributeInjector> attributeInjectors = new ArrayList<>();
   private final Map<String,String> columnMappings = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+  private final Map<String,String[]> aliases = new HashMap<>();
   private RecordIdSetter idSetter;
   private TaskDefinition td;
   private ScriptProcessor scriptProcessor;
@@ -183,7 +193,19 @@ import org.slf4j.LoggerFactory;
   
   private void parseColumnNames() {
     if (definition.getTypes()!=null) {
-      Arrays.stream(definition.getTypes().split(",")).forEach(typedef -> {
+      
+      String typesDef = definition.getTypes();
+      
+      Matcher bracketsMatch = BRACKETS_PATTERN.matcher(typesDef);
+      for (MatchResult result: bracketsMatch.results().sorted((g1,g2) -> -1* Integer.compare(g1.start(), g2.start())).collect(Collectors.toList())) {
+        String alias = UUID.randomUUID().toString();
+        String group = result.group();
+        String [] groupArray = group.substring(1, group.length()-1).split(",");
+        aliases.put(alias, groupArray);
+        typesDef = typesDef.substring(0, result.start()) + alias + typesDef.substring(result.end());
+      }
+      
+      Arrays.stream(typesDef.split(",")).forEach(typedef -> {
         List<String> kvp = Arrays.stream(StringUtils.trimToEmpty(typedef).split("=|:")).map(v->StringUtils.trimToEmpty(v)).collect(Collectors.toList());
         if (kvp.size()==2) {
           columnMappings.put(norm(kvp.get(0)), kvp.get(1));
