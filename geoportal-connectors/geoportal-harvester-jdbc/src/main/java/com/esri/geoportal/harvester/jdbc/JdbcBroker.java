@@ -29,6 +29,7 @@ import com.esri.geoportal.harvester.api.specs.InputConnector;
 import com.esri.geoportal.harvester.jdbc.ScriptProcessor.Data;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,6 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -74,6 +76,7 @@ import org.slf4j.LoggerFactory;
  */
 /*package*/class JdbcBroker implements InputBroker {
   private static final Logger LOG = LoggerFactory.getLogger(JdbcBroker.class);
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
   private static final Pattern BRACKETS_PATTERN;
   
   static {
@@ -358,6 +361,60 @@ import org.slf4j.LoggerFactory;
           jsonPropertyInjectors.add(jsonPropertyInjector);
         }
       }
+      
+      for (Map.Entry<String,String[]> alias: aliases.entrySet()) {
+        if (columnMappings.containsKey(alias.getKey())) {
+          final String [] fieldNames = alias.getValue();
+          final String attributeName = columnMappings.get(alias.getKey());
+        
+          JsonPropertyInjector jsonPropertyInjector = (n, r) -> {
+            List<Double> values = Arrays.stream(fieldNames).map(fieldName -> { 
+              try { 
+                Double value = readValue(r, fieldName, Double.class);
+                return value;
+              } catch (SQLException ex) {
+                return null;
+              }
+            }).filter(v -> v!=null).collect(Collectors.toList());
+            
+            if (values.size() == 2) {
+              ArrayNode geos = OBJECT_MAPPER.createArrayNode();
+              n.set(attributeName, geos);
+              
+              ObjectNode point = OBJECT_MAPPER.createObjectNode();
+              geos.add(point);
+              point.put("lon", values.get(0));
+              point.put("lat", values.get(1));
+            }
+            
+            if (values.size() == 4) {
+              ArrayNode geos = OBJECT_MAPPER.createArrayNode();
+              n.set(attributeName, geos);
+              
+              ObjectNode geo = OBJECT_MAPPER.createObjectNode();
+              geos.add(geo);
+              
+              geo.put("type", "envelope");
+              
+              ArrayNode geometry = OBJECT_MAPPER.createArrayNode();
+              geo.set("geometry", geometry);
+              
+              ArrayNode upperLeftArr = OBJECT_MAPPER.createArrayNode();
+              geometry.add(upperLeftArr);
+              upperLeftArr.add(values.get(0));
+              upperLeftArr.add(values.get(3));
+              
+              ArrayNode lowerRightArr = OBJECT_MAPPER.createArrayNode();
+              geometry.add(lowerRightArr);
+              lowerRightArr.add(values.get(2));
+              lowerRightArr.add(values.get(1));
+              
+            }
+          };
+          
+          jsonPropertyInjectors.add(jsonPropertyInjector);
+        }
+      }
     } catch (SQLException ex) {
       throw new DataProcessorException(String.format("Error opening JDBC connection to: %s", definition.getConnection()), ex);
     }
@@ -595,8 +652,7 @@ import org.slf4j.LoggerFactory;
   }
   
   private DataReference createReference(ResultSet resultSet) throws SQLException, JsonProcessingException, URISyntaxException, UnsupportedEncodingException, ScriptException  {
-    ObjectMapper mapper = new ObjectMapper();
-    ObjectNode node = mapper.createObjectNode();
+    ObjectNode node = OBJECT_MAPPER.createObjectNode();
     Map<String,Object> attr = new HashMap<>();
     XmlHolder xmlHolder = new XmlHolder();
     
@@ -625,14 +681,14 @@ import org.slf4j.LoggerFactory;
       data.put("sourceRef", sourceRef);
       data.put("taskRef", taskRef);
       
-      data.json = (Map)mapper.convertValue(node, Map.class);
+      data.json = (Map)OBJECT_MAPPER.convertValue(node, Map.class);
       data.attr = attr;
       
       data = scriptProcessor.process(data);
-      nodeAsJson = mapper.writeValueAsString(data.json);
+      nodeAsJson = OBJECT_MAPPER.writeValueAsString(data.json);
       attr = data.attr;
     } else {
-      nodeAsJson = mapper.writeValueAsString(node);
+      nodeAsJson = OBJECT_MAPPER.writeValueAsString(node);
     }
     
     if (xmlHolder.xml!=null) {
