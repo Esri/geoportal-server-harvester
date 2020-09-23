@@ -59,7 +59,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,10 +76,11 @@ import org.slf4j.LoggerFactory;
 /*package*/class JdbcBroker implements InputBroker {
   private static final Logger LOG = LoggerFactory.getLogger(JdbcBroker.class);
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+  private static final String SPLIT_CHARS = "=|:";
   private static final Pattern BRACKETS_PATTERN;
   
   static {
-    BRACKETS_PATTERN = Pattern.compile("\\[[^]]*\\]");
+    BRACKETS_PATTERN = Pattern.compile(String.format("\\[[^]]*\\](?=\\s*[%s])", SPLIT_CHARS));
   }
   
   private final JdbcConnector connector;
@@ -96,6 +96,20 @@ import org.slf4j.LoggerFactory;
   private RecordIdSetter idSetter;
   private TaskDefinition td;
   private ScriptProcessor scriptProcessor;
+  
+  private static class AttributeName {
+    public final String name;
+    public final boolean array;
+
+    public AttributeName(String name, boolean array) {
+      this.name = name;
+      this.array = array;
+    }
+    
+    public AttributeName(String name) {
+      this(name, false);
+    }
+  }
 
   public JdbcBroker(JdbcConnector connector, JdbcBrokerDefinitionAdaptor definition) {
     this.connector = connector;
@@ -209,7 +223,7 @@ import org.slf4j.LoggerFactory;
       }
       
       Arrays.stream(typesDef.split(",")).forEach(typedef -> {
-        List<String> kvp = Arrays.stream(StringUtils.trimToEmpty(typedef).split("=|:")).map(v->StringUtils.trimToEmpty(v)).collect(Collectors.toList());
+        List<String> kvp = Arrays.stream(StringUtils.trimToEmpty(typedef).split(SPLIT_CHARS)).map(v->StringUtils.trimToEmpty(v)).collect(Collectors.toList());
         if (kvp.size()==2) {
           columnMappings.put(norm(kvp.get(0)), kvp.get(1));
         }
@@ -420,28 +434,33 @@ import org.slf4j.LoggerFactory;
     }
   }
   
-  private List<String> createAttributeNames(String baseFormat, String columnName) {
-    List<String> attributeNames = new ArrayList<>();
+  private List<AttributeName> createAttributeNames(String baseFormat, String columnName) {
+    List<AttributeName> attributeNames = new ArrayList<>();
     columnName = norm(columnName);
     if (columnMappings.containsKey(columnName)) {
       String desiredFormat = columnMappings.get(columnName);
+      boolean isArray = false;
+      if (desiredFormat.startsWith("[") && desiredFormat.endsWith("]")) {
+        desiredFormat =  desiredFormat.substring(1, desiredFormat.length()-1).trim();
+        isArray = true;
+      }
       if (!desiredFormat.startsWith("_")) {
-        attributeNames.add(desiredFormat);
+        attributeNames.add(new AttributeName(desiredFormat, isArray));
         String suffix = "";
         int dashIndex = baseFormat.lastIndexOf("_");
         if (dashIndex>=0) {
           suffix = baseFormat.substring(dashIndex);
         }
-        attributeNames.add((desiredFormat.startsWith("src_")? "": "src_")+desiredFormat.replaceAll("(_txt|_s|_f|_d|_i|_l|_dt|_b)$", "")+suffix);
+        attributeNames.add(new AttributeName((desiredFormat.startsWith("src_")? "": "src_")+desiredFormat.replaceAll("(_txt|_s|_f|_d|_i|_l|_dt|_b)$", "")+suffix, isArray));
       } else {
         int dashIndex = baseFormat.lastIndexOf("_");
         if (dashIndex>=0) {
           baseFormat = baseFormat.substring(0, dashIndex);
         }
-        attributeNames.add(String.format(baseFormat + desiredFormat, columnName));
+        attributeNames.add(new AttributeName(String.format(baseFormat + desiredFormat, columnName), isArray));
       }
     } else {
-      attributeNames.add(String.format(baseFormat, columnName));
+      attributeNames.add(new AttributeName(String.format(baseFormat, columnName)));
     }
     return attributeNames;
   }
@@ -459,8 +478,8 @@ import org.slf4j.LoggerFactory;
       case Types.SQLXML:
         createAttributeNames("src_%s_txt", norm(columnName)).forEach(
                 name -> injectors.add((a,x,r)->{
-                  if (!name.endsWith("_xml")) {
-                    a.put(name, readValue(r, columnName, String.class));
+                  if (!name.name.endsWith("_xml")) {
+                    a.put(name.name, readValue(r, columnName, String.class));
                   } else {
                     x.xml = readValue(r, columnName, String.class);
                   }
@@ -469,56 +488,56 @@ import org.slf4j.LoggerFactory;
 
       case Types.DOUBLE:
         createAttributeNames("src_%s_d", norm(columnName)).forEach(
-                name -> injectors.add((a,x,r)->a.put(name, readValue(r, columnName, Double.class))));
+                name -> injectors.add((a,x,r)->a.put(name.name, readValue(r, columnName, Double.class))));
         break;
 
       case Types.FLOAT:
         createAttributeNames("src_%s_f", norm(columnName)).forEach(
-                name -> injectors.add((a,x,r)->a.put(name, readValue(r, columnName, Float.class))));
+                name -> injectors.add((a,x,r)->a.put(name.name, readValue(r, columnName, Float.class))));
         break;
 
       case Types.INTEGER:
         createAttributeNames("src_%s_i", norm(columnName)).forEach(
-                name -> injectors.add((a,x,r)->a.put(name, readValue(r, columnName, Integer.class))));
+                name -> injectors.add((a,x,r)->a.put(name.name, readValue(r, columnName, Integer.class))));
         break;
         
       case Types.SMALLINT:
       case Types.TINYINT:
         createAttributeNames("src_%s_i", norm(columnName)).forEach(
-                name -> injectors.add((a,x,r)->a.put(name, readValue(r, columnName, Short.class))));
+                name -> injectors.add((a,x,r)->a.put(name.name, readValue(r, columnName, Short.class))));
         break;
 
       case Types.BIGINT:
       case Types.DECIMAL:
       case Types.NUMERIC:
         createAttributeNames("src_%s_d", norm(columnName)).forEach(
-                name -> injectors.add((a,x,r)->a.put(name, readValue(r, columnName, BigDecimal.class))));
+                name -> injectors.add((a,x,r)->a.put(name.name, readValue(r, columnName, BigDecimal.class))));
         break;
 
       case Types.BOOLEAN:
         createAttributeNames("src_%s_b", norm(columnName)).forEach(
-                name -> injectors.add((a,x,r)->a.put(name, readValue(r, columnName, Boolean.class))));
+                name -> injectors.add((a,x,r)->a.put(name.name, readValue(r, columnName, Boolean.class))));
         break;
 
 
       case Types.DATE:
         createAttributeNames("src_%s_dt", norm(columnName)).forEach(
-                name -> injectors.add((a,x,r)->a.put(name, formatIsoDate(r.getDate(columnName)))));
+                name -> injectors.add((a,x,r)->a.put(name.name, formatIsoDate(r.getDate(columnName)))));
         break;
       case Types.TIME:
         createAttributeNames("src_%s_dt", norm(columnName)).forEach(
-                name -> injectors.add((a,x,r)->a.put(name, formatIsoDate(r.getTime(columnName)))));
+                name -> injectors.add((a,x,r)->a.put(name.name, formatIsoDate(r.getTime(columnName)))));
         break;
       case Types.TIMESTAMP:
         createAttributeNames("src_%s_dt", norm(columnName)).forEach(
-                name -> injectors.add((a,x,r)->a.put(name, formatIsoDate(r.getTimestamp(columnName)))));
+                name -> injectors.add((a,x,r)->a.put(name.name, formatIsoDate(r.getTimestamp(columnName)))));
         break;
         
       case Types.CLOB:
         createAttributeNames("src_%s_txt", norm(columnName)).forEach(
                 name -> injectors.add((a,x,r)->{ 
-                  if (!name.endsWith("_xml")) {
-                    a.put(name, formatClob(r.getClob(columnName))); 
+                  if (!name.name.endsWith("_xml")) {
+                    a.put(name.name, formatClob(r.getClob(columnName))); 
                   } else {
                     x.xml = formatClob(r.getClob(columnName));
                   }
@@ -531,7 +550,7 @@ import org.slf4j.LoggerFactory;
       case Types.LONGVARBINARY:
         if (columnMappings.containsKey(norm(columnName)) && columnMappings.get(norm(columnName)).endsWith("_txt")) {
           createAttributeNames("src_%s_txt", norm(columnName)).forEach(
-              name -> injectors.add((a,x,r)->a.put(name, formatBlob(r.getBlob(columnName)))));
+              name -> injectors.add((a,x,r)->a.put(name.name, formatBlob(r.getBlob(columnName)))));
         }
         break;
     }
