@@ -76,11 +76,12 @@ import org.slf4j.LoggerFactory;
 /*package*/class JdbcBroker implements InputBroker {
   private static final Logger LOG = LoggerFactory.getLogger(JdbcBroker.class);
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-  private static final String SPLIT_CHARS = "=|:";
+  private static final String KVP_SPLIT_CHARS = "=|:";
+  private static final String KEYWORDS_SPLIT_REGEX = "[,;|]";
   private static final Pattern BRACKETS_PATTERN;
   
   static {
-    BRACKETS_PATTERN = Pattern.compile(String.format("\\[[^]]*\\](?=\\s*[%s])", SPLIT_CHARS));
+    BRACKETS_PATTERN = Pattern.compile(String.format("\\[[^]]*\\](?=\\s*[%s])", KVP_SPLIT_CHARS));
   }
   
   private final JdbcConnector connector;
@@ -223,7 +224,7 @@ import org.slf4j.LoggerFactory;
       }
       
       Arrays.stream(typesDef.split(",")).forEach(typedef -> {
-        List<String> kvp = Arrays.stream(StringUtils.trimToEmpty(typedef).split(SPLIT_CHARS)).map(v->StringUtils.trimToEmpty(v)).collect(Collectors.toList());
+        List<String> kvp = Arrays.stream(StringUtils.trimToEmpty(typedef).split(KVP_SPLIT_CHARS)).map(v->StringUtils.trimToEmpty(v)).collect(Collectors.toList());
         if (kvp.size()==2) {
           columnMappings.put(norm(kvp.get(0)), kvp.get(1));
         }
@@ -477,9 +478,21 @@ import org.slf4j.LoggerFactory;
       case Types.NCHAR:
       case Types.SQLXML:
         createAttributeNames("src_%s_txt", norm(columnName)).forEach(
-                name -> injectors.add((a,x,r)->{
-                  if (!name.name.endsWith("_xml")) {
-                    a.put(name.name, readValue(r, columnName, String.class));
+                attributeName -> injectors.add((a,x,r)->{
+                  if (!attributeName.name.endsWith("_xml")) {
+                    if (!attributeName.array) {
+                      a.put(attributeName.name, readValue(r, columnName, String.class));
+                    } else {
+                      String value = StringUtils.trimToEmpty(readValue(r, columnName, String.class));
+                      String [] parts = value.split(KEYWORDS_SPLIT_REGEX);
+                      
+                      ArrayNode partsArray = OBJECT_MAPPER.createArrayNode();
+                      a.put(attributeName.name, partsArray);
+                      
+                      for (String part: parts) {
+                        partsArray.add(part);
+                      }
+                    }
                   } else {
                     x.xml = readValue(r, columnName, String.class);
                   }
