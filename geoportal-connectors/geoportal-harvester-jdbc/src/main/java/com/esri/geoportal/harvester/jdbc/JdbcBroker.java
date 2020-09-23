@@ -481,16 +481,23 @@ import org.slf4j.LoggerFactory;
                 attributeName -> injectors.add((a,x,r)->{
                   if (!attributeName.name.endsWith("_xml")) {
                     if (!attributeName.array) {
-                      a.put(attributeName.name, readValue(r, columnName, String.class));
+                      String value = StringUtils.trimToEmpty(readValue(r, columnName, String.class));
+                      if (value.length() > 0) {
+                        a.put(attributeName.name, value);
+                      }
                     } else {
                       String value = StringUtils.trimToEmpty(readValue(r, columnName, String.class));
-                      String [] parts = value.split(KEYWORDS_SPLIT_REGEX);
-                      
-                      ArrayNode partsArray = OBJECT_MAPPER.createArrayNode();
-                      a.put(attributeName.name, partsArray);
-                      
-                      for (String part: parts) {
-                        partsArray.add(part);
+                      if (value.length() > 0) {
+                        String [] parts = value.split(KEYWORDS_SPLIT_REGEX);
+
+                        if (parts.length > 0) {
+                          ArrayNode partsArray = OBJECT_MAPPER.createArrayNode();
+                          a.put(attributeName.name, partsArray);
+
+                          for (String part: parts) {
+                            partsArray.add(part);
+                          }
+                        }
                       }
                     }
                   } else {
