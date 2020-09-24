@@ -246,6 +246,8 @@ public class Client implements Closeable {
           jsonRequest.put(entry.getKey(), (Integer) entry.getValue());
         } else if (entry.getValue() instanceof Boolean) {
           jsonRequest.put(entry.getKey(), (Boolean) entry.getValue());
+        } else if (entry.getValue() instanceof JsonNode) {
+          jsonRequest.set(entry.getKey(), (JsonNode) entry.getValue());
         }
       }
     }

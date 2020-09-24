@@ -64,6 +64,6 @@ import javax.script.ScriptException;
    */
   public static class Data extends HashMap<String, String> {
     public Map json;
-    public Map attr;
+    public Map<String,Object> attr;
   }
 }
