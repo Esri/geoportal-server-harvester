@@ -412,7 +412,7 @@ import org.slf4j.LoggerFactory;
               geo.put("type", "envelope");
               
               ArrayNode geometry = OBJECT_MAPPER.createArrayNode();
-              geo.set("geometry", geometry);
+              geo.set("coordinates", geometry);
               
               ArrayNode upperLeftArr = OBJECT_MAPPER.createArrayNode();
               geometry.add(upperLeftArr);
