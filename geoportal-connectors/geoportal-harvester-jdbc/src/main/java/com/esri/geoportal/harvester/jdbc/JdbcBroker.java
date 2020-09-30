@@ -414,15 +414,77 @@ import org.slf4j.LoggerFactory;
               ArrayNode geometry = OBJECT_MAPPER.createArrayNode();
               geo.set("coordinates", geometry);
               
+              // extact coordinates
+              double xmin = values.get(0);
+              double ymin = values.get(1);
+              double xmax = values.get(2);
+              double ymax = values.get(3);
+
+              // assert coordinates
+              if ((xmin < -180.0) && (xmax >= -180.0)) xmin = -180.0;
+              if ((xmax > 180.0) && (xmin <= 180.0)) xmax = 180.0;
+              if ((ymin < -90.0) && (ymax >= -90.0)) ymin = -90.0;
+              if ((ymax > 90.0) && (ymin <= 90.0)) ymax = 90.0;
+              
+              // calculate center point
+              double xcen = (xmin + xmax) / 2.0;
+              double ycen = (ymin + ymax) / 2.0;
+              
+              // re-assert coordinates
+              if (xmin > xmax) {
+                if (xcen >= 0) xcen = xcen - 180.0;
+                else xcen = xcen + 180.0;
+              }
+              
+              // re-assert center
+              if (xcen < -180.0) xcen = -180.0;
+              if (xcen > 180.0) xcen = 180.0;
+
+              if (xmin == xmax) {
+                if (xmax + 0.00000001 > 180) {
+                  xmin -= 0.00000001;
+                } else {
+                  xmax += 0.00000001;
+                }
+              }
+              if (ymin == ymax) {
+                if (ymax + 0.00000001 > 90) {
+                  ymin -= 0.00000001;
+                } else {
+                  ymax += 0.00000001;
+                }
+              }
+              
               ArrayNode upperLeftArr = OBJECT_MAPPER.createArrayNode();
               geometry.add(upperLeftArr);
-              upperLeftArr.add(values.get(0));
-              upperLeftArr.add(values.get(3));
+              upperLeftArr.add(xmin);
+              upperLeftArr.add(ymax);
               
               ArrayNode lowerRightArr = OBJECT_MAPPER.createArrayNode();
               geometry.add(lowerRightArr);
-              lowerRightArr.add(values.get(2));
-              lowerRightArr.add(values.get(1));
+              lowerRightArr.add(xmax);
+              lowerRightArr.add(ymin);
+              
+              if (attributeName.toLowerCase().endsWith("_geo")) {
+                String cenAttributeName = attributeName.replaceFirst("_geo$", "_cen_pt");
+                
+                ArrayNode cenNode = null;
+                if (n.has(cenAttributeName) && n.get(cenAttributeName).isArray()) {
+                  cenNode = (ArrayNode)n.get(cenAttributeName);
+                } else {
+                  if (n.has(cenAttributeName)) {
+                    n.remove(cenAttributeName);
+                  }
+                  
+                  cenNode = OBJECT_MAPPER.createArrayNode();
+                  n.set(cenAttributeName, cenNode);
+                  
+                  ObjectNode point = OBJECT_MAPPER.createObjectNode();
+                  cenNode.add(point);
+                  point.put("lon", xcen);
+                  point.put("lat", ycen);
+                }
+              }
               
             }
           };
