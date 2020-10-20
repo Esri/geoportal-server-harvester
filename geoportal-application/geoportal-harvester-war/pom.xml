@@ -13,8 +13,8 @@
 
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-        <spring.version>5.2.8.RELEASE</spring.version>
-        <springsecurity.version>5.3.4.RELEASE</springsecurity.version>
+        <spring.version>5.2.9.RELEASE</spring.version>
+        <springsecurity.version>5.3.5.RELEASE</springsecurity.version>
     </properties>
     
     <dependencies>
