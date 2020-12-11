@@ -23,12 +23,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.stream.Collectors;
+import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -44,6 +45,7 @@ import org.apache.http.message.BasicNameValuePair;
  * ArcGIS Server client.
  */
 public class AgsClient implements Closeable {
+  private static final URLCodec URL_CODEC = new URLCodec("UTF-8");
 
   private final URL rootUrl;
   private final CloseableHttpClient httpClient;
@@ -135,7 +137,11 @@ public class AgsClient implements Closeable {
    * @throws IOException if accessing token fails
    */
   public ServerResponse readServiceInformation(String folder, ServiceInfo si) throws URISyntaxException, IOException {
-    String url = rootUrl.toURI().resolve("rest/services/").resolve(StringUtils.stripToEmpty(folder)).resolve(si.name + "/" + si.type).toASCIIString();
+    String url = rootUrl.toURI()
+      .resolve("rest/services/")
+      .resolve(URLEncoder.encode(StringUtils.stripToEmpty(folder), "UTF-8").replaceAll("\\+", "%20"))
+      .resolve(URLEncoder.encode(si.name, "UTF-8").replaceAll("\\+", "%20") + "/" + si.type)
+      .toASCIIString();
     return readServiceInformation(new URL(url));
   }
   
