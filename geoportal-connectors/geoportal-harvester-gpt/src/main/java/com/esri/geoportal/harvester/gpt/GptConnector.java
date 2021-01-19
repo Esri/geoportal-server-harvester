@@ -37,13 +37,16 @@ public class GptConnector implements OutputConnector<OutputBroker> {
   private static final String DEFAULT_GEOMETRY_SERVICE = "https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer";
 
   private final String geometryServiceUrl;
+  private final Integer sizeLimit;
 
-  public GptConnector() {
+  public GptConnector(Integer sizeLimit) {
     this.geometryServiceUrl = DEFAULT_GEOMETRY_SERVICE;
+    this.sizeLimit = sizeLimit;
   }
 
-  public GptConnector(String geometryServiceUrl) {
+  public GptConnector(String geometryServiceUrl, Integer sizeLimit) {
     this.geometryServiceUrl = StringUtils.defaultIfBlank(geometryServiceUrl, DEFAULT_GEOMETRY_SERVICE);
+    this.sizeLimit = sizeLimit;
   }
 
   @Override
@@ -83,7 +86,7 @@ public class GptConnector implements OutputConnector<OutputBroker> {
 
   @Override
   public OutputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
-    return new GptBroker(this, new GptBrokerDefinitionAdaptor(definition), geometryServiceUrl);
+    return new GptBroker(this, new GptBrokerDefinitionAdaptor(definition), geometryServiceUrl, sizeLimit);
   }
   
 }

@@ -81,7 +81,7 @@ public class DocUtils {
     }
 
     // Class Used By Geoportal Harvester
-    public static byte[] generateMetadataXML(byte[] file_bytes, String file_name) throws IOException {
+    public static byte[] generateMetadataXML(byte[] file_bytes, String file_name, Integer sizeLimit) throws IOException {
     	
     	// Input & Output Variables
     	ByteArrayInputStream base_input = new ByteArrayInputStream(file_bytes);
@@ -89,7 +89,7 @@ public class DocUtils {
     	
     	// Tika Parser Objects
         Parser               parser     = new AutoDetectParser();
-        BodyContentHandler   handler    = new BodyContentHandler();
+        BodyContentHandler   handler    = sizeLimit!=null? new BodyContentHandler(sizeLimit): new BodyContentHandler();
         Metadata             metadata   = new Metadata();
         ParseContext         context    = new ParseContext();
 	  

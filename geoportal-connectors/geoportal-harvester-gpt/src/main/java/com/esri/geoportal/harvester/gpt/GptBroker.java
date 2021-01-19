@@ -64,6 +64,7 @@ import java.util.stream.Collectors;
   private Client client;
   private volatile boolean preventCleanup;
   private final String geometryServiceUrl;
+  private final Integer sizeLimit;
 
   private static String generateSBOM() {
     try {
@@ -81,10 +82,11 @@ import java.util.stream.Collectors;
    * @param definition definition
    * @param client client
    */
-  public GptBroker(GptConnector connector, GptBrokerDefinitionAdaptor definition, String geometryServiceUrl) {
+  public GptBroker(GptConnector connector, GptBrokerDefinitionAdaptor definition, String geometryServiceUrl, Integer sizeLimit) {
     this.connector = connector;
     this.definition = definition;
     this.geometryServiceUrl = geometryServiceUrl;
+    this.sizeLimit = sizeLimit;
   }
 
   @Override
@@ -174,7 +176,7 @@ import java.util.stream.Collectors;
                     .collect(Collectors.toSet());
             if (!types.isEmpty()) {
               byte[]         rawContent = ref.getContent(types.toArray(new MimeType[types.size()]));
-              content = rawContent!=null ? DocUtils.generateMetadataXML(rawContent, new File(ref.getId()).getName()) : null;
+              content = rawContent!=null ? DocUtils.generateMetadataXML(rawContent, new File(ref.getId()).getName(), sizeLimit) : null;
             }
         }
 
