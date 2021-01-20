@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DocUtils {
     private final static Logger LOG = LoggerFactory.getLogger(DocUtils.class);
+    private static final String TIKA_VALUES_TAG = "Tika Values";
     
     // Method Used To Simulate Incoming Bytes
     public static byte[] bytes_from_file(String filePath) {
@@ -107,7 +108,7 @@ public class DocUtils {
         			meta_props.put(name, metadata.get(name));
         		}
         	}
-        	meta_props.store(sw, "Tika Values");
+        	meta_props.store(sw, TIKA_VALUES_TAG);
 
         	// Expected Harvester Properties
         	String     meta_descr  = metadata.get(TikaCoreProperties.DESCRIPTION);
@@ -122,7 +123,15 @@ public class DocUtils {
         	
         	// Check For Null Values & Set Defaults
         	if (meta_descr == null) {
-        		meta_props.put(WKAConstants.WKA_DESCRIPTION, "" + sw.toString());
+            String tikaValuesTag = String.format("#%s", TIKA_VALUES_TAG);
+            String tikaValues = sw.toString();
+            if (tikaValues!=null && tikaValues.toUpperCase().startsWith(tikaValuesTag.toUpperCase())) {
+              tikaValues = tikaValues.substring(tikaValuesTag.length()).trim();
+              if (tikaValues.startsWith("#")) {
+                tikaValues = tikaValues.substring(1);
+              }
+            }
+        		meta_props.put(WKAConstants.WKA_DESCRIPTION, "" + tikaValues);
         	} else {
         		meta_props.put(WKAConstants.WKA_DESCRIPTION, meta_descr);
         	}
