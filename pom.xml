@@ -47,7 +47,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.11.3</version>
+      <version>2.12.1</version>
     </dependency>
     <dependency>
       <groupId>com.esri.geometry</groupId>
@@ -57,7 +57,7 @@
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parsers</artifactId>
-      <version>1.24.1</version>
+      <version>1.25</version>
       <exclusions>
           <exclusion>
               <groupId>log4j</groupId>
@@ -77,7 +77,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.1</version>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
     <!-- Dependencies required for JAVA 11/13 runtime environment -->
