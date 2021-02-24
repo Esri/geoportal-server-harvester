@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 import org.apache.commons.codec.net.URLCodec;
@@ -137,10 +138,15 @@ public class AgsClient implements Closeable {
    * @throws IOException if accessing token fails
    */
   public ServerResponse readServiceInformation(String folder, ServiceInfo si) throws URISyntaxException, IOException {
+    String [] nameParts = si.name.split("/");
+    for (int i=0; i<nameParts.length; i++) {
+      nameParts[i] = URLEncoder.encode(nameParts[i], "UTF-8").replaceAll("\\+", "%20");
+    }
+    String name = StringUtils.join(nameParts, '/');
     String url = rootUrl.toURI()
       .resolve("rest/services/")
       .resolve(URLEncoder.encode(StringUtils.stripToEmpty(folder), "UTF-8").replaceAll("\\+", "%20"))
-      .resolve(URLEncoder.encode(si.name, "UTF-8").replaceAll("\\+", "%20") + "/" + si.type)
+      .resolve(name + "/" + si.type)
       .toASCIIString();
     return readServiceInformation(new URL(url));
   }
@@ -167,10 +173,35 @@ public class AgsClient implements Closeable {
       ServerResponse response = mapper.readValue(responseContent, ServerResponse.class);
       response.url = url.toExternalForm();
       response.json = responseContent;
+      response.itemInfo = readItemInfo(new URL(url + "/info/itemInfo"));
       return response;
     }
   }
 
+  /**
+   * Reads item information.
+   * 
+   * @param url item info url
+   * @returnitem information
+   * @throws IOException if accessing token fails
+   */
+  public ItemInfo readItemInfo(URL url) throws IOException {
+    HttpGet get = new HttpGet(url + String.format("?f=%s", "json"));
+
+    try (CloseableHttpResponse httpResponse = httpClient.execute(get); InputStream contentStream = httpResponse.getEntity().getContent();) {
+      if (httpResponse.getStatusLine().getStatusCode()>=400) {
+        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+      }
+      String responseContent = IOUtils.toString(contentStream, "UTF-8");
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      mapper.configure(Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
+      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+      ItemInfo response = mapper.readValue(responseContent, ItemInfo.class);
+      return response;
+    }
+  }
+  
   /**
    * Reads layer information.
    *

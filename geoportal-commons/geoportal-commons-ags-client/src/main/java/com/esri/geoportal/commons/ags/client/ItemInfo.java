@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Esri, Inc.
+ * Copyright 2021 Piotr Andzel.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,25 @@
  */
 package com.esri.geoportal.commons.ags.client;
 
-import java.util.List;
-
 /**
- * Map server response.
+ * Item Info.
  */
-public final class ServerResponse {
-  public String url;
-  public String json;
-  
-  public String mapName;
-  public String serviceDescription;
+public final class ItemInfo {
+  public String culture;
   public String name;
+  public String guid;
+  public String catalogPath;
+  public String snippet;
   public String description;
-  public SpatialReferenceInfo spatialReference;
-  public ExtentInfo initialExtent;
-  public ExtentInfo fullExtent;
-  public List<LayerRef> layers;
-  public ItemInfo itemInfo;
-  
-  @Override
-  public String toString() {
-    return String.format("{ \"mapName\": \"%s\", \"serviceDescription\": \"%s\", \"spatialReference\": %s, \"initialExtent\": %s, \"fullExtent\": %s}", mapName, serviceDescription, spatialReference, initialExtent, fullExtent);
-  }
+  public String summary;
+  public String title;
+  public String [] tags;
+  public String type;
+  public String [] typeKeywords;
+  public String thumbnail;
+  public String url;
+  public Double [][] extent;
+  public String spatialReference;
+  public String accessInformation;
+  public String licenseInfo;
 }
