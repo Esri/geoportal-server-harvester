@@ -214,9 +214,13 @@ import java.net.URL;
     String serviceType = getServiceType(serverResponse.url);
     String serviceRoot = getServiceRoot(serverResponse.url);
 
+    String declaredTitle = serverResponse.itemInfo!=null? serverResponse.itemInfo.title: null;
+    String constructedTitle = String.format("%s/%s", serviceRoot, StringUtils.defaultString(StringUtils.defaultIfBlank(StringUtils.defaultIfBlank(serverResponse.mapName, serverResponse.name), StringUtils.defaultIfBlank(serviceType, serverResponse.url))));
+    String title = StringUtils.defaultIfBlank(declaredTitle, constructedTitle);
+    
     HashMap<String, Attribute> attributes = new HashMap<>();
     attributes.put(WKAConstants.WKA_IDENTIFIER, new StringAttribute(serverResponse.url));
-    attributes.put(WKAConstants.WKA_TITLE, new StringAttribute(String.format("%s/%s", serviceRoot, StringUtils.defaultString(StringUtils.defaultIfBlank(StringUtils.defaultIfBlank(serverResponse.mapName, serverResponse.name), StringUtils.defaultIfBlank(serviceType, serverResponse.url))))));
+    attributes.put(WKAConstants.WKA_TITLE, new StringAttribute(title));
     attributes.put(WKAConstants.WKA_DESCRIPTION, new StringAttribute(StringUtils.defaultString(StringUtils.defaultIfBlank(serverResponse.description, serverResponse.serviceDescription))));
     attributes.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(serverResponse.url));
     attributes.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute("urn:x-esri:specification:ServiceType:ArcGIS:" + (serviceType != null ? serviceType : "Unknown")));
