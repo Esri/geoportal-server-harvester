@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -286,6 +285,30 @@ public class AgpClient implements Closeable {
   }
   
   /**
+   * Lists content.
+   * @param groupId group id
+   * @param num number items to return
+   * @param start start item
+   * @param token token (optional)
+   * @return content response
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public ContentResponse listGroupContent(String groupId, long num, long start, String token) throws URISyntaxException, IOException {
+    URIBuilder builder = new URIBuilder(groupUri(groupId));
+    
+    builder.setParameter("f", "json");
+    builder.setParameter("num", Long.toString(num));
+    builder.setParameter("start", Long.toString(start));
+    if (token!=null) {
+      builder.setParameter("token", token);
+    }
+    HttpGet req = new HttpGet(builder.build());
+    
+    return execute(req,ContentResponse.class);
+  }
+  
+  /**
    * Lists public content. Only specified item types will be included. See config.properties file.
    * @param num number items to return
    * @param start start item
@@ -480,6 +503,15 @@ public class AgpClient implements Closeable {
            .setHost(rootUrl.toURI().getHost())
            .setPort(rootUrl.toURI().getPort())
            .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + owner + (folderId!=null? "/"+folderId: ""));
+    return builder.build();
+  }
+  
+  private URI groupUri(String groupId) throws URISyntaxException {
+    URIBuilder builder = new URIBuilder();
+    builder.setScheme(rootUrl.toURI().getScheme())
+           .setHost(rootUrl.toURI().getHost())
+           .setPort(rootUrl.toURI().getPort())
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/groups/" + groupId);
     return builder.build();
   }
   
