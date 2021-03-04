@@ -120,10 +120,6 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
     return client.generateToken(minutes).token;
   }
 
-  private String generateToken() throws URISyntaxException, IOException {
-    return client.generateToken(60).token;
-  }
-
   @Override
   public EntityDefinition getEntityDefinition() {
     return definition.getEntityDefinition();
@@ -151,9 +147,9 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
       String folderId = StringUtils.trimToNull(definition.getFolderId());
       if (folderId!=null) {
         FolderEntry[] folders = this.client.listFolders(definition.getCredentials().getUserName(), generateToken(1));
-        FolderEntry selectedFodler = Arrays.stream(folders).filter(folder->folder.id!=null && folder.id.equals(folderId)).findFirst().orElse(
-                Arrays.stream(folders).filter(folder->folder.title!=null && folder.title.equalsIgnoreCase(folderId)).findFirst().orElse(null)
-        );
+        FolderEntry selectedFodler = folders!=null? Arrays.stream(folders).filter(folder->folder.id!=null && folder.id.equals(folderId)).findFirst().orElse(
+                Arrays.stream(folders).filter(folder->folder.title!=null && folder.title.replaceAll("\\s", "").equalsIgnoreCase(folderId.replaceAll("\\s", ""))).findFirst().orElse(null)
+        ): null;
         if (selectedFodler!=null) {
           definition.setFolderId(selectedFodler.id);
         } else {
@@ -167,9 +163,9 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
       String groupId = StringUtils.trimToNull(definition.getGroupId());
       if (groupId!=null) {
         Group [] groups = this.client.listGroups(definition.getCredentials().getUserName(), generateToken(1));
-        Group selectedGroup =  Arrays.stream(groups).filter(group->group.id!=null && group.id.equals(folderId)).findFirst().orElse(
-                Arrays.stream(groups).filter(group->group.title!=null && group.title.equalsIgnoreCase(groupId)).findFirst().orElse(null)
-        );
+        Group selectedGroup =  groups!=null? Arrays.stream(groups).filter(group->group.id!=null && group.id.equals(folderId)).findFirst().orElse(
+                Arrays.stream(groups).filter(group->group.title!=null && group.title.replaceAll("\\s", "").equalsIgnoreCase(groupId.replaceAll("\\s", ""))).findFirst().orElse(null)
+        ): null;
         if (selectedGroup!=null) {
           definition.setGroupId(selectedGroup.id);
         } else {
