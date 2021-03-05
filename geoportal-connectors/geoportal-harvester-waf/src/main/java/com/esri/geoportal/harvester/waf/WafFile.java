@@ -46,7 +46,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 /*package*/ class WafFile {
 
   private final WafBroker broker;
-  private final URL fileUrl;
+  public  final URL fileUrl;
   private final SimpleCredentials creds;
 
   /**

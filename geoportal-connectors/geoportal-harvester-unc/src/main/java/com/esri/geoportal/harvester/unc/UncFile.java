@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
+import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -31,7 +32,7 @@ import org.apache.commons.io.IOUtils;
  */
 /*package*/ class UncFile {
   private final UncBroker broker;
-  private final Path file;
+  public final Path file;
 
   /**
    * Creates instance of UNC file.
@@ -86,4 +87,5 @@ import org.apache.commons.io.IOUtils;
   public String toString() {
     return file.toString();
   }
+
 }
