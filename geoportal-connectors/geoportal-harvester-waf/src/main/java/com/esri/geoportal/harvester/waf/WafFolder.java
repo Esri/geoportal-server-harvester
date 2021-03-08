@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpResponseException;
@@ -70,7 +72,27 @@ import org.slf4j.LoggerFactory;
    * @throws URISyntaxException if invalid URL
    */
   public WafFolderContent readContent(CloseableHttpClient httpClient) throws IOException, URISyntaxException {
-    List<WafFile> files = new ArrayList<>();
+    Map<String, WafFile> files = new TreeMap<>(String.CASE_INSENSITIVE_ORDER) {
+      @Override
+      public WafFile put(String key, WafFile value) {
+        // The code below is intended to identify descriptors for binary files,
+        // for example if the binary file is some_imgae.jpg then some_image.jpg.xml would be
+        // a descriptor for the binary files. If the binary file is found it supersedes binary
+        // file and will be published instead
+        if (key.toLowerCase().endsWith(".xml")) {
+          String orgPath = key.replaceAll("\\.[xX][mM][lL]$", "");
+          this.remove(orgPath);
+          return super.put(key, value);
+        } else {
+          String xmlPath = key + ".xml";
+          if (!this.containsKey(xmlPath)) {
+            return super.put(key, value);
+          } else {
+            return null;
+          }
+        }
+      }
+    };
     List<WafFolder> subFolders = new ArrayList<>();
     
     HtmlUrlScrapper scrapper = new HtmlUrlScrapper(httpClient, creds);
@@ -84,7 +106,7 @@ import org.slf4j.LoggerFactory;
         if (u.toExternalForm().endsWith("/") || !cutOff(u.toExternalForm(),"/").contains(".")) {
           subFolders.add(new WafFolder(broker, u, matchPattern, creds));
         } else if (StringUtils.isBlank(matchPattern) || multiMatchUrl(u,matchPattern)) {
-          files.add(new WafFile(broker, u, creds));
+          files.put(u.toExternalForm(), new WafFile(broker, u, creds));
         }
       }
     } catch (HttpResponseException ex) {
@@ -93,10 +115,10 @@ import org.slf4j.LoggerFactory;
       }
     }
     
-    LOG.debug(formatForLog("WAF FILES in %s: %s",folderUrl,files.toString()));
+    LOG.debug(formatForLog("WAF FILES in %s: %s",folderUrl,files.values().toString()));
     LOG.debug(formatForLog("WAF SUBFOLDERS in %s: %s",folderUrl,subFolders.toString()));
 
-    return new WafFolderContent(this, subFolders, files);
+    return new WafFolderContent(this, subFolders, files.values().stream().collect(Collectors.toList()));
   }
 
   /**
@@ -147,9 +169,13 @@ import org.slf4j.LoggerFactory;
     if (!items.isEmpty()) {
       String first = items.get(0);
       List<String> subList = items.subList(1, items.size());
-      Path path = fileSystem.getPath(first, subList.toArray(new String[]{}));
       PathMatcher pathMatcher = fileSystem.getPathMatcher("glob:"+pattern);
-      return pathMatcher.matches(path);
+      Path path = fileSystem.getPath(first, subList.toArray(new String[]{}));
+      // noXmlPath is a path to the file with potiential '.xm' suffix being removed
+      // this is to assure that binary file descriptors are still being matched, for example:
+      // if the pattern is **.jpg, then both 'some_image.jpg' and 'some_image.jpg.xml' will match.
+      Path noXmlPath = Path.of(path.toString().replaceAll("\\.[xX][mM][lL]$", ""));
+      return pathMatcher.matches(path) || pathMatcher.matches(noXmlPath);
     } else {
       return false;
     }
