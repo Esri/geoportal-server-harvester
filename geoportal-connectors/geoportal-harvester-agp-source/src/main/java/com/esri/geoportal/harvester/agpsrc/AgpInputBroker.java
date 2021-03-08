@@ -18,6 +18,7 @@ package com.esri.geoportal.harvester.agpsrc;
 import com.esri.geoportal.commons.agp.client.AgpClient;
 import com.esri.geoportal.commons.agp.client.ContentResponse;
 import com.esri.geoportal.commons.agp.client.FolderEntry;
+import com.esri.geoportal.commons.agp.client.Group;
 import com.esri.geoportal.commons.agp.client.ItemEntry;
 import com.esri.geoportal.commons.agp.client.QueryResponse;
 import com.esri.geoportal.commons.constants.ItemType;
@@ -119,10 +120,6 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
     return client.generateToken(minutes).token;
   }
 
-  private String generateToken() throws URISyntaxException, IOException {
-    return client.generateToken(60).token;
-  }
-
   @Override
   public EntityDefinition getEntityDefinition() {
     return definition.getEntityDefinition();
@@ -146,12 +143,13 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
     }
     
     try {
+      // validate folder id/title and change it to id if title provided
       String folderId = StringUtils.trimToNull(definition.getFolderId());
       if (folderId!=null) {
         FolderEntry[] folders = this.client.listFolders(definition.getCredentials().getUserName(), generateToken(1));
-        FolderEntry selectedFodler = Arrays.stream(folders).filter(folder->folder.id!=null && folder.id.equals(folderId)).findFirst().orElse(
-                Arrays.stream(folders).filter(folder->folder.title!=null && folder.title.equals(folderId)).findFirst().orElse(null)
-        );
+        FolderEntry selectedFodler = folders!=null? Arrays.stream(folders).filter(folder->folder.id!=null && folder.id.equals(folderId)).findFirst().orElse(
+                Arrays.stream(folders).filter(folder->folder.title!=null && folder.title.replaceAll("\\s", "").equalsIgnoreCase(folderId.replaceAll("\\s", ""))).findFirst().orElse(null)
+        ): null;
         if (selectedFodler!=null) {
           definition.setFolderId(selectedFodler.id);
         } else {
@@ -159,6 +157,22 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
         }
       } else {
         definition.setFolderId(null);
+      }
+      
+      // validate group id/title and change it to id if title provided
+      String groupId = StringUtils.trimToNull(definition.getGroupId());
+      if (groupId!=null) {
+        Group [] groups = this.client.listGroups(definition.getCredentials().getUserName(), generateToken(1));
+        Group selectedGroup =  groups!=null? Arrays.stream(groups).filter(group->group.id!=null && group.id.equals(groupId)).findFirst().orElse(
+                Arrays.stream(groups).filter(group->group.title!=null && group.title.replaceAll("\\s", "").equalsIgnoreCase(groupId.replaceAll("\\s", ""))).findFirst().orElse(null)
+        ): null;
+        if (selectedGroup!=null) {
+          definition.setGroupId(selectedGroup.id);
+        } else {
+          definition.setGroupId(null);
+        }
+      } else {
+        definition.setGroupId(null);
       }
     } catch (IOException|URISyntaxException ex) {
       throw new DataProcessorException(String.format("Error listing folders for user: %s", definition.getCredentials().getUserName()), ex);
@@ -293,9 +307,15 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
     
     private List<ItemEntry> list() throws URISyntaxException, IOException {
       if (!definition.getCredentials().isEmpty()) {
-        ContentResponse content = client.listContent(definition.getCredentials().getUserName(), definition.getFolderId(), size, from, generateToken(1));
-        from += size;
-        return content!=null && content.items!=null && content.items.length>0? Arrays.asList(content.items): null;
+        if (definition.getGroupId()==null) {
+          ContentResponse content = client.listContent(definition.getCredentials().getUserName(), definition.getFolderId(), size, from, generateToken(1));
+          from += size;
+          return content!=null && content.items!=null && content.items.length>0? Arrays.asList(content.items): null;
+        } else {
+          ContentResponse content = client.listGroupContent(definition.getGroupId(), size, from, generateToken(1));
+          from += size;
+          return content!=null && content.items!=null && content.items.length>0? Arrays.asList(content.items): null;
+        }
       } else {
         QueryResponse content = client.listPublicContent(size, from);
         from += size;

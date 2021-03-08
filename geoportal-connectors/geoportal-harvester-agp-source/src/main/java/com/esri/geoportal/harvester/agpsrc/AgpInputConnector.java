@@ -73,6 +73,7 @@ public class AgpInputConnector implements InputConnector<InputBroker> {
       }
     });
     args.add(new UITemplate.StringArgument(P_FOLDER_ID, bundle.getString("agpsrc.folderId"), false));
+    args.add(new UITemplate.StringArgument(P_GROUP_ID, bundle.getString("agpsrc.groupId"), false));
     args.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("agpsrc.username"), false));
     args.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("agpsrc.password"), false) {
       public boolean isPassword() {

@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -163,71 +162,6 @@ public class AgpClient implements Closeable {
   }
 
   /**
-   * Adds item.
-   * @param owner owner
-   * @param folderId folder id (optional)
-   * @param title title
-   * @param description description
-   * @param text text
-   * @param thumbnailUrl thumbnail url
-   * @param itemType item type (must be a URL type)
-   * @param extent extent
-   * @param typeKeywords type keywords
-   * @param tags tags tags
-   * @param token token
-   * @return add item response
-   * @throws URISyntaxException if invalid URL
-   * @throws IOException if operation fails
-   * @deprecated to be removed without substitution
-   */
-  @Deprecated
-  public ItemResponse addItem(String owner, String folderId, String title, String description, String text, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
-    URIBuilder builder = new URIBuilder(addItemUri(owner, StringUtils.trimToNull(folderId)));
-    
-    HttpPost req = new HttpPost(builder.build());
-    
-    Map<String, String> params = makeStdParams(title, description, itemType, thumbnailUrl, extent, typeKeywords, tags, token);
-    params.put("text", text);
-    
-    req.setEntity(createEntity(params));
-
-    return execute(req,ItemResponse.class);
-  }
-
-  /**
-   * Updates item item.
-   * @param owner user name
-   * @param folderId folder id (optional)
-   * @param itemId item id
-   * @param title title
-   * @param description description
-   * @param text text
-   * @param thumbnailUrl thumbnail URL
-   * @param itemType item type (must be a URL type)
-   * @param extent extent
-   * @param typeKeywords type keywords
-   * @param tags tags tags
-   * @param token token
-   * @return add item response
-   * @throws URISyntaxException if invalid URL
-   * @throws IOException if operation fails
-   * @deprecated to be removed without substitution
-   */
-  @Deprecated
-  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, String text, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, String token) throws IOException, URISyntaxException {
-    URIBuilder builder = new URIBuilder(updateItemUri(owner, StringUtils.trimToNull(folderId), itemId));
-    
-    HttpPost req = new HttpPost(builder.build());
-    
-    Map<String, String> params = makeStdParams(title, description, itemType, thumbnailUrl, extent, typeKeywords, tags, token);
-    params.put("text", text);
-    
-    req.setEntity(createEntity(params));
-
-    return execute(req,ItemResponse.class);
-  }
-
-  /**
    * Reads item information.
    * @param itemId item id
    * @param token token
@@ -351,6 +285,30 @@ public class AgpClient implements Closeable {
   }
   
   /**
+   * Lists content.
+   * @param groupId group id
+   * @param num number items to return
+   * @param start start item
+   * @param token token (optional)
+   * @return content response
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public ContentResponse listGroupContent(String groupId, long num, long start, String token) throws URISyntaxException, IOException {
+    URIBuilder builder = new URIBuilder(groupUri(groupId));
+    
+    builder.setParameter("f", "json");
+    builder.setParameter("num", Long.toString(num));
+    builder.setParameter("start", Long.toString(start));
+    if (token!=null) {
+      builder.setParameter("token", token);
+    }
+    HttpGet req = new HttpGet(builder.build());
+    
+    return execute(req,ContentResponse.class);
+  }
+  
+  /**
    * Lists public content. Only specified item types will be included. See config.properties file.
    * @param num number items to return
    * @param start start item
@@ -392,6 +350,26 @@ public class AgpClient implements Closeable {
     HttpGet req = new HttpGet(builder.build());
     
     return execute(req,ContentResponse.class).folders;
+  }
+  
+  /**
+   * Lists folders.
+   * @param owner owner
+   * @param token token
+   * @return array of folders
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public Group[] listGroups(String owner, String token) throws URISyntaxException, IOException {
+    URIBuilder builder = new URIBuilder(communityUserUri(owner));
+    
+    builder.setParameter("f", "json");
+    if (token!=null) {
+      builder.setParameter("token", token);
+    }
+    HttpGet req = new HttpGet(builder.build());
+    
+    return execute(req,User.class).groups;
   }
   
   /**
@@ -525,6 +503,24 @@ public class AgpClient implements Closeable {
            .setHost(rootUrl.toURI().getHost())
            .setPort(rootUrl.toURI().getPort())
            .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + owner + (folderId!=null? "/"+folderId: ""));
+    return builder.build();
+  }
+  
+  private URI groupUri(String groupId) throws URISyntaxException {
+    URIBuilder builder = new URIBuilder();
+    builder.setScheme(rootUrl.toURI().getScheme())
+           .setHost(rootUrl.toURI().getHost())
+           .setPort(rootUrl.toURI().getPort())
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/groups/" + groupId);
+    return builder.build();
+  }
+  
+  private URI communityUserUri(String owner) throws URISyntaxException {
+    URIBuilder builder = new URIBuilder();
+    builder.setScheme(rootUrl.toURI().getScheme())
+           .setHost(rootUrl.toURI().getHost())
+           .setPort(rootUrl.toURI().getPort())
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/community/users/" + owner );
     return builder.build();
   }
   
