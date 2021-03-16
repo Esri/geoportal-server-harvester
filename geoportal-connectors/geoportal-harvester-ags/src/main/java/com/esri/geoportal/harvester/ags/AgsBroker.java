@@ -286,12 +286,12 @@ import java.util.stream.Collectors;
         }
       }
       
-      // overrides
-      jsonNode.put(WKAConstants.WKA_TITLE, title);
-      jsonNode.put(WKAConstants.WKA_DESCRIPTION, description);
-      
       serverResponse.json = mapper.writeValueAsString(jsonNode);
       ref.addContext(MimeType.APPLICATION_JSON, serverResponse.json.getBytes("UTF-8"));
+      
+      // attributes
+      ref.getAttributesMap().put(WKAConstants.WKA_TITLE, title);
+      ref.getAttributesMap().put(WKAConstants.WKA_DESCRIPTION, description);
     }
 
     return ref;
