@@ -62,6 +62,13 @@ import com.esri.geoportal.commons.utils.XmlUtils;
 import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.JsonObject;
 import java.net.URL;
 
 /**
@@ -71,6 +78,13 @@ import java.net.URL;
 
   private static final Logger LOG = LoggerFactory.getLogger(AgsBroker.class);
   private static final Pattern rootPattern = Pattern.compile("\\/[^\\/]*Server(\\/[0-9]+)?$");
+  private static final ObjectMapper mapper = new ObjectMapper();
+  
+  static {
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+  }
 
   private final AgsConnector connector;
   private final AgsBrokerDefinitionAdaptor definition;
@@ -242,6 +256,14 @@ import java.net.URL;
       ref.addContext(MimeType.APPLICATION_XML, bytes);
     }
     if (definition.getEmitJson() && serverResponse.json != null) {
+      ObjectNode jsonNode = (ObjectNode) mapper.readTree(serverResponse.json);
+      if (serverResponse.itemInfo!=null) {
+        JsonNode itemInfoNode = mapper.valueToTree(serverResponse.itemInfo);
+        if (itemInfoNode!=null) {
+          jsonNode.set("itemInfo", itemInfoNode);
+        }
+      }
+      serverResponse.json = mapper.writeValueAsString(jsonNode);
       ref.addContext(MimeType.APPLICATION_JSON, serverResponse.json.getBytes("UTF-8"));
     }
 
