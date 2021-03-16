@@ -285,9 +285,11 @@ import java.util.stream.Collectors;
           jsonNode.set("itemInfo", itemInfoNode);
         }
       }
-      jsonNode.put(WKAConstants.WKA_IDENTIFIER, serverResponse.url);
+      
+      // overrides
       jsonNode.put(WKAConstants.WKA_TITLE, title);
       jsonNode.put(WKAConstants.WKA_DESCRIPTION, description);
+      
       serverResponse.json = mapper.writeValueAsString(jsonNode);
       ref.addContext(MimeType.APPLICATION_JSON, serverResponse.json.getBytes("UTF-8"));
     }
