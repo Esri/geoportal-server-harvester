@@ -69,7 +69,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonObject;
+import java.math.BigDecimal;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Ags broker.
@@ -224,18 +227,37 @@ import java.net.URL;
     }
   }
 
+  private String trimHtml(String val) {
+    if (val!=null) {
+      String parts [] = val.split("<[^>]*>");
+      if (parts!=null) {
+        val = Arrays.stream(parts)
+          .map(part -> StringUtils.trimToNull(part))
+          .filter(part -> part!=null)
+          .collect(Collectors.joining(" "));
+      }
+    }
+    return StringUtils.trimToNull(val);
+  }
+  
   private DataReference createReference(ServerResponse serverResponse) throws IOException, URISyntaxException, MetaException, TransformerException {
     String serviceType = getServiceType(serverResponse.url);
     String serviceRoot = getServiceRoot(serverResponse.url);
 
-    String declaredTitle = serverResponse.itemInfo!=null? serverResponse.itemInfo.title: null;
+    // select title
+    String itemInfoTitle = serverResponse.itemInfo!=null? serverResponse.itemInfo.title: null;
     String constructedTitle = String.format("%s/%s", serviceRoot, StringUtils.defaultString(StringUtils.defaultIfBlank(StringUtils.defaultIfBlank(serverResponse.mapName, serverResponse.name), StringUtils.defaultIfBlank(serviceType, serverResponse.url))));
-    String title = StringUtils.defaultIfBlank(declaredTitle, constructedTitle);
+    String title = StringUtils.defaultIfBlank(itemInfoTitle, constructedTitle);
+    
+    // select description
+    String itemInfoDescription = trimHtml(serverResponse.itemInfo!=null? serverResponse.itemInfo.description: null);
+    String serverDescription = trimHtml(StringUtils.defaultString(StringUtils.defaultIfBlank(serverResponse.description, serverResponse.serviceDescription)));
+    String description = StringUtils.defaultIfBlank(itemInfoDescription, serverDescription);
     
     HashMap<String, Attribute> attributes = new HashMap<>();
     attributes.put(WKAConstants.WKA_IDENTIFIER, new StringAttribute(serverResponse.url));
     attributes.put(WKAConstants.WKA_TITLE, new StringAttribute(title));
-    attributes.put(WKAConstants.WKA_DESCRIPTION, new StringAttribute(StringUtils.defaultString(StringUtils.defaultIfBlank(serverResponse.description, serverResponse.serviceDescription))));
+    attributes.put(WKAConstants.WKA_DESCRIPTION, new StringAttribute(description));
     attributes.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(serverResponse.url));
     attributes.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute("urn:x-esri:specification:ServiceType:ArcGIS:" + (serviceType != null ? serviceType : "Unknown")));
 
@@ -263,11 +285,12 @@ import java.net.URL;
           jsonNode.set("itemInfo", itemInfoNode);
         }
       }
+      jsonNode.put(WKAConstants.WKA_IDENTIFIER, serverResponse.url);
+      jsonNode.put(WKAConstants.WKA_TITLE, title);
+      jsonNode.put(WKAConstants.WKA_DESCRIPTION, description);
       serverResponse.json = mapper.writeValueAsString(jsonNode);
       ref.addContext(MimeType.APPLICATION_JSON, serverResponse.json.getBytes("UTF-8"));
     }
-
-    ref.getAttributesMap().put("attributes", attrs);
 
     return ref;
   }
