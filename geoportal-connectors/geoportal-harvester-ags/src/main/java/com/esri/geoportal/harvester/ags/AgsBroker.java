@@ -67,9 +67,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonObject;
-import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -292,6 +292,14 @@ import java.util.stream.Collectors;
       // attributes
       ref.getAttributesMap().put(WKAConstants.WKA_TITLE, title);
       ref.getAttributesMap().put(WKAConstants.WKA_DESCRIPTION, description);
+      
+      if (serverResponse.itemInfo!=null) {
+        if (serverResponse.itemInfo.tags!=null) {
+          ArrayNode tagsNode = mapper.createArrayNode();
+          Arrays.stream(serverResponse.itemInfo.tags).forEach(tag -> tagsNode.add(tag));
+          ref.getAttributesMap().put("keywords_s", tagsNode);
+        }
+      }
     }
 
     return ref;
