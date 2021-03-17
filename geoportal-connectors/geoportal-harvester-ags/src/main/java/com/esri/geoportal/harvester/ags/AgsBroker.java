@@ -299,6 +299,10 @@ import java.util.stream.Collectors;
           Arrays.stream(serverResponse.itemInfo.tags).forEach(tag -> tagsNode.add(tag));
           ref.getAttributesMap().put("keywords_s", tagsNode);
         }
+        String accessInformation = trimHtml(serverResponse.itemInfo.accessInformation);
+        if (accessInformation!=null) {
+          ref.getAttributesMap().put("accessInformation_txt", accessInformation);
+        }
       }
     }
 
