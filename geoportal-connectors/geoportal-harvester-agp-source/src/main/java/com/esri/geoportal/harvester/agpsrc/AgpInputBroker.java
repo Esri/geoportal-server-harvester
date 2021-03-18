@@ -62,6 +62,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import com.esri.geoportal.commons.utils.XmlUtils;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * ArcGIS Portal output broker.
@@ -243,6 +244,14 @@ import com.esri.geoportal.harvester.api.defs.TaskDefinition;
     }
     if (definition.getEmitJson()) {
       ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(itemEntry).getBytes("UTF-8"));
+      
+      // attributes
+
+      if (itemEntry.tags!=null) {
+        ArrayNode tagsNode = mapper.createArrayNode();
+        Arrays.stream(itemEntry.tags).forEach(tag -> tagsNode.add(tag));
+        ref.getAttributesMap().put("keywords_s", tagsNode);
+      }
     }
 
     return ref;
