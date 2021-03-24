@@ -29,5 +29,6 @@
         <module>geoportal-harvester-jdbc</module>
         <module>geoportal-harvester-dcat</module>
         <module>geoportal-harvester-thredds</module>
+        <module>geoportal-harvester-stac</module>
     </modules>
 </project>
