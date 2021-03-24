@@ -26,11 +26,6 @@ public class Catalog {
   public String title;
   public String description;
   public String [] keywords;
-  public String version;
-  public String stac_version;
-  public Extent extent;
-  public Provider [] provider;
-  public String license;
   public Map<String, JsonNode> properties;
   public Map<String, JsonNode> assets;
   public Link [] links;

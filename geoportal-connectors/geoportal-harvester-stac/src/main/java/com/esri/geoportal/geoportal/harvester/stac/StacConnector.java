@@ -15,12 +15,21 @@
  */
 package com.esri.geoportal.geoportal.harvester.stac;
 
+import com.esri.geoportal.commons.meta.MetaBuilder;
+import com.esri.geoportal.commons.meta.js.SimpleDcMetaBuilder;
 import static com.esri.geoportal.geoportal.harvester.stac.StacConstants.*;
+import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.Initializable.InitContext;
+import com.esri.geoportal.harvester.api.base.SimpleInitContext;
+import com.esri.geoportal.harvester.api.base.SimpleIteratorContext;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.Task;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.InputBroker;
+import com.esri.geoportal.harvester.api.specs.InputBroker.IteratorContext;
 import com.esri.geoportal.harvester.api.specs.InputConnector;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -32,11 +41,14 @@ import java.util.ResourceBundle;
 public class StacConnector implements InputConnector<InputBroker> {
 
   public static final String TYPE = "STAC";
+    
+  protected final MetaBuilder metaBuilder;
 
   /**
    * Creates instance of the connector.
    */
-  public StacConnector() {
+  public StacConnector(MetaBuilder metaBuilder) {
+    this.metaBuilder = metaBuilder;
   }
 
   @Override
@@ -66,7 +78,6 @@ public class StacConnector implements InputConnector<InputBroker> {
 
   @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
-//    return new StacBroker(this, new StacBrokerDefinitionAdaptor(definition));
-return null;
+    return new StacBroker(this, new StacBrokerDefinitionAdaptor(definition), metaBuilder);
   }
 }

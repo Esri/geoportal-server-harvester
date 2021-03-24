@@ -19,7 +19,7 @@ package com.esri.geoportal.geoportal.commons.stac.client;
  * STAC link.
  */
 public class Link {
-  public Relation rel;
+  public String rel;
   public String href;
   public String type;
   public String title;

@@ -24,12 +24,8 @@ import java.util.Map;
 public class Item {
   public String id;
   public String type;
-  public String stac_version;
-  public String stac_extension;
   public JsonNode geometry;
   public Double [] bbox;
   public Map<String, JsonNode> properties;
   public Map<String, JsonNode> assets;
-  public Link [] links;
-  public String collection;
 }
