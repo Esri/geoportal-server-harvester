@@ -16,7 +16,9 @@
 package com.esri.geoportal.geoportal.commons.stac.client;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Closeable;
 import java.io.IOException;
@@ -61,37 +63,43 @@ public class Client implements Closeable {
     }
   }
   
-  public Item readItem(URL itemUrl)  throws IOException, URISyntaxException {
+  public ResponseWrapper<Item> readItem(URL itemUrl)  throws IOException, URISyntaxException {
     HttpUriRequest GET = new HttpGet(itemUrl.toURI());
-    return execute(GET, Item.class);
+    ResponseWrapper<Item> itemWrapper = execute(GET, Item.class);
+    return itemWrapper;
   }
   
   public Catalog readCatalog(URL catalogUrl)  throws IOException, URISyntaxException {
     HttpUriRequest GET = new HttpGet(catalogUrl.toURI());
-    return execute(GET, Catalog.class);
+    ResponseWrapper<Catalog> wrapper = execute(GET, Catalog.class);
+    return wrapper!=null? wrapper.data: null;
   }
   
+  private <T> ResponseWrapper<T> makeResponseWrapper(String responseContent, URL url, Class<T> clazz) throws JsonProcessingException  {
+      T value = mapper.readValue(responseContent, clazz);
+      return new ResponseWrapper<>(value, responseContent, url);
+  }
   
-  private <T> T execute(HttpUriRequest req, Class<T> clazz) throws IOException, URISyntaxException {
+  private <T> ResponseWrapper<T> execute(HttpUriRequest req, Class<T> clazz) throws IOException, URISyntaxException {
     try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
       String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
       LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
       
       if (httpResponse.getStatusLine().getStatusCode()>=400) {
-        T value = null;
+        ResponseWrapper<T> wrapper = null;
         try {
-          value = mapper.readValue(responseContent, clazz);
+          wrapper = makeResponseWrapper(responseContent, req.getURI().toURL(), clazz);
         } catch (Exception ex) {
           throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
         }
-        if (value==null) {
+        if (wrapper==null) {
           throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
         }
-        return value;
+        return wrapper;
       }
       
-      return mapper.readValue(responseContent, clazz);
+      return makeResponseWrapper(responseContent, req.getURI().toURL(), clazz);
     }
   }
 }

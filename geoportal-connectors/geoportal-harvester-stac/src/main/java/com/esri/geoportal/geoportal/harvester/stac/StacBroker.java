@@ -26,6 +26,7 @@ import com.esri.geoportal.commons.meta.MetaException;
 import com.esri.geoportal.commons.meta.StringAttribute;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_IDENTIFIER;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_MODIFIED;
+import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_RESOURCE_URL;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_TITLE;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
@@ -36,6 +37,7 @@ import com.esri.geoportal.geoportal.commons.stac.client.Catalog;
 import com.esri.geoportal.geoportal.commons.stac.client.Client;
 import com.esri.geoportal.geoportal.commons.stac.client.Item;
 import com.esri.geoportal.geoportal.commons.stac.client.Link;
+import com.esri.geoportal.geoportal.commons.stac.client.ResponseWrapper;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -172,18 +174,19 @@ public class StacBroker implements InputBroker {
    * @return content as string.
    * @throws DataInputException if creating content fails
    */
-  protected Content createContent(Item item) throws DataInputException {
+  protected Content createContent(ResponseWrapper<Item> wrapper) throws DataInputException {
 
     try {
       HashMap<String, Attribute> attrs = new HashMap<>();
-      String id = firstNonBlank(item.id);
+      String id = firstNonBlank(wrapper.data.id);
       attrs.put(WKA_IDENTIFIER, new StringAttribute(id));
       attrs.put(WKA_TITLE, new StringAttribute(id));
       
-      Date date = parseIsoDate(item!=null && item.properties!=null && item.properties.get("datetime")!=null? item.properties.get("datetime").asText(): null);
+      Date date = parseIsoDate(wrapper.data!=null && wrapper.data.properties!=null && wrapper.data.properties.get("datetime")!=null? wrapper.data.properties.get("datetime").asText(): null);
       if (date!=null) {
         attrs.put(WKA_MODIFIED, new StringAttribute(formatIsoDate(date)));
       }
+      attrs.put(WKA_RESOURCE_URL, new StringAttribute(wrapper.url.toString()));
 
       // TODO evaluate resource url
 //      if (dataSet.resources != null) {
@@ -225,16 +228,16 @@ public class StacBroker implements InputBroker {
   @Override
   public DataContent readContent(String id) throws DataInputException {
     try {
-      Item item = client.readItem(new URL(id));
+      ResponseWrapper<Item> itemWrapper = client.readItem(new URL(id));
 
-      Content content = createContent(item);
+      Content content = createContent(itemWrapper);
 
-      Date date = parseIsoDate(item!=null && item.properties!=null && item.properties.get("datetime")!=null? item.properties.get("datetime").asText(): null);
+      Date date = parseIsoDate(itemWrapper!=null && itemWrapper.data.properties!=null && itemWrapper.data.properties.get("datetime")!=null? itemWrapper.data.properties.get("datetime").asText(): null);
       SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, date, URI.create(escapeUri(id)), td.getSource().getRef(), td.getRef());
       if (Arrays.asList(new MimeType[]{MimeType.APPLICATION_JSON}).contains(content.getContentType())) {
         ref.addContext(MimeType.APPLICATION_JSON, content.getData().getBytes("UTF-8"));
       } else {
-        ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(item).getBytes("UTF-8"));
+        ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(itemWrapper).getBytes("UTF-8"));
       }
       
       if (content.getAttributes()!=null) {
@@ -287,11 +290,11 @@ public class StacBroker implements InputBroker {
     return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(zonedDateTime);
   }
 
-  private DataReference createReference(Item item) throws DataInputException, URISyntaxException, UnsupportedEncodingException, JsonProcessingException {
-    String id = firstNonBlank(item.id);
+  private DataReference createReference(ResponseWrapper<Item> item) throws DataInputException, URISyntaxException, UnsupportedEncodingException, JsonProcessingException {
+    String id = firstNonBlank(item.data.id);
     Content content = createContent(item);
     
-    Date date = parseIsoDate(item!=null && item.properties!=null && item.properties.get("datetime")!=null? item.properties.get("datetime").asText(): null);
+    Date date = parseIsoDate(item!=null && item.data.properties!=null && item.data.properties.get("datetime")!=null? item.data.properties.get("datetime").asText(): null);
     SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, date, URI.create(escapeUri(id)), td.getSource().getRef(), td.getRef());
 
     if (definition.getEmitXml()) {
@@ -301,11 +304,7 @@ public class StacBroker implements InputBroker {
     }
 
     if (definition.getEmitJson()) {
-      if (Arrays.asList(new MimeType[]{MimeType.APPLICATION_JSON}).contains(content.getContentType())) {
-        ref.addContext(MimeType.APPLICATION_JSON, content.getData().getBytes("UTF-8"));
-      } else {
-        ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(item).getBytes("UTF-8"));
-      }
+      ref.addContext(MimeType.APPLICATION_JSON, item.raw.getBytes("UTF-8"));
     }
     
     if (content.getAttributes()!=null) {
@@ -350,7 +349,7 @@ public class StacBroker implements InputBroker {
 
     private IteratorQueue<URL> catalogIter;
     private java.util.Iterator<URL> dataIter;
-    private Item nextItem;
+    private ResponseWrapper<Item> nextItem;
 
     public StacIterator(InputBroker.IteratorContext iteratorContext) {
       this.iteratorContext = iteratorContext;
@@ -408,6 +407,7 @@ public class StacBroker implements InputBroker {
           URL next = dataIter.next();
           try {
             nextItem = client.readItem(next);
+            if (nextItem==null || nextItem.data==null) continue;
             return true;
           } catch (IOException|URISyntaxException ex) {
             throw new DataInputException(StacBroker.this, String.format("Error accessing %s", next), ex);
@@ -444,7 +444,7 @@ public class StacBroker implements InputBroker {
     public DataReference next() throws DataInputException {
       try {
 
-        Item dataSet = nextItem;
+        ResponseWrapper<Item> dataSet = nextItem;
         nextItem = null;
         
         return createReference(dataSet);
