@@ -26,6 +26,7 @@ public class Catalog {
   public String title;
   public String description;
   public String [] keywords;
+  public JsonNode extent;
   public Map<String, JsonNode> properties;
   public Map<String, JsonNode> assets;
   public Link [] links;
