@@ -24,6 +24,7 @@ import com.esri.geoportal.commons.meta.MapAttribute;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.commons.meta.MetaException;
 import com.esri.geoportal.commons.meta.StringAttribute;
+import com.esri.geoportal.commons.meta.util.WKAConstants;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_IDENTIFIER;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_MODIFIED;
 import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_RESOURCE_URL;
@@ -182,36 +183,19 @@ public class StacBroker implements InputBroker {
       attrs.put(WKA_IDENTIFIER, new StringAttribute(id));
       attrs.put(WKA_TITLE, new StringAttribute(id));
       
-      Date date = parseIsoDate(wrapper.data!=null && wrapper.data.properties!=null && wrapper.data.properties.get("datetime")!=null? wrapper.data.properties.get("datetime").asText(): null);
+      Date date = parseIsoDate(wrapper.data.properties!=null && wrapper.data.properties.get("datetime")!=null? 
+        wrapper.data.properties.get("datetime").asText(): 
+        null
+      );
       if (date!=null) {
         attrs.put(WKA_MODIFIED, new StringAttribute(formatIsoDate(date)));
       }
       attrs.put(WKA_RESOURCE_URL, new StringAttribute(wrapper.url.toString()));
 
-      // TODO evaluate resource url
-//      if (dataSet.resources != null) {
-//        final List<Attribute> references = new ArrayList<>();
-//        dataSet.resources.forEach(resource -> {
-//          HashMap<String, Attribute> reference = new HashMap<>();
-//          if (resource.url != null) {
-//            String scheme = generateSchemeName(resource.url);
-//            reference.put(WKA_RESOURCE_URL, new StringAttribute(resource.url));
-//            if (scheme != null) {
-//              reference.put(WKA_RESOURCE_URL_SCHEME, new StringAttribute(scheme));
-//            }
-//          }
-//          references.add(new MapAttribute(reference));
-//        });
-//        if (references.size() == 1) {
-//          Map<String, Attribute> namedAttributes = references.get(0).getNamedAttributes();
-//          attrs.put(WKA_RESOURCE_URL, namedAttributes.get(WKA_RESOURCE_URL));
-//          if (namedAttributes.containsKey(WKA_RESOURCE_URL_SCHEME)) {
-//            attrs.put(WKA_RESOURCE_URL_SCHEME, namedAttributes.get(WKA_RESOURCE_URL_SCHEME));
-//          }
-//        } else if (!references.isEmpty()) {
-//          attrs.put(WKA_REFERENCES, new ArrayAttribute(references));
-//        }
-//      }
+      if (wrapper.data.bbox!=null && wrapper.data.bbox.length==4) {
+        String sBox = String.format("%f %f,%f %f", wrapper.data.bbox[0], wrapper.data.bbox[1], wrapper.data.bbox[2], wrapper.data.bbox[3]);
+        attrs.put(WKAConstants.WKA_BBOX, new StringAttribute(sBox));
+      }
 
       Document document = metaBuilder.create(new MapAttribute(attrs));
 
@@ -229,10 +213,11 @@ public class StacBroker implements InputBroker {
   public DataContent readContent(String id) throws DataInputException {
     try {
       ResponseWrapper<Item> itemWrapper = client.readItem(new URL(id));
+      Item item = itemWrapper.data;
 
       Content content = createContent(itemWrapper);
 
-      Date date = parseIsoDate(itemWrapper!=null && itemWrapper.data.properties!=null && itemWrapper.data.properties.get("datetime")!=null? itemWrapper.data.properties.get("datetime").asText(): null);
+      Date date = parseIsoDate(item.properties!=null && item.properties.get("datetime")!=null? item.properties.get("datetime").asText(): null);
       SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, date, URI.create(escapeUri(id)), td.getSource().getRef(), td.getRef());
       if (Arrays.asList(new MimeType[]{MimeType.APPLICATION_JSON}).contains(content.getContentType())) {
         ref.addContext(MimeType.APPLICATION_JSON, content.getData().getBytes("UTF-8"));
@@ -240,9 +225,6 @@ public class StacBroker implements InputBroker {
         ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(itemWrapper).getBytes("UTF-8"));
       }
       
-      if (content.getAttributes()!=null) {
-        ref.getAttributesMap().put("properties", content.getAttributes());
-      }
 
       return ref;
     } catch (IOException | URISyntaxException ex) {
@@ -290,11 +272,13 @@ public class StacBroker implements InputBroker {
     return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(zonedDateTime);
   }
 
-  private DataReference createReference(ResponseWrapper<Item> item) throws DataInputException, URISyntaxException, UnsupportedEncodingException, JsonProcessingException {
-    String id = firstNonBlank(item.data.id);
-    Content content = createContent(item);
+  private DataReference createReference(ResponseWrapper<Item> itemWrapper) throws DataInputException, URISyntaxException, UnsupportedEncodingException, JsonProcessingException {
+    Item item = itemWrapper.data;
     
-    Date date = parseIsoDate(item!=null && item.data.properties!=null && item.data.properties.get("datetime")!=null? item.data.properties.get("datetime").asText(): null);
+    String id = firstNonBlank(item.id);
+    Content content = createContent(itemWrapper);
+    
+    Date date = parseIsoDate(item.properties!=null && item.properties.get("datetime")!=null? item.properties.get("datetime").asText(): null);
     SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, date, URI.create(escapeUri(id)), td.getSource().getRef(), td.getRef());
 
     if (definition.getEmitXml()) {
@@ -304,11 +288,14 @@ public class StacBroker implements InputBroker {
     }
 
     if (definition.getEmitJson()) {
-      ref.addContext(MimeType.APPLICATION_JSON, item.raw.getBytes("UTF-8"));
+      ref.addContext(MimeType.APPLICATION_JSON, itemWrapper.raw.getBytes("UTF-8"));
     }
     
-    if (content.getAttributes()!=null) {
-      ref.getAttributesMap().put("properties",content.getAttributes());
+    // TODO absorb properties.
+    if (item.properties!=null) {
+//      item.properties.entrySet().forEach(entry -> {
+//        ref.getAttributesMap().put(entry.getKey(), entry.getValue());
+//      });
     }
 
     return ref;
