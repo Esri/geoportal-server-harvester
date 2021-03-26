@@ -18,4 +18,4 @@
 /**
  * STAC data source.
  */
-package com.esri.geoportal.geoportal.harvester.stac;
+package com.esri.geoportal.harvester.stac;

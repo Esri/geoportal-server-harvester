@@ -81,6 +81,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import org.apache.http.impl.client.HttpClients;
 import com.esri.geoportal.harvester.thredds.ThreddsConnector;
+import com.esri.geoportal.harvester.stac.StacConnector;
 
 /**
  * Bootstrap.
@@ -275,6 +276,7 @@ public class Bootstrap {
       inboundConnectorRegistry.put(JdbcConnector.TYPE, new JdbcConnector(true));
       inboundConnectorRegistry.put(DcatConnector.TYPE, new DcatConnector(metaBuilder));
       inboundConnectorRegistry.put(ThreddsConnector.TYPE, new ThreddsConnector());
+      inboundConnectorRegistry.put(StacConnector.TYPE, new StacConnector(metaBuilder));
     }
     
     return inboundConnectorRegistry;
