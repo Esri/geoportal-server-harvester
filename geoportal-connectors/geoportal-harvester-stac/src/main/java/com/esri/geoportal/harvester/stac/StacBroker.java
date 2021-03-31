@@ -218,11 +218,16 @@ public class StacBroker implements InputBroker {
       Content content = createContent(itemWrapper);
 
       Date date = parseIsoDate(item.properties!=null && item.properties.get("datetime")!=null? item.properties.get("datetime").asText(): null);
-      SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, date, URI.create(escapeUri(id)), td.getSource().getRef(), td.getRef());
+      SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, date, itemWrapper.url.toURI(), td.getSource().getRef(), td.getRef()) {
+        @Override
+        public String getFetchableId() {
+          return super.getSourceUri().toASCIIString();
+        }
+      };
       if (Arrays.asList(new MimeType[]{MimeType.APPLICATION_JSON}).contains(content.getContentType())) {
         ref.addContext(MimeType.APPLICATION_JSON, content.getData().getBytes("UTF-8"));
       } else {
-        ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(itemWrapper).getBytes("UTF-8"));
+        ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(itemWrapper.data).getBytes("UTF-8"));
       }
       
 
@@ -279,7 +284,12 @@ public class StacBroker implements InputBroker {
     Content content = createContent(itemWrapper);
     
     Date date = parseIsoDate(item.properties!=null && item.properties.get("datetime")!=null? item.properties.get("datetime").asText(): null);
-    SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, date, itemWrapper.url.toURI(), td.getSource().getRef(), td.getRef());
+    SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, date, itemWrapper.url.toURI(), td.getSource().getRef(), td.getRef()) {
+      @Override
+      public String getFetchableId() {
+        return super.getSourceUri().toASCIIString();
+      }
+    };
 
     if (definition.getEmitXml()) {
       if (Arrays.asList(new MimeType[]{MimeType.APPLICATION_XML, MimeType.TEXT_XML}).contains(content.getContentType())) {
