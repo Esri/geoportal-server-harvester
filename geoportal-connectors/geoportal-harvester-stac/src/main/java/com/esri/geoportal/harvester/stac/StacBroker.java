@@ -291,11 +291,13 @@ public class StacBroker implements InputBroker {
       ref.addContext(MimeType.APPLICATION_JSON, itemWrapper.raw.getBytes("UTF-8"));
     }
     
-    // TODO absorb properties.
     if (item.properties!=null) {
-//      item.properties.entrySet().forEach(entry -> {
-//        ref.getAttributesMap().put(entry.getKey(), entry.getValue());
-//      });
+      item.properties.entrySet().forEach(entry -> {
+        String key = entry.getKey();
+        // sanitize key
+        key = key.replaceAll("[:.#,]+", "_").replaceAll("^_+","");
+        ref.getAttributesMap().put(key, entry.getValue());
+      });
     }
 
     return ref;
