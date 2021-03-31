@@ -279,7 +279,7 @@ public class StacBroker implements InputBroker {
     Content content = createContent(itemWrapper);
     
     Date date = parseIsoDate(item.properties!=null && item.properties.get("datetime")!=null? item.properties.get("datetime").asText(): null);
-    SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, date, URI.create(escapeUri(id)), td.getSource().getRef(), td.getRef());
+    SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), id, date, itemWrapper.url.toURI(), td.getSource().getRef(), td.getRef());
 
     if (definition.getEmitXml()) {
       if (Arrays.asList(new MimeType[]{MimeType.APPLICATION_XML, MimeType.TEXT_XML}).contains(content.getContentType())) {
