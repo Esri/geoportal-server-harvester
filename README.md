@@ -27,8 +27,8 @@ Deploying war file:
 
 ## Requirements
 
-* Java JDK 1.8.x
-* Apache Tomcat 8 or higher
+* Java JDK 11 (preferred: [AdoptOpenJDK 11](https://adoptopenjdk.net/))
+* Apache Tomcat 9.x
 
 ## Contributing
 
