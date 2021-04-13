@@ -96,6 +96,13 @@
         <artifactId>jaxb-runtime</artifactId>
         <version>3.0.0</version>
     </dependency>
+    
+    <!-- Nashorn JavaScript engine  -->
+    <dependency>
+      <groupId>org.openjdk.nashorn</groupId>
+      <artifactId>nashorn-core</artifactId>
+      <version>15.2</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
