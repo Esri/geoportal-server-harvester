@@ -101,5 +101,10 @@
             <artifactId>geoportal-harvester-thredds</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>geoportal-harvester-stac</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>
