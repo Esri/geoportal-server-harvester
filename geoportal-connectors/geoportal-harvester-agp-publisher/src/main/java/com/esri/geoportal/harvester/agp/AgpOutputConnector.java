@@ -38,15 +38,18 @@ public class AgpOutputConnector implements OutputConnector<OutputBroker> {
   
   private final MetaAnalyzer metaAnalyzer;
   private final String geometryServiceUrl;
+  private final Integer sizeLimit;
 
   /**
    * Creates instance of the connector.
    * @param metaAnalyzer meta analyzer
    * @param geometryServiceUrl geometry service URL
+   * @param sizeLimit TIKA size limit
    */
-  public AgpOutputConnector(MetaAnalyzer metaAnalyzer, String geometryServiceUrl) {
+  public AgpOutputConnector(MetaAnalyzer metaAnalyzer, String geometryServiceUrl, Integer sizeLimit) {
     this.metaAnalyzer = metaAnalyzer;
     this.geometryServiceUrl = StringUtils.defaultIfBlank(geometryServiceUrl, DEFAULT_GEOMETRY_SERVICE);
+    this.sizeLimit = sizeLimit;
   }
 
   @Override
@@ -56,7 +59,7 @@ public class AgpOutputConnector implements OutputConnector<OutputBroker> {
 
   @Override
   public OutputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
-    return new AgpOutputBroker(this, new AgpOutputBrokerDefinitionAdaptor(definition), metaAnalyzer, geometryServiceUrl);
+    return new AgpOutputBroker(this, new AgpOutputBrokerDefinitionAdaptor(definition), metaAnalyzer, geometryServiceUrl, sizeLimit);
   }
 
   @Override

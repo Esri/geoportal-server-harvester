@@ -96,6 +96,7 @@ import org.xml.sax.SAXException;
   private String token;
   private final Set<String> existing = new HashSet<>();
   private volatile boolean preventCleanup;
+  private final Integer sizeLimit;
 
   /**
    * Creates instance of the broker.
@@ -103,12 +104,14 @@ import org.xml.sax.SAXException;
    * @param connector connector
    * @param definition
    * @param metaAnalyzer
+   * @param sizeLimit TIKA size limit
    */
-  public AgpOutputBroker(AgpOutputConnector connector, AgpOutputBrokerDefinitionAdaptor definition, MetaAnalyzer metaAnalyzer, String geometryServiceUrl) {
+  public AgpOutputBroker(AgpOutputConnector connector, AgpOutputBrokerDefinitionAdaptor definition, MetaAnalyzer metaAnalyzer, String geometryServiceUrl, Integer sizeLimit) {
     this.connector = connector;
     this.definition = definition;
     this.metaAnalyzer = metaAnalyzer;
     this.geometryServiceUrl = geometryServiceUrl;
+    this.sizeLimit = sizeLimit;
   }
 
   @Override
@@ -133,7 +136,7 @@ import org.xml.sax.SAXException;
                   .collect(Collectors.toSet());
           if (!types.isEmpty()) {
             byte[]         rawContent = ref.getContent(types.toArray(new MimeType[types.size()]));
-            content = rawContent!=null ? DocUtils.generateMetadataXML(rawContent, new File(ref.getId()).getName()) : null;
+            content = rawContent!=null ? DocUtils.generateMetadataXML(rawContent, new File(ref.getId()).getName(), sizeLimit) : null;
           }
       }
         

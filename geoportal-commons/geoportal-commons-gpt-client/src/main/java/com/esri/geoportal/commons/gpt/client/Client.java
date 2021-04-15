@@ -159,11 +159,11 @@ public class Client implements Closeable {
               envelope_geo.put("type", "envelope");
               ArrayNode coordinates = mapper.createArrayNode();
               ArrayNode southWest = coordinates.addArray();
-              southWest.add(xmin);
-              southWest.add(ymin);
+              southWest.add(Math.max(xmin, -180.0));
+              southWest.add(Math.min(ymax, 90.0));
               ArrayNode northEast = coordinates.addArray();
-              northEast.add(xmax);
-              northEast.add(ymax);
+              northEast.add(Math.min(xmax, 180.0));
+              northEast.add(Math.max(ymin, -90.0));
               envelope_geo.set("coordinates", coordinates);
 
               jsonRequest.set("envelope_geo", envelope_geo);
@@ -216,7 +216,7 @@ public class Client implements Closeable {
                 jsonRequest.set(String.format("%s", fld.getKey()), fld.getValue());
                 break;
               case OBJECT:
-                jsonRequest.set(String.format("%s_obj", fld.getKey()), fld.getValue());
+//                jsonRequest.set(String.format("%s_obj", fld.getKey()), fld.getValue());
                 break;
             }
           }
@@ -246,6 +246,8 @@ public class Client implements Closeable {
           jsonRequest.put(entry.getKey(), (Integer) entry.getValue());
         } else if (entry.getValue() instanceof Boolean) {
           jsonRequest.put(entry.getKey(), (Boolean) entry.getValue());
+        } else if (entry.getValue() instanceof JsonNode) {
+          jsonRequest.set(entry.getKey(), (JsonNode) entry.getValue());
         }
       }
     }

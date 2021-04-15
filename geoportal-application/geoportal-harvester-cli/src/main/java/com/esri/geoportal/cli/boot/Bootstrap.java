@@ -84,6 +84,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.apache.http.impl.client.HttpClients;
 import org.xml.sax.SAXException;
 import com.esri.geoportal.harvester.thredds.ThreddsConnector;
+import com.esri.geoportal.harvester.stac.StacConnector;
 
 /**
  * Bootstrap.
@@ -284,6 +285,7 @@ public class Bootstrap {
       inboundConnectorRegistry.put(JdbcConnector.TYPE, new JdbcConnector(true));
       inboundConnectorRegistry.put(DcatConnector.TYPE, new DcatConnector(metaBuilder));
       inboundConnectorRegistry.put(ThreddsConnector.TYPE, new ThreddsConnector());
+      inboundConnectorRegistry.put(StacConnector.TYPE, new StacConnector(metaBuilder));
     }
     
     return inboundConnectorRegistry;
@@ -300,10 +302,10 @@ public class Bootstrap {
               new SimpleIso15115_2MetaAnalyzer(), 
               new SimpleIso15119MetaAnalyzer());
 
-      outboundConnectorRegistry.put(AgpOutputConnector.TYPE, new AgpOutputConnector(metaAnalyzer, geometryServiceUrl));
+      outboundConnectorRegistry.put(AgpOutputConnector.TYPE, new AgpOutputConnector(metaAnalyzer, geometryServiceUrl, null));
       outboundConnectorRegistry.put(ConsoleConnector.TYPE, new ConsoleConnector());
       outboundConnectorRegistry.put(FolderConnector.TYPE, new FolderConnector());
-      outboundConnectorRegistry.put(com.esri.geoportal.harvester.gpt.GptConnector.TYPE, new com.esri.geoportal.harvester.gpt.GptConnector(geometryServiceUrl));
+      outboundConnectorRegistry.put(com.esri.geoportal.harvester.gpt.GptConnector.TYPE, new com.esri.geoportal.harvester.gpt.GptConnector(geometryServiceUrl, null));
     }
     
     return outboundConnectorRegistry;

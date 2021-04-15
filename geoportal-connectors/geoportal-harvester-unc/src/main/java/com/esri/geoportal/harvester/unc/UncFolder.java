@@ -23,12 +23,14 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +69,27 @@ import org.slf4j.LoggerFactory;
    * @throws URISyntaxException if invalid URL
    */
   public UncFolderContent readContent() throws IOException, URISyntaxException {
-    List<UncFile> files = new ArrayList<>();
+    Map<String, UncFile> files = new TreeMap<>(String.CASE_INSENSITIVE_ORDER) {
+      @Override
+      public UncFile put(String key, UncFile value) {
+        // The code below is intended to identify descriptors for binary files,
+        // for example if the binary file is some_imgae.jpg then some_image.jpg.xml would be
+        // a descriptor for the binary files. If the binary file is found it supersedes binary
+        // file and will be published instead
+        if (key.toLowerCase().endsWith(".xml")) {
+          String orgPath = key.replaceAll("\\.[xX][mM][lL]$", "");
+          this.remove(orgPath);
+          return super.put(key, value);
+        } else {
+          String xmlPath = key + ".xml";
+          if (!this.containsKey(xmlPath)) {
+            return super.put(key, value);
+          } else {
+            return null;
+          }
+        }
+      }
+    };
     List<UncFolder> subFolders = new ArrayList<>();
 
     Files.list(folder).forEach(f->{
@@ -78,30 +100,29 @@ import org.slf4j.LoggerFactory;
         if (Files.isDirectory(f)) {
           subFolders.add(new UncFolder(broker, f, matchPattern, since));
         } else if (Files.isRegularFile(f) && (StringUtils.isBlank(matchPattern) || multiMatchFileName(f, matchPattern))) {
-          if (since==null)
-            files.add(new UncFile(broker, f));
-          else {
-            Path fPath = Paths.get(f.toUri());
-            
-            ArrayList<Long> allTimes = new ArrayList<>();
-            collectTime(allTimes, fPath, "lastModifiedTime");
-            collectTime(allTimes, fPath, "lastAccessTime");
-            collectTime(allTimes, fPath, "creationTime");
-            
-            long latestTime = max(allTimes);
-            if (latestTime >= since.getTime()) 
-              files.add(new UncFile(broker, f));
-          }
+          files.put(f.toString(), new UncFile(broker, f));
         }
       } catch (IOException ex) {
         LOG.warn(formatForLog("Error processing path element: %s", f), ex);
       }
     });
     
-    LOG.debug(formatForLog("UNC FILES in %s: %s",folder,files.toString()));
+    LOG.debug(formatForLog("UNC FILES in %s: %s",folder,files.values().toString()));
     LOG.debug(formatForLog("UNC SUBFOLDERS in %s: %s",folder,subFolders.toString()));
     
-    return new UncFolderContent(this, subFolders, files);
+    return new UncFolderContent(this, subFolders, files.values().stream().filter(uncFile -> {
+      if (since == null) return true;
+      
+      Path fPath = uncFile.file;
+      ArrayList<Long> allTimes = new ArrayList<>();
+      collectTime(allTimes, fPath, "lastModifiedTime");
+      collectTime(allTimes, fPath, "lastAccessTime");
+      collectTime(allTimes, fPath, "creationTime");
+      
+      long latestTime = max(allTimes);
+      
+      return latestTime >= since.getTime();
+    }).collect(Collectors.toList()));
   }
   
   private void collectTime(ArrayList<Long> allTimes, Path fPath, String timeName) {
@@ -150,7 +171,11 @@ import org.slf4j.LoggerFactory;
    */
   private boolean matchFileName(Path path, String pattern) {
     PathMatcher pathMatcher = fileSystem.getPathMatcher("glob:"+pattern);
-    return pathMatcher.matches(path);
+    // noXmlPath is a path to the file with potiential '.xm' suffix being removed
+    // this is to assure that binary file descriptors are still being matched, for example:
+    // if the pattern is **.jpg, then both 'some_image.jpg' and 'some_image.jpg.xml' will match.
+    Path noXmlPath = Path.of(path.toString().replaceAll("\\.[xX][mM][lL]$", ""));
+    return pathMatcher.matches(path) || pathMatcher.matches(noXmlPath);
   }
   
 }

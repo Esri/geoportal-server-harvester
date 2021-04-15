@@ -32,6 +32,7 @@ public final class ServerResponse {
   public ExtentInfo initialExtent;
   public ExtentInfo fullExtent;
   public List<LayerRef> layers;
+  public ItemInfo itemInfo;
   
   @Override
   public String toString() {

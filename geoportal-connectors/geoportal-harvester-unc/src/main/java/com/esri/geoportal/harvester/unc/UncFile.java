@@ -31,7 +31,7 @@ import org.apache.commons.io.IOUtils;
  */
 /*package*/ class UncFile {
   private final UncBroker broker;
-  private final Path file;
+  public final Path file;
 
   /**
    * Creates instance of UNC file.
@@ -86,4 +86,5 @@ import org.apache.commons.io.IOUtils;
   public String toString() {
     return file.toString();
   }
+
 }

@@ -62,7 +62,17 @@ import com.esri.geoportal.commons.utils.XmlUtils;
 import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.JsonObject;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Ags broker.
@@ -71,6 +81,13 @@ import java.net.URL;
 
   private static final Logger LOG = LoggerFactory.getLogger(AgsBroker.class);
   private static final Pattern rootPattern = Pattern.compile("\\/[^\\/]*Server(\\/[0-9]+)?$");
+  private static final ObjectMapper mapper = new ObjectMapper();
+  
+  static {
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+  }
 
   private final AgsConnector connector;
   private final AgsBrokerDefinitionAdaptor definition;
@@ -210,14 +227,37 @@ import java.net.URL;
     }
   }
 
+  private String trimHtml(String val) {
+    if (val!=null) {
+      String parts [] = val.split("<[^>]*>");
+      if (parts!=null) {
+        val = Arrays.stream(parts)
+          .map(part -> StringUtils.trimToNull(part))
+          .filter(part -> part!=null)
+          .collect(Collectors.joining(" "));
+      }
+    }
+    return StringUtils.trimToNull(val);
+  }
+  
   private DataReference createReference(ServerResponse serverResponse) throws IOException, URISyntaxException, MetaException, TransformerException {
     String serviceType = getServiceType(serverResponse.url);
     String serviceRoot = getServiceRoot(serverResponse.url);
 
+    // select title
+    String itemInfoTitle = serverResponse.itemInfo!=null? serverResponse.itemInfo.title: null;
+    String constructedTitle = String.format("%s/%s", serviceRoot, StringUtils.defaultString(StringUtils.defaultIfBlank(StringUtils.defaultIfBlank(serverResponse.mapName, serverResponse.name), StringUtils.defaultIfBlank(serviceType, serverResponse.url))));
+    String title = StringUtils.defaultIfBlank(itemInfoTitle, constructedTitle);
+    
+    // select description
+    String itemInfoDescription = trimHtml(serverResponse.itemInfo!=null? serverResponse.itemInfo.description: null);
+    String serverDescription = trimHtml(StringUtils.defaultString(StringUtils.defaultIfBlank(serverResponse.description, serverResponse.serviceDescription)));
+    String description = StringUtils.defaultIfBlank(itemInfoDescription, serverDescription);
+    
     HashMap<String, Attribute> attributes = new HashMap<>();
     attributes.put(WKAConstants.WKA_IDENTIFIER, new StringAttribute(serverResponse.url));
-    attributes.put(WKAConstants.WKA_TITLE, new StringAttribute(String.format("%s/%s", serviceRoot, StringUtils.defaultString(StringUtils.defaultIfBlank(StringUtils.defaultIfBlank(serverResponse.mapName, serverResponse.name), StringUtils.defaultIfBlank(serviceType, serverResponse.url))))));
-    attributes.put(WKAConstants.WKA_DESCRIPTION, new StringAttribute(StringUtils.defaultString(StringUtils.defaultIfBlank(serverResponse.description, serverResponse.serviceDescription))));
+    attributes.put(WKAConstants.WKA_TITLE, new StringAttribute(title));
+    attributes.put(WKAConstants.WKA_DESCRIPTION, new StringAttribute(description));
     attributes.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(serverResponse.url));
     attributes.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute("urn:x-esri:specification:ServiceType:ArcGIS:" + (serviceType != null ? serviceType : "Unknown")));
 
@@ -238,10 +278,33 @@ import java.net.URL;
       ref.addContext(MimeType.APPLICATION_XML, bytes);
     }
     if (definition.getEmitJson() && serverResponse.json != null) {
+      ObjectNode jsonNode = (ObjectNode) mapper.readTree(serverResponse.json);
+      if (serverResponse.itemInfo!=null) {
+        JsonNode itemInfoNode = mapper.valueToTree(serverResponse.itemInfo);
+        if (itemInfoNode!=null) {
+          jsonNode.set("itemInfo", itemInfoNode);
+        }
+      }
+      
+      serverResponse.json = mapper.writeValueAsString(jsonNode);
       ref.addContext(MimeType.APPLICATION_JSON, serverResponse.json.getBytes("UTF-8"));
+      
+      // attributes
+      ref.getAttributesMap().put(WKAConstants.WKA_TITLE, title);
+      ref.getAttributesMap().put(WKAConstants.WKA_DESCRIPTION, description);
+      
+      if (serverResponse.itemInfo!=null) {
+        if (serverResponse.itemInfo.tags!=null) {
+          ArrayNode tagsNode = mapper.createArrayNode();
+          Arrays.stream(serverResponse.itemInfo.tags).forEach(tag -> tagsNode.add(tag));
+          ref.getAttributesMap().put("keywords_s", tagsNode);
+        }
+        String accessInformation = trimHtml(serverResponse.itemInfo.accessInformation);
+        if (accessInformation!=null) {
+          ref.getAttributesMap().put("accessInformation_txt", accessInformation);
+        }
+      }
     }
-
-    ref.getAttributesMap().put("attributes", attrs);
 
     return ref;
   }

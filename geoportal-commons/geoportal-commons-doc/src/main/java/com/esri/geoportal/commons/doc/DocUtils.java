@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DocUtils {
     private final static Logger LOG = LoggerFactory.getLogger(DocUtils.class);
+    private static final String TIKA_VALUES_TAG = "Tika Values";
     
     // Method Used To Simulate Incoming Bytes
     public static byte[] bytes_from_file(String filePath) {
@@ -81,7 +82,7 @@ public class DocUtils {
     }
 
     // Class Used By Geoportal Harvester
-    public static byte[] generateMetadataXML(byte[] file_bytes, String file_name) throws IOException {
+    public static byte[] generateMetadataXML(byte[] file_bytes, String file_name, Integer sizeLimit) throws IOException {
     	
     	// Input & Output Variables
     	ByteArrayInputStream base_input = new ByteArrayInputStream(file_bytes);
@@ -89,7 +90,7 @@ public class DocUtils {
     	
     	// Tika Parser Objects
         Parser               parser     = new AutoDetectParser();
-        BodyContentHandler   handler    = new BodyContentHandler();
+        BodyContentHandler   handler    = sizeLimit!=null? new BodyContentHandler(sizeLimit): new BodyContentHandler();
         Metadata             metadata   = new Metadata();
         ParseContext         context    = new ParseContext();
 	  
@@ -107,7 +108,7 @@ public class DocUtils {
         			meta_props.put(name, metadata.get(name));
         		}
         	}
-        	meta_props.store(sw, "Tika Values");
+        	meta_props.store(sw, TIKA_VALUES_TAG);
 
         	// Expected Harvester Properties
         	String     meta_descr  = metadata.get(TikaCoreProperties.DESCRIPTION);
@@ -122,7 +123,15 @@ public class DocUtils {
         	
         	// Check For Null Values & Set Defaults
         	if (meta_descr == null) {
-        		meta_props.put(WKAConstants.WKA_DESCRIPTION, "" + sw.toString());
+            String tikaValuesTag = String.format("#%s", TIKA_VALUES_TAG);
+            String tikaValues = sw.toString();
+            if (tikaValues!=null && tikaValues.toUpperCase().startsWith(tikaValuesTag.toUpperCase())) {
+              tikaValues = tikaValues.substring(tikaValuesTag.length()).trim();
+              if (tikaValues.startsWith("#")) {
+                tikaValues = tikaValues.substring(1);
+              }
+            }
+        		meta_props.put(WKAConstants.WKA_DESCRIPTION, "" + tikaValues);
         	} else {
         		meta_props.put(WKAConstants.WKA_DESCRIPTION, meta_descr);
         	}

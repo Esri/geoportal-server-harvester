@@ -17,18 +17,20 @@ package com.esri.geoportal.commons.ags.client;
 
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.stream.Collectors;
+import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -44,9 +46,17 @@ import org.apache.http.message.BasicNameValuePair;
  * ArcGIS Server client.
  */
 public class AgsClient implements Closeable {
+  private static final URLCodec URL_CODEC = new URLCodec("UTF-8");
 
   private final URL rootUrl;
   private final CloseableHttpClient httpClient;
+  private static final ObjectMapper mapper = new ObjectMapper();
+  
+  static {
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+  }
 
   /**
    * Creates instance of the client.
@@ -135,7 +145,16 @@ public class AgsClient implements Closeable {
    * @throws IOException if accessing token fails
    */
   public ServerResponse readServiceInformation(String folder, ServiceInfo si) throws URISyntaxException, IOException {
-    String url = rootUrl.toURI().resolve("rest/services/").resolve(StringUtils.stripToEmpty(folder)).resolve(si.name + "/" + si.type).toASCIIString();
+    String [] nameParts = si.name.split("/");
+    for (int i=0; i<nameParts.length; i++) {
+      nameParts[i] = URLEncoder.encode(nameParts[i], "UTF-8").replaceAll("\\+", "%20");
+    }
+    String name = StringUtils.join(nameParts, '/');
+    String url = rootUrl.toURI()
+      .resolve("rest/services/")
+      .resolve(URLEncoder.encode(StringUtils.stripToEmpty(folder), "UTF-8").replaceAll("\\+", "%20"))
+      .resolve(name + "/" + si.type)
+      .toASCIIString();
     return readServiceInformation(new URL(url));
   }
   
@@ -154,17 +173,38 @@ public class AgsClient implements Closeable {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
       String responseContent = IOUtils.toString(contentStream, "UTF-8");
-      ObjectMapper mapper = new ObjectMapper();
-      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-      mapper.configure(Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
-      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
       ServerResponse response = mapper.readValue(responseContent, ServerResponse.class);
       response.url = url.toExternalForm();
       response.json = responseContent;
+      response.itemInfo = readItemInfo(new URL(url + "/info/itemInfo"));
       return response;
     }
   }
 
+  /**
+   * Reads item information.
+   * 
+   * @param url item info url
+   * @returnitem information
+   * @throws IOException if accessing token fails
+   */
+  public ItemInfo readItemInfo(URL url) throws IOException {
+    HttpGet get = new HttpGet(url + String.format("?f=%s", "json"));
+
+    try (CloseableHttpResponse httpResponse = httpClient.execute(get); InputStream contentStream = httpResponse.getEntity().getContent();) {
+      if (httpResponse.getStatusLine().getStatusCode()>=400) {
+        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+      }
+      String responseContent = IOUtils.toString(contentStream, "UTF-8");
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      mapper.configure(Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
+      mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+      ItemInfo response = mapper.readValue(responseContent, ItemInfo.class);
+      return response;
+    }
+  }
+  
   /**
    * Reads layer information.
    *

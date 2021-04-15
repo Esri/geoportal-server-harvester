@@ -43,6 +43,7 @@ import org.apache.commons.lang3.math.NumberUtils;
   
   private URL hostUrl;
   private String folderId;
+  private String groupId;
   private boolean emitXml = true;
   private boolean emitJson = false;
   private MetadataFormat metaFormat = MetadataFormat.DEFAULT;
@@ -68,6 +69,7 @@ import org.apache.commons.lang3.math.NumberUtils;
         throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
       }
       folderId = get(P_FOLDER_ID);
+      groupId = get(P_GROUP_ID);
       emitXml = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_XML)), true);
       emitJson = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_JSON)), false);
       metaFormat = MetadataFormat.parse(get(P_EMIT_XML_FMT), MetadataFormat.DEFAULT);
@@ -79,6 +81,7 @@ import org.apache.commons.lang3.math.NumberUtils;
   public void override(Map<String, String> params) {
     consume(params,P_HOST_URL);
     consume(params,P_FOLDER_ID);
+    consume(params,P_GROUP_ID);
     consume(params,P_EMIT_XML);
     consume(params,P_EMIT_JSON);
     consume(params,P_EMIT_XML_FMT);
@@ -119,6 +122,22 @@ import org.apache.commons.lang3.math.NumberUtils;
   public void setFolderId(String folderId) {
     this.folderId = folderId;
     set(P_FOLDER_ID, folderId);
+  }
+
+  /**
+   * Gets group id.
+   * @return group id
+   */
+  public String getGroupId() {
+    return groupId;
+  }
+
+  /**
+   * Sets group id.
+   * @param groupId group id 
+   */
+  public void setGroupId(String groupId) {
+    this.groupId = groupId;
   }
 
   /**
