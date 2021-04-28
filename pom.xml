@@ -109,7 +109,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.0</version>
         <configuration>
           <aggregate>true</aggregate>
           <doctitle>Esri Geoportal Harvester ver. ${project.version}</doctitle>
@@ -143,13 +143,13 @@
             </group>
           </groups>
           <links>
-            <link>https://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/</link>
             <link>http://esri.github.io/geometry-api-java/javadoc/</link>
             <link>https://docs.spring.io/spring-security/site/docs/current/api/</link>
             <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
             <link>https://docs.spring.io/spring-ldap/docs/current/apidocs/</link>
             <link>https://docs.oracle.com/javaee/7/api/</link>
-            <link>https://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/</link>
+            <link>https://hc.apache.org/httpcomponents-client-4.5.x/current/httpclient/apidocs/</link>
+            <link>https://hc.apache.org/httpcomponents-core-4.4.x/current/httpcore/apidocs/</link>
           </links>
         </configuration>
         

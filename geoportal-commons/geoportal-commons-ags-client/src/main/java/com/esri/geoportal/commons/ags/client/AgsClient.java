@@ -185,7 +185,7 @@ public class AgsClient implements Closeable {
    * Reads item information.
    * 
    * @param url item info url
-   * @returnitem information
+   * @return item information
    * @throws IOException if accessing token fails
    */
   public ItemInfo readItemInfo(URL url) throws IOException {
