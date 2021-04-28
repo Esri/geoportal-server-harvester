@@ -8,7 +8,7 @@ For details about geoportal server harvester, please visit the [wiki](https://gi
 To report an issue, please go to [issues](https://github.com/Esri/geoportal-server-harvester/issues).
 
 ## Releases and Downloads
-- 2.6.1 - Released November 13, 2018, click [here](https://github.com/Esri/geoportal-server-harvester/releases) for release notes and downloads. 
+- 2.6.4 - Released Jul 8, 2020, click [here](https://github.com/Esri/geoportal-server-harvester/releases) for release notes and downloads. 
 
 ## Features
 
@@ -19,6 +19,10 @@ To report an issue, please go to [issues](https://github.com/Esri/geoportal-serv
 Building the source code:
 
 * Run 'mvn clean install'
+
+Building javadoc:
+
+* Run 'mvn javadoc::aggregate'
 
 Deploying war file:
 
