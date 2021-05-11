@@ -28,8 +28,9 @@ public class Record {
 
   /**
    * Creates instance of the record.
+   * @param catalog catalog URL
    * @param id id
-   * @param url uri
+   * @param uri record URI
    */
   public Record(URL catalog, String id, URI uri) {
     if (catalog==null) {

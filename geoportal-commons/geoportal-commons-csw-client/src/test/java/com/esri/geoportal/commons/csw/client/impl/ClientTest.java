@@ -24,29 +24,29 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import org.apache.commons.io.IOUtils;
+import org.junit.AfterClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
 import org.mockserver.client.MockServerClient;
-import org.mockserver.junit.MockServerRule;
+import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 
 /**
  * CSW client test.
  */
 public class ClientTest {
   
-
-  @Rule
-  public MockServerRule server = new MockServerRule(this,5000);
+  public static ClientAndServer server;
   
-  private MockServerClient client;
+  public static MockServerClient client;
 
-  @Before
-  public void setup() throws IOException {
+  @BeforeClass
+  public static void setup() throws IOException {
+    server = startClientAndServer(5000);
     client = new MockServerClient("localhost", 5000);
     client.when(
                     request()
@@ -56,7 +56,7 @@ public class ClientTest {
             .respond(
                     response()
                     .withStatusCode(200)
-                    .withBody(readAndClose(getClass().getResourceAsStream("/robots.txt")))
+                    .withBody(readAndClose(ClientTest.class.getResourceAsStream("/robots.txt")))
             );
     client.when(
                     request()
@@ -71,7 +71,7 @@ public class ClientTest {
                     .withHeaders(
                       new Header("Content-Type", "application/xml; charset=utf-8")
                     )
-                    .withBody(readAndClose(getClass().getResourceAsStream("/GetCapabilitiesResponse.xml")))
+                    .withBody(readAndClose(ClientTest.class.getResourceAsStream("/GetCapabilitiesResponse.xml")))
             );
     client.when(
                     request()
@@ -84,7 +84,7 @@ public class ClientTest {
                     .withHeaders(
                       new Header("Content-Type", "application/xml; charset=utf-8")
                     )
-                    .withBody(readAndClose(getClass().getResourceAsStream("/GetRecordsResponse.xml")))
+                    .withBody(readAndClose(ClientTest.class.getResourceAsStream("/GetRecordsResponse.xml")))
             );
     client.when(
                     request()
@@ -99,8 +99,14 @@ public class ClientTest {
                     .withHeaders(
                       new Header("Content-Type", "application/xml; charset=utf-8")
                     )
-                    .withBody(readAndClose(getClass().getResourceAsStream("/GetRecordByIdResponse.xml")))
+                    .withBody(readAndClose(ClientTest.class.getResourceAsStream("/GetRecordByIdResponse.xml")))
             );
+  }
+  
+  @AfterClass
+  public static void after()  {
+    server.stop();
+    client.stop();
   }
 
   @Test
@@ -134,7 +140,7 @@ public class ClientTest {
     assertNotEquals("No metadata", metadata.length(), 0);
   }
 
-  private String readAndClose(InputStream in) throws IOException {
+  private static String readAndClose(InputStream in) throws IOException {
     try (InputStream input=in) {
       return IOUtils.toString(input, "UTF-8");
     }

@@ -22,13 +22,13 @@ import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.Rule;
-import org.mockserver.client.server.MockServerClient;
-import org.mockserver.junit.MockServerRule;
+import org.junit.BeforeClass;
+import org.mockserver.client.MockServerClient;
+import org.mockserver.integration.ClientAndServer;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -36,14 +36,14 @@ import static org.mockserver.model.HttpResponse.response;
  * Boots HTTP client test
  */
 public class BotsHttpClientTest {
-
-  @Rule
-  public MockServerRule server = new MockServerRule(this,5000);
   
-  private MockServerClient client;
+  public static ClientAndServer server;
+  
+  public static MockServerClient client;
 
-  @Before
-  public void setup() throws IOException {
+  @BeforeClass
+  public static void setup() throws IOException {
+    server = startClientAndServer(5000);
     client = new MockServerClient("localhost", 5000);
     client.when(
                     request()
@@ -53,7 +53,7 @@ public class BotsHttpClientTest {
             .respond(
                     response()
                     .withStatusCode(200)
-                    .withBody(readAndClose(getClass().getResourceAsStream("/robots.txt")))
+                    .withBody(readAndClose(BotsHttpClientTest.class.getResourceAsStream("/robots.txt")))
             );
     client.when(
                     request()
@@ -67,8 +67,9 @@ public class BotsHttpClientTest {
             );
   }
   
-  @After
-  public void destroy() {
+  @AfterClass
+  public static void after()  {
+    server.stop();
     client.stop();
   }
 
@@ -95,7 +96,7 @@ public class BotsHttpClientTest {
     }
   }
 
-  private String readAndClose(InputStream in) throws IOException {
+  private static String readAndClose(InputStream in) throws IOException {
     try (InputStream input=in) {
       return IOUtils.toString(input, "UTF-8");
     }

@@ -45,7 +45,7 @@
             </packagings>
             <goals>
                 <goal>generate-sources</goal>
-                <goal>javadoc:javadoc</goal>
+                <goal>javadoc:aggregate</goal>
             </goals>
         </action>
     </actions>

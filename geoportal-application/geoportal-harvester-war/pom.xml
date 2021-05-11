@@ -13,8 +13,8 @@
 
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-        <spring.version>5.2.13.RELEASE</spring.version>
-        <springsecurity.version>5.3.8.RELEASE</springsecurity.version>
+        <spring.version>5.2.14.RELEASE</spring.version>
+        <springsecurity.version>5.3.9.RELEASE</springsecurity.version>
     </properties>
     
     <dependencies>
@@ -94,7 +94,7 @@
         <dependency>
           <groupId>org.springframework.security.oauth</groupId>
           <artifactId>spring-security-oauth2</artifactId>
-          <version>2.5.0.RELEASE</version>
+          <version>2.5.1.RELEASE</version>
         </dependency>
         <dependency>
           <groupId>org.springframework.security</groupId>

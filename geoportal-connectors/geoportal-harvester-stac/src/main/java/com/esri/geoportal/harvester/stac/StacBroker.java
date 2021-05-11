@@ -171,8 +171,8 @@ public class StacBroker implements InputBroker {
   /**
    * Creates document content from dataset.
    *
-   * @param item dataset
-   * @return content as string.
+   * @param wrapper item wraper
+   * @return content .
    * @throws DataInputException if creating content fails
    */
   protected Content createContent(ResponseWrapper<Item> wrapper) throws DataInputException {
