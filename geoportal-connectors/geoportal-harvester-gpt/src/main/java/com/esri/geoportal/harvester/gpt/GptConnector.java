@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.gpt;
 
 import static com.esri.geoportal.commons.constants.CredentialsConstants.*;
+import com.esri.geoportal.commons.utils.CommonGptConnector;
 import static com.esri.geoportal.harvester.gpt.GptConstants.*;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
@@ -32,21 +33,24 @@ import org.apache.commons.lang3.StringUtils;
  * GPT connector.
  * @see com.esri.geoportal.harvester.gpt API
  */
-public class GptConnector implements OutputConnector<OutputBroker> {
+public class GptConnector implements OutputConnector<OutputBroker>, CommonGptConnector {
   public static final String TYPE = "GPT";
   private static final String DEFAULT_GEOMETRY_SERVICE = "https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer";
 
   private final String geometryServiceUrl;
   private final Integer sizeLimit;
+  private final String collectionsFieldName;
 
-  public GptConnector(Integer sizeLimit) {
+  public GptConnector(Integer sizeLimit, String collectionsFieldName) {
     this.geometryServiceUrl = DEFAULT_GEOMETRY_SERVICE;
     this.sizeLimit = sizeLimit;
+    this.collectionsFieldName = StringUtils.defaultIfBlank(collectionsFieldName, DEFAULT_COLLECTIONS_FIELD_NAME);
   }
 
-  public GptConnector(String geometryServiceUrl, Integer sizeLimit) {
+  public GptConnector(String geometryServiceUrl, Integer sizeLimit, String collectionsFieldName) {
     this.geometryServiceUrl = StringUtils.defaultIfBlank(geometryServiceUrl, DEFAULT_GEOMETRY_SERVICE);
     this.sizeLimit = sizeLimit;
+    this.collectionsFieldName = StringUtils.defaultIfBlank(collectionsFieldName, DEFAULT_COLLECTIONS_FIELD_NAME);
   }
 
   @Override
@@ -76,6 +80,7 @@ public class GptConnector implements OutputConnector<OutputBroker> {
     arguments.add(new UITemplate.BooleanArgument(P_ACCEPT_JSON, bundle.getString("gpt.accept.json"),false, Boolean.FALSE));
     arguments.add(new UITemplate.BooleanArgument(P_TRANSLATE_PDF, bundle.getString("gpt.translate.pdf"),false, Boolean.TRUE));
     arguments.add(new UITemplate.BooleanArgument(P_EDITABLE, bundle.getString("gpt.editable"),false, Boolean.FALSE));
+    arguments.add(new UITemplate.StringArgument(P_COLLECTIONS, bundle.getString("gpt.collections")));
     return new UITemplate(getType(), bundle.getString("gpt"), arguments);
   }
 
@@ -86,7 +91,7 @@ public class GptConnector implements OutputConnector<OutputBroker> {
 
   @Override
   public OutputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
-    return new GptBroker(this, new GptBrokerDefinitionAdaptor(definition), geometryServiceUrl, sizeLimit);
+    return new GptBroker(this, new GptBrokerDefinitionAdaptor(definition), geometryServiceUrl, sizeLimit, collectionsFieldName);
   }
   
 }

@@ -16,6 +16,7 @@
 package com.esri.geoportal.harvester.gptsrc;
 
 import static com.esri.geoportal.commons.constants.CredentialsConstants.*;
+import com.esri.geoportal.commons.utils.CommonGptConnector;
 import static com.esri.geoportal.harvester.gptsrc.GptConstants.*;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
@@ -26,12 +27,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * GPT connector.
  */
-public class GptConnector implements InputConnector<InputBroker> {
+public class GptConnector implements InputConnector<InputBroker>, CommonGptConnector {
   public static final String TYPE = "GPTSRC";
+  
+  private final String collectionsFieldName;
+
+  public GptConnector(String collectionsFieldName) {
+    this.collectionsFieldName = StringUtils.defaultIfBlank(collectionsFieldName, DEFAULT_COLLECTIONS_FIELD_NAME);
+  }
 
   @Override
   public String getType() {
@@ -67,7 +75,7 @@ public class GptConnector implements InputConnector<InputBroker> {
 
   @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
-    return new GptBroker(this, new GptBrokerDefinitionAdaptor(definition));
+    return new GptBroker(this, new GptBrokerDefinitionAdaptor(definition), collectionsFieldName);
   }
   
 }

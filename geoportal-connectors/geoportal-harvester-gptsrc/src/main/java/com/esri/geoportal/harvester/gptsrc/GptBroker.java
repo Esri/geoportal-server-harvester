@@ -51,13 +51,15 @@ class GptBroker implements InputBroker {
   private static final Logger LOG = LoggerFactory.getLogger(GptBroker.class);
   private final GptConnector connector;
   private final GptBrokerDefinitionAdaptor definition;
+  private final String collectionsFieldName;
 
   private Client client;
   private TaskDefinition td;
 
-  public GptBroker(GptConnector connector, GptBrokerDefinitionAdaptor definition) {
+  public GptBroker(GptConnector connector, GptBrokerDefinitionAdaptor definition, String collectionsFieldName) {
     this.connector = connector;
     this.definition = definition;
+    this.collectionsFieldName = collectionsFieldName;
   }
 
   @Override
@@ -66,10 +68,10 @@ class GptBroker implements InputBroker {
     td = context.getTask().getTaskDefinition();
     CloseableHttpClient httpClient = HttpClientBuilder.create().useSystemProperties().build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
-      client = new Client(httpClient, definition.getHostUrl(), definition.getCredentials(), definition.getIndex());
+      client = new Client(httpClient, definition.getHostUrl(), definition.getCredentials(), definition.getIndex(), collectionsFieldName);
     } else {
       Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpClient, definition.getHostUrl());
-      client = new Client(new BotsHttpClient(httpClient, bots), definition.getHostUrl(), definition.getCredentials(), definition.getIndex());
+      client = new Client(new BotsHttpClient(httpClient, bots), definition.getHostUrl(), definition.getCredentials(), definition.getIndex(), collectionsFieldName);
     }
   }
 

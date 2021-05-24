@@ -27,4 +27,5 @@ package com.esri.geoportal.harvester.gpt;
   public static final String P_ACCEPT_JSON     = "gpt-accept-json";
   public static final String P_TRANSLATE_PDF   = "gpt-translate-pdf";
   public static final String P_EDITABLE        = "gpt-editable";
+  public static final String P_COLLECTIONS     = "gpt-collections";
 }

@@ -38,6 +38,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -85,6 +86,7 @@ public class Client implements Closeable {
   private final URL url;
   private final SimpleCredentials cred;
   private final String index;
+  private final String collectionsFieldName;
 
   private TokenInfo tokenInfo;
 
@@ -97,12 +99,14 @@ public class Client implements Closeable {
    * @param url URL of the GPT REST end point
    * @param cred credentials
    * @param index index name
+   * @param collectionsFieldName collections field name
    */
-  public Client(CloseableHttpClient httpClient, URL url, SimpleCredentials cred, String index) {
+  public Client(CloseableHttpClient httpClient, URL url, SimpleCredentials cred, String index, String collectionsFieldName) {
     this.httpClient = httpClient;
     this.url = url;
     this.cred = cred;
     this.index = StringUtils.defaultIfBlank(index, DEFAULT_INDEX);
+    this.collectionsFieldName = collectionsFieldName;
 
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -114,9 +118,10 @@ public class Client implements Closeable {
    * @param url URL of the GPT REST end point
    * @param cred credentials
    * @param index index name
+   * @param collectionsFieldName collections field name
    */
-  public Client(URL url, SimpleCredentials cred, String index) {
-    this(HttpClientBuilder.create().useSystemProperties().build(), url, cred, index);
+  public Client(URL url, SimpleCredentials cred, String index, String collectionsFieldName) {
+    this(HttpClientBuilder.create().useSystemProperties().build(), url, cred, index, collectionsFieldName);
   }
 
   /**
@@ -128,11 +133,18 @@ public class Client implements Closeable {
    * @param xml xml
    * @param json json
    * @param forceAdd <code>true</code> to force add.
+   * @param collections list of collections
    * @return response information
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  public PublishResponse publish(PublishRequest data, Map<String, Object> attributes, String id, String xml, String json, boolean forceAdd) throws IOException, URISyntaxException {
+  public PublishResponse publish(
+    PublishRequest data, 
+    Map<String, Object> attributes, 
+    String id, 
+    String xml, String json, 
+    boolean forceAdd,
+    String [] collections) throws IOException, URISyntaxException {
 
     ObjectNode jsonRequest = mapper.convertValue(data, ObjectNode.class);
     if (xml != null) {
@@ -252,6 +264,18 @@ public class Client implements Closeable {
       }
     }
 
+    if (collections!=null) {
+      List<String> collectionsList = Arrays.stream(collections)
+        .map(StringUtils::trimToNull)
+        .filter(collection -> collection!=null)
+        .collect(Collectors.toList());
+      
+      if (!collectionsList.isEmpty()) {
+        ArrayNode collectionsArray = jsonRequest.putArray(collectionsFieldName);
+        collectionsList.forEach(collectionsArray::add);
+      }
+    }
+    
     String strRequest = mapper.writeValueAsString(jsonRequest);
     StringEntity entity = new StringEntity(strRequest, "UTF-8");
 

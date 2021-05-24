@@ -65,6 +65,7 @@ import java.util.stream.Collectors;
   private volatile boolean preventCleanup;
   private final String geometryServiceUrl;
   private final Integer sizeLimit;
+  private final String collectionsFieldName;
 
   private static String generateSBOM() {
     try {
@@ -81,19 +82,21 @@ import java.util.stream.Collectors;
    * @param connector connector
    * @param definition definition
    * @param client client
+   * @param collectionsFieldName collections field name
    */
-  public GptBroker(GptConnector connector, GptBrokerDefinitionAdaptor definition, String geometryServiceUrl, Integer sizeLimit) {
+  public GptBroker(GptConnector connector, GptBrokerDefinitionAdaptor definition, String geometryServiceUrl, Integer sizeLimit, String collectionsFieldName) {
     this.connector = connector;
     this.definition = definition;
     this.geometryServiceUrl = geometryServiceUrl;
     this.sizeLimit = sizeLimit;
+    this.collectionsFieldName = collectionsFieldName;
   }
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     try {
-      client = new Client(definition.getHostUrl(), definition.getCredentials(), definition.getIndex());
+      client = new Client(definition.getHostUrl(), definition.getCredentials(), definition.getIndex(), collectionsFieldName);
 
       if (!context.canCleanup()) {
         preventCleanup = true;
@@ -199,7 +202,7 @@ import java.util.stream.Collectors;
         }
       }
 
-      PublishResponse response = client.publish(data, ref.getAttributesMap(), uuid, xml, json, definition.getForceAdd());
+      PublishResponse response = client.publish(data, ref.getAttributesMap(), uuid, xml, json, definition.getForceAdd(), definition.getCollectionsAsArray());
       if (response == null) {
         throw new DataOutputException(this, ref, "No response received");
       }
