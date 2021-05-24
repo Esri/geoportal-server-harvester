@@ -28,4 +28,5 @@ package com.esri.geoportal.harvester.gpt;
   public static final String P_TRANSLATE_PDF   = "gpt-translate-pdf";
   public static final String P_EDITABLE        = "gpt-editable";
   public static final String P_COLLECTIONS     = "gpt-collections";
+  public static final String P_COLLECTIONS_FLD = "gpt-collections-fld";
 }

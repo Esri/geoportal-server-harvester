@@ -43,6 +43,7 @@ import org.apache.commons.lang3.StringUtils;
   private boolean translatePdf = true;
   private boolean editable = false;
   private String collections = "";
+  private String collectionsFieldName = "";
 
   /**
    * Creates instance of the adaptor.
@@ -76,6 +77,7 @@ import org.apache.commons.lang3.StringUtils;
       translatePdf = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_TRANSLATE_PDF)), true);
       editable = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EDITABLE)), false);
       collections = StringUtils.defaultIfBlank(get(P_COLLECTIONS), "");
+      collectionsFieldName = StringUtils.defaultIfBlank(get(P_COLLECTIONS_FLD), "");
     }
   }
 
@@ -90,6 +92,7 @@ import org.apache.commons.lang3.StringUtils;
     consume(params,P_TRANSLATE_PDF);
     consume(params,P_EDITABLE);
     consume(params,P_COLLECTIONS);
+    consume(params,P_COLLECTIONS_FLD);
     credAdaptor.override(params);
   }
 
@@ -247,10 +250,27 @@ import org.apache.commons.lang3.StringUtils;
 
   /**
    * Sets collections
-   * @param collections the editable to set
+   * @param collections the collections to set
    */
   public void setCollections(String collections) {
     this.collections = StringUtils.defaultIfBlank(collections, "");
     set(P_COLLECTIONS, StringUtils.defaultIfBlank(collections, ""));
+  }
+
+  /**
+   * Gets collections field name
+   * @return the collections field name
+   */
+  public String getCollectionsFieldName() {
+    return collectionsFieldName;
+  }
+
+  /**
+   * Sets collections field name
+   * @param collectionsFieldName the collections field name to set
+   */
+  public void setCollectionsFieldName(String collectionsFieldName) {
+    this.collectionsFieldName = StringUtils.defaultIfBlank(collectionsFieldName, "");
+    set(P_COLLECTIONS_FLD, StringUtils.defaultIfBlank(collectionsFieldName, ""));
   }
 }

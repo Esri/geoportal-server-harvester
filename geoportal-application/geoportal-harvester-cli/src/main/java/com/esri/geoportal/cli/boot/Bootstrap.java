@@ -269,7 +269,7 @@ public class Bootstrap {
       inboundConnectorRegistry.put(SinkConnector.TYPE, new SinkConnector(5, 1000));
       inboundConnectorRegistry.put(AgpInputConnector.TYPE, new AgpInputConnector(metaBuilder));
       inboundConnectorRegistry.put(AgsConnector.TYPE, new AgsConnector(metaBuilder, new GeometryService(HttpClients.custom().useSystemProperties().build(), new URL(geometryServiceUrl))));
-      inboundConnectorRegistry.put(GptConnector.TYPE, new GptConnector(null));
+      inboundConnectorRegistry.put(GptConnector.TYPE, new GptConnector());
       inboundConnectorRegistry.put(CkanConnector.TYPE, new CkanConnector(metaBuilder));
       inboundConnectorRegistry.put(DataGovConnector.TYPE, new DataGovConnector(metaBuilder));
       inboundConnectorRegistry.put(OaiConnector.TYPE, new OaiConnector());
@@ -296,7 +296,7 @@ public class Bootstrap {
       outboundConnectorRegistry.put(AgpOutputConnector.TYPE, new AgpOutputConnector(metaAnalyzer, geometryServiceUrl, null));
       outboundConnectorRegistry.put(ConsoleConnector.TYPE, new ConsoleConnector());
       outboundConnectorRegistry.put(FolderConnector.TYPE, new FolderConnector());
-      outboundConnectorRegistry.put(com.esri.geoportal.harvester.gpt.GptConnector.TYPE, new com.esri.geoportal.harvester.gpt.GptConnector(geometryServiceUrl, null, null));
+      outboundConnectorRegistry.put(com.esri.geoportal.harvester.gpt.GptConnector.TYPE, new com.esri.geoportal.harvester.gpt.GptConnector(geometryServiceUrl, null));
     }
     
     return outboundConnectorRegistry;

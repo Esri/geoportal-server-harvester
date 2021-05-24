@@ -53,14 +53,12 @@
     <constructor-arg ref="metaBuilder"/>
   </bean>
   <bean class="com.esri.geoportal.harvester.gptsrc.GptConnector">
-    <constructor-arg value="${gpt.collectionsFieldName}"/>
   </bean>
   <bean class="com.esri.geoportal.harvester.csw.CswConnector"/>
   <bean class="com.esri.geoportal.harvester.folder.FolderConnector"/>
   <bean class="com.esri.geoportal.harvester.gpt.GptConnector">
     <constructor-arg value="${geometry.service.url}"/>
     <constructor-arg value="${tika.sizeLimit}"/>
-    <constructor-arg value="${gpt.collectionsFieldName}"/>
   </bean>
   <bean class="com.esri.geoportal.harvester.unc.UncConnector"/>
   <bean class="com.esri.geoportal.harvester.waf.WafConnector"/>

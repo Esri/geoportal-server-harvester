@@ -49,12 +49,14 @@ import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * GPT broker.
  */
 /*package*/ class GptBroker implements OutputBroker {
 
+  public static final String DEFAULT_COLLECTIONS_FIELD_NAME = "src_collections_s";
   private final static Logger LOG = LoggerFactory.getLogger(GptBroker.class);
   private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
   private final static String SBOM = generateSBOM();
@@ -65,7 +67,6 @@ import java.util.stream.Collectors;
   private volatile boolean preventCleanup;
   private final String geometryServiceUrl;
   private final Integer sizeLimit;
-  private final String collectionsFieldName;
 
   private static String generateSBOM() {
     try {
@@ -82,21 +83,20 @@ import java.util.stream.Collectors;
    * @param connector connector
    * @param definition definition
    * @param client client
-   * @param collectionsFieldName collections field name
    */
-  public GptBroker(GptConnector connector, GptBrokerDefinitionAdaptor definition, String geometryServiceUrl, Integer sizeLimit, String collectionsFieldName) {
+  public GptBroker(GptConnector connector, GptBrokerDefinitionAdaptor definition, String geometryServiceUrl, Integer sizeLimit) {
     this.connector = connector;
     this.definition = definition;
     this.geometryServiceUrl = geometryServiceUrl;
     this.sizeLimit = sizeLimit;
-    this.collectionsFieldName = collectionsFieldName;
   }
 
   @Override
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     try {
-      client = new Client(definition.getHostUrl(), definition.getCredentials(), definition.getIndex(), collectionsFieldName);
+      client = new Client(definition.getHostUrl(), definition.getCredentials(), definition.getIndex(), 
+        StringUtils.defaultIfBlank(definition.getCollectionsFieldName(), DEFAULT_COLLECTIONS_FIELD_NAME));
 
       if (!context.canCleanup()) {
         preventCleanup = true;

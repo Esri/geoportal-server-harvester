@@ -16,8 +16,8 @@
 package com.esri.geoportal.commons.utils;
 
 /**
- * Common GPT connector.
+ * Common GPT broker.
  */
-public interface CommonGptConnector {
+public interface CommonGptBroker {
   static final String DEFAULT_COLLECTIONS_FIELD_NAME = "src_collections_s";
 }
