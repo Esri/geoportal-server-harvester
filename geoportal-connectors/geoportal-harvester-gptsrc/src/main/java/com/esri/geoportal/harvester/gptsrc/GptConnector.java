@@ -67,7 +67,7 @@ public class GptConnector implements InputConnector<InputBroker> {
 
   @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
-    return new GptBroker(this, new GptBrokerDefinitionAdaptor(definition));
+    return new GptBroker(this, new GptBrokerDefinitionAdaptor(definition), null);
   }
   
 }

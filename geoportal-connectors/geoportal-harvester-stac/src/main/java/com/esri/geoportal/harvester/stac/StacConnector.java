@@ -38,6 +38,7 @@ public class StacConnector implements InputConnector<InputBroker> {
 
   /**
    * Creates instance of the connector.
+   * @param metaBuilder metadata builder
    */
   public StacConnector(MetaBuilder metaBuilder) {
     this.metaBuilder = metaBuilder;
