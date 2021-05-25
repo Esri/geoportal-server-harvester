@@ -1,11 +1,23 @@
 <div class="h-nav" data-dojo-attach-point="contentNode">
-  <div class="h-nav-button" data-dojo-attach-event="onclick:_onhome">
+  <div
+    class="h-nav-button"
+    data-dojo-attach-event="onclick:_onhome"
+    data-dojo-attach-point="homeNode"
+  >
     ${i18n.navigation.home}
   </div>
-  <div class="h-nav-button" data-dojo-attach-event="onclick:_onbrokers">
+  <div
+    class="h-nav-button"
+    data-dojo-attach-event="onclick:_onbrokers"
+    data-dojo-attach-point="brokersNode"
+  >
     ${i18n.navigation.brokers}
   </div>
-  <div class="h-nav-button" data-dojo-attach-event="onclick:_ontasks">
+  <div
+    class="h-nav-button"
+    data-dojo-attach-event="onclick:_ontasks"
+    data-dojo-attach-point="tasksNode"
+  >
     ${i18n.navigation.tasks}
   </div>
 </div>
