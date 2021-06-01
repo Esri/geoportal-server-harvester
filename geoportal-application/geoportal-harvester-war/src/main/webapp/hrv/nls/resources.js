@@ -76,7 +76,7 @@ define({
       groupBy: "Group by input",
       add: "Add",
       run: "Run",
-      rename: "Edit",
+      rename: "Rename",
       export: "Export",
       remove: "Delete",
       history: "History",

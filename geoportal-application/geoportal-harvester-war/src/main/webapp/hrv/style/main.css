@@ -116,6 +116,7 @@ body {
   display: flex;
   flex: 1 1 auto;
   background: #f3f3f3;
+  overflow: auto;
 }
 
 .h-stage {
@@ -149,6 +150,7 @@ body {
 
 .h-brokers-content {
   display: flex;
+  flex-direction: column;
 }
 
 .h-brokers-caption {
@@ -171,6 +173,7 @@ body {
 
 .h-broker-group {
   display: flex;
+  flex-direction: column;
   flex: 1;
   padding-bottom: 1em;
   padding-top: 1em;
@@ -437,6 +440,11 @@ body {
 .h-status-working {
   color: darkorange;
   line-height: 24px;
+}
+
+.h-status-aborting {
+  line-height: 24px;
+  font-style: italic;
 }
 
 .h-processes-process-progress {
@@ -769,9 +777,14 @@ body {
 }
 
 .h-history-failed {
+  display: flex !important;
+  flex-direction: column;
   padding: 24px 24px;
   background: #fff;
-  display: flex !important;
+}
+
+.h-history-failed > div {
+  margin: 4px 0px;
 }
 
 .h-history-failed > span {
