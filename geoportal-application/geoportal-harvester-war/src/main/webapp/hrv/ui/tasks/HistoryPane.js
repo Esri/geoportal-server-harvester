@@ -115,24 +115,24 @@ define(["dojo/_base/declare",
           array.forEach(this.widgets,function(widget){
             widget.destroy();
           });
-          if (evt.uuid) {
-            TasksREST.read(evt.uuid).then(
-              lang.hitch(this, function(response) {
-                html.set(this.labelNode, TaskUtils.makeLabel(response.taskDefinition));
-              }),
-              lang.hitch(this,function(error){
-                console.error(error);
-                topic.publish("msg",topic.publish("msg", new Error(this.i18n.tasks.errors.accessHistory)));
-              })
-            );
-            TasksREST.history(evt.uuid).then(
-              lang.hitch(this,this.processHistory),
-              lang.hitch(this,function(error){
-                console.error(error);
-                topic.publish("msg",topic.publish("msg", new Error(this.i18n.tasks.errors.accessHistory)));
-              })
-            );
-          }
+          
+        } else if (evt.uuid) {
+          TasksREST.read(evt.uuid).then(
+            lang.hitch(this, function(response) {
+              html.set(this.labelNode, TaskUtils.makeLabel(response.taskDefinition));
+            }),
+            lang.hitch(this,function(error){
+              console.error(error);
+              topic.publish("msg",topic.publish("msg", new Error(this.i18n.tasks.errors.accessHistory)));
+            })
+          );
+          TasksREST.history(evt.uuid).then(
+            lang.hitch(this,this.processHistory),
+            lang.hitch(this,function(error){
+              console.error(error);
+              topic.publish("msg",topic.publish("msg", new Error(this.i18n.tasks.errors.accessHistory)));
+            })
+          );
         }
         domStyle.set(this.domNode,"display", evt.type==="history"? "block": "none");
       },
