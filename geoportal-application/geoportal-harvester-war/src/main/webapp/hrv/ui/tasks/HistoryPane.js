@@ -115,7 +115,6 @@ define(["dojo/_base/declare",
           array.forEach(this.widgets,function(widget){
             widget.destroy();
           });
-          
         } else if (evt.uuid) {
           TasksREST.read(evt.uuid).then(
             lang.hitch(this, function(response) {
