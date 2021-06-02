@@ -151,7 +151,7 @@ define(["dojo/_base/declare",
       },
       
       processEvent: function(taskid, event) {
-        var widget = new Event(event);
+        var widget = new Event({taskid: taskid, event: event});
         widget.placeAt(this.contentNode);
         widget.startup();
         this.widgets.push(widget);

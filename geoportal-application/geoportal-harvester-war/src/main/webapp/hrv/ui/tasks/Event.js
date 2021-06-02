@@ -40,7 +40,8 @@ define(["dojo/_base/declare",
       hasDetails: false,
       
       constructor: function(args) {
-        this.data = args;
+        this.taskid = args.taskid;
+        this.data = args.event;
         this.startTime = this.format(this.data.startTimestamp);
         this.endTime = this.format(this.data.endTimestamp);
       },
@@ -49,23 +50,24 @@ define(["dojo/_base/declare",
         if (this.data.details && this.data.details.length > 0) {
           this.hasDetails = true;
         }
+        var hrefPrefix = "#/tasks/" + this. taskid + "/history/" + this.data.uuid;
         if (this.data.failedToHarvest==null || this.data.failedToPublish==null) {
           if (this.data.failed > 0) {
-            var failedLink = domConstruct.create("a", { href: "#", innerHTML: this.data.failed}, this.failedNode);
+            var failedLink = domConstruct.create("a", { href: hrefPrefix + "/failed", innerHTML: this.data.failed}, this.failedNode);
             this.own(on(failedLink, "click", lang.hitch(this, this._onFailedDetails)));
           } else {
             domConstruct.create("span", { innerHTML: this.data.failed}, this.failedNode);
           }
         } else {
           if (this.data.failedToPublish > 0) {
-            var failedLink = domConstruct.create("a", { href: "#", innerHTML: "" + this.data.failedToHarvest + " / " +this.data.failedToPublish}, this.failedNode);
+            var failedLink = domConstruct.create("a", { href: hrefPrefix + "/failed", innerHTML: "" + this.data.failedToHarvest + " / " +this.data.failedToPublish}, this.failedNode);
             this.own(on(failedLink, "click", lang.hitch(this, this._onFailedDetails)));
           } else {
             domConstruct.create("span", { innerHTML: "" + this.data.failedToHarvest + " / " +this.data.failedToPublish}, this.failedNode);
           }
         }
         if (this.hasDetails) {
-          var moreLink = domConstruct.create("a", { href: "#", innerHTML: "[?]", className: "h-event-more"}, this.failedNode);
+          var moreLink = domConstruct.create("a", { href:  hrefPrefix + "/details", innerHTML: "[?]", className: "h-event-more"}, this.failedNode);
           this.own(on(moreLink, "click", lang.hitch(this, this._onMore)));
         }
       },
