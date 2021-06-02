@@ -64,17 +64,21 @@ define(["dojo/_base/declare",
       
       _onEventClicked: function(evt) {
         this._empty();
-        TasksREST.getFailedDocuments(evt.data.uuid).then(lang.hitch(this, function(failedDocuments) { 
-          this._handleFailedDocuments(failedDocuments); 
-        }), lang.hitch(this, function(error){
-          console.debug(error);
-          topic.publish("msg", new Error(this.i18n.tasks.errors.accessFialed));
-        }));
+        router.go("/tasks/" + evt.taskid + "/history/" + evt.data.uuid + "/failed");
       },
       
       _onMoreClicked: function(evt) {
         this._empty();
         router.go("/tasks/" + evt.taskid + "/history/" + evt.data.uuid + "/details");
+      },
+      
+      loadFailedDocuments: function(eventid) {
+        TasksREST.getFailedDocuments(eventid).then(lang.hitch(this, function(failedDocuments) { 
+          this._handleFailedDocuments(failedDocuments); 
+        }), lang.hitch(this, function(error){
+          console.debug(error);
+          topic.publish("msg", new Error(this.i18n.tasks.errors.accessFialed));
+        }));
       },
       
       _handleFailedDocuments: function(failedDocuments) {
@@ -121,6 +125,13 @@ define(["dojo/_base/declare",
                 var detailsNode = domConstruct.create("div", {innerHTML: detail, className: "h-event-details"}, span);
               }));
             }));
+            domStyle.set(this.domNode, "display", "block");
+            break;
+            
+          case "failed":
+            if (this.widgets.length==0)
+              this.loadHistory(evt.uuid);
+            this.loadFailedDocuments(evt.eventid);
             domStyle.set(this.domNode, "display", "block");
             break;
             
