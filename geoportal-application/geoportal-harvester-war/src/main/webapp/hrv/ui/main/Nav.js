@@ -39,7 +39,7 @@ define(["dojo/_base/declare",
       },
       
       _onhome: function() {
-        router.go("/processes");
+        router.go("/home");
       },
       
       _onbrokers: function() {

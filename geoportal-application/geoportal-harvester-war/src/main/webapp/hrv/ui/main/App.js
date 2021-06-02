@@ -49,7 +49,7 @@ define(["dojo/_base/declare",
       templateString: template,
     
       postCreate: function(){
-        router.register("/processes", function() {
+        router.register("/home", function() {
           topic.publish("nav",{type: "processes"});
         });
         router.register("/brokers", function() {
@@ -62,7 +62,7 @@ define(["dojo/_base/declare",
           topic.publish("nav",{type: "history", uuid: evt.params.uuid});
         });
         router.startup();
-        router.go("/processes");
+        router.go("/home");
       }
     });
 });
