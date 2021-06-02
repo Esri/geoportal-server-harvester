@@ -116,7 +116,14 @@ define(["dojo/_base/declare",
             widget.destroy();
           });
         } else if (evt.uuid) {
-          TasksREST.read(evt.uuid).then(
+          this.loadHistory(evt.uuid);
+        }
+        domStyle.set(this.domNode,"display", evt.type==="history"? "block": "none");
+      },
+      
+      loadHistory: function(taskid) {
+        if (taskid) {
+          TasksREST.read(taskid).then(
             lang.hitch(this, function(response) {
               html.set(this.labelNode, TaskUtils.makeLabel(response.taskDefinition));
             }),
@@ -125,22 +132,25 @@ define(["dojo/_base/declare",
               topic.publish("msg",topic.publish("msg", new Error(this.i18n.tasks.errors.accessHistory)));
             })
           );
-          TasksREST.history(evt.uuid).then(
-            lang.hitch(this,this.processHistory),
+          TasksREST.history(taskid).then(
+            lang.hitch(this,function(history) { this.processHistory(taskid, history); }),
             lang.hitch(this,function(error){
               console.error(error);
               topic.publish("msg",topic.publish("msg", new Error(this.i18n.tasks.errors.accessHistory)));
             })
           );
         }
-        domStyle.set(this.domNode,"display", evt.type==="history"? "block": "none");
       },
       
-      processHistory: function(response) {
-        array.forEach(response.sort(function(l,r){return r.startTimestamp - l.startTimestamp;}),lang.hitch(this,this.processEvent));
+      processHistory: function(taskid, history) {
+        array.forEach(history.sort(function(l,r){return r.startTimestamp - l.startTimestamp;}),
+          lang.hitch(this,function(event) { 
+            this.processEvent(taskid, event);
+          })
+        );
       },
       
-      processEvent: function(event) {
+      processEvent: function(taskid, event) {
         var widget = new Event(event);
         widget.placeAt(this.contentNode);
         widget.startup();
