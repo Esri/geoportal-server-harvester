@@ -22,6 +22,7 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/App.html",
         "dojo/_base/lang",
         "dojo/topic",
+        "dojo/router",
         "dijit/form/CheckBox",
         "dijit/form/RadioButton",
         "dijit/layout/ContentPane", 
@@ -38,7 +39,7 @@ define(["dojo/_base/declare",
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,topic,
+           lang,topic,router,
            CheckBox,RadioButton,ContentPane,LayoutContainer,
            Header,Status,Nav,Stage,BrokersPane,TasksPane,HistoryPane,ProcessesPane
           ){
@@ -48,7 +49,20 @@ define(["dojo/_base/declare",
       templateString: template,
     
       postCreate: function(){
-        topic.publish("nav",{type: "processes"});
+        router.register("/processes", function() {
+          topic.publish("nav",{type: "processes"});
+        });
+        router.register("/brokers", function() {
+          topic.publish("nav",{type: "brokers"});
+        });
+        router.register("/tasks", function() {
+          topic.publish("nav",{type: "tasks"});
+        });
+        router.register("/tasks/:uuid/history", function(evt) {
+          topic.publish("nav",{type: "history", uuid: evt.params.uuid});
+        });
+        router.startup();
+        router.go("/processes");
       }
     });
 });

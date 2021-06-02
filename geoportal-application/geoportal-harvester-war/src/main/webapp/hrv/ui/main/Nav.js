@@ -21,12 +21,13 @@ define(["dojo/_base/declare",
         "dojo/i18n!../../nls/resources",
         "dojo/text!./templates/Nav.html",
         "dojo/_base/lang",
-        "dojo/topic"
+        "dojo/topic",
+        "dojo/router"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,topic
+           lang,topic, router
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
@@ -38,15 +39,15 @@ define(["dojo/_base/declare",
       },
       
       _onhome: function() {
-        topic.publish("nav",{type: "processes"});
+        router.go("/processes");
       },
       
       _onbrokers: function() {
-        topic.publish("nav",{type: "brokers"});
+        router.go("/brokers");
       },
       
       _ontasks: function() {
-        topic.publish("nav",{type: "tasks"});
+        router.go("/tasks");
       }
     });
 });

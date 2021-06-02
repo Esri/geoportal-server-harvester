@@ -117,7 +117,7 @@ define(["dojo/_base/declare",
       },
       
       _onHistory: function() {
-        this.emit("history",{data: this.data});
+        this.emit("history",{uuid: this.data.uuid});
       },
       
       _onSchedule: function(evt) {
