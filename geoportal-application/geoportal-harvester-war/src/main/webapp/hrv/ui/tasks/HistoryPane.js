@@ -23,6 +23,7 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/topic",
+        "dojo/router",
         "dojo/dom-style",
         "dojo/html",
         "dojo/on",
@@ -34,7 +35,8 @@ define(["dojo/_base/declare",
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,topic,domStyle,html,on,domConstruct,
+           lang,array,topic,router,
+           domStyle,html,on,domConstruct,
            TasksREST,Event,TaskUtils
           ){
   
@@ -72,14 +74,7 @@ define(["dojo/_base/declare",
       
       _onMoreClicked: function(evt) {
         this._empty();
-        var data = evt.data;
-        if (data && data.details && data.details.length > 0) {
-          array.forEach(data.details, lang.hitch(this, function(details){
-            var span = domConstruct.create("div", {}, this.failedNode);
-            var detailsNode = domConstruct.create("div", {innerHTML: details, className: "h-event-details"}, span);
-          }));
-        }
-        console.log("More clicked", evt.data);
+        router.go("/tasks/" + evt.taskid + "/history/" + evt.data.uuid + "/details");
       },
       
       _handleFailedDocuments: function(failedDocuments) {
@@ -117,6 +112,18 @@ define(["dojo/_base/declare",
             domStyle.set(this.domNode, "display", "block");
             break;
             
+          case "details":
+            if (this.widgets.length==0)
+              this.loadHistory(evt.uuid);
+            this.loadDetails(evt.uuid, evt.eventid).then(lang.hitch(this, function(details) {
+              array.forEach(details, lang.hitch(this, function(detail){
+                var span = domConstruct.create("div", {}, this.failedNode);
+                var detailsNode = domConstruct.create("div", {innerHTML: detail, className: "h-event-details"}, span);
+              }));
+            }));
+            domStyle.set(this.domNode, "display", "block");
+            break;
+            
           default:
             array.forEach(this.widgets,function(widget){
               widget.destroy();
@@ -124,6 +131,19 @@ define(["dojo/_base/declare",
             domStyle.set(this.domNode, "display", "none");
             break;
         }
+      },
+      
+      loadDetails: function(taskid, eventid) {
+        return TasksREST.history(taskid).then(
+          lang.hitch(this,function(history) {
+            var event = history? history.find(function(h) { return h.uuid === eventid; }): null
+            return event && event.details? event.details: null;
+          }),
+          lang.hitch(this,function(error){
+            console.error(error);
+            topic.publish("msg",topic.publish("msg", new Error(this.i18n.tasks.errors.accessHistory)));
+          })
+        );
       },
       
       loadHistory: function(taskid) {

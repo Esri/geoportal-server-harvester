@@ -81,11 +81,11 @@ define(["dojo/_base/declare",
       },
       
       _onFailedDetails: function(evt) {
-        this.emit("event-clicked", {data: this.data});
+        this.emit("event-clicked", {data: this.data, taskid: this.taskid});
       },
       
       _onMore: function(evt) {
-        this.emit("more-clicked", {data: this.data});
+        this.emit("more-clicked", {data: this.data, taskid: this.taskid});
       }
     });
 });

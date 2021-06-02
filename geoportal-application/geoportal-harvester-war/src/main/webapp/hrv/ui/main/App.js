@@ -67,6 +67,9 @@ define(["dojo/_base/declare",
         router.register("/tasks/:uuid/history", function(evt) {
           topic.publish("nav",{type: "history", uuid: evt.params.uuid});
         });
+        router.register("/tasks/:uuid/history/:eventid/details", function(evt) {
+          topic.publish("nav",{type: "details", uuid: evt.params.uuid, eventid: evt.params.eventid});
+        });
         router.startup();
         if (!location.hash || location.hash.length==0) {
           router.go("/home");
