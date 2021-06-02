@@ -111,14 +111,19 @@ define(["dojo/_base/declare",
       
       _onNav: function(evt) {
         this._empty();
-        if (evt.type!=="history") {
-          array.forEach(this.widgets,function(widget){
-            widget.destroy();
-          });
-        } else if (evt.uuid) {
-          this.loadHistory(evt.uuid);
+        switch (evt.type) {
+          case "history":
+            this.loadHistory(evt.uuid);
+            domStyle.set(this.domNode, "display", "block");
+            break;
+            
+          default:
+            array.forEach(this.widgets,function(widget){
+              widget.destroy();
+            });
+            domStyle.set(this.domNode, "display", "none");
+            break;
         }
-        domStyle.set(this.domNode,"display", evt.type==="history"? "block": "none");
       },
       
       loadHistory: function(taskid) {
