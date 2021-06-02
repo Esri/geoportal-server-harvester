@@ -49,6 +49,9 @@ define(["dojo/_base/declare",
       templateString: template,
     
       postCreate: function(){
+        router.register("/", function() {
+          router.go("/home");
+        });
         router.register("/home", function() {
           topic.publish("nav",{type: "processes"});
         });
@@ -58,11 +61,16 @@ define(["dojo/_base/declare",
         router.register("/tasks", function() {
           topic.publish("nav",{type: "tasks"});
         });
+        router.register("/tasks/:uuid", function(evt) {
+          router.go("/tasks/" + evt.params.uuid + "/history");
+        });
         router.register("/tasks/:uuid/history", function(evt) {
           topic.publish("nav",{type: "history", uuid: evt.params.uuid});
         });
         router.startup();
-        router.go("/home");
+        if (!location.hash || location.hash.length==0) {
+          router.go("/home");
+        }
       }
     });
 });
