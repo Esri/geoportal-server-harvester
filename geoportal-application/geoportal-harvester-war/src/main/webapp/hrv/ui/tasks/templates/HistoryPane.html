@@ -1,5 +1,8 @@
 <div class="h-history" data-dojo-attach-point="contentNode">
-  <div class="h-history-caption" data-dojo-attach-point="captionNode">${i18n.tasks.events.caption}:<span data-dojo-attach-point="labelNode"></span></div>
+  <div class="h-history-caption" data-dojo-attach-point="captionNode">
+    <span data-dojo-attach-point="labelNode"></span>
+  </div>
+  <div class="h-history-subtitle">Task History</div>
   <div class="h-history-body">
     <div>
       <div class="h-history-content" data-dojo-attach-point="contentNode">
@@ -13,7 +16,7 @@
         </div>
       </div>
     </div>
-    <div class="h-history-failed" data-dojo-attach-point="failedNode">
-    </div>
+    <h3 class="h-history-failed-title">Console/Error log</h3>
+    <div class="h-history-failed" data-dojo-attach-point="failedNode"></div>
   </div>
 </div>
