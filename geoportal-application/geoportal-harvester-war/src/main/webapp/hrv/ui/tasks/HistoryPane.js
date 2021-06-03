@@ -112,6 +112,7 @@ define(["dojo/_base/declare",
         this._empty();
         switch (evt.type) {
           case "history":
+            this.destroyWidgets();
             this.loadHistory(evt.uuid);
             domStyle.set(this.domNode, "display", "block");
             break;
@@ -136,12 +137,16 @@ define(["dojo/_base/declare",
             break;
             
           default:
-            array.forEach(this.widgets,function(widget){
-              widget.destroy();
-            });
+            this.destroyWidgets();
             domStyle.set(this.domNode, "display", "none");
             break;
         }
+      },
+      
+      destroyWidgets: function() {
+        array.forEach(this.widgets,function(widget){
+          widget.destroy();
+        });
       },
       
       loadDetails: function(taskid, eventid) {
