@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,40 +14,67 @@
  * limitations under the License.
  */
 
-define(["dojo/_base/declare",
-        "dijit/_WidgetBase",
-        "dijit/_TemplatedMixin",
-        "dijit/_WidgetsInTemplateMixin",
-        "dojo/i18n!../../nls/resources",
-        "dojo/text!./templates/Nav.html",
-        "dojo/_base/lang",
-        "dojo/topic",
-        "dojo/router"
-      ],
-  function(declare,
-           _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
-           i18n,template,
-           lang,topic, router
-          ){
-  
-    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
-      i18n: i18n,
-      templateString: template,
-    
-      postCreate: function(){
-        
-      },
-      
-      _onhome: function() {
-        router.go("/home");
-      },
-      
-      _onbrokers: function() {
-        router.go("/brokers");
-      },
-      
-      _ontasks: function() {
-        router.go("/tasks");
-      }
-    });
+define([
+  "dojo/_base/declare",
+  "dijit/_WidgetBase",
+  "dijit/_TemplatedMixin",
+  "dijit/_WidgetsInTemplateMixin",
+  "dojo/i18n!../../nls/resources",
+  "dojo/text!./templates/Nav.html",
+  "dojo/_base/lang",
+  "dojo/topic",
+  "dojo/router",
+  "dojo/dom-class"
+], function (
+  declare,
+  _WidgetBase,
+  _TemplatedMixin,
+  _WidgetsInTemplateMixin,
+  i18n,
+  template,
+  lang,
+  topic, router,
+  domClass
+) {
+  return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    i18n: i18n,
+    templateString: template,
+
+    postCreate: function () {
+      domClass.add(this.homeNode, "active-tab");
+      this.own(topic.subscribe("nav",lang.hitch(this, function(params){
+        switch(params.type) {
+          case "processes":
+            domClass.add(this.homeNode, "active-tab");
+            domClass.remove(this.tasksNode, "active-tab");
+            domClass.remove(this.brokersNode, "active-tab");
+            break;
+            
+          case "brokers":
+            domClass.add(this.brokersNode, "active-tab");
+            domClass.remove(this.homeNode, "active-tab");
+            domClass.remove(this.tasksNode, "active-tab");
+            break;
+            
+          default:
+            domClass.add(this.tasksNode, "active-tab");
+            domClass.remove(this.brokersNode, "active-tab");
+            domClass.remove(this.homeNode, "active-tab");
+            break;
+        }
+      })));
+    },
+
+    _onhome: function () {
+      router.go("/home");
+    },
+
+    _onbrokers: function () {
+      router.go("/brokers");
+    },
+
+    _ontasks: function () {
+      router.go("/tasks");
+    }
+  });
 });

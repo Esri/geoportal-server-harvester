@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -79,13 +79,21 @@ define(["dojo/_base/declare",
           return "?";
         }
       },
-      
+
+      format: function (date) {
+        if (date) {
+          return locale.format(new Date(date), { datePattern: "yyyy-MM-dd HH:mm", selector: "date" });
+        } else {
+          return "?";
+        }
+      },
+
       _onFailedDetails: function(evt) {
         this.emit("event-clicked", {data: this.data, taskid: this.taskid});
       },
       
       _onMore: function(evt) {
         this.emit("more-clicked", {data: this.data, taskid: this.taskid});
-      }
-    });
+      }      
+  });
 });
