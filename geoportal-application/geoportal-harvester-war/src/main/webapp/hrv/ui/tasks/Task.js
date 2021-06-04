@@ -38,7 +38,7 @@ define([
   "hrv/ui/tasks/SchedulerEditorPane",
   "hrv/ui/tasks/TaskRenamePane",
   "hrv/utils/TaskUtils",
-  "dojo/dom-style",
+  "dojo/dom-style"
 ], function (
   declare,
   _WidgetBase,
@@ -100,7 +100,7 @@ define([
       var dlg = new ConfirmDialog({
         title: this.i18n.tasks.removeDialog.title,
         content: string.substitute(this.i18n.tasks.removeDialog.content, {
-          title: TaskUtils.makeLabel(this.data.taskDefinition),
+          title: TaskUtils.makeLabel(this.data.taskDefinition)
         }),
         class: "h-tasks-remove-dialog",
         onExecute: lang.hitch(this, function () {
@@ -117,7 +117,7 @@ define([
         title: this.i18n.tasks.runDialog.title,
         content:
           string.substitute(this.i18n.tasks.runDialog.content, {
-            title: TaskUtils.makeLabel(this.data.taskDefinition),
+            title: TaskUtils.makeLabel(this.data.taskDefinition)
           }) +
           "<div class='h-tasks-run-dialog-options'>" +
           "<button data-dojo-type='dijit/form/CheckBox' id='ignoreRobots'></button>" +
@@ -175,7 +175,7 @@ define([
           var schedulerEditorDialog = new Dialog({
             title: this.i18n.tasks.editor.caption,
             content: schedulerEditorPane,
-            onHide: close,
+            onHide: close
           });
           this.own(schedulerEditorPane);
           this.own(schedulerEditorDialog);
@@ -252,7 +252,7 @@ define([
       var taskRenameDialog = new Dialog({
         title: this.i18n.tasks.renamer.caption,
         content: taskRenamePane,
-        onHide: close,
+        onHide: close
       });
 
       this.own(taskRenamePane);

@@ -80,14 +80,6 @@ define(["dojo/_base/declare",
         }
       },
 
-      format: function (date) {
-        if (date) {
-          return locale.format(new Date(date), { datePattern: "yyyy-MM-dd HH:mm", selector: "date" });
-        } else {
-          return "?";
-        }
-      },
-
       _onFailedDetails: function(evt) {
         this.emit("event-clicked", {data: this.data, taskid: this.taskid});
       },
