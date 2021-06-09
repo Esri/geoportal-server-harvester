@@ -23,7 +23,8 @@ define([
   "dojo/text!./templates/Nav.html",
   "dojo/_base/lang",
   "dojo/topic",
-  "dojo/dom-class",
+  "dojo/router",
+  "dojo/dom-class"
 ], function (
   declare,
   _WidgetBase,
@@ -32,7 +33,7 @@ define([
   i18n,
   template,
   lang,
-  topic,
+  topic, router,
   domClass
 ) {
   return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
@@ -41,27 +42,39 @@ define([
 
     postCreate: function () {
       domClass.add(this.homeNode, "active-tab");
+      this.own(topic.subscribe("nav",lang.hitch(this, function(params){
+        switch(params.type) {
+          case "processes":
+            domClass.add(this.homeNode, "active-tab");
+            domClass.remove(this.tasksNode, "active-tab");
+            domClass.remove(this.brokersNode, "active-tab");
+            break;
+            
+          case "brokers":
+            domClass.add(this.brokersNode, "active-tab");
+            domClass.remove(this.homeNode, "active-tab");
+            domClass.remove(this.tasksNode, "active-tab");
+            break;
+            
+          default:
+            domClass.add(this.tasksNode, "active-tab");
+            domClass.remove(this.brokersNode, "active-tab");
+            domClass.remove(this.homeNode, "active-tab");
+            break;
+        }
+      })));
     },
 
     _onhome: function () {
-      topic.publish("nav", { type: "processes" });
-      domClass.add(this.homeNode, "active-tab");
-      domClass.remove(this.tasksNode, "active-tab");
-      domClass.remove(this.brokersNode, "active-tab");
+      router.go("/home");
     },
 
     _onbrokers: function () {
-      topic.publish("nav", { type: "brokers" });
-      domClass.add(this.brokersNode, "active-tab");
-      domClass.remove(this.homeNode, "active-tab");
-      domClass.remove(this.tasksNode, "active-tab");
+      router.go("/brokers");
     },
 
     _ontasks: function () {
-      topic.publish("nav", { type: "tasks" });
-      domClass.add(this.tasksNode, "active-tab");
-      domClass.remove(this.brokersNode, "active-tab");
-      domClass.remove(this.homeNode, "active-tab");
-    },
+      router.go("/tasks");
+    }
   });
 });

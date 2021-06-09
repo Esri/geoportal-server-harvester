@@ -28,6 +28,7 @@ define(["dojo/_base/declare",
         "dojo/on",
         "dojo/json",
         "dojo/topic",
+        "dojo/router",
         "dojox/form/Uploader",
         "dijit/form/CheckBox",
         "dijit/Dialog",
@@ -41,7 +42,7 @@ define(["dojo/_base/declare",
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,domConstruct, domAttr, query, on,json,topic,
+           lang,array,domConstruct, domAttr, query, on,json,topic,router,
            Uploader,CheckBox,
            Dialog,Button,
            TasksREST,Task,TaskGroup,TaskEditorPane,
@@ -235,7 +236,7 @@ define(["dojo/_base/declare",
       },
       
       _onHistory: function(evt) {
-        topic.publish("nav",{type: "history", data: evt.data});
+          router.go("/tasks/" + evt.uuid +"/history");
       },
       
       _onUpload: function(evt) {

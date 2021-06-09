@@ -43,7 +43,7 @@ define(["dojo/_base/declare",
         domClass.remove(this.messageNode,"h-status-message-info");
         domClass.remove(this.messageNode,"h-status-message-error");
         if (!msg) {
-          html.set(this.messageNode,null);
+          html.set(this.messageNode,"");
         } else if (msg instanceof Error) {
           domClass.add(this.messageNode,"h-status-message-error");
           html.set(this.messageNode,msg.message);

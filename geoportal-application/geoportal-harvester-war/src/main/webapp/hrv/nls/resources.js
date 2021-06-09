@@ -135,7 +135,7 @@ define({
       caption: "Processes",
       cancel: "Cancel",
       min: "min",
-      purge: "Clear All",
+      purge: "Clear Completed",
       errors: {
         loading: "Error loading processes",
         canceling: "Error canceling process",
