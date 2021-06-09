@@ -1,6 +1,10 @@
 <div class="h-broker h-broker-${typeLC}" data-dojo-attach-point="contentNode">
-  <span class="h-broker-label">${data.brokerDefinition.label}</span>
-  <span class="h-broker-type">${data.brokerDefinition.type}</span>
-  <span class="h-broker-edit" data-dojo-attach-event="onclick:_onEdit">${i18n.brokers.edit}</span>
-  <span class="h-broker-remove" data-dojo-attach-event="onclick:_onRemove">${i18n.brokers.remove}</span>
+  <div class="h-broker-body h-broker-main">
+    <span class="h-broker-label">${data.brokerDefinition.label}</span>
+    <span class="h-broker-type">${data.brokerDefinition.type}</span>
+    <span class="h-broker-edit" data-dojo-attach-event="onclick:_onEdit">${i18n.brokers.edit}</span>
+    <span class="h-broker-remove" data-dojo-attach-event="onclick:_onRemove">${i18n.brokers.remove}</span>
+  </div>
+  <div class="h-broker-body h-broker-extra">
+  </div>
 </div>
