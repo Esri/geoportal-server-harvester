@@ -65,5 +65,15 @@ public class UncConnector implements InputConnector<InputBroker> {
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new UncBroker(this, new UncBrokerDefinitionAdaptor(definition));
   }
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      UncBrokerDefinitionAdaptor adaptor = new UncBrokerDefinitionAdaptor(definition);
+      return adaptor.getRootFolder()!=null? adaptor.getRootFolder().toString(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
+  }
   
 }

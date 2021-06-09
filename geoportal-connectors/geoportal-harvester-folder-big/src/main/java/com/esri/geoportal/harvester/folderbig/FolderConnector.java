@@ -64,5 +64,15 @@ public class FolderConnector implements OutputConnector<OutputBroker> {
   public OutputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new FolderBroker(this,new FolderBrokerDefinitionAdaptor(definition));
   }
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      FolderBrokerDefinitionAdaptor adaptor = new FolderBrokerDefinitionAdaptor(definition);
+      return adaptor.getRootFolder()!=null? adaptor.getRootFolder().toString(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
+  }
   
 }
