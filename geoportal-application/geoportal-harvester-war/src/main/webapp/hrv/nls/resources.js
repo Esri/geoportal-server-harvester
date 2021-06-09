@@ -136,6 +136,7 @@ define({
       cancel: "Cancel",
       min: "min",
       purge: "Clear Completed",
+      history: "History",
       errors: {
         loading: "Error loading processes",
         canceling: "Error canceling process",
