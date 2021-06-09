@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Default brokers service.
@@ -64,7 +65,7 @@ public class DefaultBrokersService implements BrokersService {
         Set<String> brokerTypes = listTypesByCategory(category, locale);
         return brokerDefinitionManager.list().stream()
                 .filter(e -> brokerTypes.contains(e.getValue().getType()))
-                .map(e -> new BrokerReference(e.getKey(), category, e.getValue()))
+                .map(e -> new BrokerReference(e.getKey(), category, e.getValue(), getResourceLocator(e.getValue())))
                 .collect(Collectors.toList());
       } catch (CrudlException ex) {
         throw new DataProcessorException(String.format("Error getting brokers for category: %s", category), ex);
@@ -81,7 +82,7 @@ public class DefaultBrokersService implements BrokersService {
       if (brokerDefinition != null) {
         BrokerReference.Category category = getBrokerCategoryByType(brokerDefinition.getType(), locale);
         if (category != null) {
-          return new BrokerReference(brokerId, category, brokerDefinition);
+          return new BrokerReference(brokerId, category, brokerDefinition, getResourceLocator(brokerDefinition));
         }
       }
       return null;
@@ -97,7 +98,7 @@ public class DefaultBrokersService implements BrokersService {
       try {
         validateDefinition(brokerDefinition);
         UUID id = brokerDefinitionManager.create(brokerDefinition);
-        return new BrokerReference(id, category, brokerDefinition);
+        return new BrokerReference(id, category, brokerDefinition, getResourceLocator(brokerDefinition));
       } catch (CrudlException|InvalidDefinitionException ex) {
         throw new DataProcessorException(String.format("Error creating broker: %s", brokerDefinition), ex);
       }
@@ -116,7 +117,7 @@ public class DefaultBrokersService implements BrokersService {
         }
       }
       BrokerReference.Category category = oldBrokerDef != null ? getBrokerCategoryByType(oldBrokerDef.getType(), locale) : null;
-      return category != null ? new BrokerReference(brokerId, category, brokerDefinition) : null;
+      return category != null ? new BrokerReference(brokerId, category, brokerDefinition, getResourceLocator(brokerDefinition)) : null;
     } catch (CrudlException|InvalidDefinitionException ex) {
       throw new DataProcessorException(String.format("Error updating broker: %s <-- %s", brokerId, brokerDefinition), ex);
     }
@@ -176,5 +177,12 @@ public class DefaultBrokersService implements BrokersService {
       throw new InvalidDefinitionException(String.format("Invalid broker type: %s", def.getType()));
     }
     connector.validateDefinition(def);
+  }
+  
+  private String getResourceLocator(EntityDefinition def) {
+    if (def==null) return "";
+    
+    Connector<?> connector = findConnectorByType(def.getType());
+    return connector!=null? StringUtils.defaultString(connector.getResourceLocator(def)): "";
   }
 }
