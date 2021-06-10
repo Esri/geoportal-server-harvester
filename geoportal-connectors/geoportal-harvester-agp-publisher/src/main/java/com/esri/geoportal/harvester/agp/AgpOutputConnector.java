@@ -63,6 +63,16 @@ public class AgpOutputConnector implements OutputConnector<OutputBroker> {
   }
 
   @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      AgpOutputBrokerDefinitionAdaptor adaptor = new AgpOutputBrokerDefinitionAdaptor(definition);
+      return adaptor.getHostUrl()!=null? adaptor.getHostUrl().toExternalForm(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
+  }
+
+  @Override
   public String getType() {
     return TYPE;
   }

@@ -100,5 +100,15 @@ public class GptConnector implements OutputConnector<OutputBroker> {
   public OutputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new GptBroker(this, new GptBrokerDefinitionAdaptor(definition), geometryServiceUrl, sizeLimit);
   }
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      GptBrokerDefinitionAdaptor adaptor = new GptBrokerDefinitionAdaptor(definition);
+      return adaptor.getHostUrl()!=null? adaptor.getHostUrl().toExternalForm(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
+  }
   
 }

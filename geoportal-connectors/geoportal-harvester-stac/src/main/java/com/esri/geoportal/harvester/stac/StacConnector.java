@@ -73,4 +73,14 @@ public class StacConnector implements InputConnector<InputBroker> {
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new StacBroker(this, new StacBrokerDefinitionAdaptor(definition), metaBuilder);
   }
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      StacBrokerDefinitionAdaptor adaptor = new StacBrokerDefinitionAdaptor(definition);
+      return adaptor.getHostUrl()!=null? adaptor.getHostUrl().toExternalForm(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
+  }
 }

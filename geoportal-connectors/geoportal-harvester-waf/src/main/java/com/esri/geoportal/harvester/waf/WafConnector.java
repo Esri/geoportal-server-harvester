@@ -74,4 +74,14 @@ public class WafConnector implements InputConnector<InputBroker> {
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new WafBroker(this,new WafBrokerDefinitionAdaptor(definition));
   }
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      WafBrokerDefinitionAdaptor adaptor = new WafBrokerDefinitionAdaptor(definition);
+      return adaptor.getHostUrl()!=null? adaptor.getHostUrl().toExternalForm(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
+  }
 }
