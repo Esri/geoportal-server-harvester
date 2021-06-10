@@ -1,6 +1,10 @@
 <div class="h-brokers" data-dojo-attach-point="contentNode">
   <div class="h-brokers-caption">
     <span class="h-brokers-caption-text" data-dojo-attach-point="captionNode"></span>
+    <span class="h-brokers-filter">
+      <select name="select1" data-dojo-attach-point="filterSelect" data-dojo-type="dijit/form/Select" data-dojo-attach-event="change: _onChangeFilter">
+      </select>
+    </span>
     <span class="h-brokers-caption-grouping">
       <input
         id="groupBy_${id}"
