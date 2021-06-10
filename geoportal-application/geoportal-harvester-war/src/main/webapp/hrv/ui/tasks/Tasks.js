@@ -190,7 +190,7 @@ define(["dojo/_base/declare",
         var data = evt.data;
         TasksREST.execute(data.uuid,data.taskDefinition.ignoreRobotsTxt, data.taskDefinition.incremental).then(
           lang.hitch(this,function(){
-            this.load(this.groupByCheckBox.get('checked'));
+            router.go("/home");
           }),
           lang.hitch(this,function(error){
             console.error(error);
