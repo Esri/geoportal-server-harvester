@@ -50,7 +50,7 @@ public class FolderConnector implements OutputConnector<OutputBroker> {
       }
     });
     arguments.add(new UITemplate.BooleanArgument(P_FOLDER_SPLIT_FOLDERS, bundle.getString("folder.splitFolders")));
-    arguments.add(new UITemplate.StringArgument(P_FOLDER_SPLIT_SIZE, bundle.getString("folder.splitSize")));
+    arguments.add(new UITemplate.StringArgument(P_FOLDER_SPLIT_SIZE, bundle.getString("folder.splitSize"), true));
     arguments.add(new UITemplate.BooleanArgument(P_FOLDER_CLEANUP, bundle.getString("folder.cleanup")));
     return new UITemplate(getType(), bundle.getString("folder"), arguments);
   }
