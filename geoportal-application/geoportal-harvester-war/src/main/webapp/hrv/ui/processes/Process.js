@@ -25,13 +25,14 @@ define(["dojo/_base/declare",
         "dojo/dom-style",
         "dojo/html",
         "dojo/topic",
+        "dojo/router",
         "hrv/rest/Processes",
         "hrv/utils/TaskUtils"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,domClass,domStyle,html,topic,
+           lang,domClass,domStyle,html,topic,router,
            ProcessesREST, TaskUtils
           ){
   
@@ -80,6 +81,9 @@ define(["dojo/_base/declare",
               if (result.status==="working" || result.status==="aborting") {
                 this.timerHandler = setTimeout(update,2000);
               }
+              if (result.status==="completed") {
+                domStyle.set(this.historyLinkNode, "display", "block");
+              }
             }),
             lang.hitch(this,function(error){
               topic.publish("msg", new Error(this.i18n.processes.errors.canceling));
@@ -91,6 +95,8 @@ define(["dojo/_base/declare",
         }
         if (this.data.status!=="completed") {
           update();
+        } else {
+          domStyle.set(this.historyLinkNode, "display", "block");
         }
       },
       
@@ -105,6 +111,10 @@ define(["dojo/_base/declare",
       
       _onCanceled: function(evt) {
         this.emit("reload");
+      },
+      
+      _onHistory: function(evt) {
+        router.go("/tasks/" + this.params.taskDefinition.ref + "/history");
       }
     });
 });
