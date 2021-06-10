@@ -150,6 +150,8 @@ define({
         title: "Cancel scheduled process?",
         content: "Please, confirm cancelation of the scheduled process:<br>${title}",
       },
+      runsAt: "Runs at: ${time}",
+      runsEvery: "Runs: ${period}",
       errors: {
         loading: "Error loading triggers",
         canceling: "Error canceling trigger",

@@ -40,9 +40,44 @@ define(["dojo/_base/declare",
       i18n: i18n,
       templateString: template,
       data: null,
+      scheduled: "",
       
       constructor: function(arg) {
         this.data = arg;
+        console.log(arg);
+        
+        if (arg && arg.triggerDefinition && arg.triggerDefinition.properties) {
+          var props = arg.triggerDefinition.properties;
+          if (props["t-period"]) {
+            var periodLength = null;
+            
+            switch (props["t-period"]) {
+              case "PT1H": 
+                periodLength = this.i18n.periodical.hourly; 
+                break;
+              case "P1D": 
+                periodLength = this.i18n.periodical.daily; 
+                break;
+              case "P1W": 
+                periodLength = this.i18n.periodical.weekly; 
+                break;
+              case "P2W": 
+                periodLength = this.i18n.periodical.biweekly; 
+                break;
+              case "P1M": 
+                periodLength = this.i18n.periodical.monthly; 
+                break;
+            }
+            
+            if (periodLength) {
+              this.scheduled = string.substitute(this.i18n.triggers.runsEvery, {period: periodLength.toLowerCase()});
+            }
+            
+          } else if (props["t-at-time"]) {
+            var atTime = props["t-at-time"];
+            this.scheduled = string.substitute(this.i18n.triggers.runsAt, {time: atTime});
+          }
+        }
       },
     
       postCreate: function(){

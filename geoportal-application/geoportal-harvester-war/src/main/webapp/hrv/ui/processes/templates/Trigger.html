@@ -1,5 +1,10 @@
 <div class="h-processes-trigger" data-dojo-attach-point="contentNode">
-  <span class="h-processes-trigger-uuid">${data.uuid}</span>
-  <span class="h-processes-trigger-title" data-dojo-attach-point="titleNode"></span>
-  <span class="h-processes-trigger-cancel" data-dojo-attach-point="cancelNode" data-dojo-attach-event="onclick: _onCancel">${i18n.triggers.cancel}</span>
+  <div class="h-processes-trigger-body">
+    <span class="h-processes-trigger-uuid">${data.uuid}</span>
+    <span class="h-processes-trigger-title" data-dojo-attach-point="titleNode"></span>
+    <span class="h-processes-trigger-cancel" data-dojo-attach-point="cancelNode" data-dojo-attach-event="onclick: _onCancel">${i18n.triggers.cancel}</span>
+  </div>
+  <div class="h-processes-trigger-extra">
+    ${scheduled}
+  </div>
 </div>
