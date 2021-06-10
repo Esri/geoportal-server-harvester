@@ -44,7 +44,6 @@ define(["dojo/_base/declare",
       
       constructor: function(arg) {
         this.data = arg;
-        console.log(arg);
         
         if (arg && arg.triggerDefinition && arg.triggerDefinition.properties) {
           var props = arg.triggerDefinition.properties;
