@@ -76,15 +76,7 @@ define(["dojo/_base/declare",
         BrokersREST[this.category]().then(
           lang.hitch(this,function(response){ 
             this.response = response;
-            
-            this.filterSelect.getOptions().forEach(lang.hitch(this, function(opt) {
-              this.filterSelect.removeOption(opt);
-            }));
-            this.filterSelect.addOption({value: " ", label: ""});
-            new Set(response.map(b => b.brokerDefinition.type)).forEach(lang.hitch(this, function(type) {
-              this.filterSelect.addOption({value: type, label: type});
-            }));
-
+            this.processBrokersTypes(response);
             this.processBrokers(response, grouping); 
           }),
           lang.hitch(this,function(error){
@@ -92,6 +84,16 @@ define(["dojo/_base/declare",
             topic.publish("msg", new Error(this.i18n.brokers.errors.access));
           })
         );
+      },
+      
+      processBrokersTypes: function(response) {
+        this.filterSelect.getOptions().forEach(lang.hitch(this, function(opt) {
+          this.filterSelect.removeOption(opt);
+        }));
+        this.filterSelect.addOption({value: " ", label: ""});
+        new Set(response.map(b => b.brokerDefinition.type)).forEach(lang.hitch(this, function(type) {
+          this.filterSelect.addOption({value: type, label: type});
+        }));
       },
       
       compareBrokerDefinitons: function(bd1, bd2) {
@@ -239,7 +241,6 @@ define(["dojo/_base/declare",
       },
       
       _onChangeFilter: function(evt) {
-        console.log(evt);
         this.clear();
         this.processBrokers(this.response, this.groupByCheckBox.get('checked'));
       }

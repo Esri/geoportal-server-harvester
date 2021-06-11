@@ -84,6 +84,8 @@ define({
       imp: "Import",
       scheduled: "Scheduled",
       running: "Running",
+      inputFilterSelect: "Input:",
+      outputFilterSelect: "Output:",
       editor: {
         caption: "Task",
         submit: "Submit",
