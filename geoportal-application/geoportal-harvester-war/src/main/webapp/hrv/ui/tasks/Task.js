@@ -89,6 +89,16 @@ define([
           })
         )
       );
+      this.own(
+        topic.subscribe(
+          "process.status",
+          lang.hitch(this, function(statusInfo) {
+            if (this.data.taskDefinition.ref === statusInfo.taskDefinition.ref) {
+              // TODO: handle individual status
+            }
+          })
+        )
+      );
     },
 
     showTriggerMark: function (show) {

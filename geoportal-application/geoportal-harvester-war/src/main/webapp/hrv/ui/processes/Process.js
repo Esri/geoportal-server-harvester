@@ -84,6 +84,8 @@ define(["dojo/_base/declare",
               if (result.status==="completed") {
                 domStyle.set(this.historyLinkNode, "display", "block");
               }
+              this.data.status = result.status;
+              topic.publish("process.status", this.data);
             }),
             lang.hitch(this,function(error){
               topic.publish("msg", new Error(this.i18n.processes.errors.canceling));
@@ -98,6 +100,7 @@ define(["dojo/_base/declare",
         } else {
           domStyle.set(this.historyLinkNode, "display", "block");
         }
+        topic.publish("process.status", this.data);
       },
       
       _onCancel: function(evt) {
