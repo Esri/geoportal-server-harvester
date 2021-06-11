@@ -1,6 +1,7 @@
 <div class="h-task" data-dojo-attach-point="contentNode">
   <span class="h-task-label" data-dojo-attach-point="taskName"> ${label}</span>
-  <span class="h-task-scheduled" data-dojo-attach-point="scheduledNode"></span>
+  <span class="h-task-scheduled" style="display: none;" data-dojo-attach-point="scheduledNode"></span>
+  <span class="h-task-running" style="display: none;" data-dojo-attach-point="runningNode"></span>
   <span class="h-link h-task-run" data-dojo-attach-event="onclick:_onRun">${i18n.tasks.run}</span>
   <span class="h-link h-task-schedule" data-dojo-attach-event="onclick:_onSchedule"
     >${i18n.tasks.schedule}</span

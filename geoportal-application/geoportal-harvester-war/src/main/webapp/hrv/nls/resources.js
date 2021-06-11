@@ -82,6 +82,8 @@ define({
       history: "History",
       schedule: "Schedule",
       imp: "Import",
+      scheduled: "Scheduled",
+      running: "Running",
       editor: {
         caption: "Task",
         submit: "Submit",
