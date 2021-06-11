@@ -96,15 +96,48 @@ define(["dojo/_base/declare",
       },
       
       processTasksTypes: function(response) {
-        console.log(response);
-        
         this.inputFilterSelect.getOptions().forEach(lang.hitch(this, function(opt) {
           this.inputFilterSelect.removeOption(opt);
         }));
         this.inputFilterSelect.addOption({value: " ", label: ""});
-        new Set(response.map(r => r.taskDefinition.source.type)).forEach(lang.hitch(this,function(type) {
+        new Set(response.map(r => this.extractInputType(r.taskDefinition)).filter(type => type!=null)).forEach(lang.hitch(this,function(type) {
           this.inputFilterSelect.addOption({value: type, label: type});
         }));
+        
+        this.outputFilterSelect.getOptions().forEach(lang.hitch(this, function(opt) {
+          this.outputFilterSelect.removeOption(opt);
+        }));
+        this.outputFilterSelect.addOption({value: " ", label: ""});
+        new Set(response.map(r => this.extractOutputTypes(r.taskDefinition)).flat().filter(type => type!=null)).forEach(lang.hitch(this,function(type) {
+          this.outputFilterSelect.addOption({value: type, label: type});
+        }));
+      },
+      
+      extractInputType: function(taskDefinition) {
+        return taskDefinition && taskDefinition.source? taskDefinition.source.type: null;
+      },
+      
+      extractOutputTypes: function(taskDefinition) {
+        if (!taskDefinition || !taskDefinition.destinations) return null;
+        
+        function crawlDestination(destination) {
+          var types = [];
+          if (destination) {
+            if (destination.action) {
+              types.push(destination.action.type);
+            }
+            if (destination.drains) {
+              destination.drains.forEach(drain => {
+                crawlDestination(drain).forEach(t => types.push(t));
+              });
+            }
+          }
+          return types;
+        }
+        
+        var types = taskDefinition.destinations.map(destination => crawlDestination(destination));
+        
+        return types.flat();
       },
       
       processTasks: function(tasks, grouping) {
