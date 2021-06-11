@@ -85,6 +85,7 @@ define(["dojo/_base/declare",
         TasksREST.list().then(
           lang.hitch(this,function(response) {
             this.response = response;
+            this.processTasksTypes(response);
             this.processTasks(response, grouping);
           }),
           lang.hitch(this,function(error){
@@ -92,6 +93,18 @@ define(["dojo/_base/declare",
             topic.publish("msg", new Error(this.i18n.tasks.errors.accessInfo));
           })
         );
+      },
+      
+      processTasksTypes: function(response) {
+        console.log(response);
+        
+        this.inputFilterSelect.getOptions().forEach(lang.hitch(this, function(opt) {
+          this.inputFilterSelect.removeOption(opt);
+        }));
+        this.inputFilterSelect.addOption({value: " ", label: ""});
+        new Set(response.map(r => r.taskDefinition.source.type)).forEach(lang.hitch(this,function(type) {
+          this.inputFilterSelect.addOption({value: type, label: type});
+        }));
       },
       
       processTasks: function(tasks, grouping) {
