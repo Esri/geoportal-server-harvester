@@ -31,6 +31,7 @@ define(["dojo/_base/declare",
         "dojo/router",
         "dojox/form/Uploader",
         "dijit/form/CheckBox",
+        "dijit/form/Select",
         "dijit/Dialog",
         "dijit/form/Button",
         "hrv/rest/Tasks",
@@ -43,7 +44,7 @@ define(["dojo/_base/declare",
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
            lang,array,domConstruct, domAttr, query, on,json,topic,router,
-           Uploader,CheckBox,
+           Uploader,CheckBox,Select,
            Dialog,Button,
            TasksREST,Task,TaskGroup,TaskEditorPane,
            TaskUtils
@@ -246,6 +247,15 @@ define(["dojo/_base/declare",
       _onGroupByClicked: function(evt) {
         this.clear();
         this.processTasks(this.response, evt);
+      },
+      
+      _onChangeInputFilter: function(evt) {
+        console.log("Input filter", evt);
+      },
+      
+      _onChangeOutputFilter: function(evt) {
+        console.log("Input filter", evt);
       }
+      
     });
 });

@@ -544,6 +544,18 @@ body {
   font-size: 14px;
 }
 
+.h-tasks-filters-filter {
+  margin-right: 1em;
+}
+
+.h-tasks-filters-filter-input {
+  
+}
+
+.h-tasks-filters-filter-output {
+  
+}
+
 .h-tasks-footer {
   margin-top: 16px;
 }

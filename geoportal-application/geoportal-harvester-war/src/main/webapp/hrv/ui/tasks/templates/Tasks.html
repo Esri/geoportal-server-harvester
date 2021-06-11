@@ -1,6 +1,18 @@
 <div class="h-tasks" data-dojo-attach-point="contentNode">
   <div class="h-tasks-caption" data-dojo-attach-point="captionNode">
     <span class="h-tasks-caption-text">${i18n.tasks.caption}</span>
+    <span class="h-tasks-filters-grouping">
+      <span class="h-tasks-filters-filter h-tasks-filters-filter-input">
+        <label for="inputFilterSelect">${i18n.tasks.inputFilterSelect}</>
+        <select name="inputFilterSelect" data-dojo-attach-point="inputFilterSelect" data-dojo-type="dijit/form/Select" data-dojo-attach-event="change: _onChangeInputFilter">
+        </select>
+      </span>
+      <span class="h-tasks-filters-filter h-tasks-filters-filter-output">
+        <label for="outputFilterSelect">${i18n.tasks.outputFilterSelect}</>
+        <select name="outputFilterSelect" data-dojo-attach-point="outputFilterSelect" data-dojo-type="dijit/form/Select" data-dojo-attach-event="change: _onChangeOutputFilter">
+        </select>
+      </span>
+    </span>
     <span class="h-tasks-caption-grouping">
       <input id="groupBy" 
              data-dojo-type="dijit/form/CheckBox" 
