@@ -241,7 +241,6 @@ define(["dojo/_base/declare",
       },
       
       _onChangeFilter: function(evt) {
-        console.log(evt);
         this.clear();
         this.processBrokers(this.response, this.groupByCheckBox.get('checked'));
       }

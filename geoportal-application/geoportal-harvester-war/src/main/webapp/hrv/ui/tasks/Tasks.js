@@ -141,6 +141,24 @@ define(["dojo/_base/declare",
       },
       
       processTasks: function(tasks, grouping) {
+        
+        var inputFilter = this.inputFilterSelect.getValue().trim();
+        var outputFilter = this.outputFilterSelect.getValue().trim();
+        
+        tasks = tasks.filter(task => {
+          if (inputFilter.length > 0) {
+            var type = this.extractInputType(task.taskDefinition);
+            if (type !== inputFilter) return false;
+          }
+          
+          if (outputFilter.length > 0) {
+            var types = this.extractOutputTypes(task.taskDefinition);
+            if (types.indexOf(outputFilter) < 0) return false;
+          }
+          
+          return true;
+        });
+        
         if (grouping) {
           var groups = this.groupTasks(tasks);
           array.forEach(groups, lang.hitch(this, function(group){
@@ -296,11 +314,13 @@ define(["dojo/_base/declare",
       },
       
       _onChangeInputFilter: function(evt) {
-        console.log("Input filter", evt);
+        this.clear();
+        this.processTasks(this.response, this.groupByCheckBox.get('checked'));
       },
       
       _onChangeOutputFilter: function(evt) {
-        console.log("Input filter", evt);
+        this.clear();
+        this.processTasks(this.response, this.groupByCheckBox.get('checked'));
       }
       
     });
