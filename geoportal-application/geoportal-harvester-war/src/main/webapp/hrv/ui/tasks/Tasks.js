@@ -31,6 +31,7 @@ define(["dojo/_base/declare",
         "dojo/router",
         "dojox/form/Uploader",
         "dijit/form/CheckBox",
+        "dijit/form/Select",
         "dijit/Dialog",
         "dijit/form/Button",
         "hrv/rest/Tasks",
@@ -43,7 +44,7 @@ define(["dojo/_base/declare",
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
            lang,array,domConstruct, domAttr, query, on,json,topic,router,
-           Uploader,CheckBox,
+           Uploader,CheckBox,Select,
            Dialog,Button,
            TasksREST,Task,TaskGroup,TaskEditorPane,
            TaskUtils
@@ -84,6 +85,7 @@ define(["dojo/_base/declare",
         TasksREST.list().then(
           lang.hitch(this,function(response) {
             this.response = response;
+            this.processTasksTypes(response);
             this.processTasks(response, grouping);
           }),
           lang.hitch(this,function(error){
@@ -93,7 +95,70 @@ define(["dojo/_base/declare",
         );
       },
       
+      processTasksTypes: function(response) {
+        this.inputFilterSelect.getOptions().forEach(lang.hitch(this, function(opt) {
+          this.inputFilterSelect.removeOption(opt);
+        }));
+        this.inputFilterSelect.addOption({value: " ", label: ""});
+        new Set(response.map(r => this.extractInputType(r.taskDefinition)).filter(type => type!=null)).forEach(lang.hitch(this,function(type) {
+          this.inputFilterSelect.addOption({value: type, label: type});
+        }));
+        
+        this.outputFilterSelect.getOptions().forEach(lang.hitch(this, function(opt) {
+          this.outputFilterSelect.removeOption(opt);
+        }));
+        this.outputFilterSelect.addOption({value: " ", label: ""});
+        new Set(response.map(r => this.extractOutputTypes(r.taskDefinition)).flat().filter(type => type!=null)).forEach(lang.hitch(this,function(type) {
+          this.outputFilterSelect.addOption({value: type, label: type});
+        }));
+      },
+      
+      extractInputType: function(taskDefinition) {
+        return taskDefinition && taskDefinition.source? taskDefinition.source.type: null;
+      },
+      
+      extractOutputTypes: function(taskDefinition) {
+        if (!taskDefinition || !taskDefinition.destinations) return null;
+        
+        function crawlDestination(destination) {
+          var types = [];
+          if (destination) {
+            if (destination.action) {
+              types.push(destination.action.type);
+            }
+            if (destination.drains) {
+              destination.drains.forEach(drain => {
+                crawlDestination(drain).forEach(t => types.push(t));
+              });
+            }
+          }
+          return types;
+        }
+        
+        var types = taskDefinition.destinations.map(destination => crawlDestination(destination));
+        
+        return types.flat();
+      },
+      
       processTasks: function(tasks, grouping) {
+        
+        var inputFilter = this.inputFilterSelect.getValue().trim();
+        var outputFilter = this.outputFilterSelect.getValue().trim();
+        
+        tasks = tasks.filter(task => {
+          if (inputFilter.length > 0) {
+            var type = this.extractInputType(task.taskDefinition);
+            if (type !== inputFilter) return false;
+          }
+          
+          if (outputFilter.length > 0) {
+            var types = this.extractOutputTypes(task.taskDefinition);
+            if (types.indexOf(outputFilter) < 0) return false;
+          }
+          
+          return true;
+        });
+        
         if (grouping) {
           var groups = this.groupTasks(tasks);
           array.forEach(groups, lang.hitch(this, function(group){
@@ -246,6 +311,17 @@ define(["dojo/_base/declare",
       _onGroupByClicked: function(evt) {
         this.clear();
         this.processTasks(this.response, evt);
+      },
+      
+      _onChangeInputFilter: function(evt) {
+        this.clear();
+        this.processTasks(this.response, this.groupByCheckBox.get('checked'));
+      },
+      
+      _onChangeOutputFilter: function(evt) {
+        this.clear();
+        this.processTasks(this.response, this.groupByCheckBox.get('checked'));
       }
+      
     });
 });

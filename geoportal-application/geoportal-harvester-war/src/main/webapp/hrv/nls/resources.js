@@ -82,6 +82,8 @@ define({
       history: "History",
       schedule: "Schedule",
       imp: "Import",
+      inputFilterSelect: "Input:",
+      outputFilterSelect: "Output:",
       editor: {
         caption: "Task",
         submit: "Submit",

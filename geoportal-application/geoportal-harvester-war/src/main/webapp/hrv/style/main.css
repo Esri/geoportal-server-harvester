@@ -505,6 +505,7 @@ body {
 
 .h-tasks-caption {
   display: flex;
+  justify-content: space-between;
 }
 
 .h-tasks-caption-text {
@@ -516,7 +517,6 @@ body {
 .h-tasks-caption-grouping {
   position: relative;
   top: 4px;
-  margin-left: auto;
   line-height: 22px;
   color: #959595;
 }
@@ -542,6 +542,18 @@ body {
 
 .h-task-group-caption {
   font-size: 14px;
+}
+
+.h-tasks-filters-filter {
+  margin-right: 1em;
+}
+
+.h-tasks-filters-filter-input {
+  
+}
+
+.h-tasks-filters-filter-output {
+  
 }
 
 .h-tasks-footer {
