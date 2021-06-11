@@ -697,6 +697,16 @@ body {
   margin-right: 1em;
 }
 
+.h-task-running {
+  color: #404040;
+  font-weight: 500;
+  line-height: 24px;
+  font-size: 12px;
+  padding: 2px 4px;
+  background: #86e868;
+  margin-right: 1em;
+}
+
 .h-task-edit {
   text-decoration: underline;
   cursor: pointer;

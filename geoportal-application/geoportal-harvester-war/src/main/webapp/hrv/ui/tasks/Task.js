@@ -89,11 +89,27 @@ define([
           })
         )
       );
+      this.own(
+        topic.subscribe(
+          "process.status",
+          lang.hitch(this, function(statusInfo) {
+            if (this.data.taskDefinition.ref === statusInfo.taskDefinition.ref) {
+              // TODO: handle individual status
+              this.showRunningMark(statusInfo.status === "working");
+            }
+          })
+        )
+      );
     },
 
     showTriggerMark: function (show) {
-      html.set(this.scheduledNode, show ? "Scheduled" : "");
+      html.set(this.scheduledNode, show ? this.i18n.tasks.scheduled : "");
       domStyle.set(this.scheduledNode, "display", show ? "inline" : "none");
+    },
+
+    showRunningMark: function (show) {
+      html.set(this.runningNode, show ? this.i18n.tasks.running : "");
+      domStyle.set(this.runningNode, "display", show ? "inline" : "none");
     },
 
     _onRemove: function () {
