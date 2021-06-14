@@ -70,6 +70,7 @@ define(["dojo/_base/declare",
       
       load: function() {
         this.loadProcesses();
+        this.loadTriggers();
       },
       
       loadProcesses: function() {
