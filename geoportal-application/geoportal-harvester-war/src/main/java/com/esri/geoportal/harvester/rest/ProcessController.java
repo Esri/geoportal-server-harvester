@@ -63,7 +63,7 @@ public class ProcessController {
    * @return all processes
    */
   @RequestMapping(value = "/rest/harvester/processes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ProcessResponse[]> listAllProcesses() {
+  public ResponseEntity<ProcessStatisticsResponse[]> listAllProcesses() {
     try {
       LOG.debug(String.format("GET /rest/harvester/processes"));
       return new ResponseEntity<>(filterProcesses(e->true),HttpStatus.OK);
@@ -199,7 +199,7 @@ public class ProcessController {
    * @param predicate predicate
    * @return array of filtered processes
    */
-  private ProcessResponse[] filterProcesses(Predicate<? super Map.Entry<UUID, ProcessInstance>> predicate) throws DataProcessorException {
+  private ProcessStatisticsResponse[] filterProcesses(Predicate<? super Map.Entry<UUID, ProcessInstance>> predicate) throws DataProcessorException {
     return engine.getProcessesService().selectProcesses(predicate).stream()
             .map(e->{ 
               Statistics statistics = null;
@@ -221,7 +221,7 @@ public class ProcessController {
                     e.getValue().getTask().getTaskDefinition(), 
                     e.getValue().getStatus(), statistics); 
             })
-            .collect(Collectors.toList()).toArray(new ProcessResponse[0]);
+            .collect(Collectors.toList()).toArray(new ProcessStatisticsResponse[0]);
   }
   
 }
