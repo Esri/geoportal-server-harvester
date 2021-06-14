@@ -64,7 +64,6 @@ define(["dojo/_base/declare",
               domClass.remove(this.statusNode,"h-status-completed");
               domClass.add(this.statusNode,"h-status-"+result.status);
               domStyle.set(this.cancelNode,"display",result.status==="working"? "inline": "none");
-//              domStyle.set(this.progressNode,"display",result.status==="working"? "inline": "none");
               if (result.status==="working" && result.statistics) {
                 var now = new Date();
                 if (this.data.taskDefinition.source.type !== "SINK") {
