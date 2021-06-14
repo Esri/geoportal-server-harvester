@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,42 +93,7 @@ public class ProcessController {
           for (Event evt: history) {
             if (evt.getUuid().equals(processId)) {
               final History.Report rpt = evt.getReport();
-              statistics = new Statistics() {
-                @Override
-                public Date getEndDate() {
-                  return evt.getEndTimestamp();
-                }
-
-                @Override
-                public long getHarvestFailed() {
-                  return rpt.failedToHarvest;
-                }
-
-                @Override
-                public long getPublishFailed() {
-                  return rpt.failedToPublish;
-                }
-
-                @Override
-                public Date getStartDate() {
-                  return evt.getEndTimestamp();
-                }
-
-                @Override
-                public long getAcquired() {
-                  return rpt.acquired;
-                }
-
-                @Override
-                public long getSucceeded() {
-                  return rpt.created + rpt.updated;
-                }
-
-                @Override
-                public boolean isFailure() {
-                  return rpt.failed > 0;
-                }
-              };
+              statistics = createStatistics(evt, rpt);
               break;
             }
           }
@@ -139,6 +105,45 @@ public class ProcessController {
       LOG.error(formatForLog("Error getting process info: %s", processId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+  
+  private Statistics createStatistics(Event evt, History.Report rpt) {
+    return new Statistics() {
+      @Override
+      public Date getEndDate() {
+        return evt.getEndTimestamp();
+      }
+
+      @Override
+      public long getHarvestFailed() {
+        return rpt.failedToHarvest;
+      }
+
+      @Override
+      public long getPublishFailed() {
+        return rpt.failedToPublish;
+      }
+
+      @Override
+      public Date getStartDate() {
+        return evt.getEndTimestamp();
+      }
+
+      @Override
+      public long getAcquired() {
+        return rpt.acquired;
+      }
+
+      @Override
+      public long getSucceeded() {
+        return rpt.created + rpt.updated;
+      }
+
+      @Override
+      public boolean isFailure() {
+        return rpt.failed > 0;
+      }
+    };
   }
   
   /**
@@ -196,10 +201,26 @@ public class ProcessController {
    */
   private ProcessResponse[] filterProcesses(Predicate<? super Map.Entry<UUID, ProcessInstance>> predicate) throws DataProcessorException {
     return engine.getProcessesService().selectProcesses(predicate).stream()
-            .map(e->new ProcessResponse(
+            .map(e->{ 
+              Statistics statistics = null;
+              try {
+                History history = engine.getTasksService().getHistory(UUID.fromString(e.getValue().getTask().getRef()));
+                if (history!=null) {
+                  for (Event evt: history) {
+                    if (evt.getUuid().equals( e.getKey())) {
+                      final History.Report rpt = evt.getReport();
+                      statistics = createStatistics(evt, rpt);
+                      break;
+                    }
+                  }
+                }
+              } catch (DataProcessorException ex) {
+              }
+              return new ProcessStatisticsResponse(
                     e.getKey(),
                     e.getValue().getTask().getTaskDefinition(), 
-                    e.getValue().getStatus()))
+                    e.getValue().getStatus(), statistics); 
+            })
             .collect(Collectors.toList()).toArray(new ProcessResponse[0]);
   }
   
