@@ -38,7 +38,7 @@ public class HistoryManagerAdaptor extends BaseProcessInstanceListener {
   private static final Logger LOG = LoggerFactory.getLogger(HistoryManagerAdaptor.class);
 
   private final UUID uuid;
-  private final ProcessInstance processInstance;
+  private final ProcessReference processReference;
   private final HistoryManager historyManager;
   private final History.Event event = new History.Event();
   private final History.Report report = new History.Report();
@@ -49,12 +49,12 @@ public class HistoryManagerAdaptor extends BaseProcessInstanceListener {
    * Creates instance of the adaptor.
    *
    * @param uuid process id
-   * @param processInstance process instance
+   * @param processReference process reference
    * @param historyManager history manager.
    */
-  public HistoryManagerAdaptor(UUID uuid, ProcessInstance processInstance, HistoryManager historyManager) {
+  public HistoryManagerAdaptor(UUID uuid, ProcessReference processReference, HistoryManager historyManager) {
     this.uuid = uuid;
-    this.processInstance = processInstance;
+    this.processReference = processReference;
     this.historyManager = historyManager;
   }
 
@@ -62,7 +62,7 @@ public class HistoryManagerAdaptor extends BaseProcessInstanceListener {
   public void onStatusChange(ProcessInstance.Status status) {
     switch (status) {
       case submitted:
-        event.setUuid(UUID.randomUUID());
+        event.setUuid(processReference.getProcessId());
         event.setTaskId(uuid);
         report.failedToHarvest = 0L;
         report.failedToPublish = 0L;

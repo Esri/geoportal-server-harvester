@@ -19,9 +19,12 @@ import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.support.ProcessResponse;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.engine.managers.History;
+import com.esri.geoportal.harvester.engine.managers.History.Event;
 import com.esri.geoportal.harvester.engine.services.Engine;
 import com.esri.geoportal.harvester.engine.utils.Statistics;
 import com.esri.geoportal.harvester.support.ProcessStatisticsResponse;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -80,6 +83,57 @@ public class ProcessController {
       LOG.debug(formatForLog("GET /rest/harvester/processes/%s", processId));
       ProcessInstance process = engine.getProcessesService().getProcess(processId);
       Statistics statistics = engine.getProcessesService().getStatistics(processId);
+      
+      if (statistics==null) {
+        // If statistics is null that mean the proces has completed (no longer in the memory).
+        // Obtain statistics from the history.
+        History history = engine.getTasksService().getHistory(UUID.fromString(process.getTask().getRef()));
+        if (history!=null) {
+          for (Event evt: history) {
+            if (evt.getUuid().equals(processId)) {
+              final History.Report rpt = evt.getReport();
+              statistics = new Statistics() {
+                @Override
+                public Date getEndDate() {
+                  return evt.getEndTimestamp();
+                }
+
+                @Override
+                public long getHarvestFailed() {
+                  return rpt.failedToHarvest;
+                }
+
+                @Override
+                public long getPublishFailed() {
+                  return rpt.failedToPublish;
+                }
+
+                @Override
+                public Date getStartDate() {
+                  return evt.getEndTimestamp();
+                }
+
+                @Override
+                public long getAcquired() {
+                  return rpt.acquired;
+                }
+
+                @Override
+                public long getSucceeded() {
+                  return rpt.created + rpt.updated;
+                }
+
+                @Override
+                public boolean isFailure() {
+                  return rpt.failed > 0;
+                }
+              };
+              break;
+            }
+          }
+        }
+      }
+      
       return new ResponseEntity<>(process!=null? new ProcessStatisticsResponse(processId, process.getTask().getTaskDefinition(), process.getStatus(), statistics): null,HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(formatForLog("Error getting process info: %s", processId), ex);
