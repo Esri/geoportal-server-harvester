@@ -64,7 +64,7 @@ define(["dojo/_base/declare",
               domClass.remove(this.statusNode,"h-status-completed");
               domClass.add(this.statusNode,"h-status-"+result.status);
               domStyle.set(this.cancelNode,"display",result.status==="working"? "inline": "none");
-              domStyle.set(this.progressNode,"display",result.status==="working"? "inline": "none");
+//              domStyle.set(this.progressNode,"display",result.status==="working"? "inline": "none");
               if (result.status==="working" && result.statistics) {
                 var now = new Date();
                 if (this.data.taskDefinition.source.type !== "SINK") {
@@ -83,6 +83,10 @@ define(["dojo/_base/declare",
               }
               if (result.status==="completed") {
                 domStyle.set(this.historyLinkNode, "display", "block");
+                if (result.statistics) {
+                  var stats = ""+result.statistics.succeeded + "/" + result.statistics.acquired;
+                  html.set(this.progressNode, stats);
+                }
               }
               this.data.status = result.status;
               topic.publish("process.status", this.data);
@@ -99,6 +103,10 @@ define(["dojo/_base/declare",
           update();
         } else {
           domStyle.set(this.historyLinkNode, "display", "block");
+          if (this.data.statistics) {
+            var stats = ""+this.data.statistics.succeeded + "/" + this.data.statistics.acquired;
+            html.set(this.progressNode, stats);
+          }
         }
         topic.publish("process.status", this.data);
       },
