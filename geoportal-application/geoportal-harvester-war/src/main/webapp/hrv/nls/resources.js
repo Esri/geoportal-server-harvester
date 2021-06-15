@@ -82,7 +82,6 @@ define({
       history: "History",
       schedule: "Schedule",
       imp: "Import",
-      scheduled: "Scheduled",
       running: "Running",
       inputFilterSelect: "Input:",
       outputFilterSelect: "Output:",
