@@ -104,10 +104,8 @@ define([
     },
 
     showTriggerMark: function (trigger) {
-      var show = !!trigger;
-      
-      html.set(this.scheduledNode, show ? TriggerUtils.makeSchedulingInfo(trigger.triggerDefinition) : "");
-      domStyle.set(this.scheduledNode, "display", show ? "inline" : "none");
+      html.set(this.scheduledNode, !!trigger ? TriggerUtils.makeSchedulingInfo(trigger.triggerDefinition) : "");
+      domStyle.set(this.scheduledNode, "display", !!trigger ? "inline" : "none");
     },
 
     showRunningMark: function (show) {
