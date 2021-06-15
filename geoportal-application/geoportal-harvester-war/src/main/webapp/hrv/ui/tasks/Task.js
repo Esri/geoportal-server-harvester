@@ -38,6 +38,7 @@ define([
   "hrv/ui/tasks/SchedulerEditorPane",
   "hrv/ui/tasks/TaskRenamePane",
   "hrv/utils/TaskUtils",
+  "hrv/utils/TriggerUtils",
   "dojo/dom-style"
 ], function (
   declare,
@@ -62,7 +63,7 @@ define([
   TriggersREST,
   SchedulerEditorPane,
   TaskRenamePane,
-  TaskUtils,
+  TaskUtils, TriggerUtils,
   domStyle
 ) {
   return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
@@ -80,12 +81,12 @@ define([
         topic.subscribe(
           "triggers.update",
           lang.hitch(this, function (triggers) {
-            var scheduled = !!triggers.find(
+            var trigger = triggers.find(
               lang.hitch(this, function (trigger) {
                 return trigger.taskId === this.data.uuid;
               })
             );
-            this.showTriggerMark(scheduled);
+            this.showTriggerMark(trigger);
           })
         )
       );
@@ -102,9 +103,9 @@ define([
       );
     },
 
-    showTriggerMark: function (show) {
-      html.set(this.scheduledNode, show ? this.i18n.tasks.scheduled : "");
-      domStyle.set(this.scheduledNode, "display", show ? "inline" : "none");
+    showTriggerMark: function (trigger) {
+      html.set(this.scheduledNode, !!trigger ? TriggerUtils.makeSchedulingInfo(trigger.triggerDefinition) : "");
+      domStyle.set(this.scheduledNode, "display", !!trigger ? "inline" : "none");
     },
 
     showRunningMark: function (show) {
@@ -222,7 +223,7 @@ define([
                           ).then(
                             lang.hitch(this, function (response) {
                               close();
-                              this.showTriggerMark(true);
+                              this.showTriggerMark(response);
                             }),
                             lang.hitch(this, function (error) {
                               console.error(error);
@@ -232,7 +233,7 @@ define([
                           );
                         } else {
                           close();
-                          this.showTriggerMark(false);
+                          this.showTriggerMark(null);
                         }
                       }),
                       lang.hitch(this, function (error) {
