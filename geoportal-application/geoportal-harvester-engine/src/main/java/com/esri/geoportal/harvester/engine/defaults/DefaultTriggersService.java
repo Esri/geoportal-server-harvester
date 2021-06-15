@@ -210,7 +210,7 @@ public class DefaultTriggersService implements TriggersService {
       iteratorContext.setLastHarvest(taskDefinition.isIncremental()? lastHarvest(): null);
       ProcessReference ref = executionService.execute(taskDefinition,iteratorContext);
       if (taskId!=null) {
-        ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref.getProcess(), historyManager));
+        ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref, historyManager));
       }
       ref.getProcess().init();
       return ref.getProcess();
