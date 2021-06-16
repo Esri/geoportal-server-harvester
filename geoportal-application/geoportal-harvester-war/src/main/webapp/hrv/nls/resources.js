@@ -21,6 +21,7 @@ define({
       error: "Error",
       ok: "OK",
       open: "Open",
+      all: "All"
     },
 
     periodical: {
