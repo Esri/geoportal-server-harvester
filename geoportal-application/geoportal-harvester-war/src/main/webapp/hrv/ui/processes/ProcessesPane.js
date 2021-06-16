@@ -56,8 +56,15 @@ define(["dojo/_base/declare",
           if (l.status === r.status) {
             if (l.statistics && r.statistics) {
               if (l.status === "completed") {
-                if (l.statistics.endDate < r.statistics.endDate) return 1;
-                if (l.statistics.endDate > r.statistics.endDate) return -1;
+                if (l.statistics.endDate && r.statistics.endDate) {
+                  if (l.statistics.endDate < r.statistics.endDate) return 1;
+                  if (l.statistics.endDate > r.statistics.endDate) return -1;
+                }
+              } else {
+                if (l.statistics.startDate && r.statistics.startDate) {
+                  if (l.statistics.startDate < r.statistics.startDate) return 1;
+                  if (l.statistics.startDate > r.statistics.startDate) return -1;
+                }
               }
             }
             return 0;
