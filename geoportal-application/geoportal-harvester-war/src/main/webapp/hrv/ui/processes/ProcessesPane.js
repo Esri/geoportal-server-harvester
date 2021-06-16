@@ -54,6 +54,8 @@ define(["dojo/_base/declare",
       },
       
       processProcesses: function(response) {
+        this.processes = response;
+        
         response = response.sort(function(l, r) {
           if (l.status === r.status) {
             if (l.statistics && r.statistics) {
@@ -73,13 +75,14 @@ define(["dojo/_base/declare",
           }
           return l.status === "completed"? 1: -1;
         });
+        
         array.forEach(response,lang.hitch(this,this.processSingleProcess));
       },
       
       processSingleProcess: function(info) {
         var widget = new Process(info).placeAt(this.processesNode);
         this.processWidgets.push(widget);
-        this.own(on(widget,"reload",lang.hitch(this,this.load)));
+        this.own(on(widget,"refresh",lang.hitch(this,this.refreshProcesses)));
         widget.startup();
       },
       
@@ -93,6 +96,11 @@ define(["dojo/_base/declare",
       load: function() {
         this.loadProcesses();
         this.loadTriggers();
+      },
+      
+      refreshProcesses: function() {
+        this.clearProcesses();
+        this.processProcesses(this.processes || []);
       },
       
       loadProcesses: function() {
@@ -119,14 +127,16 @@ define(["dojo/_base/declare",
       
       processTriggers: function(response) {
         this.triggers = response;
+        
         array.forEach(response,lang.hitch(this,this.processSingleTrigger));
+        
         topic.publish("triggers.update", this.triggers);
       },
       
       processSingleTrigger: function(info) {
         var widget = new Trigger(info).placeAt(this.triggersNode);
         this.triggerWidgets.push(widget);
-        this.own(on(widget,"reload",lang.hitch(this,this.load)));
+        this.own(on(widget,"refresh",lang.hitch(this,this.loadTriggers)));
         widget.startup();
       },
       

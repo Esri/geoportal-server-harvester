@@ -73,7 +73,7 @@ define(["dojo/_base/declare",
       },
       
       _onCanceled: function(evt) {
-        this.emit("reload");
+        this.emit("refresh");
       }
     });
 });

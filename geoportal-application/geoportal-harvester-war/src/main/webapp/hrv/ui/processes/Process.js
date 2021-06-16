@@ -91,8 +91,7 @@ define(["dojo/_base/declare",
                 domStyle.set(this.historyLinkNode, "display", "block");
                 
                 if (this.data.status !== "completed") {
-                  console.log("Emitting reload");
-                  this.emit("reload");
+                  this.emit("refresh");
                 }
               }
               
@@ -129,7 +128,7 @@ define(["dojo/_base/declare",
       },
       
       _onCanceled: function(evt) {
-        this.emit("reload");
+        this.emit("refresh");
       },
       
       _onHistory: function(evt) {
