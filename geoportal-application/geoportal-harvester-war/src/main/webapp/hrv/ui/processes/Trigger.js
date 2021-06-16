@@ -73,6 +73,7 @@ define(["dojo/_base/declare",
       },
       
       _onCanceled: function(evt) {
+        // let the container refresh list of triggers
         this.emit("refresh");
       }
     });

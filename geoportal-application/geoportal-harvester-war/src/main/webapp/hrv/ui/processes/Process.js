@@ -90,6 +90,7 @@ define(["dojo/_base/declare",
                 }
                 domStyle.set(this.historyLinkNode, "display", "block");
                 
+                // if status changed let the container refresh list of processes
                 if (this.data.status !== "completed") {
                   this.emit("refresh");
                 }
@@ -128,6 +129,7 @@ define(["dojo/_base/declare",
       },
       
       _onCanceled: function(evt) {
+        // let the container refresh list of processes
         this.emit("refresh");
       },
       

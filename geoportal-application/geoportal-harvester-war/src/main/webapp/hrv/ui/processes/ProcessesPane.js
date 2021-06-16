@@ -98,11 +98,13 @@ define(["dojo/_base/declare",
         this.loadTriggers();
       },
       
+      // refresh (rerender) processes
       refreshProcesses: function() {
         this.clearProcesses();
         this.processProcesses(this.processes || []);
       },
       
+      // load processes from server
       loadProcesses: function() {
         this.clearProcesses();
         
@@ -114,6 +116,7 @@ define(["dojo/_base/declare",
         );
       },
       
+      // loads triggers from server
       loadTriggers: function() {
         this.clearTriggers();
 
