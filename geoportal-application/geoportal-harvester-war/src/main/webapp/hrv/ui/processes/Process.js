@@ -89,6 +89,11 @@ define(["dojo/_base/declare",
                   html.set(this.progressNode, stats);
                 }
                 domStyle.set(this.historyLinkNode, "display", "block");
+                
+                if (this.data.status !== "completed") {
+                  console.log("Emitting reload");
+                  this.emit("reload");
+                }
               }
               
               this.data.status = result.status;
@@ -110,7 +115,7 @@ define(["dojo/_base/declare",
             html.set(this.progressNode, stats);
           }
         }
-          domStyle.set(this.historyLinkNode, "display", "block");
+        domStyle.set(this.historyLinkNode, "display", "block");
         topic.publish("process.status", this.data);
       },
       

@@ -43,6 +43,8 @@ define(["dojo/_base/declare",
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
+      processWidgets: [],
+      triggerWidgets: [],
     
       postCreate: function(){
         this.own(topic.subscribe("nav",lang.hitch(this,this._onNav)));
@@ -76,6 +78,7 @@ define(["dojo/_base/declare",
       
       processSingleProcess: function(info) {
         var widget = new Process(info).placeAt(this.processesNode);
+        this.processWidgets.push(widget);
         this.own(on(widget,"reload",lang.hitch(this,this.load)));
         widget.startup();
       },
@@ -93,8 +96,8 @@ define(["dojo/_base/declare",
       },
       
       loadProcesses: function() {
-        domConstruct.empty(this.processesNode);
-
+        this.clearProcesses();
+        
         ProcessesREST.list().then(
           lang.hitch(this,this.processProcesses),
           lang.hitch(this,function(error){
@@ -104,7 +107,7 @@ define(["dojo/_base/declare",
       },
       
       loadTriggers: function() {
-        domConstruct.empty(this.triggersNode);
+        this.clearTriggers();
 
         TriggersREST.list().then(
           lang.hitch(this,this.processTriggers),
@@ -122,8 +125,21 @@ define(["dojo/_base/declare",
       
       processSingleTrigger: function(info) {
         var widget = new Trigger(info).placeAt(this.triggersNode);
+        this.triggerWidgets.push(widget);
         this.own(on(widget,"reload",lang.hitch(this,this.load)));
         widget.startup();
+      },
+      
+      clearProcesses: function() {
+        this.processWidgets.forEach(widget => widget.destroy());
+        this.processWidgets = [];
+        domConstruct.empty(this.processesNode);
+      },
+      
+      clearTriggers: function() {
+        this.triggerWidgets.forEach(widget => widget.destroy());
+        this.triggerWidgets = [];
+        domConstruct.empty(this.triggersNode);
       },
       
       _onPurge: function() {
