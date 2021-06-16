@@ -52,6 +52,18 @@ define(["dojo/_base/declare",
       },
       
       processProcesses: function(response) {
+        response = response.sort(function(l, r) {
+          if (l.status === r.status) {
+            if (l.statistics && r.statistics) {
+              if (l.status === "completed") {
+                if (l.statistics.endDate < r.statistics.endDate) return 1;
+                if (l.statistics.endDate > r.statistics.endDate) return -1;
+              }
+            }
+            return 0;
+          }
+          return l.status === "completed"? 1: -1;
+        });
         array.forEach(response,lang.hitch(this,this.processSingleProcess));
       },
       
