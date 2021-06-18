@@ -52,7 +52,6 @@ define(["dojo/_base/declare",
       postCreate: function(){
         this.inherited(arguments);
         html.set(this.captionNode,this.i18n.brokers[this.category]);
-//        this.load(this.groupByCheckBox.get('checked'));
       },
       
       destroy: function() {
@@ -90,7 +89,7 @@ define(["dojo/_base/declare",
         this.filterSelect.getOptions().forEach(lang.hitch(this, function(opt) {
           this.filterSelect.removeOption(opt);
         }));
-        this.filterSelect.addOption({value: " ", label: ""});
+        this.filterSelect.addOption({value: " ", label: this.i18n.general.all});
         new Set(response.map(b => b.brokerDefinition.type)).forEach(lang.hitch(this, function(type) {
           this.filterSelect.addOption({value: type, label: type});
         }));

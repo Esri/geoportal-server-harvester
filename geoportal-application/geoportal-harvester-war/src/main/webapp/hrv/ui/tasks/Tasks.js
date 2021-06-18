@@ -99,7 +99,7 @@ define(["dojo/_base/declare",
         this.inputFilterSelect.getOptions().forEach(lang.hitch(this, function(opt) {
           this.inputFilterSelect.removeOption(opt);
         }));
-        this.inputFilterSelect.addOption({value: " ", label: ""});
+        this.inputFilterSelect.addOption({value: " ", label: this.i18n.general.all});
         new Set(response.map(r => this.extractInputType(r.taskDefinition)).filter(type => type!=null)).forEach(lang.hitch(this,function(type) {
           this.inputFilterSelect.addOption({value: type, label: type});
         }));
@@ -107,7 +107,7 @@ define(["dojo/_base/declare",
         this.outputFilterSelect.getOptions().forEach(lang.hitch(this, function(opt) {
           this.outputFilterSelect.removeOption(opt);
         }));
-        this.outputFilterSelect.addOption({value: " ", label: ""});
+        this.outputFilterSelect.addOption({value: " ", label: this.i18n.general.all});
         new Set(response.map(r => this.extractOutputTypes(r.taskDefinition)).flat().filter(type => type!=null)).forEach(lang.hitch(this,function(type) {
           this.outputFilterSelect.addOption({value: type, label: type});
         }));
