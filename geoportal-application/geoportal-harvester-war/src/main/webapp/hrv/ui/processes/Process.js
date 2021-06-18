@@ -89,6 +89,11 @@ define(["dojo/_base/declare",
                   html.set(this.progressNode, stats);
                 }
                 domStyle.set(this.historyLinkNode, "display", "block");
+                
+                // if status changed let the container refresh list of processes
+                if (this.data.status !== "completed") {
+                  this.emit("refresh");
+                }
               }
               
               this.data.status = result.status;
@@ -110,7 +115,7 @@ define(["dojo/_base/declare",
             html.set(this.progressNode, stats);
           }
         }
-          domStyle.set(this.historyLinkNode, "display", "block");
+        domStyle.set(this.historyLinkNode, "display", "block");
         topic.publish("process.status", this.data);
       },
       
@@ -124,7 +129,8 @@ define(["dojo/_base/declare",
       },
       
       _onCanceled: function(evt) {
-        this.emit("reload");
+        // let the container refresh list of processes
+        this.emit("refresh");
       },
       
       _onHistory: function(evt) {

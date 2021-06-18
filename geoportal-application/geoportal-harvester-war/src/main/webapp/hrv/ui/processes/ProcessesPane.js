@@ -43,6 +43,8 @@ define(["dojo/_base/declare",
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
+      processWidgets: [],
+      triggerWidgets: [],
     
       postCreate: function(){
         this.own(topic.subscribe("nav",lang.hitch(this,this._onNav)));
@@ -52,12 +54,35 @@ define(["dojo/_base/declare",
       },
       
       processProcesses: function(response) {
+        this.processes = response;
+        
+        response = response.sort(function(l, r) {
+          if (l.status === r.status) {
+            if (l.statistics && r.statistics) {
+              if (l.status === "completed") {
+                if (l.statistics.endDate && r.statistics.endDate) {
+                  if (l.statistics.endDate < r.statistics.endDate) return 1;
+                  if (l.statistics.endDate > r.statistics.endDate) return -1;
+                }
+              } else {
+                if (l.statistics.startDate && r.statistics.startDate) {
+                  if (l.statistics.startDate < r.statistics.startDate) return 1;
+                  if (l.statistics.startDate > r.statistics.startDate) return -1;
+                }
+              }
+            }
+            return 0;
+          }
+          return l.status === "completed"? 1: -1;
+        });
+        
         array.forEach(response,lang.hitch(this,this.processSingleProcess));
       },
       
       processSingleProcess: function(info) {
         var widget = new Process(info).placeAt(this.processesNode);
-        this.own(on(widget,"reload",lang.hitch(this,this.load)));
+        this.processWidgets.push(widget);
+        this.own(on(widget,"refresh",lang.hitch(this,this.refreshProcesses)));
         widget.startup();
       },
       
@@ -73,9 +98,16 @@ define(["dojo/_base/declare",
         this.loadTriggers();
       },
       
+      // refresh (rerender) processes
+      refreshProcesses: function() {
+        this.clearProcesses();
+        this.processProcesses(this.processes || []);
+      },
+      
+      // load processes from server
       loadProcesses: function() {
-        domConstruct.empty(this.processesNode);
-
+        this.clearProcesses();
+        
         ProcessesREST.list().then(
           lang.hitch(this,this.processProcesses),
           lang.hitch(this,function(error){
@@ -84,8 +116,9 @@ define(["dojo/_base/declare",
         );
       },
       
+      // loads triggers from server
       loadTriggers: function() {
-        domConstruct.empty(this.triggersNode);
+        this.clearTriggers();
 
         TriggersREST.list().then(
           lang.hitch(this,this.processTriggers),
@@ -97,14 +130,29 @@ define(["dojo/_base/declare",
       
       processTriggers: function(response) {
         this.triggers = response;
+        
         array.forEach(response,lang.hitch(this,this.processSingleTrigger));
+        
         topic.publish("triggers.update", this.triggers);
       },
       
       processSingleTrigger: function(info) {
         var widget = new Trigger(info).placeAt(this.triggersNode);
-        this.own(on(widget,"reload",lang.hitch(this,this.load)));
+        this.triggerWidgets.push(widget);
+        this.own(on(widget,"refresh",lang.hitch(this,this.loadTriggers)));
         widget.startup();
+      },
+      
+      clearProcesses: function() {
+        this.processWidgets.forEach(widget => widget.destroy());
+        this.processWidgets = [];
+        domConstruct.empty(this.processesNode);
+      },
+      
+      clearTriggers: function() {
+        this.triggerWidgets.forEach(widget => widget.destroy());
+        this.triggerWidgets = [];
+        domConstruct.empty(this.triggersNode);
       },
       
       _onPurge: function() {

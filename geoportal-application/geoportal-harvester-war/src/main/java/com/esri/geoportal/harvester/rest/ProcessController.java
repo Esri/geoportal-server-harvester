@@ -204,17 +204,21 @@ public class ProcessController {
             .map(e->{ 
               Statistics statistics = null;
               try {
-                History history = engine.getTasksService().getHistory(UUID.fromString(e.getValue().getTask().getRef()));
-                if (history!=null) {
-                  for (Event evt: history) {
-                    if (evt.getUuid().equals( e.getKey())) {
-                      final History.Report rpt = evt.getReport();
-                      statistics = createStatistics(evt, rpt);
-                      break;
+                statistics = engine.getProcessesService().getStatistics(e.getKey());
+                if (statistics==null) {
+                  History history = engine.getTasksService().getHistory(UUID.fromString(e.getValue().getTask().getRef()));
+                  if (history!=null) {
+                    for (Event evt: history) {
+                      if (evt.getUuid().equals( e.getKey())) {
+                        final History.Report rpt = evt.getReport();
+                        statistics = createStatistics(evt, rpt);
+                        break;
+                      }
                     }
                   }
                 }
               } catch (DataProcessorException ex) {
+                LOG.warn("Error filterig processes", ex);
               }
               return new ProcessStatisticsResponse(
                     e.getKey(),
