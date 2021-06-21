@@ -58,6 +58,16 @@ public class AgpInputConnector implements InputConnector<InputBroker> {
   }
 
   @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      AgpInputBrokerDefinitionAdaptor adaptor = new AgpInputBrokerDefinitionAdaptor(definition);
+      return adaptor.getHostUrl()!=null? adaptor.getHostUrl().toExternalForm(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
+  }
+
+  @Override
   public String getType() {
     return TYPE;
   }

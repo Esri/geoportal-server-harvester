@@ -73,4 +73,14 @@ public class DcatConnector implements InputConnector<InputBroker> {
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new DcatBroker(this, new DcatBrokerDefinitionAdaptor(definition), metaBuilder);
   }
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      DcatBrokerDefinitionAdaptor adaptor = new DcatBrokerDefinitionAdaptor(definition);
+      return adaptor.getHostUrl()!=null? adaptor.getHostUrl().toExternalForm(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
+  }
 }

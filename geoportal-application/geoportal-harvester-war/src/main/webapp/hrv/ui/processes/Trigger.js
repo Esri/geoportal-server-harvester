@@ -26,23 +26,29 @@ define(["dojo/_base/declare",
         "dojo/topic",
         "dijit/ConfirmDialog",
         "hrv/rest/Triggers",
-        "hrv/utils/TaskUtils"
+        "hrv/utils/TaskUtils",
+        "hrv/utils/TriggerUtils"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
            lang,string,html,topic,
            ConfirmDialog,
-           TriggersREST, TaskUtils
+           TriggersREST, TaskUtils, TriggerUtils
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
       data: null,
+      scheduled: "",
       
       constructor: function(arg) {
         this.data = arg;
+        
+        if (arg && arg.triggerDefinition && arg.triggerDefinition.properties) {
+          this.scheduled = TriggerUtils.makeSchedulingInfo(arg.triggerDefinition);
+        }
       },
     
       postCreate: function(){
@@ -67,7 +73,8 @@ define(["dojo/_base/declare",
       },
       
       _onCanceled: function(evt) {
-        this.emit("reload");
+        // let the container refresh list of triggers
+        this.emit("refresh");
       }
     });
 });

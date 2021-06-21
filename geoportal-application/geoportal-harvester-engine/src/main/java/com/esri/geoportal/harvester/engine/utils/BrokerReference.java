@@ -25,6 +25,7 @@ public final class BrokerReference {
   private final UUID uuid;
   private final Category category;
   private final EntityDefinition brokerDefinition;
+  private final String resourceLocator;
 
   /**
    * Creates instance of the broker info.
@@ -32,10 +33,19 @@ public final class BrokerReference {
    * @param category broker category
    * @param brokerDefinition broker definition
    */
-  public BrokerReference(UUID uuid, Category category, EntityDefinition brokerDefinition) {
+  public BrokerReference(UUID uuid, Category category, EntityDefinition brokerDefinition, String resourceLocator) {
     this.uuid = uuid;
     this.category = category;
     this.brokerDefinition = brokerDefinition;
+    this.resourceLocator = resourceLocator;
+  }
+
+  /**
+   * Gets resource locator.
+   * @return resource locator
+   */
+  public String getResourceLocator() {
+    return resourceLocator;
   }
 
   /**

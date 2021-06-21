@@ -14,53 +14,53 @@
  */
 define({
   root: {
-    
     general: {
       cancel: "Cancel",
       close: "Close",
       del: "Delete",
       error: "Error",
       ok: "OK",
-      open: "Open"
+      open: "Open",
+      all: "All"
     },
-    
+
     periodical: {
       hourly: "Hourly",
       daily: "Daily",
       weekly: "Weekly",
       biweekly: "Bi-weekly",
-      monthly: "Monthly"
+      monthly: "Monthly",
     },
-    
+
     header: {
-      caption: "Geoportal Server Harvester ver. 2.6.4",
-      logout: "Log out"
+      caption: "Harvester",
+      logout: "Log out",
     },
-    
+
     navigation: {
       home: "Home",
       connectors: "Connectors",
       brokers: "Brokers",
-      tasks: "Tasks"
+      tasks: "Tasks",
     },
-    
+
     brokers: {
       groupBy: "Group by type",
       input: "Input brokers",
       output: "Output brokers",
-      edit: "edit",
-      remove: "remove",
+      edit: "Edit",
+      remove: "Remove",
       add: "Add",
       hint: "Hint",
       editor: {
         caption: "Broker",
         type: "Type:",
         title: "Title:",
-        submit: "Submit"
+        submit: "Submit",
       },
       removeDialog: {
         title: "Delete adaptor?",
-        content: "Please, confirm deletion of the broker:<br>${title}"
+        content: "Please, confirm deletion of the broker:<br>${title}",
       },
       errors: {
         inbound: "Error loading inbound connectors",
@@ -68,32 +68,35 @@ define({
         access: "Unable to access brokers information",
         creating: "Error creating broker",
         removing: "Error removing broker",
-        schedule: "Unable to schedule task"
-      }
+        schedule: "Unable to schedule task",
+      },
     },
-    
+
     tasks: {
       caption: "Tasks",
       groupBy: "Group by input",
       add: "Add",
-      run: "run",
-      rename: "rename",
-      export: "export",
-      remove: "remove",
-      history: "history",
-      schedule: "schedule",
+      run: "Run",
+      rename: "Rename",
+      export: "Export",
+      remove: "Delete",
+      history: "History",
+      schedule: "Schedule",
       imp: "Import",
+      running: "Running",
+      inputFilterSelect: "Input:",
+      outputFilterSelect: "Output:",
       editor: {
         caption: "Task",
         submit: "Submit",
         inputs: "Inputs:",
         outputs: "Outputs:",
-        name: "Name:"
+        name: "Name:",
       },
       renamer: {
         caption: "Rename",
         submit: "Submit",
-        cancel: "Cancel"
+        cancel: "Cancel",
       },
       events: {
         caption: "History",
@@ -102,21 +105,21 @@ define({
         acquired: "Acquired",
         created: "Created",
         updated: "Updated",
-        failed: "Failed (in/out)"
+        failed: "Failed (in/out)",
       },
       scheduler: {
         type: "Type",
-        submit: "Submit"
+        submit: "Submit",
       },
       removeDialog: {
         title: "Delete task?",
-        content: "Please, confirm deletion of the task:<br>${title}"
+        content: "Please, confirm deletion of the task:<br>${title}",
       },
       runDialog: {
         title: "Run task?",
         content: "Please, confirm executing task:<br>${title}",
         ignoreRobots: "Ignore robots.txt",
-        incremental: "Incremental"
+        incremental: "Incremental",
       },
       errors: {
         typesLoadingError: "Unable to load trigger types.",
@@ -128,33 +131,35 @@ define({
         rename: "Unable to rename task",
         remove: "Error removing task",
         execute: "Error executing task",
-        create: "Error creating task"
-      }
+        create: "Error creating task",
+      },
     },
-    
+
     processes: {
       caption: "Processes",
-      cancel: "cancel",
+      cancel: "Cancel",
       min: "min",
-      purge: "Purge",
+      purge: "Clear Completed",
+      history: "History",
       errors: {
         loading: "Error loading processes",
-        canceling: "Error canceling process"
-      }
+        canceling: "Error canceling process",
+      },
     },
-    
+
     triggers: {
       caption: "Scheduled processes",
-      cancel: "cancel",
+      cancel: "Cancel",
       removeDialog: {
         title: "Cancel scheduled process?",
-        content: "Please, confirm cancelation of the scheduled process:<br>${title}"
+        content: "Please, confirm cancelation of the scheduled process:<br>${title}",
       },
+      runsAt: "Runs at: ${time}",
+      runsEvery: "Runs: ${period}",
       errors: {
         loading: "Error loading triggers",
-        canceling: "Error canceling trigger"
-      }
-    }
-
-  }
+        canceling: "Error canceling trigger",
+      },
+    },
+  },
 });
