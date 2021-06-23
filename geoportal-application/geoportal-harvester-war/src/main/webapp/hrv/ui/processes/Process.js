@@ -73,13 +73,17 @@ define(["dojo/_base/declare",
                     var progress = ""+result.statistics.acquired;
                     html.set(this.progressNode, progress);
                   }
+                  this._printTime(result.statistics);
                 }
                 
                 this.timerHandler = setTimeout(update,2000);
               }
               
               if (result.status==="completed") {
+                this.data.statistics = result.statistics;
+                
                 this._printFinalProgress(this.data.statistics);
+                this._printTime(this.data.statistics);
                 domStyle.set(this.historyLinkNode, "display", "block");
                 
                 // if status changed let the container refresh list of processes
@@ -103,9 +107,35 @@ define(["dojo/_base/declare",
           update();
         } else {
           this._printFinalProgress(this.data.statistics);
+          this._printTime(this.data.statistics);
         }
         domStyle.set(this.historyLinkNode, "display", "block");
         topic.publish("process.status", this.data);
+      },
+      
+      _printTime: function(statistics) {
+        if (statistics) {
+          var startDate = statistics.startDate? this._formatTime(new Date(statistics.startDate)): null;
+          var endDate = statistics.endDate? this._formatTime(new Date(statistics.endDate)): null;
+
+          var startInfo = (startDate? this.i18n.processes.started + ": " + startDate: null);
+          var endInfo = (endDate? this.i18n.processes.finished + ": " + endDate: null);
+
+          var info = startInfo && endInfo? startInfo + ", " + endInfo:
+                     startInfo? startInfo: endInfo? endInfo: "";
+
+          html.set(this.timesNode, info);
+        }
+      },
+      
+      _formatTime(time) {
+        if (time) {
+          var hours = ("00" + time.getHours()).slice(-2);
+          var minutes = ("00" + time.getMinutes()).slice(-2);
+          return hours + ":" + minutes;
+        }
+        
+        return null;
       },
       
       _printOngoingProgress: function(statistics) {
