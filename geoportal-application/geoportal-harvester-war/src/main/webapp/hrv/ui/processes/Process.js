@@ -130,9 +130,7 @@ define(["dojo/_base/declare",
       
       _formatTime(time) {
         if (time) {
-          var hours = ("00" + time.getHours()).slice(-2);
-          var minutes = ("00" + time.getMinutes()).slice(-2);
-          return hours + ":" + minutes;
+          return time.toLocaleTimeString().replaceAll(/:\d+\s+/g," ");
         }
         
         return null;
