@@ -365,6 +365,11 @@ body {
   justify-content: space-between;
 }
 
+.h-processes-process-extra {
+  display: flex;
+  justify-content: space-between;
+}
+
 .h-processes-process-main-title {
   
 }

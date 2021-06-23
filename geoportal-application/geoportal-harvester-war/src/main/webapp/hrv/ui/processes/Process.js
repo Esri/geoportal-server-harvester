@@ -67,13 +67,8 @@ define(["dojo/_base/declare",
               
               if (result.status==="working" || result.status==="aborting") {
                 if (result.statistics) {
-                  var now = new Date();
                   if (this.data.taskDefinition.source.type !== "SINK") {
-                    var start = new Date(result.statistics.startDate);
-                    var duration = (now-start)>0? (now-start)/1000/60: 0;
-                    var velocity = result.statistics.acquired>0 && duration>0? Math.round(result.statistics.acquired/duration): null;
-                    var progress = ""+result.statistics.acquired + (velocity? " ("+velocity+"/"+this.i18n.processes.min+")": "");
-                    html.set(this.progressNode, progress);
+                    this._printOngoingProgress(result.statistics);
                   } else {
                     var progress = ""+result.statistics.acquired;
                     html.set(this.progressNode, progress);
@@ -84,10 +79,7 @@ define(["dojo/_base/declare",
               }
               
               if (result.status==="completed") {
-                if (result.statistics) {
-                  var stats = ""+result.statistics.succeeded + "/" + result.statistics.acquired;
-                  html.set(this.progressNode, stats);
-                }
+                this._printFinalProgress(this.data.statistics);
                 domStyle.set(this.historyLinkNode, "display", "block");
                 
                 // if status changed let the container refresh list of processes
@@ -110,13 +102,28 @@ define(["dojo/_base/declare",
         if (this.data.status!=="completed") {
           update();
         } else {
-          if (this.data.statistics) {
-            var stats = ""+this.data.statistics.succeeded + "/" + this.data.statistics.acquired;
-            html.set(this.progressNode, stats);
-          }
+          this._printFinalProgress(this.data.statistics);
         }
         domStyle.set(this.historyLinkNode, "display", "block");
         topic.publish("process.status", this.data);
+      },
+      
+      _printOngoingProgress: function(statistics) {
+        if (statistics) {
+          var now = new Date();
+          var start = new Date(statistics.startDate);
+          var duration = (now-start)>0? (now-start)/1000/60: 0;
+          var velocity = statistics.acquired>0 && duration>0? Math.round(statistics.acquired/duration): null;
+          var progress = ""+statistics.acquired + (velocity? " ("+velocity+"/"+this.i18n.processes.min+")": "");
+          html.set(this.progressNode, progress);
+        }
+      },
+      
+      _printFinalProgress: function(statistics) {
+        if (statistics) {
+          var progress = ""+this.data.statistics.succeeded + "/" + this.data.statistics.acquired;
+          html.set(this.progressNode, progress);
+        }
       },
       
       _onCancel: function(evt) {
