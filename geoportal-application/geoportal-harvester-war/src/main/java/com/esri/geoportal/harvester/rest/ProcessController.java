@@ -126,7 +126,7 @@ public class ProcessController {
 
       @Override
       public Date getStartDate() {
-        return evt.getEndTimestamp();
+        return evt.getStartTimestamp();
       }
 
       @Override
