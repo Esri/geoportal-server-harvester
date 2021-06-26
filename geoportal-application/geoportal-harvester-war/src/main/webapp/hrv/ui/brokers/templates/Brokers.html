@@ -2,8 +2,12 @@
   <div class="h-brokers-caption">
     <span class="h-brokers-caption-text" data-dojo-attach-point="captionNode"></span>
     <span class="h-brokers-filter">
-      <select name="filterSelect" data-dojo-attach-point="filterSelect" data-dojo-type="dijit/form/Select" data-dojo-attach-event="change: _onChangeFilter">
-      </select>
+      <select
+        name="filterSelect"
+        data-dojo-attach-point="filterSelect"
+        data-dojo-type="dijit/form/Select"
+        data-dojo-attach-event="change: _onChangeFilter"
+      ></select>
     </span>
     <span class="h-brokers-caption-grouping">
       <input
@@ -14,9 +18,6 @@
       />
       <label for="groupBy_${id}">${i18n.brokers.groupBy}</label>
     </span>
-  </div>
-  <div class="h-brokers-content" data-dojo-attach-point="contentNode"></div>
-  <div class="h-brokers-footer" data-dojo-attach-point="footerNode">
     <button
       class="h-brokers-add"
       data-dojo-type="dijit/form/Button"
@@ -26,4 +27,5 @@
       ${i18n.brokers.add}
     </button>
   </div>
+  <div class="h-brokers-content" data-dojo-attach-point="contentNode"></div>
 </div>
