@@ -3,35 +3,62 @@
     <span class="h-tasks-caption-text">${i18n.tasks.caption}</span>
     <span class="h-tasks-filters-grouping">
       <span class="h-tasks-filters-filter h-tasks-filters-filter-input">
-        <label for="inputFilterSelect">${i18n.tasks.inputFilterSelect}</>
-        <select name="inputFilterSelect" data-dojo-attach-point="inputFilterSelect" data-dojo-type="dijit/form/Select" data-dojo-attach-event="change: _onChangeInputFilter">
-        </select>
+        <label for="inputFilterSelect">${i18n.tasks.inputFilterSelect}</label>
+        <select
+          name="inputFilterSelect"
+          data-dojo-attach-point="inputFilterSelect"
+          data-dojo-type="dijit/form/Select"
+          data-dojo-attach-event="change: _onChangeInputFilter"
+        ></select>
       </span>
       <span class="h-tasks-filters-filter h-tasks-filters-filter-output">
-        <label for="outputFilterSelect">${i18n.tasks.outputFilterSelect}</>
-        <select name="outputFilterSelect" data-dojo-attach-point="outputFilterSelect" data-dojo-type="dijit/form/Select" data-dojo-attach-event="change: _onChangeOutputFilter">
-        </select>
+        <label for="outputFilterSelect">${i18n.tasks.outputFilterSelect}</label>
+        <select
+          name="outputFilterSelect"
+          data-dojo-attach-point="outputFilterSelect"
+          data-dojo-type="dijit/form/Select"
+          data-dojo-attach-event="change: _onChangeOutputFilter"
+        ></select>
       </span>
     </span>
     <span class="h-tasks-caption-grouping">
-      <input id="groupBy" 
-             data-dojo-type="dijit/form/CheckBox" 
-             data-dojo-attach-event="onChange: _onGroupByClicked"
-             data-dojo-attach-point="groupByCheckBox"/>
-      <label for="groupBy">${i18n.tasks.groupBy}</>
+      <input
+        id="groupBy"
+        data-dojo-type="dijit/form/CheckBox"
+        data-dojo-attach-event="onChange: _onGroupByClicked"
+        data-dojo-attach-point="groupByCheckBox"
+      />
+      <label for="groupBy">${i18n.tasks.groupBy}</label>
     </span>
-  </div>
-  <div class="h-tasks-content" data-dojo-attach-point="contentNode"></div>
-  <div class="h-tasks-footer" data-dojo-attach-point="footerNode" style="display: table;">
-    <button class="h-tasks-add" data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-event="onClick:_onAdd"  style="display: table-cell;">${i18n.tasks.add}</button>
-    <span class="n-tasks-import" style="display: table-cell;">
-      <form method="post" action="rest/harvester/tasks/upload" id="myForm" enctype="multipart/form-data" >
-        <input class="h-tasks-import-button" name="file" multiple="false" type="file" label="${i18n.tasks.imp}" id="uploader" 
-               data-dojo-type="dojox.form.Uploader" 
-               data-dojo-attach-point="uploader"
-               data-dojo-attach-event="onComplete:_onUpload" 
-               data-dojo-props="uploadOnSelect: true" />
+    <button
+      class="h-tasks-add"
+      data-dojo-type="dijit/form/Button"
+      type="button"
+      data-dojo-attach-event="onClick:_onAdd"
+    >
+      ${i18n.tasks.add}
+    </button>
+    <span class="h-tasks-import">
+      <form
+        method="post"
+        action="rest/harvester/tasks/upload"
+        id="myForm"
+        enctype="multipart/form-data"
+      >
+        <input
+          class="h-tasks-import-button"
+          name="file"
+          multiple="false"
+          type="file"
+          label="${i18n.tasks.imp}"
+          id="uploader"
+          data-dojo-type="dojox.form.Uploader"
+          data-dojo-attach-point="uploader"
+          data-dojo-attach-event="onComplete:_onUpload"
+          data-dojo-props="uploadOnSelect: true"
+        />
       </form>
     </span>
   </div>
+  <div class="h-tasks-content" data-dojo-attach-point="contentNode"></div>
 </div>

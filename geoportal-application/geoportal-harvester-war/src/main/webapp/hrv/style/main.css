@@ -155,7 +155,6 @@ body {
 
 .h-brokers-caption {
   display: flex;
-  justify-content: space-between;
 }
 
 .h-brokers-caption-text {
@@ -167,8 +166,14 @@ body {
 .h-brokers-caption-grouping {
   position: relative;
   top: 4px;
+  margin-right: 8px;
   line-height: 22px;
   color: #959595;
+}
+
+.h-brokers-filter {
+  margin-left: auto;
+  margin-right: 8px;
 }
 
 .h-broker-group {
@@ -197,14 +202,13 @@ body {
 }
 
 .h-broker-main {
-  
 }
 
 .h-broker-extra {
   color: grey;
 }
 
-.h-broker:hover  span {
+.h-broker:hover span {
 }
 
 .h-broker-type {
@@ -244,9 +248,18 @@ body {
 }
 
 .h-brokers-add {
-  margin-top: 16px;
   text-decoration: underline;
   cursor: pointer;
+}
+
+.h-brokers-add .dijitButtonNode {
+  color: #007ac2;
+  border-color: #007ac2;
+}
+
+.h-brokers-add .dijitButtonNode:hover {
+  color: #fff;
+  background-color: #007ac2;
 }
 
 .h-brokers-remove-dialog {
@@ -284,6 +297,7 @@ body {
 }
 
 .h-editor-form {
+  width: 100%;
   display: table;
   border-spacing: 0.5em;
 }
@@ -371,7 +385,6 @@ body {
 }
 
 .h-processes-process-main-title {
-  
 }
 
 .h-processes-process-main-controls {
@@ -425,6 +438,10 @@ body {
   cursor: pointer;
 }
 
+.h-processes-process-history:hover {
+  text-decoration: underline;
+}
+
 .h-processes-trigger {
   box-shadow: 0px 1px 2px rgba(223, 223, 223, 0.6);
   margin: 8px 0px;
@@ -438,7 +455,8 @@ body {
 }
 
 .h-processes-trigger-extra {
-  
+  color: #757575;
+  line-height: 24px;
 }
 
 .h-processes-trigger-remove-dialog {
@@ -480,12 +498,14 @@ body {
   padding: 2px 4px;
   color: #404040;
   font-size: 12px;
-  background: rgba(207, 239, 211, 0.5);
+  background: rgba(207, 239, 211, 0.8);
 }
 
 .h-status-working {
-  color: darkorange;
-  line-height: 24px;
+  padding: 2px 4px;
+  color: #404040;
+  font-size: 12px;
+  background: #ffe8ae;
 }
 
 .h-status-aborting {
@@ -494,6 +514,7 @@ body {
 }
 
 .h-processes-process-progress {
+  color: #757575;
   line-height: 24px;
 }
 
@@ -502,6 +523,10 @@ body {
   max-width: 960px;
   margin: 0px auto;
   padding: 12px;
+}
+
+.h-tasks-filters-grouping {
+  margin-left: auto;
 }
 
 .h-tasks-content {
@@ -519,13 +544,13 @@ body {
 }
 
 .h-tasks-add {
+  margin-left: 16px;
   text-decoration: underline;
   cursor: pointer;
 }
 
 .h-tasks-caption {
   display: flex;
-  justify-content: space-between;
 }
 
 .h-tasks-caption-text {
@@ -569,11 +594,9 @@ body {
 }
 
 .h-tasks-filters-filter-input {
-  
 }
 
 .h-tasks-filters-filter-output {
-  
 }
 
 .h-tasks-footer {
@@ -582,6 +605,10 @@ body {
 
 .h-tasks-footer > span {
   padding-right: 0.3em;
+}
+
+.h-tasks-import {
+  margin-left: 8px;
 }
 
 .h-tasks-import-button > input {
@@ -713,7 +740,7 @@ body {
   line-height: 24px;
   font-size: 12px;
   padding: 2px 4px;
-  background: #e6e5e5;
+  background: #efefef;
   margin-right: 1em;
 }
 
@@ -723,7 +750,7 @@ body {
   line-height: 24px;
   font-size: 12px;
   padding: 2px 4px;
-  background: #86e868;
+  background: #ffe8ae;
   margin-right: 1em;
 }
 
@@ -922,6 +949,10 @@ body {
   padding: 15px;
 }
 
+.h-broker-editor {
+  min-width: 720px;
+}
+
 .h-broker-editor .dijitSelect {
   width: 100% !important;
 }
@@ -932,4 +963,28 @@ body {
 
 .h-history-subtitle {
   font-size: 14px;
+}
+
+.h-stage-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 48px;
+  background: #fff;
+  box-shadow: 0px -1px 2px 0px rgba(0, 0, 0, 0.05);
+  color: #404040;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+/* Button overrides */
+.dijitButtonNode {
+  color: #007ac2 !important;
+  border-color: #007ac2 !important;
+}
+
+.dijitButtonNode:hover {
+  color: #fff !important;
+  background-color: #007ac2 !important;
 }
