@@ -307,6 +307,10 @@ body {
 }
 
 .h-editor-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin-top: 16px;
 }
 
 .h-processes {
@@ -812,6 +816,10 @@ body {
 }
 
 .h-task-editor-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin-top: 16px;
 }
 
 .h-task-editor-name-section {
