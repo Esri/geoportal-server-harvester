@@ -17,6 +17,8 @@ package com.esri.geoportal.commons.gpt.client;
 
 import com.esri.geoportal.commons.constants.HttpConstants;
 import com.esri.geoportal.commons.gpt.client.QueryResponse.Hit;
+import com.esri.geoportal.commons.meta.Attribute;
+import com.esri.geoportal.commons.meta.util.WKAConstants;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -166,6 +168,30 @@ public class Client implements Closeable {
               Double ymin = fullExtent.path("ymin").asDouble();
               Double xmax = fullExtent.path("xmax").asDouble();
               Double ymax = fullExtent.path("ymax").asDouble();
+              
+              if (attributes.containsKey(WKAConstants.WKA_BBOX)) {
+                Object boxObj = attributes.get(WKAConstants.WKA_BBOX);
+                if (boxObj!=null && boxObj instanceof Attribute) {
+                  String parts [] = ((Attribute)boxObj).getValue().split(",");
+                  if (parts!=null && parts.length==2) {
+                    String ll[] = parts[0].split(" ");
+                    String ur[] = parts[1].split(" ");
+                    if (ll!=null && ll.length==2 && ur!=null && ur.length==2) {
+                      Double b_xmin = parseDouble(ll[0]);
+                      Double b_ymin = parseDouble(ll[1]);
+                      Double b_xmax = parseDouble(ur[0]);
+                      Double b_ymax = parseDouble(ur[1]);
+                      
+                      if (b_xmin!=null && b_ymin!=null && b_xmax!=null && b_ymax!=null) {
+                        xmin = b_xmin;
+                        ymin = b_ymin;
+                        xmax = b_xmax;
+                        ymax = b_ymax;
+                      }
+                    }
+                  }
+                }
+              }
 
               ObjectNode envelope_geo = mapper.createObjectNode();
               envelope_geo.put("type", "envelope");
@@ -295,6 +321,14 @@ public class Client implements Closeable {
     }
   }
 
+  private Double parseDouble(String val) {
+    try {
+      return Double.parseDouble(val);
+    } catch (Exception ex) {
+      return null;
+    }
+  }
+  
   /**
    * Reads metadata.
    *
