@@ -60,6 +60,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -385,7 +386,6 @@ import org.xml.sax.SAXException;
         factory.setNamespaceAware(true);
         DocumentBuilder builder = factory.newDocumentBuilder();
         doc = builder.parse(new InputSource(new StringReader(sXml)));
-        attributes.getNamedAttributes().putAll(metaAnalyzer.extract(doc).getNamedAttributes());
       } else if (content!=null) {
         String sXml = new String(content, "UTF-8");
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -398,7 +398,16 @@ import org.xml.sax.SAXException;
         factory.setNamespaceAware(true);
         DocumentBuilder builder = factory.newDocumentBuilder();
         doc = builder.parse(new InputSource(new StringReader(sXml)));
-        attributes.getNamedAttributes().putAll(metaAnalyzer.extract(doc).getNamedAttributes());
+      }
+      
+      if (doc!=null) {
+        MapAttribute extractedAttributes = metaAnalyzer.extract(doc);
+        if (extractedAttributes!=null) {
+          Map<String, Attribute> namedAttributes = extractedAttributes.getNamedAttributes();
+          if (namedAttributes!=null) {
+            attributes.getNamedAttributes().putAll(namedAttributes);
+          }
+        }
       }
     }
       
