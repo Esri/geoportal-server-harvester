@@ -92,7 +92,7 @@ public class CswConnector implements InputConnector<InputBroker> {
   @Override
   public String getResourceLocator(EntityDefinition definition) {
     try {
-      CswBrokerDefinitionAdaptor adaptor = new CswBrokerDefinitionAdaptor(definition);
+      CswBrokerDefinitionAdaptor adaptor = new CswBrokerDefinitionAdaptor(profilesService.newProfiles(), definition);
       return adaptor.getHostUrl()!=null? adaptor.getHostUrl().toExternalForm(): "";
     } catch (InvalidDefinitionException ex) {
       return "";
