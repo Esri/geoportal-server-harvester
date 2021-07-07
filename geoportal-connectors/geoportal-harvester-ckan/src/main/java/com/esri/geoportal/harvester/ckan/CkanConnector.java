@@ -74,4 +74,14 @@ public class CkanConnector implements InputConnector<InputBroker> {
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new CkanBroker(this, new CkanBrokerDefinitionAdaptor(definition), metaBuilder);
   }
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      CkanBrokerDefinitionAdaptor adaptor = new CkanBrokerDefinitionAdaptor(definition);
+      return adaptor.getHostUrl()!=null? adaptor.getHostUrl().toExternalForm(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
+  }
 }

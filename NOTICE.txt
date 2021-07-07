@@ -1,6 +1,6 @@
 ===============================================================================
 ESRI Geoportal Server Harvester
-	Copyright ©2019 Esri. 
+	Copyright ©2021 Esri. 
 ===============================================================================
 This document includes acknowledgments for the third‐parties whose software has 
 been used in permissible forms with the Geoportal Server Catalog and its related 
@@ -24,7 +24,13 @@ Apache James :: Mime4j :: DOM (apache-mime4j-dom-0.8.2.jar)
 	Copyright 2004-2018 The Apache Software Foundation
 	License: Apache 2.0
 ===============================================================================
-ASM (asm-6.2.jar)
+ASM
+ASM, asm-9.1.jar, http://asm.ow2.io/
+ASM Analysis, asm-analysis-7.3.1.jar, http://asm.ow2.io/
+ASM Commons, asm-commons-7.3.1.jar, http://asm.ow2.io/
+ASM Tree, asm-tree-7.3.1.jar, http://asm.ow2.io/
+ASM Utilities, asm-util-7.3.1.jar, http://asm.ow2.io/
+
 	Copyright (c) 2000-2011 INRIA, France Telecom
 	License: BSD, https://asm.ow2.io/license.html
 	https://asm.ow2.io/
@@ -81,6 +87,20 @@ Logging (dependency of 3rd party libraries) (commons-logging-1.2.jar)
 	Copyright 2002-2017 The Apache Software Foundation
 	License: Apache-2.0
 ===============================================================================
+C3P0, c3p0-0.9.5.5.jar, https://github.com/swaldman/c3p0
+-------------------------------------------------------------------------------
+EPL 1.0, LGPL 2.1
+===============================================================================
+CDM Core Library, cdm-4.5.5.jar, https://www.unidata.ucar.edu/software/netcdf-java/
+-------------------------------------------------------------------------------
+(MIT-style) netCDF C library license
+http://www.unidata.ucar.edu/software/netcdf/copyright.html
+===============================================================================
+Checker Qual, checker-qual-3.8.0.jar, https://checkerframework.org
+-------------------------------------------------------------------------------
+MIT
+
+===============================================================================
 Curvesapi (curvesapi-1.04.jar)
 	Copyright (c) 2005, Graph Builder
 	All rights reserved.
@@ -91,8 +111,17 @@ Apache CXF Core (cxf-core-3.2.6.jar)
 Apache CXF Runtime JAX RS Frontend (cxf-rt-frontend-jaxrs-3.2.6.jar)
 Apache CXF JAX RS Client (cxf-rt-rs-client-3.2.6.jar)
 Apache CXF Runtime HTTP Transport (cxf-rt-transports-http-3.2.6.jar)
+Apache CXF Runtime Security Functionality, cxf-rt-security-3.4.3.jar, https://cxf.apache.org
+-------------------------------------------------------------------------------
+
 	Copyright 2006-2018 The Apache Software Foundation
 	License: Apache-2.0
+	
+===============================================================================
+DD Plist, dd-plist-1.23.jar, http://www.github.com/3breadt/dd-plist
+-------------------------------------------------------------------------------
+MIT
+	
 ===============================================================================
 DEC (dec-0.1.2.jar)
 	License: MIT
@@ -102,11 +131,23 @@ Ehcache Core (ehcache-core-2.6.2.jar)
 	© Terracotta, Inc., a wholly-owned subsidiary of Software AG USA, Inc. All rights reserved.
 	License: Apache 2.0
 	http://www.ehcache.org/
+	
+===============================================================================
+Error Prone Annotations, error_prone_annotations-2.5.1.jar, 
+-------------------------------------------------------------------------------
+Apache 2.0
+	
 ===============================================================================
 Apache FontBox (fontbox-2.0.11.jar)
 	Copyright 2009-2018 The Apache Software Foundation
 	License: Apache 2.0	
 	https://pdfbox.apache.org/
+	
+===============================================================================
+FindBugs JSR305, jsr305-3.0.2.jar, http://findbugs.sourceforge.net/
+-------------------------------------------------------------------------------
+Apache 2.0
+	
 ===============================================================================
 GeoAPI (geoapi-3.0.1.jar)
 	License: OGC copyright, https://raw.githubusercontent.com/opengeospatial/geoapi/master/LICENSE.txt  
@@ -159,6 +200,13 @@ Gson (gson-2.8.5.jar)
 	https://github.com/google/gson
 ===============================================================================
 Guava: Google Core Libraries For Java (guava-17.0.jar)
+Guava InternalFutureFailureAccess and InternalFutures, failureaccess-1.0.1.jar, 
+Guava ListenableFuture Only, listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar, 
+-------------------------------------------------------------------------------
+Apache  2.0"
+
+-------------------------------------------------------------------------------
+
 	Copyright Google Inc.
 	License: Apache-2.0
 	https://github.com/google/guava
@@ -194,6 +242,19 @@ ISO Parser (isoparser-1.1.22.jar)
 	License: Apache-2.0
 	https://code.google.com/archive/p/mp4parser/
 ===============================================================================
+Istack Common Utility Code Runtime, istack-commons-runtime-4.0.0.jar, 
+-------------------------------------------------------------------------------
+EDL 1.0
+===============================================================================
+Itadaki Jbzip2, bzip2-0.9.1.jar, https://code.google.com/p/jbzip2/
+-------------------------------------------------------------------------------
+MIT
+===============================================================================
+J2ObjC Annotations, j2objc-annotations-1.3.jar, https://github.com/google/j2objc/
+-------------------------------------------------------------------------------
+Apache 2.0
+
+===============================================================================
 Jackcess (jackcess-2.1.12.jar)
 Jackcess Encrypt (jackcess-encrypt-2.1.4.jar)
 	Copyright ©2005–2018 Health Market Science. All rights reserved.
@@ -217,6 +278,50 @@ Java Advanced Imaging Image I/O Tools API Core (standalone) (jai-imageio-core-1.
 	Copyright © 2015-2018 jai-imageio contributors	
 	All Rights Reserved.	
 	License: BSD-3-clause License w/nuclear disclaimer, LICENSE.txt
+===============================================================================
+Jakarta Activation API JAR, jakarta.activation-api-1.2.2.jar, 
+-------------------------------------------------------------------------------
+EDL 1.0
+===============================================================================
+Jakarta Annotations API, jakarta.annotation-api-2.0.0.jar, 
+-------------------------------------------------------------------------------
+EPL 2.0
+===============================================================================
+Jakarta SOAP Implementation, saaj-impl-1.5.2.jar, 
+-------------------------------------------------------------------------------
+EDL 1.0
+
+===============================================================================
+Jakarta Web Services Metadata API, jakarta.jws-api-2.1.0.jar, https://github.com/eclipse-ee4j/jws-api
+-------------------------------------------------------------------------------
+EPL 2.0
+===============================================================================
+Jakarta WS RS API, jakarta.ws.rs-api-2.1.6.jar, 
+-------------------------------------------------------------------------------
+EPL 2.0, GPL 2.0
+===============================================================================
+Jakarta XML Binding API, jakarta.xml.bind-api-3.0.0.jar, 
+-------------------------------------------------------------------------------
+EDL 1.0
+===============================================================================
+Jakarta SOAP with Attachments API, jakarta.xml.soap-api-1.4.2.jar, 
+-------------------------------------------------------------------------------
+EDL 1.0
+===============================================================================
+Jakarta XML Web Services API, jakarta.xml.ws-api-2.3.3.jar, https://github.com/eclipse-ee4j/jax-ws-api
+-------------------------------------------------------------------------------
+EDL 1.0
+
+
+
+===============================================================================
+JavaBeans(TM) Activation Framework, activation-1.1.1.jar, http://java.sun.com/javase/technologies/desktop/javabeans/ja ...
+-------------------------------------------------------------------------------
+CDDL 1.0"
+===============================================================================
+JavaBeans Activation Framework API JAR, javax.activation-api-1.2.0.jar, 
+-------------------------------------------------------------------------------
+CDDL, GPL 2.0
 	
 ===============================================================================
 Java Libpst (java-libpst-0.8.1.jar)
@@ -243,6 +348,12 @@ JAXB Runtime (jaxb-runtime-2.3.1.jar)
 ===============================================================================
 PDFBox JBIG2 ImageIO Plugin (jbig2-imageio-3.0.1.jar)
     License: Apache 2.0
+    
+===============================================================================
+Java RMI API, jboss-rmi-api_1.0_spec-1.0.6.Final.jar, 
+-------------------------------------------------------------------------------
+LGPL 2.1
+    
 ===============================================================================
 "Java Concurrency In Practice" Book Annotations (jcip-annotations-1.0.jar)
     License: public
@@ -311,6 +422,12 @@ JSoup Java HTML Parser (jsoup-1.11.3.jar)
 	Copyright (c) 2009-2018 Jonathan Hedley <jonathan@hedley.net>
 	jsoup HTML parser © 2009 - 2018 Jonathan Hedley
     License: MIT
+    
+===============================================================================
+JTA 1.1, geronimo-jta_1.1_spec-1.1.1.jar, 
+-------------------------------------------------------------------------------
+Apache 2.0
+    
 ===============================================================================
 JUL to SLF4J Bridge (jul-to-slf4j-1.7.25.jar)
  	Copyright (c) 2004-2017 QOS.ch
@@ -330,10 +447,22 @@ Metadata Extractor (metadata-extractor-2.11.0.jar)
     License: Apache-2.0
     https://drewnoakes.com/code/exif/
 ===============================================================================
+Mchange Commons Java, mchange-commons-java-0.2.19.jar, https://github.com/swaldman/mchange-commons-java
+-------------------------------------------------------------------------------
+EPL 1.0, LGPL 2.1
+===============================================================================
+OpenJDK Nashorn, nashorn-core-15.2.jar, https://github.com/openjdk/nashorn
+-------------------------------------------------------------------------------
+GPL 2.0    
+===============================================================================
 NetCDF 4 IOSP JNI Connection to C Library (netcdf4-4.5.5.jar)
+GRIB Decoder API, grib-4.5.5.jar, http://www.unidata.ucar.edu/software/netcdf-java/
+-------------------------------------------------------------------------------
 	© 2018 UCAR
     License: (MIT-style) netCDF C library license, http://www.unidata.ucar.edu/software/netcdf/copyright.html
     https://www.unidata.ucar.edu/software/thredds/current/netcdf-java/
+
+    
 ===============================================================================
 Open JSON (openjson-1.0.10.jar)
     License: Apache-2.0
@@ -346,6 +475,11 @@ Parso (parso-2.0.9.jar)
 	Copyright (C) 2015 EPAM
     License: Apache-2.0
     https://github.com/epam/parso
+===============================================================================
+Apache PDFBox, pdfbox-2.0.23.jar, 
+-------------------------------------------------------------------------------
+Apache 2.0
+    
 ===============================================================================
 Apache PDFBox Tools (pdfbox-tools-2.0.11.jar)
 	Copyright © 2009–2018 The Apache Software Foundation
@@ -409,12 +543,17 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
 ===============================================================================
+SparseBitSet, SparseBitSet-1.2.jar, https://github.com/brettwooldridge/SparseBitSet
+-------------------------------------------------------------------------------
+Apache 2.0
+===============================================================================
 Spring Framework:
 Spring AOP (dependency of 3rd party libraries) (spring-aop-5.1.0.RELEASE.jar)
 Spring Beans (dependency of 3rd party libraries) (spring-beans-5.1.0.RELEASE.jar)
 Spring Context (dependency of 3rd party libraries) (spring-context-5.1.0.RELEASE.jar)
 Spring Core (spring-core-5.1.0.RELEASE.jar)
 Spring Expression Language (SpEL) (dependency of 3rd party libraries) (spring-expression-5.1.0.RELEASE.jar)
+Spring Commons Logging Bridge, spring-jcl-5.2.14.RELEASE.jar, https://github.com/spring-projects/spring-framework
 Spring JDBC (spring-jdbc-5.1.0.RELEASE.jar)
 Spring Transaction (dependency of 3rd party libraries) (spring-tx-5.1.0.RELEASE.jar)
 Spring Web MVC (spring-webmvc-5.1.0.RELEASE.jar)
@@ -426,6 +565,8 @@ Spring Security JWT Library (spring-security-jwt-1.0.9.RELEASE.jar)
 Spring Security LDAP (spring-security-ldap-5.1.0.RELEASE.jar)
 OAuth2 For Spring Security (spring-security-oauth2-2.3.3.RELEASE.jar)
 Spring Security Web (spring-security-web-5.1.0.RELEASE.jar)
+-------------------------------------------------------------------------------
+
 
     License: Apache-2.0
     https://github.com/spring-projects/spring-framework
@@ -435,10 +576,19 @@ The Spring Framework is released under version 2.0 of the Apache License.
 See Common Open Source Licenses section below for copy of Apache 2.0 License.
 ===============================================================================
 Extension API for Stax, Java pull-parsing API (STreaming Api for Xml) (stax2-api-4.1.jar)
+Extended StAX API, stax-ex-1.8.3.jar, 
+-------------------------------------------------------------------------------
+
+
 	Copyright © 2010 - FasterXML.com
     API is licensed under standard BSD license, which is compatible with all Free and Open Software (OSS) licenses.tagsoup-1.2.1.jar
     License: BSD-2-clause
     https://github.com/FasterXML/stax2-api
+===============================================================================
+TagSoup, tagsoup-1.2.1.jar, http://home.ccil.org/~cowan/XML/tagsoup/
+-------------------------------------------------------------------------------
+Apache 2.0
+    
 ===============================================================================
 Apache Tika Core (tika-core-1.19.jar)
 Apache Tika Parsers (tika-parsers-1.19.jar)
@@ -450,6 +600,11 @@ UDUNITS (udunits-4.5.5.jar)
 	© 2018 UCAR
     (MIT-style) netCDF C library license http://www.unidata.ucar.edu/software/netcdf/copyright.html
     https://www.unidata.ucar.edu/software/udunits/
+===============================================================================
+Units of Measurement API, unit-api-1.0.jar, 
+-------------------------------------------------------------------------------
+BSD 3-clause
+    
 ===============================================================================
 Apache UIMA UimaFIT Core (uimafit-core-2.2.0.jar)
 	Copyright © 2006-2013, The Apache Software Foundation.
@@ -476,6 +631,11 @@ Woodstox (woodstox-core-5.1.0.jar)
     License: Apache-2.0
     https://github.com/FasterXML/woodstox
 ===============================================================================
+XML APIs, xml-apis-1.4.01.jar, http://xml.apache.org/commons/components/external/
+-------------------------------------------------------------------------------
+Apache 2.0, W3C
+
+===============================================================================
 XmlBeans (xmlbeans-3.0.1.jar)
 	Copyright © 2004-2018 The Apache Software Foundation
     License: Apache-2.0
@@ -485,10 +645,17 @@ XmlSchema Core (xmlschema-core-2.2.3.jar)
 	Copyright 2004-2018 The Apache Software Foundation
     License: Apache-2.0
 ===============================================================================
+Apache XmpBox, xmpbox-2.0.23.jar, 
+-------------------------------------------------------------------------------
+Apache 2.0
+===============================================================================
 XMP Library For Java (xmpcore-5.1.3.jar)
+XMPCore Shaded, xmpcore-shaded-6.1.11.jar, https://github.com/tballison
+-------------------------------------------------------------------------------
 	Copyright (c) 2009, Adobe Systems Incorporated  All rights reserved.
     The BSD License  https://www.adobe.com/devnet/xmp/library/eula-xmp-library-java.html
     https://www.adobe.com/devnet/xmp.html
+    
 ===============================================================================
 XZ For Java (xz-1.8.jar)
     License: Public Domain. This Java implementation of XZ has been put into the public domain, thus you can do whatever you want with it. All the files in the package have been written by Lasse Collin, but some files are heavily based on public domain code written by Igor Pavlov.

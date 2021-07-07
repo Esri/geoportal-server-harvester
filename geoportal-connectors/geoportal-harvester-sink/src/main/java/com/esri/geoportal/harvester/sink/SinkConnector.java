@@ -77,5 +77,15 @@ public class SinkConnector implements InputConnector<InputBroker> {
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new SinkBroker(this, new SinkBrokerDefinitionAdaptor(definition));
   }
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      SinkBrokerDefinitionAdaptor adaptor = new SinkBrokerDefinitionAdaptor(definition);
+      return adaptor.getRootFolder()!=null? adaptor.getRootFolder().toString(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
+  }
   
 }

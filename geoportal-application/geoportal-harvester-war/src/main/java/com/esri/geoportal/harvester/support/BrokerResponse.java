@@ -27,18 +27,7 @@ public final class BrokerResponse {
   private final UUID uuid;
   private final Category category;
   private final EntityDefinition brokerDefinition;
-
-  /**
-   * Creates instance of the broker response.
-   * @param uuid broker uuid.
-   * @param category broker category
-   * @param brokerDefinition broker definition
-   */
-  public BrokerResponse(UUID uuid, Category category, EntityDefinition brokerDefinition) {
-    this.uuid = uuid;
-    this.category = category;
-    this.brokerDefinition = brokerDefinition;
-  }
+  private final String resourceLocator;
 
   /**
    * Creates instance of the broker response.
@@ -48,6 +37,7 @@ public final class BrokerResponse {
     this.uuid = brokerRef.getUuid();
     this.category = brokerRef.getCategory();
     this.brokerDefinition = brokerRef.getBrokerDefinition();
+    this.resourceLocator = brokerRef.getResourceLocator();
   }
   
   /**
@@ -81,5 +71,13 @@ public final class BrokerResponse {
    */
   public EntityDefinition getBrokerDefinition() {
     return brokerDefinition;
+  }
+
+  /**
+   * Gets resource locator.
+   * @return resource locator
+   */
+  public String getResourceLocator() {
+    return resourceLocator;
   }
 }

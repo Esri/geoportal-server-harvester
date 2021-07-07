@@ -82,5 +82,16 @@ public class AgsConnector implements InputConnector<InputBroker> {
   @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new AgsBroker(this, new AgsBrokerDefinitionAdaptor(definition), metaBuilder, gs);
+  } 
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      AgsBrokerDefinitionAdaptor adaptor = new AgsBrokerDefinitionAdaptor(definition);
+      return adaptor.getHostUrl()!=null? adaptor.getHostUrl().toExternalForm(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
   }
+  
 }

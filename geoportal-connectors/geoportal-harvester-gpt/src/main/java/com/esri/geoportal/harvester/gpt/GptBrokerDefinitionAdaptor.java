@@ -23,6 +23,7 @@ import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Map;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +42,8 @@ import org.apache.commons.lang3.StringUtils;
   private boolean emitJson = false;
   private boolean translatePdf = true;
   private boolean editable = false;
+  private String collections = "";
+  private String collectionsFieldName = "";
 
   /**
    * Creates instance of the adaptor.
@@ -73,6 +76,8 @@ import org.apache.commons.lang3.StringUtils;
       emitJson = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_ACCEPT_JSON)), false);
       translatePdf = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_TRANSLATE_PDF)), true);
       editable = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EDITABLE)), false);
+      collections = StringUtils.defaultIfBlank(get(P_COLLECTIONS), "");
+      collectionsFieldName = StringUtils.defaultIfBlank(get(P_COLLECTIONS_FLD), "");
     }
   }
 
@@ -86,6 +91,8 @@ import org.apache.commons.lang3.StringUtils;
     consume(params,P_ACCEPT_JSON);
     consume(params,P_TRANSLATE_PDF);
     consume(params,P_EDITABLE);
+    consume(params,P_COLLECTIONS);
+    consume(params,P_COLLECTIONS_FLD);
     credAdaptor.override(params);
   }
 
@@ -219,5 +226,51 @@ import org.apache.commons.lang3.StringUtils;
   public void setEditable(boolean editable) {
     this.editable = editable;
     set(P_EDITABLE, BooleanUtils.toStringTrueFalse(editable));
+  }
+
+  /**
+   * Gets collections
+   * @return the collections
+   */
+  public String getCollections() {
+    return collections;
+  }
+  
+  public String [] getCollectionsAsArray() {
+    if (collections==null) return null;
+    String [] collectionsArray = collections.split(",");
+    if (collectionsArray==null || collectionsArray.length==0) return null;
+    String[] finalCollections = Arrays.stream(collectionsArray)
+      .map(StringUtils::trimToNull)
+      .filter(collection -> collections!=null)
+      .toArray(String[]::new);
+    if (finalCollections==null || finalCollections.length==0) return null;
+    return finalCollections;
+  }
+
+  /**
+   * Sets collections
+   * @param collections the collections to set
+   */
+  public void setCollections(String collections) {
+    this.collections = StringUtils.defaultIfBlank(collections, "");
+    set(P_COLLECTIONS, StringUtils.defaultIfBlank(collections, ""));
+  }
+
+  /**
+   * Gets collections field name
+   * @return the collections field name
+   */
+  public String getCollectionsFieldName() {
+    return collectionsFieldName;
+  }
+
+  /**
+   * Sets collections field name
+   * @param collectionsFieldName the collections field name to set
+   */
+  public void setCollectionsFieldName(String collectionsFieldName) {
+    this.collectionsFieldName = StringUtils.defaultIfBlank(collectionsFieldName, "");
+    set(P_COLLECTIONS_FLD, StringUtils.defaultIfBlank(collectionsFieldName, ""));
   }
 }

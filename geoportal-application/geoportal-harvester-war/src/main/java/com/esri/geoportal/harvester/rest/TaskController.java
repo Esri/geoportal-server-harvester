@@ -384,7 +384,7 @@ public class TaskController {
       iteratorContext.setLastHarvest(incremental && lastEvent != null ? lastEvent.getStartTimestamp() : null);
 
       ProcessReference ref = engine.getExecutionService().execute(taskDefinition, iteratorContext);
-      ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref.getProcess(), historyManager));
+      ref.getProcess().addListener(new HistoryManagerAdaptor(taskId, ref, historyManager));
       ref.getProcess().init();
       ref.getProcess().begin();
       return new ResponseEntity<>(new ProcessResponse(

@@ -274,6 +274,9 @@ import java.util.stream.Collectors;
     byte[] bytes = XmlUtils.toString(document).getBytes("UTF-8");
 
     SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), serverResponse.url, null, URI.create(serverResponse.url), td.getSource().getRef(), td.getRef());
+    attributes.entrySet().forEach(entry -> {
+      ref.getAttributesMap().put(entry.getKey(), entry.getValue());
+    });
     if (definition.getEmitXml()) {
       ref.addContext(MimeType.APPLICATION_XML, bytes);
     }

@@ -90,4 +90,14 @@ public class JdbcConnector  implements InputConnector<InputBroker> {
     }
     return new UITemplate(getType(), bundle.getString("jdbc"), arguments);
   }
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      JdbcBrokerDefinitionAdaptor adaptor = new JdbcBrokerDefinitionAdaptor(definition);
+      return adaptor.getConnection()!=null? adaptor.getConnection().toString(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
+  }
 }

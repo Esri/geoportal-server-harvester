@@ -22,6 +22,7 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/App.html",
         "dojo/_base/lang",
         "dojo/topic",
+        "dojo/router",
         "dijit/form/CheckBox",
         "dijit/form/RadioButton",
         "dijit/layout/ContentPane", 
@@ -38,7 +39,7 @@ define(["dojo/_base/declare",
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,topic,
+           lang,topic,router,
            CheckBox,RadioButton,ContentPane,LayoutContainer,
            Header,Status,Nav,Stage,BrokersPane,TasksPane,HistoryPane,ProcessesPane
           ){
@@ -48,7 +49,51 @@ define(["dojo/_base/declare",
       templateString: template,
     
       postCreate: function(){
-        topic.publish("nav",{type: "processes"});
+        // home
+        router.register("/", function() {
+          router.go("/home");
+        });
+        router.register("/home", function() {
+          topic.publish("nav",{type: "processes"});
+        });
+        
+        // brokers
+        router.register("/brokers", function() {
+          topic.publish("nav",{type: "brokers"});
+        });
+        
+        // tasks
+        router.register("/tasks", function() {
+          topic.publish("nav",{type: "tasks"});
+        });
+        
+        // task history
+        router.register("/tasks/:uuid", function(evt) {
+          router.go("/tasks/" + evt.params.uuid + "/history");
+        });
+        router.register("/tasks/:uuid/history", function(evt) {
+          topic.publish("nav",{type: "history", uuid: evt.params.uuid});
+        });
+        
+        // task details
+        router.register("/tasks/:uuid/history/:eventid", function(evt) {
+          router.go("/tasks/" + evt.params.uuid + "/history/" + evt.params.eventid + "/details");
+        });
+        router.register("/tasks/:uuid/history/:eventid/details", function(evt) {
+          topic.publish("nav",{type: "details", uuid: evt.params.uuid, eventid: evt.params.eventid});
+        });
+        
+        // task failed documents
+        router.register("/tasks/:uuid/history/:eventid/failed", function(evt) {
+          topic.publish("nav",{type: "failed", uuid: evt.params.uuid, eventid: evt.params.eventid});
+        });
+        
+        
+        // initialize router
+        router.startup();
+        if (!location.hash || location.hash.length==0) {
+          router.go("/home");
+        }
       }
     });
 });

@@ -62,4 +62,14 @@ public class OaiConnector implements InputConnector<InputBroker> {
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new OaiBroker(this, new OaiBrokerDefinitionAdaptor(definition));
   }
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      OaiBrokerDefinitionAdaptor adaptor = new OaiBrokerDefinitionAdaptor(definition);
+      return adaptor.getHostUrl()!=null? adaptor.getHostUrl().toExternalForm(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
+  }
 }

@@ -50,7 +50,7 @@ public class FolderConnector implements OutputConnector<OutputBroker> {
       }
     });
     arguments.add(new UITemplate.BooleanArgument(P_FOLDER_SPLIT_FOLDERS, bundle.getString("folder.splitFolders")));
-    arguments.add(new UITemplate.StringArgument(P_FOLDER_SPLIT_SIZE, bundle.getString("folder.splitSize")));
+    arguments.add(new UITemplate.StringArgument(P_FOLDER_SPLIT_SIZE, bundle.getString("folder.splitSize"), true));
     arguments.add(new UITemplate.BooleanArgument(P_FOLDER_CLEANUP, bundle.getString("folder.cleanup")));
     return new UITemplate(getType(), bundle.getString("folder"), arguments);
   }
@@ -63,6 +63,16 @@ public class FolderConnector implements OutputConnector<OutputBroker> {
   @Override
   public OutputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new FolderBroker(this,new FolderBrokerDefinitionAdaptor(definition));
+  }
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      FolderBrokerDefinitionAdaptor adaptor = new FolderBrokerDefinitionAdaptor(definition);
+      return adaptor.getRootFolder()!=null? adaptor.getRootFolder().toString(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
   }
   
 }

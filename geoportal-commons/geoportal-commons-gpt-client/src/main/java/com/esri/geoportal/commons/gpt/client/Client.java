@@ -17,6 +17,8 @@ package com.esri.geoportal.commons.gpt.client;
 
 import com.esri.geoportal.commons.constants.HttpConstants;
 import com.esri.geoportal.commons.gpt.client.QueryResponse.Hit;
+import com.esri.geoportal.commons.meta.Attribute;
+import com.esri.geoportal.commons.meta.util.WKAConstants;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -38,6 +40,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -85,6 +88,7 @@ public class Client implements Closeable {
   private final URL url;
   private final SimpleCredentials cred;
   private final String index;
+  private final String collectionsFieldName;
 
   private TokenInfo tokenInfo;
 
@@ -97,12 +101,14 @@ public class Client implements Closeable {
    * @param url URL of the GPT REST end point
    * @param cred credentials
    * @param index index name
+   * @param collectionsFieldName collections field name
    */
-  public Client(CloseableHttpClient httpClient, URL url, SimpleCredentials cred, String index) {
+  public Client(CloseableHttpClient httpClient, URL url, SimpleCredentials cred, String index, String collectionsFieldName) {
     this.httpClient = httpClient;
     this.url = url;
     this.cred = cred;
     this.index = StringUtils.defaultIfBlank(index, DEFAULT_INDEX);
+    this.collectionsFieldName = collectionsFieldName;
 
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -114,9 +120,10 @@ public class Client implements Closeable {
    * @param url URL of the GPT REST end point
    * @param cred credentials
    * @param index index name
+   * @param collectionsFieldName collections field name
    */
-  public Client(URL url, SimpleCredentials cred, String index) {
-    this(HttpClientBuilder.create().useSystemProperties().build(), url, cred, index);
+  public Client(URL url, SimpleCredentials cred, String index, String collectionsFieldName) {
+    this(HttpClientBuilder.create().useSystemProperties().build(), url, cred, index, collectionsFieldName);
   }
 
   /**
@@ -128,11 +135,18 @@ public class Client implements Closeable {
    * @param xml xml
    * @param json json
    * @param forceAdd <code>true</code> to force add.
+   * @param collections list of collections
    * @return response information
    * @throws IOException if reading response fails
    * @throws URISyntaxException if URL has invalid syntax
    */
-  public PublishResponse publish(PublishRequest data, Map<String, Object> attributes, String id, String xml, String json, boolean forceAdd) throws IOException, URISyntaxException {
+  public PublishResponse publish(
+    PublishRequest data, 
+    Map<String, Object> attributes, 
+    String id, 
+    String xml, String json, 
+    boolean forceAdd,
+    String [] collections) throws IOException, URISyntaxException {
 
     ObjectNode jsonRequest = mapper.convertValue(data, ObjectNode.class);
     if (xml != null) {
@@ -154,6 +168,30 @@ public class Client implements Closeable {
               Double ymin = fullExtent.path("ymin").asDouble();
               Double xmax = fullExtent.path("xmax").asDouble();
               Double ymax = fullExtent.path("ymax").asDouble();
+              
+              if (attributes.containsKey(WKAConstants.WKA_BBOX)) {
+                Object boxObj = attributes.get(WKAConstants.WKA_BBOX);
+                if (boxObj!=null && boxObj instanceof Attribute) {
+                  String parts [] = ((Attribute)boxObj).getValue().split(",");
+                  if (parts!=null && parts.length==2) {
+                    String ll[] = parts[0].split(" ");
+                    String ur[] = parts[1].split(" ");
+                    if (ll!=null && ll.length==2 && ur!=null && ur.length==2) {
+                      Double b_xmin = parseDouble(ll[0]);
+                      Double b_ymin = parseDouble(ll[1]);
+                      Double b_xmax = parseDouble(ur[0]);
+                      Double b_ymax = parseDouble(ur[1]);
+                      
+                      if (b_xmin!=null && b_ymin!=null && b_xmax!=null && b_ymax!=null) {
+                        xmin = b_xmin;
+                        ymin = b_ymin;
+                        xmax = b_xmax;
+                        ymax = b_ymax;
+                      }
+                    }
+                  }
+                }
+              }
 
               ObjectNode envelope_geo = mapper.createObjectNode();
               envelope_geo.put("type", "envelope");
@@ -252,6 +290,18 @@ public class Client implements Closeable {
       }
     }
 
+    if (collections!=null) {
+      List<String> collectionsList = Arrays.stream(collections)
+        .map(StringUtils::trimToNull)
+        .filter(collection -> collection!=null)
+        .collect(Collectors.toList());
+      
+      if (!collectionsList.isEmpty()) {
+        ArrayNode collectionsArray = jsonRequest.putArray(collectionsFieldName);
+        collectionsList.forEach(collectionsArray::add);
+      }
+    }
+    
     String strRequest = mapper.writeValueAsString(jsonRequest);
     StringEntity entity = new StringEntity(strRequest, "UTF-8");
 
@@ -271,6 +321,14 @@ public class Client implements Closeable {
     }
   }
 
+  private Double parseDouble(String val) {
+    try {
+      return Double.parseDouble(val);
+    } catch (Exception ex) {
+      return null;
+    }
+  }
+  
   /**
    * Reads metadata.
    *

@@ -19,13 +19,17 @@ import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.harvester.api.ProcessInstance;
 import com.esri.geoportal.harvester.support.ProcessResponse;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.engine.managers.History;
+import com.esri.geoportal.harvester.engine.managers.History.Event;
 import com.esri.geoportal.harvester.engine.services.Engine;
 import com.esri.geoportal.harvester.engine.utils.Statistics;
 import com.esri.geoportal.harvester.support.ProcessStatisticsResponse;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +63,7 @@ public class ProcessController {
    * @return all processes
    */
   @RequestMapping(value = "/rest/harvester/processes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ProcessResponse[]> listAllProcesses() {
+  public ResponseEntity<ProcessStatisticsResponse[]> listAllProcesses() {
     try {
       LOG.debug(String.format("GET /rest/harvester/processes"));
       return new ResponseEntity<>(filterProcesses(e->true),HttpStatus.OK);
@@ -80,11 +84,66 @@ public class ProcessController {
       LOG.debug(formatForLog("GET /rest/harvester/processes/%s", processId));
       ProcessInstance process = engine.getProcessesService().getProcess(processId);
       Statistics statistics = engine.getProcessesService().getStatistics(processId);
+      
+      if (statistics==null) {
+        // If statistics is null that mean the proces has completed (no longer in the memory).
+        // Obtain statistics from the history.
+        History history = engine.getTasksService().getHistory(UUID.fromString(process.getTask().getRef()));
+        if (history!=null) {
+          for (Event evt: history) {
+            if (evt.getUuid().equals(processId)) {
+              final History.Report rpt = evt.getReport();
+              statistics = createStatistics(evt, rpt);
+              break;
+            }
+          }
+        }
+      }
+      
       return new ResponseEntity<>(process!=null? new ProcessStatisticsResponse(processId, process.getTask().getTaskDefinition(), process.getStatus(), statistics): null,HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(formatForLog("Error getting process info: %s", processId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+  
+  private Statistics createStatistics(Event evt, History.Report rpt) {
+    return new Statistics() {
+      @Override
+      public Date getEndDate() {
+        return evt.getEndTimestamp();
+      }
+
+      @Override
+      public long getHarvestFailed() {
+        return rpt.failedToHarvest;
+      }
+
+      @Override
+      public long getPublishFailed() {
+        return rpt.failedToPublish;
+      }
+
+      @Override
+      public Date getStartDate() {
+        return evt.getStartTimestamp();
+      }
+
+      @Override
+      public long getAcquired() {
+        return rpt.acquired;
+      }
+
+      @Override
+      public long getSucceeded() {
+        return rpt.created + rpt.updated;
+      }
+
+      @Override
+      public boolean isFailure() {
+        return rpt.failed > 0;
+      }
+    };
   }
   
   /**
@@ -140,13 +199,33 @@ public class ProcessController {
    * @param predicate predicate
    * @return array of filtered processes
    */
-  private ProcessResponse[] filterProcesses(Predicate<? super Map.Entry<UUID, ProcessInstance>> predicate) throws DataProcessorException {
+  private ProcessStatisticsResponse[] filterProcesses(Predicate<? super Map.Entry<UUID, ProcessInstance>> predicate) throws DataProcessorException {
     return engine.getProcessesService().selectProcesses(predicate).stream()
-            .map(e->new ProcessResponse(
+            .map(e->{ 
+              Statistics statistics = null;
+              try {
+                statistics = engine.getProcessesService().getStatistics(e.getKey());
+                if (statistics==null) {
+                  History history = engine.getTasksService().getHistory(UUID.fromString(e.getValue().getTask().getRef()));
+                  if (history!=null) {
+                    for (Event evt: history) {
+                      if (evt.getUuid().equals( e.getKey())) {
+                        final History.Report rpt = evt.getReport();
+                        statistics = createStatistics(evt, rpt);
+                        break;
+                      }
+                    }
+                  }
+                }
+              } catch (DataProcessorException ex) {
+                LOG.warn("Error filterig processes", ex);
+              }
+              return new ProcessStatisticsResponse(
                     e.getKey(),
                     e.getValue().getTask().getTaskDefinition(), 
-                    e.getValue().getStatus()))
-            .collect(Collectors.toList()).toArray(new ProcessResponse[0]);
+                    e.getValue().getStatus(), statistics); 
+            })
+            .collect(Collectors.toList()).toArray(new ProcessStatisticsResponse[0]);
   }
   
 }

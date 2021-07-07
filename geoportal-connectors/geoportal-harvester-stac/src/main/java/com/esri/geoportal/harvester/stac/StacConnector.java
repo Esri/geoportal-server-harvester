@@ -38,6 +38,7 @@ public class StacConnector implements InputConnector<InputBroker> {
 
   /**
    * Creates instance of the connector.
+   * @param metaBuilder metadata builder
    */
   public StacConnector(MetaBuilder metaBuilder) {
     this.metaBuilder = metaBuilder;
@@ -71,5 +72,15 @@ public class StacConnector implements InputConnector<InputBroker> {
   @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new StacBroker(this, new StacBrokerDefinitionAdaptor(definition), metaBuilder);
+  }
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      StacBrokerDefinitionAdaptor adaptor = new StacBrokerDefinitionAdaptor(definition);
+      return adaptor.getHostUrl()!=null? adaptor.getHostUrl().toExternalForm(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
   }
 }

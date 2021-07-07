@@ -50,5 +50,15 @@ public class ConsoleConnector implements OutputConnector<OutputBroker> {
   public OutputBroker createBroker(EntityDefinition entityDefinition) throws InvalidDefinitionException {
     return new ConsoleBroker(this, new ConsoleBrokerDefinitionAdaptor(entityDefinition));
   }
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      new ConsoleBrokerDefinitionAdaptor(definition);
+      return "console";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
+  }
   
 }

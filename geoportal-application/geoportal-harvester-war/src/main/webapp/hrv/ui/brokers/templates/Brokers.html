@@ -1,16 +1,31 @@
 <div class="h-brokers" data-dojo-attach-point="contentNode">
   <div class="h-brokers-caption">
     <span class="h-brokers-caption-text" data-dojo-attach-point="captionNode"></span>
+    <span class="h-brokers-filter">
+      <select
+        name="filterSelect"
+        data-dojo-attach-point="filterSelect"
+        data-dojo-type="dijit/form/Select"
+        data-dojo-attach-event="change: _onChangeFilter"
+      ></select>
+    </span>
     <span class="h-brokers-caption-grouping">
-      <input id="groupBy_${id}" 
-             data-dojo-type="dijit/form/CheckBox" 
-             data-dojo-attach-event="onChange: _onGroupByClicked"
-             data-dojo-attach-point="groupByCheckBox"/>
+      <input
+        id="groupBy_${id}"
+        data-dojo-type="dijit/form/CheckBox"
+        data-dojo-attach-event="onChange: _onGroupByClicked"
+        data-dojo-attach-point="groupByCheckBox"
+      />
       <label for="groupBy_${id}">${i18n.brokers.groupBy}</label>
     </span>
+    <button
+      class="h-brokers-add"
+      data-dojo-type="dijit/form/Button"
+      type="button"
+      data-dojo-attach-event="onClick:_onAdd"
+    >
+      ${i18n.brokers.add}
+    </button>
   </div>
   <div class="h-brokers-content" data-dojo-attach-point="contentNode"></div>
-  <div class="h-brokers-footer" data-dojo-attach-point="footerNode">
-    <button class="h-brokers-add" data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-event="onClick:_onAdd">${i18n.brokers.add}</button>
-  </div>
 </div>

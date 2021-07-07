@@ -88,4 +88,14 @@ public class DataGovConnector extends CkanConnector {
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new DataGovBroker(this, new DataGovBrokerDefinitionAdaptor(definition), metaBuilder);
   }
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      DataGovBrokerDefinitionAdaptor adaptor = new DataGovBrokerDefinitionAdaptor(definition);
+      return adaptor.getHostUrl()!=null? adaptor.getHostUrl().toExternalForm(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
+  }
 }

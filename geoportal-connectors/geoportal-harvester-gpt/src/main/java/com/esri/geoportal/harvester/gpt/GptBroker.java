@@ -49,12 +49,14 @@ import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * GPT broker.
  */
 /*package*/ class GptBroker implements OutputBroker {
 
+  public static final String DEFAULT_COLLECTIONS_FIELD_NAME = "src_collections_s";
   private final static Logger LOG = LoggerFactory.getLogger(GptBroker.class);
   private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
   private final static String SBOM = generateSBOM();
@@ -93,7 +95,8 @@ import java.util.stream.Collectors;
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     try {
-      client = new Client(definition.getHostUrl(), definition.getCredentials(), definition.getIndex());
+      client = new Client(definition.getHostUrl(), definition.getCredentials(), definition.getIndex(), 
+        StringUtils.defaultIfBlank(definition.getCollectionsFieldName(), DEFAULT_COLLECTIONS_FIELD_NAME));
 
       if (!context.canCleanup()) {
         preventCleanup = true;
@@ -199,7 +202,7 @@ import java.util.stream.Collectors;
         }
       }
 
-      PublishResponse response = client.publish(data, ref.getAttributesMap(), uuid, xml, json, definition.getForceAdd());
+      PublishResponse response = client.publish(data, ref.getAttributesMap(), uuid, xml, json, definition.getForceAdd(), definition.getCollectionsAsArray());
       if (response == null) {
         throw new DataOutputException(this, ref, "No response received");
       }

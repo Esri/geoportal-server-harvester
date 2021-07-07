@@ -30,6 +30,7 @@ define(["dojo/_base/declare",
         "dijit/Dialog",
         "dijit/form/Button",
         "dijit/form/CheckBox",
+        "dijit/form/Select",
         "hrv/rest/Brokers",
         "hrv/ui/brokers/Broker",
         "hrv/ui/brokers/BrokerEditorPane"
@@ -38,7 +39,7 @@ define(["dojo/_base/declare",
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
            lang,array,on,html,domConstruct,json,topic,
-           Dialog,Button,CheckBox,
+           Dialog,Button,CheckBox,Select,
            BrokersREST,Broker,BrokerEditorPane
           ){
   
@@ -51,7 +52,6 @@ define(["dojo/_base/declare",
       postCreate: function(){
         this.inherited(arguments);
         html.set(this.captionNode,this.i18n.brokers[this.category]);
-        this.load(this.groupByCheckBox.get('checked'));
       },
       
       destroy: function() {
@@ -75,6 +75,7 @@ define(["dojo/_base/declare",
         BrokersREST[this.category]().then(
           lang.hitch(this,function(response){ 
             this.response = response;
+            this.processBrokersTypes(response);
             this.processBrokers(response, grouping); 
           }),
           lang.hitch(this,function(error){
@@ -82,6 +83,16 @@ define(["dojo/_base/declare",
             topic.publish("msg", new Error(this.i18n.brokers.errors.access));
           })
         );
+      },
+      
+      processBrokersTypes: function(response) {
+        this.filterSelect.getOptions().forEach(lang.hitch(this, function(opt) {
+          this.filterSelect.removeOption(opt);
+        }));
+        this.filterSelect.addOption({value: " ", label: this.i18n.general.all});
+        new Set(response.map(b => b.brokerDefinition.type)).forEach(lang.hitch(this, function(type) {
+          this.filterSelect.addOption({value: type, label: type});
+        }));
       },
       
       compareBrokerDefinitons: function(bd1, bd2) {
@@ -108,6 +119,14 @@ define(["dojo/_base/declare",
       },
       
       processBrokers: function(response, grouping) {
+        
+        var filter = this.filterSelect.getValue().trim();
+        if (filter.length > 0) {
+          response = response.filter(function(r) {
+            return r.brokerDefinition.type === filter;
+          });
+        }
+        
         if (grouping) {
           
           var groups = {};
@@ -218,6 +237,11 @@ define(["dojo/_base/declare",
       _onGroupByClicked: function(evt) {
         this.clear();
         this.processBrokers(this.response, evt);
+      },
+      
+      _onChangeFilter: function(evt) {
+        this.clear();
+        this.processBrokers(this.response, this.groupByCheckBox.get('checked'));
       }
     });
 });

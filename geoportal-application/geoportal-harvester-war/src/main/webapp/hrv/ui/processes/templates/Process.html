@@ -1,7 +1,33 @@
 <div class="h-processes-process" data-dojo-attach-point="contentNode">
-  <span class="h-processes-process-uuid">${data.uuid}</span>
-  <span class="h-processes-process-title" data-dojo-attach-point="titleNode"></span>
-  <span class="h-processes-process-status h-status-${data.status}" data-dojo-attach-point="statusNode">${data.status}</span>
-  <span class="h-processes-process-progress" data-dojo-attach-point="progressNode"></span>
-  <span class="h-processes-process-cancel" style="display: none;" data-dojo-attach-point="cancelNode" data-dojo-attach-event="onclick: _onCancel">${i18n.processes.cancel}</span>
+  <div class="h-processes-process-main">
+    <span class="h-processes-process-main-title">
+      <span class="h-processes-process-uuid">${data.uuid}</span>
+      <span class="h-processes-process-title" data-dojo-attach-point="titleNode"></span>
+      <span
+        class="h-processes-process-status h-status-${data.status}"
+        data-dojo-attach-point="statusNode"
+        >${data.status}</span
+      >
+    </span>
+    <span class="h-processes-process-main-controls">
+      <span
+        class="h-processes-process-history"
+        style="display: none"
+        data-dojo-attach-point="historyLinkNode"
+        data-dojo-attach-event="onclick: _onHistory"
+        >${i18n.processes.history}</span
+      >
+      <span
+        class="h-processes-process-cancel"
+        style="display: none"
+        data-dojo-attach-point="cancelNode"
+        data-dojo-attach-event="onclick: _onCancel"
+        >${i18n.processes.cancel}</span
+      >
+    </span>
+  </div>
+  <div class="h-processes-process-extra">
+    <span class="h-processes-process-progress" data-dojo-attach-point="progressNode"></span>
+    <span class="h-processes-process-progress" data-dojo-attach-point="timesNode"></span>
+  </div>
 </div>

@@ -194,7 +194,7 @@ public class DefaultTasksService implements TasksService {
       
       return broker.readContent(recordId);
     } catch (InvalidDefinitionException|DataProcessorException|HttpResponseException ex) {
-      throw new DataInputException(broker, String.format("Error fetching content from: %s -> $s", taskId, recordId), ex);
+      throw new DataInputException(broker, String.format("Error fetching content from: %s -> %s", taskId, recordId, ex.getMessage()), ex);
     } finally {
       if (broker!=null) {
         broker.terminate();

@@ -18,13 +18,13 @@ package com.esri.geoportal.commons.robots;
 import java.io.IOException;
 import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.Rule;
-import org.mockserver.client.server.MockServerClient;
-import org.mockserver.junit.MockServerRule;
+import org.junit.BeforeClass;
+import org.mockserver.client.MockServerClient;
+import org.mockserver.integration.ClientAndServer;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -32,14 +32,14 @@ import static org.mockserver.model.HttpResponse.response;
  * Bots test.
  */
 public class BotsTest {
-
-  @Rule
-  public MockServerRule server = new MockServerRule(this,5000);
   
-  private MockServerClient client;
+  public static ClientAndServer server;
+  
+  public static MockServerClient client;
 
-  @Before
-  public void setupClass() throws IOException {
+  @BeforeClass
+  public static void setupClass() throws IOException {
+    server = startClientAndServer(5000);
     client = new MockServerClient("localhost", 5000);
     client.when(
                     request()
@@ -49,12 +49,14 @@ public class BotsTest {
             .respond(
                     response()
                     .withStatusCode(200)
-                    .withBody(readAndClose(getClass().getResourceAsStream("/robots.txt")))
+                    .withBody(readAndClose(BotsTest.class.getResourceAsStream("/robots.txt")))
             );
   }
+
   
-  @After
-  public void destroy() {
+  @AfterClass
+  public static void after()  {
+    server.stop();
     client.stop();
   }
   
@@ -83,7 +85,7 @@ public class BotsTest {
     assertTrue("Access denied", access.hasAccess());
   }
 
-  private String readAndClose(InputStream in) throws IOException {
+  private static String readAndClose(InputStream in) throws IOException {
     try (InputStream input=in) {
       return IOUtils.toString(input, "UTF-8");
     }

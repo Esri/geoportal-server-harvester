@@ -23,6 +23,7 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/topic",
+        "dojo/router",
         "dojo/dom-style",
         "dojo/html",
         "dojo/on",
@@ -34,7 +35,8 @@ define(["dojo/_base/declare",
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,array,topic,domStyle,html,on,domConstruct,
+           lang,array,topic,router,
+           domStyle,html,on,domConstruct,
            TasksREST,Event,TaskUtils
           ){
   
@@ -62,33 +64,30 @@ define(["dojo/_base/declare",
       
       _onEventClicked: function(evt) {
         this._empty();
-        TasksREST.getFailedDocuments(evt.data.uuid).then(lang.hitch(this, function(failedDocuments) { 
-          this._handleFailedDocuments(failedDocuments); 
+        router.go("/tasks/" + evt.taskid + "/history/" + evt.data.uuid + "/failed");
+      },
+      
+      _onMoreClicked: function(evt) {
+        this._empty();
+        router.go("/tasks/" + evt.taskid + "/history/" + evt.data.uuid + "/details");
+      },
+      
+      loadFailedDocuments: function(taskid, eventid) {
+        TasksREST.getFailedDocuments(eventid).then(lang.hitch(this, function(failedDocuments) { 
+          this._handleFailedDocuments(taskid, failedDocuments); 
         }), lang.hitch(this, function(error){
           console.debug(error);
           topic.publish("msg", new Error(this.i18n.tasks.errors.accessFialed));
         }));
       },
       
-      _onMoreClicked: function(evt) {
-        this._empty();
-        var data = evt.data;
-        if (data && data.details && data.details.length > 0) {
-          array.forEach(data.details, lang.hitch(this, function(details){
-            var span = domConstruct.create("div", {}, this.failedNode);
-            var detailsNode = domConstruct.create("div", {innerHTML: details, className: "h-event-details"}, span);
-          }));
-        }
-        console.log("More clicked", evt.data);
-      },
-      
-      _handleFailedDocuments: function(failedDocuments) {
+      _handleFailedDocuments: function(taskid, failedDocuments) {
         if (failedDocuments) {
           array.forEach(failedDocuments, lang.hitch(this,function(recordId) {
             var span = domConstruct.create("div", {}, this.failedNode);
-            var link = domConstruct.create("a", {innerHTML: recordId, href: "#"}, span);
+            var link = domConstruct.create("a", {innerHTML: recordId, href: "javascript:void(0)"}, span);
             this.handles.push(on(link, "click", lang.hitch(this, function(evt){
-              TasksREST.getFailedRecord(this.data.uuid, recordId).then(lang.hitch(this, function(response){
+              TasksREST.getFailedRecord(taskid, recordId).then(lang.hitch(this, function(response){
                 var newWindow = window.open(null, "_blank");
                 newWindow.document.open();
                 newWindow.document.write(response
@@ -111,17 +110,71 @@ define(["dojo/_base/declare",
       
       _onNav: function(evt) {
         this._empty();
-        if (evt.type!=="history") {
-          array.forEach(this.widgets,function(widget){
-            widget.destroy();
-          });
+        switch (evt.type) {
+          case "history":
+            this.destroyWidgets();
+            this.loadHistory(evt.uuid);
+            domStyle.set(this.domNode, "display", "block");
+            break;
+            
+          case "details":
+            if (this.widgets.length==0)
+              this.loadHistory(evt.uuid);
+            this.loadDetails(evt.uuid, evt.eventid).then(lang.hitch(this, function(details) {
+              array.forEach(details, lang.hitch(this, function(detail){
+                var span = domConstruct.create("div", {}, this.failedNode);
+                var detailsNode = domConstruct.create("div", {innerHTML: detail, className: "h-event-details"}, span);
+              }));
+            }));
+            domStyle.set(this.domNode, "display", "block");
+            break;
+            
+          case "failed":
+            if (this.widgets.length==0)
+              this.loadHistory(evt.uuid);
+            this.loadFailedDocuments(evt.uuid, evt.eventid);
+            domStyle.set(this.domNode, "display", "block");
+            break;
+            
+          default:
+            this.destroyWidgets();
+            domStyle.set(this.domNode, "display", "none");
+            break;
         }
-        domStyle.set(this.domNode,"display", evt.type==="history"? "block": "none");
-        if (evt.data && evt.data.taskDefinition) {
-          this.data = evt.data;
-          html.set(this.labelNode, TaskUtils.makeLabel(evt.data.taskDefinition));
-          TasksREST.history(evt.data.uuid).then(
-            lang.hitch(this,this.processHistory),
+      },
+      
+      destroyWidgets: function() {
+        array.forEach(this.widgets,function(widget){
+          widget.destroy();
+        });
+      },
+      
+      loadDetails: function(taskid, eventid) {
+        return TasksREST.history(taskid).then(
+          lang.hitch(this,function(history) {
+            var event = history? history.find(function(h) { return h.uuid === eventid; }): null
+            return event && event.details? event.details: null;
+          }),
+          lang.hitch(this,function(error){
+            console.error(error);
+            topic.publish("msg",topic.publish("msg", new Error(this.i18n.tasks.errors.accessHistory)));
+          })
+        );
+      },
+      
+      loadHistory: function(taskid) {
+        if (taskid) {
+          TasksREST.read(taskid).then(
+            lang.hitch(this, function(response) {
+              html.set(this.labelNode, TaskUtils.makeLabel(response.taskDefinition));
+            }),
+            lang.hitch(this,function(error){
+              console.error(error);
+              topic.publish("msg",topic.publish("msg", new Error(this.i18n.tasks.errors.accessHistory)));
+            })
+          );
+          TasksREST.history(taskid).then(
+            lang.hitch(this,function(history) { this.processHistory(taskid, history); }),
             lang.hitch(this,function(error){
               console.error(error);
               topic.publish("msg",topic.publish("msg", new Error(this.i18n.tasks.errors.accessHistory)));
@@ -130,12 +183,16 @@ define(["dojo/_base/declare",
         }
       },
       
-      processHistory: function(response) {
-        array.forEach(response.sort(function(l,r){return r.startTimestamp - l.startTimestamp;}),lang.hitch(this,this.processEvent));
+      processHistory: function(taskid, history) {
+        array.forEach(history.sort(function(l,r){return r.startTimestamp - l.startTimestamp;}),
+          lang.hitch(this,function(event) { 
+            this.processEvent(taskid, event);
+          })
+        );
       },
       
-      processEvent: function(event) {
-        var widget = new Event(event);
+      processEvent: function(taskid, event) {
+        var widget = new Event({taskid: taskid, event: event});
         widget.placeAt(this.contentNode);
         widget.startup();
         this.widgets.push(widget);

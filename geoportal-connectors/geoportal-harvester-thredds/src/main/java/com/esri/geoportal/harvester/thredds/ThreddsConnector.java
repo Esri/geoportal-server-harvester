@@ -68,4 +68,14 @@ public class ThreddsConnector implements InputConnector<InputBroker> {
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
     return new ThreddsBroker(this, new ThreddsBrokerDefinitionAdaptor(definition));
   }
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      ThreddsBrokerDefinitionAdaptor adaptor = new ThreddsBrokerDefinitionAdaptor(definition);
+      return adaptor.getHostUrl()!=null? adaptor.getHostUrl().toExternalForm(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
+  }
 }

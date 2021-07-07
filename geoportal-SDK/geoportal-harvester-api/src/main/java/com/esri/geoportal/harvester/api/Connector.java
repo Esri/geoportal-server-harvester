@@ -50,4 +50,11 @@ public interface Connector<B extends Broker> extends Entity {
    * @throws InvalidDefinitionException if provided definition is invalid
    */
   B createBroker(EntityDefinition definition) throws InvalidDefinitionException;
+  
+  /**
+   * Gets resource locator.
+   * @param definition connector definition
+   * @return resource locator (URL, URI, JNDI, etc.)
+   */
+  String getResourceLocator(EntityDefinition definition);
 }

@@ -16,7 +16,6 @@
 package com.esri.geoportal.harvester.support;
 
 import com.esri.geoportal.harvester.engine.managers.History;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -48,6 +47,7 @@ public final class EventResponse {
    * @param failed number of failed records
    * @param failedToHarvest number of records failed to harvest
    * @param failedToPublish number of records failed to publish
+   * @param details list of details
    */
   public EventResponse(
           UUID uuid, 

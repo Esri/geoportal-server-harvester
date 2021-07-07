@@ -66,4 +66,14 @@ public class MigrationConnector implements InputConnector<InputBroker>{
     arguments.add(new UITemplate.BooleanArgument(P_PRESERVE_UUIDS, bundle.getString("migration.preserveuuids"), true));
     return new UITemplate(getType(), bundle.getString("migration"), arguments);
   }
+
+  @Override
+  public String getResourceLocator(EntityDefinition definition) {
+    try {
+      MigrationBrokerDefinitionAdaptor adaptor = new MigrationBrokerDefinitionAdaptor(definition);
+      return adaptor.getJndi()!=null? adaptor.getJndi(): "";
+    } catch (InvalidDefinitionException ex) {
+      return "";
+    }
+  }
 }

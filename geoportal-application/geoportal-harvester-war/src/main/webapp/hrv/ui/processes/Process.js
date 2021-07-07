@@ -25,13 +25,14 @@ define(["dojo/_base/declare",
         "dojo/dom-style",
         "dojo/html",
         "dojo/topic",
+        "dojo/router",
         "hrv/rest/Processes",
         "hrv/utils/TaskUtils"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,domClass,domStyle,html,topic,
+           lang,domClass,domStyle,html,topic,router,
            ProcessesREST, TaskUtils
           ){
   
@@ -63,23 +64,36 @@ define(["dojo/_base/declare",
               domClass.remove(this.statusNode,"h-status-completed");
               domClass.add(this.statusNode,"h-status-"+result.status);
               domStyle.set(this.cancelNode,"display",result.status==="working"? "inline": "none");
-              domStyle.set(this.progressNode,"display",result.status==="working"? "inline": "none");
-              if (result.status==="working" && result.statistics) {
-                var now = new Date();
-                if (this.data.taskDefinition.source.type !== "SINK") {
-                  var start = new Date(result.statistics.startDate);
-                  var duration = (now-start)>0? (now-start)/1000/60: 0;
-                  var velocity = result.statistics.acquired>0 && duration>0? Math.round(result.statistics.acquired/duration): null;
-                  var progress = ""+result.statistics.acquired + (velocity? " ("+velocity+"/"+this.i18n.processes.min+")": "");
-                  html.set(this.progressNode, progress);
-                } else {
-                  var progress = ""+result.statistics.acquired;
-                  html.set(this.progressNode, progress);
-                }
-              }
+              
               if (result.status==="working" || result.status==="aborting") {
+                if (result.statistics) {
+                  if (this.data.taskDefinition.source.type !== "SINK") {
+                    this._printOngoingProgress(result.statistics);
+                  } else {
+                    var progress = ""+result.statistics.acquired;
+                    html.set(this.progressNode, progress);
+                  }
+                  this._printTime(result.statistics);
+                }
+                
                 this.timerHandler = setTimeout(update,2000);
               }
+              
+              if (result.status==="completed") {
+                this.data.statistics = result.statistics;
+                
+                this._printFinalProgress(this.data.statistics);
+                this._printTime(this.data.statistics);
+                domStyle.set(this.historyLinkNode, "display", "block");
+                
+                // if status changed let the container refresh list of processes
+                if (this.data.status !== "completed") {
+                  this.emit("refresh");
+                }
+              }
+              
+              this.data.status = result.status;
+              topic.publish("process.status", this.data);
             }),
             lang.hitch(this,function(error){
               topic.publish("msg", new Error(this.i18n.processes.errors.canceling));
@@ -91,6 +105,52 @@ define(["dojo/_base/declare",
         }
         if (this.data.status!=="completed") {
           update();
+        } else {
+          this._printFinalProgress(this.data.statistics);
+          this._printTime(this.data.statistics);
+        }
+        domStyle.set(this.historyLinkNode, "display", "block");
+        topic.publish("process.status", this.data);
+      },
+      
+      _printTime: function(statistics) {
+        if (statistics) {
+          var startDate = statistics.startDate? this._formatTime(new Date(statistics.startDate)): null;
+          var endDate = statistics.endDate? this._formatTime(new Date(statistics.endDate)): null;
+
+          var startInfo = (startDate? this.i18n.processes.started + ": " + startDate: null);
+          var endInfo = (endDate? this.i18n.processes.finished + ": " + endDate: null);
+
+          var info = startInfo && endInfo? startInfo + ", " + endInfo:
+                     startInfo? startInfo: endInfo? endInfo: "";
+
+          html.set(this.timesNode, info);
+        }
+      },
+      
+      _formatTime(time) {
+        if (time) {
+          return time.toLocaleTimeString().replaceAll(/:\d+\s+/g," ");
+        }
+        
+        return null;
+      },
+      
+      _printOngoingProgress: function(statistics) {
+        if (statistics) {
+          var now = new Date();
+          var start = new Date(statistics.startDate);
+          var duration = (now-start)>0? (now-start)/1000/60: 0;
+          var velocity = statistics.acquired>0 && duration>0? Math.round(statistics.acquired/duration): null;
+          var progress = ""+statistics.acquired + (velocity? " ("+velocity+"/"+this.i18n.processes.min+")": "");
+          html.set(this.progressNode, progress);
+        }
+      },
+      
+      _printFinalProgress: function(statistics) {
+        if (statistics) {
+          var progress = ""+this.data.statistics.succeeded + "/" + this.data.statistics.acquired;
+          html.set(this.progressNode, progress);
         }
       },
       
@@ -104,7 +164,12 @@ define(["dojo/_base/declare",
       },
       
       _onCanceled: function(evt) {
-        this.emit("reload");
+        // let the container refresh list of processes
+        this.emit("refresh");
+      },
+      
+      _onHistory: function(evt) {
+        router.go("/tasks/" + this.params.taskDefinition.ref + "/history");
       }
     });
 });
