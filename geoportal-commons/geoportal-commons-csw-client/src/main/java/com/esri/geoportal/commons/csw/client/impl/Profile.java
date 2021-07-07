@@ -40,7 +40,8 @@ import org.xml.sax.InputSource;
  * Profile implementation.
  */
 public class Profile implements IProfile {
-  private final Logger LOG = LoggerFactory.getLogger(Profile.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Profile.class);
+  private final StreamOpener streamOpener;
 
   private String id;
   private String name;
@@ -50,6 +51,10 @@ public class Profile implements IProfile {
   private String getRecordsRspXslt;
   private String getRecordByIdReqKVP;
   private String getRecordByIdRspXslt;
+
+  public Profile(StreamOpener streamOpener) {
+    this.streamOpener = streamOpener;
+  }
 
   @Override
   public String getId() {
@@ -126,7 +131,7 @@ public class Profile implements IProfile {
     String internalRequestXml = createInternalXmlRequest(criteria);
     try (
             ByteArrayInputStream internalRequestInputStream = new ByteArrayInputStream(internalRequestXml.getBytes("UTF-8"));
-            InputStream reqXsltInputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(Constants.CONFIG_FOLDER_PATH + "/" + getGetRecordsReqXslt())) {
+            InputStream reqXsltInputStream = streamOpener.open(getGetRecordsReqXslt())) {
       
       // create internal request DOM
       DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -169,12 +174,12 @@ public class Profile implements IProfile {
 
   @Override
   public String getResponsexslt() {
-    return Constants.CONFIG_FOLDER_PATH + "/" + getGetRecordsRspXslt();
+    return getGetRecordsRspXslt();
   }
 
   @Override
   public String getMetadataxslt() {
-    return Constants.CONFIG_FOLDER_PATH + "/" + getGetRecordByIdRspXslt();
+    return getGetRecordByIdRspXslt();
   }
 
   /**

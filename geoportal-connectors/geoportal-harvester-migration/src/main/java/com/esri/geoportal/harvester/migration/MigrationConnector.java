@@ -15,6 +15,7 @@
  */
 package com.esri.geoportal.harvester.migration;
 
+import com.esri.geoportal.commons.csw.client.impl.ProfilesService;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
@@ -32,6 +33,15 @@ import java.util.ResourceBundle;
  */
 public class MigrationConnector implements InputConnector<InputBroker>{
   public static final String TYPE = "MIG";
+  private final ProfilesService profilesService;
+
+  public MigrationConnector(ProfilesService profilesService) {
+    this.profilesService = profilesService;
+  }
+
+  public ProfilesService getProfilesService() {
+    return profilesService;
+  }
 
   @Override
   public void validateDefinition(EntityDefinition definition) throws InvalidDefinitionException {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Esri, Inc.
+ * Copyright 2020 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,21 @@
  */
 package com.esri.geoportal.commons.csw.client.impl;
 
+import com.esri.geoportal.commons.csw.client.IProfiles;
+import static com.esri.geoportal.commons.csw.client.impl.Constants.CONFIG_FILE;
 import static com.esri.geoportal.commons.csw.client.impl.Constants.CONFIG_FOLDER_PATH;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
+import java.util.TreeMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Templates;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -35,24 +44,52 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * Profiles factory.
+ * Profiles bean.
  */
-public class ProfilesLoader {
-  private final Logger LOG = LoggerFactory.getLogger(ProfilesLoader.class);
-  private static final String CONFIG_FILE_PATH = CONFIG_FOLDER_PATH+"/CSWProfiles.xml";
+public class ProfilesService {
+  private static final Logger LOG = LoggerFactory.getLogger(ProfilesService.class);
   
-  /**
-   * Loads profiles.
-   * @return profiles
-   * @throws IOException if loading profiles from configuration fails
-   * @throws ParserConfigurationException if unable to obtain XML parser
-   * @throws SAXException if unable to parse XML document
-   * @throws XPathExpressionException if invalid XPath expression
-   */
-  public Profiles load() throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
-    LOG.info(String.format("Loading CSW profiles"));
-    Profiles profiles = new Profiles();
-    try (InputStream profilesXml = Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_FILE_PATH);) {
+  private final Profiles profiles = new Profiles();
+  private final Map<String,Templates> cache = new TreeMap<>();
+  private final String cswProfilesFolder;
+  private final StreamOpener streamOpener;
+
+  public ProfilesService(String cswProfilesFolder) {
+    this.cswProfilesFolder = ResourceUtils.resolveDestinationFolder(cswProfilesFolder);
+    this.streamOpener = this.cswProfilesFolder==null? 
+      new StreamOpener.ResourceOpener(): 
+      new StreamOpener.FolderOpener(this.cswProfilesFolder);
+  }
+  
+  public void initialize() throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
+    if (this.cswProfilesFolder!=null) {
+      if (!new File(this.cswProfilesFolder).exists() || !new File(this.cswProfilesFolder, Constants.CONFIG_FILE).exists()) {
+        ResourceUtils.copyResources(CONFIG_FOLDER_PATH, this.cswProfilesFolder);
+      }
+    }
+    loadProfiles();
+  }
+  
+  public Templates getTemplate(String path) throws IOException, TransformerConfigurationException {
+    Templates template = cache.get(path);
+    if (template==null) {
+      try (InputStream xsltStream = streamOpener.open(path)) {
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        template = transformerFactory.newTemplates(new StreamSource(xsltStream));
+        cache.put(path, template);
+      }
+    }
+    return template;
+  }
+  
+  public IProfiles newProfiles() {
+    return profiles;
+  }
+  
+  private void loadProfiles() throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
+    LOG.info(String.format("Loading CSW profiles from %s", this.streamOpener));
+    
+    try (InputStream profilesXml = streamOpener.open(CONFIG_FILE)) {
       DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
       builderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
       builderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
@@ -83,7 +120,7 @@ public class ProfilesLoader {
         String getRecordByIdReqKVP = StringUtils.trimToEmpty((String)xpath.evaluate("GetRecordByID/RequestKVPs", profileNode, XPathConstants.STRING));
         String getRecordByIdRspXslt = StringUtils.trimToEmpty((String)xpath.evaluate("GetRecordByID/XSLTransformations/Response", profileNode, XPathConstants.STRING));
         
-        Profile prof = new Profile();
+        Profile prof = new Profile(streamOpener);
         prof.setId(id);
         prof.setName(name);
         prof.setDescription(description);
@@ -96,7 +133,8 @@ public class ProfilesLoader {
         profiles.add(prof);
       }
     }
+    
     LOG.info(String.format("CSW profiles loaded."));
-    return profiles;
   }
+  
 }

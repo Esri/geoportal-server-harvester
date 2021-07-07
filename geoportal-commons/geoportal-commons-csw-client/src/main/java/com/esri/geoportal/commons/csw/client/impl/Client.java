@@ -23,7 +23,6 @@ import com.esri.geoportal.commons.csw.client.ICriteria;
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IRecord;
 import com.esri.geoportal.commons.csw.client.IRecords;
-import static com.esri.geoportal.commons.csw.client.impl.Constants.CONFIG_FOLDER_PATH;
 import static com.esri.geoportal.commons.csw.client.impl.Constants.SCHEME_METADATA_DOCUMENT;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
@@ -86,6 +85,7 @@ import org.xml.sax.SAXException;
 public class Client implements IClient {
 
   private final Logger LOG = LoggerFactory.getLogger(Client.class);
+  private final ProfilesService profilesService;
   private final CloseableHttpClient httpClient;
   private final URL baseUrl;
   private final IProfile profile;
@@ -101,7 +101,8 @@ public class Client implements IClient {
    * @param profile CSW profile
    * @param cred credentials
    */
-  public Client(CloseableHttpClient httpClient, URL baseUrl, IProfile profile, SimpleCredentials cred) {
+  public Client(ProfilesService profilesService, CloseableHttpClient httpClient, URL baseUrl, IProfile profile, SimpleCredentials cred) {
+    this.profilesService = profilesService;
     this.httpClient = httpClient;
     this.baseUrl = baseUrl;
     this.profile = profile;
@@ -163,12 +164,12 @@ public class Client implements IClient {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
       String response = IOUtils.toString(responseStream, "UTF-8");
-      if (CONFIG_FOLDER_PATH.equals(profile.getMetadataxslt())) {
+      if (profile.getMetadataxslt()==null || profile.getMetadataxslt().isBlank()) {
         return response;
       }
     
       // create transformer
-      Templates template = TemplatesManager.getInstance().getTemplate(profile.getMetadataxslt());
+      Templates template = profilesService.getTemplate(profile.getMetadataxslt());
       Transformer transformer = template.newTransformer();
 
       try (ByteArrayInputStream contentStream = new ByteArrayInputStream(response.getBytes("UTF-8"));) {
@@ -270,7 +271,7 @@ public class Client implements IClient {
     String internalRequestXml = createInternalXmlRequest(criteria);
 
     // create transformer
-    Templates template = TemplatesManager.getInstance().getTemplate(Constants.CONFIG_FOLDER_PATH + "/" + profile.getGetRecordsReqXslt());
+    Templates template = profilesService.getTemplate(profile.getGetRecordsReqXslt());
     Transformer transformer = template.newTransformer();
 
     try (ByteArrayInputStream internalRequestInputStream = new ByteArrayInputStream(internalRequestXml.getBytes("UTF-8"));) {
@@ -310,7 +311,7 @@ public class Client implements IClient {
     ArrayList<IRecord> records = new ArrayList<>();
 
     // create transformer
-    Templates template = TemplatesManager.getInstance().getTemplate(profile.getResponsexslt());
+    Templates template = profilesService.getTemplate(profile.getResponsexslt());
     Transformer transformer = template.newTransformer();
 
     // perform transformation

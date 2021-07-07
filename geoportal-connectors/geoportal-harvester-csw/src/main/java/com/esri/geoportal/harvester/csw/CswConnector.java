@@ -18,8 +18,7 @@ package com.esri.geoportal.harvester.csw;
 import static com.esri.geoportal.commons.constants.CredentialsConstants.*;
 import static com.esri.geoportal.harvester.csw.CswConstants.*;
 import com.esri.geoportal.commons.csw.client.IProfile;
-import com.esri.geoportal.commons.csw.client.IProfiles;
-import com.esri.geoportal.commons.csw.client.impl.ProfilesProvider;
+import com.esri.geoportal.commons.csw.client.impl.ProfilesService;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.defs.UITemplate.Choice;
@@ -38,7 +37,16 @@ import java.util.ResourceBundle;
  */
 public class CswConnector implements InputConnector<InputBroker> {
   public static final String TYPE = "CSW";
+  private final ProfilesService profilesService;
 
+  public CswConnector(ProfilesService profilesService, String cswProfilesFolder) {
+    this.profilesService = profilesService;
+  }
+  
+  public ProfilesService getProfilesService() {
+    return profilesService;
+  }
+ 
   @Override
   public String getType() {
     return TYPE;
@@ -60,12 +68,10 @@ public class CswConnector implements InputConnector<InputBroker> {
         return true;
       }
     });
-    ProfilesProvider of = new ProfilesProvider();
-    IProfiles profiles = of.newProfiles();
-    Choice<String>[] choices = profiles.listAll().stream().map(p->new Choice<String>(p.getId(),p.getName())).toArray(Choice[]::new);
+    Choice<String>[] choices = profilesService.newProfiles().listAll().stream().map(p->new Choice<String>(p.getId(),p.getName())).toArray(Choice[]::new);
     arguments.add(new UITemplate.ChoiceArgument(P_PROFILE_ID, bundle.getString("csw.profile"), Arrays.asList(choices)){
       public String getDefault() {
-        IProfile defaultProfile = profiles.getDefaultProfile();
+        IProfile defaultProfile = profilesService.newProfiles().getDefaultProfile();
         return defaultProfile!=null? defaultProfile.getId(): null;
       }
     });
@@ -75,12 +81,12 @@ public class CswConnector implements InputConnector<InputBroker> {
 
   @Override
   public void validateDefinition(EntityDefinition definition) throws InvalidDefinitionException {
-    new CswBrokerDefinitionAdaptor(definition);
+    new CswBrokerDefinitionAdaptor(profilesService.newProfiles(), definition);
   }
 
   @Override
   public InputBroker createBroker(EntityDefinition definition) throws InvalidDefinitionException {
-    return new CswBroker(this, new CswBrokerDefinitionAdaptor(definition));
+    return new CswBroker(this, new CswBrokerDefinitionAdaptor(profilesService.newProfiles(), definition));
   }
 
   @Override

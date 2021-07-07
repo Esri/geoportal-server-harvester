@@ -18,7 +18,6 @@ package com.esri.geoportal.harvester.csw;
 import static com.esri.geoportal.harvester.csw.CswConstants.*;
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
-import com.esri.geoportal.commons.csw.client.impl.ProfilesProvider;
 import com.esri.geoportal.commons.robots.BotsConfig;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -48,7 +47,7 @@ public class CswBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    * @param def broker definition
    * @throws InvalidDefinitionException if invalid definition
    */
-  public CswBrokerDefinitionAdaptor(EntityDefinition def) throws InvalidDefinitionException {
+  public CswBrokerDefinitionAdaptor(IProfiles profiles, EntityDefinition def) throws InvalidDefinitionException {
     super(def);
     this.credAdaptor = new CredentialsDefinitionAdaptor(def);
     this.botsAdaptor = new BotsBrokerDefinitionAdaptor(def);
@@ -62,8 +61,6 @@ public class CswBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
       } catch (MalformedURLException ex) {
         throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL, get(P_HOST_URL)), ex);
       }
-      ProfilesProvider of = new ProfilesProvider();
-      IProfiles profiles = of.newProfiles();
       profile = profiles.getProfileById(this.get(P_PROFILE_ID));
       if (profile == null) {
         throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_PROFILE_ID, get(P_PROFILE_ID)));

@@ -21,6 +21,8 @@ package com.esri.geoportal.commons.csw.client.impl;
 public class Constants {
   /** Profiles configuration folder path */
   public static final String CONFIG_FOLDER_PATH = "gpt/search/profiles";
+  /** Configuration entry point */
+  public static final String CONFIG_FILE = "CSWProfiles.xml";
   /** scheme metadata document */
   public final static String SCHEME_METADATA_DOCUMENT
           = "urn:x-esri:specification:ServiceType:ArcIMS:Metadata:Document";

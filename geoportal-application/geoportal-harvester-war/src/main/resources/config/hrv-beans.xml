@@ -8,6 +8,9 @@
   <bean class="com.esri.geoportal.harvester.beans.GeometryServiceBean" id="geometryService" destroy-method="close">
     <constructor-arg value="${geometry.service.url}"/>
   </bean>
+  <bean class="com.esri.geoportal.harvester.beans.ProfilesServiceBean" id="profilesService" init-method="init">
+    <constructor-arg value="${csw.profiles.folder}"/>
+  </bean>
   
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultEngine" autowire="constructor" init-method="init"/>
   <bean class="com.esri.geoportal.harvester.engine.defaults.DefaultProcessor" autowire="constructor"/>
@@ -52,9 +55,11 @@
   <bean class="com.esri.geoportal.harvester.ckan.data.gov.DataGovConnector">
     <constructor-arg ref="metaBuilder"/>
   </bean>
-  <bean class="com.esri.geoportal.harvester.gptsrc.GptConnector">
+  <bean class="com.esri.geoportal.harvester.gptsrc.GptConnector"/>
+  <bean class="com.esri.geoportal.harvester.csw.CswConnector">
+    <constructor-arg ref="profilesService"/>
+    <constructor-arg value="${csw.profiles.folder}"/>
   </bean>
-  <bean class="com.esri.geoportal.harvester.csw.CswConnector"/>
   <bean class="com.esri.geoportal.harvester.folder.FolderConnector"/>
   <bean class="com.esri.geoportal.harvester.gpt.GptConnector">
     <constructor-arg value="${geometry.service.url}"/>
@@ -62,7 +67,9 @@
   </bean>
   <bean class="com.esri.geoportal.harvester.unc.UncConnector"/>
   <bean class="com.esri.geoportal.harvester.waf.WafConnector"/>
-  <bean class="com.esri.geoportal.harvester.migration.MigrationConnector"/>
+  <bean class="com.esri.geoportal.harvester.migration.MigrationConnector">
+    <constructor-arg ref="profilesService"/>
+  </bean>
   <bean class="com.esri.geoportal.harvester.sink.SinkConnector">
     <constructor-arg value="${sink.attempt.count}"/>
     <constructor-arg value="${sink.attempt.delay}"/>

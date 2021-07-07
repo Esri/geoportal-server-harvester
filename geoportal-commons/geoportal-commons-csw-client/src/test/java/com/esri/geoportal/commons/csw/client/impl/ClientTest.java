@@ -16,6 +16,7 @@
 package com.esri.geoportal.commons.csw.client.impl;
 
 import com.esri.geoportal.commons.csw.client.IProfile;
+import com.esri.geoportal.commons.csw.client.IProfiles;
 import com.esri.geoportal.commons.csw.client.IRecords;
 import com.esri.geoportal.commons.http.BotsHttpClient;
 import com.esri.geoportal.commons.robots.Bots;
@@ -111,14 +112,17 @@ public class ClientTest {
 
   @Test
   public void testGetRecords() throws Exception {
-    Profiles profiles = new ProfilesLoader().load();
+    ProfilesService profilesService = new ProfilesService(null);
+    profilesService.initialize();
+    
+    IProfiles profiles = profilesService.newProfiles();
     IProfile defaultProfile = profiles.getDefaultProfile();
     assertNotNull("No default profile", defaultProfile);
     
     Bots bots = BotsUtils.readBots("http://localhost:5000/robots.txt");
     BotsHttpClient httpClient = new BotsHttpClient(bots);
     
-    Client cswClient = new Client(httpClient, new URL("http://localhost:5000/csw"), defaultProfile, null);
+    Client cswClient = new Client(profilesService, httpClient, new URL("http://localhost:5000/csw"), defaultProfile, null);
     IRecords records = cswClient.findRecords(1, 10, null, null);
     
     assertNotNull("No records", records);
@@ -126,14 +130,17 @@ public class ClientTest {
   
   @Test
   public void testReadMetadata() throws Exception {
-    Profiles profiles = new ProfilesLoader().load();
+    ProfilesService profilesService = new ProfilesService(null);
+    profilesService.initialize();
+    
+    IProfiles profiles = profilesService.newProfiles();
     IProfile defaultProfile = profiles.getDefaultProfile();
     assertNotNull("No default profile", defaultProfile);
     
     Bots bots = BotsUtils.readBots("http://localhost:5000/robots.txt");
     BotsHttpClient httpClient = new BotsHttpClient(bots);
     
-    Client cswClient = new Client(httpClient, new URL("http://localhost:5000/csw"), defaultProfile, null);
+    Client cswClient = new Client(profilesService, httpClient, new URL("http://localhost:5000/csw"), defaultProfile, null);
     String metadata = cswClient.readMetadata("{093CBDB1-9D7A-4602-9937-2EC89359E633}");
     
     assertNotNull("No metadata", metadata);

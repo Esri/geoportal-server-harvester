@@ -75,10 +75,10 @@ import org.slf4j.LoggerFactory;
     td = context.getTask().getTaskDefinition();
     httpclient = HttpClientBuilder.create().useSystemProperties().build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
-      client = new Client(httpclient, definition.getHostUrl(), definition.getProfile(), definition.getCredentials());
+      client = new Client(connector.getProfilesService(), httpclient, definition.getHostUrl(), definition.getProfile(), definition.getCredentials());
     } else {
       Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpclient, definition.getHostUrl());
-      client = new Client(new BotsHttpClient(httpclient,bots), definition.getHostUrl(), definition.getProfile(), definition.getCredentials());
+      client = new Client(connector.getProfilesService(), new BotsHttpClient(httpclient,bots), definition.getHostUrl(), definition.getProfile(), definition.getCredentials());
     }
   }
 

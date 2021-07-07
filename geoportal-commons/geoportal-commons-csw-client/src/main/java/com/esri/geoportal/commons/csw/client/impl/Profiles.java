@@ -17,21 +17,16 @@ package com.esri.geoportal.commons.csw.client.impl;
 
 import com.esri.geoportal.commons.csw.client.IProfile;
 import com.esri.geoportal.commons.csw.client.IProfiles;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-import org.xml.sax.SAXException;
 
 /**
  * Profiles implementation.
  */
 public class Profiles implements IProfiles {
   private static final String DEFAULT_PROFILE_ID = "urn:ogc:CSW:2.0.2:HTTP:OGCCORE:ESRI:GPT";
-  private static Profiles instance;
   
   private List<IProfile> orderedList = new ArrayList<>();
   private Map<String,IProfile> mappedValued = new HashMap<>();
@@ -62,24 +57,6 @@ public class Profiles implements IProfiles {
       defaultProfile = orderedList.get(0);
     }
     return defaultProfile;
-  }
-  
-  /**
-   * Gets instance of the profiles.
-   * <p>
-   * Loads configuration if called first time.
-   * @return profiles
-   * @throws IOException if loading profiles from configuration fails
-   * @throws ParserConfigurationException if unable to obtain XML parser
-   * @throws SAXException if unable to parse XML document
-   * @throws XPathExpressionException if invalid XPath expression
-   */
-  public static Profiles getInstance() throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
-    if (instance==null) {
-      ProfilesLoader loader = new ProfilesLoader();
-      instance = loader.load();
-    }
-    return instance;
   }
   
   @Override
