@@ -13,8 +13,8 @@
 
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-        <spring.version>5.2.14.RELEASE</spring.version>
-        <springsecurity.version>5.3.9.RELEASE</springsecurity.version>
+        <spring.version>5.2.15.RELEASE</spring.version>
+        <springsecurity.version>5.3.10.RELEASE</springsecurity.version>
     </properties>
     
     <dependencies>
@@ -37,11 +37,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>geoportal-harvester-migration</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
-            <version>1.7.30</version>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
