@@ -142,7 +142,7 @@ body {
 
 .h-brokers-input {
   flex: 1;
-  margin-right: 80px;
+  margin-right: 20px;
 }
 
 .h-brokers-footer {
@@ -180,8 +180,8 @@ body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  padding-bottom: 1em;
-  padding-top: 1em;
+  padding-bottom: 10px;
+  padding-top: 4px;
 }
 
 .h-broker-group .h-broker {
