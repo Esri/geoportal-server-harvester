@@ -32,7 +32,6 @@ import static com.esri.geoportal.commons.meta.util.WKAConstants.WKA_TITLE;
 import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
-import static com.esri.geoportal.commons.utils.UriUtils.escapeUri;
 import com.esri.geoportal.commons.utils.XmlUtils;
 import com.esri.geoportal.geoportal.commons.stac.client.Catalog;
 import com.esri.geoportal.geoportal.commons.stac.client.Client;
@@ -75,6 +74,7 @@ import java.util.LinkedList;
 import java.util.Set;
 import javax.xml.transform.TransformerException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.w3c.dom.Document;
 
 /**
@@ -117,7 +117,7 @@ public class StacBroker implements InputBroker {
   public void initialize(Initializable.InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     td = context.getTask().getTaskDefinition();
-    CloseableHttpClient http = HttpClientBuilder.create().useSystemProperties().build();
+    CloseableHttpClient http = HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       httpClient = http;
     } else {

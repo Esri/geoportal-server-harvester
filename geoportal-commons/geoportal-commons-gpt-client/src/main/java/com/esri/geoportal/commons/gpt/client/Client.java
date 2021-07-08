@@ -66,6 +66,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,7 +124,7 @@ public class Client implements Closeable {
    * @param collectionsFieldName collections field name
    */
   public Client(URL url, SimpleCredentials cred, String index, String collectionsFieldName) {
-    this(HttpClientBuilder.create().useSystemProperties().build(), url, cred, index, collectionsFieldName);
+    this(HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build(), url, cred, index, collectionsFieldName);
   }
 
   /**

@@ -85,6 +85,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.xml.sax.SAXException;
 import com.esri.geoportal.harvester.thredds.ThreddsConnector;
 import com.esri.geoportal.harvester.stac.StacConnector;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 
 /**
  * Bootstrap.
@@ -268,7 +269,7 @@ public class Bootstrap {
       inboundConnectorRegistry = new InboundConnectorRegistry();
 
       MetaBuilder metaBuilder = new SimpleDcMetaBuilder();
-      GeometryService geometryService = new GeometryService(HttpClients.custom().useSystemProperties().build(), new URL(geometryServiceUrl));
+      GeometryService geometryService = new GeometryService(HttpClients.custom().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build(), new URL(geometryServiceUrl));
       ProfilesService profilesService = new ProfilesService(cswProfilesFolder);
       profilesService.initialize();
 

@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.List;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 
 /**
  * Robots txt utility class/shortcut methods.
@@ -32,7 +33,7 @@ public final class BotsUtils {
    * @return default parser (never <code>null</code>)
    */
   public static BotsParser parser() {
-    return parser(BotsConfig.DEFAULT,HttpClientBuilder.create().useSystemProperties().build());
+    return parser(BotsConfig.DEFAULT,HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build());
   }
   
   /**

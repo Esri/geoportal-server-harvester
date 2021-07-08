@@ -73,6 +73,7 @@ import com.google.gson.JsonObject;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 
 /**
  * Ags broker.
@@ -125,7 +126,7 @@ import java.util.stream.Collectors;
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     td = context.getTask().getTaskDefinition();
-    CloseableHttpClient httpclient = HttpClientBuilder.create().useSystemProperties().build();
+    CloseableHttpClient httpclient = HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new AgsClient(httpclient, definition.getHostUrl());
     } else {

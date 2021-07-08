@@ -136,17 +136,7 @@ public class Client implements IClient {
       if (httpResponse.getStatusLine().getStatusCode()>=400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
-      if (httpResponse.getStatusLine().getStatusCode()==301 || httpResponse.getStatusLine().getStatusCode()==302) {
-        HttpPost post2 = createRecordsPostRequest(httpResponse.getFirstHeader("Location").getValue(), requestBody);
-        try (CloseableHttpResponse httpResponse2 = httpClient.execute(post2,context); InputStream responseInputStream2 = httpResponse2.getEntity().getContent();) {
-          if (httpResponse2.getStatusLine().getStatusCode()>=400) {
-            throw new HttpResponseException(httpResponse2.getStatusLine().getStatusCode(), httpResponse2.getStatusLine().getReasonPhrase());
-          }
-          return readRecordsFromStream(responseInputStream2);
-        }
-      } else {
-        return readRecordsFromStream(responseInputStream);
-      }
+      return readRecordsFromStream(responseInputStream);
     }
   }
 
