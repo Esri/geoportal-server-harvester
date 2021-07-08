@@ -35,6 +35,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
@@ -54,7 +55,7 @@ public class BotsHttpClient extends CloseableHttpClient {
   }
 
   public BotsHttpClient(Bots bots) {
-    this.client = HttpClientBuilder.create().useSystemProperties().build();
+    this.client = HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build();
     this.bots = bots;
   }
 

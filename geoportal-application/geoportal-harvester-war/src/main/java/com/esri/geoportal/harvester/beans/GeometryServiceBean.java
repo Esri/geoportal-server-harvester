@@ -19,6 +19,7 @@ import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 
 /**
  * Geometry service bean.
@@ -31,7 +32,7 @@ public class GeometryServiceBean extends GeometryService {
    * @throws MalformedURLException if invalid geometry service url
    */
   public GeometryServiceBean(String geometryServiceUrl) throws MalformedURLException {
-    super(HttpClients.custom().useSystemProperties().build(), new URL(geometryServiceUrl));
+    super(HttpClients.custom().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build(), new URL(geometryServiceUrl));
   }
   
 }

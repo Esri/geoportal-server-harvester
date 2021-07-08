@@ -63,6 +63,7 @@ import com.esri.geoportal.commons.utils.XmlUtils;
 import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 
 /**
  * ArcGIS Portal output broker.
@@ -135,7 +136,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     td = context.getTask().getTaskDefinition();
-    CloseableHttpClient httpclient = HttpClientBuilder.create().useSystemProperties().build();
+    CloseableHttpClient httpclient = HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new AgpClient(httpclient, definition.getHostUrl(),definition.getCredentials(), definition.getMaxRedirects());
     } else {

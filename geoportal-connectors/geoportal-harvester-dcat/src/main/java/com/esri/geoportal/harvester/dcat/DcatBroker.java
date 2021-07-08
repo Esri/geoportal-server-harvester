@@ -75,6 +75,7 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.w3c.dom.Document;
 
 /**
@@ -117,7 +118,7 @@ import org.w3c.dom.Document;
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     td = context.getTask().getTaskDefinition();
-    CloseableHttpClient http = HttpClientBuilder.create().useSystemProperties().build();
+    CloseableHttpClient http = HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       httpClient = http;
     } else {

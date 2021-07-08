@@ -206,17 +206,7 @@ public class Client implements Closeable {
       if (httpResponse.getStatusLine().getStatusCode() >= 400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
-      if (httpResponse.getStatusLine().getStatusCode() == 301 || httpResponse.getStatusLine().getStatusCode() == 302) {
-        HttpGet method2 = new HttpGet(URI.create(httpResponse.getFirstHeader("Location").getValue()));
-        try (CloseableHttpResponse httpResponse2 = httpClient.execute(method2); InputStream responseInputStream2 = httpResponse2.getEntity().getContent();) {
-          if (httpResponse2.getStatusLine().getStatusCode() >= 400) {
-            throw new HttpResponseException(httpResponse2.getStatusLine().getStatusCode(), httpResponse2.getStatusLine().getReasonPhrase());
-          }
-          return readContentFromStream(responseInputStream2);
-        }
-      } else {
-        return readContentFromStream(responseInputStream);
-      }
+      return readContentFromStream(responseInputStream);
     }
   }
 

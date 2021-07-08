@@ -39,6 +39,7 @@ import java.util.Date;
 import java.util.List;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +67,7 @@ class GptBroker implements InputBroker {
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     td = context.getTask().getTaskDefinition();
-    CloseableHttpClient httpClient = HttpClientBuilder.create().useSystemProperties().build();
+    CloseableHttpClient httpClient = HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new Client(httpClient, definition.getHostUrl(), definition.getCredentials(), definition.getIndex(), collectionsFieldName);
     } else {

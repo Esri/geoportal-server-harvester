@@ -49,6 +49,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 
 /**
  * OAI broker.
@@ -79,7 +80,7 @@ import java.util.Date;
   public void initialize(Initializable.InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     td = context.getTask().getTaskDefinition();
-    CloseableHttpClient http = HttpClientBuilder.create().useSystemProperties().build();
+    CloseableHttpClient http = HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       httpClient = http;
     } else {

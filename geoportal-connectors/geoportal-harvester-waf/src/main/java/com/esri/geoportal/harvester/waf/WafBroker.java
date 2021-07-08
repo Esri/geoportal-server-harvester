@@ -32,13 +32,13 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +71,7 @@ import org.slf4j.LoggerFactory;
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     td = context.getTask().getTaskDefinition();
-    CloseableHttpClient client = HttpClientBuilder.create().useSystemProperties().build();
+    CloseableHttpClient client = HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       httpClient = client;
     } else {

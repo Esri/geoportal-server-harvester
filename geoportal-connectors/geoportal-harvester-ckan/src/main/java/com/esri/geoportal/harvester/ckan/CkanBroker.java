@@ -76,6 +76,7 @@ import com.esri.geoportal.harvester.api.DataContent;
 import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import java.util.stream.Collectors;
 import static com.esri.geoportal.commons.utils.UriUtils.*;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 
 /**
  * CKAN broker.
@@ -117,7 +118,7 @@ public class CkanBroker implements InputBroker {
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     td = context.getTask().getTaskDefinition();
-    CloseableHttpClient http = HttpClientBuilder.create().useSystemProperties().build();
+    CloseableHttpClient http = HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       httpClient = http;
     } else {

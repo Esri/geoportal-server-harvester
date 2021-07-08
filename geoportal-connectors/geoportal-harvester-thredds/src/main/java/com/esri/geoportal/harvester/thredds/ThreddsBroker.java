@@ -51,6 +51,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.xml.sax.SAXException;
 
 /**
@@ -83,7 +84,7 @@ import org.xml.sax.SAXException;
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     td = context.getTask().getTaskDefinition();
-    CloseableHttpClient http = HttpClientBuilder.create().useSystemProperties().build();
+    CloseableHttpClient http = HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       httpClient = http;
     } else {

@@ -39,6 +39,7 @@ import java.net.URISyntaxException;
 import java.util.Date;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +74,7 @@ import org.slf4j.LoggerFactory;
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     td = context.getTask().getTaskDefinition();
-    httpclient = HttpClientBuilder.create().useSystemProperties().build();
+    httpclient = HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
       client = new Client(connector.getProfilesService(), httpclient, definition.getHostUrl(), definition.getProfile(), definition.getCredentials());
     } else {
