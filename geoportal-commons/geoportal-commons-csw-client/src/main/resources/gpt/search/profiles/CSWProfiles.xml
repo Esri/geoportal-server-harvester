@@ -563,7 +563,7 @@
 			</XSLTransformations>
 		</GetRecords>
 		<GetRecordByID>
-			<RequestKVPs><![CDATA[service=CSW&request=GetRecordById&version=2.0.2&ElementSetName=full&outputschema=http%3A%2F%2Fwww.isotc211.org%2F2005%2Fgmd]]></RequestKVPs>
+			<RequestKVPs><![CDATA[service=CSW&request=GetRecordById&version=2.0.2&ElementSetName=full&outputschema=http%3A%2F%2Fwww.opengis.net%2Fcat%2Fcsw%2F2.0.2]]></RequestKVPs>
 			<XSLTransformations>
 				<Response>CSW_2.0.2_APISO_pycsw_2_GetRecordByID_Response.xslt</Response>
 			</XSLTransformations>

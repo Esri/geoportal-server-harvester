@@ -1,24 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
- See the NOTICE file distributed with
- this work for additional information regarding copyright ownership.
- Esri Inc. licenses this file to You under the Apache License, Version 2.0
- (the "License"); you may not use this file except in compliance with
- the License.  You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
--->
-<xsl:stylesheet version="1.0"  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:dct="http://purl.org/dc/terms/" xmlns:ows="http://www.opengis.net/ows" xmlns:dc="http://purl.org/dc/elements/1.1/" exclude-result-prefixes="csw dc dct ows">
-  <xsl:output method="xml" indent="yes"  encoding="UTF-8" omit-xml-declaration="no" />
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:ows="http://www.opengis.net/ows" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gmi="http://www.isotc211.org/2005/gmi"  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <xsl:output indent="yes" method="xml" omit-xml-declaration="no"/>
   <xsl:template match="/">
- <xsl:choose>
-  <xsl:when test="/ows:ExceptionReport">
+    <xsl:choose>
+      <xsl:when test="/csw:GetRecordByIdResponse/ows:ExceptionReport">
         <exception>
           <exceptionText>
             <xsl:for-each select="/ows:ExceptionReport/ows:Exception">
@@ -26,75 +11,35 @@
             </xsl:for-each>
           </exceptionText>
         </exception>
-   </xsl:when>
-   <xsl:otherwise>
-    <Records>
-      <xsl:attribute name="maxRecords">
-        <xsl:value-of select="/csw:GetRecordsResponse/csw:SearchResults/@numberOfRecordsMatched"/>
-      </xsl:attribute>
-      <xsl:for-each select="/csw:GetRecordsResponse/csw:SearchResults/csw:Record">
-        <Record>
-          <ID>
-            <xsl:choose>
-                  <xsl:when test="string-length(normalize-space(dc:identifier[@scheme='urn:x-esri:specification:ServiceType:ArcIMS:Metadata:DocID']/text())) > 0">
-                    <xsl:value-of select="normalize-space(dc:identifier[@scheme='urn:x-esri:specification:ServiceType:ArcIMS:Metadata:DocID'])"/>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="normalize-space(dc:identifier)"/>
-                  </xsl:otherwise>
-             </xsl:choose>
-          </ID>
-          <Title>
-            <xsl:value-of select="dc:title"/>
-          </Title>
-          <Abstract>
-            <xsl:value-of select="dct:abstract"/>
-          </Abstract>
-          <Type>
-            <xsl:value-of select="dc:type"/>
-          </Type>
-          <LowerCorner>
-          <xsl:value-of select="ows:WGS84BoundingBox/ows:LowerCorner"/>
-          </LowerCorner>
-          <UpperCorner>
-          <xsl:value-of select="ows:WGS84BoundingBox/ows:UpperCorner"/>
-          </UpperCorner>
-          <MaxX>
-                <xsl:value-of select="normalize-space(substring-before(ows:WGS84BoundingBox/ows:UpperCorner, ' '))"/>
-              </MaxX>
-              <MaxY>
-                <xsl:value-of select="normalize-space(substring-after(ows:WGS84BoundingBox/ows:UpperCorner, ' '))"/>
-              </MaxY>
-              <MinX>
-                <xsl:value-of select="normalize-space(substring-before(ows:WGS84BoundingBox/ows:LowerCorner, ' '))"/>
-              </MinX>
-              <MinY>
-                <xsl:value-of select="normalize-space(substring-after(ows:WGS84BoundingBox/ows:LowerCorner, ' '))"/>
-              </MinY>
-              <ModifiedDate>
-                <xsl:value-of select="./dct:modified"/>
-              </ModifiedDate>
-              <References>
-                <xsl:for-each select="./dct:references">
-                  <xsl:value-of select="."/>
-                  <xsl:text>&#x2714;</xsl:text>
-                  <xsl:value-of select="@scheme"/>
-                  <xsl:text>&#x2715;</xsl:text>
-                </xsl:for-each>
-              </References>
-              <Types>
-                <xsl:for-each select="./dc:type">
-                  <xsl:value-of select="."/>
-                  <xsl:text>&#x2714;</xsl:text>
-                  <xsl:value-of select="@scheme"/>
-                  <xsl:text>&#x2715;</xsl:text>
-                </xsl:for-each>
-              </Types>
-        </Record>
-      </xsl:for-each>
-
-    </Records>
-   </xsl:otherwise>
-  </xsl:choose>
- </xsl:template>
+      </xsl:when>
+      <xsl:otherwise>
+		<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:dcmiBox="http://dublincore.org/documents/2000/07/11/dcmi-box/" xmlns:ows="http://www.opengis.net/ows" xmlns:gml="http://www.opengis.net/gml" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+			<rdf:Description>
+				<xsl:apply-templates select="/csw:GetRecordByIdResponse/csw:Record"/>
+			</rdf:Description>
+		</rdf:RDF>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template> 
+	<xsl:template match="/csw:GetRecordByIdResponse/csw:Record">
+		<xsl:attribute name="rdf:about"><xsl:value-of select="normalize-space(dc:identifier)"/></xsl:attribute>
+		<dc:identifier><xsl:value-of select="normalize-space(dc:identifier)"/></dc:identifier>
+		<xsl:if test="string-length(normalize-space(dc:title))>0">
+			<dc:title><xsl:value-of select="dc:title"/></dc:title>
+		</xsl:if>
+		<xsl:if test="string-length(normalize-space(dc:title))=0">
+			<dc:title><xsl:value-of select="dc:identifier"/></dc:title>
+		</xsl:if>
+		<xsl:if test="string-length(dc:description | dct:abstract)>0">
+			<dc:description><xsl:value-of select="dc:description | dct:abstract"/></dc:description>
+		</xsl:if>
+		<xsl:if test="string-length(dct:abstract | dc:description)>0">
+			<dct:abstract><xsl:value-of select="dct:abstract | dc:description"/></dct:abstract>
+		</xsl:if>
+		<xsl:if test="string-length(dct:modified)>0">
+			<dc:date><xsl:value-of select="dct:modified"/></dc:date>
+		</xsl:if>
+		<xsl:copy-of select="dct:references"  />
+		<xsl:copy-of select="ows:WGS84BoundingBox"  />
+	</xsl:template>
 </xsl:stylesheet>
