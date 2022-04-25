@@ -24,12 +24,21 @@ import org.apache.commons.lang3.StringUtils;
 public class DcatVersion implements Comparable<DcatVersion>{
   public static final DcatVersion DV10 = new DcatVersion(1, 0);
   public static final DcatVersion DV11 = new DcatVersion(1, 1);
+  public static final DcatVersion DV201 = new DcatVersion(2, 0, 1);
   private final int major;
   private final int minor;
-
+  private final int patch;
+  
   public DcatVersion(int major, int minor) {
     this.major = major;
     this.minor = minor;
+    this.patch = 0;
+  }
+
+  public DcatVersion(int major, int minor, int patch) {
+    this.major = major;
+    this.minor = minor;
+    this.patch = patch;
   }
 
   public int getMajor() {
@@ -40,17 +49,27 @@ public class DcatVersion implements Comparable<DcatVersion>{
     return minor;
   }
   
+  public int getPatch() {
+    return patch;
+  }
+
   public static DcatVersion parse(String version) {
     String [] parts = StringUtils.trimToEmpty(version).split(".");
-    if (parts.length!=2) {
-      throw new IllegalArgumentException("Illegal DCAt version: "+StringUtils.trimToEmpty(version)+".");
+    if (parts.length<1 || parts.length>3) {
+      throw new IllegalArgumentException("Illegal DCAT version: "+StringUtils.trimToEmpty(version)+".");
     }
     try {
       int major = Integer.parseInt(parts[0]);
       int minor = Integer.parseInt(parts[1]);
-      return new DcatVersion(major, minor);
+      if (parts.length < 3) {
+        return new DcatVersion(major, minor);
+      }
+      else {
+        int patch = Integer.parseInt(parts[2]);
+        return new DcatVersion(major, minor, patch);  
+      }
     } catch (NumberFormatException ex) {
-      throw new IllegalArgumentException("Illegal DCAt version: "+StringUtils.trimToEmpty(version)+".", ex);
+      throw new IllegalArgumentException("Illegal DCAT version: "+StringUtils.trimToEmpty(version)+".", ex);
     }
   }
   
