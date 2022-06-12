@@ -48,6 +48,7 @@ import org.apache.http.client.methods.HttpRequestWrapper;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.client.utils.URIUtils;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -122,7 +123,7 @@ public class AgpClient implements Closeable {
     }
     
     req.setEntity(multipart? createEntity(params, fileToUpload): createEntity(params));
-
+    
     return execute(req,ItemResponse.class);
   }
   
@@ -209,6 +210,36 @@ public class AgpClient implements Closeable {
     }
   }
   
+  /**
+   * Writes item metadata.
+   * @param itemId item id
+   * @param metadataXML metadata
+   * @param token token
+   * @return item metadata if available
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public String writeItemMetadata(String itemId, String metadataXML, String token) throws IOException, URISyntaxException {
+    URIBuilder builder = new URIBuilder(itemMetaUri(itemId));
+    
+    if (token!=null) {
+      builder.setParameter("f", "json");
+      builder.setParameter("token", token);
+    }
+    HttpPost req = new HttpPost(builder.build());
+    
+    try {
+      HttpEntity entity = new ByteArrayEntity(metadataXML.getBytes("UTF-8"));
+      req.setEntity(entity);
+      return execute(req, 0);
+    } catch (HttpResponseException ex) {
+      if (ex.getStatusCode() == 500) {
+        return null;
+      }
+      throw ex;
+    }
+  }  
+    
   /**
    * Sharing item.
    * @param owner user name
@@ -452,7 +483,7 @@ public class AgpClient implements Closeable {
     return builder.build();
   }
   
-  private URI itemMetaUri(String itemId) throws URISyntaxException {
+  public URI itemMetaUri(String itemId) throws URISyntaxException {
     URIBuilder builder = new URIBuilder();
     builder.setScheme(rootUrl.toURI().getScheme())
            .setHost(rootUrl.toURI().getHost())

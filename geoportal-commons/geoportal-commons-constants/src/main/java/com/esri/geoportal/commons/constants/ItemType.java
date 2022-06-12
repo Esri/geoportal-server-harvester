@@ -28,11 +28,12 @@ import java.util.stream.Stream;
  * Item types.
  */
 public enum ItemType {
+  SCIENCEBASE_DATASET("Document Link", URL, Pattern.compile(".+www\\.sciencebase\\.gov\\/catalog\\/item\\/.+"), "", MimeType.TEXT_HTML),
   WEB_MAP("Web Map", Text, MimeType.APPLICATION_JSON),
   CITYENGINE_WEB_SCENE("CityEngine Web Scene", File),
   WEB_SCENE("Web Scene", Text, MimeType.APPLICATION_JSON),
   PRO_MAP("Pro Map", File, MimeType.APPLICATION_ESRI_MAPX),
-  FEATURE_SERVICE("Feature Service", URL, Pattern.compile(".+/FeatureServer$|.+/MapServer/\\d+$", Pattern.CASE_INSENSITIVE),"FeatureServer"),
+  FEATURE_SERVICE("Feature Service", URL, Pattern.compile(".+/FeatureServer$|.+/FeatureServer/\\d+$|.+/MapServer/\\d+$", Pattern.CASE_INSENSITIVE),"FeatureServer"),
   MAP_SERVICE("Map Service", URL, Pattern.compile(".+/MapServer$", Pattern.CASE_INSENSITIVE),"MapServer"),
   IMAGE_SERVICE("Image Service", URL, Pattern.compile(".+/ImageServer$", Pattern.CASE_INSENSITIVE),"ImageServer"),
   KML("KML", URL, MimeType.APPLICATION_KML, MimeType.APPLICATION_KMZ),

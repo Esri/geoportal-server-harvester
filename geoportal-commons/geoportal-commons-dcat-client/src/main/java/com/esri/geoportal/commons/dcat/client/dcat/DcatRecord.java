@@ -186,4 +186,10 @@ public interface DcatRecord {
    * @return abstract
    */
   String getAbstract();
+
+  /**
+   * Gets metadata URL.
+   * @return URL to full metadata XML
+   */
+  String getMetadataURL();
 }

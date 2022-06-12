@@ -237,5 +237,11 @@ public class DcatRecordAdaptor extends DcatAdaptor implements DcatRecord {
     return getString("isPartOf");
   }
   
+  @Override
+  public String getMetadataURL() {
+    String url = getString("metadataURL");
+    return url;
+  }
+  
   
 }

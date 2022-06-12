@@ -70,8 +70,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
@@ -242,6 +247,21 @@ import org.xml.sax.SAXException;
             String error = response != null && response.error != null && response.error.message != null ? response.error.message : null;
             throw new DataOutputException(this, ref, String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
           }
+          
+          // MH - upload item metadata
+          String metadataAdded = client.writeItemMetadata(response.id, 
+                  "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+                  + "<metadata xml:lang=\"en\">"
+                  + "  <Esri/>"
+                  + "  <mdFileID>" + response.id + "</mdFileID>"
+                  + "  <dataIdInfo>"
+                  + "    <idCitation>"
+                  + "      <resTitle>" + title + "</resTitle>"
+                  + "    </idCitation>"
+                  + "    <idAbs>" + description + "</idAbs>"
+                  + "  </idCitation>"
+                  + "</metadata>", token);
+          System.out.print("METADATA -> " + metadataAdded);    
 
           client.share(definition.getCredentials().getUserName(), definition.getFolderId(), response.id, true, true, null, token);
 
