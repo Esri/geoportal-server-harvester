@@ -59,18 +59,21 @@ public abstract class BaseXmlMetaAnalyzer implements MetaAnalyzer {
 
   private final Templates xsltDecodeDC;
   private final XPathExpression xPath;
+  private final Templates xsltToArcGIS;
   
   /**
    * Creates instance of the handler.
    * @param decoderXslt decoder xslt
    * @param interrogator XPath for interrogation
+   * @param toArcGISXslt xslt to convert this metadata to ArcGIS XML
    * @throws java.io.IOException if error reading xslt
    * @throws javax.xml.transform.TransformerConfigurationException if error compiling xslt
    * @throws XPathExpressionException if invalid xpath.
    */
-  public BaseXmlMetaAnalyzer(String decoderXslt, String interrogator) throws IOException, TransformerConfigurationException, XPathExpressionException {
+  public BaseXmlMetaAnalyzer(String decoderXslt, String interrogator, String toArcGISXslt) throws IOException, TransformerConfigurationException, XPathExpressionException {
     xsltDecodeDC = loadTransformer(decoderXslt);
     this.xPath = createExpression(interrogator);
+    xsltToArcGIS = loadTransformer(toArcGISXslt);
   }
 
   @Override
@@ -92,7 +95,24 @@ public abstract class BaseXmlMetaAnalyzer implements MetaAnalyzer {
       throw new MetaException(String.format("Error extracting attributes."), ex);
     }
   }
-
+  
+  @Override
+  public String transform2ArcGISXML(Document doc) throws MetaException {
+    try {
+      Transformer transformer = xsltToArcGIS.newTransformer();
+      DOMSource domSource = new DOMSource(doc);
+      if (!(Boolean)xPath.evaluate(doc,XPathConstants.BOOLEAN)) {
+        return null;
+      }
+      StringWriter writer = new StringWriter();
+      StreamResult result = new StreamResult(writer);
+      transformer.transform(domSource, result);
+      String ArcGISXML = writer.toString();
+      return ArcGISXML;
+    } catch (TransformerException | XPathExpressionException ex) {
+      throw new MetaException(String.format("Error creating ArcGIS XML."), ex);
+    }
+  }  
   /**
    * Creates XPath expression based on string definition.
    * @param definition string definition

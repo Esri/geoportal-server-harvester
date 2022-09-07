@@ -13,6 +13,7 @@
     <modules>
         <module>geoportal-harvester-console</module>
         <module>geoportal-harvester-csw</module>
+        <module>geoportal-harvester-dcat</module>
         <module>geoportal-harvester-folder</module>
         <module>geoportal-harvester-gpt</module>
         <module>geoportal-harvester-waf</module>

@@ -56,4 +56,17 @@ public class MultiMetaAnalyzerWrapper implements MetaAnalyzer {
     }
     return null;
   }
+
+  @Override
+  public String transform2ArcGISXML(Document doc) throws MetaException {
+    if (analyzers!=null) {
+      for (MetaAnalyzer a: analyzers) {
+        String arcgisXML = a.transform2ArcGISXML(doc);
+        if (arcgisXML!=null) {
+          return arcgisXML;
+        }
+      }
+    }
+    return null;
+  }
 }

@@ -29,4 +29,12 @@ public interface MetaAnalyzer {
    * @throws MetaException if metadata extraction failed
    */
   MapAttribute extract(Document doc) throws MetaException;
+  
+  /**
+   * Transforms source metadata to ArcGIS XML
+   * @param doc - source metadata to transform to ArcGIS XML
+   * @return the XML as a string
+   * @throws MetaException if metadata translation failed
+   */
+  String transform2ArcGISXML(Document doc) throws MetaException;
 }

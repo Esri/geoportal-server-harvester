@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -49,6 +50,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.ContentProducer;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -126,9 +128,28 @@ public class AgpClient implements Closeable {
     
     return execute(req,ItemResponse.class);
   }
+
+  public ItemResponse addItem(String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, File fileToUpload, File metadataFile, String token) throws IOException, URISyntaxException {
+    boolean multipart = (fileToUpload!=null || metadataFile!=null);
+    URIBuilder builder = new URIBuilder(addItemUri(owner, StringUtils.trimToNull(folderId)));
+    
+    HttpPost req = new HttpPost(builder.build());
+    
+    Map<String, String> params = makeStdParams(title, description, itemType, thumbnailUrl, extent, typeKeywords, tags, token);
+    if (url != null) {
+        params.put("url", url.toExternalForm());
+    }
+    
+    if (multipart) {
+        req.setEntity(multipart? createEntity(params, fileToUpload, metadataFile): createEntity(params));
+    } else {
+        createEntity(params);
+    }
+    return execute(req,ItemResponse.class);
+  }
   
   /**
-   * Adds item.
+   * updates item without metadata.
    * @param owner user name
    * @param folderId folder id (optional)
    * @param itemId item id
@@ -161,7 +182,49 @@ public class AgpClient implements Closeable {
 
     return execute(req,ItemResponse.class);
   }
+  
+ /**
+   * Updates item including its metadata.
+   * @param owner user name
+   * @param folderId folder id (optional)
+   * @param itemId item id
+   * @param title title
+   * @param description description
+   * @param url URL
+   * @param thumbnailUrl thumbnail URL
+   * @param itemType item type (must be a URL type)
+   * @param extent extent
+   * @param typeKeywords type keywords
+   * @param tags tags tags
+   * @param fileToUpload the file to be uploaded
+   * @param metadataFile the metadata to be uploaded
+   * @param token token
+   * @return add item response
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+  public ItemResponse updateItem(String owner, String folderId, String itemId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double [] extent, String [] typeKeywords, String [] tags, File fileToUpload, File metadataFile, String token) throws IOException, URISyntaxException {
+    boolean multipart = fileToUpload!=null || metadataFile!=null;
+    URIBuilder builder = new URIBuilder(updateItemUri(owner, StringUtils.trimToNull(folderId), itemId));
+    
+    HttpPost req = new HttpPost(builder.build());
+    
+    Map<String, String> params = makeStdParams(title, description, itemType, thumbnailUrl, extent, typeKeywords, tags, token);
+    if (url != null) {
+      params.put("url", url.toExternalForm());
+    }
+    
+    // MH include metadata file
+    // req.setEntity(multipart? createEntity(params, fileToUpload): createEntity(params));
+    if (multipart) {
+        req.setEntity(multipart? createEntity(params, fileToUpload, metadataFile): createEntity(params));
+    } else {
+        createEntity(params);
+    }
 
+    return execute(req,ItemResponse.class);
+  }
+  
   /**
    * Reads item information.
    * @param itemId item id
@@ -225,11 +288,15 @@ public class AgpClient implements Closeable {
     if (token!=null) {
       builder.setParameter("f", "json");
       builder.setParameter("token", token);
+      builder.setParameter("overwrite", "true");
     }
     HttpPost req = new HttpPost(builder.build());
     
     try {
-      HttpEntity entity = new ByteArrayEntity(metadataXML.getBytes("UTF-8"));
+      //HttpEntity entity = new ByteArrayEntity(metadataXML.getBytes("UTF-8"));
+      ByteArrayEntity entity = new ByteArrayEntity(metadataXML.getBytes("UTF-8"));
+      
+      entity.setContentType("text/xml");
       req.setEntity(entity);
       return execute(req, 0);
     } catch (HttpResponseException ex) {
@@ -509,7 +576,7 @@ public class AgpClient implements Closeable {
            .setPath(rootUrl.toURI().getPath() + "sharing/rest/content/users/" + owner + (folderId!=null? "/" +folderId: "") +"/addItem");
     return builder.build();
   }
-  
+
   private URI shareUri(String owner, String folderId, String itemId) throws URISyntaxException {
     URIBuilder builder = new URIBuilder();
     builder.setScheme(rootUrl.toURI().getScheme())
@@ -581,7 +648,21 @@ public class AgpClient implements Closeable {
     builder.addBinaryBody("file", file);
     return builder.build();
   }
-  
+  private HttpEntity createEntity(Map<String, String> params, File file, File metadataFile) throws UnsupportedEncodingException, IOException {
+    MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+    builder.setMode(HttpMultipartMode.RFC6532);
+    params.entrySet().stream().forEach(e->builder.addPart(e.getKey(), new StringBody(e.getValue(), ContentType.MULTIPART_FORM_DATA)));
+    if (metadataFile != null) {
+        //String content = FileUtils.readFileToString(metadataFile, "UTF-8");//Files.readString(fileName);
+        //builder.addTextBody("metadata", content, ContentType.TEXT_XML);
+        builder.addBinaryBody("metadata", metadataFile, ContentType.TEXT_XML, "metadata.xml");
+    }
+    if (file != null) {
+        builder.addBinaryBody("file", file);        
+    }
+    return builder.build();
+  }
+    
   private <T> T execute(HttpUriRequest req, Class<T> clazz) throws IOException {
     String responseContent = execute(req, 0);
     ObjectMapper mapper = new ObjectMapper();

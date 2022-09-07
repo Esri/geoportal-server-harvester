@@ -22,7 +22,7 @@ import javax.xml.xpath.XPathExpressionException;
 /**
  * Simple DC meta analyzer.
  */
-public class SimpleDcMetaAnalyzer extends BaseXmlMetaAnalyzer {
+public class SimpleArcGISMetaAnalyzer extends BaseXmlMetaAnalyzer {
   
   /**
    * Creates instance of the analyzer.
@@ -30,9 +30,8 @@ public class SimpleDcMetaAnalyzer extends BaseXmlMetaAnalyzer {
    * @throws javax.xml.transform.TransformerConfigurationException if error compiling xslt
    * @throws javax.xml.xpath.XPathExpressionException if invalid xpath
    */
-  public SimpleDcMetaAnalyzer() throws IOException, TransformerConfigurationException, XPathExpressionException {
-    // super("meta/decodedc.xslt","count(/rdf:RDF/rdf:Description/@rdf:about)>0");
-       super("meta/decodedc.xslt","count(/rdf:RDF/rdf:Description/@rdf:about)>0", "meta/DC_to_ArcGIS.xslt");
+  public SimpleArcGISMetaAnalyzer() throws IOException, TransformerConfigurationException, XPathExpressionException {
+       super("meta/decodearcgis.xslt","count(/metadata/Esri/ArcGISFormat)>0", "meta/Identity.xslt");
   }
   
 }

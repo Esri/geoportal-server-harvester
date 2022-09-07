@@ -48,11 +48,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+// import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -70,13 +74,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.HttpResponseException;
+//import org.apache.http.HttpEntity;
+//import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ByteArrayEntity;
+//import org.apache.http.client.methods.HttpPost;
+//import org.apache.http.client.utils.URIBuilder;
+//import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
@@ -142,13 +146,17 @@ import org.xml.sax.SAXException;
                   .filter(t->!Arrays.stream(toBeSkipped).anyMatch(s->s==t))
                   .collect(Collectors.toSet());
           if (!types.isEmpty()) {
-            byte[]         rawContent = ref.getContent(types.toArray(new MimeType[types.size()]));
+            byte[] rawContent = ref.getContent(types.toArray(new MimeType[types.size()]));
             content = rawContent!=null ? DocUtils.generateMetadataXML(rawContent, new File(ref.getId()).getName(), sizeLimit) : null;
           }
       }
         
       // extract map of attributes (normalized names)
       MapAttribute attributes = extractMapAttributes(ref, content);
+      
+      // transform metadata to ArcGIS XML
+      String arcgisMetadata = transformMetadataToArcGISXML(content);
+          
 
       if (attributes == null) {
         throw new DataOutputException(this, ref, String.format("Error extracting attributes from data."));
@@ -220,6 +228,11 @@ import org.xml.sax.SAXException;
         }
       }
 
+      // create temporary file for the metadata
+      Path tmpFile = Files.createTempFile(null, null);
+      Files.write(tmpFile, arcgisMetadata.getBytes(StandardCharsets.UTF_8));
+      File metadataFile = tmpFile.toFile();
+
       try {
 
         // generate token
@@ -232,6 +245,36 @@ import org.xml.sax.SAXException;
 
         if (itemEntry == null) {
           // add item if doesn't exist
+          
+          // add item with dummy 'simple' metadata
+          String dummyMetadata =  "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+                  + "<metadata xml:lang=\"en\">"
+                  + "  <Esri>"
+                  + "    <CreaDate>2022-07-21</CreaDate>"
+                  + "    <CreaTime>12:26:34.68</CreaTime>"
+                  + "    <ModDate>2022-07-21</ModDate>"
+                  + "    <ModTime>12:59:19.59</ModTime>"
+                  + "    <PublishStatus>editor:esri.dijit.metadata.editor</PublishStatus>"
+                  + "    <ArcGISFormat>1.0</ArcGISFormat>"
+                  + "    <ArcGISstyle>ISO 19139 Metadata Implementation Specification GML3.2</ArcGISstyle>"
+                  + "    <ArcGISProfile>ISO19139</ArcGISProfile>"
+                  + "    <MapLyrSync>false</MapLyrSync>"
+                  + "  </Esri>"
+                  + "  <mdHrLv><ScopeCd value=\"005\"/></mdHrLv>"
+                  + "  <mdFileID>" + resourceUrl + "</mdFileID>"
+                  + "  <mdDateSt>2016-02-19</mdDateSt><mdTimeSt>16:48:06.84</mdTimeSt>"
+                  + "  <dataIdInfo>"
+                  + "    <idCitation>"
+                  + "      <resTitle>" + title + "</resTitle>"
+                  + "    </idCitation>"
+                  + "    <idAbs>" + sanitize(description) + "</idAbs>"
+                  + "  </dataIdInfo>"
+                  + "</metadata>";
+
+          Path dummyMetadataPath = Files.createTempFile(null, null);
+          Files.write(dummyMetadataPath, dummyMetadata.getBytes(StandardCharsets.UTF_8));
+          File dummyMetadataFile = dummyMetadataPath.toFile();          
+          
           ItemResponse response = addItem(
                   title,
                   description,
@@ -240,34 +283,35 @@ import org.xml.sax.SAXException;
                   itemType,
                   extractEnvelope(bbox),
                   typeKeywords,
-                  fileToUpload
+                  null,
+                  metadataFile,
+                  token
           );
 
+          // remove the dummy metadata file
+          dummyMetadataFile.delete();
+          
           if (response == null || !response.success) {
             String error = response != null && response.error != null && response.error.message != null ? response.error.message : null;
             throw new DataOutputException(this, ref, String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
+          } else {
+            System.out.print("addItem -> " + response.toString());
+            
+            // Now upload full metadata
+            String metadataAdded = client.writeItemMetadata(response.id, arcgisMetadata, token);
+            System.out.print("METADATA -> " + metadataAdded);
           }
           
-          // MH - upload item metadata
-          String metadataAdded = client.writeItemMetadata(response.id, 
-                  "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
-                  + "<metadata xml:lang=\"en\">"
-                  + "  <Esri/>"
-                  + "  <mdFileID>" + response.id + "</mdFileID>"
-                  + "  <dataIdInfo>"
-                  + "    <idCitation>"
-                  + "      <resTitle>" + title + "</resTitle>"
-                  + "    </idCitation>"
-                  + "    <idAbs>" + description + "</idAbs>"
-                  + "  </idCitation>"
-                  + "</metadata>", token);
-          System.out.print("METADATA -> " + metadataAdded);    
 
           client.share(definition.getCredentials().getUserName(), definition.getFolderId(), response.id, true, true, null, token);
 
           return PublishingStatus.CREATED;
 
-        } else if (itemEntry.owner.equals(definition.getCredentials().getUserName())) {
+        } else { // if (itemEntry.owner.equals(definition.getCredentials().getUserName())) {
+          // if the item is not owned by the registered account, try to update
+          // assuming the item is in a shared update group.
+          // if this fails and the registered account cannot update the existing item
+          // then consider this item 'skipped'
 
           itemEntry = client.readItem(itemEntry.id, token);
           if (itemEntry == null) {
@@ -286,19 +330,25 @@ import org.xml.sax.SAXException;
                   itemType,
                   extractEnvelope(bbox),
                   typeKeywords,
-                  fileToUpload
+                  fileToUpload,
+                  metadataFile,
+                  token
           );
 
           if (response == null || !response.success) {
             String error = response != null && response.error != null && response.error.message != null ? response.error.message : null;
             throw new DataOutputException(this, ref, String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
+          } else {
+            // String metadataAdded = client.writeItemMetadata(response.id, arcgisMetadata, token);
+            System.out.print("updateItem -> " + response.toString());
           }
 
           existing.remove(itemEntry.id);
 
           return PublishingStatus.UPDATED;
-        } else {
-          return PublishingStatus.SKIPPED;
+        // MH
+        //} else {
+        //  return PublishingStatus.SKIPPED;
         }
       } catch (MalformedURLException ex) {
         return PublishingStatus.SKIPPED;
@@ -395,31 +445,37 @@ import org.xml.sax.SAXException;
     if (doc != null) {
       attributes.getNamedAttributes().putAll(metaAnalyzer.extract(doc).getNamedAttributes());
     } else {
+      String sXml = "";
       if (ref.getContentType().contains(MimeType.APPLICATION_XML) || ref.getContentType().contains(MimeType.TEXT_XML)) {
-        String sXml = new String(ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML), "UTF-8");
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-        factory.setXIncludeAware(false);
-        factory.setExpandEntityReferences(false);
-        factory.setNamespaceAware(true);
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        doc = builder.parse(new InputSource(new StringReader(sXml)));
+        sXml = new String(ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML), "UTF-8");
+        //DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        //factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        //factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        //factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        //factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        //factory.setXIncludeAware(false);
+        //factory.setExpandEntityReferences(false);
+        //factory.setNamespaceAware(true);
+        //DocumentBuilder builder = factory.newDocumentBuilder();
+        //doc = builder.parse(new InputSource(new StringReader(sXml)));
       } else if (content!=null) {
-        String sXml = new String(content, "UTF-8");
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-        factory.setXIncludeAware(false);
-        factory.setExpandEntityReferences(false);
-        factory.setNamespaceAware(true);
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        doc = builder.parse(new InputSource(new StringReader(sXml)));
+        sXml = new String(content, "UTF-8");
       }
+      /*
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+      factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+      factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+      factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+      factory.setFeature("http://xml.org/sax/features/validation", false);
+      factory.setFeature("http://apache.org/xml/features/validation/schema", false);
+      factory.setXIncludeAware(false);
+      factory.setExpandEntityReferences(false);
+      factory.setNamespaceAware(true);
+      DocumentBuilder builder = factory.newDocumentBuilder();
+      doc = builder.parse(new InputSource(new StringReader(sXml)));
+      */
+      doc = stringToDoc(sXml);
       
       if (doc!=null) {
         MapAttribute extractedAttributes = metaAnalyzer.extract(doc);
@@ -434,7 +490,47 @@ import org.xml.sax.SAXException;
       
     return attributes;
   }
+  
+  private Document stringToDoc(String sXml) throws SAXException, IOException, ParserConfigurationException {
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+      factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+      factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+      factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+      factory.setXIncludeAware(false);
+      factory.setExpandEntityReferences(false);
+      factory.setNamespaceAware(true);
+      factory.setValidating(false);
+      DocumentBuilder builder = factory.newDocumentBuilder();
+      
+      org.w3c.dom.Document theDocument = builder.parse(new InputSource(new StringReader(sXml)));
+      
+      return theDocument;
+  }
 
+
+  /*
+    clean up html tags from inText (for example <br> or &nbsp;) that are hard for XML
+  */
+  private String sanitize(String inText) {
+      String result = inText.replace("&nbsp;", "&amp;nbsp;")
+              .replace("<br>","<br/>")
+              .replace("</br>", "<br/>");      
+      
+      return result;
+  }  
+  private String transformMetadataToArcGISXML(byte [] content) throws MetaException, IOException, ParserConfigurationException, SAXException {
+      String sXml = new String(content, StandardCharsets.UTF_8);
+      String sXsd = "xsi:schemaLocation=\"http://www.isotc211.org/2005/gmi ftp://ftp.ncddc.noaa.gov/pub/Metadata/Online_ISO_Training/Intro_to_ISO/schemas/ISObio/schema.xsd\"";
+      sXml = sXml.replace(sXsd, "");
+      System.out.println("XML -> \n" + sXml);
+      org.w3c.dom.Document doc = stringToDoc(sXml);
+      String arcgisXML = metaAnalyzer.transform2ArcGISXML(doc);
+      System.out.println("ArcGIS XML -> \n" + arcgisXML);
+      
+      return arcgisXML;        
+  }
+  
   private ItemResponse addItem(String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double[] envelope, String[] typeKeywords, File fileToUpload) throws IOException, URISyntaxException {
     if (token == null) {
       token = generateToken();
@@ -462,9 +558,19 @@ import org.xml.sax.SAXException;
             title,
             description,
             url, thumbnailUrl,
-            itemType, envelope, typeKeywords, null, fileToUpload, token);
+            itemType, envelope, typeKeywords, null, fileToUpload, null, token);
   }
 
+  private ItemResponse addItem(String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double[] envelope, String[] typeKeywords, File fileToUpload, File metadataFile, String token) throws IOException, URISyntaxException {
+    return client.addItem(
+            definition.getCredentials().getUserName(),
+            definition.getFolderId(),
+            title,
+            description,
+            url, thumbnailUrl,
+            itemType, envelope, typeKeywords, null, fileToUpload, metadataFile, token);
+  }
+  
   private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double[] envelope, String[] typeKeywords, File fileToUpload) throws IOException, URISyntaxException {
     if (token == null) {
       token = generateToken();
@@ -500,6 +606,17 @@ import org.xml.sax.SAXException;
             description,
             url, thumbnailUrl,
             itemType, envelope, typeKeywords, null, fileToUpload, token);
+  }
+  
+  private ItemResponse updateItem(String id, String owner, String folderId, String title, String description, URL url, URL thumbnailUrl, ItemType itemType, Double[] envelope, String[] typeKeywords, File fileToUpload, File metadataFile, String token) throws IOException, URISyntaxException {
+    return client.updateItem(
+            owner,
+            folderId,
+            id,
+            title,
+            description,
+            url, thumbnailUrl,
+            itemType, envelope, typeKeywords, null, fileToUpload, metadataFile, token);
   }
 
   private DeleteResponse deleteItem(String id, String owner, String folderId) throws URISyntaxException, IOException {

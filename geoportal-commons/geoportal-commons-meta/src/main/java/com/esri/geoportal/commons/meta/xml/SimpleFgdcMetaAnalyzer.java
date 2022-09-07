@@ -31,7 +31,8 @@ public class SimpleFgdcMetaAnalyzer extends BaseXmlMetaAnalyzer {
    * @throws javax.xml.xpath.XPathExpressionException if invalid xpath
    */
   public SimpleFgdcMetaAnalyzer() throws IOException, TransformerConfigurationException, XPathExpressionException {
-    super("meta/decodefgdc.xslt","count(/metadata/idinfo/citation/*[name()='citeinfo'])>0");
+    //super("meta/decodefgdc.xslt","count(/metadata/idinfo/citation/*[name()='citeinfo'])>0");
+    super("meta/decodefgdc.xslt","count(/metadata/idinfo/citation/*[name()='citeinfo'])>0", "meta/FGDC_to_ArcGIS.xslt");
   }
-  
+    
 }

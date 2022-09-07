@@ -14,7 +14,8 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>geoportal-commons-agp-client</artifactId>
-            <version>${project.version}</version>
+            <version>2.6.5</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

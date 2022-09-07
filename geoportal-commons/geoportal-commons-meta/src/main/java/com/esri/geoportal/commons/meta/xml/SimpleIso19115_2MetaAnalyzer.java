@@ -22,7 +22,7 @@ import javax.xml.xpath.XPathExpressionException;
 /**
  * SImple ISO-15115 meta analyzer.
  */
-public class SimpleIso15115MetaAnalyzer extends BaseXmlMetaAnalyzer {
+public class SimpleIso19115_2MetaAnalyzer extends BaseXmlMetaAnalyzer {
   
   /**
    * Creates instance of the analyzer.
@@ -30,7 +30,8 @@ public class SimpleIso15115MetaAnalyzer extends BaseXmlMetaAnalyzer {
    * @throws javax.xml.transform.TransformerConfigurationException if error compiling xslt
    * @throws javax.xml.xpath.XPathExpressionException if invalid xpath
    */
-  public SimpleIso15115MetaAnalyzer() throws IOException, TransformerConfigurationException, XPathExpressionException {
-    super("meta/decodeiso15115.xslt","count(/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification)>0");
+  public SimpleIso19115_2MetaAnalyzer() throws IOException, TransformerConfigurationException, XPathExpressionException {
+    // super("meta/decodeiso15115-2.xslt","count(/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification)>0");
+    super("meta/decodeiso19115-2.xslt","count(/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification)>0", "meta/ISO19139_to_ArcGIS.xsl");
   }
 }

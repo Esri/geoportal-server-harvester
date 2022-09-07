@@ -60,4 +60,9 @@ public class MultiMetaAnalyzerBean implements MetaAnalyzer {
     return metaAnalyzer.extract(doc);
   }
   
+  @Override
+  public String transform2ArcGISXML(Document doc) throws MetaException {
+    return metaAnalyzer.transform2ArcGISXML(doc);
+  }
+  
 }

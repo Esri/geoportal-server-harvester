@@ -22,9 +22,9 @@ import com.esri.geoportal.commons.meta.util.MultiMetaAnalyzerWrapper;
 import com.esri.geoportal.commons.meta.xml.SimpleDcMetaAnalyzer;
 import com.esri.geoportal.commons.meta.xml.SimpleDcMetaBuilder;
 import com.esri.geoportal.commons.meta.xml.SimpleFgdcMetaAnalyzer;
-import com.esri.geoportal.commons.meta.xml.SimpleIso15115MetaAnalyzer;
-import com.esri.geoportal.commons.meta.xml.SimpleIso15115_2MetaAnalyzer;
-import com.esri.geoportal.commons.meta.xml.SimpleIso15119MetaAnalyzer;
+import com.esri.geoportal.commons.meta.xml.SimpleIso19115MetaAnalyzer;
+import com.esri.geoportal.commons.meta.xml.SimpleIso19115_2MetaAnalyzer;
+import com.esri.geoportal.commons.meta.xml.SimpleIso19119MetaAnalyzer;
 import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
 import com.esri.geoportal.harvester.ckan.CkanConnector;
 import com.esri.geoportal.harvester.ckan.data.gov.DataGovConnector;
@@ -299,9 +299,9 @@ public class Bootstrap {
       MetaAnalyzer metaAnalyzer = new MultiMetaAnalyzerWrapper(
               new SimpleDcMetaAnalyzer(), 
               new SimpleFgdcMetaAnalyzer(), 
-              new SimpleIso15115MetaAnalyzer(), 
-              new SimpleIso15115_2MetaAnalyzer(), 
-              new SimpleIso15119MetaAnalyzer());
+              new SimpleIso19115MetaAnalyzer(), 
+              new SimpleIso19115_2MetaAnalyzer(), 
+              new SimpleIso19119MetaAnalyzer());
 
       outboundConnectorRegistry.put(AgpOutputConnector.TYPE, new AgpOutputConnector(metaAnalyzer, geometryServiceUrl, null));
       outboundConnectorRegistry.put(ConsoleConnector.TYPE, new ConsoleConnector());
