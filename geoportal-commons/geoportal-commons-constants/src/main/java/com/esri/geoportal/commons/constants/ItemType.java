@@ -35,6 +35,7 @@ public enum ItemType {
   PRO_MAP("Pro Map", File, MimeType.APPLICATION_ESRI_MAPX),
   FEATURE_SERVICE("Feature Service", URL, Pattern.compile(".+/FeatureServer$|.+/FeatureServer/\\d+$|.+/MapServer/\\d+$", Pattern.CASE_INSENSITIVE),"FeatureServer"),
   MAP_SERVICE("Map Service", URL, Pattern.compile(".+/MapServer$", Pattern.CASE_INSENSITIVE),"MapServer"),
+  TILED_IMAGERY("Tiled Imagery", URL, Pattern.compile(".+tiledimageservices\\.arcgis\\.com\\/.+"), "ImageServer"),
   IMAGE_SERVICE("Image Service", URL, Pattern.compile(".+/ImageServer$", Pattern.CASE_INSENSITIVE),"ImageServer"),
   KML("KML", URL, MimeType.APPLICATION_KML, MimeType.APPLICATION_KMZ),
   WMS("WMS", URL, Pattern.compile(".+service=WMS.*$|.+/wms$", Pattern.CASE_INSENSITIVE), null),

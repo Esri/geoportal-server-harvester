@@ -41,6 +41,8 @@ import org.apache.commons.text.StringEscapeUtils;
     Pattern quotPattern = Pattern.compile("[\"'][^\"']*[\"']", Pattern.CASE_INSENSITIVE);
     Matcher hrefMatcher = hrefPattern.matcher(content);
 
+    String rootExternalForm = root.toExternalForm();
+    
     int startIndex = 0;
     while (hrefMatcher.find(startIndex)) {
       String group = hrefMatcher.group();
@@ -50,7 +52,19 @@ import org.apache.commons.text.StringEscapeUtils;
         String extractedUrl = matchedUrl.replaceAll("^.|.$", "").replaceAll("\\{", "%7B").replaceAll("\\}", "%7D");
         try {
           URL url = new URL(root,extractedUrl);
-          if (url.toExternalForm().startsWith(root.toExternalForm()) && url.toExternalForm().length() > root.toExternalForm().length()) {
+
+          String urlExternalForm = url.toExternalForm();
+          String urlExternalFormUpper = urlExternalForm.toUpperCase();
+          
+          // if (url.toExternalForm().startsWith(root.toExternalForm()) && url.toExternalForm().length() > root.toExternalForm().length()) {
+          if (!urlExternalFormUpper.contains("O=A") 
+                  && !urlExternalFormUpper.contains("O=D") 
+                  && !urlExternalFormUpper.contains("C=N") 
+                  && !urlExternalFormUpper.contains("C=M") 
+                  && !urlExternalFormUpper.contains("C=S") 
+                  && !urlExternalFormUpper.contains("C=D") 
+                  && urlExternalForm.startsWith(rootExternalForm) 
+                  && urlExternalForm.length() > rootExternalForm.length()) {
             list.add(url);
           }
         } catch (NullPointerException|IllegalArgumentException ex) {}

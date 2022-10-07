@@ -60,6 +60,7 @@ import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -72,6 +73,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 //import org.apache.http.HttpEntity;
@@ -128,7 +130,9 @@ import org.xml.sax.SAXException;
   @Override
   public PublishingStatus publish(DataReference ref) throws DataOutputException {
     File fileToUpload = null;
+    File metadataFile = null;
     boolean deleteTempFile = false;
+    boolean deleteMetadataFile = false;
     
     try {
 
@@ -169,22 +173,36 @@ import org.xml.sax.SAXException;
       String src_uri_s = URLEncoder.encode(ref.getSourceUri().toASCIIString(), "UTF-8");
       String src_lastupdate_dt = ref.getLastModifiedDate() != null ? URLEncoder.encode(fromatDate(ref.getLastModifiedDate()), "UTF-8") : null;
 
-      String[] typeKeywords = {
-        String.format("src_source_type_s=%s", src_source_type_s),
-        String.format("src_source_uri_s=%s", src_source_uri_s),
-        String.format("src_source_name_s=%s", src_source_name_s),
-        String.format("src_uri_s=%s", src_uri_s),
-        String.format("src_lastupdate_dt=%s", src_lastupdate_dt)
-      };
-
       String title = getAttributeValue(attributes, WKAConstants.WKA_TITLE, null);
       String description = getAttributeValue(attributes, WKAConstants.WKA_DESCRIPTION, null);
       String sThumbnailUrl = StringUtils.trimToNull(getAttributeValue(attributes, WKAConstants.WKA_THUMBNAIL_URL, null));
       String resourceUrl = getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null);
       String bbox = getAttributeValue(attributes, WKAConstants.WKA_BBOX, null);
 
+      String[] typeKeywords = {
+        String.format("src_source_type_s=%s", src_source_type_s),
+        String.format("src_source_uri_s=%s", src_source_uri_s),
+        String.format("src_source_name_s=%s", src_source_name_s),
+        String.format("src_uri_s=%s", src_uri_s),
+        String.format("src_lastupdate_dt=%s", src_lastupdate_dt),
+        String.format("resourceURL=%s", URLEncoder.encode(resourceUrl, "UTF-8"))
+      };
+      
       // check if the item is eligible for publishing
+      // based on the main link in the item itself (not source metadata link)
       ItemType itemType = createItemType(resourceUrl);
+      if (itemType.equals(ItemType.TILED_IMAGERY)) {
+        ArrayList<String> newTypeKeywords = new ArrayList<>();
+        // import typeKeywords
+        newTypeKeywords.addAll(Arrays.asList(typeKeywords));
+        // add new type keyword
+        newTypeKeywords.add("Tiled Imagery");
+
+        typeKeywords = newTypeKeywords.toArray(new String[newTypeKeywords.size()]);
+
+        // finally, set the item type to IMAGE_SERVICE so that ArcGIS Portal/Online understand it
+        itemType = ItemType.IMAGE_SERVICE;
+      }
       
       // If the WKA_RESOURCE_URL is empty after parsing the XML file, see if it was set on the 
       // DataReference directly.
@@ -231,7 +249,8 @@ import org.xml.sax.SAXException;
       // create temporary file for the metadata
       Path tmpFile = Files.createTempFile(null, null);
       Files.write(tmpFile, arcgisMetadata.getBytes(StandardCharsets.UTF_8));
-      File metadataFile = tmpFile.toFile();
+      metadataFile = tmpFile.toFile();
+      //deleteMetadataFile = true;
 
       try {
 
@@ -241,7 +260,7 @@ import org.xml.sax.SAXException;
         }
 
         // check if item exists
-        ItemEntry itemEntry = searchForItem(src_uri_s);
+        ItemEntry itemEntry = searchForItem(resourceUrl);
 
         if (itemEntry == null) {
           // add item if doesn't exist
@@ -273,7 +292,7 @@ import org.xml.sax.SAXException;
 
           Path dummyMetadataPath = Files.createTempFile(null, null);
           Files.write(dummyMetadataPath, dummyMetadata.getBytes(StandardCharsets.UTF_8));
-          File dummyMetadataFile = dummyMetadataPath.toFile();          
+          File dummyMetadataFile = dummyMetadataPath.toFile();  
           
           ItemResponse response = addItem(
                   title,
@@ -302,7 +321,6 @@ import org.xml.sax.SAXException;
             System.out.print("METADATA -> " + metadataAdded);
           }
           
-
           client.share(definition.getCredentials().getUserName(), definition.getFolderId(), response.id, true, true, null, token);
 
           return PublishingStatus.CREATED;
@@ -317,7 +335,21 @@ import org.xml.sax.SAXException;
           if (itemEntry == null) {
             throw new DataOutputException(this, ref, String.format("Unable to read item entry."));
           }
+          
+          // Workaround for ArcGIS Portal/Online bug: look at typeKeywords in existing entry
+          // if it has 'Tiled Imagery' then re-add it to the list because otherwise it gets dropped
+          if (ArrayUtils.contains(itemEntry.typeKeywords, "Tiled Imagery")) {
+            if (!ArrayUtils.contains(typeKeywords, "Tiled Imagery")) {
+                ArrayList<String> newTypeKeywords = new ArrayList<>();
+                // import typeKeywords
+                newTypeKeywords.addAll(Arrays.asList(typeKeywords));
+                // add new type keyword
+                newTypeKeywords.add("Tiled Imagery");
 
+                typeKeywords = newTypeKeywords.toArray(new String[newTypeKeywords.size()]);
+            }
+          }
+     
           // update item if does exist
           ItemResponse response = updateItem(
                   itemEntry.id,
@@ -346,9 +378,6 @@ import org.xml.sax.SAXException;
           existing.remove(itemEntry.id);
 
           return PublishingStatus.UPDATED;
-        // MH
-        //} else {
-        //  return PublishingStatus.SKIPPED;
         }
       } catch (MalformedURLException ex) {
         return PublishingStatus.SKIPPED;
@@ -360,6 +389,9 @@ import org.xml.sax.SAXException;
       if (fileToUpload!=null && deleteTempFile) {
         fileToUpload.delete();
       }
+      if (metadataFile!=null && deleteMetadataFile) {
+        metadataFile.delete();
+      } 
     }
   }
   private ItemType createItemType(String resourceUrl) {
@@ -391,7 +423,9 @@ import org.xml.sax.SAXException;
 
   private ItemEntry searchForItem(String src_uri_s) throws URISyntaxException, IOException {
 
-    QueryResponse search = client.search(String.format("typekeywords:%s", String.format("src_uri_s=%s", src_uri_s)), 0, 0, token);
+    // QueryResponse search = client.search(String.format("typekeywords:%s", String.format("src_uri_s=%s", src_uri_s)), 0, 0, token);
+    // for ArcGIS Portal/Online, look for the resource URL instead of the source XML URI
+    QueryResponse search = client.search(String.format("url:%s", String.format("%s", src_uri_s)), 0, 0, token);
     ItemEntry itemEntry = search != null && search.results != null && search.results.length > 0 ? search.results[0] : null;
     
     return itemEntry;
@@ -515,7 +549,8 @@ import org.xml.sax.SAXException;
   private String sanitize(String inText) {
       String result = inText.replace("&nbsp;", "&amp;nbsp;")
               .replace("<br>","<br/>")
-              .replace("</br>", "<br/>");      
+              .replace("</br>", "<br/>")
+              .replace("’", "&#8217;");      
       
       return result;
   }  

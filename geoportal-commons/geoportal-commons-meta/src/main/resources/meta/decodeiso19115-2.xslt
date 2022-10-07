@@ -14,14 +14,13 @@ resource.url=<xsl:for-each select="/gmi:MI_Metadata/gmd:distributionInfo/gmd:MD_
     <xsl:when test="contains($link,'/mapserver')">
       <xsl:value-of select="."/>
     </xsl:when>
+    <xsl:when test="contains($link,'/imageserver')">
+      <xsl:value-of select="."/>
+    </xsl:when>
+    <xsl:when test="contains($link,'/featureserver')">
+      <xsl:value-of select="."/>
+    </xsl:when>
     <xsl:otherwise>
-      <xsl:choose>
-        <xsl:when test="contains($link,'/featureserver')">
-          <xsl:value-of select="."/>
-        </xsl:when>
-        <xsl:otherwise>
-        </xsl:otherwise>
-      </xsl:choose>
     </xsl:otherwise>
   </xsl:choose>  
 </xsl:for-each>
