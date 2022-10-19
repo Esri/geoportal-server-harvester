@@ -91,6 +91,10 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.commonmark.node.*;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
+
 
 /**
  * ArcGIS Portal output broker.
@@ -133,6 +137,9 @@ import org.xml.sax.SAXException;
     File metadataFile = null;
     boolean deleteTempFile = false;
     boolean deleteMetadataFile = false;
+    Parser markdownParser = Parser.builder().build();
+    HtmlRenderer htmlRenderer = HtmlRenderer.builder().build();
+
     
     try {
 
@@ -175,6 +182,13 @@ import org.xml.sax.SAXException;
 
       String title = getAttributeValue(attributes, WKAConstants.WKA_TITLE, null);
       String description = getAttributeValue(attributes, WKAConstants.WKA_DESCRIPTION, null);
+      // convert title and description from markdown to HTML
+      if (definition.isMarkdown2HTML()) {
+          Node titleNode = markdownParser.parse(title);
+          title = htmlRenderer.render(titleNode);
+          Node descriptionNode = markdownParser.parse(description);
+          description = htmlRenderer.render(descriptionNode);
+      }
       String sThumbnailUrl = StringUtils.trimToNull(getAttributeValue(attributes, WKAConstants.WKA_THUMBNAIL_URL, null));
       String resourceUrl = getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null);
       String bbox = getAttributeValue(attributes, WKAConstants.WKA_BBOX, null);
@@ -266,6 +280,8 @@ import org.xml.sax.SAXException;
           // add item if doesn't exist
           
           // add item with dummy 'simple' metadata
+          // no longer needed, but keep for testing purposes
+          /*
           String dummyMetadata =  "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
                   + "<metadata xml:lang=\"en\">"
                   + "  <Esri>"
@@ -293,6 +309,7 @@ import org.xml.sax.SAXException;
           Path dummyMetadataPath = Files.createTempFile(null, null);
           Files.write(dummyMetadataPath, dummyMetadata.getBytes(StandardCharsets.UTF_8));
           File dummyMetadataFile = dummyMetadataPath.toFile();  
+          */
           
           ItemResponse response = addItem(
                   title,
@@ -308,7 +325,8 @@ import org.xml.sax.SAXException;
           );
 
           // remove the dummy metadata file
-          dummyMetadataFile.delete();
+          // no longer needed, but keep for testing purposes
+          // dummyMetadataFile.delete();
           
           if (response == null || !response.success) {
             String error = response != null && response.error != null && response.error.message != null ? response.error.message : null;

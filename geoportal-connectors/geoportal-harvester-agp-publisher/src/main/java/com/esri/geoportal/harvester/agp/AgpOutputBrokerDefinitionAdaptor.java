@@ -41,7 +41,9 @@ import org.apache.commons.lang3.math.NumberUtils;
   private boolean cleanup;
   private Integer maxRedirects;
   private boolean uploadFiles;
+  private boolean markdown2html;
 
+  
   /**
    * Creates instance of the adaptor.
    *
@@ -68,6 +70,7 @@ import org.apache.commons.lang3.math.NumberUtils;
       cleanup = Boolean.parseBoolean(get(P_FOLDER_CLEANUP));
       maxRedirects = NumberUtils.toInt(get(P_MAX_REDIRECTS), DEFAULT_MAX_REDIRECTS);
       uploadFiles = Boolean.parseBoolean(get(P_UPLOAD));
+      markdown2html = Boolean.parseBoolean(get(P_MARKDOWN2HTML));
     }
   }
 
@@ -78,6 +81,7 @@ import org.apache.commons.lang3.math.NumberUtils;
     consume(params, P_FOLDER_CLEANUP);
     consume(params, P_MAX_REDIRECTS);
     consume(params, P_UPLOAD);
+    consume(params, P_MARKDOWN2HTML);
     credAdaptor.override(params);
   }
 
@@ -182,4 +186,12 @@ import org.apache.commons.lang3.math.NumberUtils;
     set(P_UPLOAD, Boolean.toString(uploadFiles));
   }
 
+  public boolean isMarkdown2HTML() {
+      return markdown2html;
+  }
+  
+  public void setMarkdown2HTML(boolean markdown2html) {
+      this.markdown2html = markdown2html;
+      set(P_MARKDOWN2HTML, Boolean.toString(markdown2html));        
+  }
 }

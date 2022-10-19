@@ -24,4 +24,5 @@ package com.esri.geoportal.harvester.agp;
   public static final String P_FOLDER_CLEANUP = "agp-folder-cleanup";
   public static final String P_MAX_REDIRECTS  = "agp-max-redirects";
   public static final String P_UPLOAD         = "agp-upload";
+  public static final String P_MARKDOWN2HTML  = "agp-markdown2html";
 }

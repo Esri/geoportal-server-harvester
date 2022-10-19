@@ -959,6 +959,7 @@ body {
 
 .h-broker-editor {
   min-width: 720px;
+  top: 100px !important;
 }
 
 .h-broker-editor .dijitSelect {
