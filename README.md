@@ -9,7 +9,7 @@ To report an issue, please go to [issues](https://github.com/Esri/geoportal-serv
 
 ## Limiting the Harvester's Reach
 
-The nature of the Harvester application is, as the name suggests, to harvest data from whatever web endpoints it is provided. The list(s) of endpoints to download data from can also be provided by external entities over the internet. Neither the data being harvested nor the list(s) of endpoints provided by external entities are vetted or checked by the Harvester. **Users who wish to limit the scope of the Harvester's reach should configure the network or machine where the Harvester is located with allow lists or deny lists of web endpoints to prevent the Harvester from reaching undesireable locations.**
+The nature of the Harvester application is, as the name suggests, to harvest data from whatever web endpoints it is provided. The list(s) of endpoints to download data from can also be provided by external entities over the internet. Neither the data being harvested nor the list(s) of endpoints provided by external entities are vetted or checked by the Harvester. **Users who wish to limit the scope of the Harvester's reach should configure the network or machine where the Harvester is located with allow lists or deny lists of web endpoints to prevent the Harvester from reaching undesirable locations.**
 
 ## Releases and Downloads
 - 2.6.5 - Released Jul 13, 2021, click [here](https://github.com/Esri/geoportal-server-harvester/releases/tag/v2.6.5) for release notes and downloads. 
