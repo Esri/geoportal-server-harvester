@@ -205,7 +205,7 @@ import org.slf4j.LoggerFactory;
       }
       return null;
     } catch (SQLException|JsonProcessingException|URISyntaxException|ScriptException|UnsupportedEncodingException ex) {
-      throw new DataInputException(this, String.format("Error reading content for: %s", id), ex);
+      throw new DataInputException(this, String.format("Error reading content for : %s", id), ex);
     }
   }
   
