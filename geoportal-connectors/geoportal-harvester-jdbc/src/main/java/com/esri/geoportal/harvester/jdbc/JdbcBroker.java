@@ -240,9 +240,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
       Class.forName(definition.getDriverClass());
       connection = DriverManager.getConnection(definition.getConnection(), definition.getCredentials().getUserName(), definition.getCredentials().getPassword());
     } catch (ClassNotFoundException ex) {
-      throw new DataProcessorException(String.format("Error loading JDBC driver class: %s", definition.getDriverClass()), ex);
+    	LOG.error(String.format("Error loading JDBC driver class: %s", ex.getMessage()));
+      throw new DataProcessorException(String.format("Error loading JDBC driver class: %s : Exception: "+ex, definition.getDriverClass()), ex);
     } catch (SQLException ex) {
-      throw new DataProcessorException(String.format("Error opening JDBC connection to: %s", definition.getConnection()), ex);
+    	LOG.error(String.format("Error opening JDBC connection to: %s", ex.getMessage()));
+      throw new DataProcessorException(String.format("Error opening JDBC connection to: %s : Exception: "+ex, definition.getConnection()), ex);
     }
   }
   
@@ -256,7 +258,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
               ? connection.prepareStatement(String.format("SELECT * FROM %s WHERE %s = ?", definition.getSqlStatement(), definition.getFileIdColumn())) 
               : connection.prepareStatement(String.format("SELECT * FROM (%s) AS data WHERE %s = ?", definition.getSqlStatement(), definition.getFileIdColumn()));
     } catch (SQLException ex) {
-      throw new DataProcessorException(String.format("Error in creating statement: %s", definition.getSqlStatement()), ex);
+      throw new DataProcessorException(String.format("Error in creating statement: %s : Exception: "+ex, definition.getSqlStatement()), ex);
     }
   }
   
@@ -264,7 +266,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
     try {
       resultSet = statement.executeQuery();
     } catch (SQLException ex) {
-      throw new DataProcessorException(String.format("Error in executing query: %s", definition.getSqlStatement()), ex);
+      throw new DataProcessorException(String.format("Error in executing query: %s : Exception: "+ex, definition.getSqlStatement()), ex);
     }
   }
   
@@ -496,7 +498,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
         }
       }
     } catch (SQLException ex) {
-      throw new DataProcessorException(String.format("Error opening JDBC connection to: %s", definition.getConnection()), ex);
+      throw new DataProcessorException(String.format("Error getting resultset metadata: %s : Exception: "+ex, definition.getConnection()), ex);
     }
   }
   
@@ -653,7 +655,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
         attributeInjectors.addAll(createAttributeInjectors(columnName, columnType));
       }
     } catch (SQLException ex) {
-      throw new DataProcessorException(String.format("Error in getting metadata from resultset: %s", definition.getSqlStatement()), ex);
+      throw new DataProcessorException(String.format("Error in getting metadata from resultset: %s : Exception: "+ex, definition.getSqlStatement()), ex);
     }
   }
   
@@ -698,7 +700,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
         }
       }
     } catch (SQLException ex) {
-      throw new DataProcessorException(String.format("Error in getting metadata from resultset: %s", definition.getSqlStatement()), ex);
+      throw new DataProcessorException(String.format("Error in getting metadata from resultset: %s : Exception: "+ex, definition.getSqlStatement()), ex);
     }
   }
   
@@ -718,7 +720,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
       ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
       return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(zonedDateTime);
     } catch (DateTimeException ex) {
-      LOG.trace(String.format("Invalid ISO date: %s", date), ex);
+      LOG.trace(String.format("Invalid ISO date: %s : Exception: "+ex, date), ex);
       return null;
     }
   }
@@ -840,7 +842,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
       try {
         return resultSet.next();
       } catch (SQLException ex) {
-        throw new DataInputException(JdbcBroker.this, String.format("Error iterating data."), ex);
+        throw new DataInputException(JdbcBroker.this, String.format("Error iterating data. : Exception: "+ex), ex);
       }
     }
 
@@ -849,7 +851,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
       try {
         return createReference(resultSet);
       } catch (SQLException|URISyntaxException|UnsupportedEncodingException|JsonProcessingException|ScriptException ex) {
-        throw new DataInputException(JdbcBroker.this, String.format("Error reading data"), ex);
+        throw new DataInputException(JdbcBroker.this, String.format("Error reading data : Exception: "+ex), ex);
       }
     }
   }
