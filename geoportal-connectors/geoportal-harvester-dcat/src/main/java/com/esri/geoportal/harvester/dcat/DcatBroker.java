@@ -162,7 +162,7 @@ import org.w3c.dom.Document;
       return iter;
     } catch (IOException ex) {
       safeDeleteFile(file);
-      throw new DataInputException(this, String.format("Error reading content of %s", definition.getHostUrl().toExternalForm()), ex);
+      throw new DataInputException(this, String.format("Error reading content of %s Exception: "+ex, definition.getHostUrl().toExternalForm()), ex);
     }
   }
 
@@ -211,7 +211,7 @@ import org.w3c.dom.Document;
           parser = new DcatParser(input);
         } catch (IOException ex) {
           close();
-          throw new DataInputException(DcatBroker.this, String.format("Error parsing DCAT file"), ex);
+          throw new DataInputException(DcatBroker.this, String.format("Error parsing DCAT file. Exception: "+ex), ex);
         }
       }
 
@@ -250,7 +250,7 @@ import org.w3c.dom.Document;
             byte[] bytes = json.getBytes("UTF-8");
             ref.addContext(MimeType.APPLICATION_JSON, bytes);
           } catch (JsonProcessingException | UnsupportedEncodingException ex) {
-            throw new DataInputException(DcatBroker.this, String.format("Error generating JSON"), ex);
+            throw new DataInputException(DcatBroker.this, String.format("Error generating JSON. Exception: "+ex), ex);
           }
         }
 
@@ -299,13 +299,13 @@ import org.w3c.dom.Document;
             ref.addContext(MimeType.APPLICATION_XML, bytes);
 
           } catch (MetaException | TransformerException | UnsupportedEncodingException ex) {
-            throw new DataInputException(DcatBroker.this, String.format("Error generating XML"), ex);
+            throw new DataInputException(DcatBroker.this, String.format("Error generating XML. Exception: "+ex), ex);
           }
         }
 
         return ref;
       } catch (URISyntaxException ex) {
-        throw new DataInputException(DcatBroker.this, String.format("Error creating data for %s", r.getIdentifier()), ex);
+        throw new DataInputException(DcatBroker.this, String.format("Error creating data for %s Exception: "+ex, r.getIdentifier()), ex);
       }
     }
 

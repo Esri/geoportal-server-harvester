@@ -177,7 +177,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
         definition.setGroupId(null);
       }
     } catch (IOException|URISyntaxException ex) {
-      throw new DataProcessorException(String.format("Error listing folders for user: %s", definition.getCredentials().getUserName()), ex);
+      throw new DataProcessorException(String.format("Error listing folders for user: %s Exception: "+ex, definition.getCredentials().getUserName()), ex);
     }
   }
 
@@ -200,7 +200,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
       ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(itemEntry).getBytes("UTF-8"));
       return ref;
     } catch (IOException|URISyntaxException ex) {
-      throw new DataInputException(this, String.format("Error reading data from: %s", id), ex);
+      throw new DataInputException(this, String.format("Error reading data from: %s Exception: "+ex, id), ex);
     }
   }
 
@@ -286,7 +286,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
           iter = list.iterator();
         } catch (IOException|URISyntaxException ex) {
           done = true;
-          throw new DataInputException(AgpInputBroker.this, String.format("Error reading content."), ex);
+          throw new DataInputException(AgpInputBroker.this, String.format("Error reading content. Exception: "+ex), ex);
         }
       }
       if (iter!=null && !iter.hasNext()) {
@@ -311,7 +311,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
         }
         return createReference(nextEntry);
       } catch (MetaException|TransformerException|URISyntaxException|IOException ex) {
-        throw new DataInputException(AgpInputBroker.this, String.format("Error reading next data reference."), ex);
+        throw new DataInputException(AgpInputBroker.this, String.format("Error reading next data reference. Exception: "+ex), ex);
       }
     }
     

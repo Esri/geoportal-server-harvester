@@ -124,7 +124,7 @@ class GptBroker implements InputBroker {
       ref.addContext(MimeType.APPLICATION_XML, readXml(id).getBytes("UTF-8"));
       return ref;
     } catch (URISyntaxException | UnsupportedEncodingException ex) {
-      throw new DataInputException(this, String.format("Error reading data %s", id), ex);
+      throw new DataInputException(this, String.format("Error reading data %s Exception: "+ex, id), ex);
     }
   }
 
@@ -145,7 +145,7 @@ class GptBroker implements InputBroker {
 
       return ref;
     } catch (URISyntaxException | IOException ex) {
-      throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records."), ex);
+      throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records. Exception: "+ex), ex);
     }
   }
 
@@ -182,7 +182,7 @@ class GptBroker implements InputBroker {
         }
         return iter.hasNext();
       } catch (IOException | URISyntaxException ex) {
-        throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records."), ex);
+        throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records. Exception: "+ex), ex);
       }
     }
 

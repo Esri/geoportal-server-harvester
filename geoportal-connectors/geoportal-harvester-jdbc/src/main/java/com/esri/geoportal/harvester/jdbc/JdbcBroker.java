@@ -239,6 +239,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
     try {
       Class.forName(definition.getDriverClass());
       connection = DriverManager.getConnection(definition.getConnection(), definition.getCredentials().getUserName(), definition.getCredentials().getPassword());
+      LOG.info("jdbc connection created");
     } catch (ClassNotFoundException ex) {
     	LOG.error(String.format("Error loading JDBC driver class: %s", ex.getMessage()));
       throw new DataProcessorException(String.format("Error loading JDBC driver class: %s : Exception: "+ex, definition.getDriverClass()), ex);

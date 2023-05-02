@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.esri.geoportal</groupId>
   <artifactId>geoportal-harvester</artifactId>
-  <version>2.6.5</version>
+  <version>2.7.0</version>
   <packaging>pom</packaging>
   <name>Esri :: Geoportal Server :: Harvester</name>
   <description>Top-level project for all Harvester modules.</description>
@@ -67,6 +67,14 @@
               <groupId>org.slf4j</groupId>
               <artifactId>slf4j-log4j12</artifactId>
           </exclusion>
+		 <!--   <exclusion>
+              <groupId>xml-apis</groupId>
+              <artifactId>xml-apis</artifactId>
+          </exclusion>
+		  <exclusion>
+              <groupId>xerces</groupId>
+              <artifactId>xercesImpl</artifactId>
+          </exclusion>-->
       </exclusions>
     </dependency>
     <dependency>
@@ -109,7 +117,7 @@
         <groupId>org.commonmark</groupId>
         <artifactId>commonmark</artifactId>
         <version>0.19.0</version>
-    </dependency>
+    </dependency>  
   </dependencies>
   <build>
     <plugins>
