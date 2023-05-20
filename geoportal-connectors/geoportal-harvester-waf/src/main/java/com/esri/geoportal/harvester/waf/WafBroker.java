@@ -122,9 +122,9 @@ import org.slf4j.LoggerFactory;
       WafFile file = new WafFile(this, new URL(id), definition.getCredentials());
       return file.readContent(httpClient, null);
     } catch (MalformedURLException ex) {
-      throw new DataInputException(this, String.format("Invalid id: %s", id), ex);
+      throw new DataInputException(this, String.format("Invalid id: %s : Exception: "+ex, id), ex);
     } catch (IOException|URISyntaxException ex) {
-      throw new DataInputException(this, String.format("Error reading content: %s", id), ex);
+      throw new DataInputException(this, String.format("Error reading content: %s : Exception: "+ex, id), ex);
     }
   }
 
@@ -189,7 +189,7 @@ import org.slf4j.LoggerFactory;
 
         return false;
       } catch (IOException|URISyntaxException ex) {
-        throw new DataInputException(WafBroker.this, "Error reading data.", ex);
+        throw new DataInputException(WafBroker.this, "Error reading data. : Exception: "+ex, ex);
       }
     }
 

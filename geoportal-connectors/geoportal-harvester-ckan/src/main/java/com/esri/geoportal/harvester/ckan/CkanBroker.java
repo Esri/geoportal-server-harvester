@@ -214,7 +214,7 @@ public class CkanBroker implements InputBroker {
 
       return new Content(XmlUtils.toString(document), MimeType.APPLICATION_XML, new MapAttribute(attrs));
     } catch (MetaException | TransformerException ex) {
-      throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
+      throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s Exception: "+ex, this), ex);
     }
   }
 
@@ -243,7 +243,7 @@ public class CkanBroker implements InputBroker {
 
       return ref;
     } catch (IOException | URISyntaxException ex) {
-      throw new DataInputException(this, String.format("Error reading data from: %s", id), ex);
+      throw new DataInputException(this, String.format("Error reading data from: %s Exception: "+ex, id), ex);
     }
   }
 
@@ -393,7 +393,7 @@ public class CkanBroker implements InputBroker {
 
         return hasNext();
       } catch (IOException | URISyntaxException ex) {
-        throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
+        throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s Exception: "+ex, this), ex);
       }
     }
 
@@ -405,7 +405,7 @@ public class CkanBroker implements InputBroker {
         return createReference(dataSet);
 
       } catch (URISyntaxException | UnsupportedEncodingException | IllegalArgumentException | JsonProcessingException ex) {
-        throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s", this), ex);
+        throw new DataInputException(CkanBroker.this, String.format("Error reading data from: %s Exception: "+ex, this), ex);
       }
     }
   }

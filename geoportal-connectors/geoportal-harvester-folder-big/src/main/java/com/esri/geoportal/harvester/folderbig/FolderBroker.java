@@ -91,7 +91,7 @@ import static com.esri.geoportal.harvester.folderbig.PathUtil.splitPath;
         fetchExisting(brokerRootFolder);
       }
     } catch (IOException|URISyntaxException ex) {
-      throw new DataProcessorException(String.format("Error initializing broker."), ex);
+      throw new DataProcessorException(String.format("Error initializing broker. Exception: "+ex), ex);
     }
   }
 
@@ -115,7 +115,7 @@ import static com.esri.geoportal.harvester.folderbig.PathUtil.splitPath;
         try {
           Files.delete(Paths.get(f));
         } catch (IOException ex) {
-          LOG.warn(String.format("Error deleting file: %s", f), ex);
+          LOG.warn(String.format("Error deleting file: %s Exception: "+ex, f), ex);
         }
       }
       LOG.info(String.format("%d records has been removed during cleanup.", existing.size()));

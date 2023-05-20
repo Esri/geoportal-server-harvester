@@ -406,7 +406,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
       }
 
     } catch (MetaException | IOException | ParserConfigurationException | SAXException | URISyntaxException ex) {
-      throw new DataOutputException(this, ref, String.format("Error publishing data: %s", ref), ex);
+      throw new DataOutputException(this, ref, String.format("Error publishing data: %s Exception: "+ex, ref), ex);
     } finally {
       if (fileToUpload!=null && deleteTempFile) {
         fileToUpload.delete();

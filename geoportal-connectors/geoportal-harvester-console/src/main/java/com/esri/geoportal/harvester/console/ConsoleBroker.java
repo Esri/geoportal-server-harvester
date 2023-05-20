@@ -72,7 +72,7 @@ import java.io.IOException;
       
       return PublishingStatus.CREATED;
     } catch (IOException ex) {
-      throw new DataOutputException(this, ref, String.format("Error publishing data: %s", ref), ex);
+      throw new DataOutputException(this, ref, String.format("Error publishing data: %s Exception: "+ex, ref), ex);
     }
   }
 

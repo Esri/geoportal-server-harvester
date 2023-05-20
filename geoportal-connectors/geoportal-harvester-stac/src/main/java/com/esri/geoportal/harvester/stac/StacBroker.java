@@ -133,7 +133,7 @@ public class StacBroker implements InputBroker {
       try {
         httpClient.close();
       } catch (IOException ex) {
-        LOG.error(String.format("Error terminating broker."), ex);
+        LOG.error(String.format("Error terminating broker.Exception: "+ex), ex);
       }
     }
   }
@@ -201,7 +201,7 @@ public class StacBroker implements InputBroker {
 
       return new Content(XmlUtils.toString(document), MimeType.APPLICATION_XML, new MapAttribute(attrs));
     } catch (MetaException | TransformerException ex) {
-      throw new DataInputException(StacBroker.this, String.format("Error reading data from: %s", this), ex);
+      throw new DataInputException(StacBroker.this, String.format("Error reading data from: %s Exception: "+ex, this), ex);
     }
   }
 
@@ -233,7 +233,7 @@ public class StacBroker implements InputBroker {
 
       return ref;
     } catch (IOException | URISyntaxException ex) {
-      throw new DataInputException(this, String.format("Error reading data from: %s", id), ex);
+      throw new DataInputException(this, String.format("Error reading data from: %s Exception: "+ex, id), ex);
     }
   }
 
@@ -409,7 +409,7 @@ public class StacBroker implements InputBroker {
             if (nextItem==null || nextItem.data==null) continue;
             return true;
           } catch (IOException|URISyntaxException ex) {
-            throw new DataInputException(StacBroker.this, String.format("Error accessing %s", next), ex);
+            throw new DataInputException(StacBroker.this, String.format("Error accessing %s Exception: "+ex, next), ex);
           }
         }
         
@@ -421,7 +421,7 @@ public class StacBroker implements InputBroker {
             loadCatalog(next);
             return hasNext();
           } catch (IOException|URISyntaxException ex) {
-            throw new DataInputException(StacBroker.this, String.format("Error accessing %s", next), ex);
+            throw new DataInputException(StacBroker.this, String.format("Error accessing %s Exception: "+ex, next), ex);
           }
         }
         
@@ -432,7 +432,7 @@ public class StacBroker implements InputBroker {
             loadCatalog(next);
             return hasNext();
           } catch (IOException|URISyntaxException ex) {
-            throw new DataInputException(StacBroker.this, String.format("Error accessing %s", next), ex);
+            throw new DataInputException(StacBroker.this, String.format("Error accessing %s Exception: "+ex, next), ex);
           }
         }
 
@@ -449,7 +449,7 @@ public class StacBroker implements InputBroker {
         return createReference(dataSet);
 
       } catch (URISyntaxException | UnsupportedEncodingException | IllegalArgumentException | JsonProcessingException ex) {
-        throw new DataInputException(StacBroker.this, String.format("Error reading data from: %s", this), ex);
+        throw new DataInputException(StacBroker.this, String.format("Error reading data from: %s Exception: "+ex, this), ex);
       }
     }
   }

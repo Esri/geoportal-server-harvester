@@ -145,7 +145,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
 
       return ref;
     } catch (URISyntaxException | IOException | ParserConfigurationException | SAXException | TransformerException | XPathExpressionException ex) {
-      throw new DataInputException(OaiBroker.this, String.format("Error reading data from: %s", this), ex);
+      throw new DataInputException(OaiBroker.this, String.format("Error reading data from: %s Exception: "+ex, this), ex);
     }
   }
 
@@ -193,7 +193,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
 
         return false;
       } catch (IOException | URISyntaxException | ParserConfigurationException | SAXException | XPathExpressionException ex) {
-        throw new DataInputException(OaiBroker.this, String.format("Error reading data from: %s", this), ex);
+        throw new DataInputException(OaiBroker.this, String.format("Error reading data from: %s Exception: "+ex, this), ex);
       }
     }
 

@@ -95,7 +95,7 @@ import org.slf4j.LoggerFactory;
       }, String.format("Folder watching thread on %s", dropPath.toString()));
       watchThread.start();
     } catch (IOException ex) {
-      throw new DataProcessorException(String.format("Error creating folder watch service."), ex);
+      throw new DataProcessorException(String.format("Error creating folder watch service. Exception: "+ex), ex);
     }
   }
 
@@ -191,7 +191,7 @@ import org.slf4j.LoggerFactory;
       } catch (InterruptedException ex) {
         return false;
       } catch (IOException ex) {
-        throw new DataInputException(SinkBroker.this, "Error reading data.", ex);
+        throw new DataInputException(SinkBroker.this, "Error reading data. Exception: "+ex, ex);
       }
     }
 
@@ -201,7 +201,7 @@ import org.slf4j.LoggerFactory;
         SinkFile file = files.poll();
         return file.readContent();
       } catch (IOException|URISyntaxException ex) {
-        throw new DataInputException(SinkBroker.this, "Error reading data.", ex);
+        throw new DataInputException(SinkBroker.this, "Error reading data. Exception: "+ex, ex);
       }
     }
   }

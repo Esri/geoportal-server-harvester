@@ -136,7 +136,7 @@ import org.slf4j.LoggerFactory;
       ref.addContext(MimeType.APPLICATION_XML, metadata.getBytes("UTF-8"));
       return ref;
     } catch (Exception ex) {
-      throw new DataInputException(this, String.format("Error reading data %s", id), ex);
+      throw new DataInputException(this, String.format("Error reading data %s Exception: "+ex, id), ex);
     }
   }
   

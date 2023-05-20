@@ -69,7 +69,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.gson.JsonObject;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -160,7 +159,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
       List<ServerResponse> responses = listResponses(null);
       return new AgsIterator(responses.iterator());
     } catch (URISyntaxException | IOException ex) {
-      throw new DataInputException(this, String.format("Error listing server content."), ex);
+      throw new DataInputException(this, String.format("Error listing server content. Exception: "+ex), ex);
     }
   }
 
@@ -224,7 +223,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
       ref.addContext(MimeType.APPLICATION_JSON, serverResponse.json.getBytes("UTF-8"));
       return ref;
     } catch (IOException | URISyntaxException ex) {
-      throw new DataInputException(this, String.format("Error reading data %s", id), ex);
+      throw new DataInputException(this, String.format("Error reading data %s Exception: "+ex, id), ex);
     }
   }
 
@@ -391,7 +390,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
         ServerResponse serverResponse = iterator.next();
         return createReference(serverResponse);
       } catch (TransformerException | TransformerFactoryConfigurationError | IOException | URISyntaxException | MetaException ex) {
-        throw new DataInputException(AgsBroker.this, String.format("Error creating data reference for ArcGIS Server service"), ex);
+        throw new DataInputException(AgsBroker.this, String.format("Error creating data reference for ArcGIS Server service Exception: "+ex), ex);
       }
     }
 

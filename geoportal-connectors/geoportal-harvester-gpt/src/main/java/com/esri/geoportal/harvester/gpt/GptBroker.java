@@ -114,7 +114,7 @@ import org.apache.commons.lang3.StringUtils;
         existing.addAll(existingIds);
       }
     } catch (IOException | URISyntaxException ex) {
-      throw new DataProcessorException(String.format("Error getting published records for: %s", client), ex);
+      throw new DataProcessorException(String.format("Error getting published records for: %s Exception: "+ex, client), ex);
     }
   }
 
@@ -217,7 +217,7 @@ import org.apache.commons.lang3.StringUtils;
       existing.remove(response.getId());
       return response.getStatus().equalsIgnoreCase("created") ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
     } catch (IOException | URISyntaxException ex) {
-      throw new DataOutputException(this, ref, String.format("Error publishing data: %s", ref), ex);
+      throw new DataOutputException(this, ref, String.format("Error publishing data: %s Exception: "+ex, ref), ex);
     }
   }
 

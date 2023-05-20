@@ -98,7 +98,7 @@ import org.slf4j.LoggerFactory;
       buildUserMap(context);
       buildHarvestSites(context);
     } catch (NamingException|SQLException ex) {
-      throw new DataProcessorException(String.format("Unable to init broker."), ex);
+      throw new DataProcessorException(String.format("Unable to init broker. Exception: "+ex), ex);
     }
   }
 
@@ -217,7 +217,7 @@ import org.slf4j.LoggerFactory;
         
         return true;
       } catch (SQLException ex) {
-        throw new DataInputException(MigrationBroker.this, String.format("Error fetching data."), ex);
+        throw new DataInputException(MigrationBroker.this, String.format("Error fetching data. Exception: "+ex), ex);
       }
     }
 
@@ -240,7 +240,7 @@ import org.slf4j.LoggerFactory;
       } catch (DataInputException ex) {
         throw ex;
       } catch (Exception ex) {
-        throw new DataInputException(MigrationBroker.this, String.format("Error reading data."), ex);
+        throw new DataInputException(MigrationBroker.this, String.format("Error reading data. Exception: "+ex), ex);
       }
     }
     
@@ -255,14 +255,14 @@ import org.slf4j.LoggerFactory;
         try {
           adminRs.close();
         } catch(SQLException ex) {
-          LOG.warn(String.format("Error closing iterator."), ex);
+          LOG.warn(String.format("Error closing iterator. Exception: "+ex), ex);
         }
       }
       if (adminSt!=null) {
         try {
           adminSt.close();
         } catch(SQLException ex) {
-          LOG.warn(String.format("Error closing iterator."), ex);
+          LOG.warn(String.format("Error closing iterator. Exception: "+ex), ex);
         }
       }
       if (conn!=null) {

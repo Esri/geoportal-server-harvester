@@ -15,22 +15,6 @@
  */
 package com.esri.geoportal.harvester.jdbc;
 
-import com.esri.geoportal.commons.constants.MimeType;
-import com.esri.geoportal.commons.utils.SimpleCredentials;
-import com.esri.geoportal.harvester.api.DataContent;
-import com.esri.geoportal.harvester.api.DataReference;
-import com.esri.geoportal.harvester.api.base.SimpleDataReference;
-import com.esri.geoportal.harvester.api.defs.EntityDefinition;
-import com.esri.geoportal.harvester.api.defs.TaskDefinition;
-import com.esri.geoportal.harvester.api.ex.DataInputException;
-import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.api.specs.InputBroker;
-import com.esri.geoportal.harvester.api.specs.InputConnector;
-import com.esri.geoportal.harvester.jdbc.ScriptProcessor.Data;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -63,12 +47,31 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import javax.script.ScriptException;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.esri.geoportal.commons.constants.MimeType;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.esri.geoportal.harvester.api.DataContent;
+import com.esri.geoportal.harvester.api.DataReference;
+import com.esri.geoportal.harvester.api.base.SimpleDataReference;
+import com.esri.geoportal.harvester.api.defs.EntityDefinition;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
+import com.esri.geoportal.harvester.api.ex.DataInputException;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.specs.InputBroker;
+import com.esri.geoportal.harvester.api.specs.InputConnector;
+import com.esri.geoportal.harvester.jdbc.ScriptProcessor.Data;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * JDBC broker.
@@ -205,7 +208,7 @@ import org.slf4j.LoggerFactory;
       }
       return null;
     } catch (SQLException|JsonProcessingException|URISyntaxException|ScriptException|UnsupportedEncodingException ex) {
-      throw new DataInputException(this, String.format("Error reading content for: %s", id), ex);
+      throw new DataInputException(this, String.format("Error reading content for : %s", id), ex);
     }
   }
   
@@ -236,10 +239,13 @@ import org.slf4j.LoggerFactory;
     try {
       Class.forName(definition.getDriverClass());
       connection = DriverManager.getConnection(definition.getConnection(), definition.getCredentials().getUserName(), definition.getCredentials().getPassword());
+      LOG.info("jdbc connection created");
     } catch (ClassNotFoundException ex) {
-      throw new DataProcessorException(String.format("Error loading JDBC driver class: %s", definition.getDriverClass()), ex);
+    	LOG.error(String.format("Error loading JDBC driver class: %s", ex.getMessage()));
+      throw new DataProcessorException(String.format("Error loading JDBC driver class: %s : Exception: "+ex, definition.getDriverClass()), ex);
     } catch (SQLException ex) {
-      throw new DataProcessorException(String.format("Error opening JDBC connection to: %s", definition.getConnection()), ex);
+    	LOG.error(String.format("Error opening JDBC connection to: %s", ex.getMessage()));
+      throw new DataProcessorException(String.format("Error opening JDBC connection to: %s : Exception: "+ex, definition.getConnection()), ex);
     }
   }
   
@@ -253,7 +259,7 @@ import org.slf4j.LoggerFactory;
               ? connection.prepareStatement(String.format("SELECT * FROM %s WHERE %s = ?", definition.getSqlStatement(), definition.getFileIdColumn())) 
               : connection.prepareStatement(String.format("SELECT * FROM (%s) AS data WHERE %s = ?", definition.getSqlStatement(), definition.getFileIdColumn()));
     } catch (SQLException ex) {
-      throw new DataProcessorException(String.format("Error opening JDBC connection to: %s", definition.getConnection()), ex);
+      throw new DataProcessorException(String.format("Error in creating statement: %s : Exception: "+ex, definition.getSqlStatement()), ex);
     }
   }
   
@@ -261,7 +267,7 @@ import org.slf4j.LoggerFactory;
     try {
       resultSet = statement.executeQuery();
     } catch (SQLException ex) {
-      throw new DataProcessorException(String.format("Error opening JDBC connection to: %s", definition.getConnection()), ex);
+      throw new DataProcessorException(String.format("Error in executing query: %s : Exception: "+ex, definition.getSqlStatement()), ex);
     }
   }
   
@@ -493,7 +499,7 @@ import org.slf4j.LoggerFactory;
         }
       }
     } catch (SQLException ex) {
-      throw new DataProcessorException(String.format("Error opening JDBC connection to: %s", definition.getConnection()), ex);
+      throw new DataProcessorException(String.format("Error getting resultset metadata: %s : Exception: "+ex, definition.getConnection()), ex);
     }
   }
   
@@ -650,7 +656,7 @@ import org.slf4j.LoggerFactory;
         attributeInjectors.addAll(createAttributeInjectors(columnName, columnType));
       }
     } catch (SQLException ex) {
-      throw new DataProcessorException(String.format("Error opening JDBC connection to: %s", definition.getConnection()), ex);
+      throw new DataProcessorException(String.format("Error in getting metadata from resultset: %s : Exception: "+ex, definition.getSqlStatement()), ex);
     }
   }
   
@@ -695,7 +701,7 @@ import org.slf4j.LoggerFactory;
         }
       }
     } catch (SQLException ex) {
-      throw new DataProcessorException(String.format("Error opening JDBC connection to: %s", definition.getConnection()), ex);
+      throw new DataProcessorException(String.format("Error in getting metadata from resultset: %s : Exception: "+ex, definition.getSqlStatement()), ex);
     }
   }
   
@@ -715,7 +721,7 @@ import org.slf4j.LoggerFactory;
       ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
       return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(zonedDateTime);
     } catch (DateTimeException ex) {
-      LOG.trace(String.format("Invalid ISO date: %s", date), ex);
+      LOG.trace(String.format("Invalid ISO date: %s : Exception: "+ex, date), ex);
       return null;
     }
   }
@@ -837,7 +843,7 @@ import org.slf4j.LoggerFactory;
       try {
         return resultSet.next();
       } catch (SQLException ex) {
-        throw new DataInputException(JdbcBroker.this, String.format("Error iterating data."), ex);
+        throw new DataInputException(JdbcBroker.this, String.format("Error iterating data. : Exception: "+ex), ex);
       }
     }
 
@@ -846,7 +852,7 @@ import org.slf4j.LoggerFactory;
       try {
         return createReference(resultSet);
       } catch (SQLException|URISyntaxException|UnsupportedEncodingException|JsonProcessingException|ScriptException ex) {
-        throw new DataInputException(JdbcBroker.this, String.format("Error reading data"), ex);
+        throw new DataInputException(JdbcBroker.this, String.format("Error reading data : Exception: "+ex), ex);
       }
     }
   }

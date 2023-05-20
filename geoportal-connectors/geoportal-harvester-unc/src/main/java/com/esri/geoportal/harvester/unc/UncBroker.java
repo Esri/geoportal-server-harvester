@@ -100,7 +100,7 @@ import java.util.LinkedList;
       UncFile file = new UncFile(this, Paths.get(id));
       return file.readContent();
     } catch (IOException|URISyntaxException ex) {
-      throw new DataInputException(this, String.format("Error reading content: %s", id), ex);
+      throw new DataInputException(this, String.format("Error reading content: %s : Exception: "+ex, id), ex);
     }
   }
 
@@ -144,7 +144,7 @@ import java.util.LinkedList;
 
         return false;
       } catch (IOException|URISyntaxException ex) {
-        throw new DataInputException(UncBroker.this, "Error reading data.", ex);
+        throw new DataInputException(UncBroker.this, "Error reading data. : Exception: "+ex, ex);
       }
     }
 
@@ -154,7 +154,7 @@ import java.util.LinkedList;
         UncFile file = files.poll();
         return file.readContent();
       } catch (IOException|URISyntaxException ex) {
-        throw new DataInputException(UncBroker.this, "Error reading data.", ex);
+        throw new DataInputException(UncBroker.this, "Error reading data. : Exception: "+ex, ex);
       }
     }
   }
