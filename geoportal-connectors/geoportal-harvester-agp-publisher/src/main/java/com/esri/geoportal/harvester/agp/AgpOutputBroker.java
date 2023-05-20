@@ -184,13 +184,16 @@ import org.commonmark.renderer.html.HtmlRenderer;
       String description = getAttributeValue(attributes, WKAConstants.WKA_DESCRIPTION, null);
       // convert title and description from markdown to HTML
       if (definition.isMarkdown2HTML()) {
-          Node titleNode = markdownParser.parse(title);
-          title = htmlRenderer.render(titleNode);
+          //Node titleNode = markdownParser.parse(title);
+          //title = htmlRenderer.render(titleNode);
           Node descriptionNode = markdownParser.parse(description);
           description = htmlRenderer.render(descriptionNode);
       }
       String sThumbnailUrl = StringUtils.trimToNull(getAttributeValue(attributes, WKAConstants.WKA_THUMBNAIL_URL, null));
       String resourceUrl = getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null);
+      // clean up resource URL
+      resourceUrl = resourceUrl.replace("http:", "https:")
+                               .replace(":80/", "/");
       String bbox = getAttributeValue(attributes, WKAConstants.WKA_BBOX, null);
 
       String[] typeKeywords = {
@@ -205,19 +208,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
       // check if the item is eligible for publishing
       // based on the main link in the item itself (not source metadata link)
       ItemType itemType = createItemType(resourceUrl);
-      if (itemType.equals(ItemType.TILED_IMAGERY)) {
-        ArrayList<String> newTypeKeywords = new ArrayList<>();
-        // import typeKeywords
-        newTypeKeywords.addAll(Arrays.asList(typeKeywords));
-        // add new type keyword
-        newTypeKeywords.add("Tiled Imagery");
-
-        typeKeywords = newTypeKeywords.toArray(new String[newTypeKeywords.size()]);
-
-        // finally, set the item type to IMAGE_SERVICE so that ArcGIS Portal/Online understand it
-        itemType = ItemType.IMAGE_SERVICE;
-      }
-      
+     
       // If the WKA_RESOURCE_URL is empty after parsing the XML file, see if it was set on the 
       // DataReference directly.
       if (itemType==null) {
@@ -242,6 +233,19 @@ import org.commonmark.renderer.html.HtmlRenderer;
       if (itemType == null) {
         LOG.debug(String.format("Resource '%s' with resource url '%s' skipped for unrecognized item type", title, resourceUrl));
         return PublishingStatus.SKIPPED;
+      }
+      
+      if (itemType.equals(ItemType.TILED_IMAGERY)) {
+        ArrayList<String> newTypeKeywords = new ArrayList<>();
+        // import typeKeywords
+        newTypeKeywords.addAll(Arrays.asList(typeKeywords));
+        // add new type keyword
+        newTypeKeywords.add("Tiled Imagery");
+
+        typeKeywords = newTypeKeywords.toArray(new String[newTypeKeywords.size()]);
+
+        // finally, set the item type to IMAGE_SERVICE so that ArcGIS Portal/Online understand it
+        itemType = ItemType.IMAGE_SERVICE;
       }
       
       // download file

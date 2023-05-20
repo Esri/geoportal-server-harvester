@@ -35,6 +35,7 @@ import java.util.function.Predicate;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.XMLConstants;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -212,6 +213,7 @@ public class Client implements Closeable {
 
   private Document readContentFromStream(InputStream stream) throws ParserConfigurationException, SAXException, IOException {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
     DocumentBuilder builder = factory.newDocumentBuilder();
     InputSource is = new InputSource(new InputStreamReader(stream, "UTF-8"));
     return builder.parse(is);
