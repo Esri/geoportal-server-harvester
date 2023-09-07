@@ -187,7 +187,20 @@ import org.commonmark.renderer.html.HtmlRenderer;
           //Node titleNode = markdownParser.parse(title);
           //title = htmlRenderer.render(titleNode);
           Node descriptionNode = markdownParser.parse(description);
+          
           description = htmlRenderer.render(descriptionNode);
+          description = description.replaceAll("[*] ","<li>");
+          description = description.replaceAll("\\\\n","<br/>");
+          description = replaceSpecialCharacters(description);
+          //description = description.replaceAll("[^\\x00-\\x7F]", "");
+          
+          // also update arcgisMetadata with the new description as idAbs
+          // only if there is exactly 1 idAbs element
+          String[] metadataPieces = arcgisMetadata.split("idAbs>");
+          if (metadataPieces.length == 3) {
+            metadataPieces[1] = "idAbs><![CDATA[" + description + "]]></idAbs>";
+            arcgisMetadata = metadataPieces[0] + metadataPieces[1] + metadataPieces[2]; 
+          }
       }
       String sThumbnailUrl = StringUtils.trimToNull(getAttributeValue(attributes, WKAConstants.WKA_THUMBNAIL_URL, null));
       String resourceUrl = getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null);
@@ -373,33 +386,46 @@ import org.commonmark.renderer.html.HtmlRenderer;
           }
      
           // update item if does exist
-          ItemResponse response = updateItem(
-                  itemEntry.id,
-                  itemEntry.owner,
-                  itemEntry.ownerFolder,
-                  title,
-                  description,
-                  new URL(resourceUrl),
-                  sThumbnailUrl != null ? new URL(sThumbnailUrl) : null,
-                  itemType,
-                  extractEnvelope(bbox),
-                  typeKeywords,
-                  fileToUpload,
-                  metadataFile,
-                  token
-          );
+          
+          // if the item url is the same as the resourceUrl, proceed.
+          // otherwise the metadata is for a sublayer, but the item is the parent
+          if (resourceUrl.equals(itemEntry.url)) {
+            ItemResponse response = updateItem(
+                    itemEntry.id,
+                    itemEntry.owner,
+                    itemEntry.ownerFolder,
+                    title,
+                    description,
+                    new URL(resourceUrl),
+                    sThumbnailUrl != null ? new URL(sThumbnailUrl) : null,
+                    itemType,
+                    extractEnvelope(bbox),
+                    typeKeywords,
+                    fileToUpload,
+                    metadataFile,
+                    token
+            );
 
-          if (response == null || !response.success) {
-            String error = response != null && response.error != null && response.error.message != null ? response.error.message : null;
-            throw new DataOutputException(this, ref, String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
+            if (response == null || !response.success) {
+              String error = response != null && response.error != null && response.error.message != null ? response.error.message : null;
+              throw new DataOutputException(this, ref, String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
+            } else {
+              // String metadataAdded = client.writeItemMetadata(response.id, arcgisMetadata, token);
+              System.out.print("updateItem -> " + response.toString());
+            }
+
+            existing.remove(itemEntry.id);
+
+            return PublishingStatus.UPDATED;
           } else {
-            // String metadataAdded = client.writeItemMetadata(response.id, arcgisMetadata, token);
-            System.out.print("updateItem -> " + response.toString());
+              // the metadata is apparently for a sublayer
+              
+              // DO SOMETHING ELSE
+              String metadataUpdateURI = resourceUrl + "/metadata/update";
+              System.out.println("update metadata at " + metadataUpdateURI);
+              
+              return PublishingStatus.SKIPPED;
           }
-
-          existing.remove(itemEntry.id);
-
-          return PublishingStatus.UPDATED;
         }
       } catch (MalformedURLException ex) {
         return PublishingStatus.SKIPPED;
@@ -449,6 +475,27 @@ import org.commonmark.renderer.html.HtmlRenderer;
     // for ArcGIS Portal/Online, look for the resource URL instead of the source XML URI
     QueryResponse search = client.search(String.format("url:%s", String.format("%s", src_uri_s)), 0, 0, token);
     ItemEntry itemEntry = search != null && search.results != null && search.results.length > 0 ? search.results[0] : null;
+    
+    // if no results found and the source uri (src_uri_s) ends in /0, /1, ... this may be a sublayer
+    // look for the parent service
+    if (itemEntry == null) {
+        String[] uri_parts = src_uri_s.split("/");
+        
+        // iff the last part is a number, this could be a sublayer
+        if (StringUtils.isNumeric(uri_parts[uri_parts.length-1])) {
+            String regex = "\\/" + uri_parts[uri_parts.length-1] + "$";
+            String mother_uri = "";
+            try {
+                mother_uri = src_uri_s.replaceFirst(regex, "");
+            } catch (Exception e) {
+                System.out.println(e.toString());
+            }
+ 
+            // now search for mother uri
+            search = client.search(String.format("url:%s", String.format("%s", mother_uri)), 0, 0, token);
+            itemEntry = search != null && search.results != null && search.results.length > 0 ? search.results[0] : null;
+        }
+    }
     
     return itemEntry;
   }
@@ -818,6 +865,24 @@ import org.commonmark.renderer.html.HtmlRenderer;
     
     return new FileName(name, ext);
   }
+  
+    private String replaceSpecialCharacters(String inputText) {
+        String outputText = "";
+        String sourceText = inputText;
+        
+        HashMap<String, String> extendedCharacters = new HashMap<>();
+
+        extendedCharacters.put("\\x91", "&lsquo;");
+        extendedCharacters.put("\\x92", "&rsquo;");
+        extendedCharacters.put("\\x93", "&ldquo;");
+        extendedCharacters.put("\\x94", "&rdquo;");
+        
+        for (HashMap.Entry<String, String> val: extendedCharacters.entrySet()) {
+            outputText = sourceText.replaceAll(val.getKey(), val.getValue());
+            sourceText = outputText;
+        }
+        return outputText;
+    }
   
   private static class FileName {
     public final String name;
