@@ -26,4 +26,6 @@ public class LayerInfo {
   public String description;
   public ExtentInfo extent;
   public String json;
+  public boolean hasMetadata;
+  public String metadataXML;
 }

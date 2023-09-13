@@ -50,14 +50,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import com.esri.geoportal.commons.utils.XmlUtils;
 import com.esri.geoportal.geoportal.commons.geometry.GeometryService;
 import com.esri.geoportal.harvester.api.DataContent;
@@ -69,10 +77,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 import org.apache.http.impl.client.LaxRedirectStrategy;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * Ags broker.
@@ -171,6 +184,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
     response.description = layerInfo.description;
     response.fullExtent = layerInfo.extent;
     response.initialExtent = layerInfo.extent;
+    response.metadataXML = layerInfo.metadataXML;
     return response;
   }
 
@@ -253,6 +267,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
     String itemInfoDescription = trimHtml(serverResponse.itemInfo!=null? serverResponse.itemInfo.description: null);
     String serverDescription = trimHtml(StringUtils.defaultString(StringUtils.defaultIfBlank(serverResponse.description, serverResponse.serviceDescription)));
     String description = StringUtils.defaultIfBlank(itemInfoDescription, serverDescription);
+    String metadataXML = serverResponse.metadataXML!=null? serverResponse.metadataXML: null;
     
     HashMap<String, Attribute> attributes = new HashMap<>();
     attributes.put(WKAConstants.WKA_IDENTIFIER, new StringAttribute(serverResponse.url));
@@ -260,6 +275,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
     attributes.put(WKAConstants.WKA_DESCRIPTION, new StringAttribute(description));
     attributes.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(serverResponse.url));
     attributes.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute("urn:x-esri:specification:ServiceType:ArcGIS:" + (serviceType != null ? serviceType : "Unknown")));
+    attributes.put(WKAConstants.WKA_METADATA_XML, new StringAttribute(metadataXML));
 
     if (serverResponse.fullExtent != null) {
       normalizeExtent(serverResponse.fullExtent, 4326);
@@ -269,10 +285,85 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
       }
     }
 
-    MapAttribute attrs = new MapAttribute(attributes);
-    Document document = metaBuilder.create(attrs);
-    byte[] bytes = XmlUtils.toString(document).getBytes("UTF-8");
+    Document document = null;
+    byte[] bytes = null;
+    
+    if (metadataXML != null && !metadataXML.trim().isEmpty()) {
+        bytes = metadataXML.getBytes("UTF-8");
 
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(false);
+        DocumentBuilder builder = null;
+        try {
+            builder = factory.newDocumentBuilder();
+            document = builder.parse(new InputSource(new StringReader(metadataXML)));
+            
+            XPath xpath = XPathFactory.newInstance().newXPath();
+            NodeList thumbnailNodes = (NodeList) xpath.compile("/metadata/Binary/Thumbnail/Data").evaluate(document, XPathConstants.NODESET);
+            if (thumbnailNodes.getLength() > 0) {
+                LOG.debug(thumbnailNodes.item(0).getTextContent());
+            }
+            
+            NodeList serviceUrlNodes = (NodeList) xpath.compile("/metadata/distInfo/distributor/distorTran/onLineSrc/linkage").evaluate(document, XPathConstants.NODESET);
+            if (serviceUrlNodes.getLength() > 0) {
+                serviceUrlNodes.item(0).setNodeValue(serverResponse.url);
+            } else {
+                // no onLineSrc/linkage nodes
+                
+                // get /metadata
+                NodeList metadataNodes = (NodeList) xpath.compile("/metadata").evaluate(document, XPathConstants.NODESET);
+                
+                // get /metadata/distInfo
+                NodeList distinfoNodes = (NodeList) xpath.compile("/metadata/distinfo").evaluate(document, XPathConstants.NODESET);
+                if (distinfoNodes.getLength() == 0) {
+                    Element distinfoElement = document.createElement("distinfo");
+                    metadataNodes.item(0).appendChild(distinfoElement);
+                }
+ 
+                // get /metadata/distInfo/distributor
+                NodeList distributorNodes = (NodeList) xpath.compile("/metadata/distinfo/distributor").evaluate(document, XPathConstants.NODESET);
+                if (distributorNodes.getLength() == 0) {
+                    distinfoNodes = (NodeList) xpath.compile("/metadata/distinfo").evaluate(document, XPathConstants.NODESET);
+                    Element distributorElement = document.createElement("distributor");
+                    distinfoNodes.item(0).appendChild(distributorElement);
+                } 
+                
+                // get /metadata/distInfo/distributor/distorTran
+                NodeList distorTranNodes = (NodeList) xpath.compile("/metadata/distinfo/distributor/distorTran").evaluate(document, XPathConstants.NODESET);
+                if (distorTranNodes.getLength() == 0) {
+                    distributorNodes = (NodeList) xpath.compile("/metadata/distinfo/distributor").evaluate(document, XPathConstants.NODESET);
+                    Element distorTranElement = document.createElement("distorTran");
+                    distributorNodes.item(0).appendChild(distorTranElement);
+                }
+                
+                // get /metadata/distInfo/distributor/distorTran/onLineSrc
+                NodeList onLineSrcNodes = (NodeList) xpath.compile("/metadata/distinfo/distributor/distorTran/onLineSrc").evaluate(document, XPathConstants.NODESET);
+                if (onLineSrcNodes.getLength() == 0) {
+                    distorTranNodes = (NodeList) xpath.compile("/metadata/distinfo/distributor/distorTran").evaluate(document, XPathConstants.NODESET);
+                    Element onLineSrcElement = document.createElement("onLineSrc");
+                    distorTranNodes.item(0).appendChild(onLineSrcElement);
+                }
+                
+                // get /metadata/distInfo/distributor/distorTran/onLineSrc/linkage
+                NodeList linkageNodes = (NodeList) xpath.compile("/metadata/distinfo/distributor/distorTran/onLineSrc/linkage").evaluate(document, XPathConstants.NODESET);
+                if (linkageNodes.getLength() == 0) {
+                    onLineSrcNodes = (NodeList) xpath.compile("/metadata/distinfo/distributor/distorTran/onLineSrc").evaluate(document, XPathConstants.NODESET);
+                    Element linkageElement = document.createElement("linkage");
+                    linkageElement.setTextContent(serverResponse.url);
+                    onLineSrcNodes.item(0).appendChild(linkageElement);
+                }
+            }
+            
+        } catch (Exception ex) {
+            LOG.error(String.format("Error geting XML document. "), ex);
+
+        }
+    } else {
+        MapAttribute attrs = new MapAttribute(attributes);
+        document = metaBuilder.create(attrs);
+    }
+    bytes = XmlUtils.toString(document).getBytes("UTF-8");
+    
     SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), getEntityDefinition().getLabel(), serverResponse.url, null, URI.create(serverResponse.url), td.getSource().getRef(), td.getRef());
     attributes.entrySet().forEach(entry -> {
       ref.getAttributesMap().put(entry.getKey(), entry.getValue());
