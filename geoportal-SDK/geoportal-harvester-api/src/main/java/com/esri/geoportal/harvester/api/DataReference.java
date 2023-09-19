@@ -86,4 +86,6 @@ public interface DataReference extends Serializable, DataContent {
    * @return task reference of <code>null</code> if ad-hoc
    */
   String getTaskRef();
+  
+  String getTitle();
 }

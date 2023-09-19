@@ -75,6 +75,10 @@ public class DataReferenceWrapper implements DataReference {
   public String getId() {
     return baseRef.getId();
   }
+  @Override
+  public String getTitle() {
+    return baseRef.getTitle();
+  }
 
   @Override
   public String getFetchableId() {
