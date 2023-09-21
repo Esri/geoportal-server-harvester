@@ -81,7 +81,7 @@ public class Client implements Closeable {
 
   private static final String DEFAULT_INDEX = "metadata";
   private static final String REST_ITEM_URL = "rest/metadata/item";
-  private static final String ELASTIC_SEARCH_URL = "elastic/{metadata}/item/_search";
+  private static final String ELASTIC_SEARCH_URL = "elastic/{metadata}/_search";
   private static final String ELASTIC_SCROLL_URL = "elastic/_search/scroll";
   private static final String TOKEN_URL = "oauth/token";
 
