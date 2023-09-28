@@ -196,7 +196,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
   public DataContent readContent(String id) throws DataInputException {
     try {
       ItemEntry itemEntry = client.readItem(id, client.generateToken(1).token);
-      SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), itemEntry.id, new Date(itemEntry.modified), URI.create(itemEntry.id), td.getSource().getRef(), td.getRef());
+      SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), itemEntry.id, new Date(itemEntry.modified), URI.create(itemEntry.id), td.getSource().getRef(), td.getRef(),itemEntry.title);
       ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(itemEntry).getBytes("UTF-8"));
       return ref;
     } catch (IOException|URISyntaxException ex) {
@@ -228,7 +228,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
       props.put(WKAConstants.WKA_BBOX, sBox);
     }
 
-    SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), itemEntry.id, new Date(itemEntry.modified), URI.create(itemEntry.id), td.getSource().getRef(), td.getRef());
+    SimpleDataReference ref = new SimpleDataReference(getBrokerUri(), definition.getEntityDefinition().getLabel(), itemEntry.id, new Date(itemEntry.modified), URI.create(itemEntry.id), td.getSource().getRef(), td.getRef(),itemEntry.title);
 
     if (definition.getEmitXml()) {
       String orgMeta = null;

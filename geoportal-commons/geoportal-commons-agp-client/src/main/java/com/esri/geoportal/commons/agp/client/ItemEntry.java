@@ -19,7 +19,7 @@ package com.esri.geoportal.commons.agp.client;
  * Item entry.
  */
 public final class ItemEntry {
-  public String id;
+  public String id;  
   public String owner;
   public long created;
   public long modified;
