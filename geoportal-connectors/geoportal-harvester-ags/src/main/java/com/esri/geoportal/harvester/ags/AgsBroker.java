@@ -286,11 +286,9 @@ import org.xml.sax.SAXException;
     }
 
     Document document = null;
-    byte[] bytes = null;
+    byte[] bytes;
     
-    if (metadataXML != null && !metadataXML.trim().isEmpty()) {
-        bytes = metadataXML.getBytes("UTF-8");
-
+    if ((this.definition.getUseServiceXml()) && (metadataXML != null && !metadataXML.trim().isEmpty())) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(false);
         DocumentBuilder builder = null;

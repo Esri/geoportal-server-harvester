@@ -41,6 +41,7 @@ public class AgsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   private boolean enableLayers;
   private boolean emitXml = true;
   private boolean emitJson = false;
+  private boolean useServiceXML = false;
 
   /**
    * Creates instance of the adaptor.
@@ -64,6 +65,7 @@ public class AgsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
       enableLayers = BooleanUtils.toBoolean(get(P_ENABLE_LAYERS));
       emitXml = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_XML)), true);
       emitJson = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_JSON)), false);
+      useServiceXML = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_USE_FULL_XML)), false);
     }
   }
 
@@ -73,6 +75,7 @@ public class AgsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
     consume(params,P_ENABLE_LAYERS);
     consume(params,P_EMIT_XML);
     consume(params,P_EMIT_JSON);
+    consume(params,P_USE_FULL_XML);
     credAdaptor.override(params);
     botsAdaptor.override(params);
   }
@@ -159,6 +162,15 @@ public class AgsBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   public void setEmitJson(boolean emitJson) {
     this.emitJson = emitJson;
     set(P_EMIT_JSON, BooleanUtils.toStringTrueFalse(emitJson));
+  }
+  
+   public boolean getUseServiceXml() {
+    return useServiceXML;
+  }
+
+  public void setUseServiceXML(boolean useServiceXML) {
+    this.useServiceXML = useServiceXML;
+    set(P_USE_FULL_XML, BooleanUtils.toStringTrueFalse(useServiceXML));
   }
   
 }
