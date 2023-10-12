@@ -306,6 +306,48 @@ public class AgpClient implements Closeable {
       throw ex;
     }
   }  
+  
+  /**
+   * Writes layer metadata.
+   * @param resourceURL
+   * @param fileToUpload metadata
+   * @param token token
+   * @return true metadata if and only if update successful
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+   public boolean writeSubLayerMetadata(String resourceURL, File fileToUpload, String token) throws IOException, URISyntaxException {
+    URIBuilder builder = new URIBuilder(resourceURL);
+    HttpPost req = new HttpPost(builder.build());
+    
+    Map<String, String> params = new HashMap<>();
+    params.put("f", "json");
+    params.put("token", token);
+    params.put("metadataUploadFormat", "xml");
+    params.put("overwrite", "true");
+    
+    try {
+        HttpEntity entity = createEntity(params, fileToUpload);
+        req.setEntity(entity);
+
+        try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
+            if (httpResponse.getStatusLine().getStatusCode()>=400) {
+                throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+            }
+            String responseContent = IOUtils.toString(contentStream, "UTF-8");
+            System.out.println(responseContent);
+            if (responseContent.contains("error")) {
+                return false;
+            }
+        }
+      
+    } catch (IOException ex) {
+        System.out.println(ex.getMessage());
+        return false;
+    }
+    
+    return true;
+  }    
     
   /**
    * Sharing item.

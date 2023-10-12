@@ -21,8 +21,8 @@ import com.esri.geoportal.commons.agp.client.DeleteResponse;
 import com.esri.geoportal.commons.agp.client.FolderEntry;
 import com.esri.geoportal.commons.agp.client.ItemEntry;
 import com.esri.geoportal.commons.agp.client.ItemResponse;
-import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.agp.client.QueryResponse;
+import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.doc.DocUtils;
 import com.esri.geoportal.commons.meta.ArrayAttribute;
@@ -48,7 +48,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
-// import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -76,13 +75,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-//import org.apache.http.HttpEntity;
-//import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-//import org.apache.http.client.methods.HttpPost;
-//import org.apache.http.client.utils.URIBuilder;
-//import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
@@ -394,8 +388,8 @@ import org.commonmark.renderer.html.HtmlRenderer;
                     itemEntry.id,
                     itemEntry.owner,
                     itemEntry.ownerFolder,
-                    title,
-                    description,
+                    title, 
+                   description,
                     new URL(resourceUrl),
                     sThumbnailUrl != null ? new URL(sThumbnailUrl) : null,
                     itemType,
@@ -421,8 +415,9 @@ import org.commonmark.renderer.html.HtmlRenderer;
               // the metadata is apparently for a sublayer
               
               // DO SOMETHING ELSE
-              String metadataUpdateURI = resourceUrl + "/metadata/update";
-              System.out.println("update metadata at " + metadataUpdateURI);
+              String metadataUpdateURI = resourceUrl + "/metadata/update/";
+              boolean wasUpdated = client.writeSubLayerMetadata(metadataUpdateURI, metadataFile, token);
+              System.out.println("update metadata at " + metadataUpdateURI + " was a succes: " + wasUpdated);
               
               return PublishingStatus.SKIPPED;
           }
@@ -442,6 +437,8 @@ import org.commonmark.renderer.html.HtmlRenderer;
       } 
     }
   }
+  
+  
   private ItemType createItemType(String resourceUrl) {
     
     resourceUrl = StringUtils.trimToEmpty(resourceUrl);
@@ -551,33 +548,9 @@ import org.commonmark.renderer.html.HtmlRenderer;
       String sXml = "";
       if (ref.getContentType().contains(MimeType.APPLICATION_XML) || ref.getContentType().contains(MimeType.TEXT_XML)) {
         sXml = new String(ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML), "UTF-8");
-        //DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        //factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        //factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        //factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        //factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-        //factory.setXIncludeAware(false);
-        //factory.setExpandEntityReferences(false);
-        //factory.setNamespaceAware(true);
-        //DocumentBuilder builder = factory.newDocumentBuilder();
-        //doc = builder.parse(new InputSource(new StringReader(sXml)));
       } else if (content!=null) {
         sXml = new String(content, "UTF-8");
       }
-      /*
-      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-      factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-      factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-      factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-      factory.setFeature("http://xml.org/sax/features/validation", false);
-      factory.setFeature("http://apache.org/xml/features/validation/schema", false);
-      factory.setXIncludeAware(false);
-      factory.setExpandEntityReferences(false);
-      factory.setNamespaceAware(true);
-      DocumentBuilder builder = factory.newDocumentBuilder();
-      doc = builder.parse(new InputSource(new StringReader(sXml)));
-      */
       doc = stringToDoc(sXml);
       
       if (doc!=null) {
