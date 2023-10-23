@@ -122,10 +122,15 @@ import org.apache.commons.lang3.StringUtils;
   public void terminate() {
     try {
       if (client != null && definition.getCleanup() && !preventCleanup) {
+        int deleted = 0;
+        
         for (String id : existing) {
-          client.delete(id);
+          PublishResponse deleteResult = client.delete(id);
+          if ((deleteResult != null) && (deleteResult.getStatus() != null)) {
+            deleted += 1;
+          }
         }
-        LOG.info(String.format("%d records has been removed during cleanup.", existing.size()));
+        LOG.info(String.format("%d records has been removed during cleanup.", deleted));
       }
     } catch (URISyntaxException | IOException ex) {
       LOG.error(String.format("Error terminating broker."), ex);
