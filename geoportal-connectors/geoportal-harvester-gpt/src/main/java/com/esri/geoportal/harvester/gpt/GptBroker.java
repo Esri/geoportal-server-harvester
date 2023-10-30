@@ -127,8 +127,12 @@ import org.apache.commons.lang3.StringUtils;
         for (String id : existing) {
           PublishResponse deleteResult = client.delete(id);
           if ((deleteResult != null) && (deleteResult.getStatus() != null)) {
+            LOG.info(String.format("Metadata deleted: %1$s", id));
             deleted += 1;
-          }
+          } else {
+              String responseMessage = deleteResult != null ? deleteResult.getError().toString() : "None"; 
+              LOG.error(String.format("Error deleting metadata: %1$s: response: %2$s", id, responseMessage));
+          } 
         }
         LOG.info(String.format("%d records has been removed during cleanup.", deleted));
       }
