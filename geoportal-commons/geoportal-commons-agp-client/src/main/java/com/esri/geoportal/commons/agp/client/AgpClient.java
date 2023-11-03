@@ -29,6 +29,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -316,7 +318,7 @@ public class AgpClient implements Closeable {
    * @throws URISyntaxException if invalid URL
    * @throws IOException if operation fails
    */
-   public boolean writeSubLayerMetadata(String resourceURL, File fileToUpload, String token) throws IOException, URISyntaxException {
+   public boolean writeSubLayerMetadata(String resourceURL, String fileToUpload, String token) throws IOException, URISyntaxException {
     URIBuilder builder = new URIBuilder(resourceURL);
     HttpPost req = new HttpPost(builder.build());
     
@@ -325,9 +327,10 @@ public class AgpClient implements Closeable {
     params.put("token", token);
     params.put("metadataUploadFormat", "xml");
     params.put("overwrite", "true");
+    params.put("metadata",fileToUpload);
     
     try {
-        HttpEntity entity = createEntity(params, fileToUpload);
+        HttpEntity entity = createEntity(params);
         req.setEntity(entity);
 
         try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
@@ -554,6 +557,25 @@ public class AgpClient implements Closeable {
     }
     params.put("client", "requestip");
     params.put("expiration", Integer.toString(minutes));
+    
+    req.setEntity(createEntity(params));
+
+    return execute(req,TokenResponse.class);
+  }
+  
+  public TokenResponse generateToken(int minutes, String serverUrl,String token) throws URISyntaxException, IOException {
+    HttpPost req = new HttpPost(generateTokenUri());
+    
+    HashMap<String, String> params = new HashMap<>();
+    params.put("f", "json");
+    if (credentials != null) {
+      params.put("username", StringUtils.trimToEmpty(credentials.getUserName()));
+      params.put("password", StringUtils.trimToEmpty(credentials.getPassword()));
+    }
+    params.put("client", "requestip");
+    params.put("expiration", Integer.toString(minutes));
+    params.put("serverUrl", serverUrl);
+    params.put("token",token );
     
     req.setEntity(createEntity(params));
 

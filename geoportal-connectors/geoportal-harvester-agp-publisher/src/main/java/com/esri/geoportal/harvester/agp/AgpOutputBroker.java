@@ -198,6 +198,8 @@ import org.commonmark.renderer.html.HtmlRenderer;
       }
       String sThumbnailUrl = StringUtils.trimToNull(getAttributeValue(attributes, WKAConstants.WKA_THUMBNAIL_URL, null));
       String resourceUrl = getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null);
+      
+      //resourceUrl="https://services.arcgis.com/RhGiohBHzSBKt1MS/arcgis/rest/services/group_of_layers/FeatureServer/1";
       // clean up resource URL
       resourceUrl = resourceUrl.replace("http:", "https:")
                                .replace(":80/", "/");
@@ -279,11 +281,15 @@ import org.commonmark.renderer.html.HtmlRenderer;
 
       try {
 
-        // generate token
+        // generate token       
         if (token == null) {
-          token = generateToken();
+           token = definition.getOAuthToken();
+           //oAuth token was not generated, hence generate token from user password. In this case subLayer metadata update will fail
+           if(token == null || token.isBlank())
+           {
+               token = generateToken(60);
+           }
         }
-
         // check if item exists
         ItemEntry itemEntry = searchForItem(resourceUrl);
 
@@ -412,11 +418,11 @@ import org.commonmark.renderer.html.HtmlRenderer;
 
             return PublishingStatus.UPDATED;
           } else {
-              // the metadata is apparently for a sublayer
-              
+              // the metadata is apparently for a sublayer              
               // DO SOMETHING ELSE
+              String featureServerToken = generateToken(60,"https://services.arcgis.com/RhGiohBHzSBKt1MS/arcgis/rest/admin/services/group_of_layers/FeatureServer",token);
               String metadataUpdateURI = resourceUrl + "/metadata/update/";
-              boolean wasUpdated = client.writeSubLayerMetadata(metadataUpdateURI, metadataFile, token);
+              boolean wasUpdated = client.writeSubLayerMetadata(metadataUpdateURI, arcgisMetadata, featureServerToken);
               System.out.println("update metadata at " + metadataUpdateURI + " was a succes: " + wasUpdated);
               
               return PublishingStatus.SKIPPED;
@@ -715,6 +721,10 @@ import org.commonmark.renderer.html.HtmlRenderer;
   private String generateToken(int minutes) throws URISyntaxException, IOException {
     return client.generateToken(minutes).token;
   }
+   private String generateToken(int minutes,String serverUrl,String token) throws URISyntaxException, IOException {
+    return client.generateToken(minutes,serverUrl,token).token;
+  }
+  
 
   private String generateToken() throws URISyntaxException, IOException {
     return client.generateToken(60).token;
