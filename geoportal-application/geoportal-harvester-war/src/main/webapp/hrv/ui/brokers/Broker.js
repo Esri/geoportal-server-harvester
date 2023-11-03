@@ -29,9 +29,9 @@ define(["dojo/_base/declare",
         "dijit/ConfirmDialog",
         "hrv/rest/Brokers",
         "hrv/ui/brokers/BrokerEditorPane",
-        "esri/IdentityManager",
-        "esri/arcgis/OAuthInfo",
-        "esri/arcgis/Portal"
+        "esri/IdentityManager",        
+        "esri/arcgis/Portal",
+        "esri/config",
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
@@ -39,7 +39,7 @@ define(["dojo/_base/declare",
            lang,string,topic,on,json,
            Dialog,ConfirmDialog,
            BrokersREST,BrokerEditorPane,
-           esriId, OAuthInfo, arcgisPortal
+           esriId, arcgisPortal,esriConfig
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
@@ -81,11 +81,8 @@ define(["dojo/_base/declare",
             
             if(brokerDefinitionProp["agp-oauth"]=== "true"){
                 esriId.getCredential(portalUrl,{oAuthPopupConfirmation:false}).then(
-                    lang.hitch(this,function(){
-                        var portal = new arcgisPortal.Portal(portalUrl);
-                        portal.signIn().then(function(portalUser){             
-                       
-                        var token = portalUser.credential.token;  
+                    lang.hitch(this,function(credential){                     
+                        var token = credential.token;  
                         brokerDefinitionProp["agp-token"]= token;
 
                         // use API to update broker
@@ -102,10 +99,7 @@ define(["dojo/_base/declare",
                           topic.publish("msg", new Error(this.i18n.brokers.errors.creating));
                         })
                     );
-                }).otherwise(function(error){                
-                  console.warn("Error occurred while signing in:",error);
-                });
-            }));
+                }));
             }
             else
             {
