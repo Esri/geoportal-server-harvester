@@ -26,17 +26,19 @@ define(["dojo/_base/declare",
         "dijit/form/Select",
         "dijit/form/ValidationTextBox",
         "dijit/form/CheckBox",
+        "dijit/form/TextBox",
         "dijit/form/TimeTextBox",
         "dijit/form/RadioButton",
         "dijit/form/NumberTextBox",
         "dijit/form/Textarea",
         "dijit/form/Form",
+        "dijit/form/Button",
         "dojox/html/entities",
         "hrv/utils/TextScrambler"
       ],
   function(declare,i18n,
            lang,array,domConstruct,domAttr,html,number,
-           Select,ValidationTextBox,CheckBox,TimeTextBox,RadioButton,NumberTextBox,Textarea,Form,
+           Select,ValidationTextBox,CheckBox,TextBox,TimeTextBox,RadioButton,NumberTextBox,Textarea,Form,Button,
            entities,TextScrambler
           ){
   
@@ -61,7 +63,8 @@ define(["dojo/_base/declare",
       
       renderArgument: function(rootNode,arg) {
         var argNode = domConstruct.create("div",{class: "h-editor-line"},rootNode);
-        var titleNode = domConstruct.create("span",{innerHTML: arg.label+":", class: "h-editor-argname"},argNode);
+        if(arg.label!=="hidden")
+            var titleNode = domConstruct.create("span",{innerHTML: arg.label+":", class: "h-editor-argname"},argNode);
         var placeholderWrapper = domConstruct.create("span",{class: "h-editor-argctrl"},argNode);
         var placeholderNode = domConstruct.create("span",null,placeholderWrapper);
         
@@ -79,6 +82,8 @@ define(["dojo/_base/declare",
           case "temporal": return this.renderTime(placeholderNode,arg);
           case "periodical": return this.renderPeriod(placeholderNode,arg);
           case "integer": return this.renderInteger(placeholderNode, arg);
+          case "button": return this.renderButton(placeholderNode, arg);    
+          case "hidden": return this.renderHidden(placeholderNode, arg);            
           default: 
             console.error("Unsupported argument type:", arg.type);
             return {
@@ -126,16 +131,16 @@ define(["dojo/_base/declare",
       renderText: function(placeholderNode,arg) {
         var input = new Textarea({
           name: arg.name, 
-          required: arg.required
+          required: arg.required          
         }).placeAt(placeholderNode);
         input.name = arg.name;
-        if (arg.defaultValue!=null) {
+        if (arg.defaultValue!==null) {
           input.set("value", arg.defaultValue);
         }
         input.startup();
         return { 
           init: function(values) {
-            input.set("value", values[arg.name]!=null? values[arg.name]: arg.defaultValue);
+            input.set("value", values[arg.name]!==null? values[arg.name]: arg.defaultValue);
           },
           read: function(values) {
             values[arg.name] = input.get("value");
@@ -143,6 +148,47 @@ define(["dojo/_base/declare",
           destroy: function() {
             input.destroy();
           } 
+        };
+      },
+      
+       renderButton: function (placeholderNode, arg) {
+        var input = new Button({
+          name: arg.name,
+          required: arg.required         
+        }).placeAt(placeholderNode);
+
+        input.set("label", arg.label);
+        input.startup();
+
+        return {
+          init: function (values) {           
+          },
+          read: function (values) {            
+          },
+          destroy: function () {
+            input.destroy();
+          }
+        }
+      },
+      renderHidden: function (placeholderNode, arg) {
+        var input = new TextBox({
+          name: arg.name,
+          type: "hidden"
+        });
+
+        input.set("value", "");
+        input.startup();
+
+        return {
+          init: function (values) {
+            input.set("value", Number(values[arg.name]));
+          },
+          read: function (values) {
+            values[arg.name] = input.get("value");
+          },
+          destroy: function () {
+            input.destroy();
+          }
         };
       },
 

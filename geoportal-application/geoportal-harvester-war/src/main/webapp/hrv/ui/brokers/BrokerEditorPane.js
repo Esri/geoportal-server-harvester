@@ -108,6 +108,10 @@ define(["dojo/_base/declare",
         this.updateArgumentsForm(this.connectorTemplates[type].arguments);
       },
       
+      onOAuth:function()
+      {
+          alert("hello");
+      },
       _onSubmit: function() {
         if (this.formWidget.validate()) {
           var values = this.formWidget.getValues();

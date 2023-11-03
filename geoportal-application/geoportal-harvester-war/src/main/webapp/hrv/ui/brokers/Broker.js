@@ -28,14 +28,18 @@ define(["dojo/_base/declare",
         "dijit/Dialog",
         "dijit/ConfirmDialog",
         "hrv/rest/Brokers",
-        "hrv/ui/brokers/BrokerEditorPane"
+        "hrv/ui/brokers/BrokerEditorPane",
+        "esri/IdentityManager",
+        "esri/arcgis/OAuthInfo",
+        "esri/arcgis/Portal"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
            lang,string,topic,on,json,
            Dialog,ConfirmDialog,
-           BrokersREST,BrokerEditorPane
+           BrokersREST,BrokerEditorPane,
+           esriId, OAuthInfo, arcgisPortal
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
@@ -71,23 +75,56 @@ define(["dojo/_base/declare",
         
         // listen to "submit" button click
         this.own(on(brokerEditorPane,"submit",lang.hitch(this, function(evt){
-          var brokerDefinition = evt.brokerDefinition;
-          
-          // use API to update broker
-          BrokersREST.update(brokerDefinition.uuid,json.stringify(brokerDefinition)).then(
-            lang.hitch({brokerEditorPane: brokerEditorPane, brokerEditorDialog: brokerEditorDialog, self: this},function(){
-              topic.publish("msg"); // clear any former errors
-              this.brokerEditorDialog.destroy();
-              this.brokerEditorPane.destroy();
-              this.self.load();
-            }),
-            lang.hitch(this,function(error){
-              console.debug(error);
-              topic.publish("msg", new Error(this.i18n.brokers.errors.creating));
-            })
-          );
-        })));
-        
+            var brokerDefinition = evt.brokerDefinition;
+            var brokerDefinitionProp = evt.brokerDefinition.properties;
+            var portalUrl = brokerDefinitionProp["agp-host-url"] ;            
+            
+            if(brokerDefinitionProp["agp-oauth"]=== "true"){
+                esriId.getCredential(portalUrl,{oAuthPopupConfirmation:false}).then(
+                    lang.hitch(this,function(){
+                        var portal = new arcgisPortal.Portal(portalUrl);
+                        portal.signIn().then(function(portalUser){             
+                       
+                        var token = portalUser.credential.token;  
+                        brokerDefinitionProp["agp-token"]= token;
+
+                        // use API to update broker
+                        BrokersREST.update(brokerDefinition.uuid,json.stringify(brokerDefinition)).then(
+                        lang.hitch({brokerEditorPane: brokerEditorPane, brokerEditorDialog: brokerEditorDialog, self: this},function(){
+                          topic.publish("msg"); // clear any former errors
+                          this.brokerEditorDialog.destroy();
+                          this.brokerEditorPane.destroy();
+                          //TODO reload Broker
+                         // this.self.load();
+                        }),
+                        lang.hitch(this,function(error){
+                          console.debug(error);
+                          topic.publish("msg", new Error(this.i18n.brokers.errors.creating));
+                        })
+                    );
+                }).otherwise(function(error){                
+                  console.warn("Error occurred while signing in:",error);
+                });
+            }));
+            }
+            else
+            {
+                brokerDefinitionProp["agp-token"]= "";
+                // use API to update broker
+                BrokersREST.update(brokerDefinition.uuid,json.stringify(brokerDefinition)).then(
+                lang.hitch({brokerEditorPane: brokerEditorPane, brokerEditorDialog: brokerEditorDialog, self: this},function(){
+                  topic.publish("msg"); // clear any former errors
+                  this.brokerEditorDialog.destroy();
+                  this.brokerEditorPane.destroy();  
+                  this.self.load();
+                }),
+                lang.hitch(this,function(error){
+                  console.debug(error);
+                  topic.publish("msg", new Error(this.i18n.brokers.errors.creating));
+                }));                
+            }
+        })));      
+       
         brokerEditorDialog.show();
       },
       
