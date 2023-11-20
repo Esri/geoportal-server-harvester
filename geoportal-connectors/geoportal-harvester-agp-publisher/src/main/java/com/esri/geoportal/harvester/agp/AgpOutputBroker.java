@@ -199,7 +199,8 @@ import org.commonmark.renderer.html.HtmlRenderer;
       String sThumbnailUrl = StringUtils.trimToNull(getAttributeValue(attributes, WKAConstants.WKA_THUMBNAIL_URL, null));
       String resourceUrl = getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null);
       
-      resourceUrl="https://services.arcgis.com/RhGiohBHzSBKt1MS/arcgis/rest/services/group_of_layers/FeatureServer/1";
+      //Hardcoded url just for dev testing
+      //resourceUrl="https://services.arcgis.com/RhGiohBHzSBKt1MS/arcgis/rest/services/group_of_layers/FeatureServer/1";
       // clean up resource URL
       resourceUrl = resourceUrl.replace("http:", "https:")
                                .replace(":80/", "/");
