@@ -199,7 +199,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
       String sThumbnailUrl = StringUtils.trimToNull(getAttributeValue(attributes, WKAConstants.WKA_THUMBNAIL_URL, null));
       String resourceUrl = getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null);
       
-      //resourceUrl="https://services.arcgis.com/RhGiohBHzSBKt1MS/arcgis/rest/services/group_of_layers/FeatureServer/1";
+      resourceUrl="https://services.arcgis.com/RhGiohBHzSBKt1MS/arcgis/rest/services/group_of_layers/FeatureServer/1";
       // clean up resource URL
       resourceUrl = resourceUrl.replace("http:", "https:")
                                .replace(":80/", "/");
@@ -425,7 +425,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
               boolean wasUpdated = client.writeSubLayerMetadata(metadataUpdateURI, arcgisMetadata, featureServerToken);
               System.out.println("update metadata at " + metadataUpdateURI + " was a succes: " + wasUpdated);
               
-              return PublishingStatus.SKIPPED;
+              return PublishingStatus.UPDATED;
           }
         }
       } catch (MalformedURLException ex) {
