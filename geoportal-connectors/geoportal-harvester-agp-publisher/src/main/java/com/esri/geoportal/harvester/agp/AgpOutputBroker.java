@@ -283,7 +283,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
       try {
 
         // generate token       
-        if (token == null) {
+        if ((definition.useOAuth()) || (token == null)) {
            token = definition.getOAuthToken();
            //oAuth token was not generated, hence generate token from user password. In this case subLayer metadata update will fail
            if(token == null || token.isBlank())
@@ -421,12 +421,17 @@ import org.commonmark.renderer.html.HtmlRenderer;
           } else {
               // the metadata is apparently for a sublayer              
               // DO SOMETHING ELSE
-              String featureServerToken = generateToken(60,"https://services.arcgis.com/RhGiohBHzSBKt1MS/arcgis/rest/admin/services/group_of_layers/FeatureServer",token);
+              String parentUrl = resourceUrl.substring(0,resourceUrl.lastIndexOf("/"));
+              String featureServerToken = generateToken(60, parentUrl,token);
               String metadataUpdateURI = resourceUrl + "/metadata/update/";
               boolean wasUpdated = client.writeSubLayerMetadata(metadataUpdateURI, arcgisMetadata, featureServerToken);
               System.out.println("update metadata at " + metadataUpdateURI + " was a succes: " + wasUpdated);
-              
-              return PublishingStatus.UPDATED;
+
+              if (wasUpdated) {
+                  return PublishingStatus.UPDATED;
+              } else {
+                  return PublishingStatus.SKIPPED;
+              }
           }
         }
       } catch (MalformedURLException ex) {

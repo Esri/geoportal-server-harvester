@@ -42,6 +42,7 @@ import org.apache.commons.lang3.math.NumberUtils;
   private Integer maxRedirects;
   private boolean uploadFiles;
   private boolean markdown2html;
+  private boolean useOAuth;
   private String oAuthToken;
 
   
@@ -72,6 +73,7 @@ import org.apache.commons.lang3.math.NumberUtils;
       maxRedirects = NumberUtils.toInt(get(P_MAX_REDIRECTS), DEFAULT_MAX_REDIRECTS);
       uploadFiles = Boolean.parseBoolean(get(P_UPLOAD));
       markdown2html = Boolean.parseBoolean(get(P_MARKDOWN2HTML));
+      useOAuth = Boolean.parseBoolean(get(P_OAUTH));
       oAuthToken = get(P_TOKEN);
     }
   }
@@ -198,6 +200,10 @@ import org.apache.commons.lang3.math.NumberUtils;
       set(P_MARKDOWN2HTML, Boolean.toString(markdown2html));        
   }
   
+  public boolean useOAuth() {
+      return useOAuth;
+  }
+
   public String getOAuthToken()
   {
       return oAuthToken;
