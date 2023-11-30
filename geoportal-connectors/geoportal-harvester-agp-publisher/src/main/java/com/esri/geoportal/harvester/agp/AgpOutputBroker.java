@@ -425,6 +425,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
               String featureServerToken = generateToken(60, parentUrl,token);
               String metadataUpdateURI = resourceUrl + "/metadata/update/";
               boolean wasUpdated = client.writeSubLayerMetadata(metadataUpdateURI, arcgisMetadata, featureServerToken);
+              LOG.debug("update metadata at " + metadataUpdateURI + " was a succes: " + wasUpdated);
               System.out.println("update metadata at " + metadataUpdateURI + " was a succes: " + wasUpdated);
 
               if (wasUpdated) {
