@@ -295,77 +295,43 @@ import org.commonmark.renderer.html.HtmlRenderer;
         ItemEntry itemEntry = searchForItem(resourceUrl);
 
         if (itemEntry == null) {
-          // add item if doesn't exist
           
-          // add item with dummy 'simple' metadata
-          // no longer needed, but keep for testing purposes
-          /*
-          String dummyMetadata =  "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
-                  + "<metadata xml:lang=\"en\">"
-                  + "  <Esri>"
-                  + "    <CreaDate>2022-07-21</CreaDate>"
-                  + "    <CreaTime>12:26:34.68</CreaTime>"
-                  + "    <ModDate>2022-07-21</ModDate>"
-                  + "    <ModTime>12:59:19.59</ModTime>"
-                  + "    <PublishStatus>editor:esri.dijit.metadata.editor</PublishStatus>"
-                  + "    <ArcGISFormat>1.0</ArcGISFormat>"
-                  + "    <ArcGISstyle>ISO 19139 Metadata Implementation Specification GML3.2</ArcGISstyle>"
-                  + "    <ArcGISProfile>ISO19139</ArcGISProfile>"
-                  + "    <MapLyrSync>false</MapLyrSync>"
-                  + "  </Esri>"
-                  + "  <mdHrLv><ScopeCd value=\"005\"/></mdHrLv>"
-                  + "  <mdFileID>" + resourceUrl + "</mdFileID>"
-                  + "  <mdDateSt>2016-02-19</mdDateSt><mdTimeSt>16:48:06.84</mdTimeSt>"
-                  + "  <dataIdInfo>"
-                  + "    <idCitation>"
-                  + "      <resTitle>" + title + "</resTitle>"
-                  + "    </idCitation>"
-                  + "    <idAbs>" + sanitize(description) + "</idAbs>"
-                  + "  </dataIdInfo>"
-                  + "</metadata>";
+            // neither the potential sub layer, nor the parent layer exist. Add a new portal item
+         
+            ItemResponse response = addItem(
+                    title,
+                    description,
+                    new URL(resourceUrl),
+                    sThumbnailUrl != null ? new URL(sThumbnailUrl) : null,
+                    itemType,
+                    extractEnvelope(bbox),
+                    typeKeywords,
+                    null,
+                    metadataFile,
+                    token
+            );
 
-          Path dummyMetadataPath = Files.createTempFile(null, null);
-          Files.write(dummyMetadataPath, dummyMetadata.getBytes(StandardCharsets.UTF_8));
-          File dummyMetadataFile = dummyMetadataPath.toFile();  
-          */
-          
-          ItemResponse response = addItem(
-                  title,
-                  description,
-                  new URL(resourceUrl),
-                  sThumbnailUrl != null ? new URL(sThumbnailUrl) : null,
-                  itemType,
-                  extractEnvelope(bbox),
-                  typeKeywords,
-                  null,
-                  metadataFile,
-                  token
-          );
+            if (response == null || !response.success) {
+              String error = response != null && response.error != null && response.error.message != null ? response.error.message : null;
+              throw new DataOutputException(this, ref, String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
+            } else {
+              System.out.print("addItem -> " + response.toString());
 
-          // remove the dummy metadata file
-          // no longer needed, but keep for testing purposes
-          // dummyMetadataFile.delete();
-          
-          if (response == null || !response.success) {
-            String error = response != null && response.error != null && response.error.message != null ? response.error.message : null;
-            throw new DataOutputException(this, ref, String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
-          } else {
-            System.out.print("addItem -> " + response.toString());
-            
-            // Now upload full metadata
-            String metadataAdded = client.writeItemMetadata(response.id, arcgisMetadata, token);
-            System.out.print("METADATA -> " + metadataAdded);
-          }
-          
-          client.share(definition.getCredentials().getUserName(), definition.getFolderId(), response.id, true, true, null, token);
+              // Now upload full metadata
+              String metadataAdded = client.writeItemMetadata(response.id, arcgisMetadata, token);
+              System.out.print("METADATA -> " + metadataAdded);
+            }
 
-          return PublishingStatus.CREATED;
+            client.share(definition.getCredentials().getUserName(), definition.getFolderId(), response.id, true, true, null, token);
 
-        } else { // if (itemEntry.owner.equals(definition.getCredentials().getUserName())) {
-          // if the item is not owned by the registered account, try to update
-          // assuming the item is in a shared update group.
+            return PublishingStatus.CREATED;
+
+        } else {
+          // there is an item registered for this resourceUrl, try to update
+          // if the item is not owned by the registered account
+          // assume the item is in a shared update group.
           // if this fails and the registered account cannot update the existing item
-          // then consider this item 'skipped'
+          // then this item will be 'skipped'
 
           itemEntry = client.readItem(itemEntry.id, token);
           if (itemEntry == null) {
@@ -420,18 +386,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
             return PublishingStatus.UPDATED;
           } else {
               // the metadata is apparently for a sublayer              
-              // DO SOMETHING ELSE
-              String parentUrl = resourceUrl.substring(0,resourceUrl.lastIndexOf("/"));
-              String featureServerToken = generateToken(60, parentUrl,token);
-              String metadataUpdateURI = resourceUrl + "/metadata/update/";
-              boolean wasUpdated = client.writeSubLayerMetadata(metadataUpdateURI, arcgisMetadata, featureServerToken);
-              System.out.println("update metadata at " + metadataUpdateURI + " was a succes: " + wasUpdated);
-
-              if (wasUpdated) {
-                  return PublishingStatus.UPDATED;
-              } else {
-                  return PublishingStatus.SKIPPED;
-              }
+              return updateSubLayerMetadata(resourceUrl, arcgisMetadata);
           }
         }
       } catch (MalformedURLException ex) {
@@ -447,6 +402,21 @@ import org.commonmark.renderer.html.HtmlRenderer;
       if (metadataFile!=null && deleteMetadataFile) {
         metadataFile.delete();
       } 
+    }
+  }
+  
+  
+  private PublishingStatus updateSubLayerMetadata(String resourceUrl, String arcgisMetadata) throws URISyntaxException, IOException {
+    String parentUrl = resourceUrl.substring(0,resourceUrl.lastIndexOf("/"));
+    String featureServerToken = generateToken(60, parentUrl,token);
+    String metadataUpdateURI = resourceUrl + "/metadata/update/";
+    boolean wasUpdated = client.writeSubLayerMetadata(metadataUpdateURI, arcgisMetadata, featureServerToken);
+    System.out.println("update metadata at " + metadataUpdateURI + " was a succes: " + wasUpdated);
+
+    if (wasUpdated) {
+        return PublishingStatus.UPDATED;
+    } else {
+        return PublishingStatus.SKIPPED;
     }
   }
   
