@@ -386,7 +386,19 @@ import org.commonmark.renderer.html.HtmlRenderer;
             return PublishingStatus.UPDATED;
           } else {
               // the metadata is apparently for a sublayer              
-              return updateSubLayerMetadata(resourceUrl, arcgisMetadata);
+              // DO SOMETHING ELSE
+              String parentUrl = resourceUrl.substring(0,resourceUrl.lastIndexOf("/"));
+              String featureServerToken = generateToken(60, parentUrl,token);
+              String metadataUpdateURI = resourceUrl + "/metadata/update/";
+              boolean wasUpdated = client.writeSubLayerMetadata(metadataUpdateURI, arcgisMetadata, featureServerToken);
+              LOG.debug("update metadata at " + metadataUpdateURI + " was a succes: " + wasUpdated);
+              System.out.println("update metadata at " + metadataUpdateURI + " was a succes: " + wasUpdated);
+
+              if (wasUpdated) {
+                  return PublishingStatus.UPDATED;
+              } else {
+                  return PublishingStatus.SKIPPED;
+              }
           }
         }
       } catch (MalformedURLException ex) {

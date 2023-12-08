@@ -338,14 +338,14 @@ public class AgpClient implements Closeable {
                 throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
             }
             String responseContent = IOUtils.toString(contentStream, "UTF-8");
-            System.out.println(responseContent);
+            LOG.debug(" writeSubLayerMetadata "+responseContent);
             if (responseContent.contains("error")) {
                 return false;
             }
         }
       
     } catch (IOException ex) {
-        System.out.println(ex.getMessage());
+        LOG.error("Error writeSubLayerMetadata " +ex.getMessage(),ex);
         return false;
     }
     
@@ -770,7 +770,7 @@ public class AgpClient implements Closeable {
 
             return execute(newReq, ++redirectDepth);
           } catch (IOException | URISyntaxException e) {
-            LOG.debug("Error executing request", e);
+            LOG.error("Error executing request", e);
             throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
           }
         }
