@@ -42,6 +42,8 @@ import org.apache.commons.lang3.math.NumberUtils;
   private Integer maxRedirects;
   private boolean uploadFiles;
   private boolean markdown2html;
+  private boolean useOAuth;
+  private String oAuthToken;
 
   
   /**
@@ -71,6 +73,8 @@ import org.apache.commons.lang3.math.NumberUtils;
       maxRedirects = NumberUtils.toInt(get(P_MAX_REDIRECTS), DEFAULT_MAX_REDIRECTS);
       uploadFiles = Boolean.parseBoolean(get(P_UPLOAD));
       markdown2html = Boolean.parseBoolean(get(P_MARKDOWN2HTML));
+      useOAuth = Boolean.parseBoolean(get(P_OAUTH));
+      oAuthToken = get(P_TOKEN);
     }
   }
 
@@ -82,6 +86,7 @@ import org.apache.commons.lang3.math.NumberUtils;
     consume(params, P_MAX_REDIRECTS);
     consume(params, P_UPLOAD);
     consume(params, P_MARKDOWN2HTML);
+    consume(params, P_TOKEN);
     credAdaptor.override(params);
   }
 
@@ -193,5 +198,18 @@ import org.apache.commons.lang3.math.NumberUtils;
   public void setMarkdown2HTML(boolean markdown2html) {
       this.markdown2html = markdown2html;
       set(P_MARKDOWN2HTML, Boolean.toString(markdown2html));        
+  }
+  
+  public boolean useOAuth() {
+      return useOAuth;
+  }
+
+  public String getOAuthToken()
+  {
+      return oAuthToken;
+  }
+  public void setOAuthToken(String oAuthToken) {
+      this.oAuthToken = oAuthToken;
+      set(P_TOKEN, oAuthToken);        
   }
 }

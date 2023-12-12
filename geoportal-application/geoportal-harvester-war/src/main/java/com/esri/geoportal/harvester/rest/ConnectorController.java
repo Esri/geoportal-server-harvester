@@ -18,6 +18,9 @@ package com.esri.geoportal.harvester.rest;
 import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.engine.services.Engine;
+import com.esri.geoportal.harvester.engine.services.TemplatesService;
+import java.util.List;
+import java.util.Locale;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -181,6 +184,8 @@ public class ConnectorController {
   @RequestMapping(value = "/rest/harvester/connectors/outbound", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate[] listOutboundConnectors() {
     LOG.debug(String.format("GET /rest/harvester/connectors/outbound"));
+      TemplatesService srv1 = engine.getTemplatesService();
+      List<UITemplate> temp2= srv1.getOutboundConnectorTemplates(Locale.US);
     return engine.getTemplatesService().getOutboundConnectorTemplates(LocaleContextHolder.getLocale()).toArray(new UITemplate[0]);
   }
   

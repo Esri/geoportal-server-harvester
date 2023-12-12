@@ -87,7 +87,7 @@ public class AgpOutputConnector implements OutputConnector<OutputBroker> {
         return bundle.getString("agp.hint");
       }
     });
-    args.add(new UITemplate.StringArgument(P_FOLDER_ID, bundle.getString("agp.folderId"), false));
+    args.add(new UITemplate.StringArgument(P_FOLDER_ID, bundle.getString("agp.folderId"), false));       
     args.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("agp.username"), true));
     args.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("agp.password"), true) {
       public boolean isPassword() {
@@ -98,7 +98,8 @@ public class AgpOutputConnector implements OutputConnector<OutputBroker> {
     args.add(new UITemplate.BooleanArgument(P_FOLDER_CLEANUP, bundle.getString("agp.cleanup")));
     args.add(new UITemplate.BooleanArgument(P_UPLOAD, bundle.getString("agp.upload"), true, true));
     args.add(new UITemplate.BooleanArgument(P_MARKDOWN2HTML, bundle.getString("agp.markdown2html"), true, true));
-    
+    args.add(new UITemplate.BooleanArgument(P_OAUTH, bundle.getString("agp.oauth"), false,false)); 
+    args.add(new UITemplate.HiddenArgument(P_TOKEN, "hidden"));
     return new UITemplate(getType(), bundle.getString("agp"), args);
   }
   

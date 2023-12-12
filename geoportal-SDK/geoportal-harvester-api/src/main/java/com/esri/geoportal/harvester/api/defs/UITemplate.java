@@ -81,7 +81,10 @@ public final class UITemplate {
     /** temporal type */
     temporal,
     /** periodical */
-    periodical
+    periodical,
+    button,
+    hidden
+    
   }
   
   /**
@@ -224,7 +227,7 @@ public final class UITemplate {
     }
   }
   
-  /**
+    /**
    * String argument.
    */
   public static class StringArgument extends ArgumentBase<String> {
@@ -269,6 +272,44 @@ public final class UITemplate {
     @Override
     public ArgumentType getType() {
       return ArgumentType.string;
+    }
+  }
+  
+  /**
+   * Button argument.
+   */
+  public static class ButtonArgument extends ArgumentBase<String> { 
+      
+    /**
+  * Creates instance of the argument.
+  * @param name type
+  * @param label label
+  * @param required <code>true</code> if argument is required
+  */
+    public ButtonArgument(String name, String label, boolean required) {
+      super(name, label, required);
+    }
+    @Override
+    public ArgumentType getType() {
+      return ArgumentType.button;
+    }
+  }
+  
+  /**
+   * Button argument.
+   */
+  public static class HiddenArgument extends ArgumentBase<String> {       
+    /**
+  * Creates instance of the argument.
+  * @param name type
+  * @param label label
+ */
+    public HiddenArgument(String name, String label) {
+      super(name, label);
+    }
+    @Override
+    public ArgumentType getType() {
+      return ArgumentType.hidden;
     }
   }
   

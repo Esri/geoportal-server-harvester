@@ -29,6 +29,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -306,6 +308,49 @@ public class AgpClient implements Closeable {
       throw ex;
     }
   }  
+  
+  /**
+   * Writes layer metadata.
+   * @param resourceURL
+   * @param fileToUpload metadata
+   * @param token token
+   * @return true metadata if and only if update successful
+   * @throws URISyntaxException if invalid URL
+   * @throws IOException if operation fails
+   */
+   public boolean writeSubLayerMetadata(String resourceURL, String fileToUpload, String token) throws IOException, URISyntaxException {
+    URIBuilder builder = new URIBuilder(resourceURL);
+    HttpPost req = new HttpPost(builder.build());
+    
+    Map<String, String> params = new HashMap<>();
+    params.put("f", "json");
+    params.put("token", token);
+    params.put("metadataUploadFormat", "xml");
+    params.put("overwrite", "true");
+    params.put("metadata",fileToUpload);
+    
+    try {
+        HttpEntity entity = createEntity(params);
+        req.setEntity(entity);
+
+        try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
+            if (httpResponse.getStatusLine().getStatusCode()>=400) {
+                throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+            }
+            String responseContent = IOUtils.toString(contentStream, "UTF-8");
+            LOG.debug(" writeSubLayerMetadata "+responseContent);
+            if (responseContent.contains("error")) {
+                return false;
+            }
+        }
+      
+    } catch (IOException ex) {
+        LOG.error("Error writeSubLayerMetadata " +ex.getMessage(),ex);
+        return false;
+    }
+    
+    return true;
+  }    
     
   /**
    * Sharing item.
@@ -518,6 +563,25 @@ public class AgpClient implements Closeable {
     return execute(req,TokenResponse.class);
   }
   
+  public TokenResponse generateToken(int minutes, String serverUrl,String token) throws URISyntaxException, IOException {
+    HttpPost req = new HttpPost(generateTokenUri());
+    
+    HashMap<String, String> params = new HashMap<>();
+    params.put("f", "json");
+    if (credentials != null) {
+      params.put("username", StringUtils.trimToEmpty(credentials.getUserName()));
+      params.put("password", StringUtils.trimToEmpty(credentials.getPassword()));
+    }
+    params.put("client", "requestip");
+    params.put("expiration", Integer.toString(minutes));
+    params.put("serverUrl", serverUrl);
+    params.put("token",token );
+    
+    req.setEntity(createEntity(params));
+
+    return execute(req,TokenResponse.class);
+  }
+  
   private Map<String, String> makeStdParams(String title, String description, ItemType itemType, URL thumbnailUrl, Double [] extent, String [] typeKeywords, String [] tags, String token) {
     HashMap<String, String> params = new HashMap<>();
     params.put("f", "json");
@@ -706,7 +770,7 @@ public class AgpClient implements Closeable {
 
             return execute(newReq, ++redirectDepth);
           } catch (IOException | URISyntaxException e) {
-            LOG.debug("Error executing request", e);
+            LOG.error("Error executing request", e);
             throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
           }
         }

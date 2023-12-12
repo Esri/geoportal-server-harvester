@@ -23,4 +23,5 @@ package com.esri.geoportal.harvester.ags;
   public static final String P_ENABLE_LAYERS = "ags-enable-layers";
   public static final String P_EMIT_XML      = "ags-emit-xml";
   public static final String P_EMIT_JSON     = "ags-emit-json";
+  public static final String P_USE_FULL_XML  = "ags-use-full-xml";
 }

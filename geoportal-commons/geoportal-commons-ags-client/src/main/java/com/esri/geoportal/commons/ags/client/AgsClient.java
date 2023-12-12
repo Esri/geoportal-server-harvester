@@ -177,6 +177,19 @@ public class AgsClient implements Closeable {
       response.url = url.toExternalForm();
       response.json = responseContent;
       response.itemInfo = readItemInfo(new URL(url + "/info/itemInfo"));
+      
+      response.hasMetadata = false;
+      response.metadataXML = "";
+      String metadataURL = url + "/info/metadata";
+      HttpGet getXML = new HttpGet(metadataURL);
+      try (CloseableHttpResponse httpResponseXML = httpClient.execute(getXML); InputStream contentStreamXML = httpResponseXML.getEntity().getContent();) {
+        if (httpResponseXML.getStatusLine().getStatusCode()<400) {
+          String responseContentXML = IOUtils.toString(contentStreamXML, "UTF-8");
+          response.metadataXML = responseContentXML;
+          response.hasMetadata = true;
+        }
+      }
+      
       return response;
     }
   }
@@ -201,6 +214,7 @@ public class AgsClient implements Closeable {
       mapper.configure(Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
       mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
       ItemInfo response = mapper.readValue(responseContent, ItemInfo.class);
+                      
       return response;
     }
   }
@@ -228,6 +242,17 @@ public class AgsClient implements Closeable {
       mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
       LayerInfo response = mapper.readValue(responseContent, LayerInfo.class);
+      if (response.hasMetadata) {
+        HttpGet getXML = new HttpGet(url + String.format("/metadata", "text/xml"));
+        try (CloseableHttpResponse httpResponseXML = httpClient.execute(getXML); InputStream contentStreamXML = httpResponseXML.getEntity().getContent();) {
+          if (httpResponseXML.getStatusLine().getStatusCode()>=400) {
+            throw new HttpResponseException(httpResponseXML.getStatusLine().getStatusCode(), httpResponseXML.getStatusLine().getReasonPhrase());
+          }
+          String responseContentXML = IOUtils.toString(contentStreamXML, "UTF-8");
+          response.metadataXML = responseContentXML;
+        }
+          
+      }
       response.url = url;
       response.json = responseContent;
       return response;

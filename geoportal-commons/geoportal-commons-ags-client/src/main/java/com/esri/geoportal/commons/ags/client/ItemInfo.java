@@ -36,4 +36,6 @@ public final class ItemInfo {
   public String spatialReference;
   public String accessInformation;
   public String licenseInfo;
+  public boolean hasMetadata;
+  public String metadataXML;
 }

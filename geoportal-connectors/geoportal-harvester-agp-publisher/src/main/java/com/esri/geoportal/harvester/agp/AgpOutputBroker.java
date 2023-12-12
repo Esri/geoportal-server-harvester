@@ -21,8 +21,8 @@ import com.esri.geoportal.commons.agp.client.DeleteResponse;
 import com.esri.geoportal.commons.agp.client.FolderEntry;
 import com.esri.geoportal.commons.agp.client.ItemEntry;
 import com.esri.geoportal.commons.agp.client.ItemResponse;
-import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.agp.client.QueryResponse;
+import com.esri.geoportal.commons.constants.ItemType;
 import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.doc.DocUtils;
 import com.esri.geoportal.commons.meta.ArrayAttribute;
@@ -48,7 +48,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
-// import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -76,13 +75,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-//import org.apache.http.HttpEntity;
-//import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-//import org.apache.http.client.methods.HttpPost;
-//import org.apache.http.client.utils.URIBuilder;
-//import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
@@ -187,10 +181,26 @@ import org.commonmark.renderer.html.HtmlRenderer;
           //Node titleNode = markdownParser.parse(title);
           //title = htmlRenderer.render(titleNode);
           Node descriptionNode = markdownParser.parse(description);
+          
           description = htmlRenderer.render(descriptionNode);
+          description = description.replaceAll("[*] ","<li>");
+          description = description.replaceAll("\\\\n","<br/>");
+          description = replaceSpecialCharacters(description);
+          //description = description.replaceAll("[^\\x00-\\x7F]", "");
+          
+          // also update arcgisMetadata with the new description as idAbs
+          // only if there is exactly 1 idAbs element
+          String[] metadataPieces = arcgisMetadata.split("idAbs>");
+          if (metadataPieces.length == 3) {
+            metadataPieces[1] = "idAbs><![CDATA[" + description + "]]></idAbs>";
+            arcgisMetadata = metadataPieces[0] + metadataPieces[1] + metadataPieces[2]; 
+          }
       }
       String sThumbnailUrl = StringUtils.trimToNull(getAttributeValue(attributes, WKAConstants.WKA_THUMBNAIL_URL, null));
       String resourceUrl = getAttributeValue(attributes, WKAConstants.WKA_RESOURCE_URL, null);
+      
+      //Hardcoded url just for dev testing
+      //resourceUrl="https://services.arcgis.com/RhGiohBHzSBKt1MS/arcgis/rest/services/group_of_layers/FeatureServer/1";
       // clean up resource URL
       resourceUrl = resourceUrl.replace("http:", "https:")
                                .replace(":80/", "/");
@@ -272,86 +282,56 @@ import org.commonmark.renderer.html.HtmlRenderer;
 
       try {
 
-        // generate token
-        if (token == null) {
-          token = generateToken();
+        // generate token       
+        if ((definition.useOAuth()) || (token == null)) {
+           token = definition.getOAuthToken();
+           //oAuth token was not generated, hence generate token from user password. In this case subLayer metadata update will fail
+           if(token == null || token.isBlank())
+           {
+               token = generateToken(60);
+           }
         }
-
         // check if item exists
         ItemEntry itemEntry = searchForItem(resourceUrl);
 
         if (itemEntry == null) {
-          // add item if doesn't exist
           
-          // add item with dummy 'simple' metadata
-          // no longer needed, but keep for testing purposes
-          /*
-          String dummyMetadata =  "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
-                  + "<metadata xml:lang=\"en\">"
-                  + "  <Esri>"
-                  + "    <CreaDate>2022-07-21</CreaDate>"
-                  + "    <CreaTime>12:26:34.68</CreaTime>"
-                  + "    <ModDate>2022-07-21</ModDate>"
-                  + "    <ModTime>12:59:19.59</ModTime>"
-                  + "    <PublishStatus>editor:esri.dijit.metadata.editor</PublishStatus>"
-                  + "    <ArcGISFormat>1.0</ArcGISFormat>"
-                  + "    <ArcGISstyle>ISO 19139 Metadata Implementation Specification GML3.2</ArcGISstyle>"
-                  + "    <ArcGISProfile>ISO19139</ArcGISProfile>"
-                  + "    <MapLyrSync>false</MapLyrSync>"
-                  + "  </Esri>"
-                  + "  <mdHrLv><ScopeCd value=\"005\"/></mdHrLv>"
-                  + "  <mdFileID>" + resourceUrl + "</mdFileID>"
-                  + "  <mdDateSt>2016-02-19</mdDateSt><mdTimeSt>16:48:06.84</mdTimeSt>"
-                  + "  <dataIdInfo>"
-                  + "    <idCitation>"
-                  + "      <resTitle>" + title + "</resTitle>"
-                  + "    </idCitation>"
-                  + "    <idAbs>" + sanitize(description) + "</idAbs>"
-                  + "  </dataIdInfo>"
-                  + "</metadata>";
+            // neither the potential sub layer, nor the parent layer exist. Add a new portal item
+         
+            ItemResponse response = addItem(
+                    title,
+                    description,
+                    new URL(resourceUrl),
+                    sThumbnailUrl != null ? new URL(sThumbnailUrl) : null,
+                    itemType,
+                    extractEnvelope(bbox),
+                    typeKeywords,
+                    null,
+                    metadataFile,
+                    token
+            );
 
-          Path dummyMetadataPath = Files.createTempFile(null, null);
-          Files.write(dummyMetadataPath, dummyMetadata.getBytes(StandardCharsets.UTF_8));
-          File dummyMetadataFile = dummyMetadataPath.toFile();  
-          */
-          
-          ItemResponse response = addItem(
-                  title,
-                  description,
-                  new URL(resourceUrl),
-                  sThumbnailUrl != null ? new URL(sThumbnailUrl) : null,
-                  itemType,
-                  extractEnvelope(bbox),
-                  typeKeywords,
-                  null,
-                  metadataFile,
-                  token
-          );
+            if (response == null || !response.success) {
+              String error = response != null && response.error != null && response.error.message != null ? response.error.message : null;
+              throw new DataOutputException(this, ref, String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
+            } else {
+              System.out.print("addItem -> " + response.toString());
 
-          // remove the dummy metadata file
-          // no longer needed, but keep for testing purposes
-          // dummyMetadataFile.delete();
-          
-          if (response == null || !response.success) {
-            String error = response != null && response.error != null && response.error.message != null ? response.error.message : null;
-            throw new DataOutputException(this, ref, String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
-          } else {
-            System.out.print("addItem -> " + response.toString());
-            
-            // Now upload full metadata
-            String metadataAdded = client.writeItemMetadata(response.id, arcgisMetadata, token);
-            System.out.print("METADATA -> " + metadataAdded);
-          }
-          
-          client.share(definition.getCredentials().getUserName(), definition.getFolderId(), response.id, true, true, null, token);
+              // Now upload full metadata
+              String metadataAdded = client.writeItemMetadata(response.id, arcgisMetadata, token);
+              System.out.print("METADATA -> " + metadataAdded);
+            }
 
-          return PublishingStatus.CREATED;
+            client.share(definition.getCredentials().getUserName(), definition.getFolderId(), response.id, true, true, null, token);
 
-        } else { // if (itemEntry.owner.equals(definition.getCredentials().getUserName())) {
-          // if the item is not owned by the registered account, try to update
-          // assuming the item is in a shared update group.
+            return PublishingStatus.CREATED;
+
+        } else {
+          // there is an item registered for this resourceUrl, try to update
+          // if the item is not owned by the registered account
+          // assume the item is in a shared update group.
           // if this fails and the registered account cannot update the existing item
-          // then consider this item 'skipped'
+          // then this item will be 'skipped'
 
           itemEntry = client.readItem(itemEntry.id, token);
           if (itemEntry == null) {
@@ -373,33 +353,53 @@ import org.commonmark.renderer.html.HtmlRenderer;
           }
      
           // update item if does exist
-          ItemResponse response = updateItem(
-                  itemEntry.id,
-                  itemEntry.owner,
-                  itemEntry.ownerFolder,
-                  title,
-                  description,
-                  new URL(resourceUrl),
-                  sThumbnailUrl != null ? new URL(sThumbnailUrl) : null,
-                  itemType,
-                  extractEnvelope(bbox),
-                  typeKeywords,
-                  fileToUpload,
-                  metadataFile,
-                  token
-          );
+          
+          // if the item url is the same as the resourceUrl, proceed.
+          // otherwise the metadata is for a sublayer, but the item is the parent
+          if (resourceUrl.equals(itemEntry.url)) {
+            ItemResponse response = updateItem(
+                    itemEntry.id,
+                    itemEntry.owner,
+                    itemEntry.ownerFolder,
+                    title, 
+                   description,
+                    new URL(resourceUrl),
+                    sThumbnailUrl != null ? new URL(sThumbnailUrl) : null,
+                    itemType,
+                    extractEnvelope(bbox),
+                    typeKeywords,
+                    fileToUpload,
+                    metadataFile,
+                    token
+            );
 
-          if (response == null || !response.success) {
-            String error = response != null && response.error != null && response.error.message != null ? response.error.message : null;
-            throw new DataOutputException(this, ref, String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
+            if (response == null || !response.success) {
+              String error = response != null && response.error != null && response.error.message != null ? response.error.message : null;
+              throw new DataOutputException(this, ref, String.format("Error adding item: %s%s", ref, error != null ? "; " + error : ""));
+            } else {
+              // String metadataAdded = client.writeItemMetadata(response.id, arcgisMetadata, token);
+              System.out.print("updateItem -> " + response.toString());
+            }
+
+            existing.remove(itemEntry.id);
+
+            return PublishingStatus.UPDATED;
           } else {
-            // String metadataAdded = client.writeItemMetadata(response.id, arcgisMetadata, token);
-            System.out.print("updateItem -> " + response.toString());
+              // the metadata is apparently for a sublayer              
+              // DO SOMETHING ELSE
+              String parentUrl = resourceUrl.substring(0,resourceUrl.lastIndexOf("/"));
+              String featureServerToken = generateToken(60, parentUrl,token);
+              String metadataUpdateURI = resourceUrl + "/metadata/update/";
+              boolean wasUpdated = client.writeSubLayerMetadata(metadataUpdateURI, arcgisMetadata, featureServerToken);
+              LOG.debug("update metadata at " + metadataUpdateURI + " was a succes: " + wasUpdated);
+              System.out.println("update metadata at " + metadataUpdateURI + " was a succes: " + wasUpdated);
+
+              if (wasUpdated) {
+                  return PublishingStatus.UPDATED;
+              } else {
+                  return PublishingStatus.SKIPPED;
+              }
           }
-
-          existing.remove(itemEntry.id);
-
-          return PublishingStatus.UPDATED;
         }
       } catch (MalformedURLException ex) {
         return PublishingStatus.SKIPPED;
@@ -416,6 +416,23 @@ import org.commonmark.renderer.html.HtmlRenderer;
       } 
     }
   }
+  
+  
+  private PublishingStatus updateSubLayerMetadata(String resourceUrl, String arcgisMetadata) throws URISyntaxException, IOException {
+    String parentUrl = resourceUrl.substring(0,resourceUrl.lastIndexOf("/"));
+    String featureServerToken = generateToken(60, parentUrl,token);
+    String metadataUpdateURI = resourceUrl + "/metadata/update/";
+    boolean wasUpdated = client.writeSubLayerMetadata(metadataUpdateURI, arcgisMetadata, featureServerToken);
+    System.out.println("update metadata at " + metadataUpdateURI + " was a succes: " + wasUpdated);
+
+    if (wasUpdated) {
+        return PublishingStatus.UPDATED;
+    } else {
+        return PublishingStatus.SKIPPED;
+    }
+  }
+  
+  
   private ItemType createItemType(String resourceUrl) {
     
     resourceUrl = StringUtils.trimToEmpty(resourceUrl);
@@ -449,6 +466,27 @@ import org.commonmark.renderer.html.HtmlRenderer;
     // for ArcGIS Portal/Online, look for the resource URL instead of the source XML URI
     QueryResponse search = client.search(String.format("url:%s", String.format("%s", src_uri_s)), 0, 0, token);
     ItemEntry itemEntry = search != null && search.results != null && search.results.length > 0 ? search.results[0] : null;
+    
+    // if no results found and the source uri (src_uri_s) ends in /0, /1, ... this may be a sublayer
+    // look for the parent service
+    if (itemEntry == null) {
+        String[] uri_parts = src_uri_s.split("/");
+        
+        // iff the last part is a number, this could be a sublayer
+        if (StringUtils.isNumeric(uri_parts[uri_parts.length-1])) {
+            String regex = "\\/" + uri_parts[uri_parts.length-1] + "$";
+            String mother_uri = "";
+            try {
+                mother_uri = src_uri_s.replaceFirst(regex, "");
+            } catch (Exception e) {
+                System.out.println(e.toString());
+            }
+ 
+            // now search for mother uri
+            search = client.search(String.format("url:%s", String.format("%s", mother_uri)), 0, 0, token);
+            itemEntry = search != null && search.results != null && search.results.length > 0 ? search.results[0] : null;
+        }
+    }
     
     return itemEntry;
   }
@@ -504,33 +542,9 @@ import org.commonmark.renderer.html.HtmlRenderer;
       String sXml = "";
       if (ref.getContentType().contains(MimeType.APPLICATION_XML) || ref.getContentType().contains(MimeType.TEXT_XML)) {
         sXml = new String(ref.getContent(MimeType.APPLICATION_XML, MimeType.TEXT_XML), "UTF-8");
-        //DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        //factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        //factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        //factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        //factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-        //factory.setXIncludeAware(false);
-        //factory.setExpandEntityReferences(false);
-        //factory.setNamespaceAware(true);
-        //DocumentBuilder builder = factory.newDocumentBuilder();
-        //doc = builder.parse(new InputSource(new StringReader(sXml)));
       } else if (content!=null) {
         sXml = new String(content, "UTF-8");
       }
-      /*
-      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-      factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-      factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-      factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-      factory.setFeature("http://xml.org/sax/features/validation", false);
-      factory.setFeature("http://apache.org/xml/features/validation/schema", false);
-      factory.setXIncludeAware(false);
-      factory.setExpandEntityReferences(false);
-      factory.setNamespaceAware(true);
-      DocumentBuilder builder = factory.newDocumentBuilder();
-      doc = builder.parse(new InputSource(new StringReader(sXml)));
-      */
       doc = stringToDoc(sXml);
       
       if (doc!=null) {
@@ -695,6 +709,10 @@ import org.commonmark.renderer.html.HtmlRenderer;
   private String generateToken(int minutes) throws URISyntaxException, IOException {
     return client.generateToken(minutes).token;
   }
+   private String generateToken(int minutes,String serverUrl,String token) throws URISyntaxException, IOException {
+    return client.generateToken(minutes,serverUrl,token).token;
+  }
+  
 
   private String generateToken() throws URISyntaxException, IOException {
     return client.generateToken(60).token;
@@ -818,6 +836,24 @@ import org.commonmark.renderer.html.HtmlRenderer;
     
     return new FileName(name, ext);
   }
+  
+    private String replaceSpecialCharacters(String inputText) {
+        String outputText = "";
+        String sourceText = inputText;
+        
+        HashMap<String, String> extendedCharacters = new HashMap<>();
+
+        extendedCharacters.put("\\x91", "&lsquo;");
+        extendedCharacters.put("\\x92", "&rsquo;");
+        extendedCharacters.put("\\x93", "&ldquo;");
+        extendedCharacters.put("\\x94", "&rdquo;");
+        
+        for (HashMap.Entry<String, String> val: extendedCharacters.entrySet()) {
+            outputText = sourceText.replaceAll(val.getKey(), val.getValue());
+            sourceText = outputText;
+        }
+        return outputText;
+    }
   
   private static class FileName {
     public final String name;

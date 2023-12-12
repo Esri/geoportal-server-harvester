@@ -23,6 +23,8 @@ import java.util.List;
 public final class ServerResponse {
   public String url;
   public String json;
+  public boolean hasMetadata;
+  public String metadataXML;
   
   public String mapName;
   public String serviceDescription;
@@ -36,6 +38,6 @@ public final class ServerResponse {
   
   @Override
   public String toString() {
-    return String.format("{ \"mapName\": \"%s\", \"serviceDescription\": \"%s\", \"spatialReference\": %s, \"initialExtent\": %s, \"fullExtent\": %s}", mapName, serviceDescription, spatialReference, initialExtent, fullExtent);
+    return String.format("{ \"mapName\": \"%s\", \"serviceDescription\": \"%s\", \"spatialReference\": %s, \"initialExtent\": %s, \"fullExtent\": %s, \"metadata\": %s}", mapName, serviceDescription, spatialReference, initialExtent, fullExtent, metadataXML);
   }
 }

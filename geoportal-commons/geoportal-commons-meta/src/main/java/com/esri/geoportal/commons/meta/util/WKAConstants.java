@@ -33,10 +33,12 @@ public final class WKAConstants {
   public static final String WKA_BBOX = "bbox";
   public static final String WKA_MODIFIED = "modified";
   public static final String WKA_REFERENCES = "references";
+  public static final String WKA_METADATA_XML = "metadataXML";
   
   private static final Set<String> all = new HashSet(Arrays.asList(new String[]{
     WKA_IDENTIFIER, WKA_TITLE, WKA_DESCRIPTION, WKA_RESOURCE_URL, 
-    WKA_RESOURCE_URL_SCHEME, WKA_BBOX, WKA_THUMBNAIL_URL, WKA_MODIFIED, WKA_REFERENCES
+    WKA_RESOURCE_URL_SCHEME, WKA_BBOX, WKA_THUMBNAIL_URL, WKA_MODIFIED, WKA_REFERENCES,
+    WKA_METADATA_XML
   }));
   
   /**

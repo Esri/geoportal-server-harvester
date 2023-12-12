@@ -34,6 +34,7 @@ public class SimpleDataReference implements DataReference {
   private final URI brokerUri;
   private final String brokerName;
   private final String id;
+  private String title = "";
   private final Date lastModifiedDate;
   private final URI sourceUri;
   private final String inputBrokerRef;
@@ -60,7 +61,18 @@ public class SimpleDataReference implements DataReference {
     this.lastModifiedDate = lastModifiedDate;
     this.sourceUri = sourceUri;
     this.inputBrokerRef = inputBrokerRef;
+    this.taskRef = taskRef;   
+  }
+  
+  public SimpleDataReference(URI brokerUri, String brokerName, String id, Date lastModifiedDate, URI sourceUri, String inputBrokerRef, String taskRef,String title) {
+    this.brokerUri = brokerUri;
+    this.brokerName = brokerName;
+    this.id = id;
+    this.lastModifiedDate = lastModifiedDate;
+    this.sourceUri = sourceUri;
+    this.inputBrokerRef = inputBrokerRef;
     this.taskRef = taskRef;
+    this.title = title;
   }
 
   /**
@@ -100,6 +112,11 @@ public class SimpleDataReference implements DataReference {
   @Override
   public URI getSourceUri() {
     return sourceUri;
+  }
+  
+  @Override
+  public String getTitle() {
+    return title;
   }
 
   @Override

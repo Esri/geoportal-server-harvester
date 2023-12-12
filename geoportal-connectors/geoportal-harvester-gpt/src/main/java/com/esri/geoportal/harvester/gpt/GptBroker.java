@@ -47,7 +47,9 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ListIterator;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
@@ -122,10 +124,16 @@ import org.apache.commons.lang3.StringUtils;
   public void terminate() {
     try {
       if (client != null && definition.getCleanup() && !preventCleanup) {
+        int deleted = 0;
+        
         for (String id : existing) {
-          client.delete(id);
-        }
-        LOG.info(String.format("%d records has been removed during cleanup.", existing.size()));
+          PublishResponse deleteResult = client.delete(id);
+          if ((deleteResult != null) && (deleteResult.getStatus() != null)) {
+            deleted += 1;
+          }
+        }            
+        
+        LOG.info(String.format("%d records has been removed during cleanup.", deleted));
       }
     } catch (URISyntaxException | IOException ex) {
       LOG.error(String.format("Error terminating broker."), ex);
