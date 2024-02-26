@@ -43,7 +43,8 @@
     <import resource="hrv-beans.xml" />
 
     <!-- Security -->
-    <import resource="app-security.xml" />
+  <!-- <import resource="app-security.xml" /> -->
+   <import resource="app-security-arcgis.xml" />
     
     <!-- ADD PERSISTENCE SUPPORT HERE (jpa, hibernate, etc) -->
 
