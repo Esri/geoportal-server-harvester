@@ -215,7 +215,7 @@ import org.apache.commons.lang3.StringUtils;
         throw new DataOutputException(this, ref, "No response received");
       }
       if (response.getError() != null) {
-        throw new DataOutputException(this, ref, response.getError().getMessage()) {
+        throw new DataOutputException(this, ref, response.getError().getMessage()+"  Source Item: "+ref.getSourceUri()) {
           @Override
           public boolean isNegligible() {
             return true;
