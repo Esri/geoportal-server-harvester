@@ -31,6 +31,28 @@
                     <ArcGISFormat>1.0</ArcGISFormat>
                     <ArcGISstyle>ISO 19139 Metadata Implementation Specification GML3.2</ArcGISstyle>
                     <ArcGISProfile>ISO19139</ArcGISProfile>
+					<xsl:if test="count(/gmd:MD_Metadata/gmd:locale/gmd:PT_Locale)>0">
+					<locales>
+						<xsl:for-each select="/gmd:MD_Metadata/gmd:locale/gmd:PT_Locale">
+						<locale>
+							<id><xsl:value-of select="@id"/></id>
+							<xsl:attribute name="language">
+								<xsl:value-of select="./gmd:language/gmd:LanguageCode/@codeListValue"/>
+							</xsl:attribute>
+							<xsl:attribute name="country">
+								<xsl:value-of select="./gmd:country/gmd:CountryCode/@codeListValue"/>
+							</xsl:attribute>
+							<resTitle>
+								<xsl:value-of select="@locale=gmd:language/gmd:languageCode/@codeListValue"/>
+								<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=@id]"/>
+							</resTitle>
+							<idAbs>
+								<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=@id]"/>
+							</idAbs>
+						</locale>
+						</xsl:for-each>
+					</locales>
+					</xsl:if>
                 </Esri>
                 <!--
                 <Esri>
