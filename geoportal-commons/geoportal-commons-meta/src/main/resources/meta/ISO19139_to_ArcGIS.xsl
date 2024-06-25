@@ -13,7 +13,9 @@
 
 	<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" omit-xml-declaration="no" />
 
-	
+	<xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz'" />
+	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
+
 	<!-- B.2.1 Metadata entity set information -->
 
 	<!-- MD_Metadata -->
@@ -23,58 +25,91 @@
                     <xsl:value-of select="gmd:language/gco:CharacterString" />
                 </xsl:attribute>
                 <Esri>
-                    <CreaDate>2022-07-21</CreaDate>
-                    <CreaTime>12:26:34.68</CreaTime>
-                    <ModDate>2022-07-21</ModDate>
-                    <ModTime>12:59:19.59</ModTime>
+					<xsl:choose>
+						<xsl:when test="count(/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='creation']/gmd:date/gco:Date)>0">
+							<CreaDate><xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='creation']/gmd:date/gco:Date" /></CreaDate>
+							<CreaTime>00:00:00.00</CreaTime>
+						</xsl:when>
+						<xsl:otherwise>
+							<CreaDate><xsl:value-of select="/gmd:MD_Metadata/gmd:dateStamp/gco:Date" /></CreaDate>
+							<CreaTime>00:00:00.00</CreaTime>
+						</xsl:otherwise>
+					</xsl:choose>
+					<xsl:choose>
+						<xsl:when test="count(/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='revision']/gmd:date/gco:Date)>0">
+							<ModDate><xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='revision']/gmd:date/gco:Date" /></ModDate>
+							<ModTime>00:00:00.00</ModTime>
+						</xsl:when>
+						<xsl:otherwise>
+							<ModDate><xsl:value-of select="/gmd:MD_Metadata/gmd:dateStamp/gco:Date" /></ModDate>
+							<ModTime>00:00:00.00</ModTime>
+						</xsl:otherwise>
+					</xsl:choose>
                     <PublishStatus>editor:esri.dijit.metadata.editor</PublishStatus>
                     <ArcGISFormat>1.0</ArcGISFormat>
                     <ArcGISstyle>ISO 19139 Metadata Implementation Specification GML3.2</ArcGISstyle>
                     <ArcGISProfile>ISO19139</ArcGISProfile>
+					<xsl:if test="count(/gmd:MD_Metadata/gmd:locale/gmd:PT_Locale)>0">
+					<locales>
+						<xsl:for-each select="/gmd:MD_Metadata/gmd:locale/gmd:PT_Locale">
+						<locale>
+							<xsl:attribute name="language">
+								<xsl:value-of select="./gmd:language/gmd:LanguageCode/@codeListValue"/>
+							</xsl:attribute>
+							<xsl:attribute name="country">
+								<xsl:value-of select="translate(./gmd:country/gmd:CountryCode/@codeListValue, $lowercase, $uppercase)"/>
+							</xsl:attribute>
+							<id><xsl:value-of select="@id"/></id>
+								<xsl:choose>
+									<xsl:when test="@id='CAT'">
+										<resTitle>
+											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='CAT']"/>
+										</resTitle>
+										<idAbs>
+											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='CAT']"/>
+										</idAbs>
+									</xsl:when>
+									<xsl:when test="@id='ENG'">
+										<resTitle>
+											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='ENG']"/>
+										</resTitle>
+										<idAbs>
+											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='CAT']"/>
+										</idAbs>
+									</xsl:when>
+									<xsl:when test="@id='ESP'">
+										<resTitle>
+											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='ESP']"/>
+										</resTitle>
+										<idAbs>
+											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='CAT']"/>
+										</idAbs>
+									</xsl:when>
+									<xsl:otherwise>
+										<resTitle>
+											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString"/>
+										</resTitle>
+										<idAbs>
+											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='CAT']"/>
+										</idAbs>
+									</xsl:otherwise>
+								</xsl:choose>
+							<!--
+							<idAbs>
+								<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=@id]"/>
+							</idAbs>
+							-->
+						</locale>
+						</xsl:for-each>
+					</locales>
+					</xsl:if>
                 </Esri>
-                <!--
-                <Esri>
-                   <CreaDate></CreaDate>
-                   <CreaTime></CreaTime>
-                   <ArcGISstyle>Custom Metadata Editor</ArcGISstyle>
-                   <SyncOnce>FALSE</SyncOnce>
-                   <SyncDate></SyncDate>
-                   <SyncTime></SyncTime>
-                   <ModDate></ModDate>
-                   <ModTime></ModTime>
-                   <ArcGISProfile>ISO19139</ArcGISProfile>
-                   <locales>
-                           <locale>
-                                   <xsl:attribute name="language">
-                                           <xsl:value-of select="gmd:language/gco:CharacterString" />
-                                   </xsl:attribute>
-                                   <xsl:attribute name="country"></xsl:attribute>
-                                   <resTitle>
-                                           <xsl:value-of select="gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString"/>
-                                   </resTitle>
-                                   <idAbs>
-                                           <xsl:value-of select="gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract/gco:CharacterString" />
-                                   </idAbs>
-                           </locale>
-                   </locales>
-                   <ArcGISFormat>1.0</ArcGISFormat>
-                   <scaleRange>
-                           <minScale></minScale>
-                           <maxScale></maxScale>
-                   </scaleRange>
-                   <DataProperties>
-                           <itemProps>
-                                   <imsContentType export="False"/>
-                           </itemProps>
-                   </DataProperties>
-                </Esri>
-                -->
 
                 <mdFileID>
                     <xsl:value-of select="gmd:fileIdentifier/gco:CharacterString" />
                 </mdFileID>
 
-               <xsl:for-each select="gmd:language/gmd:LanguageCode">
+               	<xsl:for-each select="gmd:language/gmd:LanguageCode">
                     <mdLang>
                         <languageCode>
                             <xsl:attribute name="value">
