@@ -17,8 +17,8 @@
 	<client-registrations>
             <client-registration registration-id="arcgis"
                                                     client-authentication-method="post"
-                                                     client-id="VbQMHv3XKryz4bRE"
-                                                     client-secret="dbd010b2f2414b9a9048525c6c1d0396"							 
+                                                     client-id=""
+                                                     client-secret=""							 
                                                      authorization-grant-type="authorization_code"    
                                                      redirect-uri="http://localhost:8080/harvester/login/oauth2/code/arcgis"                                                                                                
                                                      client-name="ArcGIS"                                                     
@@ -26,9 +26,9 @@
                                                      
                 />
             <provider provider-id="arcgis"                               
-                              authorization-uri="https://rdx1081.esriemcs.com/portal/sharing/rest/oauth2/authorize"
-                              token-uri="https://rdx1081.esriemcs.com/portal/sharing/rest/oauth2/token?f=json"
-                              user-info-uri="https://rdx1081.esriemcs.com/portal/sharing/rest/community/users"
+                              authorization-uri="https://portal_hostname/portal_webadaptorname/sharing/rest/oauth2/authorize"
+                              token-uri="https://portal_hostname/portal_webadaptorname/sharing/rest/oauth2/token?f=json"
+                              user-info-uri="https://portal_hostname/portal_webadaptorname/sharing/rest/community/users"
                               user-info-user-name-attribute="username"                             
                               />
         </client-registrations>
