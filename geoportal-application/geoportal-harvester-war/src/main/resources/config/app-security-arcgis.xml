@@ -26,9 +26,9 @@
                                                      
                 />
             <provider provider-id="arcgis"                               
-                              authorization-uri="https://hostname/portal/sharing/rest/oauth2/authorize"
-                              token-uri="https://hostname/portal/sharing/rest/oauth2/token?f=json"
-                              user-info-uri="https://hostname/portal/sharing/rest/community/users"
+                              authorization-uri="https://portal_hostname/portal_webadaptorname/sharing/rest/oauth2/authorize"
+                              token-uri="https://portal_hostname/portal_webadaptorname/sharing/rest/oauth2/token?f=json"
+                              user-info-uri="https://portal_hostname/portal_webadaptorname/sharing/rest/community/users"
                               user-info-user-name-attribute="username"                             
                               />
         </client-registrations>
