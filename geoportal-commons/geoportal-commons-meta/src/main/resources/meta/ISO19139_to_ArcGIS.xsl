@@ -98,7 +98,6 @@
 							<idAbs>
 								<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=@id]"/>
 							</idAbs>
-							-->
 						</locale>
 						</xsl:for-each>
 					</locales>
