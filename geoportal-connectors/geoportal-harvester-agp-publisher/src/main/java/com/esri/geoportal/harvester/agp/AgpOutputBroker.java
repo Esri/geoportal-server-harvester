@@ -356,7 +356,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
           
           // if the item url is the same as the resourceUrl, proceed.
           // otherwise the metadata is for a sublayer, but the item is the parent
-          if (resourceUrl.equals(itemEntry.url)) {
+          if (resourceUrl.toLowerCase().equals(itemEntry.url.toLowerCase())) {
             ItemResponse response = updateItem(
                     itemEntry.id,
                     itemEntry.owner,
@@ -466,6 +466,20 @@ import org.commonmark.renderer.html.HtmlRenderer;
     // for ArcGIS Portal/Online, look for the resource URL instead of the source XML URI
     QueryResponse search = client.search(String.format("url:%s", String.format("%s", src_uri_s)), 0, 0, token);
     ItemEntry itemEntry = search != null && search.results != null && search.results.length > 0 ? search.results[0] : null;
+    
+    // if no results found see if changing the case of /arcgis/ to /ArcGIS/ or vice versa in the src_uri_s does find it
+    if (itemEntry == null) {
+        String src_uri_s_alternative = "";
+        if (src_uri_s.contains("/arcgis/rest/services")) {
+            src_uri_s_alternative = src_uri_s.replace("/arcgis/rest/services", "/ArcGIS/rest/services");
+        } else if (src_uri_s.contains("/ArcGIS/rest/services")) {
+            src_uri_s_alternative = src_uri_s.replace("/ArcGIS/rest/services", "/arcgis/rest/services");
+        }
+        if (!src_uri_s_alternative.isBlank()) {
+            search = client.search(String.format("url:%s", String.format("%s", src_uri_s_alternative)), 0, 0, token);
+            itemEntry = search != null && search.results != null && search.results.length > 0 ? search.results[0] : null;
+        }
+    }
     
     // if no results found and the source uri (src_uri_s) ends in /0, /1, ... this may be a sublayer
     // look for the parent service
