@@ -29,10 +29,7 @@
   <bean class="com.esri.geoportal.harvester.beans.MultiMetaAnalyzerBean" id="metaAnalyzer"/>
   <bean class="com.esri.geoportal.commons.meta.xml.SimpleArcGISMetaAnalyzer"/>
   <bean class="com.esri.geoportal.commons.meta.xml.SimpleDcMetaAnalyzer"/>
-  <bean class="com.esri.geoportal.commons.meta.xml.SimpleFgdcMetaAnalyzer"/>
-  <bean class="com.esri.geoportal.commons.meta.xml.SimpleIso19115MetaAnalyzer"/>
-  <bean class="com.esri.geoportal.commons.meta.xml.SimpleIso19115_2MetaAnalyzer"/>
-  <bean class="com.esri.geoportal.commons.meta.xml.SimpleIso19119MetaAnalyzer"/>
+  <bean class="com.esri.geoportal.commons.meta.xml.SimpleFgdcMetaAnalyzer"/>  
   
   <!-- Metadata Builders -->
   <bean class="com.esri.geoportal.commons.meta.js.SimpleDcMetaBuilder" id="metaBuilder"/>
