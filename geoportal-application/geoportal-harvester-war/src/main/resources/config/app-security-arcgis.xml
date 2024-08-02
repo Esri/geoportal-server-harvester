@@ -14,6 +14,7 @@
                        
 	<http auto-config="true" >
 		<intercept-url pattern="/**" access="authenticated"/>
+		<csrf disabled="true"/>
 		<oauth2-login authorized-client-repository-ref="authorizedClientRepository" access-token-response-client-ref="arcgisTokenResponseClient"
                 user-service-ref="customUserService"/>
 	</http>
