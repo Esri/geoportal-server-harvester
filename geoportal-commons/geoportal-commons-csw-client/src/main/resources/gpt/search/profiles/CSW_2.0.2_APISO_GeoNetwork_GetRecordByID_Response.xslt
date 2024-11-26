@@ -23,6 +23,12 @@
  xmlns:gco="http://www.isotc211.org/2005/gco" 
  xmlns:srv="http://www.isotc211.org/2005/srv" 
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+
+ xmlns:gts="http://www.isotc211.org/2005/gts" 
+ xmlns:gml="http://www.opengis.net/gml" 
+ xmlns:xlink="http://www.w3.org/1999/xlink" 
+ xmlns:geonet="http://www.fao.org/geonetwork"
+
  exclude-result-prefixes="csw dct">
   <xsl:output indent="yes" method="xml" omit-xml-declaration="no"/>
   <xsl:template match="/">

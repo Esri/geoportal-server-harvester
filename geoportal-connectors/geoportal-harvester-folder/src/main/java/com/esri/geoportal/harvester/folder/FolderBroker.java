@@ -132,8 +132,11 @@ import org.slf4j.LoggerFactory;
       for (MimeType ct: ref.getContentType()) {
         String extension = MimeTypeUtils.findExtensions(ct).stream().findFirst().orElse(null);
         if (extension!=null) {            
-            
-          Path f = generateFileName(ref.getBrokerUri(), ref.getSourceUri(), ref.getTitle() , extension);
+          String title = ref.getTitle();
+          if (title.length() < 1) {
+              title = ref.getSourceUri().toString().replace(":", "_");
+          }
+          Path f = generateFileName(ref.getBrokerUri(), ref.getSourceUri(), title, extension);
           boolean created = !Files.exists(f);
           Files.createDirectories(f.getParent());
           try (OutputStream output = Files.newOutputStream(f)) {
