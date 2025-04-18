@@ -14,7 +14,7 @@
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <spring.version>5.3.37</spring.version>
-        <springsecurity.version>5.6.9</springsecurity.version>
+        <springsecurity.version>5.7.13</springsecurity.version>
     </properties>
     
     <dependencies>
