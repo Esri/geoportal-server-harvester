@@ -32,6 +32,6 @@ public class SimpleIso19119MetaAnalyzer extends BaseXmlMetaAnalyzer {
    */
   public SimpleIso19119MetaAnalyzer() throws IOException, TransformerConfigurationException, XPathExpressionException {
     //super("meta/decodeiso15119.xslt","count(/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification)>0");
-    super("meta/decodeiso19119.xslt","count(/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification)>0", "meta/ISO19139_to_ArcGIS.xsl");
+    super("meta/decodeiso19119.xslt","count(/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification)>0", "meta/ISO19139_to_ArcGIS.xsl");
   }
 }

@@ -26,8 +26,8 @@
                 </xsl:attribute>
                 <Esri>
 					<xsl:choose>
-						<xsl:when test="count(/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='creation']/gmd:date/gco:Date)>0">
-							<CreaDate><xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='creation']/gmd:date/gco:Date" /></CreaDate>
+						<xsl:when test="count(/gmd:MD_Metadata/gmd:identificationInfo//gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='creation']/gmd:date/gco:Date)>0">
+							<CreaDate><xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='creation']/gmd:date/gco:Date" /><xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='creation']/gmd:date/gco:Date" /></CreaDate>
 							<CreaTime>00:00:00.00</CreaTime>
 						</xsl:when>
 						<xsl:otherwise>
@@ -36,8 +36,8 @@
 						</xsl:otherwise>
 					</xsl:choose>
 					<xsl:choose>
-						<xsl:when test="count(/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='revision']/gmd:date/gco:Date)>0">
-							<ModDate><xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='revision']/gmd:date/gco:Date" /></ModDate>
+						<xsl:when test="count(/gmd:MD_Metadata/gmd:identificationInfo//gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='revision']/gmd:date/gco:Date)>0">
+							<ModDate><xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='creation']/gmd:date/gco:Date" /><xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='creation']/gmd:date/gco:Date" /></ModDate>
 							<ModTime>00:00:00.00</ModTime>
 						</xsl:when>
 						<xsl:otherwise>
@@ -60,40 +60,44 @@
 								<xsl:value-of select="translate(./gmd:country/gmd:CountryCode/@codeListValue, $lowercase, $uppercase)"/>
 							</xsl:attribute>
 							<id><xsl:value-of select="@id"/></id>
+							<xsl:if test="string-length(@id)>0">
 								<xsl:choose>
 									<xsl:when test="@id='CAT'">
 										<resTitle>
-											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='CAT']"/>
+											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo//gmd:citation/gmd:CI_Citation/gmd:title/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='CAT']"/>
 										</resTitle>
 										<idAbs>
-											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='CAT']"/>
+											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo//gmd:abstract/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='CAT']"/>
 										</idAbs>
 									</xsl:when>
 									<xsl:when test="@id='ENG'">
 										<resTitle>
-											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='ENG']"/>
+											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo//gmd:citation/gmd:CI_Citation/gmd:title/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='ENG']"/>
 										</resTitle>
 										<idAbs>
-											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='ENG']"/>
+											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo//gmd:abstract/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='ENG']"/>
 										</idAbs>
 									</xsl:when>
 									<xsl:when test="@id='ESP'">
 										<resTitle>
-											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='ESP']"/>
+											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo//gmd:citation/gmd:CI_Citation/gmd:title/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='ESP']"/>
 										</resTitle>
 										<idAbs>
-											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='ESP']"/>
+											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo//gmd:abstract/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='ESP']"/>
 										</idAbs>
 									</xsl:when>
 									<xsl:otherwise>
 										<resTitle>
 											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString"/>
+											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString"/>
 										</resTitle>
 										<idAbs>
 											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale='ENG']"/>
+											<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:abstract/gco:CharacterString"/>
 										</idAbs>
 									</xsl:otherwise>
 								</xsl:choose>
+							</xsl:if>
 							<!--
 							<idAbs>
 								<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=@id]"/>
@@ -195,7 +199,7 @@
                        </dataIdInfo>
                </xsl:for-each>
 
-               <xsl:for-each select="gmd:identificationInfo/gmd:MD_DataIdentification">
+               <xsl:for-each select="gmd:identificationInfo/gmd:MD_DataIdentification | gmd:identificationInfo/srv:SV_ServiceIdentification">
                        <dataIdInfo>
                                <xsl:call-template name="MD_Identification" />
                        </dataIdInfo>
@@ -281,6 +285,11 @@
 				<xsl:call-template name="CI_Citation"/>
 			</idCitation>
 		</xsl:for-each>
+		
+		<!-- resTitle -->
+		<resTitle>
+			<xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo//gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString"/>
+		</resTitle>
 
 		<!-- idAbs -->
 		<idAbs><xsl:value-of select="gmd:abstract/gco:CharacterString"/></idAbs>

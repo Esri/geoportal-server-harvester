@@ -164,14 +164,20 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
       // validate group id/title and change it to id if title provided
       String groupId = StringUtils.trimToNull(definition.getGroupId());
       if (groupId!=null) {
-        Group [] groups = this.client.listGroups(definition.getCredentials().getUserName(), generateToken(1));
-        Group selectedGroup =  groups!=null? Arrays.stream(groups).filter(group->group.id!=null && group.id.equals(groupId)).findFirst().orElse(
-                Arrays.stream(groups).filter(group->group.title!=null && group.title.replaceAll("\\s", "").equalsIgnoreCase(groupId.replaceAll("\\s", ""))).findFirst().orElse(null)
-        ): null;
-        if (selectedGroup!=null) {
-          definition.setGroupId(selectedGroup.id);
+        if (!definition.getCredentials().getUserName().isEmpty()) {
+          
+          Group [] groups = this.client.listGroups(definition.getCredentials().getUserName(), generateToken(1));
+          Group selectedGroup =  groups!=null? Arrays.stream(groups).filter(group->group.id!=null && group.id.equals(groupId)).findFirst().orElse(
+                  Arrays.stream(groups).filter(group->group.title!=null && group.title.replaceAll("\\s", "").equalsIgnoreCase(groupId.replaceAll("\\s", ""))).findFirst().orElse(null)
+          ): null;
+          if (selectedGroup!=null) {
+            definition.setGroupId(selectedGroup.id);
+          } else {
+            definition.setGroupId(null);
+          }
         } else {
-          definition.setGroupId(null);
+          // anonymous harvest, trust the entered groupId
+          definition.setGroupId(groupId);
         }
       } else {
         definition.setGroupId(null);
@@ -327,9 +333,15 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
           return content!=null && content.items!=null && content.items.length>0? Arrays.asList(content.items): null;
         }
       } else {
-        QueryResponse content = client.listPublicContent(size, from);
-        from += size;
-        return content!=null && content.results!=null && content.results.length>0? Arrays.asList(content.results): null;
+        if (definition.getGroupId()==null) {
+          QueryResponse content = client.listPublicContent(size, from);
+          from += size;
+          return content!=null && content.results!=null && content.results.length>0? Arrays.asList(content.results): null;
+        } else {
+          ContentResponse content = client.listGroupContent(definition.getGroupId(), size, from, generateToken(1));
+          from += size;
+          return content!=null && content.items!=null && content.items.length>0? Arrays.asList(content.items): null;
+        }
       }
     }
     

@@ -401,7 +401,32 @@
                 <SupportContentTypeQuery>False</SupportContentTypeQuery>
                 <SupportSpatialBoundary>True</SupportSpatialBoundary>    
        </Profile>
-	
+
+      
+        <!-- Carmenta -->
+        <Profile>
+          <ID>urn:ogc:CSW:2.0.2:HTTP:APISO:Carmenta</ID>
+          <Name>Carmenta CSW 2.0.2 APISO</Name>
+          <Description></Description>
+            <CswNamespace>http://www.opengis.net/cat/csw/2.0.2</CswNamespace>
+          <GetRecords>
+            <XSLTransformations>
+              <Request>CSW_2.0.2_APISO_GeoNetwork_GetRecords_Request.xslt</Request>
+              <Response>CSW_2.0.2_APISO_GeoNetwork_GetRecords_Response.xslt</Response>
+            </XSLTransformations>
+          </GetRecords>
+          <GetRecordByID>
+            <RequestKVPs><![CDATA[service=CSW&request=GetRecordById&version=2.0.2&ElementSetName=full&outputSchema=http%3A//www.isotc211.org/2005/gmd]]></RequestKVPs>
+          <XSLTransformations>
+            <Response>CSW_2.0.2_APISO_GeoNetwork_GetRecordByID_Response.xslt</Response>
+          </XSLTransformations>
+          </GetRecordByID>
+          <SupportSpatialQuery>True</SupportSpatialQuery>
+          <SupportContentTypeQuery>False</SupportContentTypeQuery>
+          <SupportSpatialBoundary>True</SupportSpatialBoundary>    
+        </Profile>
+        
+  	
 				<!-- SRU CSW 2.0.2 Gateway to Z39.50 -->
         <Profile>
         	<ID>urn:ogc:CSW:2.0.2:HTTP:OGCCORE:SRU</ID>
