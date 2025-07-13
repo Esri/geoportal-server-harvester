@@ -13,27 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.commons.stac.client;
-
-import java.net.URL;
+package com.esri.geoportal.commons.stac.client;
 
 /**
- * ResponseWrapper wrapper.
+ * STAC link.
  */
-public class ResponseWrapper<T> {
-  public final T data;
-  public final String raw;
-  public final URL url;
-
-  public ResponseWrapper(T data, String raw, URL url) {
-    if (data==null) throw new IllegalArgumentException("Missing data component.");
-    if (raw==null) throw new IllegalArgumentException("Missing raw data component.");
-    if (url==null) throw new IllegalArgumentException("Missing URL component.");
-    
-    this.data = data;
-    this.raw = raw;
-    this.url = url;
-  }
-  
-  
+public class Link {
+  public String rel;
+  public String href;
+  public String hreflang;
+  public String type;
+  public String title;
 }

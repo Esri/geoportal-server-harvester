@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Esri, Inc.
+ * Copyright 2016 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.commons.stac.client;
-
 /**
- * STAC link.
+ * STAC output broker.
  */
-public class Link {
-  public String rel;
-  public String href;
-  public String type;
-  public String title;
-}
+package com.esri.geoportal.harvester.stacpub;

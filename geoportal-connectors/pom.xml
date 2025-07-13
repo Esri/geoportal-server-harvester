@@ -30,5 +30,6 @@
         <module>geoportal-harvester-thredds</module>
         <module>geoportal-harvester-stac</module>
         <module>geoportal-harvester-waf</module>
+        <module>geoportal-harvester-stac-publisher</module>
     </modules>
 </project>

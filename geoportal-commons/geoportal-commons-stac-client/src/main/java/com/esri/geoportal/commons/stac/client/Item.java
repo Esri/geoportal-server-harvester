@@ -13,10 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.esri.geoportal.commons.stac.client;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Map;
 
 /**
- * STAC client.
+ * STAC item
  */
-package com.esri.geoportal.geoportal.commons.stac.client;
-
-
+public class Item {
+  public String id;
+  public String type;
+  public String stac_version;
+  public String[] stac_extensions;
+  public JsonNode geometry;
+  public Double[] bbox;
+  public Map<String, JsonNode> properties;
+  public Map<String, JsonNode> assets;
+  public Link[] links;
+}

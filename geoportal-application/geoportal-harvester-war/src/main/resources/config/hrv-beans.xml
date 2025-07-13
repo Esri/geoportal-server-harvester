@@ -87,6 +87,10 @@
   <bean class="com.esri.geoportal.harvester.stac.StacConnector">
     <constructor-arg ref="metaBuilder"/>
   </bean>
+  <bean class="com.esri.geoportal.harvester.stacpub.STACOutputConnector">
+    <constructor-arg value="${geometry.service.url}"/>
+    <constructor-arg value="${tika.sizeLimit}"/>
+  </bean>
   
   <!-- Triggers -->
   <bean class="com.esri.geoportal.harvester.engine.triggers.NowTrigger"/>

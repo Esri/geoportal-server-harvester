@@ -33,11 +33,11 @@ import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.commons.utils.XmlUtils;
-import com.esri.geoportal.geoportal.commons.stac.client.Catalog;
-import com.esri.geoportal.geoportal.commons.stac.client.Client;
-import com.esri.geoportal.geoportal.commons.stac.client.Item;
-import com.esri.geoportal.geoportal.commons.stac.client.Link;
-import com.esri.geoportal.geoportal.commons.stac.client.ResponseWrapper;
+import com.esri.geoportal.commons.stac.client.Catalog;
+import com.esri.geoportal.commons.stac.client.STACClient;
+import com.esri.geoportal.commons.stac.client.Item;
+import com.esri.geoportal.commons.stac.client.Link;
+import com.esri.geoportal.commons.stac.client.ResponseWrapper;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -89,7 +89,7 @@ public class StacBroker implements InputBroker {
   private final MetaBuilder metaBuilder;
 
   protected CloseableHttpClient httpClient;
-  private Client client;
+  private STACClient client;
   protected TaskDefinition td;
 
   private static final ObjectMapper mapper = new ObjectMapper();
@@ -124,7 +124,7 @@ public class StacBroker implements InputBroker {
       Bots bots = BotsUtils.readBots(definition.getBotsConfig(), http, definition.getHostUrl());
       httpClient = new BotsHttpClient(http, bots);
     }
-    client = new Client(httpClient);
+    client = new STACClient(httpClient);
   }
 
   @Override
@@ -155,7 +155,7 @@ public class StacBroker implements InputBroker {
 
   @Override
   public String toString() {
-    return String.format("CKAN [%s]", definition.getHostUrl());
+    return String.format("STAC [%s]", definition.getHostUrl());
   }
 
   @Override
@@ -339,7 +339,7 @@ public class StacBroker implements InputBroker {
   }
   
   /**
-   * CKAN iterator.
+   * STAC (static) iterator.
    */
   private class StacIterator implements InputBroker.Iterator {
 

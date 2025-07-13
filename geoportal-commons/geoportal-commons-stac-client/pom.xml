@@ -9,4 +9,22 @@
     <artifactId>geoportal-commons-stac-client</artifactId>
     <packaging>jar</packaging>
     <name>Esri :: Geoportal Server :: Commons :: STAC Client</name>
+    <description>STAC API client capable of communicating with a STAC target</description>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>geoportal-commons-meta</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>commons-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>geoportal-commons-constants</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>
