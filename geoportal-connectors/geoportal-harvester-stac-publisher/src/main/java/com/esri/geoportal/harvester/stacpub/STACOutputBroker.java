@@ -15,11 +15,13 @@
  */
 package com.esri.geoportal.harvester.stacpub;
 
+import com.esri.geoportal.commons.constants.MimeType;
 import com.esri.geoportal.commons.stac.client.STACClient;
-import com.esri.geoportal.commons.agp.client.FolderEntry;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.esri.geoportal.commons.stac.client.PublishRequest;
+import com.esri.geoportal.commons.stac.client.PublishResponse;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.defs.PublishingStatus;
 import com.esri.geoportal.harvester.api.ex.DataException;
@@ -38,6 +40,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -45,6 +48,8 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 
 /**
@@ -61,8 +66,8 @@ import org.json.simple.JSONObject;
   private STACClient client;
   private String token;
   private final Set<String> existing = new HashSet<>();
-  private volatile boolean preventCleanup;
-
+  private final static String SBOM = generateSBOM();
+  
   /**
    * Creates instance of the broker.
    *
@@ -86,7 +91,42 @@ import org.json.simple.JSONObject;
       String src_uri_s = URLEncoder.encode(ref.getSourceUri().toASCIIString(), "UTF-8");
       String src_lastupdate_dt = ref.getLastModifiedDate() != null ? URLEncoder.encode(formatDate(ref.getLastModifiedDate()), "UTF-8") : null;
 
-      return null;
+      String json = null;
+      byte[] content = null;
+      try {
+        content = ref.getContent(MimeType.APPLICATION_JSON);
+      } catch (IOException ex) {
+        java.util.logging.Logger.getLogger(STACOutputBroker.class.getName()).log(Level.SEVERE, null, ex);
+      }
+      if (content != null) {
+        json = new String(content, "UTF-8");
+        if (json.startsWith(SBOM)) {
+          json = json.substring(1);
+        }
+      }
+      JSONParser p = new JSONParser();
+      JSONObject stacItem = null;
+      try {
+        stacItem = (JSONObject) p.parse(json);
+      } catch (ParseException ex) {
+        java.util.logging.Logger.getLogger(STACOutputBroker.class.getName()).log(Level.SEVERE, null, ex);
+      }
+      
+      // TO-DO: insert source info into JSON?
+      PublishResponse response = client.publish(stacItem, this.definition.getCollectionId());
+      if (response == null) {
+        throw new DataOutputException(this, ref, "No response received");
+      }
+      if (response.getError() != null) {
+        throw new DataOutputException(this, ref, response.getError().getMessage()+"Source URI: "+ref.getSourceUri()) {
+          @Override
+          public boolean isNegligible() {
+            return true;
+          }
+        };
+      }
+      existing.remove(response.getId());
+      return response.getStatus().equalsIgnoreCase("created") ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
 
        
     } catch (UnsupportedEncodingException ex) {
@@ -121,50 +161,14 @@ import org.json.simple.JSONObject;
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     this.httpClient = HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build();
-    this.client = new STACClient(httpClient, definition.getHostUrl(), definition.getCredentials(), definition.getMaxRedirects());
-
-    if (!context.canCleanup()) {
-      preventCleanup = true;
-    }
-    if (definition.getCleanup() && !preventCleanup) {
-      context.addListener(new BaseProcessInstanceListener() {
-        @Override
-        public void onError(DataException ex) {
-          preventCleanup = true;
-        }
-      });
-      try {
-        String itemId = "";
-        JSONObject search = client.search(itemId);
-//        while (search != null) {
-//          existing.addAll(Arrays.asList(search.entrySet().toArray()).stream().map(i -> i.id).collect(Collectors.toList()));
-//          if (search.nextStart > 0) {
-//            search = client.search(String.format("typekeywords:%s", String.format("src_source_uri_s=%s", src_source_uri_s)), 0, search.nextStart, generateToken(1));
-//          } else {
-//            break;
-//          }
-//        }
-      } catch (Exception ex) {
-        throw new DataProcessorException(String.format("Error collecting ids of existing items."), ex);
-      }
-    }
+    this.client = new STACClient(httpClient, definition.getHostUrl(), definition.getCredentials());
 
     try {
-      String folderId = StringUtils.trimToNull(definition.getFolderId());
-      if (folderId != null) {
-        FolderEntry[] folders = null;
-        FolderEntry selectedFodler = folders != null
-                ? Arrays.stream(folders).filter(folder -> folder.id != null && folder.id.equals(folderId)).findFirst().orElse(
-                        Arrays.stream(folders).filter(folder -> folder.title != null && folder.title.equals(folderId)).findFirst().orElse(null)
-                )
-                : null;
-        if (selectedFodler != null) {
-          definition.setFolderId(selectedFodler.id);
-        } else {
-          definition.setFolderId(null);
-        }
+      String collectionId = StringUtils.trimToNull(definition.getCollectionId());
+      if (collectionId != null) {
+        // TO-DO: see if collectionId exists in the STAC
       } else {
-        definition.setFolderId(null);
+        definition.setCollectionId(null);
       }
     } catch (Exception ex) {
       throw new DataProcessorException(String.format("Error listing folders for user: %s", definition.getCredentials().getUserName()), ex);
@@ -174,12 +178,6 @@ import org.json.simple.JSONObject;
   @Override
   public void terminate() {
     try {
-      if (definition.getCleanup() && !preventCleanup) {
-        for (String id : existing) {
-          //TO-DO: remove all items added before the user terminated the harvest job
-          LOG.debug("Remove " + id);
-        }
-      }
       if (client!=null) {
         client.close();
       }
@@ -197,5 +195,15 @@ import org.json.simple.JSONObject;
     ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     return FORMATTER.format(zonedDateTime);
   }
+
+  private static String generateSBOM() {
+    try {
+      return new String(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}, "UTF-8");
+    } catch (UnsupportedEncodingException ex) {
+      LOG.error(String.format("Error creating BOM."), ex);
+      return "";
+    }
+  }
+
 
 }

@@ -84,19 +84,19 @@ public class STACOutputConnector implements OutputConnector<OutputBroker> {
         return bundle.getString("stac.hint");
       }
     });
-    args.add(new UITemplate.StringArgument(P_FOLDER_ID, bundle.getString("stac.folderId"), false));       
+    args.add(new UITemplate.StringArgument(P_COLLECTION_ID, bundle.getString("stac.collectionId"), false));       
     args.add(new UITemplate.StringArgument(P_CRED_USERNAME, bundle.getString("stac.username"), true));
     args.add(new UITemplate.StringArgument(P_CRED_PASSWORD, bundle.getString("stac.password"), true) {
       public boolean isPassword() {
         return true;
       }
     });
-    args.add(new UITemplate.IntegerArgument(P_MAX_REDIRECTS, bundle.getString("stac.max.redirects"), false, 5));
-    args.add(new UITemplate.BooleanArgument(P_FOLDER_CLEANUP, bundle.getString("stac.cleanup")));
-    args.add(new UITemplate.BooleanArgument(P_UPLOAD, bundle.getString("stac.upload"), true, true));
-    args.add(new UITemplate.BooleanArgument(P_MARKDOWN2HTML, bundle.getString("stac.markdown2html"), true, true));
-    args.add(new UITemplate.BooleanArgument(P_OAUTH, bundle.getString("stac.oauth"), false,false)); 
-    args.add(new UITemplate.HiddenArgument(P_TOKEN, "hidden"));
+    //args.add(new UITemplate.IntegerArgument(P_MAX_REDIRECTS, bundle.getString("stac.max.redirects"), false, 5));
+    //args.add(new UITemplate.BooleanArgument(P_FOLDER_CLEANUP, bundle.getString("stac.cleanup")));
+    //args.add(new UITemplate.BooleanArgument(P_UPLOAD, bundle.getString("stac.upload"), true, true));
+    //args.add(new UITemplate.BooleanArgument(P_MARKDOWN2HTML, bundle.getString("stac.markdown2html"), true, true));
+    //args.add(new UITemplate.BooleanArgument(P_OAUTH, bundle.getString("stac.oauth"), false,false)); 
+    //args.add(new UITemplate.HiddenArgument(P_TOKEN, "hidden"));
     return new UITemplate(getType(), bundle.getString("stac"), args);
   }
   

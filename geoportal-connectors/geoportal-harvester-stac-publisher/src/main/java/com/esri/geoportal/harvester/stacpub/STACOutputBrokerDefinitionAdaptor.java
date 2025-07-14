@@ -37,13 +37,13 @@ import org.apache.commons.lang3.math.NumberUtils;
   private final CredentialsDefinitionAdaptor credAdaptor;
 
   private URL hostUrl;
-  private String folderId;
-  private boolean cleanup;
-  private Integer maxRedirects;
-  private boolean uploadFiles;
-  private boolean markdown2html;
-  private boolean useOAuth;
-  private String oAuthToken;
+  private String collectionId;
+  //private boolean cleanup;
+  //private Integer maxRedirects;
+  //private boolean uploadFiles;
+  //private boolean markdown2html;
+  //private boolean useOAuth;
+  //private String oAuthToken;
 
   
   /**
@@ -68,26 +68,20 @@ import org.apache.commons.lang3.math.NumberUtils;
       } catch (MalformedURLException ex) {
         throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL, get(P_HOST_URL)), ex);
       }
-      folderId = get(P_FOLDER_ID);
-      cleanup = Boolean.parseBoolean(get(P_FOLDER_CLEANUP));
-      maxRedirects = NumberUtils.toInt(get(P_MAX_REDIRECTS), DEFAULT_MAX_REDIRECTS);
-      uploadFiles = Boolean.parseBoolean(get(P_UPLOAD));
-      markdown2html = Boolean.parseBoolean(get(P_MARKDOWN2HTML));
-      useOAuth = Boolean.parseBoolean(get(P_OAUTH));
-      oAuthToken = get(P_TOKEN);
+      collectionId = get(P_COLLECTION_ID);
+      //cleanup = Boolean.parseBoolean(get(P_FOLDER_CLEANUP));
+      //maxRedirects = NumberUtils.toInt(get(P_MAX_REDIRECTS), DEFAULT_MAX_REDIRECTS);
+      //uploadFiles = Boolean.parseBoolean(get(P_UPLOAD));
+      //markdown2html = Boolean.parseBoolean(get(P_MARKDOWN2HTML));
+      //useOAuth = Boolean.parseBoolean(get(P_OAUTH));
+      //oAuthToken = get(P_TOKEN);
     }
   }
 
   @Override
   public void override(Map<String, String> params) {
     consume(params, P_HOST_URL);
-    consume(params, P_FOLDER_ID);
-    consume(params, P_FOLDER_CLEANUP);
-    consume(params, P_MAX_REDIRECTS);
-    consume(params, P_UPLOAD);
-    consume(params, P_MARKDOWN2HTML);
-    consume(params, P_TOKEN);
-    credAdaptor.override(params);
+    consume(params, P_COLLECTION_ID);
   }
 
   /**
@@ -114,18 +108,18 @@ import org.apache.commons.lang3.math.NumberUtils;
    *
    * @return folder id
    */
-  public String getFolderId() {
-    return folderId;
+  public String getCollectionId() {
+    return collectionId;
   }
 
   /**
    * Sets folder id.
    *
-   * @param folderId folder id
+   * @param collectionId folder id
    */
-  public void setFolderId(String folderId) {
-    this.folderId = folderId;
-    set(P_FOLDER_ID, folderId);
+  public void setCollectionId(String collectionId) {
+    this.collectionId = collectionId;
+    set(P_COLLECTION_ID, collectionId);
   }
 
   /**
@@ -144,72 +138,5 @@ import org.apache.commons.lang3.math.NumberUtils;
    */
   public void setCredentials(SimpleCredentials cred) {
     credAdaptor.setCredentials(cred);
-  }
-
-  /**
-   * Gets permission to cleanup.
-   *
-   * @return <code>true</code> if cleanup permitted
-   */
-  public boolean getCleanup() {
-    return cleanup;
-  }
-
-  /**
-   * Sets permission to cleanup.
-   *
-   * @param cleanup <code>true</code> to permit cleanup
-   */
-  public void setCleanup(boolean cleanup) {
-    this.cleanup = cleanup;
-    set(P_FOLDER_CLEANUP, Boolean.toString(cleanup));
-  }
-
-  /**
-   * Gets maximum of redirects.
-   * @return the maxRedirects
-   */
-  public Integer getMaxRedirects() {
-    return maxRedirects;
-  }
-
-  /**
-   * Sets maximum of redirects.
-   * @param maxRedirects the maxRedirects to set
-   */
-  public void setMaxRedirects(Integer maxRedirects) {
-    this.maxRedirects = maxRedirects;
-    set(P_MAX_REDIRECTS, Integer.toString(maxRedirects));
-  }
-
-  public boolean isUploadFiles() {
-    return uploadFiles;
-  }
-
-  public void setUploadFiles(boolean uploadFiles) {
-    this.uploadFiles = uploadFiles;
-    set(P_UPLOAD, Boolean.toString(uploadFiles));
-  }
-
-  public boolean isMarkdown2HTML() {
-      return markdown2html;
-  }
-  
-  public void setMarkdown2HTML(boolean markdown2html) {
-      this.markdown2html = markdown2html;
-      set(P_MARKDOWN2HTML, Boolean.toString(markdown2html));        
-  }
-  
-  public boolean useOAuth() {
-      return useOAuth;
-  }
-
-  public String getOAuthToken()
-  {
-      return oAuthToken;
-  }
-  public void setOAuthToken(String oAuthToken) {
-      this.oAuthToken = oAuthToken;
-      set(P_TOKEN, oAuthToken);        
   }
 }

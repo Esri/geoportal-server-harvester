@@ -17,12 +17,14 @@
             <version>2.7.2</version>
             <type>jar</type>
         </dependency>
+        <!--
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>geoportal-commons-agp-client</artifactId>
             <version>2.7.2</version>
             <type>jar</type>
         </dependency>
+        -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>geoportal-commons-pdf</artifactId>

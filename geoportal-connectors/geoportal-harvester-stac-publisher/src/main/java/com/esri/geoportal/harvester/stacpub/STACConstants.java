@@ -19,12 +19,12 @@ package com.esri.geoportal.harvester.stacpub;
  * STAC constants.
  */
 /*package*/ final class STACConstants {
-  public static final String P_HOST_URL       = "agp-host-url";
-  public static final String P_FOLDER_ID      = "agp-folder-id";
-  public static final String P_FOLDER_CLEANUP = "agp-folder-cleanup";
-  public static final String P_MAX_REDIRECTS  = "agp-max-redirects";
-  public static final String P_UPLOAD         = "agp-upload";
-  public static final String P_MARKDOWN2HTML  = "agp-markdown2html";
-  public static final String P_OAUTH          = "agp-oauth";
-  public static final String P_TOKEN          = "agp-token";
+  public static final String P_HOST_URL       = "stac-host-url";
+  public static final String P_COLLECTION_ID  = "stac-folder-id";
+//  public static final String P_FOLDER_CLEANUP = "stac-folder-cleanup";
+//  public static final String P_MAX_REDIRECTS  = "stac-max-redirects";
+//  public static final String P_UPLOAD         = "stac-upload";
+//  public static final String P_MARKDOWN2HTML  = "stac-markdown2html";
+//  public static final String P_OAUTH          = "stac-oauth";
+//  public static final String P_TOKEN          = "stac-token";
 }
