@@ -4,7 +4,7 @@
     <parent>
       <artifactId>geoportal-application</artifactId>
       <groupId>com.esri.geoportal</groupId>
-      <version>2.7.2</version>
+      <version>3.0.0</version>
     </parent>
     <artifactId>geoportal-harvester-war</artifactId>
     <packaging>war</packaging>
@@ -13,8 +13,8 @@
 
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-        <spring.version>5.3.37</spring.version>
-        <springsecurity.version>5.6.9</springsecurity.version>
+        <spring.version>5.3.39</spring.version>
+        <springsecurity.version>5.8.16</springsecurity.version>
     </properties>
     
     <dependencies>

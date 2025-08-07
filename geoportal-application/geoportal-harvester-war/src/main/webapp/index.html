@@ -6,39 +6,20 @@
     
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">    
     
     <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+    <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/css/main.css">
     <link rel="stylesheet" href="https://js.arcgis.com/3.36/esri/themes/calcite/dijit/calcite.css">
     <link rel="stylesheet" href="https://js.arcgis.com/3.36/esri/themes/calcite/esri/esri.css">
     <link rel="stylesheet" href="hrv/style/main.css">
     
     <script type="text/javascript">
-      var dojoConfig = {
-        locale: "en",
-        parseOnLoad: true,
-        packages: [
-          {
-            name: 'hrv',
-            location: location.pathname.replace(/\/[^/]*$/, '') + '/hrv'
-          }
-        ]
-      };
+     
     </script>
-    
-    <script src="//js.arcgis.com/3.36/"></script>
-    
-    <script>
-    require(["hrv"],function() {
-      require(["dojo/ready","hrv/ui/main/App"],
-      function(ready,App) {
-        ready(function() {
-          var app = new App({},"hrv");
-          app.startup();
-        });
-      });
-    });
-    </script>
+    <script src="./hrv/ui/main/init.js"></script>
+    <script src="//js.arcgis.com/3.36/"></script>    
+    <script src="./hrv/ui/main/startup.js"></script>
     
   </head>
   
