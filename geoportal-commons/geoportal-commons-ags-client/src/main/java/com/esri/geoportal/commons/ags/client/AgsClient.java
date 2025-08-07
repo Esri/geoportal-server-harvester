@@ -118,7 +118,15 @@ public class AgsClient implements Closeable {
    * @throws IOException if accessing token fails
    */
   public ContentResponse listContent(String folder) throws URISyntaxException, IOException {
+       // Validate folder name to prevent SSRF
+    if (!isValidFolderName(folder)) {
+      throw new IllegalArgumentException("Invalid folder name: " + folder);
+    }
     String url = rootUrl.toURI().resolve("rest/services/").resolve(StringUtils.stripToEmpty(folder)).toASCIIString();
+     // Ensure the resolved URL is still under the rootUrl
+    if (!url.startsWith(rootUrl.toURI().resolve("rest/services/").toASCIIString())) {
+      throw new IllegalArgumentException("Resolved URL is outside allowed path: " + url);
+    }
     HttpGet get = new HttpGet(url + String.format("?f=%s", "json"));
 
     try (CloseableHttpResponse httpResponse = httpClient.execute(get); InputStream contentStream = httpResponse.getEntity().getContent();) {
@@ -230,7 +238,16 @@ public class AgsClient implements Closeable {
    * @throws IOException if accessing token fails
    */
   public LayerInfo readLayerInformation(String folder, ServiceInfo si, LayerRef lRef) throws URISyntaxException, IOException {
+      
+    // Validate folder name to prevent SSRF
+    if (!isValidFolderName(folder)) {
+      throw new IllegalArgumentException("Invalid folder name: " + folder);
+    }
     String url = rootUrl.toURI().resolve("rest/services/").resolve(StringUtils.stripToEmpty(folder)).resolve(si.name + "/" + si.type + "/" + lRef.id).toASCIIString();
+     // Ensure the resolved URL is still under the rootUrl
+    if (!url.startsWith(rootUrl.toURI().resolve("rest/services/").toASCIIString())) {
+      throw new IllegalArgumentException("Resolved URL is outside allowed path: " + url);
+    }
     HttpGet get = new HttpGet(url + String.format("?f=%s", "json"));
 
     try (CloseableHttpResponse httpResponse = httpClient.execute(get); InputStream contentStream = httpResponse.getEntity().getContent();) {
@@ -265,5 +282,18 @@ public class AgsClient implements Closeable {
     } catch (MalformedURLException ex) {
       return rootUrl;
     }
+  }
+  
+  /**
+   * Validates folder name to prevent SSRF and path traversal.
+   * Allows only alphanumeric, underscore, dash, and forward slash.
+   * Disallows ".." and absolute URLs.
+   */
+  private boolean isValidFolderName(String folder) {
+    if (folder == null || folder.isEmpty()) return true; // root folder is allowed
+    // Disallow ".." and absolute URLs
+    if (folder.contains("..") || folder.contains("://")) return false;
+    // Only allow safe characters
+    return folder.matches("^[a-zA-Z0-9_\\-/]*$");
   }
 }
