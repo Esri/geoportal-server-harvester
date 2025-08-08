@@ -67,7 +67,9 @@ import org.apache.commons.lang3.StringUtils;
             {
                 throw new InvalidDefinitionException("Geoportal host Url length should be less tahn 500.");
             }
-          sHostUrl = sHostUrl.replaceAll("/*$", "/");
+            //Code QL 14            
+            sHostUrl = sHostUrl+"/";
+         // sHostUrl = sHostUrl.replaceAll("/*$", "/");
         }
         hostUrl = new URL(sHostUrl);
       } catch (MalformedURLException ex) {
