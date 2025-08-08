@@ -244,9 +244,10 @@ public class AgsClient implements Closeable {
       throw new IllegalArgumentException("Invalid folder name: " + folder);
     }
     String url = rootUrl.toURI().resolve("rest/services/").resolve(StringUtils.stripToEmpty(folder)).resolve(si.name + "/" + si.type + "/" + lRef.id).toASCIIString();
-     // Ensure the resolved URL is still under the rootUrl
-    if (!url.startsWith(rootUrl.toURI().resolve("rest/services/").toASCIIString())) {
-      throw new IllegalArgumentException("Resolved URL is outside allowed path: " + url);
+    
+   // SSRF mitigation: ensure the constructed URL is within the rootUrl
+    if (!isUrlWithinRoot(url)) {
+      throw new IOException("Attempt to access a URL outside the allowed root: " + url);
     }
     HttpGet get = new HttpGet(url + String.format("?f=%s", "json"));
 
@@ -274,6 +275,19 @@ public class AgsClient implements Closeable {
       response.json = responseContent;
       return response;
     }
+  }
+  
+  /**
+   * Checks if the given URL string is within the rootUrl.
+   * Prevents SSRF by ensuring the URL starts with the rootUrl.
+   */
+  private boolean isUrlWithinRoot(String urlStr) {
+    String root = rootUrl.toExternalForm();
+    // Ensure trailing slash for root
+    if (!root.endsWith("/")) {
+      root = root + "/";
+    }
+    return urlStr != null && urlStr.startsWith(root);
   }
 
   private URL adjustUrl(URL rootUrl) {
