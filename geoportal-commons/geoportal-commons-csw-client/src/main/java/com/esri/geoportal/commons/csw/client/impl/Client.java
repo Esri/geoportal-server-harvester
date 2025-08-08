@@ -394,6 +394,10 @@ public class Client implements IClient {
     Capabilities capabilities = new Capabilities();
     SAXParserFactory factory = SAXParserFactory.newInstance();
     factory.setNamespaceAware(true);
+        // Prevent XXE attacks
+    factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+    factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+    factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
     CapabilitiesParse cParse = new CapabilitiesParse(capabilities);
     factory.newSAXParser().parse(new InputSource(stream), cParse);
     return capabilities;
