@@ -134,7 +134,12 @@ import org.slf4j.LoggerFactory;
         if (extension!=null) {            
           String title = ref.getTitle();         
           if (title.length() < 1) {
-              title = ref.getSourceUri().toString().replace(":", "_").replace("?","_").replace("/","_").replace("\\", "_");             
+              title = ref.getSourceUri().toString().replace(":", "_").replace("?","_").replace("/","_").replace("\\", "_");
+              //When source is geoportal and item does not have title: URI conatins access_token, remove access_token from title
+              {
+                  int index = title.indexOf("_access_token");
+                  title = title.substring(0,index);
+              }
           }
           Path f = generateFileName(ref.getBrokerUri(), ref.getSourceUri(), title, extension);
           boolean created = !Files.exists(f);
