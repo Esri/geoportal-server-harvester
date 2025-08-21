@@ -119,12 +119,47 @@ import org.slf4j.LoggerFactory;
   @Override
   public DataContent readContent(String id) throws DataInputException {
     try {
-      WafFile file = new WafFile(this, new URL(id), definition.getCredentials());
+      URL fileUrl = new URL(id);
+      // SSRF protection: ensure fileUrl is within hostUrl
+      if (!isUrlWithinHost(fileUrl, definition.getHostUrl())) {
+        throw new DataInputException(this, String.format("Access to URL outside allowed host: %s", id), null);
+      }
+      WafFile file = new WafFile(this, fileUrl, definition.getCredentials());
       return file.readContent(httpClient, null);
     } catch (MalformedURLException ex) {
       throw new DataInputException(this, String.format("Invalid id: %s : Exception: "+ex, id), ex);
     } catch (IOException|URISyntaxException ex) {
       throw new DataInputException(this, String.format("Error reading content: %s : Exception: "+ex, id), ex);
+    }
+  }
+  
+  /**
+   * Checks if the given fileUrl is within the allowed hostUrl.
+   * Only allows access to URLs that are subpaths of the hostUrl.
+   */
+  private boolean isUrlWithinHost(URL fileUrl, URL hostUrl) {
+    try {
+      // Compare host and protocol
+      if (!fileUrl.getProtocol().equalsIgnoreCase(hostUrl.getProtocol())) {
+        return false;
+      }
+      if (!fileUrl.getHost().equalsIgnoreCase(hostUrl.getHost())) {
+        return false;
+      }
+      int hostPort = hostUrl.getPort() != -1 ? hostUrl.getPort() : hostUrl.getDefaultPort();
+      int filePort = fileUrl.getPort() != -1 ? fileUrl.getPort() : fileUrl.getDefaultPort();
+      if (hostPort != filePort) {
+        return false;
+      }
+      // Ensure fileUrl path starts with hostUrl path
+      String hostPath = hostUrl.getPath();
+      String filePath = fileUrl.getPath();
+      if (!filePath.startsWith(hostPath)) {
+        return false;
+      }
+      return true;
+    } catch (Exception ex) {
+      return false;
     }
   }
 

@@ -17,6 +17,7 @@ package com.esri.geoportal.commons.meta.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
@@ -38,6 +39,9 @@ import javax.xml.transform.stream.StreamSource;
   public static Templates loadTransformer(String sourceName) throws IOException, TransformerConfigurationException {
     try (final InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(sourceName)) {
       TransformerFactory transFact = TransformerFactory.newInstance();
+      transFact.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+      transFact.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+      transFact.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
       Source source = new StreamSource(input);
       return transFact.newTemplates(source);
     }

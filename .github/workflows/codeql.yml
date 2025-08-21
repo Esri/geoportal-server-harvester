@@ -21,6 +21,7 @@ on:
     branches: 
       - "master"
       - "Harvester3_CodeQL"
+
   schedule:
     - cron: '23 5 * * 1'
 

@@ -259,8 +259,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
   }
   
   private class AgpIterator implements InputBroker.Iterator {
-    private final IteratorContext iteratorContext;
-    private final TransformerFactory tf = TransformerFactory.newInstance();
+    private final IteratorContext iteratorContext;   
     private final long size = 10;
     private long from = 1;
     private java.util.Iterator<ItemEntry> iter;
