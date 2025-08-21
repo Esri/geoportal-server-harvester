@@ -191,7 +191,14 @@ public class AtTrigger implements Trigger {
       try {
         long delay = calcDelay();
         LOG.info(String.format("Task is scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition()));
-        future = service.schedule(runnable, delay, TimeUnit.MINUTES);
+        if(delay > 1439) //Delay should be less than 24*60
+        {
+             LOG.error("Error activating trigger. Delay is greater than 1 day");
+        }
+        else
+        {
+            future = service.schedule(runnable, delay, TimeUnit.MINUTES);
+        }        
       } catch (ParseException ex) {
         LOG.error(String.format("Error activating trigger: %s", getType()), ex);
       }
