@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import org.owasp.esapi.ESAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +71,7 @@ public class DefaultProcessor implements Processor {
 
   @Override
   public ProcessInstance createProcess(Task task, IteratorContext iteratorContext) {
-    LOG.info(String.format("SUBMITTING: %s", task));
+    LOG.info(ESAPI.encoder().encodeForHTML(String.format("SUBMITTING: %s", task)));
     return new DefaultProcess(task, iteratorContext);
   }
 

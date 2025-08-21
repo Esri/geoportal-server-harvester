@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
+import org.owasp.esapi.ESAPI;
 
 /**
  * 'At' trigger. Triggers harvesting at the specific time.
@@ -190,7 +190,7 @@ public class AtTrigger implements Trigger {
     private synchronized void schedule(Runnable runnable) {
       try {
         long delay = calcDelay();
-        LOG.info(String.format("Task is scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition()));
+        LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition())));
         if(delay > 1439) //Delay should be less than 24*60
         {
              LOG.error("Error activating trigger. Delay is greater than 1 day");

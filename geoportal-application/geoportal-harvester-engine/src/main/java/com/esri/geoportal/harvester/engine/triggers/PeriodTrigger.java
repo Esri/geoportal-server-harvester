@@ -46,6 +46,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.owasp.esapi.ESAPI;
 
 /**
  * Period trigger. Allows to schedule task periodically, for example: daily or 
@@ -167,7 +168,7 @@ public class PeriodTrigger implements Trigger {
     private synchronized void schedule(Date lastHarvest, Runnable runnable) {
       try {
         if (lastHarvest==null) {
-          LOG.info(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition()));
+          LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition())));
           future = service.submit(runnable);
         } else {
           TemporalAmount tempAmt = parseTemporalAmount(triggerDefinition.getProperties().get(T_PERIOD));
@@ -176,10 +177,10 @@ public class PeriodTrigger implements Trigger {
           long delay = (nh.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - lh.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())/1000/60;
           
           if (delay>0) {
-            LOG.info(String.format("Task is scheduled to be run in %d minutes: %s", delay, triggerDefinition.getTaskDefinition()));
+            LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is scheduled to be run in %d minutes: %s", delay, triggerDefinition.getTaskDefinition())));
             future = service.schedule(runnable, delay, TimeUnit.MINUTES);
           } else {
-            LOG.info(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition()));
+            LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition())));
             future = service.submit(runnable);
           }
         }
