@@ -20,6 +20,8 @@ import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Trigger instance.
@@ -41,7 +43,7 @@ public interface TriggerInstance {
    * @throws DataProcessorException if creating process fails
    * @throws InvalidDefinitionException if task definition is invalid
    */
-  void activate(Context triggerContext) throws DataProcessorException, InvalidDefinitionException;
+  void activate(Context triggerContext) throws DataProcessorException, InvalidDefinitionException,TimeoutException;
   
   /**
    * Deactivates trigger.
@@ -59,7 +61,7 @@ public interface TriggerInstance {
      * @throws DataProcessorException if processing fails
      * @throws InvalidDefinitionException if task definition is invalid
      */
-    ProcessInstance execute(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException;
+    ProcessInstance execute(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException,TimeoutException,ExecutionException,InterruptedException;
     
     /**
      * Gets last harvest for task.

@@ -23,6 +23,9 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +88,15 @@ public class NowTrigger implements Trigger {
     @Override
     public void activate(TriggerInstance.Context context) throws DataProcessorException, InvalidDefinitionException {
       LOG.info(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition()));
-      context.execute(triggerDefinition.getTaskDefinition());
+        try {
+            context.execute(triggerDefinition.getTaskDefinition());
+        } catch (TimeoutException ex) {
+            LOG.error(String.format("Error executing task"), ex);
+        } catch (ExecutionException ex) {
+            LOG.error(String.format("Error executing task"), ex);
+        } catch (InterruptedException ex) {
+            LOG.error(String.format("Error executing task"), ex);
+        }
     }
 
     @Override

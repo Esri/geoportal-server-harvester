@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -44,7 +46,7 @@ public class RegExFilter implements Filter {
   public static final String TYPE = "REGEX";
 
   @Override
-  public FilterInstance createInstance(EntityDefinition filterDefinition) throws InvalidDefinitionException {
+  public FilterInstance createInstance(EntityDefinition filterDefinition) throws InvalidDefinitionException,TimeoutException,ExecutionException,InterruptedException {
     return new RegExpFilterInstance(filterDefinition);
   }
 
@@ -73,13 +75,14 @@ public class RegExFilter implements Filter {
      * Creates instance of the filter instance.
      * @param definition filter definition
      */
-    public RegExpFilterInstance(EntityDefinition definition) throws InvalidDefinitionException {
+    public RegExpFilterInstance(EntityDefinition definition) throws InvalidDefinitionException,TimeoutException,ExecutionException,InterruptedException {
       this.definition = definition;
       
       String strPattern = definition.getProperties().get(F_REGEX_PATTERN);
       try {
         String strPatternQuoted =  Pattern.quote(strPattern);
-        pattern = Pattern.compile(strPatternQuoted);
+        pattern = SafeRegEx.compile(strPatternQuoted);
+       
       } catch (PatternSyntaxException ex) {
         throw new InvalidDefinitionException(formatForLog("Invalid pattern: %s", strPattern), ex);
       }

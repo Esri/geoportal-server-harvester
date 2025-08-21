@@ -20,6 +20,8 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.api.specs.InputBroker.IteratorContext;
 import com.esri.geoportal.harvester.engine.utils.ProcessReference;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Execution service.
@@ -35,5 +37,5 @@ public interface ExecutionService {
    * @throws InvalidDefinitionException invalid definition exception
    * @throws DataProcessorException if accessing repository fails
    */
-  ProcessReference execute(TaskDefinition taskDefinition, IteratorContext iteratorContext) throws InvalidDefinitionException, DataProcessorException;
+  ProcessReference execute(TaskDefinition taskDefinition, IteratorContext iteratorContext) throws InvalidDefinitionException, DataProcessorException,TimeoutException,ExecutionException,InterruptedException;
 }

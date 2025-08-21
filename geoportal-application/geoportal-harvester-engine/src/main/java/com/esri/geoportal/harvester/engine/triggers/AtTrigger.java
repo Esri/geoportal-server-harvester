@@ -41,6 +41,9 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 
 /**
  * 'At' trigger. Triggers harvesting at the specific time.
@@ -171,7 +174,13 @@ public class AtTrigger implements Trigger {
             process.begin();
           } catch (DataProcessorException|InvalidDefinitionException ex) {
             LOG.error(String.format("Error submitting task"), ex);
-          }
+          } catch (TimeoutException ex) {
+                LOG.error(String.format("Error submitting task"), ex);
+            } catch (ExecutionException ex) {
+                LOG.error(String.format("Error submitting task"), ex);
+            } catch (InterruptedException ex) {
+                LOG.error(String.format("Error submitting task"), ex);
+            }
         } else {
           schedule(newRunnable(triggerContext, predicate));
         }

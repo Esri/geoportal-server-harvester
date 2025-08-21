@@ -27,6 +27,8 @@ import com.esri.geoportal.harvester.engine.managers.History;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
 /**
@@ -109,7 +111,7 @@ public interface TasksService {
    * @return task
    * @throws InvalidDefinitionException if invalid task definition
    */
-  Task createTask(TaskDefinition taskDefinition) throws InvalidDefinitionException;
+  Task createTask(TaskDefinition taskDefinition) throws InvalidDefinitionException,TimeoutException,ExecutionException,InterruptedException;
   
   /**
    * Fetching content.
@@ -119,7 +121,7 @@ public interface TasksService {
    * @return content or <code>null</code> if no content
    * @throws DataInputException if error fetching content
    */
-  DataContent fetchContent(UUID taskId, String recordId, SimpleCredentials credentials) throws DataInputException;
+  DataContent fetchContent(UUID taskId, String recordId, SimpleCredentials credentials) throws DataInputException,TimeoutException,ExecutionException,InterruptedException;
   
   /**
    * Updates all tasks with new broker definition.

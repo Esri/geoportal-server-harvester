@@ -37,10 +37,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,23 +138,30 @@ public class PeriodTrigger implements Trigger {
       }
     }
     
-    private Runnable newRunnable(Context triggerContext) {
-      return ()->{
-        try {
-          ProcessInstance process = triggerContext.execute(triggerDefinition.getTaskDefinition());
-          process.addListener(new BaseProcessInstanceListener() {
-            @Override
-            public void onStatusChange(ProcessInstance.Status status) {
-              if (status==ProcessInstance.Status.completed && !Thread.currentThread().isInterrupted()) {
-                schedule(new Date(),newRunnable(triggerContext));
+      private Runnable newRunnable(Context triggerContext) {
+          return () -> {
+              ProcessInstance process;
+              try {
+                  process = triggerContext.execute(triggerDefinition.getTaskDefinition());
+                  process.addListener(new BaseProcessInstanceListener() {
+                      @Override
+                      public void onStatusChange(ProcessInstance.Status status) {
+                          if (status == ProcessInstance.Status.completed && !Thread.currentThread().isInterrupted()) {
+                              schedule(new Date(), newRunnable(triggerContext));
+                          }
+                      }
+                  });
+                  process.begin();
+              } catch (TimeoutException ex) {
+                  LOG.error(String.format("Error submitting task"), ex);
+              } catch (ExecutionException ex) {
+                  LOG.error(String.format("Error submitting task"), ex);
+              } catch (InterruptedException ex) {
+                  LOG.error(String.format("Error submitting task"), ex);
+              } catch (DataProcessorException | InvalidDefinitionException ex) {
+                  LOG.error(String.format("Error submitting task"), ex);
               }
-            }
-          });
-          process.begin();
-        } catch (DataProcessorException|InvalidDefinitionException ex) {
-          LOG.error(String.format("Error submitting task"), ex);
-        }
-      };
+          };
     }
     
     private synchronized void schedule(Date lastHarvest, Runnable runnable) {
