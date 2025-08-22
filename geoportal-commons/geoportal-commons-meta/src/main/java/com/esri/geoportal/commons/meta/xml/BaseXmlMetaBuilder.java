@@ -22,6 +22,8 @@ import com.esri.geoportal.commons.meta.MapAttribute;
 import static com.esri.geoportal.commons.meta.xml.TransformerLoader.loadTransformer;
 import java.io.IOException;
 import java.util.Properties;
+import javax.xml.XMLConstants;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Result;
@@ -47,7 +49,9 @@ public abstract class BaseXmlMetaBuilder implements MetaBuilder {
    * @throws javax.xml.transform.TransformerConfigurationException if error compiling xslt
    */
   public BaseXmlMetaBuilder(String encoderXslt) throws IOException, TransformerConfigurationException {
-    xsltEncodeDC = loadTransformer(encoderXslt);
+    TransformerFactory factory = TransformerFactory.newInstance();
+    factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+    xsltEncodeDC = factory.newTemplates(new javax.xml.transform.stream.StreamSource(encoderXslt));
   }
 
   @Override
