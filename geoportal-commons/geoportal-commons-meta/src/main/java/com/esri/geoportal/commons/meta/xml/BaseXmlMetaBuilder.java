@@ -54,7 +54,7 @@ public abstract class BaseXmlMetaBuilder implements MetaBuilder {
   @Override
   public Document create(MapAttribute wellKnowsAttributes) throws MetaException {
     try {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
         dbf.setNamespaceAware(true);
 
         // Harden the parser
