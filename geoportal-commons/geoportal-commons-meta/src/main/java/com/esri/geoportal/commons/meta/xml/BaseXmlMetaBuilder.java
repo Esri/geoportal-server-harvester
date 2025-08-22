@@ -23,6 +23,7 @@ import static com.esri.geoportal.commons.meta.xml.TransformerLoader.loadTransfor
 import java.io.IOException;
 import java.util.Properties;
 import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Result;
@@ -54,22 +55,17 @@ public abstract class BaseXmlMetaBuilder implements MetaBuilder {
   @Override
   public Document create(MapAttribute wellKnowsAttributes) throws MetaException {
     try {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
-        dbf.setNamespaceAware(true);
-
-        // Harden the parser
-        dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        try { dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true); } catch (Exception ignored) {}
-        try { dbf.setFeature("http://xml.org/sax/features/external-general-entities", false); } catch (Exception ignored) {}
-        try { dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false); } catch (Exception ignored) {}
-        dbf.setXIncludeAware(false);
-        dbf.setExpandEntityReferences(false);
-        // Block external DTD/schema fetches (supported on modern JAXP)
-        try { dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); } catch (IllegalArgumentException ignored) {}
-        try { dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); } catch (IllegalArgumentException ignored) {}        
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        builderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        builderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        builderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        builderFactory.setXIncludeAware(false);
+        builderFactory.setExpandEntityReferences(false);
+       
         
-      Document inputDoc = dbf.newDocumentBuilder().newDocument();
-      Document outputDoc = DocumentBuilderFactory.newDefaultInstance().newDocumentBuilder().newDocument();
+      Document inputDoc = builderFactory.newDocumentBuilder().newDocument();
+      Document outputDoc =builderFactory.newDocumentBuilder().newDocument();
       Transformer transformer = xsltEncodeDC.newTransformer();
       Properties props = AttributeUtils.toProperties(wellKnowsAttributes);
       props.keySet().stream().map(Object::toString).forEach((String key) -> {
