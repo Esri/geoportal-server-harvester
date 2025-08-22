@@ -19,7 +19,6 @@ import com.esri.geoportal.commons.meta.AttributeUtils;
 import com.esri.geoportal.commons.meta.MetaBuilder;
 import com.esri.geoportal.commons.meta.MetaException;
 import com.esri.geoportal.commons.meta.MapAttribute;
-import static com.esri.geoportal.commons.meta.xml.TransformerLoader.loadTransformer;
 import java.io.IOException;
 import java.util.Properties;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -32,6 +31,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.XMLConstants;
 
 /**
  * Base xml meta builder
@@ -47,7 +48,11 @@ public abstract class BaseXmlMetaBuilder implements MetaBuilder {
    * @throws javax.xml.transform.TransformerConfigurationException if error compiling xslt
    */
   public BaseXmlMetaBuilder(String encoderXslt) throws IOException, TransformerConfigurationException {
-    xsltEncodeDC = loadTransformer(encoderXslt);
+    TransformerFactory factory = TransformerFactory.newInstance();
+    factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+    xsltEncodeDC = factory.newTemplates(new javax.xml.transform.stream.StreamSource(encoderXslt));
   }
 
   @Override
