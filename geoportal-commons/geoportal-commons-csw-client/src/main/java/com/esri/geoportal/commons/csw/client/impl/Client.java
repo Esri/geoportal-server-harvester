@@ -37,7 +37,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -132,7 +131,8 @@ public class Client implements IClient {
     HttpPost post = createRecordsPostRequest(capabilites.get_getRecordsPostURL(), requestBody);
 
     HttpClientContext context = cred!=null && !cred.isEmpty()? createHttpClientContext(baseUrl, cred): null;
-    try (CloseableHttpResponse httpResponse = httpClient.execute(post,context); InputStream responseInputStream = httpResponse.getEntity().getContent();) {
+    try (CloseableHttpResponse httpResponse = httpClient.execute(post,context); 
+            InputStream responseInputStream = httpResponse.getEntity().getContent();) {
       if (httpResponse.getStatusLine().getStatusCode()>=400) {
         throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
       }
@@ -167,7 +167,16 @@ public class Client implements IClient {
 
         // perform transformation
         StringWriter writer = new StringWriter();
-        transformer.transform(new StreamSource(contentStream), new StreamResult(writer));
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        builderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        builderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        builderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        builderFactory.setXIncludeAware(false);
+        builderFactory.setExpandEntityReferences(false);
+        DocumentBuilder builder = builderFactory.newDocumentBuilder();
+        Document inputDoc = builder.parse(contentStream);
+        transformer.transform(new DOMSource(inputDoc), new StreamResult(writer));
 
         String intermediateResult = writer.toString();
 
@@ -307,21 +316,32 @@ public class Client implements IClient {
 
     // perform transformation
     StringWriter writer = new StringWriter();
-    transformer.transform(new StreamSource(contentStream), new StreamResult(writer));
+  
+    DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+    builderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+    builderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+    builderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+    builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+    builderFactory.setXIncludeAware(false);
+    builderFactory.setExpandEntityReferences(false);
+    DocumentBuilder builder = builderFactory.newDocumentBuilder();
+    Document inputDoc = builder.parse(contentStream);
+    
+    transformer.transform(new DOMSource(inputDoc), new StreamResult(writer));
     
     LOG.trace(String.format("Received records:\n%s", writer.toString()));
 
     try (ByteArrayInputStream transformedContentStream = new ByteArrayInputStream(writer.toString().getBytes("UTF-8"))) {
 
       // create internal request DOM
-      DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-      builderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-      builderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-      builderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-      builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-      builderFactory.setXIncludeAware(false);
-      builderFactory.setExpandEntityReferences(false);
-      DocumentBuilder builder = builderFactory.newDocumentBuilder();
+//      DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+//      builderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+//      builderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+//      builderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+//      builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+//      builderFactory.setXIncludeAware(false);
+//      builderFactory.setExpandEntityReferences(false);
+//      DocumentBuilder builder = builderFactory.newDocumentBuilder();
       Document resultDom = builder.parse(new InputSource(transformedContentStream));
 
       // create xpath

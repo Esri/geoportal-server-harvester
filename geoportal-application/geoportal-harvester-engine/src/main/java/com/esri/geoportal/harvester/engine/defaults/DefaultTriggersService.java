@@ -43,6 +43,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,10 +154,15 @@ public class DefaultTriggersService implements TriggersService {
         } catch (DataProcessorException|InvalidDefinitionException ex) {
           LOG.warn(formatForLog("Error creating and activating trigger instance: %s -> %s", uuid, definition), ex);
         }
+        catch(TimeoutException ex)
+        {
+            LOG.warn(formatForLog("Error creating and activating trigger instance: %s -> %s", uuid, definition), ex);
+        }
       });
     } catch (CrudlException ex) {
       LOG.error("Error processing trigger definitions", ex);
     }
+    
   }
   
   @Override
@@ -188,6 +195,10 @@ public class DefaultTriggersService implements TriggersService {
     } catch (CrudlException ex) {
       throw new DataProcessorException(formatForLog("Error scheduling task: %s", trigDef.getTaskDefinition()), ex);
     }
+    catch(TimeoutException ex)
+    {
+         throw new DataProcessorException(formatForLog("Error scheduling task: %s", trigDef.getTaskDefinition()), ex);
+    }
   }
   
   /**
@@ -205,7 +216,7 @@ public class DefaultTriggersService implements TriggersService {
     }
 
     @Override
-    public synchronized ProcessInstance execute(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException {
+    public synchronized ProcessInstance execute(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException,TimeoutException,ExecutionException,InterruptedException {
       SimpleIteratorContext iteratorContext = new SimpleIteratorContext();
       iteratorContext.setLastHarvest(taskDefinition.isIncremental()? lastHarvest(): null);
       ProcessReference ref = executionService.execute(taskDefinition,iteratorContext);

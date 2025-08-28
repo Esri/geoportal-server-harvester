@@ -24,6 +24,8 @@ import com.esri.geoportal.harvester.engine.services.ExecutionService;
 import com.esri.geoportal.harvester.engine.services.ProcessesService;
 import com.esri.geoportal.harvester.engine.services.TasksService;
 import com.esri.geoportal.harvester.engine.utils.ProcessReference;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Default execution service.
@@ -46,7 +48,7 @@ public class DefaultExecutionService implements ExecutionService {
   }
 
   @Override
-  public ProcessReference execute(TaskDefinition taskDefinition, IteratorContext iteratorContext) throws InvalidDefinitionException, DataProcessorException {
+  public ProcessReference execute(TaskDefinition taskDefinition, IteratorContext iteratorContext) throws InvalidDefinitionException, DataProcessorException,TimeoutException,ExecutionException,InterruptedException {
     Task task = tasksService.createTask(taskDefinition);
     return processesService.createProcess(task, iteratorContext);
   }

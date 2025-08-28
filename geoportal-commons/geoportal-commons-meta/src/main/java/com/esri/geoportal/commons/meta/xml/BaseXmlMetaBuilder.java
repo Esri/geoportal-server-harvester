@@ -22,6 +22,8 @@ import com.esri.geoportal.commons.meta.MapAttribute;
 import static com.esri.geoportal.commons.meta.xml.TransformerLoader.loadTransformer;
 import java.io.IOException;
 import java.util.Properties;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Result;
@@ -53,8 +55,17 @@ public abstract class BaseXmlMetaBuilder implements MetaBuilder {
   @Override
   public Document create(MapAttribute wellKnowsAttributes) throws MetaException {
     try {
-      Document inputDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-      Document outputDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        builderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        builderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        builderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        builderFactory.setXIncludeAware(false);
+        builderFactory.setExpandEntityReferences(false);
+       
+        
+      Document inputDoc = builderFactory.newDocumentBuilder().newDocument();
+      Document outputDoc =builderFactory.newDocumentBuilder().newDocument();
       Transformer transformer = xsltEncodeDC.newTransformer();
       Properties props = AttributeUtils.toProperties(wellKnowsAttributes);
       props.keySet().stream().map(Object::toString).forEach((String key) -> {

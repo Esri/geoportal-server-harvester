@@ -37,12 +37,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.owasp.esapi.ESAPI;
 
 /**
  * Period trigger. Allows to schedule task periodically, for example: daily or 
@@ -135,29 +139,36 @@ public class PeriodTrigger implements Trigger {
       }
     }
     
-    private Runnable newRunnable(Context triggerContext) {
-      return ()->{
-        try {
-          ProcessInstance process = triggerContext.execute(triggerDefinition.getTaskDefinition());
-          process.addListener(new BaseProcessInstanceListener() {
-            @Override
-            public void onStatusChange(ProcessInstance.Status status) {
-              if (status==ProcessInstance.Status.completed && !Thread.currentThread().isInterrupted()) {
-                schedule(new Date(),newRunnable(triggerContext));
+      private Runnable newRunnable(Context triggerContext) {
+          return () -> {
+              ProcessInstance process;
+              try {
+                  process = triggerContext.execute(triggerDefinition.getTaskDefinition());
+                  process.addListener(new BaseProcessInstanceListener() {
+                      @Override
+                      public void onStatusChange(ProcessInstance.Status status) {
+                          if (status == ProcessInstance.Status.completed && !Thread.currentThread().isInterrupted()) {
+                              schedule(new Date(), newRunnable(triggerContext));
+                          }
+                      }
+                  });
+                  process.begin();
+              } catch (TimeoutException ex) {
+                  LOG.error(String.format("Error submitting task"), ex);
+              } catch (ExecutionException ex) {
+                  LOG.error(String.format("Error submitting task"), ex);
+              } catch (InterruptedException ex) {
+                  LOG.error(String.format("Error submitting task"), ex);
+              } catch (DataProcessorException | InvalidDefinitionException ex) {
+                  LOG.error(String.format("Error submitting task"), ex);
               }
-            }
-          });
-          process.begin();
-        } catch (DataProcessorException|InvalidDefinitionException ex) {
-          LOG.error(String.format("Error submitting task"), ex);
-        }
-      };
+          };
     }
     
     private synchronized void schedule(Date lastHarvest, Runnable runnable) {
       try {
         if (lastHarvest==null) {
-          LOG.info(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition()));
+          LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition())));
           future = service.submit(runnable);
         } else {
           TemporalAmount tempAmt = parseTemporalAmount(triggerDefinition.getProperties().get(T_PERIOD));
@@ -166,10 +177,10 @@ public class PeriodTrigger implements Trigger {
           long delay = (nh.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - lh.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())/1000/60;
           
           if (delay>0) {
-            LOG.info(String.format("Task is scheduled to be run in %d minutes: %s", delay, triggerDefinition.getTaskDefinition()));
+            LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is scheduled to be run in %d minutes: %s", delay, triggerDefinition.getTaskDefinition())));
             future = service.schedule(runnable, delay, TimeUnit.MINUTES);
           } else {
-            LOG.info(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition()));
+            LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition())));
             future = service.submit(runnable);
           }
         }

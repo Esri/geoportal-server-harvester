@@ -54,6 +54,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -178,7 +180,7 @@ public class DefaultTasksService implements TasksService {
   }
   
   @Override
-  public DataContent fetchContent(UUID taskId, String recordId, SimpleCredentials credentials) throws DataInputException {
+  public DataContent fetchContent(UUID taskId, String recordId, SimpleCredentials credentials) throws DataInputException,TimeoutException,ExecutionException,InterruptedException {
     InputBroker broker = null;
     try {
       TaskDefinition taskDefinition = readTaskDefinition(taskId);
@@ -209,7 +211,7 @@ public class DefaultTasksService implements TasksService {
    * @throws InvalidDefinitionException  if invalid definition
    */
   @Override
-  public Task createTask(TaskDefinition taskDefinition) throws InvalidDefinitionException {
+  public Task createTask(TaskDefinition taskDefinition) throws InvalidDefinitionException,TimeoutException,ExecutionException,InterruptedException {
     InputBroker dataSource = newInputBroker(taskDefinition.getSource());
 
     ArrayList<Link> dataDestinations = new ArrayList<>();
@@ -262,7 +264,7 @@ public class DefaultTasksService implements TasksService {
    * @return link
    * @throws InvalidDefinitionException if invalid definition
    */
-  private Link newLink(LinkDefinition linkDefinition) throws InvalidDefinitionException {
+  private Link newLink(LinkDefinition linkDefinition) throws InvalidDefinitionException,TimeoutException,ExecutionException,InterruptedException {
     LinkAction linkAction = newLinkAction(linkDefinition.getAction());
     ArrayList<Link> drains = new ArrayList<>();
     if (linkDefinition.getDrains()!=null) {
@@ -279,7 +281,7 @@ public class DefaultTasksService implements TasksService {
    * @return link action
    * @throws InvalidDefinitionException if invalid definition.
    */
-  private LinkAction newLinkAction(EntityDefinition actionDefinition) throws InvalidDefinitionException {
+  private LinkAction newLinkAction(EntityDefinition actionDefinition) throws InvalidDefinitionException,TimeoutException,ExecutionException,InterruptedException {
     OutputConnector<OutputBroker> outputConnector = outboundConnectorRegistry.get(actionDefinition.getType());
     if (outputConnector!=null) {
       OutputBroker broker = outputConnector.createBroker(actionDefinition);

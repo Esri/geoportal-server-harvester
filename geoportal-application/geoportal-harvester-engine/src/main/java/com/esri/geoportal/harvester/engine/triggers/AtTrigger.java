@@ -41,6 +41,9 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+import org.owasp.esapi.ESAPI;
 
 /**
  * 'At' trigger. Triggers harvesting at the specific time.
@@ -171,7 +174,13 @@ public class AtTrigger implements Trigger {
             process.begin();
           } catch (DataProcessorException|InvalidDefinitionException ex) {
             LOG.error(String.format("Error submitting task"), ex);
-          }
+          } catch (TimeoutException ex) {
+                LOG.error(String.format("Error submitting task"), ex);
+            } catch (ExecutionException ex) {
+                LOG.error(String.format("Error submitting task"), ex);
+            } catch (InterruptedException ex) {
+                LOG.error(String.format("Error submitting task"), ex);
+            }
         } else {
           schedule(newRunnable(triggerContext, predicate));
         }
@@ -181,8 +190,15 @@ public class AtTrigger implements Trigger {
     private synchronized void schedule(Runnable runnable) {
       try {
         long delay = calcDelay();
-        LOG.info(String.format("Task is scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition()));
-        future = service.schedule(runnable, delay, TimeUnit.MINUTES);
+        LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition())));
+        if(delay > 1439) //Delay should be less than 24*60
+        {
+             LOG.error("Error activating trigger. Delay is greater than 1 day");
+        }
+        else
+        {
+            future = service.schedule(runnable, delay, TimeUnit.MINUTES);
+        }        
       } catch (ParseException ex) {
         LOG.error(String.format("Error activating trigger: %s", getType()), ex);
       }

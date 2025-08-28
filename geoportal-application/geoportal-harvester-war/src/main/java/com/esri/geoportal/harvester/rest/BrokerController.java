@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.harvester.engine.utils.BrokerReference;
+import org.owasp.esapi.ESAPI;
 
 /**
  * Broker controller.
@@ -144,7 +145,7 @@ public class BrokerController {
   @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BrokerResponse> createBroker(@RequestBody EntityDefinition brokerDefinition) {
     try {
-      LOG.debug(String.format("POST /rest/harvester/brokers <-- %s", brokerDefinition));
+      LOG.debug(ESAPI.encoder().encodeForHTML(String.format("POST /rest/harvester/brokers <-- %s", brokerDefinition)));
       return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().createBroker(brokerDefinition, LocaleContextHolder.getLocale())), HttpStatus.OK);
     } catch (DataProcessorException ex) {
       LOG.error(String.format("Error creating broker: %s", brokerDefinition), ex);

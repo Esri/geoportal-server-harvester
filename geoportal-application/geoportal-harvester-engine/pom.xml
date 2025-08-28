@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-      <artifactId>geoportal-application</artifactId>
-      <groupId>com.esri.geoportal</groupId>
-      <version>3.0.0</version>
+        <artifactId>geoportal-application</artifactId>
+        <groupId>com.esri.geoportal</groupId>
+        <version>3.0.0</version>
     </parent>
     <artifactId>geoportal-harvester-engine</artifactId>
     <name>Esri :: Geoportal Server :: Harvester :: Application :: Engine</name>
@@ -105,6 +105,35 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>geoportal-harvester-stac</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.owasp.esapi</groupId>
+            <artifactId>esapi</artifactId>
+            <version>2.7.0.0</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bsh</artifactId>
+                    <groupId>org.apache-extras.beanshell</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>xom</artifactId>
+                    <groupId>xom</groupId>
+                </exclusion>
+                <exclusion>                  
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion> 
+                    <groupId>commons-fileupload</groupId>
+                    <artifactId>commons-fileupload</artifactId>
+                </exclusion>
+                <exclusion> 
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>    
+            </exclusions>
+            <optional>false</optional>
         </dependency>
     </dependencies>
     <version>3.0.0</version>

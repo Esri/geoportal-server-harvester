@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpResponseException;
@@ -395,7 +396,10 @@ public class TaskController {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     } catch (DataProcessorException ex) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    
+    } catch (Exception ex) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    } 
   }
 
   /**
@@ -420,7 +424,9 @@ public class TaskController {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     } catch (DataProcessorException ex) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    } catch (Exception ex) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    } 
   }
 
   /**
@@ -551,6 +557,9 @@ public class TaskController {
     } catch (IOException ex) {
       LOG.error(formatForLog("Error fetching record: %s <-- %s", taskId, taskId), ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    } catch (Exception ex) {
+      LOG.error(formatForLog("Error fetching record: %s <-- %s", taskId, taskId), ex);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    } 
   }
 }

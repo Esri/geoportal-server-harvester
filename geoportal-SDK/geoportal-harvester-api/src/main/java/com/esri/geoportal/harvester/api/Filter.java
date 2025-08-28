@@ -18,6 +18,8 @@ package com.esri.geoportal.harvester.api;
 import com.esri.geoportal.harvester.api.general.Entity;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Filter.
@@ -31,6 +33,6 @@ public interface Filter extends Entity {
    * @return instance of the filter
    * @throws InvalidDefinitionException if invalid filter definition
    */
-  FilterInstance createInstance(EntityDefinition filterDefinition) throws InvalidDefinitionException;
+  FilterInstance createInstance(EntityDefinition filterDefinition) throws InvalidDefinitionException,TimeoutException,ExecutionException,InterruptedException;
   
 }

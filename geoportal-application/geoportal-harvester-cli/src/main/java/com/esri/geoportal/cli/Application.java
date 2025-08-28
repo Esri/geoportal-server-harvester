@@ -29,6 +29,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -97,7 +99,7 @@ public class Application {
           printHelp(options);
         }
       }
-    } catch (IOException|DataProcessorException|InvalidDefinitionException|ParserConfigurationException|SAXException ex) {
+    } catch (IOException|DataProcessorException|InvalidDefinitionException|ParserConfigurationException|SAXException|ExecutionException|TimeoutException|InterruptedException ex) {
       ex.printStackTrace(System.err);
     } catch (ParseException ex) {
       printHeader();
@@ -141,7 +143,8 @@ public class Application {
     return options;
   }
 
-  protected void harvest(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException, ParserConfigurationException, SAXException {
+  protected void harvest(TaskDefinition taskDefinition) throws DataProcessorException, InvalidDefinitionException, ParserConfigurationException, 
+          SAXException,ExecutionException,TimeoutException,InterruptedException {
     Bootstrap boot = new Bootstrap(this.geometryServiceUrl, this.cswProfilesFolder, new MemReportManager());
     Engine engine = boot.createEngine();
     IteratorContext iterCtx = new SimpleIteratorContext();
