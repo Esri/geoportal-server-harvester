@@ -97,7 +97,13 @@ public class XsltTransformer implements Transformer {
         throw new InvalidDefinitionException(String.format("No transformation defined"));
       }
       try {
-        xsltTransformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new ByteArrayInputStream(strXslt.getBytes("UTF-8"))));
+          
+         TransformerFactory factory = TransformerFactory.newInstance();
+         factory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+         factory.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD, "");
+         factory.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+         xsltTransformer = factory.newTransformer(new StreamSource(new ByteArrayInputStream(strXslt.getBytes("UTF-8"))));          
+       
         String strProps = definition.getProperties().get(X_XSLT_PROPS);
         if (strProps != null) {
           Properties props = new Properties();

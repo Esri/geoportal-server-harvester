@@ -57,7 +57,13 @@ import org.apache.commons.lang3.StringUtils;
       try {
         String sHostUrl = get(P_HOST_URL);
         if (sHostUrl!=null) {
-          sHostUrl = sHostUrl.replaceAll("/*$", "/");
+            if(sHostUrl.length()>500)
+            {
+                throw new InvalidDefinitionException("Geoportal host Url length should be less tahn 500.");
+            }
+            //Code QL 15
+            sHostUrl = sHostUrl+"/";
+          //sHostUrl = sHostUrl.replaceAll("/*$", "/");
         }
         hostUrl = new URL(sHostUrl);
       } catch (MalformedURLException ex) {

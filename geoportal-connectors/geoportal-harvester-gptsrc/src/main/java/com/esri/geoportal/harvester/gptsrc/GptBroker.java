@@ -145,7 +145,7 @@ class GptBroker implements InputBroker {
 
       return ref;
     } catch (URISyntaxException | IOException ex) {
-      throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records. Exception: "+ex), ex);
+      throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 3.0 records. Exception: "+ex), ex);
     }
   }
 
@@ -182,21 +182,21 @@ class GptBroker implements InputBroker {
         }
         return iter.hasNext();
       } catch (IOException | URISyntaxException ex) {
-        throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records. Exception: "+ex), ex);
+        throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 3.0 records. Exception: "+ex), ex);
       }
     }
 
     @Override
     public DataReference next() throws DataInputException {
       if (iter == null || !iter.hasNext()) {
-        throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records."));
+        throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 3.0 records."));
       }
       String id = iter.next();
       try {
         EntryRef entryRef = client.readItem(id);
         return readContent(id, entryRef.getLastModified(), entryRef.getSourceUri());
       } catch (URISyntaxException | IOException ex) {
-        throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 2.0 records."), ex);
+        throw new DataInputException(GptBroker.this, String.format("Error iterating through Geoportal Server 3.0 records."), ex);
       }
     }
 

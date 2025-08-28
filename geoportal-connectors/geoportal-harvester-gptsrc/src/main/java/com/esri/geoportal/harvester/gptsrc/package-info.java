@@ -15,6 +15,6 @@
  */
 
 /**
- * Geoportal Server 2.0 as a source.
+ * Geoportal Server 3.0 as a source.
  */
 package com.esri.geoportal.harvester.gptsrc;

@@ -29,9 +29,7 @@ define(["dojo/_base/declare",
         "dijit/ConfirmDialog",
         "hrv/rest/Brokers",
         "hrv/ui/brokers/BrokerEditorPane",
-        "esri/IdentityManager",        
-        "esri/arcgis/Portal",
-        "esri/config",
+        "esri4/identity/IdentityManager"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
@@ -39,7 +37,7 @@ define(["dojo/_base/declare",
            lang,string,topic,on,json,
            Dialog,ConfirmDialog,
            BrokersREST,BrokerEditorPane,
-           esriId, arcgisPortal,esriConfig
+           esriId
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{

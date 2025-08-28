@@ -78,7 +78,8 @@ public class RegExFilter implements Filter {
       
       String strPattern = definition.getProperties().get(F_REGEX_PATTERN);
       try {
-        pattern = Pattern.compile(strPattern);
+        String strPatternQuoted =  Pattern.quote(strPattern);
+        pattern = Pattern.compile(strPatternQuoted);
       } catch (PatternSyntaxException ex) {
         throw new InvalidDefinitionException(formatForLog("Invalid pattern: %s", strPattern), ex);
       }

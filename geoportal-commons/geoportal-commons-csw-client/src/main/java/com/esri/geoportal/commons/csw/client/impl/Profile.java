@@ -147,6 +147,9 @@ public class Profile implements IProfile {
 
       // create transformer
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
+      transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+      transformerFactory.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD, "");
+      transformerFactory.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
       Templates template = transformerFactory.newTemplates(new StreamSource(reqXsltInputStream));
       Transformer transformer = template.newTransformer();
       

@@ -132,8 +132,16 @@ import org.slf4j.LoggerFactory;
       for (MimeType ct: ref.getContentType()) {
         String extension = MimeTypeUtils.findExtensions(ct).stream().findFirst().orElse(null);
         if (extension!=null) {            
-            
-          Path f = generateFileName(ref.getBrokerUri(), ref.getSourceUri(), ref.getTitle() , extension);
+          String title = ref.getTitle();         
+          if (title.length() < 1) {
+              title = ref.getSourceUri().toString().replace(":", "_").replace("?","_").replace("/","_").replace("\\", "_");
+              //When source is geoportal and item does not have title: URI conatins access_token, remove access_token from title
+              {
+                  int index = title.indexOf("_access_token");
+                  title = title.substring(0,index);
+              }
+          }
+          Path f = generateFileName(ref.getBrokerUri(), ref.getSourceUri(), title, extension);
           boolean created = !Files.exists(f);
           Files.createDirectories(f.getParent());
           try (OutputStream output = Files.newOutputStream(f)) {
@@ -152,6 +160,16 @@ import org.slf4j.LoggerFactory;
       throw new DataOutputException(this, ref, String.format("Error publishing data: %s Exception: "+ex, ref), ex);
     }
   }
+  
+  private boolean isValidFilename(String filename) {
+        String invalidChars = "<>:\"/\\|?*"; // Common invalid characters for Windows
+        for (char c : filename.toCharArray()) {
+            if (invalidChars.indexOf(c) != -1 || c < 32) { // Check for invalid chars and control characters
+                return false;
+            }
+        }
+        return true;
+    }
 
   @Override
   public boolean hasAccess(SimpleCredentials creds) {
@@ -177,7 +195,7 @@ import org.slf4j.LoggerFactory;
       List<String> subFolder = splitPath(sourceUri.getPath().replaceAll("/[a-zA-Z]:/|/$", ""));
       if (!subFolder.isEmpty() && subFolder.get(0).equals(sspRoot)) {
         subFolder.remove(0);
-      }
+      }     
       for (String sf : subFolder) {
         fileName = Paths.get(fileName.toString(), (id.isBlank() ? sf :id));
       }

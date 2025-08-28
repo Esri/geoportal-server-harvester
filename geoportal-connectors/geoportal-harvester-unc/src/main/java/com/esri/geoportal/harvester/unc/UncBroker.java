@@ -97,7 +97,14 @@ import java.util.LinkedList;
   @Override
   public DataContent readContent(String id) throws DataInputException {
     try {
-      UncFile file = new UncFile(this, Paths.get(id));
+      // Restrict file access to within the configured root folder
+      java.io.File rootFolderFile = definition.getRootFolder();
+      java.nio.file.Path rootFolder = rootFolderFile.toPath().toAbsolutePath().normalize();
+      java.nio.file.Path requestedPath = rootFolder.resolve(id).normalize();
+      if (!requestedPath.startsWith(rootFolder)) {
+        throw new DataInputException(this, String.format("Invalid file path: %s", id), null);
+      }
+      UncFile file = new UncFile(this, requestedPath);;
       return file.readContent();
     } catch (IOException|URISyntaxException ex) {
       throw new DataInputException(this, String.format("Error reading content: %s : Exception: "+ex, id), ex);
