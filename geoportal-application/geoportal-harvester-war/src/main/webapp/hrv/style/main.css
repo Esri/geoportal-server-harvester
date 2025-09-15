@@ -987,6 +987,19 @@ body {
   line-height: 22px;
 }
 
+.h-api {
+  flex: 1 1 auto;
+  width: 100%;
+  margin: 0px auto;
+  padding: 12px;
+  align-items: center;
+}
+
+.h-api-layout {
+  height: 100%;  
+  display: flex;
+}
+
 /* Button overrides */
 .dijitButtonNode {
   color: #007ac2 !important;
@@ -997,3 +1010,4 @@ body {
   color: #fff !important;
   background-color: #007ac2 !important;
 }
+

@@ -29,12 +29,12 @@ define({
       daily: "Daily",
       weekly: "Weekly",
       biweekly: "Bi-weekly",
-      monthly: "Monthly",
+      monthly: "Monthly"
     },
 
     header: {
       caption: "Harvester",
-      logout: "Log out",
+      logout: "Log out"
     },
 
     navigation: {
@@ -42,6 +42,7 @@ define({
       connectors: "Connectors",
       brokers: "Brokers",
       tasks: "Tasks",
+      api: "API"
     },
 
     brokers: {
