@@ -658,7 +658,8 @@ public class TaskController {
     })
 
   @RequestMapping(value = "/rest/harvester/tasks/upload", method = RequestMethod.POST)
-  public ResponseEntity<TaskResponse> handleImport(@RequestParam("file") MultipartFile file) {
+  public ResponseEntity<TaskResponse> handleImport( @Parameter(description = "Task file", required = true,
+                       schema = @Schema(type = "string", format = "binary")) @RequestParam("file") MultipartFile file) {
     try (InputStream inputStream = file.getInputStream()) {
       try {
         TaskDefinition taskDefinition = deserialize(inputStream,TaskDefinition.class);

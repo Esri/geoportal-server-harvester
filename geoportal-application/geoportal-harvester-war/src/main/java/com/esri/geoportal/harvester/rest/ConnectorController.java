@@ -19,6 +19,14 @@ import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.engine.services.Engine;
 import com.esri.geoportal.harvester.engine.services.TemplatesService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.http.MediaType;
@@ -161,6 +169,7 @@ import org.springframework.web.bind.annotation.PathVariable;
  * </code></pre>
  */
 @RestController
+@Tag(name = "Connector Controller", description = "Connector information controller.")
 public class ConnectorController {
   private static final Logger LOG = LoggerFactory.getLogger(ConnectorController.class);
   
@@ -168,9 +177,17 @@ public class ConnectorController {
   private Engine engine;
   
   /**
-   * Lists all inbound connectors. A connector might be: WAF, CSW, etc.
+   * Lists all inbound connectors. A connector might be: WAF, CSW, etc. (array of connector templates)
    * @return array of connector templates
    */
+   @Operation(description = "Lists all inbound connectors. A connector might be: WAF, CSW, etc.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful",
+                     content = @Content( mediaType = "application/json", 
+                     array = @ArraySchema(    
+                             schema = @Schema(implementation = UITemplate.class)))
+                    )
+    })
   @RequestMapping(value = "/rest/harvester/connectors/inbound", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate[] listInboundConnectors() {
     LOG.debug(String.format("GET /rest/harvester/connectors/inbound"));
@@ -181,6 +198,14 @@ public class ConnectorController {
    * Lists all outbound connectors. A connector might be: GPT, FOLDER, etc.
    * @return array of connector templates
    */
+   @Operation(description = "Lists all outbound connectors. GPT, FOLDER, etc. (array of connector templates)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful",
+                     content = @Content( mediaType = "application/json", 
+                     array = @ArraySchema(    
+                             schema = @Schema(implementation = UITemplate.class)))
+                    )
+    })
   @RequestMapping(value = "/rest/harvester/connectors/outbound", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate[] listOutboundConnectors() {
     LOG.debug(String.format("GET /rest/harvester/connectors/outbound"));
@@ -194,6 +219,11 @@ public class ConnectorController {
    * @param id id of the connector
    * @return connector template
    */
+  @Operation(description = "Get single inbound connector.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = UITemplate.class)))
+    })
   @RequestMapping(value = "/rest/harvester/connectors/inbound/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate getInboundConnector(@PathVariable String id) {
     LOG.debug(formatForLog("GET /rest/harvester/connectors/inbound/%s", id));
@@ -205,6 +235,11 @@ public class ConnectorController {
    * @param id id of the connector
    * @return connector template
    */
+   @Operation(description = "Get single outbound connector.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = UITemplate.class)))
+    })
   @RequestMapping(value = "/rest/harvester/connectors/outbound/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate getOutboundConnector(@PathVariable String id) {
     LOG.debug(formatForLog("GET /rest/harvester/connectors/outbound/%s", id));

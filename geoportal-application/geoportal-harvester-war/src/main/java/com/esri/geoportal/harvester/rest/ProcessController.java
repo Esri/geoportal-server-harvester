@@ -17,6 +17,7 @@ package com.esri.geoportal.harvester.rest;
 
 import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
 import com.esri.geoportal.harvester.api.ProcessInstance;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.support.ProcessResponse;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.engine.managers.History;
@@ -24,6 +25,14 @@ import com.esri.geoportal.harvester.engine.managers.History.Event;
 import com.esri.geoportal.harvester.engine.services.Engine;
 import com.esri.geoportal.harvester.engine.utils.Statistics;
 import com.esri.geoportal.harvester.support.ProcessStatisticsResponse;
+import com.esri.geoportal.harvester.support.TaskResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +60,7 @@ import org.springframework.web.bind.annotation.RestController;
    DELETE /rest/harvester/processes/{processId}   - aborts a single process
  * </code></pre>
  */
+@Tag(name = "Process Controller", description = "Provides access to processes.")
 @RestController
 public class ProcessController {
   private static final Logger LOG = LoggerFactory.getLogger(ProcessController.class);
@@ -62,6 +72,15 @@ public class ProcessController {
    * List all processes.
    * @return all processes
    */
+  @Operation(description = "Lists all processes.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful",
+                     content = @Content( mediaType = "application/json", 
+                     array = @ArraySchema(    
+                             schema = @Schema(implementation = ProcessStatisticsResponse.class)))
+                    ),        
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/processes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessStatisticsResponse[]> listAllProcesses() {
     try {
@@ -78,6 +97,12 @@ public class ProcessController {
    * @param processId process id
    * @return process info
    */
+  @Operation(description = "Get information for the given process id.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = ProcessStatisticsResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/processes/{processId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessStatisticsResponse> getProcessInfo(@PathVariable UUID processId) {
     try {
@@ -151,6 +176,12 @@ public class ProcessController {
    * @param processId process id
    * @return process info
    */
+  @Operation(description = "Aborts (deletes) an existing process")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = ProcessResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/processes/{processId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessResponse> abortProcess(@PathVariable UUID processId) {
     try {
@@ -177,6 +208,15 @@ public class ProcessController {
    * Removes completed processes from the list of processes.
    * @return process info array
    */
+   @Operation(description = "Removes completed processes from the list of processes.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful",
+                     content = @Content( mediaType = "application/json", 
+                     array = @ArraySchema(    
+                             schema = @Schema(implementation = ProcessResponse.class)))
+                    ),        
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/processes", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessResponse[]> purge() {
     try {

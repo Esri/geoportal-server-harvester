@@ -17,6 +17,13 @@ package com.esri.geoportal.harvester.rest;
 
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.engine.services.Engine;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  * </code></pre>
  */
 @RestController
+@Tag(name = "Filter Controller", description = "Provides access to filter information.")
 public class FilterController {
   private static final Logger LOG = LoggerFactory.getLogger(FilterController.class);
   
@@ -44,6 +52,14 @@ public class FilterController {
    * Lists all filters.
    * @return array of filter templates
    */
+  @Operation(description = "Lists all filters. GPT, FOLDER, etc. (array of filter templates)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful",
+                     content = @Content( mediaType = "application/json", 
+                     array = @ArraySchema(    
+                             schema = @Schema(implementation = UITemplate.class)))
+                    )
+    })
   @RequestMapping(value = "/rest/harvester/filters", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate[] list() {
     LOG.debug(String.format("GET /rest/harvester/filters"));
