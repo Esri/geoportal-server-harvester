@@ -12,11 +12,12 @@ To report an issue, please go to [issues](https://github.com/Esri/geoportal-serv
 The nature of the Harvester application is, as the name suggests, to harvest metadata from whatever web endpoints it is provided. The list(s) of endpoints to download metadata from can also be provided by external entities over the internet. Neither the metadata being harvested nor the list(s) of endpoints provided by external entities are vetted or checked by the Harvester. **Users who wish to limit the scope of the Harvester's reach should configure the network or machine where the Harvester is located with allow lists or deny lists of web endpoints to prevent the Harvester from reaching undesirable locations.**
 
 ## Releases and Downloads
-- 2.7.2 - November 22, 2024, click [here](https://github.com/Esri/geoportal-server-harvester/releases/tag/v2.7.2) for release notes and downloads. 
-- 2.7.1 - December 21, 2023, click [here](https://github.com/Esri/geoportal-server-harvester/releases/tag/v2.7.1) for release notes and downloads. 
-- 2.7.0 - June 13, 2021, click [here](https://github.com/Esri/geoportal-server-harvester/releases/tag/v2.7.1) for release notes and downloads. 
-- 2.6.5 - July 13, 2021, click [here](https://github.com/Esri/geoportal-server-harvester/releases/tag/v2.6.5) for release notes and downloads. 
-- 2.6.4 - July 8, 2020, click [here](https://github.com/Esri/geoportal-server-harvester/releases/tag/v2.6.4) for release notes and downloads. 
+- 3.0.0 - September 19, 2025, see: [release info](https://github.com/Esri/geoportal-server-harvester/releases/tag/v3.0.0)
+- 2.7.2 - November 22, 2024. 
+- 2.7.1 - December 21, 2023. 
+- 2.7.0 - June 13, 2021. 
+- 2.6.5 - July 13, 2021. 
+- 2.6.4 - July 8, 2020. 
 
 ## Features
 
