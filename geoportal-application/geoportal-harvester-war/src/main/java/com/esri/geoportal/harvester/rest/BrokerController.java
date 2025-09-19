@@ -36,7 +36,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
+import com.esri.geoportal.harvester.api.defs.TaskDefinition;
 import com.esri.geoportal.harvester.engine.utils.BrokerReference;
+import com.esri.geoportal.harvester.support.TaskResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.owasp.esapi.ESAPI;
 
 /**
@@ -74,6 +83,7 @@ import org.owasp.esapi.ESAPI;
  * </code></pre>
  * Both PUT and POST require body of a single definition, similar to the one above.
  */
+@Tag(name = "Broker Controller", description = "Provides access to brokers")
 @RestController
 public class BrokerController {
   private static final Logger LOG = LoggerFactory.getLogger(BrokerController.class);
@@ -87,6 +97,15 @@ public class BrokerController {
    * @param category category (optional)
    * @return array of broker infos
    */
+   @Operation(description = "Lists all input brokers")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful",
+                     content = @Content( mediaType = "application/json", 
+                     array = @ArraySchema(    
+                             schema = @Schema(implementation = BrokerResponse.class)))
+                    ),
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BrokerResponse[]> listBrokers(@RequestParam(value = "category", required = false) String category) {
     try {
@@ -109,6 +128,12 @@ public class BrokerController {
    * @param brokerId broker id
    * @return broker info or <code>null</code> if no broker found
    */
+   @Operation(description = "Gets broker by broker Id")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = BrokerResponse.class))),       
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BrokerResponse> getBroker(@PathVariable UUID brokerId) {
     try {
@@ -125,6 +150,12 @@ public class BrokerController {
    * @param brokerId broker id
    * @return broker info
    */
+  @Operation(description = "Deletes a broker by broker Id")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = BrokerResponse.class))),       
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BrokerResponse> deleteBroker(@PathVariable UUID brokerId) {
     try {
@@ -138,12 +169,24 @@ public class BrokerController {
   }
   
   /**
-   * Adds a new task.
+   * Adds a new broker.
    * @param brokerDefinition broker definition
    * @return broker info of the newly created broker
    */
+  @Operation(description = "Add a new broker")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = BrokerResponse.class))),       
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/brokers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<BrokerResponse> createBroker(@RequestBody EntityDefinition brokerDefinition) {
+  public ResponseEntity<BrokerResponse> createBroker(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Broker definition",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = EntityDefinition.class)
+                    )) @RequestBody EntityDefinition brokerDefinition) {
     try {
       LOG.debug(ESAPI.encoder().encodeForHTML(String.format("POST /rest/harvester/brokers <-- %s", brokerDefinition)));
       return new ResponseEntity<>(BrokerResponse.createFrom(engine.getBrokersService().createBroker(brokerDefinition, LocaleContextHolder.getLocale())), HttpStatus.OK);
@@ -154,13 +197,26 @@ public class BrokerController {
   }
   
   /**
-   * Adds a new task.
+   * Update broker by broker id.
    * @param brokerDefinition broker definition
    * @param brokerId broker id
    * @return broker info of the task which has been replaced
    */
+  @Operation(description = "Updates a broker by broker Id")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = BrokerResponse.class))),       
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/brokers/{brokerId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<BrokerResponse> updateBroker(@RequestBody EntityDefinition brokerDefinition, @PathVariable UUID brokerId) {
+  public ResponseEntity<BrokerResponse> updateBroker(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Broker definition",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = EntityDefinition.class)
+                    )
+            ) @RequestBody EntityDefinition brokerDefinition, @PathVariable UUID brokerId) {
     try {
       LOG.debug(formatForLog("PUT /rest/harvester/brokers/%s <-- %s", brokerId, brokerDefinition));
       BrokerReference brokerReference = engine.getBrokersService().updateBroker(brokerId, brokerDefinition, LocaleContextHolder.getLocale());

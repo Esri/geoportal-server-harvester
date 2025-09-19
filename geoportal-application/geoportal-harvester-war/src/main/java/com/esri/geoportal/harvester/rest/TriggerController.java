@@ -21,7 +21,15 @@ import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import com.esri.geoportal.harvester.engine.services.Engine;
 import com.esri.geoportal.harvester.engine.utils.TriggerReference;
+import com.esri.geoportal.harvester.support.TaskResponse;
 import com.esri.geoportal.harvester.support.TriggerResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -47,6 +55,7 @@ import org.springframework.web.bind.annotation.RestController;
  * </code></pre>
  */
 @RestController
+@Tag(name = "Trigger Controller", description = "Provides access to triggers.")
 public class TriggerController {
   private static final Logger LOG = LoggerFactory.getLogger(TriggerController.class);
   
@@ -58,6 +67,14 @@ public class TriggerController {
    * Lists all triggers.
    * @return array of trigger templates
    */
+   @Operation(description = "Lists all triggers (array of trigger templates).")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful",
+                     content = @Content( mediaType = "application/json", 
+                     array = @ArraySchema(    
+                             schema = @Schema(implementation = UITemplate.class)))
+                    )
+    })
   @RequestMapping(value = "/rest/harvester/triggers/types", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate[] listTriggerTypes() {
     LOG.debug(String.format("GET /rest/harvester/triggers/types"));
@@ -68,6 +85,14 @@ public class TriggerController {
    * List all active triggers.
    * @return list of all activated triggers.
    */
+  @Operation(description = "Lists all active triggers.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful",
+                     content = @Content( mediaType = "application/json", 
+                     array = @ArraySchema(    
+                             schema = @Schema(implementation = TriggerResponse.class)))
+                    )
+    })
   @RequestMapping(value = "/rest/harvester/triggers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<List<TriggerResponse>> listTriggers() {
     LOG.debug(String.format("GET /rest/harvester/triggers"));
@@ -82,6 +107,14 @@ public class TriggerController {
    * @param triggerId trigger id
    * @return trigger response
    */
+  @Operation(description = "Deactivates trigger.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = TaskResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Bad Request",
+                content = @Content(schema = @Schema())),
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/triggers/{triggerId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TriggerResponse> deactivateTrigger(@PathVariable UUID triggerId) {
     try {

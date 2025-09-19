@@ -20,7 +20,7 @@
 >
   
     <!-- Bootstrap -->
-	<context:component-scan base-package="com.esri.geoportal.harvester.rest, com.esri.geoportal.harvester.beans" />
+	<context:component-scan base-package="com.esri.geoportal.harvester.rest, com.esri.geoportal.harvester.config,com.esri.geoportal.harvester.beans" />
 	<mvc:annotation-driven />
     <mvc:default-servlet-handler />
     
@@ -43,8 +43,9 @@
     <import resource="hrv-beans.xml" />
 
     <!-- Security -->
+   <!-- <import resource="app-security-basic-auth.xml" /> -->
   <!-- <import resource="app-security.xml" /> -->
-  <!-- <import resource="app-security-arcgis.xml" /> -->
+  <!--<import resource="app-security-arcgis.xml" />-->
     
     <!-- ADD PERSISTENCE SUPPORT HERE (jpa, hibernate, etc) -->
 

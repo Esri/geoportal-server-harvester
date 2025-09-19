@@ -67,6 +67,11 @@ define(["dojo/_base/declare",
           topic.publish("nav",{type: "tasks"});
         });
         
+         // api
+        router.register("/api", function() {
+          topic.publish("nav",{type: "api"});
+        });
+        
         // task history
         router.register("/tasks/:uuid", function(evt) {
           router.go("/tasks/" + evt.params.uuid + "/history");

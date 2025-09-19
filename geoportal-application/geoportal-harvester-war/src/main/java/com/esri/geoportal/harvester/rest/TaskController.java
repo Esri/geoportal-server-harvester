@@ -46,7 +46,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpResponseException;
@@ -65,6 +64,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Content;
 
 /**
  * Task controller.
@@ -158,6 +166,7 @@ import org.springframework.web.multipart.MultipartFile;
  * </code></pre>
  */
 @RestController
+@Tag(name = "Task Controller", description = "Provides access to tasks")
 public class TaskController {
 
   private static final Logger LOG = LoggerFactory.getLogger(TaskController.class);
@@ -171,8 +180,17 @@ public class TaskController {
   /**
    * Lists all available tasks.
    *
-   * @return array of task informations
+   * @return array of task information
    */
+    @Operation(description = "Returns list of tasks.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful",
+                     content = @Content( mediaType = "application/json", 
+                     array = @ArraySchema(    
+                             schema = @Schema(implementation = TaskResponse.class)))
+                    ),
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/tasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TaskResponse[]> listTasks() {
     try {
@@ -190,8 +208,16 @@ public class TaskController {
    * @param taskId task id
    * @return task info or <code>null</code> if no task found
    */
+  @Operation(description = "Gets task by id.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = TaskResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Task not found.",
+                content = @Content(schema = @Schema())),
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<TaskResponse> getTask(@PathVariable UUID taskId) {
+  public ResponseEntity<TaskResponse> getTask(@Parameter(description = "task id") @PathVariable UUID taskId) {
     try {
       LOG.debug(formatForLog("GET /rest/harvester/tasks/%s", taskId));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
@@ -206,11 +232,19 @@ public class TaskController {
   }
 
   /**
-   * Gets task by id.
+   * Exports task by id.
    *
    * @param taskId task id
    * @return task info or <code>null</code> if no task found
    */
+  @Operation(description = "Exports task by id.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "400", description = "Task not found.",
+                content = @Content(schema = @Schema())),
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/export", method = RequestMethod.GET)
   public ResponseEntity<String> export(@PathVariable UUID taskId) {
     try {
@@ -244,6 +278,15 @@ public class TaskController {
    * @param taskId task id
    * @return list of all events for the given task
    */
+   @Operation(description = "History for task by task id.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(
+                             array = @ArraySchema(    
+                             schema = @Schema(implementation = EventResponse.class)))
+                    ),       
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/history", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<List<EventResponse>> getTaskHistory(@PathVariable UUID taskId) {
     try {
@@ -256,6 +299,14 @@ public class TaskController {
     }
   }
 
+   @Operation(description = "Get failed dowcuments by event id.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(
+                             array = @ArraySchema(    
+                             schema = @Schema(implementation = String.class)))),       
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/tasks/failed/{eventId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<List<String>> getFailedDocuments(@PathVariable UUID eventId) {
     try {
@@ -269,11 +320,16 @@ public class TaskController {
   }
   
   /**
-   * Gets history by task id.
+   * Purge history by task id.
    *
    * @param taskId task id
    * @return list of all events for the given task
    */
+  @Operation(description = "Purge history by task id")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful."),       
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.")
+    })
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/history", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Void> purgeHistory(@PathVariable UUID taskId) {
     try {
@@ -293,6 +349,12 @@ public class TaskController {
    * @return task info of the deleted task or <code>null</code> if no tasks have
    * been deleted
    */
+  
+   @Operation(description = "Deletes task by task id")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful."),       
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.")
+    })
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TaskResponse> deleteTask(@PathVariable UUID taskId) {
     try {
@@ -318,8 +380,21 @@ public class TaskController {
    * @param taskDefinition task definition
    * @return task info of the newly created task
    */
+   @Operation(description = "Create new task")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = TaskResponse.class))),      
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/tasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<TaskResponse> addTask(@RequestBody TaskDefinition taskDefinition) {
+  public ResponseEntity<TaskResponse> addTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Task definition",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TaskDefinition.class)
+                    )
+            ) @RequestBody TaskDefinition taskDefinition) {
     try {
       LOG.debug(formatForLog("POST /rest/harvester/tasks <-- %s", taskDefinition));
       UUID id = engine.getTasksService().addTaskDefinition(taskDefinition);
@@ -338,8 +413,20 @@ public class TaskController {
    * @return task info of the deleted task or <code>null</code> if no tasks have
    * been deleted
    */
+   @Operation(description = "Update task with task id")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = TaskResponse.class))),      
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })          
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<TaskResponse> updateTask(@RequestBody TaskDefinition taskDefinition, @PathVariable UUID taskId) {
+  public ResponseEntity<TaskResponse> updateTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Task definition",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TaskDefinition.class)
+                    )) @RequestBody TaskDefinition taskDefinition, @Parameter(description ="task id") @PathVariable UUID taskId) {
     try {
       LOG.debug(formatForLog("PUT /rest/harvester/tasks/%s <-- %s", taskId, taskDefinition));
       TaskDefinition oldTaskDef = engine.getTasksService().updateTaskDefinition(taskId, taskDefinition);
@@ -359,6 +446,14 @@ public class TaskController {
    * @return task info of the deleted task or <code>null</code> if no tasks have
    * been deleted
    */
+   @Operation(description = "Execute task by task id")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = ProcessResponse.class))), 
+         @ApiResponse(responseCode = "400", description = "Task not found.",
+                content = @Content(schema = @Schema())),
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })   
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/execute", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ProcessResponse> executeTask(@PathVariable UUID taskId, @RequestParam(required = false) Boolean ignoreRobots, @RequestParam(required = false) Boolean incremental) {
     try {
@@ -409,8 +504,22 @@ public class TaskController {
    * @return task info of the deleted task or <code>null</code> if no tasks have
    * been deleted
    */
+  @Operation(description = "Execute task immediately using task definition")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = ProcessResponse.class))), 
+         @ApiResponse(responseCode = "400", description = "Invalid task definition",
+                content = @Content(schema = @Schema())),
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })   
   @RequestMapping(value = "/rest/harvester/tasks/execute", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ProcessResponse> executeTask(@RequestBody TaskDefinition taskDefinition) {
+  public ResponseEntity<ProcessResponse> executeTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Task definition",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TaskDefinition.class)
+                    )) @RequestBody TaskDefinition taskDefinition) {
     try {
       LOG.debug(formatForLog("POST /rest/harvester/tasks/execute <-- %s", taskDefinition));
       ProcessReference ref = engine.getExecutionService().execute(taskDefinition, new SimpleIteratorContext());
@@ -439,8 +548,21 @@ public class TaskController {
    * @return task info of the deleted task or <code>null</code> if no tasks have
    * been deleted
    */
+  @Operation(description = "Schedules task by id")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = TriggerResponse.class))), 
+         @ApiResponse(responseCode = "400", description = "Invalid trigger definition.", content = @Content(schema = @Schema())),
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/schedule", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId, @RequestParam(required = false) Boolean ignoreRobots, @RequestParam(required = false) Boolean incremental) {
+  public ResponseEntity<TriggerResponse> scheduleTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Trigger definition",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TriggerDefinition.class)
+                    )) @RequestBody EntityDefinition triggerDefinition, @PathVariable UUID taskId, @RequestParam(required = false) Boolean ignoreRobots, @RequestParam(required = false) Boolean incremental) {
     try {
       LOG.debug(formatForLog("POST /rest/harvester/tasks/%s/schedule <-- %s", taskId, triggerDefinition));
       TaskDefinition taskDefinition = engine.getTasksService().readTaskDefinition(taskId);
@@ -477,7 +599,14 @@ public class TaskController {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
+  
+    @Operation(description = "List triggers")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(
+                             array = @ArraySchema(    
+                             schema = @Schema(implementation = TriggerResponse.class))))  
+    })
   @RequestMapping(value = "/rest/harvester/tasks/{taskId}/triggers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<List<TriggerResponse>> listTriggers(@PathVariable UUID taskId) {
     LOG.debug(formatForLog("GET /rest/harvester/tasks/%s/triggers", taskId));
@@ -494,8 +623,21 @@ public class TaskController {
    * @return task info of the deleted task or <code>null</code> if no tasks have
    * been deleted
    */
+  @Operation(description = "Schedules task using trigger definition")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = TriggerResponse.class))), 
+         @ApiResponse(responseCode = "400", description = "Invalid trigger definition.", content = @Content(schema = @Schema())),
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/tasks/schedule", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<TriggerResponse> scheduleTask(@RequestBody TriggerDefinition trigDef) {
+  public ResponseEntity<TriggerResponse> scheduleTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Task definition",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TriggerDefinition.class)
+                    )) @RequestBody TriggerDefinition trigDef) {
     try {
       LOG.debug(formatForLog("POST /rest/harvester/tasks/schedule <-- %s", trigDef));
       TriggerReference trigRef = engine.getTriggersService().schedule(null, trigDef, new SimpleIteratorContext());
@@ -506,9 +648,18 @@ public class TaskController {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+  
+    @Operation(description = "Import Task")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful.",
+                     content = @Content(schema = @Schema(implementation = TaskResponse.class))), 
+         @ApiResponse(responseCode = "400", description = "Error uoloading task.", content = @Content(schema = @Schema())),
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
 
   @RequestMapping(value = "/rest/harvester/tasks/upload", method = RequestMethod.POST)
-  public ResponseEntity<TaskResponse> handleImport(@RequestParam("file") MultipartFile file) {
+  public ResponseEntity<TaskResponse> handleImport( @Parameter(description = "Task file", required = true,
+                       schema = @Schema(type = "string", format = "binary")) @RequestParam("file") MultipartFile file) {
     try (InputStream inputStream = file.getInputStream()) {
       try {
         TaskDefinition taskDefinition = deserialize(inputStream,TaskDefinition.class);

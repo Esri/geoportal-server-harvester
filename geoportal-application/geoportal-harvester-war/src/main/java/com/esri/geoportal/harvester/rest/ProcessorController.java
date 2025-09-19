@@ -17,6 +17,14 @@ package com.esri.geoportal.harvester.rest;
 
 import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.engine.services.Engine;
+import com.esri.geoportal.harvester.support.ProcessStatisticsResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
  * </code></pre>
  */
 @RestController
+@Tag(name = "Processor Controller", description = "Provides access to processor's information.")
 public class ProcessorController {
   private static final Logger LOG = LoggerFactory.getLogger(ProcessorController.class);
   
@@ -44,6 +53,15 @@ public class ProcessorController {
    * Lists all processors.
    * @return array of processors templates
    */
+   @Operation(description = "Lists all processeors (array of processors templates).")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operation is successful",
+                     content = @Content( mediaType = "application/json", 
+                     array = @ArraySchema(    
+                             schema = @Schema(implementation = UITemplate.class)))
+                    ),        
+        @ApiResponse(responseCode = "500", description = "Inetrnal Server Error.",content = @Content(schema = @Schema()))
+    })
   @RequestMapping(value = "/rest/harvester/processors/types", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public UITemplate[] listProcessorTypes() {
     LOG.debug(String.format("GET /rest/harvester/processors/types"));

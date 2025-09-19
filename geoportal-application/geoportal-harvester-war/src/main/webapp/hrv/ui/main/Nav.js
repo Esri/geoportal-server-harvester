@@ -48,18 +48,27 @@ define([
             domClass.add(this.homeNode, "active-tab");
             domClass.remove(this.tasksNode, "active-tab");
             domClass.remove(this.brokersNode, "active-tab");
+            domClass.remove(this.apiNode, "active-tab");
             break;
             
           case "brokers":
             domClass.add(this.brokersNode, "active-tab");
             domClass.remove(this.homeNode, "active-tab");
             domClass.remove(this.tasksNode, "active-tab");
+            domClass.remove(this.apiNode, "active-tab");
+            break;
+          case "api":
+            domClass.add(this.apiNode, "active-tab");
+            domClass.remove(this.homeNode, "active-tab");
+            domClass.remove(this.tasksNode, "active-tab");
+            domClass.remove(this.brokersNode, "active-tab");
             break;
             
           default:
             domClass.add(this.tasksNode, "active-tab");
             domClass.remove(this.brokersNode, "active-tab");
             domClass.remove(this.homeNode, "active-tab");
+            domClass.remove(this.apiNode, "active-tab");
             break;
         }
       })));
@@ -75,6 +84,11 @@ define([
 
     _ontasks: function () {
       router.go("/tasks");
+    },
+    _onapi: function () {
+       // window.open("swagger-ui/index.html", '_blank');
+      router.go("/api");
     }
+    
   });
 });
