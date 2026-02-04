@@ -4,7 +4,7 @@
     <parent>
         <artifactId>geoportal-application</artifactId>
         <groupId>com.esri.geoportal</groupId>
-        <version>3.0.0</version>
+        <version>4.0.0</version>
     </parent>
     <artifactId>geoportal-harvester-engine</artifactId>
     <name>Esri :: Geoportal Server :: Harvester :: Application :: Engine</name>
@@ -132,9 +132,13 @@
                     <groupId>xml-apis</groupId>
                     <artifactId>xml-apis</artifactId>
                 </exclusion>    
+                <exclusion> 
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis-ext</artifactId>
+                </exclusion>
             </exclusions>
             <optional>false</optional>
         </dependency>
     </dependencies>
-    <version>3.0.0</version>
+    <version>4.0.0</version>
 </project>

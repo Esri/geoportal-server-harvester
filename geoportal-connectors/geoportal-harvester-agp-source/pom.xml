@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.esri.geoportal</groupId>
         <artifactId>geoportal-connectors</artifactId>
-        <version>3.0.0</version>
+        <version>4.0.0</version>
     </parent>
     <artifactId>geoportal-harvester-agp-source</artifactId>
     <name>Esri :: Geoportal Server :: Harvester :: Data Source :: ArcGIS Portal</name>

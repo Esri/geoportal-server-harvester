@@ -1,6 +1,6 @@
 package com.esri.geoportal.harvester.config;
 
-import org.springdoc.core.GroupedOpenApi;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,7 +20,7 @@ import io.swagger.v3.oas.models.info.Info;
 	    public OpenAPI customOpenAPI() {
 	        return new OpenAPI()
 	                .info(new Info().title("Harvester API")
-	                                .version("3.0.0")
+	                                .version("4.0.0")
 	                                .description("API Documentation for Harvester"));
 	    }
 	    

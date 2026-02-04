@@ -40,7 +40,9 @@ public class ArcGISOAuth2LoginConfig {
      public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> arcgisTokenResponseClient() {
 		OAuth2AccessTokenResponseHttpMessageConverter tokenResponseHttpMessageConverter =
 				new OAuth2AccessTokenResponseHttpMessageConverter();
-		tokenResponseHttpMessageConverter.setTokenResponseConverter(new CustomAccessTokenResponseConverter());
+		tokenResponseHttpMessageConverter.setAccessTokenResponseConverter(null);
+		//TODO custom converter
+	//.setAccessTokenResponseConverter(new CustomAccessTokenResponseConverter());
 
 		RestTemplate restTemplate = new RestTemplate(Arrays.asList(
 				new FormHttpMessageConverter(), tokenResponseHttpMessageConverter));
@@ -56,8 +58,8 @@ public class ArcGISOAuth2LoginConfig {
      public DefaultOAuth2UserService customUserService()
      {
          DefaultOAuth2UserService userService = new DefaultOAuth2UserService();
-         
-         userService.setRequestEntityConverter(new CustomRequestEntityConverter());
+         //TODO fix this
+    //     userService.setRequestEntityConverter(new CustomRequestEntityConverter());
          
          return userService;
          

@@ -70,7 +70,7 @@ import org.slf4j.LoggerFactory;
     definition.override(context.getParams());
     try {
       URI ssp = URI.create(context.getTask().getDataSource().getBrokerUri().getSchemeSpecificPart());
-      // special case for "jdbc" type schema; strip off everything to rreveal host name
+      // special case for "jdbc" type schema; strip off everything to reveal host name
       if ("jdbc".equals(ssp.getScheme())) {
         ssp = URI.create(ssp.getSchemeSpecificPart().replaceAll(";.*$","").replaceAll("^.*?://", "").replaceAll(":.*$", ""));
       }

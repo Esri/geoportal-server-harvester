@@ -23,7 +23,7 @@
 	<context:component-scan base-package="com.esri.geoportal.harvester.rest, com.esri.geoportal.harvester.config,com.esri.geoportal.harvester.beans" />
 	<mvc:annotation-driven />
     <mvc:default-servlet-handler />
-    
+    <bean class="org.springframework.boot.autoconfigure.web.WebProperties"/>
     <bean id="config"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
           p:location="classpath:config/hrv.properties"/>
@@ -35,8 +35,7 @@
       p:username="${jdbc.username}"
       p:password="${jdbc.password}" />
 
-    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-        <property name="maxUploadSize" value="268435456"/> <!-- 256 megs -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver">        
     </bean>    
 
     <!-- Definitions of un-annotated managed beans -->

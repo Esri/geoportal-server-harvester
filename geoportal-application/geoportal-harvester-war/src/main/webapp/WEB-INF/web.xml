@@ -10,6 +10,15 @@
       <param-value>classpath:config/hrv-context.xml</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
+    
+	<!-- This is where size limits belong when using StandardServletMultipartResolver -->
+    <multipart-config>
+        <!-- 256 MB -->
+        <max-file-size>268435456</max-file-size>
+        <max-request-size>268435456</max-request-size>
+        <!-- Optional: memory threshold before files are written to disk -->
+        <file-size-threshold>0</file-size-threshold>
+    </multipart-config>    
   </servlet>
   <servlet-mapping>
     <servlet-name>spring</servlet-name>

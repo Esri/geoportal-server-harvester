@@ -45,3 +45,4 @@ nb-configuration.xml
 /geoportal-connectors/geoportal-harvester-jdbc/target/
 .idea_modules/
 /geoportal-commons/geoportal-commons-dcat-client/nbproject/
+/bin/

@@ -5,28 +5,33 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Import({ org.springdoc.core.SpringDocConfiguration.class, 
-    org.springdoc.webmvc.core.SpringDocWebMvcConfiguration.class,
-    org.springdoc.webmvc.ui.SwaggerConfig.class, 
-    org.springdoc.core.SwaggerUiConfigProperties.class,
-    org.springdoc.core.SwaggerUiOAuthProperties.class,
-    org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration.class,
-    OpenAPIConfig.class
+@Import({
+    org.springdoc.core.configuration.SpringDocConfiguration.class,
+    org.springdoc.webmvc.core.configuration.SpringDocWebMvcConfiguration.class,
+    OpenAPIConfig.class,
+    SpringdocBootBridgingConfig.class
 })
-
-
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = {"com.esri.geoportal.harvester.rest", "org.springdoc"}) // Add org.springdoc
+@ComponentScan(basePackages = {"com.esri.geoportal.harvester.rest"})
 public class WebConfig implements WebMvcConfigurer {
 
     @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        // Forward "/" to the SPA index.html (hash router handles /#/home)
+        registry.addViewController("/").setViewName("forward:/index.html");
+    }
+
+    @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // Swagger UI static resources (webjars)
         registry.addResourceHandler("/swagger-ui/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/swagger-ui/5.x.x/"); // Adjust version
+                .addResourceLocations("classpath:/META-INF/resources/webjars/swagger-ui/");
         registry.addResourceHandler("/webjars/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
+        // If your SPA assets are classpath-based (e.g., /static/**), add handlers here accordingly.
     }
 }
