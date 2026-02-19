@@ -15,8 +15,6 @@ import org.springframework.web.servlet.config.annotation.DefaultServletHandlerCo
     org.springdoc.webmvc.core.configuration.SpringDocWebMvcConfiguration.class,
 
  // Springdoc-managed Swagger UI controller  
-     org.springdoc.webmvc.ui.SwaggerConfig.class,
-
     org.springdoc.webmvc.ui.SwaggerConfig.class,
     OpenAPIConfig.class,
     SpringdocConfig.class
