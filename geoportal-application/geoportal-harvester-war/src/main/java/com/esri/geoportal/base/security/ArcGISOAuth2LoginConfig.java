@@ -33,10 +33,8 @@ import org.springframework.web.client.RestTemplate;
  * @author cont_anki
  */
 @Configuration
-public class ArcGISOAuth2LoginConfig {
-    
-  
-     @Bean
+public class ArcGISOAuth2LoginConfig {  
+     //TODO check after simple authentication is working, then add this to the config
      public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> arcgisTokenResponseClient() {
 		OAuth2AccessTokenResponseHttpMessageConverter tokenResponseHttpMessageConverter =
 				new OAuth2AccessTokenResponseHttpMessageConverter();
@@ -54,7 +52,7 @@ public class ArcGISOAuth2LoginConfig {
 		return tokenResponseClient;
 	}
      
-     @Bean
+     
      public DefaultOAuth2UserService customUserService()
      {
          DefaultOAuth2UserService userService = new DefaultOAuth2UserService();

@@ -20,7 +20,7 @@
 >
   
     <!-- Bootstrap -->
-	<context:component-scan base-package="com.esri.geoportal.harvester.rest, com.esri.geoportal.harvester.config,com.esri.geoportal.harvester.beans" />
+	<context:component-scan base-package="com.esri.geoportal.harvester.rest, com.esri.geoportal.harvester.config,com.esri.geoportal.harvester.beans,com.esri.geoportal.base.security" />
 	<mvc:annotation-driven />
     <mvc:default-servlet-handler />
     <bean class="org.springframework.boot.autoconfigure.web.WebProperties"/>
@@ -45,6 +45,7 @@
    <!-- <import resource="app-security-basic-auth.xml" /> -->
   <!-- <import resource="app-security.xml" /> -->
   <!--<import resource="app-security-arcgis.xml" />-->
+ 
     
     <!-- ADD PERSISTENCE SUPPORT HERE (jpa, hibernate, etc) -->
 
