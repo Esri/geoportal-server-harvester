@@ -118,13 +118,13 @@ public class SecurityConfig {
       .headers(h -> h.frameOptions(f -> f.sameOrigin())) 
       .authorizeHttpRequests(authorize -> {
           // Make sure the login & OAuth entry points are open:
-          authorize
-              .requestMatchers("/login.html",
-                      "/custom-login.html",
-                      "/callback-popup.html",
-                      "/login",          // processing URL for form POST
-                      "/oauth2/authorization/**", "/login/oauth2/**",
-                      "/error", "/css/**", "/js/**").permitAll();
+//          authorize
+//              .requestMatchers("/login.html",
+//                      "/custom-login.html",
+//                      "/callback-popup.html",
+//                      "/login",          // processing URL for form POST
+//                      "/oauth2/authorization/**", "/login/oauth2/**",
+//                      "/error", "/css/**", "/hrv/**").permitAll();
 
           // Apply configured public endpoints (permitAll)
           for (String pattern : configProperties.getPublicEndpointsList()) {

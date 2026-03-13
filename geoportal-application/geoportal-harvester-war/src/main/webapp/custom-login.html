@@ -21,9 +21,9 @@
   <div class="wrap">
     <h1>Local Account</h1>
 
-    <!-- IMPORTANT: context-aware action; resolves to /geoportal-harvester-war/login -->
+    <!-- IMPORTANT: relative action -> /<context>/login -->
     <form method="post" action="login">
-      <!-- If CSRF is enabled later, inject CSRF hidden inputs here -->
+      <!-- If CSRF is enabled later, include hidden CSRF inputs here -->
       <label for="username">Username</label>
       <input id="username" name="username" autocomplete="username" required />
 
@@ -31,76 +31,13 @@
       <input id="password" name="password" type="password" autocomplete="current-password" required />
 
       <button class="btn" type="submit">Sign in</button>
+
       <div id="err" class="error" role="alert"></div>
-      
+      <p class="muted">After authentication, this window completes OAuth 2.0 and closes.</p>
     </form>
   </div>
 
-  <script>
-    // ===== CONFIG =====
-    function getContextPath() {
-      const parts = window.location.pathname.split('/').filter(Boolean);
-      return parts.length > 0 ? '/' + parts[0] : ''; // '' when deployed at ROOT
-    }		
-    const HOME_URL = getContextPath();//'/geoportal-harvester-war';
-    const ORIGIN = window.location.origin
-    			|| (window.location.protocol + '//' + window.location.host);    
-	
-    const CLIENT_ID      = 'harvester-ui-client';
-    const REDIRECT_URI   = ORIGIN + HOME_URL + '/callback-popup.html';   
-    const AUTHZ_ENDPOINT = HOME_URL+'/oauth2/authorize';
-    const SCOPES         = ['openid','profile','api.read'];
-    
-
-    // PKCE helpers
-    async function sha256(input) {
-      const data = new TextEncoder().encode(input);
-      const hash = await crypto.subtle.digest('SHA-256', data);
-      return new Uint8Array(hash);
-    }
-    function b64url(bytes) {
-      return btoa(String.fromCharCode(...bytes)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-    }
-    function rnd(len=64) { const a = new Uint8Array(len); crypto.getRandomValues(a); return b64url(a).substring(0,len); }
-    async function createPkce() {
-      const code_verifier  = b64url(crypto.getRandomValues(new Uint8Array(64)));
-      const challengeBytes = await sha256(code_verifier);
-      const code_challenge = b64url(challengeBytes);
-      return { code_verifier, code_challenge };
-    }
-
-    // On Spring login success (server redirects back here with ?loggedin),
-    // automatically start /oauth2/authorize
-    (async function maybeStartAuthorize() {
-      const p = new URLSearchParams(window.location.search);
-      if (p.has('loggedin')) {
-        const { code_verifier, code_challenge } = await createPkce();
-        const state = rnd(24);
-        sessionStorage.setItem('pkce_code_verifier', code_verifier);
-        sessionStorage.setItem('pkce_state', state);
-
-        const qs = new URLSearchParams({
-          client_id: CLIENT_ID,
-          response_type: 'code',
-          redirect_uri: REDIRECT_URI,
-          scope: SCOPES.join(' '),
-          code_challenge: code_challenge,
-          code_challenge_method: 'S256',
-          state: state
-        });
-        window.location.assign(`${AUTHZ_ENDPOINT}?${qs.toString()}`);
-      }
-    })();
-
-    // Show Spring error messages (?error)
-    (function () {
-      const params = new URLSearchParams(window.location.search);
-      if (params.has('error')) {
-        const err = document.getElementById('err');
-        err.textContent = 'Authentication failed. Please check your username and password.';
-        err.style.display = 'block';
-      }
-    })();
-  </script>
+  <!-- ES modules -->
+  <script type="module" src="hrv/security/custom-login.js"></script>
 </body>
 </html>

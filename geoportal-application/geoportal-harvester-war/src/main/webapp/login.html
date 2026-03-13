@@ -20,55 +20,13 @@
 <body>
   <div class="wrap">
     <h1>Sign in to Harvester</h1>
-
-    <button id="btnLocal" class="btn primary">Sign in with Local Account</button>
-    <button id="btnArcgis" class="btn outline">Sign in with ArcGIS</button>
+    <button id="btnLocal"  class="btn primary">Sign in with Local Account (Popup)</button>
+    <button id="btnArcgis" class="btn outline">Sign in with ArcGIS (Popup)</button>
+    <p class="muted">Both options complete OAuth 2.0 Authorization Code + PKCE. After success, this page loads <code>#/home</code>.</p>
     <pre id="err" class="error"></pre>
   </div>
 
-  <script>
-
-  	function getContextPath() {
-      const parts = window.location.pathname.split('/').filter(Boolean);
-      return parts.length > 0 ? '/' + parts[0] : ''; // '' when deployed at ROOT
-    }	
-    const HOME_URL = getContextPath();//'/geoportal-harvester-war';   
-    // popup opener
-    function openPopup(url, name = 'oauth_popup') {
-      const w = 520, h = 720;
-      const y = window.top.outerHeight / 2 + window.top.screenY - (h / 2);
-      const x = window.top.outerWidth  / 2 + window.top.screenX - (w / 2);
-      return window.open(url, name, `width=${w},height=${h},left=${x},top=${y},resizable,scrollbars`);
-    }
-
-    // Receive tokens from popup
-    window.addEventListener('message', (ev) => {
-      if (ev.origin !== window.location.origin) return;
-      const data = ev.data || {};
-      if (data.type === 'oauth_result') {
-        if (data.error) {
-          const err = document.getElementById('err');
-          err.textContent = data.error;
-          err.style.display = 'block';
-          return;
-        }
-        sessionStorage.setItem('access_token',  data.access_token || '');
-        if (data.refresh_token) sessionStorage.setItem('refresh_token', data.refresh_token);
-        if (data.id_token)      sessionStorage.setItem('id_token',      data.id_token);
-        sessionStorage.setItem('token_type',    data.token_type || 'Bearer');
-        sessionStorage.setItem('expires_in',    String(data.expires_in || ''));
-        window.location.replace(HOME_URL);
-      }
-    });
-
-    // open popup to our custom local login page (no context path here; container adds it)
-    document.getElementById('btnLocal')
-            .addEventListener('click', () => openPopup('custom-login.html', 'local_login'));
-
-    // open popup directly to authorize with ArcGIS hint
-    // (custom-login.html can also start /oauth2/authorize after local login)
-    document.getElementById('btnArcgis')
-            .addEventListener('click', () => openPopup('oauth2/authorization/arcgis', 'arcgis_login'));
-  </script>
+  <!-- ES modules -->
+  <script type="module" src="hrv/security/login.js"></script>
 </body>
 </html>

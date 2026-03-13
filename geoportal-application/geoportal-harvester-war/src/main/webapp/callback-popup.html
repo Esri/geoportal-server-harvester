@@ -6,53 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
 </head>
 <body>
-<script>
-  (async () => {
-    function send(payload) {
-      try { window.opener && window.opener.postMessage({type:'oauth_result', ...payload}, window.location.origin); }
-      finally { window.close(); }
-    }
-    try {
-      const p = new URLSearchParams(window.location.search);
-      const code  = p.get('code');
-      const state = p.get('state');
-      if (!code) throw new Error('Missing authorization code');
+  <!-- Optional minimal message for users with very old browsers -->
+  <noscript>This page requires JavaScript to complete sign‑in.</noscript>
 
-      const expect = sessionStorage.getItem('pkce_state');
-      if (expect && state && expect !== state) throw new Error('State mismatch');
-
-      const verifier = sessionStorage.getItem('pkce_code_verifier');
-      if (!verifier) throw new Error('Missing PKCE code_verifier');
-
-      const tokenEndpoint = '/geoportal-harvester-war/oauth2/token';
-      const clientId      = 'harvester-ui-client';
-      const redirectUri   = 'http://localhost:8080/geoportal-harvester-war/callback-popup.html';
-
-      const body = new URLSearchParams({
-        grant_type: 'authorization_code',
-        client_id: clientId,
-        redirect_uri: redirectUri,
-        code: code,
-        code_verifier: verifier
-      });
-
-      const res = await fetch(tokenEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: body.toString(),
-        credentials: 'include'
-      });
-      if (!res.ok) throw new Error(`Token error ${res.status}: ${await res.text()}`);
-      const tokens = await res.json();
-
-      sessionStorage.removeItem('pkce_code_verifier');
-      sessionStorage.removeItem('pkce_state');
-
-      send(tokens);
-    } catch (e) {
-      send({ error: e.message || String(e) });
-    }
-  })();
-</script>
+  <!-- ES modules -->
+  <script type="module" src="hrv/security/callback-popup.js"></script>
 </body>
 </html>
