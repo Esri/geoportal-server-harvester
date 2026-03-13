@@ -2,83 +2,73 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <title>Sign in</title>
+  <title>Sign in – Geoportal Harvester</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <style>
     body { font-family: system-ui, sans-serif; background:#f7f7f9; margin:0; }
-    .wrap { max-width:520px; margin:8vh auto; background:#fff; border-radius:12px;
+    .wrap { max-width:560px; margin:8vh auto; background:#fff; border-radius:12px;
             box-shadow:0 8px 24px rgba(0,0,0,.08); padding:2rem; }
-    h1 { margin-top:0; font-size:1.25rem; }
-    .btn { display:block; width:100%; padding:.75rem 1rem; border:1px solid #ccc; border-radius:8px;
-           background:#fff; cursor:pointer; text-align:center; margin:.5rem 0; font-weight:600; }
-    .btn.primary { background:#0854c7; color:#fff; border-color:#0854c7; }
-    .or { text-align:center; color:#666; margin:1rem 0; }
+    h1 { margin:0 0 1rem; font-size:1.25rem; }
+    .btn { display:block; width:100%; padding:.75rem 1rem; border-radius:8px;
+           font-weight:600; cursor:pointer; margin:.75rem 0; border:1px solid #0854c7; }
+    .btn.primary { background:#0854c7; color:#fff; }
+    .btn.outline { background:#fff; color:#0854c7; }
     .muted { color:#666; font-size:.9rem; }
+    .error { color:#b00020; white-space:pre-wrap; display:none; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>Sign in to Harvester</h1>
 
-    <button class="btn primary" id="btnArcgis">Sign in with ArcGIS</button>
-    <div class="or">— or —</div>
-    <button class="btn" id="btnLocal">Sign in with Local Account</button>
-    
+    <button id="btnLocal" class="btn primary">Sign in with Local Account</button>
+    <button id="btnArcgis" class="btn outline">Sign in with ArcGIS</button>
+    <pre id="err" class="error"></pre>
   </div>
 
   <script>
-    // ======== CONFIGURE THESE ========
-    const CLIENT_ID      = 'harvester-ui-client';  // configProperties.getUiClientId()
-    const AUTHZ_ENDPOINT = '/geoportal-harvester-war/oauth2/authorize';    // Your SAS authorize endpoint (same origin)
-    const REDIRECT_URI   = 'http://localhost:8080/geoportal-harvester-war/callback.html'; // must match RegisteredClient
-    const SCOPES         = ['openid','profile','api.read'];                  // adjust as needed
 
-    // ======== PKCE helpers ========
-    async function sha256(input) {
-      const data = new TextEncoder().encode(input);
-      const hash = await crypto.subtle.digest('SHA-256', data);
-      return new Uint8Array(hash);
-    }
-    function b64url(bytes) {
-      return btoa(String.fromCharCode(...bytes)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-    }
-    function randomStr(len=64) {
-      const a = new Uint8Array(len);
-      crypto.getRandomValues(a);
-      return b64url(a).substring(0, len);
-    }
-    async function createPkce() {
-      const code_verifier  = b64url(crypto.getRandomValues(new Uint8Array(64)));
-      const challengeBytes = await sha256(code_verifier);
-      const code_challenge = b64url(challengeBytes);
-      return { code_verifier, code_challenge };
+  	function getContextPath() {
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      return parts.length > 0 ? '/' + parts[0] : ''; // '' when deployed at ROOT
+    }	
+    const HOME_URL = getContextPath();//'/geoportal-harvester-war';   
+    // popup opener
+    function openPopup(url, name = 'oauth_popup') {
+      const w = 520, h = 720;
+      const y = window.top.outerHeight / 2 + window.top.screenY - (h / 2);
+      const x = window.top.outerWidth  / 2 + window.top.screenX - (w / 2);
+      return window.open(url, name, `width=${w},height=${h},left=${x},top=${y},resizable,scrollbars`);
     }
 
-    async function startAuth({ idpHint } = {}) {
-      // 1) Build PKCE + state; persist for callback
-      const { code_verifier, code_challenge } = await createPkce();
-      const state = randomStr(24);
-      sessionStorage.setItem('pkce_code_verifier', code_verifier);
-      sessionStorage.setItem('pkce_state', state);
+    // Receive tokens from popup
+    window.addEventListener('message', (ev) => {
+      if (ev.origin !== window.location.origin) return;
+      const data = ev.data || {};
+      if (data.type === 'oauth_result') {
+        if (data.error) {
+          const err = document.getElementById('err');
+          err.textContent = data.error;
+          err.style.display = 'block';
+          return;
+        }
+        sessionStorage.setItem('access_token',  data.access_token || '');
+        if (data.refresh_token) sessionStorage.setItem('refresh_token', data.refresh_token);
+        if (data.id_token)      sessionStorage.setItem('id_token',      data.id_token);
+        sessionStorage.setItem('token_type',    data.token_type || 'Bearer');
+        sessionStorage.setItem('expires_in',    String(data.expires_in || ''));
+        window.location.replace(HOME_URL);
+      }
+    });
 
-      // 2) Build the authorization request
-      const params = new URLSearchParams({
-        client_id: CLIENT_ID,
-        response_type: 'code',
-        redirect_uri: REDIRECT_URI,
-        scope: SCOPES.join(' '),
-        code_challenge: code_challenge,
-        code_challenge_method: 'S256',
-        state: state
-      });
-      if (idpHint) params.set('idp', idpHint); // tell SAS to federate to ArcGIS
+    // open popup to our custom local login page (no context path here; container adds it)
+    document.getElementById('btnLocal')
+            .addEventListener('click', () => openPopup('custom-login.html', 'local_login'));
 
-      // 3) Top-level redirect (no popup)
-      window.location.assign(`${AUTHZ_ENDPOINT}?${params.toString()}`);
-    }
-
-    document.getElementById('btnArcgis').addEventListener('click', () => startAuth({ idpHint: 'arcgis' }));
-    document.getElementById('btnLocal') .addEventListener('click', () => startAuth({ /* no hint */ }));
+    // open popup directly to authorize with ArcGIS hint
+    // (custom-login.html can also start /oauth2/authorize after local login)
+    document.getElementById('btnArcgis')
+            .addEventListener('click', () => openPopup('oauth2/authorization/arcgis', 'arcgis_login'));
   </script>
 </body>
 </html>

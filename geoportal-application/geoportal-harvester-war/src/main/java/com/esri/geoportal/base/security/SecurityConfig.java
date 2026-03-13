@@ -96,7 +96,7 @@ public class SecurityConfig {
       )
       .authorizeHttpRequests((authorize) -> authorize.anyRequest().authenticated())
       .exceptionHandling((exceptions) -> exceptions.defaultAuthenticationEntryPointFor(
-          new LoginUrlAuthenticationEntryPoint("/login"),
+          new LoginUrlAuthenticationEntryPoint("/login.html"),
           new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
 
     return http.build();
@@ -115,85 +115,83 @@ public class SecurityConfig {
 
     http
       .csrf(csrf -> csrf.disable())
-      .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
+      .headers(h -> h.frameOptions(f -> f.sameOrigin())) 
       .authorizeHttpRequests(authorize -> {
-        // Make sure the login & OAuth entry points are open:
-        authorize
-            .requestMatchers("/login", "/login.html",
-                             "/oauth2/authorization/**", "/login/oauth2/**",
-                             "/error", "/css/**", "/js/**").permitAll();
+          // Make sure the login & OAuth entry points are open:
+          authorize
+              .requestMatchers("/login.html",
+                      "/custom-login.html",
+                      "/callback-popup.html",
+                      "/login",          // processing URL for form POST
+                      "/oauth2/authorization/**", "/login/oauth2/**",
+                      "/error", "/css/**", "/js/**").permitAll();
 
-        // Apply configured public endpoints (permitAll)
-        for (String pattern : configProperties.getPublicEndpointsList()) {
-          authorize.requestMatchers(pattern).permitAll();
-        }
-        // Apply secured endpoint rules (from your properties)
-        for (EndpointSecurityConfig rule : securityEndPointProp.getSecuredEndpoints()) {
-          String pattern = rule.getPattern();
-          String method  = rule.getMethod();
-          String roles   = (rule.getRoles() == null) ? "" : rule.getRoles().trim();
+          // Apply configured public endpoints (permitAll)
+          for (String pattern : configProperties.getPublicEndpointsList()) {
+            authorize.requestMatchers(pattern).permitAll();
+          }
+          // Apply secured endpoint rules (from your properties)
+          for (EndpointSecurityConfig rule : securityEndPointProp.getSecuredEndpoints()) {
+            String pattern = rule.getPattern();
+            String method  = rule.getMethod();
+            String roles   = (rule.getRoles() == null) ? "" : rule.getRoles().trim();
 
-          boolean isPermitAll    = "permitAll".equalsIgnoreCase(roles);
-          boolean isAuthenticated= "authenticated".equalsIgnoreCase(roles);
+            boolean isPermitAll    = "permitAll".equalsIgnoreCase(roles);
+            boolean isAuthenticated= "authenticated".equalsIgnoreCase(roles);
 
-          if (method == null || method.trim().isEmpty()) {
-            if (isPermitAll) {
-              authorize.requestMatchers(pattern).permitAll();
-            } else if (isAuthenticated) {
-              authorize.requestMatchers(pattern).authenticated();
-            } else if (!roles.isEmpty()) {
-              authorize.requestMatchers(pattern).hasAnyAuthority(splitCsv(roles));
-            }
-          } else {
-            for (String m : splitCsv(method)) {
-              HttpMethod httpMethod;
-              try { httpMethod = HttpMethod.valueOf(m.trim().toUpperCase()); }
-              catch (IllegalArgumentException ex) { continue; }
+            if (method == null || method.trim().isEmpty()) {
               if (isPermitAll) {
-                authorize.requestMatchers(httpMethod, pattern).permitAll();
+                authorize.requestMatchers(pattern).permitAll();
               } else if (isAuthenticated) {
-                authorize.requestMatchers(httpMethod, pattern).authenticated();
+                authorize.requestMatchers(pattern).authenticated();
               } else if (!roles.isEmpty()) {
-                authorize.requestMatchers(httpMethod, pattern).hasAnyAuthority(splitCsv(roles));
+                authorize.requestMatchers(pattern).hasAnyAuthority(splitCsv(roles));
+              }
+            } else {
+              for (String m : splitCsv(method)) {
+                HttpMethod httpMethod;
+                try { httpMethod = HttpMethod.valueOf(m.trim().toUpperCase()); }
+                catch (IllegalArgumentException ex) { continue; }
+                if (isPermitAll) {
+                  authorize.requestMatchers(httpMethod, pattern).permitAll();
+                } else if (isAuthenticated) {
+                  authorize.requestMatchers(httpMethod, pattern).authenticated();
+                } else if (!roles.isEmpty()) {
+                  authorize.requestMatchers(httpMethod, pattern).hasAnyAuthority(splitCsv(roles));
+                }
               }
             }
           }
-        }
-        // Everything else requires auth (so /harvester triggers login)
-        authorize.anyRequest().authenticated();
-      })
-      .exceptionHandling(ex -> ex.defaultAuthenticationEntryPointFor(
-          new LoginUrlAuthenticationEntryPoint("/login"),
-          new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
+          // Everything else requires auth (so /harvester triggers login)
+          authorize.anyRequest().authenticated();
+        })
+        .exceptionHandling(ex -> ex.defaultAuthenticationEntryPointFor(
+            new LoginUrlAuthenticationEntryPoint("/login.html"),
+            new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
+      // Use your custom login page (popup page)
 
-      // === Form login (backed by authentication-simple.xml) ===
-      .formLogin(form -> form
-         // .loginPage("/login.html")
-          .loginProcessingUrl("/login")
-          .permitAll())
+	.formLogin(form -> form
+	    .loginPage("/custom-login.html")
+	    .loginProcessingUrl("/login")
+	    .defaultSuccessUrl("/custom-login.html?loggedin", true) // <— force=true is critical
+	    .failureUrl("/custom-login.html?error")
+	    .permitAll())
 
-      // === Federated login with ArcGIS ===
+
+      // Keep ArcGIS federation
       .oauth2Login(oauth -> oauth
           .clientRegistrationRepository(clientRegistrationRepository)
           .authorizedClientService(authorizedClientService)
-         // .loginPage("/login.html")
-          .tokenEndpoint(token -> token
-              .accessTokenResponseClient(arcgisTokenClient)
-          )
+          .tokenEndpoint(token -> token.accessTokenResponseClient(arcgisTokenClient))
       )
 
-      // === Resource server validation (unchanged) ===
-      .oauth2ResourceServer(oauth2 ->
-          oauth2.jwt(jwt -> {
-            jwt.decoder(jwtDecoder(jwkSource()));
-            jwt.jwtAuthenticationConverter(jwtAuthenticationConverter());
-          })
-      )
+      .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
+        jwt.decoder(jwtDecoder(jwkSource()));
+        jwt.jwtAuthenticationConverter(jwtAuthenticationConverter());
+      }))
       .httpBasic(Customizer.withDefaults());
 
-    // Add your existing JWT filter
     http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
     return http.build();
   }
 
