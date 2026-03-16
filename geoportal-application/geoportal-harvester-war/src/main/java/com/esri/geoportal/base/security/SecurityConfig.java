@@ -184,12 +184,19 @@ public class SecurityConfig {
           .authorizedClientService(authorizedClientService)
           .tokenEndpoint(token -> token.accessTokenResponseClient(arcgisTokenClient))
       )
-
       .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
         jwt.decoder(jwtDecoder(jwkSource()));
         jwt.jwtAuthenticationConverter(jwtAuthenticationConverter());
       }))
-      .httpBasic(Customizer.withDefaults());
+      .httpBasic(Customizer.withDefaults())
+  
+	   .logout(logout -> logout
+	       .logoutUrl("/logout")                               // default is /logout
+	       .logoutSuccessUrl("/login.html?loggedout")          // after server logout (optional)
+	       .invalidateHttpSession(true)
+	       .deleteCookies("JSESSIONID")
+	       .permitAll()
+	   );
 
     http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();

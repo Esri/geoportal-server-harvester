@@ -93,12 +93,55 @@ define(["dojo/_base/declare",
           topic.publish("nav",{type: "failed", uuid: evt.params.uuid, eventid: evt.params.eventid});
         });
         
-        
         // initialize router
         router.startup();
         if (!location.hash || location.hash.length==0) {
           router.go("/home");
         }
-      }
+      },
+	  _onLogout: function() {
+	  		console.log('Logout initiated');
+	  		const ORIGIN = window.location.origin || (window.location.protocol + '//' + window.location.host);		
+	  		const parts = window.location.pathname.split('/').filter(Boolean);
+	  		  // If this page is at /<context>/file.html, the first segment is the WAR context.
+	  		const CONTEXT = parts.length > 0 ? '/' + parts[0] : ''; 
+	          const BASE = ORIGIN + CONTEXT; 
+	          const redirectTo = BASE+'/login.html'; // Spring Security default logout redirect
+	  		try {
+	  		    // 1) Clear SPA-side tokens/state
+	  		    sessionStorage.removeItem('access_token');
+	  		    sessionStorage.removeItem('refresh_token');
+	  		    sessionStorage.removeItem('id_token');
+	  		    sessionStorage.removeItem('token_type');
+	  		    sessionStorage.removeItem('expires_in');		  
+	  		    sessionStorage.removeItem('pkce_code_verifier');
+	  		    sessionStorage.removeItem('pkce_state');
+
+	  		    // 2) Server-side logout (Spring Security default /logout endpoint)	
+	  			var def = new Deferred();
+	  			def.resolve(fetch(`${BASE}/logout`, {
+	                method: 'POST',
+	                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+	                credentials: 'include'
+	              }));
+	              def.then(() => {
+	                  console.log('Logout successful');
+	              }).catch(e => {
+	                  console.warn('Logout error', e);
+	              });	    
+	  		  fetch(`${BASE}/logout`, {
+	  		      method: 'POST',
+	  		      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+	  		      credentials: 'include'
+	  		    });
+	  		  } catch (e) {
+	  		    // Log-and-continue; redirect anyway
+	  		    console.warn('Logout error', e);
+	  		  } finally {
+	  		    // 3) Navigate user to login page 
+	  		    window.location.replace(redirectTo);
+	  		  }
+	       }
+	  		
     });
 });
