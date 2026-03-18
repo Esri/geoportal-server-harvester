@@ -53,6 +53,7 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
+import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -117,15 +118,6 @@ public class SecurityConfig {
       .csrf(csrf -> csrf.disable())
       .headers(h -> h.frameOptions(f -> f.sameOrigin())) 
       .authorizeHttpRequests(authorize -> {
-          // Make sure the login & OAuth entry points are open:
-//          authorize
-//              .requestMatchers("/login.html",
-//                      "/custom-login.html",
-//                      "/callback-popup.html",
-//                      "/login",          // processing URL for form POST
-//                      "/oauth2/authorization/**", "/login/oauth2/**",
-//                      "/error", "/css/**", "/hrv/**").permitAll();
-
           // Apply configured public endpoints (permitAll)
           for (String pattern : configProperties.getPublicEndpointsList()) {
             authorize.requestMatchers(pattern).permitAll();
@@ -168,8 +160,8 @@ public class SecurityConfig {
         .exceptionHandling(ex -> ex.defaultAuthenticationEntryPointFor(
             new LoginUrlAuthenticationEntryPoint("/login.html"),
             new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
-      // Use your custom login page (popup page)
-
+        
+      // Use custom login page (popup page)
 	.formLogin(form -> form
 	    .loginPage("/custom-login.html")
 	    .loginProcessingUrl("/login")
@@ -177,8 +169,7 @@ public class SecurityConfig {
 	    .failureUrl("/custom-login.html?error")
 	    .permitAll())
 
-
-      // Keep ArcGIS federation
+      // ArcGIS federation
       .oauth2Login(oauth -> oauth
           .clientRegistrationRepository(clientRegistrationRepository)
           .authorizedClientService(authorizedClientService)
@@ -208,10 +199,10 @@ public class SecurityConfig {
         .toArray(String[]::new);
   }
 
-  // === Password encoder utility (optional) =========================================
+  //Password encoder utility 
   public BCryptPasswordEncoder bcryptPassEncoder() { return new BCryptPasswordEncoder(); }
 
-  // === Registered clients for your AS (unchanged) ==================================
+  // Registered clients
   @Bean
   public InMemoryRegisteredClientRepository registeredClientRepository() {
     TokenSettings tokenSettings = TokenSettings.builder()
@@ -227,6 +218,9 @@ public class SecurityConfig {
         .redirectUri(configProperties.getUiRedirectUri())
         .tokenSettings(tokenSettings)
         .scope("openid").scope("profile").scope("api.read")
+		.clientSettings(ClientSettings.builder()
+		          .requireAuthorizationConsent(false)
+		          .build())
         .build();
 
     RegisteredClient apiClientRW = RegisteredClient
@@ -314,7 +308,7 @@ public class SecurityConfig {
     return client;
   }
 
-  // === JWK / JWT for AS & RS (unchanged) ==========================================
+  // JWK / JWT for AS & RS
   @Bean
   public JWKSource<SecurityContext> jwkSource() {
     KeyPair keyPair = generateRsaKey();
