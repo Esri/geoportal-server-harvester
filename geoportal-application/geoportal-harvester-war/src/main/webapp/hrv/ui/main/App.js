@@ -34,14 +34,15 @@ define(["dojo/_base/declare",
         "hrv/ui/brokers/BrokersPane",
         "hrv/ui/tasks/TasksPane",
         "hrv/ui/tasks/HistoryPane",
-        "hrv/ui/processes/ProcessesPane"
+        "hrv/ui/processes/ProcessesPane",
+		"hrv/config"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
            lang,topic,router,
            CheckBox,RadioButton,ContentPane,LayoutContainer,
-           Header,Status,Nav,Stage,BrokersPane,TasksPane,HistoryPane,ProcessesPane
+           Header,Status,Nav,Stage,BrokersPane,TasksPane,HistoryPane,ProcessesPane,config
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
@@ -49,6 +50,13 @@ define(["dojo/_base/declare",
       templateString: template,
     
       postCreate: function(){
+		var btnLogout = document.getElementById("btnLogout");
+		if(config.app.secure) {
+            btnLogout.style.display = "block";
+        } else {
+            btnLogout.style.display = "none";
+        }
+		
         // home
         router.register("/", function() {
           router.go("/home");
