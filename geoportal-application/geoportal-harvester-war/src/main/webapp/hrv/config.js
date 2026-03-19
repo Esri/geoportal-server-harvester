@@ -3,8 +3,8 @@ define([],function(){var obj={
 
   app: {
     secure: true,
-	arcGISAuthEnabled: false,
-	localAccountAuthEnabled: true
+	arcGISAuthEnabled: true,
+	localAccountAuthEnabled: false
     }
   
 

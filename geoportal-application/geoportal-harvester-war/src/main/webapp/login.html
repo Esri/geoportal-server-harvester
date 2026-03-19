@@ -26,7 +26,13 @@
     <pre id="err" class="error"></pre>
   </div>
 
-  <!-- ES modules -->
-  <script type="module" src="hrv/security/login.js"></script>
+  <!-- AMD modules -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+  <script>
+    require.config({
+      baseUrl: window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))
+    });
+    require(['hrv/security/login.js']);
+  </script>
 </body>
 </html>
