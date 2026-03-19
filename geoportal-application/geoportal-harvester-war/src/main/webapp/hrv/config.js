@@ -2,8 +2,11 @@ define([],function(){var obj={
 // .......................................................................................
 
   app: {
-    secure: false
-  }
+    secure: true,
+	arcGISAuthEnabled: false,
+	localAccountAuthEnabled: true
+    }
+  
 
 // .......................................................................................
 };return obj;});
