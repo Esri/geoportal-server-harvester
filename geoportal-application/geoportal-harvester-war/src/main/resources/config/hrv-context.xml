@@ -41,8 +41,14 @@
     <!-- Definitions of un-annotated managed beans -->
     <import resource="hrv-beans.xml" />
 
-    <!-- Security -->
+    <!-- One and only one of the authentication methods must be implemented. -->
+  <!--    <import resource="authentication-simple.xml"/>-->
+   <!--  <import resource="authentication-ldap.xml"/>--> 
+   <import resource="authentication-simple.xml"/>
+     
+       <!--TODO delete below  -->
    <!-- <import resource="app-security-basic-auth.xml" /> -->
+ 
   <!-- <import resource="app-security.xml" /> -->
   <!--<import resource="app-security-arcgis.xml" />-->
  

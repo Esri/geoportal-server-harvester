@@ -15,6 +15,7 @@ define([], function() {
   const HOME_URL       = `${BASE}/#/home`;
   const AUTHZ_ENDPOINT = `${BASE}/oauth2/authorize`; // SAS authorize
   const TOKEN_ENDPOINT = `${BASE}/oauth2/token`;     // SAS token
+  const ARCGIS_ENDPOINT = `${BASE}/login/oauth2/code/arcgis`; // ArcGIS OAuth2 callback
   const REDIRECT_URI   = `${BASE}/callback-popup.html`; // must be registered in RegisteredClient
   const CLIENT_ID      = 'harvester-ui-client';         // keep in sync with server config
   const SCOPES         = ['openid', 'profile', 'api.read'];
@@ -42,7 +43,7 @@ define([], function() {
 
   // ===== Popup helpers =====
   function openPopup(url, name = 'oauth_popup') {
-    const w = 520, h = 720;
+    const w = 520, h = 320;
     const y = window.top.outerHeight / 2 + window.top.screenY - (h / 2);
     const x = window.top.outerWidth  / 2 + window.top.screenX - (w / 2);
     return window.open(url, name, `width=${w},height=${h},left=${x},top=${y},resizable,scrollbars`);
@@ -65,6 +66,7 @@ define([], function() {
     HOME_URL,
     AUTHZ_ENDPOINT,
     TOKEN_ENDPOINT,
+    ARCGIS_ENDPOINT,
     REDIRECT_URI,
     CLIENT_ID,
     SCOPES,

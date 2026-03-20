@@ -15,11 +15,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-// >>> Import your simple in-memory users for form login
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
@@ -28,10 +27,12 @@ import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
@@ -71,7 +72,6 @@ import com.nimbusds.jose.proc.SecurityContext;
 
 @Configuration
 @EnableWebSecurity
-@ImportResource("classpath:config/authentication-simple.xml") // uses the uploaded XML for form login users
 public class SecurityConfig {
 
   // Use SecurityProperties component to hold configuration loaded from config.properties
@@ -82,8 +82,7 @@ public class SecurityConfig {
   public SecurityConfig(SecurityConfigProperties securityProperties) {
     this.configProperties = securityProperties;
   }
-
-  // === AUTHORIZATION SERVER CHAIN (unchanged) ======================================
+  // === AUTHORIZATION SERVER CHAIN 
   @Bean
   @Order(1)
   public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -173,7 +172,34 @@ public class SecurityConfig {
       .oauth2Login(oauth -> oauth
           .clientRegistrationRepository(clientRegistrationRepository)
           .authorizedClientService(authorizedClientService)
+          .userInfoEndpoint(userInfo -> {
+              ArcGISCustomOAuth2UserService customUserService = arcgisOAuth2UserService();
+              userInfo.userService(customUserService);
+          })
           .tokenEndpoint(token -> token.accessTokenResponseClient(arcgisTokenClient))
+          .successHandler((request, response, authentication) -> {
+            logger.info("OAuth2 Login Success Handler - Authentication: {}", authentication.getName());
+            logger.info("Authentication Authorities: {}", authentication.getAuthorities());
+            
+            // Enhance the authentication with proper roles
+            if (authentication instanceof OAuth2AuthenticationToken) {
+                OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
+                Authentication enhancedAuth = ArcGISAuthenticationConverter.enhanceAuthentication(token);
+                logger.info("Enhanced Authentication Authorities: {}", enhancedAuth.getAuthorities());
+                // Set the enhanced authentication in the SecurityContext
+                org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(enhancedAuth);
+            }
+            
+            // After successful OAuth2 login, redirect to home
+            String context = request.getContextPath();
+            response.sendRedirect(context + "/#/home");
+          })
+          .failureHandler((request, response, ex) -> {
+            logger.error("OAuth2 login failed", ex);
+            // Redirect to a friendlier error page
+            response.sendRedirect(request.getContextPath() + "/custom-login.html?oauth2_error=" + ex.getClass().getSimpleName());
+          })
+
       )
       .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
         jwt.decoder(jwtDecoder(jwkSource()));
@@ -217,7 +243,7 @@ public class SecurityConfig {
         .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
         .redirectUri(configProperties.getUiRedirectUri())
         .tokenSettings(tokenSettings)
-        .scope("openid").scope("profile").scope("api.read")
+        .scope("openid").scope("profile").scope("api.read").scope("api.write")
 		.clientSettings(ClientSettings.builder()
 		          .requireAuthorizationConsent(false)
 		          .build())
@@ -251,18 +277,18 @@ public class SecurityConfig {
   //TODO === ArcGIS ClientRegistration & OAuth2 client beans =============================
   @Bean
   public ClientRegistrationRepository clientRegistrationRepository() {
+    // Build the redirect URI dynamically - it will be resolved at runtime by Spring
     ClientRegistration arcgis = ClientRegistration.withRegistrationId("arcgis")
-        .clientId("<ARC_GIS_CLIENT_ID>")
-        .clientSecret("<ARC_GIS_CLIENT_SECRET>") // if created as confidential; omit for public
+    	.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST) // or .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+        .clientId(configProperties.getArcgisClientId())       
+        .clientSecret(configProperties.getArcgisClientSecret())        
         .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-        .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
-        .scope("profile") // add what your tenant requires
-        // ArcGIS endpoints:
-        .authorizationUri("https://www.arcgis.com/sharing/rest/oauth2/authorize")
-        .tokenUri("https://www.arcgis.com/sharing/oauth2/token")
-        // If you use a UserInfo endpoint, configure it here and set userNameAttributeName accordingly.
-        // .userInfoUri("https://www.arcgis.com/sharing/rest/community/self?f=json")
-        // .userNameAttributeName("username")
+        .redirectUri("http://localhost:8080/geoportal-harvester-war/login/oauth2/code/arcgis")  
+        .scope("profile") // adjust scopes as needed
+        .authorizationUri(configProperties.getArcgisAuthorizationURI())
+        .tokenUri(configProperties.getArcgisTokenURI())        
+        .userInfoUri(configProperties.getArcgisUserInfoURI())
+        .userNameAttributeName(configProperties.getArcgisUserNameAttr())
         .clientName("ArcGIS")
         .build();
     return new InMemoryClientRegistrationRepository(arcgis);
@@ -374,5 +400,15 @@ public class SecurityConfig {
   public JwtAuthenticationFilter jwtAuthenticationFilter(JwtDecoder jwtDecoder) {
     return new JwtAuthenticationFilter(jwtDecoder, configProperties);
   }
-}
 
+  /**
+   * Custom OAuth2 user service for ArcGIS Portal authentication.
+   * This service handles user info from ArcGIS and assigns proper Spring Security roles.
+   */
+  @Bean
+  public ArcGISCustomOAuth2UserService arcgisOAuth2UserService() {
+    return new ArcGISCustomOAuth2UserService();
+  }
+
+  private static final org.slf4j.Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+}

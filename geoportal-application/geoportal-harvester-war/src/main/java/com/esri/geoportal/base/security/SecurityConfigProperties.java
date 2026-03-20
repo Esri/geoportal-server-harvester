@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.nimbusds.jose.jwk.JWKSet;
+
 /**
  * Configuration holder for security-config.properties.
  * Values are injected from property keys. The PropertySourcesPlaceholderConfigurer bean
@@ -39,6 +41,25 @@ public class SecurityConfigProperties {
 
     @Value("${security.public-endpoints:}")
     private String publicEndpoints;
+
+	@Value("${security.arcgis.clientId:}")
+    private String arcgisClientId;
+	
+	@Value("${security.arcgis.clientSecret:}")
+    private String arcgisClientSecret;
+    
+    @Value("${security.arcgis.authorizationURI:}")
+    private String arcgisAuthorizationURI;
+    
+    @Value("${security.arcgis.tokenURI:}")
+    private String arcgisTokenURI;
+    
+    @Value("${security.arcgis.userInfoURI:}")
+    private String arcgisUserInfoURI;
+    
+    @Value("${security.arcgis.userNameAttr:}")
+    private String arcgisUserNameAttr;
+    
 
     @jakarta.annotation.PostConstruct
     private void validate() {
@@ -85,6 +106,29 @@ public class SecurityConfigProperties {
     public String getApiReadClientSecret() {
         return apiReadClientSecret;
     }
+    
+    public String getArcgisAuthorizationURI() {
+		return arcgisAuthorizationURI;
+	}
+
+	public void setArcgisAuthorizationURI(String arcgisAuthorizationURI) {
+		this.arcgisAuthorizationURI = arcgisAuthorizationURI;
+	}
+
+	public String getArcgisClientId() {
+		return arcgisClientId;
+	}
+	public String getArcgisTokenURI() {
+		return arcgisTokenURI;
+	}
+
+	public String getArcgisUserInfoURI() {
+		return arcgisUserInfoURI;
+	}
+
+	public String getArcgisUserNameAttr() {
+		return arcgisUserNameAttr;
+	}
 
     public List<String> getPublicEndpointsList() {
         List<String> publicEndpointsList = splitAndTrim(publicEndpoints);
@@ -98,6 +142,10 @@ public class SecurityConfigProperties {
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.toList());
     }
+
+	public String getArcgisClientSecret() {		
+		return arcgisClientSecret != null && !arcgisClientSecret.isEmpty() ? arcgisClientSecret : null;
+	}
     
     
 }
