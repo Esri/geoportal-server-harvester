@@ -8,7 +8,10 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -38,14 +41,11 @@ import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorH
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 // === Authorization Server & Resource Server ===
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
@@ -63,6 +63,12 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.client.RestTemplate;
+
+// UserInfo service imports
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -109,17 +115,19 @@ public class SecurityConfig {
       ClientRegistrationRepository clientRegistrationRepository,
       OAuth2AuthorizedClientService authorizedClientService,
       OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> arcgisTokenClient,
-      OAuth2UserService<OAuth2UserRequest, OAuth2User> arcgisUserService) throws Exception {
+      // Inject our customized DefaultOAuth2UserService
+      OAuth2UserService<OAuth2UserRequest, OAuth2User> arcgisUserService
+  ) throws Exception {
 
     http
       .csrf(csrf -> csrf.disable())
       .headers(h -> h.frameOptions(f -> f.sameOrigin()))
       .authorizeHttpRequests(authorize -> {
-        // Apply configured public endpoints (from hrv.properties) (permitAll)
+        // Apply configured public endpoints (permitAll)
         for (String pattern : configProperties.getPublicEndpointsList()) {
           authorize.requestMatchers(pattern).permitAll();
         }
-        // Apply secured endpoint rules (from hrv.properties)
+        // Apply secured endpoint rules (from your properties)
         for (EndpointSecurityConfig rule : securityEndPointProp.getSecuredEndpoints()) {
           String pattern = rule.getPattern();
           String method = rule.getMethod();
@@ -159,7 +167,7 @@ public class SecurityConfig {
       .formLogin(form -> form
           .loginPage("/custom-login.html")
           .loginProcessingUrl("/login")
-          .defaultSuccessUrl("/custom-login.html?loggedin", true)
+          .defaultSuccessUrl("/custom-login.html?loggedin", true) // — force=true is critical
           .failureUrl("/custom-login.html?error")
           .permitAll())
       // ArcGIS federation
@@ -174,17 +182,21 @@ public class SecurityConfig {
           .successHandler((request, response, authentication) -> {
             logger.info("OAuth2 Login Success Handler - Authentication: {}", authentication.getName());
             logger.info("Authentication Authorities: {}", authentication.getAuthorities());
+            // Enhance the authentication with proper roles
             if (authentication instanceof OAuth2AuthenticationToken) {
               OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
               Authentication enhancedAuth = ArcGISAuthenticationConverter.enhanceAuthentication(token);
               logger.info("Enhanced Authentication Authorities: {}", enhancedAuth.getAuthorities());
+              // Set the enhanced authentication in the SecurityContext
               org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(enhancedAuth);
             }
+            // After successful OAuth2 login, redirect to home
             String context = request.getContextPath();
             response.sendRedirect(context + "/#/home");
           })
           .failureHandler((request, response, ex) -> {
             logger.error("OAuth2 login failed", ex);
+            // Redirect to a friendlier error page
             response.sendRedirect(request.getContextPath() + "/custom-login.html?oauth2_error=" + ex.getClass().getSimpleName());
           })
       )
@@ -194,8 +206,8 @@ public class SecurityConfig {
       }))
       .httpBasic(Customizer.withDefaults())
       .logout(logout -> logout
-          .logoutUrl("/logout")
-          .logoutSuccessUrl("/login.html?loggedout")
+          .logoutUrl("/logout") // default is /logout
+          .logoutSuccessUrl("/login.html?loggedout") // after server logout (optional)
           .invalidateHttpSession(true)
           .deleteCookies("JSESSIONID")
           .permitAll()
@@ -211,8 +223,10 @@ public class SecurityConfig {
         .toArray(String[]::new);
   }
 
+  //Password encoder utility
   public BCryptPasswordEncoder bcryptPassEncoder() { return new BCryptPasswordEncoder(); }
 
+  // Registered clients
   @Bean
   public InMemoryRegisteredClientRepository registeredClientRepository() {
     TokenSettings tokenSettings = TokenSettings.builder()
@@ -258,16 +272,16 @@ public class SecurityConfig {
     return new InMemoryRegisteredClientRepository(uiAppClient, apiClientRW, apiClientRead);
   }
 
-  // ArcGIS ClientRegistration & OAuth2 client beans
+  // === ArcGIS ClientRegistration & OAuth2 client beans =============================
   @Bean
   public ClientRegistrationRepository clientRegistrationRepository() {
     ClientRegistration arcgis = ClientRegistration.withRegistrationId("arcgis")
-        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
+        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST) // or BASIC
         .clientId(configProperties.getArcgisClientId())
         .clientSecret(configProperties.getArcgisClientSecret())
-        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-        .redirectUri("http://localhost:8080/geoportal-harvester-war/login/oauth2/code/arcgis")
-        .scope("profile")
+        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)        
+        .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
+        .scope("profile") // adjust scopes as needed
         .authorizationUri(configProperties.getArcgisAuthorizationURI())
         .tokenUri(configProperties.getArcgisTokenURI())
         .userInfoUri(configProperties.getArcgisUserInfoURI())
@@ -291,7 +305,7 @@ public class SecurityConfig {
   public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> arcgisTokenClient() {
     OAuth2AccessTokenResponseHttpMessageConverter tokenConverter =
         new OAuth2AccessTokenResponseHttpMessageConverter();
-    // IMPORTANT: Use custom converter so additional parameters are preserved
+    // IMPORTANT: Use our custom converter so additional parameters are preserved
     tokenConverter.setAccessTokenResponseConverter(new CustomAccessTokenResponseConverter());
 
     RestTemplate rest = new RestTemplate(Arrays.asList(
@@ -303,9 +317,11 @@ public class SecurityConfig {
     return client;
   }
 
-  // Custom RequestEntity converter & DefaultOAuth2UserService
+  // ====== Custom RequestEntity converter & DefaultOAuth2UserService for UserInfo ======
+
   @Bean
   public CustomRequestEntityConverter customRequestEntityConverter() {
+    // Appends "/{username}?f=json" to userInfoUri and sets headers appropriately.
     return new CustomRequestEntityConverter();
   }
 
@@ -314,10 +330,12 @@ public class SecurityConfig {
       CustomRequestEntityConverter converter
   ) {
     DefaultOAuth2UserService svc = new DefaultOAuth2UserService();
+    // Plug in the custom RequestEntity converter for the UserInfo call
     svc.setRequestEntityConverter(converter);
     return svc;
   }
 
+  // JWK / JWT for AS & RS
   @Bean
   public JWKSource<SecurityContext> jwkSource() {
     KeyPair keyPair = generateRsaKey();
@@ -382,6 +400,10 @@ public class SecurityConfig {
     return new JwtAuthenticationFilter(jwtDecoder, configProperties);
   }
 
+  /**
+   * Custom OAuth2 user service for ArcGIS Portal authentication.
+   * Kept for compatibility; not wired into oauth2Login when arcgisUserService is used.
+   */
   @Bean
   public ArcGISCustomOAuth2UserService arcgisOAuth2UserService() {
     return new ArcGISCustomOAuth2UserService();
