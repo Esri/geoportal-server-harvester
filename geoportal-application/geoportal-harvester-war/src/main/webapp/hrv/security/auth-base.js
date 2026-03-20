@@ -44,7 +44,7 @@ define([], function() {
   // ===== Popup helpers =====
   function openPopup(url, name = 'oauth_popup') {
     const w = 520, h = 320;
-    const y = window.top.outerHeight / 2 + window.top.screenY - (h / 2);
+    const y = window.top.outerHeight / 2 + window.top.screenY - (h / 1.5);
     const x = window.top.outerWidth  / 2 + window.top.screenX - (w / 2);
     return window.open(url, name, `width=${w},height=${h},left=${x},top=${y},resizable,scrollbars`);
   }
