@@ -32,7 +32,7 @@ import org.springframework.util.StringUtils;
  *
  * @author cont_anki
  */
-public class CustomAccessTokenResponseConverter implements Converter<Map<String, String>, OAuth2AccessTokenResponse> {
+public class CustomAccessTokenResponseConverter implements Converter<Map<String, Object>, OAuth2AccessTokenResponse> {
 	private static final Set<String> TOKEN_RESPONSE_PARAMETER_NAMES = Stream.of(
 			OAuth2ParameterNames.ACCESS_TOKEN,
 			OAuth2ParameterNames.TOKEN_TYPE,
@@ -41,21 +41,27 @@ public class CustomAccessTokenResponseConverter implements Converter<Map<String,
 			OAuth2ParameterNames.SCOPE).collect(Collectors.toSet());
 
 	@Override
-	public OAuth2AccessTokenResponse convert(Map<String, String> tokenResponseParameters) {
-		String accessToken = tokenResponseParameters.get(OAuth2ParameterNames.ACCESS_TOKEN);
+	public OAuth2AccessTokenResponse convert(Map<String, Object> tokenResponseParameters) {
+		String accessToken = (String) tokenResponseParameters.get(OAuth2ParameterNames.ACCESS_TOKEN);
 
 		OAuth2AccessToken.TokenType accessTokenType = OAuth2AccessToken.TokenType.BEARER;
 
 		long expiresIn = 0;
 		if (tokenResponseParameters.containsKey(OAuth2ParameterNames.EXPIRES_IN)) {
 			try {
-				expiresIn = Long.valueOf(tokenResponseParameters.get(OAuth2ParameterNames.EXPIRES_IN));
+				Object expiresInObj = tokenResponseParameters.get(OAuth2ParameterNames.EXPIRES_IN);
+				if (expiresInObj instanceof Number) {
+					expiresIn = ((Number) expiresInObj).longValue();
+				} else {
+					expiresIn = Long.valueOf(expiresInObj.toString());
+				}
 			} catch (NumberFormatException ex) { }
 		}
 
 		Set<String> scopes = Collections.emptySet();
 		if (tokenResponseParameters.containsKey(OAuth2ParameterNames.SCOPE)) {
-			String scope = tokenResponseParameters.get(OAuth2ParameterNames.SCOPE);
+			Object scopeObj = tokenResponseParameters.get(OAuth2ParameterNames.SCOPE);
+			String scope = scopeObj instanceof String ? (String) scopeObj : scopeObj.toString();
 			scopes = Arrays.stream(StringUtils.delimitedListToStringArray(scope, " ")).collect(Collectors.toSet());
 		}
 

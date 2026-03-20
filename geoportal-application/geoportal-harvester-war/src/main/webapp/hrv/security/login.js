@@ -83,71 +83,15 @@ define(['./auth-base.js', '../config.js'], function (authBase, cfg) {
     btnLocal.style.display = 'none';
   }
 
-  // Local Account flow:
-  // 1) Open same-origin custom-login.html (popup)
-  // 2) After /login success, popup posts {type:'start_authorize'}
-  // 3) Parent replies with {type:'navigate_authorize', url, code_verifier, state}
+  // Local Account flow (popup)
   btnLocal.addEventListener('click', () => {
     openPopup('custom-login.html', 'local_login');
   });
 
-  // ArcGIS OAuth2 flow - directly redirects to ArcGIS Portal
-  btnArcgis.addEventListener('click', async () => {
-    try {
-      console.log('ArcGIS sign-in initiated');
-
-      // Generate PKCE and state
-      const { code_verifier, code_challenge } = await createPkce();
-      const state = randomUrlSafe(24);
-
-      // Store in sessionStorage for later verification
-      sessionStorage.setItem('pkce_code_verifier', code_verifier);
-      sessionStorage.setItem('pkce_state', state);
-      console.log('PKCE and state generated');
-
-      // Build redirect URI for ArcGIS callback
-      const redirectUri = BASE + '/login/oauth2/code/arcgis';
-      console.log('Redirect URI:', redirectUri);
-
-      // Get ArcGIS OAuth configuration from server
-      const cfgUrl = BASE + '/rest/harvester/security/arcgis-config';
-      console.log('Fetching ArcGIS config from:', cfgUrl);
-      const response = await fetch(cfgUrl);
-      if (!response.ok) {
-        const errorBody = await response.text();
-        console.error('ArcGIS config response:', response.status, errorBody);
-        throw new Error(`Failed to load ArcGIS OAuth configuration (${response.status}): ${errorBody}`);
-      }
-      const arcgisConfig = await response.json();
-      console.log('ArcGIS config loaded:', arcgisConfig);
-
-      // Verify required config fields
-      if (!arcgisConfig.clientId || !arcgisConfig.authorizationUri) {
-        throw new Error('ArcGIS configuration is incomplete. Check environment variables: HRV_ARCGIS_CLIENTID, HRV_ARCGIS_AUTHORIZATIONURI');
-      }
-
-      // Build ArcGIS authorization URL
-      const arcgisAuthParams = new URLSearchParams({
-        client_id: arcgisConfig.clientId,
-        response_type: 'code',
-        redirect_uri: redirectUri,
-        state: state,
-        code_challenge: code_challenge,
-        code_challenge_method: 'S256'
-      });
-      const arcgisAuthUrl = arcgisConfig.authorizationUri + '?' + arcgisAuthParams.toString();
-      console.log('Redirecting to ArcGIS:', arcgisAuthUrl.substring(0, 100) + '...');
-
-      // Redirect to ArcGIS (not a popup - direct navigation)
-      window.location.href = arcgisAuthUrl;
-    } catch (err) {
-      const errorMsg = err && err.message ? err.message : String(err);
-      if (errBox) {
-        errBox.textContent = 'Error initiating ArcGIS sign-in:\n\n' + errorMsg;
-        errBox.style.display = 'block';
-      }
-      console.error('ArcGIS sign-in error:', err);
-    }
+  // ArcGIS OAuth2 flow - Let Spring initiate the redirect so it can save the authorization request in the HttpSession
+  // This avoids authorization_request_not_found on /login/oauth2/code/arcgis
+  btnArcgis.addEventListener('click', () => {
+    window.location.href = BASE + '/oauth2/authorization/arcgis';
   });
 
   // Popup -> Parent requesting parent-built PKCE authorize URL

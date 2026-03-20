@@ -8,10 +8,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -41,11 +38,14 @@ import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorH
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 // === Authorization Server & Resource Server ===
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
@@ -76,19 +76,18 @@ public class SecurityConfig {
 
   // Use SecurityProperties component to hold configuration loaded from config.properties
   private final SecurityConfigProperties configProperties;
-
   @Autowired private SecurityEndPointProp securityEndPointProp;
 
   public SecurityConfig(SecurityConfigProperties securityProperties) {
     this.configProperties = securityProperties;
   }
-  // === AUTHORIZATION SERVER CHAIN 
+
+  // === AUTHORIZATION SERVER CHAIN
   @Bean
   @Order(1)
   public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
     OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
         OAuth2AuthorizationServerConfigurer.authorizationServer();
-
     http
       .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
       .with(authorizationServerConfigurer, (authorizationServer) ->
@@ -98,11 +97,10 @@ public class SecurityConfig {
       .exceptionHandling((exceptions) -> exceptions.defaultAuthenticationEntryPointFor(
           new LoginUrlAuthenticationEntryPoint("/login.html"),
           new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
-
     return http.build();
   }
 
-  // === APPLICATION / RESOURCE SERVER CHAIN  ========================================
+  // === APPLICATION / RESOURCE SERVER CHAIN ========================================
   @Bean
   @Order(2)
   public SecurityFilterChain securityFilterChain(
@@ -110,110 +108,98 @@ public class SecurityConfig {
       JwtAuthenticationFilter jwtAuthenticationFilter,
       ClientRegistrationRepository clientRegistrationRepository,
       OAuth2AuthorizedClientService authorizedClientService,
-      OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> arcgisTokenClient
-  ) throws Exception {
+      OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> arcgisTokenClient,
+      OAuth2UserService<OAuth2UserRequest, OAuth2User> arcgisUserService) throws Exception {
 
     http
       .csrf(csrf -> csrf.disable())
-      .headers(h -> h.frameOptions(f -> f.sameOrigin())) 
+      .headers(h -> h.frameOptions(f -> f.sameOrigin()))
       .authorizeHttpRequests(authorize -> {
-          // Apply configured public endpoints (permitAll)
-          for (String pattern : configProperties.getPublicEndpointsList()) {
-            authorize.requestMatchers(pattern).permitAll();
-          }
-          // Apply secured endpoint rules (from your properties)
-          for (EndpointSecurityConfig rule : securityEndPointProp.getSecuredEndpoints()) {
-            String pattern = rule.getPattern();
-            String method  = rule.getMethod();
-            String roles   = (rule.getRoles() == null) ? "" : rule.getRoles().trim();
-
-            boolean isPermitAll    = "permitAll".equalsIgnoreCase(roles);
-            boolean isAuthenticated= "authenticated".equalsIgnoreCase(roles);
-
-            if (method == null || method.trim().isEmpty()) {
+        // Apply configured public endpoints (from hrv.properties) (permitAll)
+        for (String pattern : configProperties.getPublicEndpointsList()) {
+          authorize.requestMatchers(pattern).permitAll();
+        }
+        // Apply secured endpoint rules (from hrv.properties)
+        for (EndpointSecurityConfig rule : securityEndPointProp.getSecuredEndpoints()) {
+          String pattern = rule.getPattern();
+          String method = rule.getMethod();
+          String roles = (rule.getRoles() == null) ? "" : rule.getRoles().trim();
+          boolean isPermitAll = "permitAll".equalsIgnoreCase(roles);
+          boolean isAuthenticated= "authenticated".equalsIgnoreCase(roles);
+          if (method == null || method.trim().isEmpty()) {
+            if (isPermitAll) {
+              authorize.requestMatchers(pattern).permitAll();
+            } else if (isAuthenticated) {
+              authorize.requestMatchers(pattern).authenticated();
+            } else if (!roles.isEmpty()) {
+              authorize.requestMatchers(pattern).hasAnyAuthority(splitCsv(roles));
+            }
+          } else {
+            for (String m : splitCsv(method)) {
+              HttpMethod httpMethod;
+              try { httpMethod = HttpMethod.valueOf(m.trim().toUpperCase()); }
+              catch (IllegalArgumentException ex) { continue; }
               if (isPermitAll) {
-                authorize.requestMatchers(pattern).permitAll();
+                authorize.requestMatchers(httpMethod, pattern).permitAll();
               } else if (isAuthenticated) {
-                authorize.requestMatchers(pattern).authenticated();
+                authorize.requestMatchers(httpMethod, pattern).authenticated();
               } else if (!roles.isEmpty()) {
-                authorize.requestMatchers(pattern).hasAnyAuthority(splitCsv(roles));
-              }
-            } else {
-              for (String m : splitCsv(method)) {
-                HttpMethod httpMethod;
-                try { httpMethod = HttpMethod.valueOf(m.trim().toUpperCase()); }
-                catch (IllegalArgumentException ex) { continue; }
-                if (isPermitAll) {
-                  authorize.requestMatchers(httpMethod, pattern).permitAll();
-                } else if (isAuthenticated) {
-                  authorize.requestMatchers(httpMethod, pattern).authenticated();
-                } else if (!roles.isEmpty()) {
-                  authorize.requestMatchers(httpMethod, pattern).hasAnyAuthority(splitCsv(roles));
-                }
+                authorize.requestMatchers(httpMethod, pattern).hasAnyAuthority(splitCsv(roles));
               }
             }
           }
-          // Everything else requires auth (so /harvester triggers login)
-          authorize.anyRequest().authenticated();
-        })
-        .exceptionHandling(ex -> ex.defaultAuthenticationEntryPointFor(
-            new LoginUrlAuthenticationEntryPoint("/login.html"),
-            new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
-        
+        }
+        // Everything else requires auth (so /harvester triggers login)
+        authorize.anyRequest().authenticated();
+      })
+      .exceptionHandling(ex -> ex.defaultAuthenticationEntryPointFor(
+          new LoginUrlAuthenticationEntryPoint("/login.html"),
+          new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
       // Use custom login page (popup page)
-	.formLogin(form -> form
-	    .loginPage("/custom-login.html")
-	    .loginProcessingUrl("/login")
-	    .defaultSuccessUrl("/custom-login.html?loggedin", true) // <— force=true is critical
-	    .failureUrl("/custom-login.html?error")
-	    .permitAll())
-
+      .formLogin(form -> form
+          .loginPage("/custom-login.html")
+          .loginProcessingUrl("/login")
+          .defaultSuccessUrl("/custom-login.html?loggedin", true)
+          .failureUrl("/custom-login.html?error")
+          .permitAll())
       // ArcGIS federation
       .oauth2Login(oauth -> oauth
           .clientRegistrationRepository(clientRegistrationRepository)
           .authorizedClientService(authorizedClientService)
           .userInfoEndpoint(userInfo -> {
-              ArcGISCustomOAuth2UserService customUserService = arcgisOAuth2UserService();
-              userInfo.userService(customUserService);
+            // Use the customized DefaultOAuth2UserService (with CustomRequestEntityConverter)
+            userInfo.userService(arcgisUserService);
           })
           .tokenEndpoint(token -> token.accessTokenResponseClient(arcgisTokenClient))
           .successHandler((request, response, authentication) -> {
             logger.info("OAuth2 Login Success Handler - Authentication: {}", authentication.getName());
             logger.info("Authentication Authorities: {}", authentication.getAuthorities());
-            
-            // Enhance the authentication with proper roles
             if (authentication instanceof OAuth2AuthenticationToken) {
-                OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
-                Authentication enhancedAuth = ArcGISAuthenticationConverter.enhanceAuthentication(token);
-                logger.info("Enhanced Authentication Authorities: {}", enhancedAuth.getAuthorities());
-                // Set the enhanced authentication in the SecurityContext
-                org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(enhancedAuth);
+              OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
+              Authentication enhancedAuth = ArcGISAuthenticationConverter.enhanceAuthentication(token);
+              logger.info("Enhanced Authentication Authorities: {}", enhancedAuth.getAuthorities());
+              org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(enhancedAuth);
             }
-            
-            // After successful OAuth2 login, redirect to home
             String context = request.getContextPath();
             response.sendRedirect(context + "/#/home");
           })
           .failureHandler((request, response, ex) -> {
             logger.error("OAuth2 login failed", ex);
-            // Redirect to a friendlier error page
             response.sendRedirect(request.getContextPath() + "/custom-login.html?oauth2_error=" + ex.getClass().getSimpleName());
           })
-
       )
       .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
         jwt.decoder(jwtDecoder(jwkSource()));
         jwt.jwtAuthenticationConverter(jwtAuthenticationConverter());
       }))
       .httpBasic(Customizer.withDefaults())
-  
-	   .logout(logout -> logout
-	       .logoutUrl("/logout")                               // default is /logout
-	       .logoutSuccessUrl("/login.html?loggedout")          // after server logout (optional)
-	       .invalidateHttpSession(true)
-	       .deleteCookies("JSESSIONID")
-	       .permitAll()
-	   );
+      .logout(logout -> logout
+          .logoutUrl("/logout")
+          .logoutSuccessUrl("/login.html?loggedout")
+          .invalidateHttpSession(true)
+          .deleteCookies("JSESSIONID")
+          .permitAll()
+      );
 
     http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();
@@ -225,10 +211,8 @@ public class SecurityConfig {
         .toArray(String[]::new);
   }
 
-  //Password encoder utility 
   public BCryptPasswordEncoder bcryptPassEncoder() { return new BCryptPasswordEncoder(); }
 
-  // Registered clients
   @Bean
   public InMemoryRegisteredClientRepository registeredClientRepository() {
     TokenSettings tokenSettings = TokenSettings.builder()
@@ -244,9 +228,9 @@ public class SecurityConfig {
         .redirectUri(configProperties.getUiRedirectUri())
         .tokenSettings(tokenSettings)
         .scope("openid").scope("profile").scope("api.read").scope("api.write")
-		.clientSettings(ClientSettings.builder()
-		          .requireAuthorizationConsent(false)
-		          .build())
+        .clientSettings(ClientSettings.builder()
+            .requireAuthorizationConsent(false)
+            .build())
         .build();
 
     RegisteredClient apiClientRW = RegisteredClient
@@ -274,19 +258,18 @@ public class SecurityConfig {
     return new InMemoryRegisteredClientRepository(uiAppClient, apiClientRW, apiClientRead);
   }
 
-  //TODO === ArcGIS ClientRegistration & OAuth2 client beans =============================
+  // ArcGIS ClientRegistration & OAuth2 client beans
   @Bean
   public ClientRegistrationRepository clientRegistrationRepository() {
-    // Build the redirect URI dynamically - it will be resolved at runtime by Spring
     ClientRegistration arcgis = ClientRegistration.withRegistrationId("arcgis")
-    	.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST) // or .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-        .clientId(configProperties.getArcgisClientId())       
-        .clientSecret(configProperties.getArcgisClientSecret())        
+        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
+        .clientId(configProperties.getArcgisClientId())
+        .clientSecret(configProperties.getArcgisClientSecret())
         .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-        .redirectUri("http://localhost:8080/geoportal-harvester-war/login/oauth2/code/arcgis")  
-        .scope("profile") // adjust scopes as needed
+        .redirectUri("http://localhost:8080/geoportal-harvester-war/login/oauth2/code/arcgis")
+        .scope("profile")
         .authorizationUri(configProperties.getArcgisAuthorizationURI())
-        .tokenUri(configProperties.getArcgisTokenURI())        
+        .tokenUri(configProperties.getArcgisTokenURI())
         .userInfoUri(configProperties.getArcgisUserInfoURI())
         .userNameAttributeName(configProperties.getArcgisUserNameAttr())
         .clientName("ArcGIS")
@@ -300,30 +283,16 @@ public class SecurityConfig {
   }
 
   /**
-   * Custom token client that can normalize provider-specific token responses
-   * (e.g., ArcGIS sometimes returns 'expires' instead of 'expires_in').
+   * Token client using CustomAccessTokenResponseConverter so additional parameters
+   * from ArcGIS token response (e.g., username) are propagated into
+   * OAuth2AccessTokenResponse#additionalParameters and then into OAuth2UserRequest.
    */
   @Bean
   public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> arcgisTokenClient() {
     OAuth2AccessTokenResponseHttpMessageConverter tokenConverter =
         new OAuth2AccessTokenResponseHttpMessageConverter();
-
-    tokenConverter.setAccessTokenResponseConverter((Map<String, Object> input) -> {
-      Map<String, Object> map = new HashMap<>(input);
-
-      // Normalize common deviations
-      if (map.containsKey("expires") && !map.containsKey("expires_in")) {
-        map.put("expires_in", map.get("expires"));
-      }
-      Object token = map.get("access_token");
-      long expiresIn = Long.parseLong(String.valueOf(map.getOrDefault("expires_in", 3600)));
-
-      return OAuth2AccessTokenResponse.withToken(String.valueOf(token))
-          .tokenType(org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType.BEARER)
-          .expiresIn(expiresIn)
-          .scopes(Collections.emptySet()) // add if provider supplies scopes
-          .build();
-    });
+    // IMPORTANT: Use custom converter so additional parameters are preserved
+    tokenConverter.setAccessTokenResponseConverter(new CustomAccessTokenResponseConverter());
 
     RestTemplate rest = new RestTemplate(Arrays.asList(
         new FormHttpMessageConverter(), tokenConverter));
@@ -334,7 +303,21 @@ public class SecurityConfig {
     return client;
   }
 
-  // JWK / JWT for AS & RS
+  // Custom RequestEntity converter & DefaultOAuth2UserService
+  @Bean
+  public CustomRequestEntityConverter customRequestEntityConverter() {
+    return new CustomRequestEntityConverter();
+  }
+
+  @Bean
+  public OAuth2UserService<OAuth2UserRequest, OAuth2User> arcgisUserService(
+      CustomRequestEntityConverter converter
+  ) {
+    DefaultOAuth2UserService svc = new DefaultOAuth2UserService();
+    svc.setRequestEntityConverter(converter);
+    return svc;
+  }
+
   @Bean
   public JWKSource<SecurityContext> jwkSource() {
     KeyPair keyPair = generateRsaKey();
@@ -366,10 +349,9 @@ public class SecurityConfig {
   @Bean
   public JwtAuthenticationConverter jwtAuthenticationConverter() {
     JwtGrantedAuthoritiesConverter defaultConverter = new JwtGrantedAuthoritiesConverter();
-    JwtGrantedAuthoritiesConverter customConverter  = new JwtGrantedAuthoritiesConverter();
+    JwtGrantedAuthoritiesConverter customConverter = new JwtGrantedAuthoritiesConverter();
     customConverter.setAuthoritiesClaimName("authorities");
     customConverter.setAuthorityPrefix("");
-
     Converter<org.springframework.security.oauth2.jwt.Jwt, Collection<GrantedAuthority>> combined = jwt -> {
       Collection<GrantedAuthority> a1 = defaultConverter.convert(jwt);
       Collection<GrantedAuthority> a2 = customConverter.convert(jwt);
@@ -378,7 +360,6 @@ public class SecurityConfig {
       if (a2 != null) merged.addAll(a2);
       return new ArrayList<>(merged);
     };
-
     JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
     converter.setJwtGrantedAuthoritiesConverter(combined);
     return converter;
@@ -401,10 +382,6 @@ public class SecurityConfig {
     return new JwtAuthenticationFilter(jwtDecoder, configProperties);
   }
 
-  /**
-   * Custom OAuth2 user service for ArcGIS Portal authentication.
-   * This service handles user info from ArcGIS and assigns proper Spring Security roles.
-   */
   @Bean
   public ArcGISCustomOAuth2UserService arcgisOAuth2UserService() {
     return new ArcGISCustomOAuth2UserService();
