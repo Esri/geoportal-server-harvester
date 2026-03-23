@@ -115,7 +115,7 @@ public class SecurityConfig {
       ClientRegistrationRepository clientRegistrationRepository,
       OAuth2AuthorizedClientService authorizedClientService,
       OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> arcgisTokenClient,
-      // Inject our customized DefaultOAuth2UserService
+      // Inject customized DefaultOAuth2UserService
       OAuth2UserService<OAuth2UserRequest, OAuth2User> arcgisUserService
   ) throws Exception {
 
@@ -127,7 +127,7 @@ public class SecurityConfig {
         for (String pattern : configProperties.getPublicEndpointsList()) {
           authorize.requestMatchers(pattern).permitAll();
         }
-        // Apply secured endpoint rules (from your properties)
+        // Apply secured endpoint rules (from config.properties)
         for (EndpointSecurityConfig rule : securityEndPointProp.getSecuredEndpoints()) {
           String pattern = rule.getPattern();
           String method = rule.getMethod();
@@ -276,7 +276,7 @@ public class SecurityConfig {
   @Bean
   public ClientRegistrationRepository clientRegistrationRepository() {
     ClientRegistration arcgis = ClientRegistration.withRegistrationId("arcgis")
-        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST) // or BASIC
+        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST) 
         .clientId(configProperties.getArcgisClientId())
         .clientSecret(configProperties.getArcgisClientSecret())
         .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)        
@@ -305,7 +305,7 @@ public class SecurityConfig {
   public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> arcgisTokenClient() {
     OAuth2AccessTokenResponseHttpMessageConverter tokenConverter =
         new OAuth2AccessTokenResponseHttpMessageConverter();
-    // IMPORTANT: Use our custom converter so additional parameters are preserved
+    //Use custom converter so additional parameters are preserved
     tokenConverter.setAccessTokenResponseConverter(new CustomAccessTokenResponseConverter());
 
     RestTemplate rest = new RestTemplate(Arrays.asList(
