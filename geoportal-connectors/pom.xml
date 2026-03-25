@@ -31,16 +31,4 @@
         <module>geoportal-harvester-stac</module>
         <module>geoportal-harvester-waf</module>
     </modules>
-    <dependencies>
-    	<dependency>
-    		<groupId>com.esri.geoportal</groupId>
-    		<artifactId>geoportal-SDK</artifactId>
-    		<version>4.0.0</version>
-    	</dependency>
-    	<dependency>
-    		<groupId>com.esri.geoportal</groupId>
-    		<artifactId>geoportal-harvester</artifactId>
-    		<version>4.0.0</version>
-    	</dependency>
-    </dependencies>
 </project>
