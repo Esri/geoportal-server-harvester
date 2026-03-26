@@ -69,10 +69,10 @@ class GptBroker implements InputBroker {
     td = context.getTask().getTaskDefinition();
     CloseableHttpClient httpClient = HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build();
     if (context.getTask().getTaskDefinition().isIgnoreRobotsTxt()) {
-      client = new Client(httpClient, definition.getHostUrl(), definition.getCredentials(), definition.getIndex(), collectionsFieldName);
+      client = new Client(httpClient, definition.getHostUrl(), definition.getCredentials(), collectionsFieldName);
     } else {
       Bots bots = BotsUtils.readBots(definition.getBotsConfig(), httpClient, definition.getHostUrl());
-      client = new Client(new BotsHttpClient(httpClient, bots), definition.getHostUrl(), definition.getCredentials(), definition.getIndex(), collectionsFieldName);
+      client = new Client(new BotsHttpClient(httpClient, bots), definition.getHostUrl(), definition.getCredentials(), collectionsFieldName);
     }
   }
 

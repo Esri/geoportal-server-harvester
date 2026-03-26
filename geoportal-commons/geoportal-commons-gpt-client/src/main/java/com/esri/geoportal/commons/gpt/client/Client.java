@@ -81,14 +81,13 @@ public class Client implements Closeable {
 
     private static final String DEFAULT_INDEX = "metadata";
     private static final String REST_ITEM_URL = "rest/metadata/item";
-    private static final String ELASTIC_SEARCH_URL = "elastic/{metadata}/_search";
+    private static String ELASTIC_SEARCH_URL = "";
     private static final String ELASTIC_SCROLL_URL = "elastic/_search/scroll";
     private static final String TOKEN_URL = "oauth2/token";
 
     private final CloseableHttpClient httpClient;
     private final URL url;
-    private final SimpleCredentials cred;
-    private final String index;
+    private final SimpleCredentials cred;    
     private final String collectionsFieldName;
 
     private TokenInfo tokenInfo;
@@ -104,11 +103,10 @@ public class Client implements Closeable {
      * @param index index name
      * @param collectionsFieldName collections field name
      */
-    public Client(CloseableHttpClient httpClient, URL url, SimpleCredentials cred, String index, String collectionsFieldName) {
+    public Client(CloseableHttpClient httpClient, URL url, SimpleCredentials cred, String collectionsFieldName) {
         this.httpClient = httpClient;
         this.url = url;
-        this.cred = cred;
-        this.index = StringUtils.defaultIfBlank(index, DEFAULT_INDEX);
+        this.cred = cred;       
         this.collectionsFieldName = collectionsFieldName;
 
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -123,8 +121,8 @@ public class Client implements Closeable {
      * @param index index name
      * @param collectionsFieldName collections field name
      */
-    public Client(URL url, SimpleCredentials cred, String index, String collectionsFieldName) {
-        this(HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build(), url, cred, index, collectionsFieldName);
+    public Client(URL url, SimpleCredentials cred, String collectionsFieldName) {
+        this(HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build(), url, cred,  collectionsFieldName);
     }
 
     /**
@@ -711,8 +709,23 @@ public class Client implements Closeable {
         return execute(request, QueryResponse.class);
     }
 
-    private String createElasticSearchUrl() {
-        return ELASTIC_SEARCH_URL.replaceAll("\\{metadata\\}", index);
+    private String createElasticSearchUrl() throws IOException, URISyntaxException {  
+    	if(ELASTIC_SEARCH_URL.isBlank())
+    	{
+    		//Retrieve index name from  /geoportal/rest/geoportal
+    		URI uri = URI.create(this.url + "/rest/geoportal");
+    		String url = uri.normalize().toString();
+        	
+        	HttpGet request = new HttpGet(url);
+
+            request.setConfig(DEFAULT_REQUEST_CONFIG);
+            request.setHeader("Content-Type", "application/json");
+            request.setHeader("User-Agent", HttpConstants.getUserAgent());
+            
+            GeoportalInfoResponse gpInfoRes =  execute(request, GeoportalInfoResponse.class);
+            ELASTIC_SEARCH_URL= "elastic/"+(gpInfoRes.getMetadataIndexName() != null ? gpInfoRes.getMetadataIndexName() : DEFAULT_INDEX)+"/_search" ;
+    	}        
+        return ELASTIC_SEARCH_URL;
     }
 
     private HttpEntity createQueryEntity(String term, String value, long size, SearchContext searchContext) {

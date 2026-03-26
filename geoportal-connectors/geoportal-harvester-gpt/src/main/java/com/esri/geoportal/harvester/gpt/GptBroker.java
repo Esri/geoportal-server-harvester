@@ -15,7 +15,6 @@
  */
 package com.esri.geoportal.harvester.gpt;
 
-import com.esri.geoportal.commons.utils.SimpleCredentials;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -23,12 +22,15 @@ import java.net.URISyntaxException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +40,7 @@ import com.esri.geoportal.commons.gpt.client.Client;
 import com.esri.geoportal.commons.gpt.client.PublishRequest;
 import com.esri.geoportal.commons.gpt.client.PublishResponse;
 import com.esri.geoportal.commons.pdf.PdfUtils;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.DataReference;
 import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
@@ -47,11 +50,6 @@ import com.esri.geoportal.harvester.api.ex.DataOutputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
 import com.esri.geoportal.harvester.api.specs.OutputBroker;
 import com.esri.geoportal.harvester.api.specs.OutputConnector;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.ListIterator;
-import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * GPT broker.
@@ -97,7 +95,7 @@ import org.apache.commons.lang3.StringUtils;
   public void initialize(InitContext context) throws DataProcessorException {
     definition.override(context.getParams());
     try {
-      client = new Client(definition.getHostUrl(), definition.getCredentials(), definition.getIndex(), 
+      client = new Client(definition.getHostUrl(), definition.getCredentials(),
         StringUtils.defaultIfBlank(definition.getCollectionsFieldName(), DEFAULT_COLLECTIONS_FIELD_NAME));
 
       if (!context.canCleanup()) {
