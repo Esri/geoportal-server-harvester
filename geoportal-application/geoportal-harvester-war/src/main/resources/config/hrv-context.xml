@@ -45,13 +45,6 @@
   <!--    <import resource="authentication-simple.xml"/>-->
    <!--  <import resource="authentication-ldap.xml"/>--> 
    <import resource="authentication-simple.xml"/>
-     
-       <!--TODO delete below  -->
-   <!-- <import resource="app-security-basic-auth.xml" /> -->
- 
-  <!-- <import resource="app-security.xml" /> -->
-  <!--<import resource="app-security-arcgis.xml" />-->
- 
     
     <!-- ADD PERSISTENCE SUPPORT HERE (jpa, hibernate, etc) -->
 
