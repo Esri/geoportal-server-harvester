@@ -1,4 +1,4 @@
-define(['./auth-base.js', '../config.js'], function (authBase, cfg) {
+define(['hrv/security/auth-base', 'hrv/config'], function (authBase, cfg) {
   'use strict';
 
   const {
@@ -82,14 +82,18 @@ define(['./auth-base.js', '../config.js'], function (authBase, cfg) {
   } else {
     btnLocal.style.display = 'none';
   }
+  
+  if (cfg.app.arcGISAuthEnabled && !cfg.app.localAccountAuthEnabled) {
+		btnArcgis.classList.remove("outline");
+	    btnArcgis.classList.add("primary");
+    }
 
   // Local Account flow (popup)
   btnLocal.addEventListener('click', () => {
     openPopup('custom-login.html', 'local_login');
   });
 
-  // ArcGIS OAuth2 flow - Let Spring initiate the redirect so it can save the authorization request in the HttpSession
-  // This avoids authorization_request_not_found on /login/oauth2/code/arcgis
+  // ArcGIS OAuth2 flow 
   btnArcgis.addEventListener('click', () => {
     window.location.href = BASE + '/oauth2/authorization/arcgis';
   });
