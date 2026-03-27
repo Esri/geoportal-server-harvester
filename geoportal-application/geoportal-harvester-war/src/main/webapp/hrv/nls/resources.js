@@ -36,6 +36,12 @@ define({
       caption: "Harvester",
       logout: "Log out"
     },
+	login: {
+      caption: "Sign In",
+      label: "Sign In",
+      username: "Username",
+      password: "Password"     
+    },
 
     navigation: {
       home: "Home",

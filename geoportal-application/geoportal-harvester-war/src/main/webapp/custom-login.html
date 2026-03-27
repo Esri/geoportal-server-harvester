@@ -16,31 +16,53 @@
     .muted { color:#666; font-size:.9rem; }
     .error { color:#b00020; white-space:pre-wrap; display:none; }
   </style>
+  <script>
+  window.dojoConfig = {
+		    locale: "en",
+		    async: true,
+		    parseOnLoad: true,
+
+		    packages: [		         
+		          {
+		              name: 'hrv',
+		              location: location.pathname.replace(/\/[^/]*$/, '') + '/hrv',
+		          }
+		    	],
+		    baseUrl: window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))
+		  };
+  </script>
+  <script src="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js"></script>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Application Account</h1>
+ <div class="wrap">
+    <h1 id="lblTitle">Sign In</h1>
 
-    <!-- IMPORTANT: relative action -> /<context>/login -->
     <form method="post" action="login">
-      <!-- If CSRF is enabled later, include hidden CSRF inputs here -->
-      <label for="username">Username</label>
-      <input id="username" name="username" autocomplete="username" required />
+        <label id="lblUsername" for="username">Username:</label>
+        <input id="username" name="username" data-dojo-type="dijit/form/TextBox" required>
 
-      <label for="password">Password</label>
-      <input id="password" name="password" type="password" autocomplete="current-password" required />
+        <label id="lblPassword" for="password">Password:</label>
+        <input id="password" name="password" type="password" data-dojo-type="dijit/form/TextBox" required>
 
-      <button class="btn" type="submit">Sign in</button>
-      <div id="err" class="error" role="alert"></div>     
+        <button id="btnLogin" class="btn" type="submit">Sign in</button>
+
+        <div id="errorMessage" style="display:none; color:red; font-size:14px">
+            Invalid username or password.
+        </div>
     </form>
-  </div>
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+</div> 
   <script>
-    require.config({
-      baseUrl: window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))
-    });
-    require(['hrv/security/custom-login.js']);
+	  require([		
+	    "dojo/i18n!hrv/nls/resources",
+	    "dojo/dom",
+	    "hrv/security/custom-login",
+	    "dojo/domReady!"
+	], function (i18n, dom) {
+	    dom.byId("lblTitle").innerHTML     = i18n.login.caption;
+	    dom.byId("lblUsername").innerHTML  = i18n.login.username;
+	    dom.byId("lblPassword").innerHTML  = i18n.login.password;
+	    dom.byId("btnLogin").innerHTML     = i18n.login.label;
+	});
   </script>
 </body>
 </html>
