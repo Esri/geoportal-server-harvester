@@ -1,7 +1,9 @@
 define([],function(){var obj={
   app: {
-    secure: true, // If true, one or both of the following auth methods must be enabled
-	arcGISAuthEnabled: true,
+    secure: false, // If true, one or both of the following auth methods must be enabled
+	arcGISAuthEnabled: false,
 	localAccountAuthEnabled: true
     }
-};return obj;});
+};
+
+return obj;});
