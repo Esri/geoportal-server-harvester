@@ -17,18 +17,17 @@
     .error { color:#b00020; white-space:pre-wrap; display:none; }
   </style>
    <script>
-  (function () {    
-    var ctx = location.pathname.split("/").slice(0,2).join("/");
+  (function () { 
+	  window.dojoConfig = {
+	    locale: "en",
+	    async: true,
+	    parseOnLoad: true,
+	    baseUrl: ".",
+	    packages: [
+	      { name: "hrv", location: "hrv" }
+	    ]
+	  };
 
-    window.dojoConfig = {
-      locale: "en",
-      async: true,
-      parseOnLoad: true,
-      baseUrl: ctx + "/",
-      packages: [
-        { name: "hrv", location: ctx + "/hrv" }
-      ]
-    };
   })();
 </script>
 <script src="https://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js"></script>
