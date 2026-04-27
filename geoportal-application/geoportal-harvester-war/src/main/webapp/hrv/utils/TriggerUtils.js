@@ -52,8 +52,22 @@ define([
         }
 
       } else if (props["t-at-time"]) {
+
+        const dayMap = new Map([
+          ["1", "Sunday"],
+          ["2", "Monday"],
+          ["3", "Tuesday"],
+          ["4", "Wednesday"],
+          ["5", "Thursday"],
+          ["6", "Friday"],
+          ["7", "Saturday"],
+          ["1,2,3,4,5,6,7", "Everyday"]
+          
+        ]);
         var atTime = props["t-at-time"];
-        return string.substitute(i18n.triggers.runsAt, {time: atTime});
+        var atDay = props["t-at-day"];
+        
+        return string.substitute(i18n.triggers.runsAt, {time: dayMap.get(atDay)+":"+atTime});
       }
       
       return null;
