@@ -107,14 +107,14 @@ public class AtTrigger implements Trigger {
         List<UITemplate.Argument> arguments = new ArrayList<>();
         arguments.add(new UITemplate.TemporalArgument(T_AT_TIME, bundle.getString("engine.triggers.at.time"), true));
         Map<String,String> dayOfWeek = new LinkedHashMap<>();
-        dayOfWeek.put("1", "Sunday");
-        dayOfWeek.put("2", "Monday");
-        dayOfWeek.put("3", "Tuesday");
-        dayOfWeek.put("4", "Wednesday");
-        dayOfWeek.put("5", "Thursday");
-        dayOfWeek.put("6", "Friday");
-        dayOfWeek.put("7", "Saturday"); 
-        dayOfWeek.put("1,2,3,4,5,6,7", "Everyday");       
+        dayOfWeek.put("1", bundle.getString("engine.triggers.at.day1"));
+        dayOfWeek.put("2", bundle.getString("engine.triggers.at.day2"));
+        dayOfWeek.put("3", bundle.getString("engine.triggers.at.day3"));
+        dayOfWeek.put("4", bundle.getString("engine.triggers.at.day4"));
+        dayOfWeek.put("5", bundle.getString("engine.triggers.at.day5"));
+        dayOfWeek.put("6", bundle.getString("engine.triggers.at.day6"));
+        dayOfWeek.put("7", bundle.getString("engine.triggers.at.day7")); 
+        dayOfWeek.put("1,2,3,4,5,6,7", bundle.getString("engine.triggers.at.dayAll"));       
        
         Choice<String>[] choices = dayOfWeek.entrySet()
         .stream()

@@ -54,14 +54,14 @@ define([
       } else if (props["t-at-time"]) {
 
         const dayMap = new Map([
-          ["1", "Sunday"],
-          ["2", "Monday"],
-          ["3", "Tuesday"],
-          ["4", "Wednesday"],
-          ["5", "Thursday"],
-          ["6", "Friday"],
-          ["7", "Saturday"],
-          ["1,2,3,4,5,6,7", "Everyday"]
+          ["1", i18n.dayOfWeek.day1],
+          ["2", i18n.dayOfWeek.day2],
+          ["3", i18n.dayOfWeek.day3],
+          ["4", i18n.dayOfWeek.day4],
+          ["5", i18n.dayOfWeek.day5],
+          ["6", i18n.dayOfWeek.day6],
+          ["7", i18n.dayOfWeek.day7],
+          ["1,2,3,4,5,6,7", i18n.dayOfWeek.dayAll]
           
         ]);
         var atTime = props["t-at-time"];
