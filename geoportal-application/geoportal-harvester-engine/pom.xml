@@ -4,7 +4,7 @@
     <parent>
         <artifactId>geoportal-application</artifactId>
         <groupId>com.esri.geoportal</groupId>
-        <version>3.0.0</version>
+        <version>3.0.1</version>
     </parent>
     <artifactId>geoportal-harvester-engine</artifactId>
     <name>Esri :: Geoportal Server :: Harvester :: Application :: Engine</name>
@@ -136,5 +136,5 @@
             <optional>false</optional>
         </dependency>
     </dependencies>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
 </project>
