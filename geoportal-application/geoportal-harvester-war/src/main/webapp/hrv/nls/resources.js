@@ -40,7 +40,7 @@ define({
         day5:"Thursday",
         day6:"Friday",
         day7:"Saturday",
-        dayAll:"Everyday",
+        dayAll:"Every day",
         
     },
 
