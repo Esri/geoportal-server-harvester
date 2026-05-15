@@ -31,6 +31,18 @@ define({
       biweekly: "Bi-weekly",
       monthly: "Monthly"
     },
+    
+    dayOfWeek:{
+        day1:"Sunday",
+        day2:"Monday",
+        day3:"Tuesday",
+        day4:"Wednesday",
+        day5:"Thursday",
+        day6:"Friday",
+        day7:"Saturday",
+        dayAll:"Every day",
+        
+    },
 
     header: {
       caption: "Harvester",

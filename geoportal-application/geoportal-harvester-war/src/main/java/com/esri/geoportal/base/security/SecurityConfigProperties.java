@@ -10,9 +10,8 @@ import org.springframework.stereotype.Component;
 import com.nimbusds.jose.jwk.JWKSet;
 
 /**
- * Configuration holder for security-config.properties.
- * Values are injected from property keys. The PropertySourcesPlaceholderConfigurer bean
- * (configured separately) loads config/hrv.properties where env var fallbacks
+ * Configuration holder for config/hrv.properties.
+ * Values are injected from property keys (PropertyPlaceholderConfigurer) in config/hrv.properties where env var fallbacks
  * and defaults are defined.
  */
 @Component
