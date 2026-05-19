@@ -1,5 +1,5 @@
 define([], function() {
-  const errBox = document.getElementById('err');
+  const errBox = document.getElementById('errorMessage');
 
   // Show Spring error messages (?error)
   (function () {

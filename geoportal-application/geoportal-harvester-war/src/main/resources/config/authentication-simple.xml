@@ -10,7 +10,7 @@
     <security:authentication-provider>
       <security:user-service>
         <security:user name="gptadmin" password="{noop}gptadmin" authorities="ROLE_ADMIN,ROLE_PUBLISHER" />
-        <security:user name="admin" password="{noop}admin" authorities="ROLE_ADMIN,ROLE_PUBLISHER" />
+        <security:user name="admin" password="{bcrypt}$2a$12$eP9QgrUV5U1Lgnh55XpXGeWwh80gY7SF6WXfiTL6bOStZGdnGmZea" authorities="ROLE_ADMIN,ROLE_PUBLISHER" />
         <security:user name="publisher" password="{noop}publisher" authorities="ROLE_PUBLISHER" />
         <security:user name="user" password="{noop}user" authorities="ROLE_USER" />
       </security:user-service>
