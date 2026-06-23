@@ -8,7 +8,7 @@
 	
   <security:ldap-server 
     id="ldapServer"  
-    url="ldap://gptelastic.esri.com:10389"
+    url=""
     manager-dn="uid=admin, ou=system" 
     manager-password="secret" />
 	

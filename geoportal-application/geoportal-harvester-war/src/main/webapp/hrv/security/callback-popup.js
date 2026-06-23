@@ -1,4 +1,4 @@
-define(['./auth-base.js'], function(authBase) {
+define(['./auth-base'], function(authBase) {
   const {
     TOKEN_ENDPOINT, CLIENT_ID, REDIRECT_URI,
     sendTokensToOpenerAndClose

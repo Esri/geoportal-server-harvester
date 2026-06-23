@@ -126,30 +126,18 @@ define(["dojo/_base/declare",
 	  		    sessionStorage.removeItem('pkce_code_verifier');
 	  		    sessionStorage.removeItem('pkce_state');
 
-	  		    // 2) Server-side logout (Spring Security default /logout endpoint)	
-	  			var def = new Deferred();
-	  			def.resolve(fetch(`${BASE}/logout`, {
-	                method: 'POST',
-	                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-	                credentials: 'include'
-	              }));
-	              def.then(() => {
-	                  console.log('Logout successful');
-	              }).catch(e => {
-	                  console.warn('Logout error', e);
-	              });	    
-	  		  fetch(`${BASE}/logout`, {
-	  		      method: 'POST',
-	  		      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-	  		      credentials: 'include'
-	  		    });
-	  		  } catch (e) {
-	  		    // Log-and-continue; redirect anyway
-	  		    console.warn('Logout error', e);
-	  		  } finally {
-	  		    // 3) Navigate user to login page 
-	  		    window.location.replace(redirectTo);
-	  		  }
+				// 2) Server-side logout (Spring Security default /logout endpoint)
+			    fetch(`${BASE}/logout`, {
+			      method: 'POST',
+			      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			      credentials: 'include'
+			    })
+			      .catch(e => console.warn('Logout error', e))
+			      .finally(() => window.location.replace(redirectTo));
+			  } catch (e) {
+			    console.warn('Logout error', e);
+			    window.location.replace(redirectTo);
+			  }
 	       }
 	  		
     });

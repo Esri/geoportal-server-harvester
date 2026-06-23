@@ -81,7 +81,6 @@ public class Client implements Closeable {
 
     private static final String DEFAULT_INDEX = "metadata";
     private static final String REST_ITEM_URL = "rest/metadata/item";
-    private static String ELASTIC_SEARCH_URL = "";
     private static final String ELASTIC_SCROLL_URL = "elastic/_search/scroll";
     private static final String TOKEN_URL = "oauth2/token";
 
@@ -91,6 +90,7 @@ public class Client implements Closeable {
     private final String collectionsFieldName;
 
     private TokenInfo tokenInfo;
+    private volatile String elasticSearchUrl;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -709,23 +709,30 @@ public class Client implements Closeable {
         return execute(request, QueryResponse.class);
     }
 
-    private String createElasticSearchUrl() throws IOException, URISyntaxException {  
-    	if(ELASTIC_SEARCH_URL.isBlank())
-    	{
-    		//Retrieve index name from  /geoportal/rest/geoportal
-    		URI uri = URI.create(this.url + "/rest/geoportal");
-    		String url = uri.normalize().toString();
-        	
-        	HttpGet request = new HttpGet(url);
+    private String createElasticSearchUrl() throws IOException, URISyntaxException {
+        if (StringUtils.isBlank(elasticSearchUrl)) {
+            synchronized (this) {
+                if (StringUtils.isBlank(elasticSearchUrl)) {
+                    URI uri = url.toURI().resolve("rest/geoportal");
+                    HttpGet request = new HttpGet(uri);
 
-            request.setConfig(DEFAULT_REQUEST_CONFIG);
-            request.setHeader("Content-Type", "application/json");
-            request.setHeader("User-Agent", HttpConstants.getUserAgent());
-            
-            GeoportalInfoResponse gpInfoRes =  execute(request, GeoportalInfoResponse.class);
-            ELASTIC_SEARCH_URL= "elastic/"+(gpInfoRes.getMetadataIndexName() != null ? gpInfoRes.getMetadataIndexName() : DEFAULT_INDEX)+"/_search" ;
-    	}        
-        return ELASTIC_SEARCH_URL;
+                    request.setConfig(DEFAULT_REQUEST_CONFIG);
+                    request.setHeader("Content-Type", "application/json");
+                    request.setHeader("User-Agent", HttpConstants.getUserAgent());
+
+                    if (cred != null && !cred.isEmpty()) {
+                        request.setHeader("Authorization", "Bearer " + getAccessToken());
+                    }
+                    GeoportalInfoResponse gpInfoRes = execute(request, GeoportalInfoResponse.class);
+                    String indexName = (gpInfoRes != null && gpInfoRes.getMetadataIndexName() != null)
+                            ? gpInfoRes.getMetadataIndexName()
+                            : DEFAULT_INDEX;
+                    elasticSearchUrl = "elastic/" + indexName + "/_search";
+                }
+            }
+        }
+
+        return elasticSearchUrl;
     }
 
     private HttpEntity createQueryEntity(String term, String value, long size, SearchContext searchContext) {
