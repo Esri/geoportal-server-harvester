@@ -1,5 +1,9 @@
 package com.esri.geoportal.base.security;
 
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfToken;
+
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
@@ -62,7 +66,10 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.client.RestTemplate;
 
 import com.nimbusds.jose.jwk.JWKSet;
@@ -114,8 +121,20 @@ public class SecurityConfig {
       OAuth2UserService<OAuth2UserRequest, OAuth2User> arcgisUserService
   ) throws Exception {
 
-    http
-      .csrf(csrf -> csrf.disable())
+	  Set<String> csrfExemptEndpoints = new HashSet<>(configProperties.getPublicEndpointsList());
+      for (EndpointSecurityConfig rule : securityEndPointProp.getSecuredEndpoints()) {
+          if (rule != null && rule.getPattern() != null && !rule.getPattern().trim().isEmpty()) {
+              csrfExemptEndpoints.add(rule.getPattern().trim());
+          }
+      }
+
+      http
+          .csrf(csrf -> {
+              csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+              if (!csrfExemptEndpoints.isEmpty()) {
+                  csrf.ignoringRequestMatchers(csrfExemptEndpoints.toArray(new String[0]));
+              }
+          })
       .headers(h -> h.frameOptions(f -> f.sameOrigin()))
       .authorizeHttpRequests(authorize -> {
         // Apply configured public endpoints (permitAll)
@@ -209,6 +228,17 @@ public class SecurityConfig {
       );
 
     http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+    
+
+    // Force token resolution so CookieCsrfTokenRepository emits XSRF-TOKEN for SPA requests.
+    http.addFilterAfter((request, response, filterChain) -> {
+        CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+        if (csrfToken != null) {
+            csrfToken.getToken();
+        }
+        filterChain.doFilter(request, response);
+    }, BasicAuthenticationFilter.class);
+
     return http.build();
   }
 

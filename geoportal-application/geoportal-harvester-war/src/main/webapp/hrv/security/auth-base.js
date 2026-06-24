@@ -18,7 +18,7 @@ define([], function() {
   const ARCGIS_ENDPOINT = `${BASE}/login/oauth2/code/arcgis`; // ArcGIS OAuth2 callback
   const REDIRECT_URI   = `${BASE}/callback-popup.html`; // must be registered in RegisteredClient
   const CLIENT_ID      = 'harvester-ui-client';         // keep in sync with server config
-  const SCOPES         = ['openid', 'profile', 'api.read'];
+  const SCOPES         = ['openid', 'profile', 'api.read', 'api.write']; // keep in sync with server config
 
   // ===== PKCE helpers =====
   async function sha256(input) {

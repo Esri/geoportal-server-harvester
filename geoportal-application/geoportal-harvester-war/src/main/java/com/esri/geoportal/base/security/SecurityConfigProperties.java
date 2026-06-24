@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.nimbusds.jose.jwk.JWKSet;
-
 /**
  * Configuration holder for config/hrv.properties.
  * Values are injected from property keys (PropertyPlaceholderConfigurer) in config/hrv.properties where env var fallbacks
