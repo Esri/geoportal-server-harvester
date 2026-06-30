@@ -51,16 +51,22 @@ public class ArcGISAuthenticationConverter implements AuthenticationConverter {
             logger.info("Processing ArcGIS user: {}", username);
             
             // Create authorities
-            Set<GrantedAuthority> authorities = new HashSet<>();
-            authorities.add(new SimpleGrantedAuthority("ROLE_PUBLISHER"));
+            Set<GrantedAuthority> authorities = new HashSet<>();            
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
             
-            // Check for admin role in ArcGIS
+            // Check for admin/publisher role in ArcGIS
             Object role = attributes.get("role");
-            if (role != null && "admin".equalsIgnoreCase(role.toString())) {
-                logger.info("User {} has admin role in ArcGIS", username);
-                authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-            }
+            if (role != null) {
+            	String roleStr = role.toString().toLowerCase();
+            	 if(!roleStr.isBlank() && roleStr.contains("admin")) {
+                     logger.debug("User {} has admin role in ArcGIS", username);
+                     authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+                 }
+            	 if(!roleStr.isBlank() && roleStr.contains("publisher")) {
+                     logger.debug("User {} has publisher role in ArcGIS", username);
+                     authorities.add(new SimpleGrantedAuthority("ROLE_PUBLISHER"));
+                 }
+            }           
             
             logger.info("User {} authenticated with authorities: {}", username, authorities);
             

@@ -39,6 +39,9 @@ public class SecurityConfigProperties {
     @Value("${security.public-endpoints:}")
     private String publicEndpoints;
 
+    @Value("${security.arcgis.auth.enabled:false}")
+    private boolean arcgisAuthEnabled;
+
 	@Value("${security.arcgis.clientId:}")
     private String arcgisClientId;
 	
@@ -68,6 +71,15 @@ public class SecurityConfigProperties {
         if (apiAdminClientSecret == null || apiAdminClientSecret.isEmpty()) missing.append("security.api.admin.clientSecret, ");
         if (apiReadClientId == null || apiReadClientId.isEmpty()) missing.append("security.api.read.clientId, ");
         if (apiReadClientSecret == null || apiReadClientSecret.isEmpty()) missing.append("security.api.read.clientSecret, ");
+
+        if (arcgisAuthEnabled) {
+            if (arcgisClientId == null || arcgisClientId.isEmpty()) missing.append("security.arcgis.clientId, ");
+            if (arcgisClientSecret == null || arcgisClientSecret.isEmpty()) missing.append("security.arcgis.clientSecret, ");
+            if (arcgisAuthorizationURI == null || arcgisAuthorizationURI.isEmpty()) missing.append("security.arcgis.authorizationURI, ");
+            if (arcgisTokenURI == null || arcgisTokenURI.isEmpty()) missing.append("security.arcgis.tokenURI, ");
+            if (arcgisUserInfoURI == null || arcgisUserInfoURI.isEmpty()) missing.append("security.arcgis.userInfoURI, ");
+            if (arcgisUserNameAttr == null || arcgisUserNameAttr.isEmpty()) missing.append("security.arcgis.userNameAttr, ");
+        }
 
         if (missing.length() > 0) {
             // remove trailing comma+space
@@ -102,6 +114,10 @@ public class SecurityConfigProperties {
 
     public String getApiReadClientSecret() {
         return apiReadClientSecret;
+    }
+
+    public boolean isArcgisAuthEnabled() {
+        return arcgisAuthEnabled;
     }
     
     public String getArcgisAuthorizationURI() {

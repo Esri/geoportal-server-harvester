@@ -94,8 +94,20 @@ public class AtTrigger implements Trigger {
     public static final String T_AT_TIME = "t-at-time";
     public static final String T_AT_DAY = "t-at-day";
     public static final String TYPE = "AT";
-    private static final ScheduledExecutorService service = Executors.newScheduledThreadPool(1000);
+    private static final int POOL_SIZE = 1000;
+    private static volatile ScheduledExecutorService service = newService();
     private static final WeakHashMap<AtTriggerInstance, WeakReference<AtTriggerInstance>> weakMap = new WeakHashMap<>();
+
+    private static ScheduledExecutorService newService() {
+        return Executors.newScheduledThreadPool(POOL_SIZE);
+    }
+
+    private static synchronized ScheduledExecutorService scheduler() {
+        if (service == null || service.isShutdown() || service.isTerminated()) {
+            service = newService();
+        }
+        return service;
+    }
 
     @Override
     public String getType() {
@@ -149,7 +161,10 @@ public class AtTrigger implements Trigger {
     weakMap.values().stream().map(v->v.get()).forEach(i->{
             i.deactivate();
         });
-        service.shutdownNow();
+        ScheduledExecutorService scheduler = service;
+        if (scheduler != null) {
+            scheduler.shutdownNow();
+        }
     }
 
     /**
@@ -185,7 +200,7 @@ public class AtTrigger implements Trigger {
 
                 long delay = calcDelayToNextMatch(predicate);
                 LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is --new code now scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition())));
-                future = service.schedule(
+                future = scheduler().schedule(
                         newRunnable(triggerContext, predicate),
                         delay,
                         TimeUnit.MINUTES
@@ -218,7 +233,7 @@ public class AtTrigger implements Trigger {
                                     long delay = calcDelayToNextMatch(predicate);
                                     LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is now scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition())));
 
-                                    future = service.schedule(
+                                    future = scheduler().schedule(
                                             newRunnable(triggerContext, predicate),
                                             delay,
                                             TimeUnit.MINUTES
@@ -242,7 +257,7 @@ public class AtTrigger implements Trigger {
 
                     long delay = calcDelayToNextMatch(predicate);
                     LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is --new code now scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition())));
-                    future = service.schedule(
+                    future = scheduler().schedule(
                             newRunnable(triggerContext, predicate),
                             delay,
                             TimeUnit.MINUTES

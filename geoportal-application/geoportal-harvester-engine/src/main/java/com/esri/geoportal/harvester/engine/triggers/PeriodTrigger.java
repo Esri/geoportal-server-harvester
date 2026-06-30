@@ -71,8 +71,20 @@ public class PeriodTrigger implements Trigger {
   private static final Logger LOG = LoggerFactory.getLogger(PeriodTrigger.class);
   public static final String T_PERIOD = "t-period";
   public static final String TYPE = "PERIOD";
-  private static final ScheduledExecutorService service = Executors.newScheduledThreadPool(1000);
+  private static final int POOL_SIZE = 1000;
+  private static volatile ScheduledExecutorService service = newService();
   private static final WeakHashMap<PeriodTriggerInstance,WeakReference<PeriodTriggerInstance>> weakMap = new WeakHashMap<>();
+
+  private static ScheduledExecutorService newService() {
+    return Executors.newScheduledThreadPool(POOL_SIZE);
+  }
+
+  private static synchronized ScheduledExecutorService scheduler() {
+    if (service == null || service.isShutdown() || service.isTerminated()) {
+      service = newService();
+    }
+    return service;
+  }
 
   @Override
   public String getType() {
@@ -103,7 +115,10 @@ public class PeriodTrigger implements Trigger {
     weakMap.values().stream().map(v->v.get()).forEach(i->{
         i.deactivate();
     });
-    service.shutdownNow();
+    ScheduledExecutorService scheduler = service;
+    if (scheduler != null) {
+      scheduler.shutdownNow();
+    }
   }
 
   /**
@@ -169,7 +184,7 @@ public class PeriodTrigger implements Trigger {
       try {
         if (lastHarvest==null) {
           LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition())));
-          future = service.submit(runnable);
+          future = scheduler().submit(runnable);
         } else {
           TemporalAmount tempAmt = parseTemporalAmount(triggerDefinition.getProperties().get(T_PERIOD));
           LocalDateTime lh = LocalDateTime.ofInstant(lastHarvest.toInstant(), ZoneId.systemDefault() );
@@ -178,10 +193,10 @@ public class PeriodTrigger implements Trigger {
           
           if (delay>0) {
             LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is scheduled to be run in %d minutes: %s", delay, triggerDefinition.getTaskDefinition())));
-            future = service.schedule(runnable, delay, TimeUnit.MINUTES);
+            future = scheduler().schedule(runnable, delay, TimeUnit.MINUTES);
           } else {
             LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is being submitted now: %s", triggerDefinition.getTaskDefinition())));
-            future = service.submit(runnable);
+            future = scheduler().submit(runnable);
           }
         }
       } catch (ParseException ex) {

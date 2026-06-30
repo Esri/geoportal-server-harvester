@@ -18,6 +18,9 @@ import java.util.UUID;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -33,6 +36,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
@@ -114,11 +118,11 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http,
       JwtAuthenticationFilter jwtAuthenticationFilter,
-      ClientRegistrationRepository clientRegistrationRepository,
-      OAuth2AuthorizedClientService authorizedClientService,
-      OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> arcgisTokenClient,
-      // Inject customized DefaultOAuth2UserService
-      OAuth2UserService<OAuth2UserRequest, OAuth2User> arcgisUserService
+      ObjectProvider<ClientRegistrationRepository> clientRegistrationRepositoryProvider,
+      ObjectProvider<OAuth2AuthorizedClientService> authorizedClientServiceProvider,
+      ObjectProvider<OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest>> arcgisTokenClientProvider,
+      @Qualifier("arcgisUserService")
+      ObjectProvider<OAuth2UserService<OAuth2UserRequest, OAuth2User>> arcgisUserServiceProvider
   ) throws Exception {
 
 	  Set<String> csrfExemptEndpoints = new HashSet<>(configProperties.getPublicEndpointsList());
@@ -183,9 +187,24 @@ public class SecurityConfig {
           .loginProcessingUrl("/login")
           .defaultSuccessUrl("/custom-login.html?loggedin", true) // — force=true is critical
           .failureUrl("/custom-login.html?error")
-          .permitAll())
+          .permitAll());
+
+    if (configProperties.isArcgisAuthEnabled()) {
+      ClientRegistrationRepository clientRegistrationRepository = getRequiredBean(
+          clientRegistrationRepositoryProvider,
+          "ClientRegistrationRepository");
+      OAuth2AuthorizedClientService authorizedClientService = getRequiredBean(
+          authorizedClientServiceProvider,
+          "OAuth2AuthorizedClientService");
+      OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> arcgisTokenClient = getRequiredBean(
+          arcgisTokenClientProvider,
+          "OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest>");
+      OAuth2UserService<OAuth2UserRequest, OAuth2User> arcgisUserService = getRequiredBean(
+          arcgisUserServiceProvider,
+          "OAuth2UserService<OAuth2UserRequest, OAuth2User>");
+
       // ArcGIS federation
-      .oauth2Login(oauth -> oauth
+      http.oauth2Login(oauth -> oauth
           .clientRegistrationRepository(clientRegistrationRepository)
           .authorizedClientService(authorizedClientService)
           .userInfoEndpoint(userInfo -> {
@@ -213,8 +232,10 @@ public class SecurityConfig {
             // Redirect to a friendlier error page
             response.sendRedirect(request.getContextPath() + "/custom-login.html?oauth2_error=" + ex.getClass().getSimpleName());
           })
-      )
-      .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
+      );
+    }
+
+    http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
         jwt.decoder(jwtDecoder(jwkSource()));
         jwt.jwtAuthenticationConverter(jwtAuthenticationConverter());
       }))
@@ -246,6 +267,14 @@ public class SecurityConfig {
     return Arrays.stream(csv.split(","))
         .map(String::trim).filter(s -> !s.isEmpty())
         .toArray(String[]::new);
+  }
+
+  private <T> T getRequiredBean(ObjectProvider<T> provider, String beanName) {
+    T bean = provider.getIfAvailable();
+    if (bean == null) {
+      throw new IllegalStateException("ArcGIS authentication is enabled, but required bean is missing: " + beanName);
+    }
+    return bean;
   }
 
   //Password encoder utility
@@ -300,6 +329,9 @@ public class SecurityConfig {
   // === ArcGIS ClientRegistration & OAuth2 client beans =============================
   @Bean
   public ClientRegistrationRepository clientRegistrationRepository() {
+    if (!configProperties.isArcgisAuthEnabled()) {
+      return registrationId -> null;
+    }
     ClientRegistration arcgis = ClientRegistration.withRegistrationId("arcgis")
         .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST) 
         .clientId(configProperties.getArcgisClientId())
@@ -318,6 +350,24 @@ public class SecurityConfig {
 
   @Bean
   public OAuth2AuthorizedClientService authorizedClientService(ClientRegistrationRepository repo) {
+    if (!configProperties.isArcgisAuthEnabled()) {
+      return new OAuth2AuthorizedClientService() {
+        @Override
+        public <T extends OAuth2AuthorizedClient> T loadAuthorizedClient(String clientRegistrationId, String principalName) {
+          return null;
+        }
+
+        @Override
+        public void saveAuthorizedClient(OAuth2AuthorizedClient authorizedClient, Authentication principal) {
+          // no-op when ArcGIS auth is disabled
+        }
+
+        @Override
+        public void removeAuthorizedClient(String clientRegistrationId, String principalName) {
+          // no-op when ArcGIS auth is disabled
+        }
+      };
+    }
     return new InMemoryOAuth2AuthorizedClientService(repo);
   }
 
