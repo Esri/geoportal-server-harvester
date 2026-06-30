@@ -64,14 +64,6 @@ public class SecurityConfigProperties {
     @jakarta.annotation.PostConstruct
     private void validate() {
         StringBuilder missing = new StringBuilder();
-        if (issuer == null || issuer.isEmpty()) missing.append("security.issuer, ");
-        if (uiClientId == null || uiClientId.isEmpty()) missing.append("security.ui.clientId, ");
-        if (uiRedirectUri == null || uiRedirectUri.isEmpty()) missing.append("security.ui.redirectUri, ");
-        if (apiAdminClientId == null || apiAdminClientId.isEmpty()) missing.append("security.api.admin.clientId, ");
-        if (apiAdminClientSecret == null || apiAdminClientSecret.isEmpty()) missing.append("security.api.admin.clientSecret, ");
-        if (apiReadClientId == null || apiReadClientId.isEmpty()) missing.append("security.api.read.clientId, ");
-        if (apiReadClientSecret == null || apiReadClientSecret.isEmpty()) missing.append("security.api.read.clientSecret, ");
-
         if (arcgisAuthEnabled) {
             if (arcgisClientId == null || arcgisClientId.isEmpty()) missing.append("security.arcgis.clientId, ");
             if (arcgisClientSecret == null || arcgisClientSecret.isEmpty()) missing.append("security.arcgis.clientSecret, ");
