@@ -23,6 +23,7 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/topic",
         "dojo/router",
+		"dojo/Deferred",
         "dijit/form/CheckBox",
         "dijit/form/RadioButton",
         "dijit/layout/ContentPane", 
@@ -34,14 +35,15 @@ define(["dojo/_base/declare",
         "hrv/ui/brokers/BrokersPane",
         "hrv/ui/tasks/TasksPane",
         "hrv/ui/tasks/HistoryPane",
-        "hrv/ui/processes/ProcessesPane"
+        "hrv/ui/processes/ProcessesPane",
+		"hrv/config"
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
            i18n,template,
-           lang,topic,router,
+           lang,topic,router,Deferred,
            CheckBox,RadioButton,ContentPane,LayoutContainer,
-           Header,Status,Nav,Stage,BrokersPane,TasksPane,HistoryPane,ProcessesPane
+           Header,Status,Nav,Stage,BrokersPane,TasksPane,HistoryPane,ProcessesPane,config
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
@@ -49,6 +51,13 @@ define(["dojo/_base/declare",
       templateString: template,
     
       postCreate: function(){
+		var btnLogout = document.getElementById("btnLogout");
+		if(config.app.secure) {
+            btnLogout.style.display = "block";
+        } else {
+            btnLogout.style.display = "none";
+        }
+		
         // home
         router.register("/", function() {
           router.go("/home");
@@ -93,12 +102,43 @@ define(["dojo/_base/declare",
           topic.publish("nav",{type: "failed", uuid: evt.params.uuid, eventid: evt.params.eventid});
         });
         
-        
         // initialize router
         router.startup();
         if (!location.hash || location.hash.length==0) {
           router.go("/home");
         }
-      }
+      },
+	  _onLogout: function() {
+	  		console.log('Logout initiated');
+	  		const ORIGIN = window.location.origin || (window.location.protocol + '//' + window.location.host);		
+	  		const parts = window.location.pathname.split('/').filter(Boolean);
+	  		  // If this page is at /<context>/file.html, the first segment is the WAR context.
+	  		const CONTEXT = parts.length > 0 ? '/' + parts[0] : ''; 
+	          const BASE = ORIGIN + CONTEXT; 
+	          const redirectTo = BASE+'/login.html'; // Spring Security default logout redirect
+	  		try {
+	  		    // 1) Clear SPA-side tokens/state
+	  		    sessionStorage.removeItem('access_token');
+	  		    sessionStorage.removeItem('refresh_token');
+	  		    sessionStorage.removeItem('id_token');
+	  		    sessionStorage.removeItem('token_type');
+	  		    sessionStorage.removeItem('expires_in');		  
+	  		    sessionStorage.removeItem('pkce_code_verifier');
+	  		    sessionStorage.removeItem('pkce_state');
+
+				// 2) Server-side logout (Spring Security default /logout endpoint)
+			    fetch(`${BASE}/logout`, {
+			      method: 'POST',
+			      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			      credentials: 'include'
+			    })
+			      .catch(e => console.warn('Logout error', e))
+			      .finally(() => window.location.replace(redirectTo));
+			  } catch (e) {
+			    console.warn('Logout error', e);
+			    window.location.replace(redirectTo);
+			  }
+	       }
+	  		
     });
 });

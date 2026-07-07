@@ -81,17 +81,16 @@ public class Client implements Closeable {
 
     private static final String DEFAULT_INDEX = "metadata";
     private static final String REST_ITEM_URL = "rest/metadata/item";
-    private static final String ELASTIC_SEARCH_URL = "elastic/{metadata}/_search";
     private static final String ELASTIC_SCROLL_URL = "elastic/_search/scroll";
-    private static final String TOKEN_URL = "oauth/token";
+    private static final String TOKEN_URL = "oauth2/token";
 
     private final CloseableHttpClient httpClient;
     private final URL url;
-    private final SimpleCredentials cred;
-    private final String index;
+    private final SimpleCredentials cred;    
     private final String collectionsFieldName;
 
     private TokenInfo tokenInfo;
+    private volatile String elasticSearchUrl;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -104,11 +103,10 @@ public class Client implements Closeable {
      * @param index index name
      * @param collectionsFieldName collections field name
      */
-    public Client(CloseableHttpClient httpClient, URL url, SimpleCredentials cred, String index, String collectionsFieldName) {
+    public Client(CloseableHttpClient httpClient, URL url, SimpleCredentials cred, String collectionsFieldName) {
         this.httpClient = httpClient;
         this.url = url;
-        this.cred = cred;
-        this.index = StringUtils.defaultIfBlank(index, DEFAULT_INDEX);
+        this.cred = cred;       
         this.collectionsFieldName = collectionsFieldName;
 
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -123,8 +121,8 @@ public class Client implements Closeable {
      * @param index index name
      * @param collectionsFieldName collections field name
      */
-    public Client(URL url, SimpleCredentials cred, String index, String collectionsFieldName) {
-        this(HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build(), url, cred, index, collectionsFieldName);
+    public Client(URL url, SimpleCredentials cred, String collectionsFieldName) {
+        this(HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build(), url, cred,  collectionsFieldName);
     }
 
     /**
@@ -473,7 +471,9 @@ public class Client implements Closeable {
         put.setEntity(entity);
         put.setHeader("Content-Type", "application/json; charset=UTF-8");
         put.setHeader("User-Agent", HttpConstants.getUserAgent());
-
+	    if (cred != null && !cred.isEmpty()) {
+	    	  put.setHeader("Authorization","Bearer "+getAccessToken());
+	    }
         PublishResponse response = execute(put, PublishResponse.class);
         if (response.getError() == null && owner != null) {
             changeOwner(response.getId(), owner);
@@ -486,6 +486,9 @@ public class Client implements Closeable {
         HttpGet get = new HttpGet(uri);
         get.setConfig(DEFAULT_REQUEST_CONFIG);
         get.setHeader("User-Agent", HttpConstants.getUserAgent());
+        if (cred != null && !cred.isEmpty()) {
+	    	  get.setHeader("Authorization","Bearer "+getAccessToken());
+	    }
         Hit hit = execute(get, Hit.class);
         return new EntryRef(hit._id, readUri(hit._source, uri), readLastUpdated(hit._source, new Date()));
     }
@@ -494,6 +497,9 @@ public class Client implements Closeable {
         HttpGet get = new HttpGet(uri);
         get.setConfig(DEFAULT_REQUEST_CONFIG);
         get.setHeader("User-Agent", HttpConstants.getUserAgent());
+        if (cred != null && !cred.isEmpty()) {
+	    	  get.setHeader("Authorization","Bearer "+getAccessToken());
+	    }
 
         try ( CloseableHttpResponse httpResponse = httpClient.execute(get);  InputStream contentStream = httpResponse.getEntity().getContent();) {
             if (httpResponse.getStatusLine().getStatusCode() >= 400) {
@@ -512,6 +518,9 @@ public class Client implements Closeable {
         put.setConfig(DEFAULT_REQUEST_CONFIG);
         put.setHeader("Content-Type", "application/json; charset=UTF-8");
         put.setHeader("User-Agent", HttpConstants.getUserAgent());
+        if (cred != null && !cred.isEmpty()) {
+	    	  put.setHeader("Authorization","Bearer "+getAccessToken());
+	    }
 
         return execute(put, PublishResponse.class);
     }
@@ -540,44 +549,34 @@ public class Client implements Closeable {
         HttpDelete del = new HttpDelete(uri);
         del.setConfig(DEFAULT_REQUEST_CONFIG);
         del.setHeader("User-Agent", HttpConstants.getUserAgent());
+        if (cred != null && !cred.isEmpty()) {
+	    	  del.setHeader("Authorization","Bearer "+getAccessToken());
+	    }
         return execute(del, PublishResponse.class);
     }
 
     private URI createItemsUri() throws URISyntaxException, IOException {
         URIBuilder b = new URIBuilder(url.toURI().resolve(REST_ITEM_URL));
-        if (cred != null && !cred.isEmpty()) {
-            b.addParameter("access_token", getAccessToken());
-        }
         return b.build();
     }
 
     private URI createItemUri(String id) throws URISyntaxException, IOException {
         URIBuilder b = new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id));
-        if (cred != null && !cred.isEmpty()) {
-            b.addParameter("access_token", getAccessToken());
-        }
         return b.build();
     }
 
     private URI createChangeOwnerUri(String id, String owner) throws URISyntaxException, IOException {
         return new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/owner/" + owner))
-                .addParameter("access_token", getAccessToken())
                 .build();
     }
 
     private URI createXmlUri(String id) throws URISyntaxException, IOException {
         URIBuilder b = new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id + "/xml"));
-        if (cred != null && !cred.isEmpty()) {
-            b.addParameter("access_token", getAccessToken());
-        }
         return b.build();
     }
 
     private URI createJsonUri(String id) throws URISyntaxException, IOException {
         URIBuilder b = new URIBuilder(url.toURI().resolve(REST_ITEM_URL + "/" + id));
-        if (cred != null && !cred.isEmpty()) {
-            b.addParameter("access_token", getAccessToken());
-        }
         return b.build();
     }
 
@@ -606,9 +605,6 @@ public class Client implements Closeable {
 
         do {
             URIBuilder builder = new URIBuilder(url.toURI().resolve(createElasticSearchUrl()));
-            if (cred != null && !cred.isEmpty()) {
-                builder = builder.addParameter("access_token", getAccessToken());
-            }
 
             if (search_after != null) {
                 root.set("search_after", mapper.createArrayNode().add(search_after));
@@ -684,19 +680,12 @@ public class Client implements Closeable {
     }
 
     private QueryResponse query(URIBuilder builder, HttpEntity entity) throws IOException, URISyntaxException {
-        if (cred != null && !cred.isEmpty()) {
-            builder = builder.addParameter("access_token", getAccessToken());
-        }
-
         QueryResponse response = null;
         try {
             response = query(builder.build(), entity);
         } catch (HttpResponseException ex) {
             if (ex.getStatusCode() == 401) {
                 clearToken();
-                if (cred != null && !cred.isEmpty()) {
-                    builder = builder.addParameter("access_token", getAccessToken());
-                }
                 response = query(builder.build(), entity);
             } else {
                 throw ex;
@@ -713,12 +702,37 @@ public class Client implements Closeable {
         request.setConfig(DEFAULT_REQUEST_CONFIG);
         request.setHeader("Content-Type", "application/json");
         request.setHeader("User-Agent", HttpConstants.getUserAgent());
+        if (cred != null && !cred.isEmpty()) {
+        	request.setHeader("Authorization","Bearer "+getAccessToken());
+	    }
 
         return execute(request, QueryResponse.class);
     }
 
-    private String createElasticSearchUrl() {
-        return ELASTIC_SEARCH_URL.replaceAll("\\{metadata\\}", index);
+    private String createElasticSearchUrl() throws IOException, URISyntaxException {
+        if (StringUtils.isBlank(elasticSearchUrl)) {
+            synchronized (this) {
+                if (StringUtils.isBlank(elasticSearchUrl)) {
+                    URI uri = url.toURI().resolve("rest/geoportal");
+                    HttpGet request = new HttpGet(uri);
+
+                    request.setConfig(DEFAULT_REQUEST_CONFIG);
+                    request.setHeader("Content-Type", "application/json");
+                    request.setHeader("User-Agent", HttpConstants.getUserAgent());
+
+                    if (cred != null && !cred.isEmpty()) {
+                        request.setHeader("Authorization", "Bearer " + getAccessToken());
+                    }
+                    GeoportalInfoResponse gpInfoRes = execute(request, GeoportalInfoResponse.class);
+                    String indexName = (gpInfoRes != null && gpInfoRes.getMetadataIndexName() != null)
+                            ? gpInfoRes.getMetadataIndexName()
+                            : DEFAULT_INDEX;
+                    elasticSearchUrl = "elastic/" + indexName + "/_search";
+                }
+            }
+        }
+
+        return elasticSearchUrl;
     }
 
     private HttpEntity createQueryEntity(String term, String value, long size, SearchContext searchContext) {
@@ -755,9 +769,9 @@ public class Client implements Closeable {
                     .addParameter("scroll", "1m");
         }
 
-        if (cred != null && !cred.isEmpty()) {
-            builder = builder.addParameter("access_token", getAccessToken());
-        }
+//        if (cred != null && !cred.isEmpty()) {
+//            builder = builder.addParameter("access_token", getAccessToken());
+//        }
 
         return builder.build();
     }
@@ -808,11 +822,12 @@ public class Client implements Closeable {
         post.setHeader("Accept", "application/json");
         HashMap<String, String> params = new HashMap<>();
         if (cred != null) {
-            params.put("username", StringUtils.trimToEmpty(cred.getUserName()));
-            params.put("password", StringUtils.trimToEmpty(cred.getPassword()));
+        	 
+             params.put("client_id", StringUtils.trimToEmpty(cred.getUserName()));
+             params.put("client_secret", StringUtils.trimToEmpty(cred.getPassword()));
         }
-        params.put("grant_type", "password");
-        params.put("client_id", "geoportal-client");
+        params.put("grant_type", "client_credentials");
+        params.put("scope", "api.write");
         HttpEntity entity = new UrlEncodedFormEntity(params.entrySet().stream()
                 .map(e -> new BasicNameValuePair(e.getKey(), e.getValue())).collect(Collectors.toList()));
         post.setEntity(entity);

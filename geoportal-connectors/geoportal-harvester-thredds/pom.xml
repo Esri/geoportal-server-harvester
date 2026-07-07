@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.esri.geoportal</groupId>
         <artifactId>geoportal-connectors</artifactId>
-        <version>3.0.1</version>
+        <version>4.0.0</version>
     </parent>
     <artifactId>geoportal-harvester-thredds</artifactId>
     <packaging>jar</packaging>

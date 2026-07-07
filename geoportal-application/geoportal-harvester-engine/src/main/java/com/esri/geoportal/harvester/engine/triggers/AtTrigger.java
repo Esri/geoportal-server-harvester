@@ -15,40 +15,41 @@
  */
 package com.esri.geoportal.harvester.engine.triggers;
 
-import com.esri.geoportal.commons.csw.client.IProfile;
-import com.esri.geoportal.harvester.api.ProcessInstance;
-import com.esri.geoportal.harvester.api.Trigger;
-import com.esri.geoportal.harvester.api.TriggerInstance;
-import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
-import com.esri.geoportal.harvester.api.defs.UITemplate;
-import com.esri.geoportal.harvester.api.ex.DataProcessorException;
-import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
-import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
+import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
+
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
+
+import org.owasp.esapi.ESAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static com.esri.geoportal.commons.utils.CrlfUtils.formatForLog;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
-import org.owasp.esapi.ESAPI;
+
+import com.esri.geoportal.harvester.api.ProcessInstance;
+import com.esri.geoportal.harvester.api.Trigger;
+import com.esri.geoportal.harvester.api.TriggerInstance;
+import com.esri.geoportal.harvester.api.base.BaseProcessInstanceListener;
+import com.esri.geoportal.harvester.api.defs.TriggerDefinition;
+import com.esri.geoportal.harvester.api.defs.UITemplate;
 import com.esri.geoportal.harvester.api.defs.UITemplate.Choice;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import com.esri.geoportal.harvester.api.ex.DataProcessorException;
+import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 
 
 /**
@@ -93,15 +94,28 @@ public class AtTrigger implements Trigger {
     public static final String T_AT_TIME = "t-at-time";
     public static final String T_AT_DAY = "t-at-day";
     public static final String TYPE = "AT";
-    private static final ScheduledExecutorService service = Executors.newScheduledThreadPool(1000);
+    private static final int POOL_SIZE = 1000;
+    private static volatile ScheduledExecutorService service = newService();
     private static final WeakHashMap<AtTriggerInstance, WeakReference<AtTriggerInstance>> weakMap = new WeakHashMap<>();
+
+    private static ScheduledExecutorService newService() {
+        return Executors.newScheduledThreadPool(POOL_SIZE);
+    }
+
+    private static synchronized ScheduledExecutorService scheduler() {
+        if (service == null || service.isShutdown() || service.isTerminated()) {
+            service = newService();
+        }
+        return service;
+    }
 
     @Override
     public String getType() {
         return TYPE;
     }
 
-    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
     public UITemplate getTemplate(Locale locale) {
         ResourceBundle bundle = ResourceBundle.getBundle("EngineResource", locale);
         List<UITemplate.Argument> arguments = new ArrayList<>();
@@ -116,12 +130,14 @@ public class AtTrigger implements Trigger {
         dayOfWeek.put("7", bundle.getString("engine.triggers.at.day7")); 
         dayOfWeek.put("1,2,3,4,5,6,7", bundle.getString("engine.triggers.at.dayAll"));       
        
-        Choice<String>[] choices = dayOfWeek.entrySet()
+        
+		Choice<String>[] choices = dayOfWeek.entrySet()
         .stream()
         .map(e -> new Choice<>(e.getKey(), e.getValue()))
         .toArray(Choice[]::new);
         arguments.add(new UITemplate.ChoiceArgument(T_AT_DAY, bundle.getString("engine.triggers.at.day"), Arrays.asList(choices)){
-            public String getDefault() {
+            @SuppressWarnings("unused")
+			public String getDefault() {
               return "1";
             }
         });
@@ -145,7 +161,10 @@ public class AtTrigger implements Trigger {
     weakMap.values().stream().map(v->v.get()).forEach(i->{
             i.deactivate();
         });
-        service.shutdownNow();
+        ScheduledExecutorService scheduler = service;
+        if (scheduler != null) {
+            scheduler.shutdownNow();
+        }
     }
 
     /**
@@ -181,7 +200,7 @@ public class AtTrigger implements Trigger {
 
                 long delay = calcDelayToNextMatch(predicate);
                 LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is --new code now scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition())));
-                future = service.schedule(
+                future = scheduler().schedule(
                         newRunnable(triggerContext, predicate),
                         delay,
                         TimeUnit.MINUTES
@@ -214,7 +233,7 @@ public class AtTrigger implements Trigger {
                                     long delay = calcDelayToNextMatch(predicate);
                                     LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is now scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition())));
 
-                                    future = service.schedule(
+                                    future = scheduler().schedule(
                                             newRunnable(triggerContext, predicate),
                                             delay,
                                             TimeUnit.MINUTES
@@ -238,7 +257,7 @@ public class AtTrigger implements Trigger {
 
                     long delay = calcDelayToNextMatch(predicate);
                     LOG.info(ESAPI.encoder().encodeForHTML(String.format("Task is --new code now scheduled to be run in %d minues: %s", delay, triggerDefinition.getTaskDefinition())));
-                    future = service.schedule(
+                    future = scheduler().schedule(
                             newRunnable(triggerContext, predicate),
                             delay,
                             TimeUnit.MINUTES
@@ -439,9 +458,9 @@ public class AtTrigger implements Trigger {
          * @param cal calendar
          * @return minute of the day.
          */
-        private int extractMinOfDay(Calendar cal) {
-            int minOfDay = cal.get(Calendar.HOUR_OF_DAY) * 60 + cal.get(Calendar.MINUTE);
-            return minOfDay;
-        }
+//        private int extractMinOfDay(Calendar cal) {
+//            int minOfDay = cal.get(Calendar.HOUR_OF_DAY) * 60 + cal.get(Calendar.MINUTE);
+//            return minOfDay;
+//        }
     }
 }

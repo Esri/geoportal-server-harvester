@@ -37,7 +37,7 @@ import org.apache.commons.lang3.StringUtils;
   private URL hostUrl;
   private boolean forceAdd;
   private boolean cleanup;
-  private String index;
+ // private String index;
   private boolean emitXml = true;
   private boolean emitJson = false;
   private boolean translatePdf = true;
@@ -77,7 +77,7 @@ import org.apache.commons.lang3.StringUtils;
       }
       forceAdd = Boolean.parseBoolean(get(P_FORCE_ADD));
       cleanup  = Boolean.parseBoolean(get(P_CLEANUP));
-      index  = get(P_INDEX);
+      //index  = get(P_INDEX);
       emitXml = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_ACCEPT_XML)), true);
       emitJson = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_ACCEPT_JSON)), false);
       translatePdf = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_TRANSLATE_PDF)), true);
@@ -92,7 +92,7 @@ import org.apache.commons.lang3.StringUtils;
     consume(params,P_HOST_URL);
     consume(params,P_FORCE_ADD);
     consume(params,P_CLEANUP);
-    consume(params,P_INDEX);
+    //consume(params,P_INDEX);
     consume(params,P_ACCEPT_XML);
     consume(params,P_ACCEPT_JSON);
     consume(params,P_TRANSLATE_PDF);
@@ -173,18 +173,18 @@ import org.apache.commons.lang3.StringUtils;
    * Gets index.
    * @return index
    */
-  public String getIndex() {
-    return index;
-  }
-
-  /**
-   * Sets index.
-   * @param index index
-   */
-  public void setIndex(String index) {
-    this.index = index;
-    set(P_INDEX, index);
-  }
+//  public String getIndex() {
+//    return index;
+//  }
+//
+//  /**
+//   * Sets index.
+//   * @param index index
+//   */
+//  public void setIndex(String index) {
+//    this.index = index;
+//    set(P_INDEX, index);
+//  }
 
   public boolean getAcceptXml() {
     return emitXml;

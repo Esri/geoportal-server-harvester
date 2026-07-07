@@ -48,6 +48,17 @@ define({
       caption: "Harvester",
       logout: "Log out"
     },
+	login: {
+      caption: "Sign In",
+      label: "Sign In",
+      username: "Username",
+      password: "Password"     
+    },
+	landing: {
+		signInLocalAccount: "Sign in with Application Account",
+		signInArcGIS: "Sign in with ArcGIS",
+		caption: "Sign in to Harvester"		
+	},
 
     navigation: {
       home: "Home",

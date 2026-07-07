@@ -1,65 +1,58 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Harvester</title>
-    <style>
-      body {
-        width: 100%;
-      }
-      .h-login {
-        margin: 0 auto;
-        width: 330px;
-      }
-      .h-title {
-        height: 20px;
-        background-color: #196fa6;
-        padding: 15px;
-        color: #ffffff;
-        font-weight: 400;
-        font-size: 16px;
-      }
-      .h-error {
-        display: none;
-        background-color: #cf0000;
-        color: white;
-        padding: 10px;
-        margin-top: 5px;
-      }
-      .h-form {
-        margin-top: 30px;
-      }
-      #submit {
-        margin-top: 20px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="h-login">
-      <div class="h-title">Login into Geoportal Server Harvester.</div>
-      <div class="h-error" id="error">Invalid credentials</div>
-      <form class="h-form" name='f' action="login.html" method='POST' enctype="application/x-www-form-urlencoded" >
-        <table>
-          <tr>
-            <td>User:</td>
-            <td><input type='text' name='username' value=''></td>
-          </tr>
-          <tr>
-            <td>Password:</td>
-            <td><input type='password' name='password' /></td>
-          </tr>
-          <tr>
-            <td><input id="submit" name="submit" type="submit" value="Submit" /></td>
-          </tr>
-        </table>
-      </form>
-    </div>
-    <script type="text/javascript">
-      if (location.search.replace(/^\?+/g,"").toLowerCase().split("&").includes("error=true")) {
-        var errorNode = document.getElementById("error");
-        if (errorNode) {
-          errorNode.style.display = "block";
-        }
-      }
-    </script>
-  </body>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Sign in – Geoportal Harvester</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    body { font-family: system-ui, sans-serif; background:#f7f7f9; margin:0; }
+    .wrap { max-width:560px; margin:8vh auto; background:#fff; border-radius:12px;
+            box-shadow:0 8px 24px rgba(0,0,0,.08); padding:2rem; }
+    h1 { margin:0 0 1rem; font-size:1.25rem; }
+    .btn { display:block; width:100%; padding:.75rem 1rem; border-radius:8px;
+           font-weight:600; cursor:pointer; margin:.75rem 0; border:1px solid #0854c7; }
+    .btn.primary { background:#0854c7; color:#fff; }
+    .btn.outline { background:#fff; color:#0854c7; }
+    .muted { color:#666; font-size:.9rem; }
+    .error { color:#b00020; white-space:pre-wrap; display:none; }
+  </style>
+   <script>
+  (function () { 
+	  window.dojoConfig = {
+	    locale: "en",
+	    async: true,
+	    parseOnLoad: true,
+	    baseUrl: ".",
+	    packages: [
+	      { name: "hrv", location: "hrv" }
+	    ]
+	  };
+
+  })();
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <h1 id="title">Sign in to Harvester</h1>
+    <button id="btnLocal"  class="btn primary">Sign in with Application Account</button>
+    <button id="btnArcgis" class="btn outline">Sign in with ArcGIS</button>
+    
+    <pre id="err" class="error"></pre>
+  </div>
+
+  <script>
+	  require([		
+	    "dojo/i18n!hrv/nls/resources",
+	    "dojo/dom",
+	    "hrv/security/login",
+	    "hrv/config",
+	    "dojo/domReady!"
+	], function (i18n, dom) {
+	    dom.byId("btnLocal").innerHTML     = i18n.landing.signInLocalAccount;
+	    dom.byId("btnArcgis").innerHTML  = i18n.landing.signInArcGIS;
+	    dom.byId("title").innerHTML  = i18n.landing.caption;
+	});
+  </script>
+</body>
 </html>

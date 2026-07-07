@@ -19,21 +19,22 @@ define(["dojo/_base/declare",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dojo/i18n!../../nls/resources",
-        "dojo/text!./templates/Header.html",
-        "dojo/_base/lang"
+        "dojo/text!./templates/Header.html"
+		
       ],
   function(declare,
            _WidgetBase,_TemplatedMixin,_WidgetsInTemplateMixin,
-           i18n,template,
-           lang
+           i18n,template           
           ){
   
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
       i18n: i18n,
       templateString: template,
     
-      postCreate: function(){
-        
-      }
-    });
+      postCreate: function(){		
+		  
+      	}
+		
+	
+    	});
 });

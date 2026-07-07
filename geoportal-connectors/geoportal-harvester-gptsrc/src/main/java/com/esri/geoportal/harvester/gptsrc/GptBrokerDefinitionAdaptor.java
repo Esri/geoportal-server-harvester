@@ -37,7 +37,7 @@ import org.apache.commons.lang3.StringUtils;
   private final BotsBrokerDefinitionAdaptor botsAdaptor;
   private final CredentialsDefinitionAdaptor credAdaptor;
   private URL hostUrl;
-  private String index;
+ // private String index;
   private boolean emitXml = true;
   private boolean emitJson = false;
 
@@ -69,7 +69,7 @@ import org.apache.commons.lang3.StringUtils;
       } catch (MalformedURLException ex) {
         throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
       }
-      index  = get(P_INDEX);
+      //index  = get(P_INDEX);
       emitXml = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_XML)), true);
       emitJson = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(get(P_EMIT_JSON)), false);
     }
@@ -78,7 +78,7 @@ import org.apache.commons.lang3.StringUtils;
   @Override
   public void override(Map<String, String> params) {
     consume(params,P_HOST_URL);
-    consume(params,P_INDEX);
+    //consume(params,P_INDEX);
     consume(params,P_EMIT_XML);
     consume(params,P_EMIT_JSON);
     credAdaptor.override(params);
@@ -138,18 +138,18 @@ import org.apache.commons.lang3.StringUtils;
    * Gets index.
    * @return index
    */
-  public String getIndex() {
-    return index;
-  }
-
-  /**
-   * Sets index.
-   * @param index index
-   */
-  public void setIndex(String index) {
-    this.index = index;
-    set(P_INDEX, index);
-  }
+//  public String getIndex() {
+//    return index;
+//  }
+//
+//  /**
+//   * Sets index.
+//   * @param index index
+//   */
+//  public void setIndex(String index) {
+//    this.index = index;
+//    set(P_INDEX, index);
+//  }
 
   public boolean getEmitXml() {
     return emitXml;
