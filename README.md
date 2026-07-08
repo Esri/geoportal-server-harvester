@@ -1,5 +1,8 @@
 # geoportal-server-harvester
-As part of the evolution of Geoportal Server, the harvesting capability has been separated into its own module. This is because there are use cases where the harvesting can be used as a stand-alone broker between catalogs of content. 
+[![apache licensed](https://img.shields.io/badge/license-Apache%202.0-orange.svg?style=flat-square)](https://raw.githubusercontent.com/Esri/geoportal-server-catalog/master/LICENSE.txt)
+
+> ## Geoportal Server Harvester 4.0.0 IS HERE!
+> Geoportal Server Harvester 4.0.0 is now available! There are breaking changes between 3.x and 4.x due to updates in Java, Tomcat, and Spring. Beware when pulling code from `master`! Release notes and packages are available now: https://github.com/Esri/geoportal-server-harvester/releases/tag/v4.0.0. Installation documentation is available in the [wiki](https://github.com/Esri/geoportal-server-harvester/wiki/Installation-guide-4.x).
 
 This repository thus contains the harvesting capability, while it's sibling [geoportal-server-catalog](https://github.com/Esri/geoportal-server-catalog) is the new catalog of Geoportal Server.
 
