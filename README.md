@@ -15,6 +15,7 @@ To report an issue, please go to [issues](https://github.com/Esri/geoportal-serv
 The nature of the Harvester application is, as the name suggests, to harvest metadata from whatever web endpoints it is provided. The list(s) of endpoints to download metadata from can also be provided by external entities over the internet. Neither the metadata being harvested nor the list(s) of endpoints provided by external entities are vetted or checked by the Harvester. **Users who wish to limit the scope of the Harvester's reach should configure the network or machine where the Harvester is located with allow lists or deny lists of web endpoints to prevent the Harvester from reaching undesirable locations.**
 
 ## Releases and Downloads
+- 4.0.0 - July 2026, see: https://github.com/Esri/geoportal-server-harvester/releases/tag/v4.0.0
 - 3.0.0 - September 19, 2025, see: [release info](https://github.com/Esri/geoportal-server-harvester/releases/tag/v3.0.0)
 - 2.7.2 - November 22, 2024. 
 - 2.7.1 - December 21, 2023. 
@@ -43,8 +44,8 @@ Deploying war file:
 
 ## Requirements
 
-* Java JDK 11 (preferred: [AdoptOpenJDK 11](https://adoptopenjdk.net/))
-* Apache Tomcat 9.x
+* Java JDK 21+ (preferred: [AdoptOpenJDK 25]([https://adoptopenjdk.net/](https://adoptium.net/download?link=https%3A%2F%2Fgithub.com%2Fadoptium%2Ftemurin25-binaries%2Freleases%2Fdownload%2Fjdk-25.0.4.1%252B1%2FOpenJDK25U-jdk_x64_windows_hotspot_25.0.4.1_1.msi&vendor=Adoptium)))
+* Apache Tomcat 11.x
 
 ## Contributing
 
