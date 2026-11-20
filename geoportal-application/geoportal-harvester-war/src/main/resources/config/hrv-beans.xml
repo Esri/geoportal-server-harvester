@@ -87,6 +87,7 @@
   <bean class="com.esri.geoportal.harvester.stac.StacConnector">
     <constructor-arg ref="metaBuilder"/>
   </bean>
+  <bean class="com.esri.geoportal.harvester.stacpub.StacConnector" />
   
   <!-- Triggers -->
   <bean class="com.esri.geoportal.harvester.engine.triggers.NowTrigger"/>

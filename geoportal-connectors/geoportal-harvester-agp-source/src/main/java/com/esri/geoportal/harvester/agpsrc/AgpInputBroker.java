@@ -212,9 +212,32 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
     if (itemEntry.title!=null) {
       props.put(WKAConstants.WKA_TITLE, itemEntry.title);
     }
+    if (itemEntry.snippet!=null) {
+      props.put(WKAConstants.WKA_SNIPPET, itemEntry.snippet);
+    }
     if (itemEntry.description!=null) {
       props.put(WKAConstants.WKA_DESCRIPTION, itemEntry.description);
     }
+    if (itemEntry.licenseInfo!=null) {
+      props.put(WKAConstants.WKA_LICENSE_INFO, itemEntry.licenseInfo);
+    }
+    if (itemEntry.access!=null) {
+      props.put(WKAConstants.WKA_ACCESS, itemEntry.access);
+    }
+    if (itemEntry.contentStatus!=null) {
+      props.put(WKAConstants.WKA_CONTENT_STATUS, itemEntry.contentStatus);
+    }
+/*
+    if (itemEntry.tags!=null) {
+      props.put(WKAConstants.WKA_TAGS, itemEntry.tags);
+    }
+    if (itemEntry.categories!=null) {
+      props.put(WKAConstants.WKA_CATEGORIES, itemEntry.categories);
+    }
+    if (itemEntry.typeKeywords!=null) {
+      props.put(WKAConstants.WKA_TYPE_KEYWORDS, itemEntry.typeKeywords);
+    }
+*/
     if (itemEntry.url!=null) {
       props.put(WKAConstants.WKA_RESOURCE_URL, itemEntry.url);
     } else if (ItemType.WEB_MAP.getTypeName().equals(itemEntry.type)) {
@@ -246,13 +269,20 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
     if (definition.getEmitJson()) {
       ref.addContext(MimeType.APPLICATION_JSON, mapper.writeValueAsString(itemEntry).getBytes("UTF-8"));
       
-      // attributes
-
-      if (itemEntry.tags!=null) {
+        // tags, categorie, and typeKeywords all are added to keywords_s
         ArrayNode tagsNode = mapper.createArrayNode();
-        Arrays.stream(itemEntry.tags).forEach(tag -> tagsNode.add(tag));
-        ref.getAttributesMap().put("keywords_s", tagsNode);
-      }
+        if (itemEntry.tags!=null) {
+            Arrays.stream(itemEntry.tags).forEach(tag -> tagsNode.add(tag));
+        }
+        if (itemEntry.categories!=null) {
+            Arrays.stream(itemEntry.categories).forEach(category -> tagsNode.add(category));
+        }
+        if (itemEntry.typeKeywords!=null) {
+            Arrays.stream(itemEntry.typeKeywords).forEach(typeKeyword -> tagsNode.add(typeKeyword));
+        }
+        if (!tagsNode.isEmpty()) {
+            ref.getAttributesMap().put("keywords_s", tagsNode);
+        }
     }
 
     return ref;

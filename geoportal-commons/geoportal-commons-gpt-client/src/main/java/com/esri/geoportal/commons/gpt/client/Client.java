@@ -727,7 +727,8 @@ public class Client implements Closeable {
                     String indexName = (gpInfoRes != null && gpInfoRes.getMetadataIndexName() != null)
                             ? gpInfoRes.getMetadataIndexName()
                             : DEFAULT_INDEX;
-                    elasticSearchUrl = "elastic/" + indexName + "/_search";
+                    //elasticSearchUrl = "elastic/" + indexName + "/_search";
+                    elasticSearchUrl = "elastic/_search";
                 }
             }
         }
