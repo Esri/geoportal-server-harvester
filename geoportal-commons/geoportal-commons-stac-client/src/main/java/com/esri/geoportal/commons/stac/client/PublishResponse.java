@@ -15,12 +15,15 @@
  */
 package com.esri.geoportal.commons.stac.client;
 
+
 /**
- * GPT 2.0 PublishResponse.
+ * STAC PublishResponse.
  */
 public class PublishResponse {
   private String id;
   private String status;
+  private int code;
+  private String message;
   private Error error;
 
   /**
@@ -37,6 +40,7 @@ public class PublishResponse {
    */
   public void setId(String id) {
     this.id = id;
+    this.setCode(201);
   }
 
   /**
@@ -54,6 +58,47 @@ public class PublishResponse {
   public void setStatus(String status) {
     this.status = status;
   }
+
+  /**
+   * Gets response code.
+   * @return response code
+   */
+  public int getCode() {
+    return code;
+  }
+
+  /**
+   * Sets response code.
+   * @param code
+   */
+  public void setCode(int code) {
+    this.code = code;
+    switch (code) {
+        case 200:
+            this.status = "updated";
+        case 201:
+            this.status = "created";
+        default:
+            this.status = "failed";
+    }
+  }
+
+  /**
+   * Gets status information.
+   * @return status information
+   */
+  public String getMessage() {
+    return message;
+  }
+
+  /**
+   * Sets status information.
+   * @param message status information
+   */
+  public void setMessage(String message) {
+    this.message = message;    
+  }
+
 
   /**
    * Gets error if any.

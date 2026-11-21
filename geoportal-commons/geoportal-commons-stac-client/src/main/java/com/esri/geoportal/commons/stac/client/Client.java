@@ -190,8 +190,9 @@ public class Client implements Closeable {
     private <T> ResponseWrapper<T> execute(HttpUriRequest req, Class<T> clazz) throws IOException, URISyntaxException {
         try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
             String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
+            int reasonCode = httpResponse.getStatusLine().getStatusCode();
             String responseContent = IOUtils.toString(contentStream, "UTF-8");
-            LOG.trace(String.format("RESPONSE: %s, %s", responseContent, reasonMessage));
+            LOG.trace(String.format("RESPONSE: %s, %s, %s", reasonCode, responseContent, reasonMessage));
 
             if (httpResponse.getStatusLine().getStatusCode() >= 400) {
                 ResponseWrapper<T> wrapper = null;
