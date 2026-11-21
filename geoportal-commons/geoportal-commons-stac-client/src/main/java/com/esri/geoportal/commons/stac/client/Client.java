@@ -158,20 +158,20 @@ public class Client implements Closeable {
         //String strRequest = mapper.writeValueAsString(jsonRequest);
         StringEntity entity = new StringEntity(json, "UTF-8");
 
-        URI pubUri = createCollectionUri("portal");
+        URI pubUri = createCollectionItemsUri("portal");
         return publish(pubUri, entity, data.sys_owner_s);
     }    
     
     private PublishResponse publish(URI uri, StringEntity entity, String owner) throws IOException, URISyntaxException {
-        HttpPut put = new HttpPut(uri);
-        put.setConfig(DEFAULT_REQUEST_CONFIG);
-        put.setEntity(entity);
-        put.setHeader("Content-Type", "application/json; charset=UTF-8");
-        put.setHeader("User-Agent", HttpConstants.getUserAgent());
+        HttpPost post = new HttpPost(uri);
+        post.setConfig(DEFAULT_REQUEST_CONFIG);
+        post.setEntity(entity);
+        post.setHeader("Content-Type", "application/json; charset=UTF-8");
+        post.setHeader("User-Agent", HttpConstants.getUserAgent());
 	    if (cred != null && !cred.isEmpty()) {
-	    	  put.setHeader("Authorization","Bearer "+getAccessToken());
+	    	  post.setHeader("Authorization","Bearer "+getAccessToken());
 	    }
-        ResponseWrapper<PublishResponse> response = execute(put, PublishResponse.class);
+        ResponseWrapper<PublishResponse> response = execute(post, PublishResponse.class);
 
         return response != null ? response.data : null;
     }
@@ -210,8 +210,8 @@ public class Client implements Closeable {
         }
     }
     
-    private URI createCollectionUri(String collectionId) throws URISyntaxException, IOException {
-        URIBuilder b = new URIBuilder(url.toURI().resolve("collections/" + collectionId));
+    private URI createCollectionItemsUri(String collectionId) throws URISyntaxException, IOException {
+        URIBuilder b = new URIBuilder(url.toURI().resolve("collections/" + collectionId + "/items"));
         return b.build();
     }    
     
