@@ -13,21 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.commons.stac.client;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import java.util.Map;
 
 /**
- * STAC catalog.
+ * STAC client.
  */
-public class Catalog {
-  public String id;
-  public String title;
-  public String description;
-  public String [] keywords;
-  public JsonNode extent;
-  public Map<String, JsonNode> properties;
-  public Map<String, JsonNode> assets;
-  public Link [] links;
-}
+package com.esri.geoportal.commons.stac.client;
+
+

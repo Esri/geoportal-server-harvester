@@ -15,10 +15,10 @@
  */
 package com.esri.geoportal.harvester.stacpub;
 
-import com.esri.geoportal.commons.robots.BotsConfig;
 import static com.esri.geoportal.harvester.stacpub.StacConstants.*;
-import com.esri.geoportal.harvester.api.base.BotsBrokerDefinitionAdaptor;
 import com.esri.geoportal.harvester.api.base.BrokerDefinitionAdaptor;
+import com.esri.geoportal.harvester.api.base.CredentialsDefinitionAdaptor;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.net.MalformedURLException;
@@ -31,27 +31,42 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class StacBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   
-  private final BotsBrokerDefinitionAdaptor botsAdaptor;
+  private final CredentialsDefinitionAdaptor credAdaptor;
   private URL hostUrl;
+  private String collectionId = "stac";
 
 
   /**
-   * Creates instance of the adaptor.
+   * Creates instance of the adapter.
    * @param def broker definition
    * @throws InvalidDefinitionException if definition is invalid
    * @throws IllegalArgumentException if invalid broker definition
    */
   public StacBrokerDefinitionAdaptor(EntityDefinition def) throws InvalidDefinitionException {
     super(def);
-    this.botsAdaptor = new BotsBrokerDefinitionAdaptor(def);
+    this.credAdaptor = new CredentialsDefinitionAdaptor(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(StacConnector.TYPE);
     } else if (!getType().equals(def.getType())) {
       throw new InvalidDefinitionException("Broker definition doesn't match");
     } else {
-      initialize(def);
+      //initialize(def);
+      try {
+        String sHostUrl = get(P_HOST_URL);
+        if (sHostUrl!=null) {
+            if(sHostUrl.length()>500)
+            {
+                throw new InvalidDefinitionException("Geoportal host Url length should be less tahn 500.");
+            }
+            sHostUrl = sHostUrl+"/";
+        }
+        hostUrl = new URL(sHostUrl);
+      } catch (MalformedURLException ex) {
+        throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
+      }
     }
-  }
+    collectionId = StringUtils.defaultIfBlank(get(P_COLLECTION_ID), "");
+}
 
   protected String getType() {
     return StacConnector.TYPE;
@@ -74,7 +89,8 @@ public class StacBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
   @Override
   public void override(Map<String, String> params) {
     consume(params,P_HOST_URL);
-    botsAdaptor.override(params);
+    consume(params,P_COLLECTION_ID);
+    credAdaptor.override(params);
   }
   
   public URL getHostUrl() {
@@ -85,22 +101,30 @@ public class StacBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
     this.hostUrl = hostUrl;
     set(P_HOST_URL,hostUrl.toExternalForm());
   }
-
-  /**
-   * Gets bots configuration.
-   * @return bots configuration
-   */
-  public BotsConfig getBotsConfig() {
-    return botsAdaptor.getBotsConfig();
-  }
-
-  /**
-   * Sets bots config.
-   * @param botsConfig bots configuration 
-   */
-  public void setBotsConfig(BotsConfig botsConfig) {
-    botsAdaptor.setBotsConfig(botsConfig);
-  }
-
   
+
+  public String getCollectionId() {
+    return this.collectionId;
+  }
+
+  public void setCollectionId(String collectionId) {
+    this.collectionId = collectionId;
+    set(P_COLLECTION_ID,collectionId);
+  }
+
+  /**
+   * Gets credentials.
+   * @return credentials
+   */
+  public SimpleCredentials getCredentials() {
+    return credAdaptor.getCredentials();
+  }
+
+  /**
+   * Sets credentials.
+   * @param cred credentials
+   */
+  public void setCredentials(SimpleCredentials cred) {
+    credAdaptor.setCredentials(cred);
+  }  
 }

@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.esri.geoportal.commons.stac.client;
 
 /**
- * STAC client.
+ * STAC link.
  */
-package com.esri.geoportal.geoportal.commons.stac.client;
-
-
+public class Link {
+  public String rel;
+  public String href;
+  public String type;
+  public String title;
+}

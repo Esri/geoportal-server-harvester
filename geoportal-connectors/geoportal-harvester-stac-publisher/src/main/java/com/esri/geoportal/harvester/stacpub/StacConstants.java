@@ -22,5 +22,4 @@ package com.esri.geoportal.harvester.stacpub;
   public static final String P_HOST_URL  = "stac-host-url";
   public static final String P_COLLECTION_ID  = "stac-collection-id";
   public static final String P_CLEANUP  = "stac-cleanup";
-  
 }

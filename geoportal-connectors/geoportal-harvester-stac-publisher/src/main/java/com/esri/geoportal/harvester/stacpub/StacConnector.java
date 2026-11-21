@@ -62,7 +62,10 @@ public class StacConnector implements OutputConnector<OutputBroker> {
         return true;
       }
     });
+    arguments.add(new UITemplate.StringArgument(P_COLLECTION_ID, bundle.getString("stac.collectionId"), true));
+        
     arguments.add(new UITemplate.BooleanArgument(P_CLEANUP, bundle.getString("stac.cleanup"),false, Boolean.TRUE));
+
     return new UITemplate(getType(), bundle.getString("stac"), arguments);
   }
 

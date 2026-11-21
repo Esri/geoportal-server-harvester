@@ -13,19 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.commons.stac.client;
+package com.esri.geoportal.commons.stac.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import java.util.Map;
+import java.net.URL;
 
 /**
- * STAC item.
+ * ResponseWrapper wrapper.
  */
-public class Item {
-  public String id;
-  public String type;
-  public JsonNode geometry;
-  public Double [] bbox;
-  public Map<String, JsonNode> properties;
-  public Map<String, JsonNode> assets;
+public class ResponseWrapper<T> {
+  public final T data;
+  public final String raw;
+  public final URL url;
+
+  public ResponseWrapper(T data, String raw, URL url) {
+    if (data==null) throw new IllegalArgumentException("Missing data component.");
+    if (raw==null) throw new IllegalArgumentException("Missing raw data component.");
+    if (url==null) throw new IllegalArgumentException("Missing URL component.");
+    
+    this.data = data;
+    this.raw = raw;
+    this.url = url;
+  }
+  
+  
 }

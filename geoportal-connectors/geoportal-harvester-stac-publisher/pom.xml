@@ -20,5 +20,10 @@
             <artifactId>geoportal-commons-stac-client</artifactId>
             <version>${project.version}</version>
         </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>geoportal-commons-gpt-client</artifactId>
+          <version>${project.version}</version>
+      </dependency>
     </dependencies>
 </project>

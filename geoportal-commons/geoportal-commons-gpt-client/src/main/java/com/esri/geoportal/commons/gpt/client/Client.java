@@ -100,7 +100,6 @@ public class Client implements Closeable {
      * @param httpClient HTTP client
      * @param url URL of the GPT REST end point
      * @param cred credentials
-     * @param index index name
      * @param collectionsFieldName collections field name
      */
     public Client(CloseableHttpClient httpClient, URL url, SimpleCredentials cred, String collectionsFieldName) {
@@ -118,7 +117,6 @@ public class Client implements Closeable {
      *
      * @param url URL of the GPT REST end point
      * @param cred credentials
-     * @param index index name
      * @param collectionsFieldName collections field name
      */
     public Client(URL url, SimpleCredentials cred, String collectionsFieldName) {
@@ -444,8 +442,7 @@ public class Client implements Closeable {
 
     /**
      * Deletes record by id.
-     *
-     * @param id record id
+     *ecord id
      * @return publish response
      * @throws IOException if reading response fails
      * @throws URISyntaxException if URL has invalid syntax
