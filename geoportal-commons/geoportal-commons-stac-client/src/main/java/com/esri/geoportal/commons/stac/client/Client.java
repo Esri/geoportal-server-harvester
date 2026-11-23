@@ -158,7 +158,7 @@ public class Client implements Closeable {
         //String strRequest = mapper.writeValueAsString(jsonRequest);
         StringEntity entity = new StringEntity(json, "UTF-8");
 
-        URI pubUri = createCollectionItemsUri("portal");
+        URI pubUri = createCollectionItemsUri(this.collectionId);
         return publish(pubUri, entity, data.sys_owner_s);
     }    
     
