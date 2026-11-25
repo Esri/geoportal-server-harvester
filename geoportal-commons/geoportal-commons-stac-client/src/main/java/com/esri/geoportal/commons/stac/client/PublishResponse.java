@@ -76,8 +76,10 @@ public class PublishResponse {
     switch (code) {
         case 200:
             this.status = "updated";
+            break;
         case 201:
             this.status = "created";
+            break;
         default:
             this.status = "failed";
     }
