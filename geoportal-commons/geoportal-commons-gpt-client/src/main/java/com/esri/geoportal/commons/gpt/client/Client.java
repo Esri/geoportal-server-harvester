@@ -80,8 +80,7 @@ public class Client implements Closeable {
     private static final int BATCH_SIZE = 500;
 
     private static final String DEFAULT_INDEX = "metadata";
-    private static final String REST_ITEM_URL = "rest/metadata/item";
-    private static final String ELASTIC_SCROLL_URL = "elastic/_search/scroll";
+    private static final String REST_ITEM_URL = "rest/metadata/item";    
     private static final String TOKEN_URL = "oauth2/token";
 
     private final CloseableHttpClient httpClient;
@@ -611,11 +610,12 @@ public class Client implements Closeable {
             HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 
             QueryResponse response = query(builder, entity);
-            if (response != null && response.status != null && response.status == 400 && search_after == null) {
-                // This indicates it could be an old version of Elastic Search behind the Geoportal.
-                // Fall back to using scroll API
-                return queryIdsScroll(term, value, batchSize);
-            }
+            //Since GP 4.1.0 /elastic/_search/scroll endpoint is not supported anymore, we don't need to check for 400 error and fallback to scroll API
+//            if (response != null && response.status != null && response.status == 400 && search_after == null) {
+//                // This indicates it could be an old version of Elastic Search behind the Geoportal.
+//                // Fall back to using scroll API
+//                return queryIdsScroll(term, value, batchSize);
+//            }
 
             search_after = null;
             if (response != null && response.hasHits()) {
@@ -630,27 +630,6 @@ public class Client implements Closeable {
         return ids.stream().collect(Collectors.toList());
     }
 
-    private List<String> queryIdsScroll(String term, String value, long size) throws IOException, URISyntaxException {
-        ArrayList<String> ids = new ArrayList<>();
-        SearchContext searchContext = new SearchContext();
-
-        while (!Thread.currentThread().isInterrupted()) {
-            QueryResponse response = query(term, value, size, searchContext);
-            if (Thread.currentThread().isInterrupted()) {
-                break;
-            }
-            if (response.hits == null || response.hits.hits == null || response.hits.hits.isEmpty()) {
-                break;
-            }
-            ids.addAll(response.hits.hits.stream()
-                    .map(h -> h._id)
-                    .filter(id -> id != null)
-                    .collect(Collectors.toList()));
-        }
-
-        return ids;
-    }
-
     private void clearToken() {
         tokenInfo = null;
     }
@@ -659,16 +638,14 @@ public class Client implements Closeable {
         URI uri = createQueryUri(searchContext);
         HttpEntity httpEntity = createQueryEntity(term, value, size, searchContext);
         try {
-            QueryResponse response = query(uri, httpEntity);
-            searchContext._scroll_id = response._scroll_id;
+            QueryResponse response = query(uri, httpEntity);            
             return response;
         } catch (HttpResponseException ex) {
             if (ex.getStatusCode() == 401) {
                 clearToken();
                 uri = createQueryUri(searchContext);
                 httpEntity = createQueryEntity(term, value, size, searchContext);
-                QueryResponse response = query(uri, httpEntity);
-                searchContext._scroll_id = response._scroll_id;
+                QueryResponse response = query(uri, httpEntity);                
                 return response;
             } else {
                 throw ex;
@@ -719,12 +696,7 @@ public class Client implements Closeable {
 
                     if (cred != null && !cred.isEmpty()) {
                         request.setHeader("Authorization", "Bearer " + getAccessToken());
-                    }
-                    GeoportalInfoResponse gpInfoRes = execute(request, GeoportalInfoResponse.class);
-                    String indexName = (gpInfoRes != null && gpInfoRes.getMetadataIndexName() != null)
-                            ? gpInfoRes.getMetadataIndexName()
-                            : DEFAULT_INDEX;
-                    //elasticSearchUrl = "elastic/" + indexName + "/_search";
+                    }                    
                     elasticSearchUrl = "elastic/_search";
                 }
             }
@@ -736,41 +708,23 @@ public class Client implements Closeable {
     private HttpEntity createQueryEntity(String term, String value, long size, SearchContext searchContext) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
-        if (searchContext._scroll_id == null) {
-            node.put("size", size);
-            if (term != null && value != null) {
-                ObjectNode query = mapper.createObjectNode();
-                node.set("query", query);
+       
+        node.put("size", size);
+        if (term != null && value != null) {
+            ObjectNode query = mapper.createObjectNode();
+            node.set("query", query);
 
-                ObjectNode match = mapper.createObjectNode();
-                query.set("match", match);
+            ObjectNode match = mapper.createObjectNode();
+            query.set("match", match);
 
-                match.put(term, value);
-            }
-        } else {
-            node.put("scroll", "1m");
-            node.put("scroll_id", searchContext._scroll_id);
+            match.put(term, value);
         }
-
         return new StringEntity(node.toString(), ContentType.APPLICATION_JSON);
     }
 
     private URI createQueryUri(SearchContext searchContext) throws IOException, URISyntaxException {
         URIBuilder builder;
-
-        if (searchContext._scroll_id == null) {
-            builder = new URIBuilder(url.toURI().resolve(createElasticSearchUrl()))
-                    .addParameter("scroll", "1m");
-        } else {
-            builder = new URIBuilder(url.toURI().resolve(ELASTIC_SCROLL_URL))
-                    .addParameter("scroll_id", searchContext._scroll_id)
-                    .addParameter("scroll", "1m");
-        }
-
-//        if (cred != null && !cred.isEmpty()) {
-//            builder = builder.addParameter("access_token", getAccessToken());
-//        }
-
+        builder = new URIBuilder(url.toURI().resolve(createElasticSearchUrl()));
         return builder.build();
     }
 
@@ -837,8 +791,7 @@ public class Client implements Closeable {
      * Search context.
      */
     public static class SearchContext {
-
-        public String _scroll_id;
+        
     }
 
     /**
