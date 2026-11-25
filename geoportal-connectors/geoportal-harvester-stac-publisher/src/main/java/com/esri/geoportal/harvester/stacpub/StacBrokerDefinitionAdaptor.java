@@ -47,7 +47,8 @@ public class StacBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
     this.credAdaptor = new CredentialsDefinitionAdaptor(def);
     if (StringUtils.trimToEmpty(def.getType()).isEmpty()) {
       def.setType(StacConnector.TYPE);
-    } else if (!getType().equals(def.getType())) {
+    }
+    if (!getType().equals(def.getType())) {
       throw new InvalidDefinitionException("Broker definition doesn't match");
     } else {
       //initialize(def);
