@@ -166,7 +166,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
             String groupId = StringUtils.trimToNull(definition.getGroupId());
             if (groupId != null) {
                 SimpleCredentials creds = definition.getCredentials();
-                if (creds != null) {
+                if (creds != null && !creds.isEmpty()) {
                     Group[] groups = this.client.listGroups(definition.getCredentials().getUserName(), generateToken(1));
                     Group selectedGroup = groups != null ? Arrays.stream(groups).filter(group -> group.id != null && group.id.equals(groupId)).findFirst().orElse(
                             Arrays.stream(groups).filter(group -> group.title != null && group.title.replaceAll("\\s", "").equalsIgnoreCase(groupId.replaceAll("\\s", ""))).findFirst().orElse(null)
