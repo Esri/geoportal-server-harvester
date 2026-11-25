@@ -139,10 +139,8 @@ import org.slf4j.LoggerFactory;
         } catch (IOException ex) {
           throw new DataOutputException(this, ref, String.format("Error publishing data: %s Exception: "+ex, ref), ex);
         } catch (URISyntaxException ex) {
-            System.getLogger(StacOutputBroker.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
-        } 
-        
-        return null;
+            throw new DataOutputException(this, ref, "Invalid publishing URI", ex);
+        }
     }
   
   
