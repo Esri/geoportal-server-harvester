@@ -51,23 +51,9 @@ public class StacBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
     if (!getType().equals(def.getType())) {
       throw new InvalidDefinitionException("Broker definition doesn't match");
     } else {
-      //initialize(def);
-      try {
-        String sHostUrl = get(P_HOST_URL);
-        if (sHostUrl!=null) {
-            if(sHostUrl.length()>500)
-            {
-                throw new InvalidDefinitionException("Geoportal host Url length should be less tahn 500.");
-            }
-            sHostUrl = sHostUrl+"/";
-        }
-        hostUrl = new URL(sHostUrl);
-      } catch (MalformedURLException ex) {
-        throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
-      }
+      initialize(def);
     }
-    collectionId = StringUtils.defaultIfBlank(get(P_COLLECTION_ID), "");
-}
+  }
 
   protected String getType() {
     return StacConnector.TYPE;
@@ -79,18 +65,59 @@ public class StacBrokerDefinitionAdaptor extends BrokerDefinitionAdaptor {
    * @throws InvalidDefinitionException if definition is invalid
    */
   protected void initialize(EntityDefinition def) throws InvalidDefinitionException {
-    
+    hostUrl = parseHostUrl(get(P_HOST_URL));
+    collectionId = parseCollectionId(get(P_COLLECTION_ID));
+  }
+
+  /**
+   * Parses and validates host URL.
+   * @param sHostUrl host URL as string
+   * @return host URL
+   * @throws InvalidDefinitionException if host URL is invalid
+   */
+  private static URL parseHostUrl(String sHostUrl) throws InvalidDefinitionException {
+    if (sHostUrl == null) {
+      throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL, sHostUrl));
+    }
+    if (sHostUrl.length() > 500) {
+      throw new InvalidDefinitionException("Geoportal host Url length should be less than 500.");
+    }
     try {
-      hostUrl = new URL(get(P_HOST_URL));
+      return new URL(sHostUrl.endsWith("/") ? sHostUrl : sHostUrl + "/");
     } catch (MalformedURLException ex) {
-      throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL,get(P_HOST_URL)), ex);
+      throw new InvalidDefinitionException(String.format("Invalid %s: %s", P_HOST_URL, sHostUrl), ex);
     }
   }
 
+  private static String parseCollectionId(String sCollectionId) {
+    return StringUtils.defaultIfBlank(sCollectionId, "");
+  }
+
+  /**
+   * Applies runtime parameter overrides. Host URL and collection id are
+   * validated before any state is modified, and the cached fields are
+   * refreshed so the getters reflect the effective values.
+   * @param params override parameters
+   * @throws IllegalArgumentException if overridden host URL is invalid
+   */
   @Override
   public void override(Map<String, String> params) {
+    URL newHostUrl = hostUrl;
+    if (params.containsKey(P_HOST_URL)) {
+      try {
+        newHostUrl = parseHostUrl(params.get(P_HOST_URL));
+      } catch (InvalidDefinitionException ex) {
+        throw new IllegalArgumentException(ex.getMessage(), ex);
+      }
+    }
+    String newCollectionId = params.containsKey(P_COLLECTION_ID)
+            ? parseCollectionId(params.get(P_COLLECTION_ID))
+            : collectionId;
+
     consume(params,P_HOST_URL);
     consume(params,P_COLLECTION_ID);
+    hostUrl = newHostUrl;
+    collectionId = newCollectionId;
     credAdaptor.override(params);
   }
   

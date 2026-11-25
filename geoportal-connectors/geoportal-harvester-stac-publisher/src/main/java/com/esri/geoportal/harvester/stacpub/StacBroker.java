@@ -84,7 +84,11 @@ import org.slf4j.LoggerFactory;
   
     @Override
     public void initialize(InitContext context) throws DataProcessorException {
-        definition.override(context.getParams());
+        try {
+            definition.override(context.getParams());
+        } catch (IllegalArgumentException ex) {
+            throw new DataProcessorException(String.format("Invalid override parameters: %s", ex.getMessage()), ex);
+        }
         this.httpClient = HttpClientBuilder.create().useSystemProperties().setRedirectStrategy(LaxRedirectStrategy.INSTANCE).build();
 
         client = new Client(definition.getHostUrl(), 
