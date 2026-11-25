@@ -198,7 +198,11 @@ public class Client implements Closeable {
                 throw new HttpResponseException(reasonCode, reasonMessage);
             }
 
-            return makeResponseWrapper(responseContent, req.getURI().toURL(), clazz);
+            ResponseWrapper<T> wrapper = makeResponseWrapper(responseContent, req.getURI().toURL(), clazz);
+            if (wrapper.data instanceof PublishResponse) {
+                ((PublishResponse) wrapper.data).setCode(reasonCode);
+            }
+            return wrapper;
         }
     }
     
