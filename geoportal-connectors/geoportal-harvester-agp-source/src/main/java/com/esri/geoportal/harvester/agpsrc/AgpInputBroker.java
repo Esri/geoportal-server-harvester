@@ -368,7 +368,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
                     from += size;
                     return content != null && content.results != null && content.results.length > 0 ? Arrays.asList(content.results) : null;
                 } else {
-                    ContentResponse content = client.listGroupContent(definition.getGroupId(), size, from, generateToken(1));
+                    ContentResponse content = client.listGroupContent(definition.getGroupId(), size, from, null);
                     from += size;
                     return content != null && content.items != null && content.items.length > 0 ? Arrays.asList(content.items) : null;
                 }
