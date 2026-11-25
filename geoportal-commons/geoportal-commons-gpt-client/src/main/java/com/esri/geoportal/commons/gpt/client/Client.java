@@ -610,12 +610,9 @@ public class Client implements Closeable {
             HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 
             QueryResponse response = query(builder, entity);
-            //Since GP 4.1.0 /elastic/_search/scroll endpoint is not supported anymore, we don't need to check for 400 error and fallback to scroll API
-//            if (response != null && response.status != null && response.status == 400 && search_after == null) {
-//                // This indicates it could be an old version of Elastic Search behind the Geoportal.
-//                // Fall back to using scroll API
-//                return queryIdsScroll(term, value, batchSize);
-//            }
+            if (response != null && response.status != null && response.status >= 400) {
+                throw new HttpResponseException(response.status, "Geoportal search failed");
+            }
 
             search_after = null;
             if (response != null && response.hasHits()) {
