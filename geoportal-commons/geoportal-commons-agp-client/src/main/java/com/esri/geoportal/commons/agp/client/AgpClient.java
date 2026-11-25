@@ -504,15 +504,25 @@ public class AgpClient implements Closeable {
    * @throws IOException if operation fails
    */
   public Group[] listGroups(String owner, String token) throws URISyntaxException, IOException {
-    URIBuilder builder = new URIBuilder(communityUserUri(owner));
+    Group[] theGroups = null;
     
-    builder.setParameter("f", "json");
     if (token!=null) {
-      builder.setParameter("token", token);
+        URIBuilder builder = new URIBuilder(communityUserUri(owner));
+        builder.setParameter("f", "json");
+        builder.setParameter("token", token);
+        
+        HttpGet req = new HttpGet(builder.build());
+
+        theGroups = execute(req,User.class).groups;
+    } else {
+        URIBuilder builder = new URIBuilder(communityGroupUri(""));
+        builder.setParameter("f", "json");
+        HttpGet req = new HttpGet(builder.build());
+        theGroups = execute(req,Groups.class).groups;
+        
     }
-    HttpGet req = new HttpGet(builder.build());
-    
-    return execute(req,User.class).groups;
+
+    return theGroups;
   }
   
   /**
@@ -677,7 +687,15 @@ public class AgpClient implements Closeable {
     return builder.build();
   }
   
-  private URI communityUserUri(String owner) throws URISyntaxException {
+  private URI communityGroupUri(String groupId) throws URISyntaxException {
+    URIBuilder builder = new URIBuilder();
+    builder.setScheme(rootUrl.toURI().getScheme())
+           .setHost(rootUrl.toURI().getHost())
+           .setPort(rootUrl.toURI().getPort())
+           .setPath(rootUrl.toURI().getPath() + "sharing/rest/community/groups/" + groupId);
+    return builder.build();
+  }
+   private URI communityUserUri(String owner) throws URISyntaxException {
     URIBuilder builder = new URIBuilder();
     builder.setScheme(rootUrl.toURI().getScheme())
            .setHost(rootUrl.toURI().getHost())
