@@ -194,17 +194,8 @@ public class Client implements Closeable {
             String responseContent = IOUtils.toString(contentStream, "UTF-8");
             LOG.trace(String.format("RESPONSE: %s, %s, %s", reasonCode, responseContent, reasonMessage));
 
-            if (httpResponse.getStatusLine().getStatusCode() >= 400) {
-                ResponseWrapper<T> wrapper = null;
-                try {
-                    wrapper = makeResponseWrapper(responseContent, req.getURI().toURL(), clazz);
-                } catch (Exception ex) {
-                    throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
-                }
-                if (wrapper == null) {
-                    throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
-                }
-                return wrapper;
+            if (reasonCode >= 400) {
+                throw new HttpResponseException(reasonCode, reasonMessage);
             }
 
             return makeResponseWrapper(responseContent, req.getURI().toURL(), clazz);
