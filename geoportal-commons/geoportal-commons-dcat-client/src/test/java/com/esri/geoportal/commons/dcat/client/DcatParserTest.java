@@ -26,6 +26,32 @@ import org.junit.BeforeClass;
  * Parser test.
  */
 public class DcatParserTest {
+  @Test
+  public void preservesDistributionsInEmittedJson() throws Exception {
+    String input = "{\"dataset\":[{\"identifier\":\"dataset-1\",\"keyword\":[\"water\"],"
+        + "\"distribution\":[{\"@type\":\"dcat:Distribution\",\"title\":\"ArcGIS Hub Dataset\","
+        + "\"format\":\"Web Page\",\"mediaType\":\"text/html\",\"accessURL\":\"https://example.org/dataset\"},"
+        + "{\"title\":\"ArcGIS GeoService\",\"mediaType\":\"application/json\","
+        + "\"accessURL\":\"https://example.org/FeatureServer\"}]}]}";
+    DcatParser parser = new DcatParser(new java.io.StringReader(input));
+    DcatParserAdaptor adaptor = new DcatParserAdaptor(parser);
+    try {
+      java.util.Iterator<DcatRecord> records = adaptor.iterator();
+      assertTrue(records.hasNext());
+      DcatRecord record = records.next();
+      assertEquals(2, record.getDistribution().size());
+      com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+      mapper.setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL);
+      com.fasterxml.jackson.databind.JsonNode json = mapper.readTree(mapper.writeValueAsString(record));
+      assertTrue(json.has("distribution"));
+      assertEquals(2, json.get("distribution").size());
+      assertEquals("https://example.org/dataset", json.get("distribution").get(0).path("accessURL").asText());
+      assertEquals("https://example.org/FeatureServer", json.get("distribution").get(1).path("accessURL").asText());
+    } finally {
+      adaptor.close();
+    }
+  }
+
   private static URL url;
   
   @BeforeClass
