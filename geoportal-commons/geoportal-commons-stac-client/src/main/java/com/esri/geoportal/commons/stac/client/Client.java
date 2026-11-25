@@ -47,6 +47,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpResponseException;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -131,8 +132,39 @@ public class Client implements Closeable {
         }
     }
 
+    private URI validateItemUri(URL itemUrl) throws IOException, URISyntaxException {
+        if (itemUrl == null || url == null) {
+            throw new IOException("Item URL and configured STAC URL are required");
+        }
+
+        URI itemUri = itemUrl.toURI();
+        URI configuredUri = url.toURI();
+        String scheme = itemUri.getScheme();
+        if (scheme == null
+                || (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme))
+                || !scheme.equalsIgnoreCase(configuredUri.getScheme())
+                || itemUri.getHost() == null
+                || configuredUri.getHost() == null
+                || itemUri.getRawUserInfo() != null
+                || configuredUri.getRawUserInfo() != null
+                || !itemUri.getHost().equalsIgnoreCase(configuredUri.getHost())
+                || effectivePort(itemUri) != effectivePort(configuredUri)) {
+            throw new IOException("Item URL is not on the configured STAC origin");
+        }
+
+        return itemUri;
+    }
+
+    private int effectivePort(URI uri) {
+        if (uri.getPort() != -1) {
+            return uri.getPort();
+        }
+        return "https".equalsIgnoreCase(uri.getScheme()) ? 443 : 80;
+    }
+
     public ResponseWrapper<Item> readItem(URL itemUrl) throws IOException, URISyntaxException {
-        HttpUriRequest GET = new HttpGet(itemUrl.toURI());
+        HttpGet GET = new HttpGet(validateItemUri(itemUrl));
+        GET.setConfig(RequestConfig.custom().setRedirectsEnabled(false).build());
         ResponseWrapper<Item> itemWrapper = execute(GET, Item.class);
         return itemWrapper;
     }
