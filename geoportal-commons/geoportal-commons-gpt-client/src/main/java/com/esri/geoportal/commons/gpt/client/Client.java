@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -611,8 +612,19 @@ public class Client implements Closeable {
             String json = mapper.writeValueAsString(root);
             HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 
-            QueryResponse response = query(builder, entity);
+            QueryResponse response;
+            try {
+                response = query(builder, entity);
+            } catch (HttpResponseException ex) {
+                if (ex.getStatusCode() == HttpStatus.SC_BAD_REQUEST) {
+                    throw idSortRejected(ex.getStatusCode());
+                }
+                throw ex;
+            }
             if (response != null && response.status != null && response.status >= 400) {
+                if (response.status == HttpStatus.SC_BAD_REQUEST) {
+                    throw idSortRejected(response.status);
+                }
                 throw new HttpResponseException(response.status, "Geoportal search failed");
             }
 
@@ -627,6 +639,25 @@ public class Client implements Closeable {
         } while (search_after != null && !Thread.currentThread().isInterrupted());
 
         return ids.stream().collect(Collectors.toList());
+    }
+
+    /**
+     * Creates exception explaining that the search backend rejected the
+     * <code>_id</code>-sorted <code>search_after</code> query.
+     *
+     * @param status HTTP status
+     * @return exception
+     */
+    private HttpResponseException idSortRejected(int status) {
+        String message = String.format(
+                "Geoportal search backend at %s rejected the ID lookup query (HTTP %d). "
+                + "The harvester pages record IDs with a query sorted on '_id' using 'search_after'. "
+                + "Elasticsearch 8.x (and 7.6+ with deprecation) rejects sorting on '_id' unless "
+                + "'indices.id_field_data.enabled' is set to true, and very old Elasticsearch versions do not support 'search_after'. "
+                + "Enable '_id' field data on the cluster or upgrade the backend.",
+                url, status);
+        LOG.error(message);
+        return new HttpResponseException(status, message);
     }
 
     private void clearToken() {
