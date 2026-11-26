@@ -124,7 +124,8 @@ public class StacBroker implements InputBroker {
       Bots bots = BotsUtils.readBots(definition.getBotsConfig(), http, definition.getHostUrl());
       httpClient = new BotsHttpClient(http, bots);
     }
-    client = new Client(httpClient);
+    // pass configured STAC URL so Client.readItem can validate item URLs against the configured origin
+    client = new Client(httpClient, definition.getHostUrl(), null, "");
   }
 
   @Override
