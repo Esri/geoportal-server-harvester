@@ -138,8 +138,22 @@ import org.slf4j.LoggerFactory;
               }
             };
           }
+          String status = StringUtils.trimToEmpty(response.getStatus());
+          PublishingStatus publishingStatus;
+          if ("created".equalsIgnoreCase(status)) {
+            publishingStatus = PublishingStatus.CREATED;
+          } else if ("updated".equalsIgnoreCase(status)) {
+            publishingStatus = PublishingStatus.UPDATED;
+          } else {
+            throw new DataOutputException(this, ref, String.format(
+                    "Publication not confirmed (status: %s, code: %d%s) Source URI: %s",
+                    status.isEmpty() ? "<none>" : status,
+                    response.getCode(),
+                    StringUtils.isBlank(response.getMessage()) ? "" : ", message: " + response.getMessage(),
+                    ref.getSourceUri()));
+          }
           existing.remove(response.getId());
-          return response.getStatus().equalsIgnoreCase("created") ? PublishingStatus.CREATED : PublishingStatus.UPDATED;
+          return publishingStatus;
         } catch (IOException ex) {
           throw new DataOutputException(this, ref, String.format("Error publishing data: %s Exception: "+ex, ref), ex);
         } catch (URISyntaxException ex) {
