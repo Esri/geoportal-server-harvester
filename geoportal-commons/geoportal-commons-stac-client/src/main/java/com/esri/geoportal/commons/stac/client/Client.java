@@ -24,6 +24,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,12 +34,15 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
@@ -53,6 +58,7 @@ import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -183,21 +189,70 @@ public class Client implements Closeable {
         StringEntity entity = new StringEntity(json, "UTF-8");
 
         URI pubUri = createCollectionItemsUri(this.collectionId);
-        return publish(pubUri, entity, data.sys_owner_s);
-    }    
-    
-    private PublishResponse publish(URI uri, StringEntity entity, String owner) throws IOException, URISyntaxException {
-        HttpPost post = new HttpPost(uri);
-        post.setConfig(DEFAULT_REQUEST_CONFIG);
-        post.setEntity(entity);
-        post.setHeader("Content-Type", "application/json; charset=UTF-8");
-        post.setHeader("User-Agent", HttpConstants.getUserAgent());
-	    if (cred != null && !cred.isEmpty()) {
-	    	  post.setHeader("Authorization","Bearer "+getAccessToken());
-	    }
-        ResponseWrapper<PublishResponse> response = execute(post, PublishResponse.class);
+        try {
+            return send(new HttpPost(pubUri), entity);
+        } catch (HttpResponseException ex) {
+            if (ex.getStatusCode() != HttpStatus.SC_CONFLICT) {
+                throw ex;
+            }
+            // item with the same id already exists; update it in place
+            String itemId = extractItemId(json);
+            if (itemId == null) {
+                throw ex;
+            }
+            LOG.debug(String.format("Item '%s' already exists in collection '%s'; updating.", itemId, collectionId));
+            return updateItem(itemId, entity);
+        }
+    }
+
+    /**
+     * Updates an existing item (PUT /collections/{collectionId}/items/{itemId}).
+     *
+     * @param itemId item id
+     * @param entity item JSON
+     * @return response with status "updated"
+     */
+    private PublishResponse updateItem(String itemId, StringEntity entity) throws IOException, URISyntaxException {
+        URI itemUri = createCollectionItemUri(this.collectionId, itemId);
+        PublishResponse response = send(new HttpPut(itemUri), entity);
+        if (response == null) {
+            return null;
+        }
+        int code = response.getCode();
+        if (code != HttpStatus.SC_OK && code != HttpStatus.SC_CREATED && code != HttpStatus.SC_NO_CONTENT) {
+            // leave status as set by setCode ("failed")
+            return response;
+        }
+        if (response.getId() == null) {
+            response.setId(itemId); // note: setId resets the code
+            response.setCode(code);
+        }
+        response.setStatus("updated");
+        return response;
+    }
+
+    private PublishResponse send(HttpEntityEnclosingRequestBase request, StringEntity entity) throws IOException, URISyntaxException {
+        request.setConfig(DEFAULT_REQUEST_CONFIG);
+        request.setEntity(entity);
+        request.setHeader("Content-Type", "application/json; charset=UTF-8");
+        request.setHeader("User-Agent", HttpConstants.getUserAgent());
+        if (cred != null && !cred.isEmpty()) {
+            request.setHeader("Authorization", "Bearer " + getAccessToken());
+        }
+        ResponseWrapper<PublishResponse> response = execute(request, PublishResponse.class);
 
         return response != null ? response.data : null;
+    }
+
+    private String extractItemId(String json) {
+        try {
+            JsonNode node = mapper.readTree(json);
+            JsonNode id = node != null ? node.get("id") : null;
+            return id != null && id.isTextual() && !id.asText().isBlank() ? id.asText() : null;
+        } catch (JsonProcessingException ex) {
+            LOG.debug("Unable to read item id from JSON.", ex);
+            return null;
+        }
     }
 
     public Catalog readCatalog(URL catalogUrl) throws IOException, URISyntaxException {
@@ -230,7 +285,7 @@ public class Client implements Closeable {
 
             ResponseWrapper<T> wrapper;
             if (StringUtils.isBlank(responseContent)) {
-                if (clazz != PublishResponse.class || (reasonCode != 200 && reasonCode != 201)) {
+                if (clazz != PublishResponse.class || (reasonCode != 200 && reasonCode != 201 && reasonCode != 204)) {
                     throw new IOException("Missing JSON response body");
                 }
                 wrapper = new ResponseWrapper<>(clazz.cast(new PublishResponse()), responseContent, req.getURI().toURL());
@@ -248,6 +303,11 @@ public class Client implements Closeable {
         URIBuilder b = new URIBuilder(url.toURI().resolve("collections/" + collectionId + "/items"));
         return b.build();
     }    
+
+    private URI createCollectionItemUri(String collectionId, String itemId) throws URISyntaxException, IOException {
+        String encodedId = URLEncoder.encode(itemId, StandardCharsets.UTF_8).replace("+", "%20");
+        return new URI(createCollectionItemsUri(collectionId).toASCIIString() + "/" + encodedId);
+    }
     
 
     private String getAccessToken() throws URISyntaxException, IOException {
