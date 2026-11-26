@@ -19,7 +19,6 @@ import com.esri.geoportal.harvester.api.ex.InvalidDefinitionException;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.poi.util.StringUtil;
 
 /**
  * JDBC validator utility class.
@@ -33,7 +32,7 @@ import org.apache.poi.util.StringUtil;
                   // map each word into case-insensitive expression, for example: ALTER -> [aA][lL][tT][eE][rR]
                   .map(w->w.chars()
                           // map each character into lower-case upper-case expression, for example: A -> [aA]
-                          .mapToObj(ch->String.format("[%s%s]", StringUtil.toLowerCase((char)ch), StringUtil.toUpperCase((char)ch)))
+                          .mapToObj(ch->String.format("[%s%s]", Character.toLowerCase((char)ch), Character.toUpperCase((char)ch)))
                           // join all characters together into a single string
                           .collect(Collectors.joining()))
                   // join all words together by pipe (!)

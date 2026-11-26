@@ -10,4 +10,12 @@
     <packaging>jar</packaging>
     <name>Esri :: Geoportal Server :: Commons :: DCAT client</name>
     <description>DCAT client.</description>
+    <dependencies>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.13.2</version>
+        </dependency>
+    </dependencies>
+
 </project>

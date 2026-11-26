@@ -26,6 +26,11 @@
             <artifactId>geoportal-commons-constants</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>4.5.13</version>
+        </dependency>
     </dependencies>
     <version>4.1.0</version>
 </project>
