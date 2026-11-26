@@ -212,17 +212,31 @@ public class Client implements Closeable {
     }
 
     private <T> ResponseWrapper<T> execute(HttpUriRequest req, Class<T> clazz) throws IOException, URISyntaxException {
-        try (CloseableHttpResponse httpResponse = httpClient.execute(req); InputStream contentStream = httpResponse.getEntity().getContent();) {
+        try (CloseableHttpResponse httpResponse = httpClient.execute(req)) {
             String reasonMessage = httpResponse.getStatusLine().getReasonPhrase();
             int reasonCode = httpResponse.getStatusLine().getStatusCode();
-            String responseContent = IOUtils.toString(contentStream, "UTF-8");
-            LOG.trace(String.format("RESPONSE: %s, %s, %s", reasonCode, responseContent, reasonMessage));
-
             if (reasonCode >= 400) {
                 throw new HttpResponseException(reasonCode, reasonMessage);
             }
 
-            ResponseWrapper<T> wrapper = makeResponseWrapper(responseContent, req.getURI().toURL(), clazz);
+            String responseContent = "";
+            HttpEntity entity = httpResponse.getEntity();
+            if (entity != null) {
+                try (InputStream contentStream = entity.getContent()) {
+                    responseContent = IOUtils.toString(contentStream, "UTF-8");
+                }
+            }
+            LOG.trace(String.format("RESPONSE: %s, %s, %s", reasonCode, responseContent, reasonMessage));
+
+            ResponseWrapper<T> wrapper;
+            if (StringUtils.isBlank(responseContent)) {
+                if (clazz != PublishResponse.class || (reasonCode != 200 && reasonCode != 201)) {
+                    throw new IOException("Missing JSON response body");
+                }
+                wrapper = new ResponseWrapper<>(clazz.cast(new PublishResponse()), responseContent, req.getURI().toURL());
+            } else {
+                wrapper = makeResponseWrapper(responseContent, req.getURI().toURL(), clazz);
+            }
             if (wrapper.data instanceof PublishResponse) {
                 ((PublishResponse) wrapper.data).setCode(reasonCode);
             }
@@ -253,9 +267,13 @@ public class Client implements Closeable {
        
     
     private Token generateToken() throws URISyntaxException, UnsupportedEncodingException, IOException {
-        String sOauth2Url = url.toString().replace("/stac","");
-        URL oauth2Url = new URL(sOauth2Url);
-        HttpPost post = new HttpPost(oauth2Url.toURI().resolve(TOKEN_URL));
+        URI oauth2Uri = url.toURI();
+        if (oauth2Uri.getPath().endsWith("/stac/")) {
+            oauth2Uri = oauth2Uri.resolve("../");
+        } else if (oauth2Uri.getPath().endsWith("/stac")) {
+            oauth2Uri = oauth2Uri.resolve(".");
+        }
+        HttpPost post = new HttpPost(oauth2Uri.resolve(TOKEN_URL));
         post.setConfig(DEFAULT_REQUEST_CONFIG);
         post.setHeader("User-Agent", HttpConstants.getUserAgent());
         post.setHeader("Content-Type", "application/x-www-form-urlencoded");
