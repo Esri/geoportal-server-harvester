@@ -24,14 +24,20 @@ public final class ItemEntry {
   public long created;
   public long modified;
   public String title;
+  public String snippet;
+  public String description;
   public String type;
   public String [] typeKeywords;
   public String [] tags;
+  public String [] categories;
   public Double [][] extent;
-  public String description;
+  public String licenseInfo;
+  public String thumbnail;
   public String url;
   public String ownerFolder;
-  
+  public String contentStatus;
+  public String access;
+ 
   @Override
   public String toString() {
     return String.format("id:%s, title:%s, type:%s, url:%s", id, title, type, url);

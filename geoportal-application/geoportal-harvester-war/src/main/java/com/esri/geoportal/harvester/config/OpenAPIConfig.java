@@ -20,7 +20,7 @@ public class OpenAPIConfig {
         OpenAPI openAPI = new OpenAPI()
                 .info(new Info()
                         .title("Harvester API")
-                        .version("4.0.0")
+                        .version("4.1.0")
                         .description("API Documentation for Harvester"))
 
                 // ✅ GLOBAL SECURITY (this enables Authorize button)

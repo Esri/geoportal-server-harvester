@@ -299,7 +299,7 @@ public class AgsClient implements Closeable {
     if (si.name.startsWith(folder + "/")) {
       si.name = si.name.replace(folder + "/", "");
     }
-    String url = rootUrl.toURI().resolve("rest/services/").resolve(StringUtils.stripToEmpty(folder)).resolve(URLEncoder.encode(si.name, StandardCharsets.UTF_8.toString()) + "/" + si.type + "/" + lRef.id).toASCIIString();
+    String url = rootUrl.toURI().resolve("rest/services/").resolve(StringUtils.stripToEmpty(folder)).resolve(URLEncoder.encode(si.name, StandardCharsets.UTF_8.toString()).replace("+", "%20") + "/" + si.type + "/" + lRef.id).toASCIIString();
     
    // SSRF mitigation: ensure the constructed URL is within the rootUrl
     if (!isUrlWithinRoot(url)) {

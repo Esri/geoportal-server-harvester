@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.esri.geoportal</groupId>
         <artifactId>geoportal-commons</artifactId>
-        <version>4.0.0</version>
+        <version>4.1.0</version>
     </parent>
     <artifactId>geoportal-commons-agp-client</artifactId>
     <name>Esri :: Geoportal Server :: Commons :: ArcGIS Portal Client</name>
@@ -26,6 +26,11 @@
             <artifactId>geoportal-commons-constants</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>4.5.13</version>
+        </dependency>
     </dependencies>
-    <version>4.0.0</version>
+    <version>4.1.0</version>
 </project>

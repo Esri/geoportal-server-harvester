@@ -26,11 +26,18 @@ public final class WKAConstants {
   
   public static final String WKA_IDENTIFIER = "identifier";
   public static final String WKA_TITLE = "title";
+  public static final String WKA_SNIPPET = "snippet";
   public static final String WKA_DESCRIPTION = "description";
   public static final String WKA_RESOURCE_URL = "resource.url";
   public static final String WKA_THUMBNAIL_URL = "thumbnail.url";
+  public static final String WKA_TAGS = "tags";
+  public static final String WKA_CATEGORIES = "categories";
+  public static final String WKA_TYPE_KEYWORDS = "typeKeywords";
   public static final String WKA_RESOURCE_URL_SCHEME = "resource.url.scheme";
   public static final String WKA_BBOX = "bbox";
+  public static final String WKA_LICENSE_INFO = "licenseInfo";
+  public static final String WKA_ACCESS = "access";
+  public static final String WKA_CONTENT_STATUS = "contentStatus";
   public static final String WKA_MODIFIED = "modified";
   public static final String WKA_REFERENCES = "references";
   public static final String WKA_METADATA_XML = "metadataXML";

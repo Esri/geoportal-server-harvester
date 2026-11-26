@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Esri, Inc.
+ * Copyright 2016 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.commons.stac.client;
+package com.esri.geoportal.commons.stac.client;
 
 /**
- * STAC link.
+ * PublishRequest structure.
  */
-public class Link {
-  public String rel;
-  public String href;
-  public String type;
-  public String title;
+public final class PublishRequest {
+  public String src_source_type_s;
+  public String src_source_uri_s;
+  public String src_source_name_s;
+  public String src_uri_s;
+  public String src_lastupdate_dt;
+  public String sys_owner_s;
+  public String sys_owner_txt;
+  public String src_source_ref_s;
+  public String src_task_ref_s;
+  public String app_editor_s;
 }

@@ -15,18 +15,8 @@
  */
 package com.esri.geoportal.commons.gpt.client;
 
-import com.esri.geoportal.commons.constants.HttpConstants;
-import com.esri.geoportal.commons.gpt.client.QueryResponse.Hit;
-import com.esri.geoportal.commons.meta.Attribute;
-import com.esri.geoportal.commons.meta.util.WKAConstants;
 import static com.esri.geoportal.commons.utils.Constants.DEFAULT_REQUEST_CONFIG;
-import com.esri.geoportal.commons.utils.SimpleCredentials;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +29,6 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -50,9 +39,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -71,6 +62,18 @@ import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.esri.geoportal.commons.constants.HttpConstants;
+import com.esri.geoportal.commons.gpt.client.QueryResponse.Hit;
+import com.esri.geoportal.commons.meta.Attribute;
+import com.esri.geoportal.commons.meta.util.WKAConstants;
+import com.esri.geoportal.commons.utils.SimpleCredentials;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * GPT 2.0 Client.
  */
@@ -80,8 +83,7 @@ public class Client implements Closeable {
     private static final int BATCH_SIZE = 500;
 
     private static final String DEFAULT_INDEX = "metadata";
-    private static final String REST_ITEM_URL = "rest/metadata/item";
-    private static final String ELASTIC_SCROLL_URL = "elastic/_search/scroll";
+    private static final String REST_ITEM_URL = "rest/metadata/item";    
     private static final String TOKEN_URL = "oauth2/token";
 
     private final CloseableHttpClient httpClient;
@@ -100,7 +102,6 @@ public class Client implements Closeable {
      * @param httpClient HTTP client
      * @param url URL of the GPT REST end point
      * @param cred credentials
-     * @param index index name
      * @param collectionsFieldName collections field name
      */
     public Client(CloseableHttpClient httpClient, URL url, SimpleCredentials cred, String collectionsFieldName) {
@@ -118,7 +119,6 @@ public class Client implements Closeable {
      *
      * @param url URL of the GPT REST end point
      * @param cred credentials
-     * @param index index name
      * @param collectionsFieldName collections field name
      */
     public Client(URL url, SimpleCredentials cred, String collectionsFieldName) {
@@ -444,8 +444,7 @@ public class Client implements Closeable {
 
     /**
      * Deletes record by id.
-     *
-     * @param id record id
+     *ecord id
      * @return publish response
      * @throws IOException if reading response fails
      * @throws URISyntaxException if URL has invalid syntax
@@ -613,11 +612,20 @@ public class Client implements Closeable {
             String json = mapper.writeValueAsString(root);
             HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 
-            QueryResponse response = query(builder, entity);
-            if (response != null && response.status != null && response.status == 400 && search_after == null) {
-                // This indicates it could be an old version of Elastic Search behind the Geoportal.
-                // Fall back to using scroll API
-                return queryIdsScroll(term, value, batchSize);
+            QueryResponse response;
+            try {
+                response = query(builder, entity);
+            } catch (HttpResponseException ex) {
+                if (ex.getStatusCode() == HttpStatus.SC_BAD_REQUEST) {
+                    throw idSortRejected(ex.getStatusCode());
+                }
+                throw ex;
+            }
+            if (response != null && response.status != null && response.status >= 400) {
+                if (response.status == HttpStatus.SC_BAD_REQUEST) {
+                    throw idSortRejected(response.status);
+                }
+                throw new HttpResponseException(response.status, "Geoportal search failed");
             }
 
             search_after = null;
@@ -633,51 +641,47 @@ public class Client implements Closeable {
         return ids.stream().collect(Collectors.toList());
     }
 
-    private List<String> queryIdsScroll(String term, String value, long size) throws IOException, URISyntaxException {
-        ArrayList<String> ids = new ArrayList<>();
-        SearchContext searchContext = new SearchContext();
-
-        while (!Thread.currentThread().isInterrupted()) {
-            QueryResponse response = query(term, value, size, searchContext);
-            if (Thread.currentThread().isInterrupted()) {
-                break;
-            }
-            if (response.hits == null || response.hits.hits == null || response.hits.hits.isEmpty()) {
-                break;
-            }
-            ids.addAll(response.hits.hits.stream()
-                    .map(h -> h._id)
-                    .filter(id -> id != null)
-                    .collect(Collectors.toList()));
-        }
-
-        return ids;
+    /**
+     * Creates exception explaining that the search backend rejected the
+     * <code>_id</code>-sorted <code>search_after</code> query.
+     *
+     * @param status HTTP status
+     * @return exception
+     */
+    private HttpResponseException idSortRejected(int status) {
+        String message = String.format(
+                "Geoportal search backend at %s rejected the ID lookup query (HTTP %d). "
+                + "The harvester pages record IDs with a query sorted on '_id' using 'search_after'. "
+                + "Elasticsearch 8.x (and 7.6+ with deprecation) rejects sorting on '_id' unless "
+                + "'indices.id_field_data.enabled' is set to true, and very old Elasticsearch versions do not support 'search_after'. "
+                + "Enable '_id' field data on the cluster or upgrade the backend.",
+                url, status);
+        LOG.error(message);
+        return new HttpResponseException(status, message);
     }
 
     private void clearToken() {
         tokenInfo = null;
     }
 
-    private QueryResponse query(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
-        URI uri = createQueryUri(searchContext);
-        HttpEntity httpEntity = createQueryEntity(term, value, size, searchContext);
-        try {
-            QueryResponse response = query(uri, httpEntity);
-            searchContext._scroll_id = response._scroll_id;
-            return response;
-        } catch (HttpResponseException ex) {
-            if (ex.getStatusCode() == 401) {
-                clearToken();
-                uri = createQueryUri(searchContext);
-                httpEntity = createQueryEntity(term, value, size, searchContext);
-                QueryResponse response = query(uri, httpEntity);
-                searchContext._scroll_id = response._scroll_id;
-                return response;
-            } else {
-                throw ex;
-            }
-        }
-    }
+//    private QueryResponse query(String term, String value, long size, SearchContext searchContext) throws IOException, URISyntaxException {
+//        URI uri = createQueryUri(searchContext);
+//        HttpEntity httpEntity = createQueryEntity(term, value, size, searchContext);
+//        try {
+//            QueryResponse response = query(uri, httpEntity);            
+//            return response;
+//        } catch (HttpResponseException ex) {
+//            if (ex.getStatusCode() == 401) {
+//                clearToken();
+//                uri = createQueryUri(searchContext);
+//                httpEntity = createQueryEntity(term, value, size, searchContext);
+//                QueryResponse response = query(uri, httpEntity);                
+//                return response;
+//            } else {
+//                throw ex;
+//            }
+//        }
+//    }
 
     private QueryResponse query(URIBuilder builder, HttpEntity entity) throws IOException, URISyntaxException {
         QueryResponse response = null;
@@ -722,12 +726,8 @@ public class Client implements Closeable {
 
                     if (cred != null && !cred.isEmpty()) {
                         request.setHeader("Authorization", "Bearer " + getAccessToken());
-                    }
-                    GeoportalInfoResponse gpInfoRes = execute(request, GeoportalInfoResponse.class);
-                    String indexName = (gpInfoRes != null && gpInfoRes.getMetadataIndexName() != null)
-                            ? gpInfoRes.getMetadataIndexName()
-                            : DEFAULT_INDEX;
-                    elasticSearchUrl = "elastic/" + indexName + "/_search";
+                    }                    
+                    elasticSearchUrl = "elastic/_search";
                 }
             }
         }
@@ -738,41 +738,23 @@ public class Client implements Closeable {
     private HttpEntity createQueryEntity(String term, String value, long size, SearchContext searchContext) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
-        if (searchContext._scroll_id == null) {
-            node.put("size", size);
-            if (term != null && value != null) {
-                ObjectNode query = mapper.createObjectNode();
-                node.set("query", query);
+       
+        node.put("size", size);
+        if (term != null && value != null) {
+            ObjectNode query = mapper.createObjectNode();
+            node.set("query", query);
 
-                ObjectNode match = mapper.createObjectNode();
-                query.set("match", match);
+            ObjectNode match = mapper.createObjectNode();
+            query.set("match", match);
 
-                match.put(term, value);
-            }
-        } else {
-            node.put("scroll", "1m");
-            node.put("scroll_id", searchContext._scroll_id);
+            match.put(term, value);
         }
-
         return new StringEntity(node.toString(), ContentType.APPLICATION_JSON);
     }
 
     private URI createQueryUri(SearchContext searchContext) throws IOException, URISyntaxException {
         URIBuilder builder;
-
-        if (searchContext._scroll_id == null) {
-            builder = new URIBuilder(url.toURI().resolve(createElasticSearchUrl()))
-                    .addParameter("scroll", "1m");
-        } else {
-            builder = new URIBuilder(url.toURI().resolve(ELASTIC_SCROLL_URL))
-                    .addParameter("scroll_id", searchContext._scroll_id)
-                    .addParameter("scroll", "1m");
-        }
-
-//        if (cred != null && !cred.isEmpty()) {
-//            builder = builder.addParameter("access_token", getAccessToken());
-//        }
-
+        builder = new URIBuilder(url.toURI().resolve(createElasticSearchUrl()));
         return builder.build();
     }
 
@@ -839,8 +821,7 @@ public class Client implements Closeable {
      * Search context.
      */
     public static class SearchContext {
-
-        public String _scroll_id;
+        
     }
 
     /**

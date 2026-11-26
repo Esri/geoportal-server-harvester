@@ -13,19 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.geoportal.commons.stac.client;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import java.util.Map;
+package com.esri.geoportal.commons.stac.client;
 
 /**
- * STAC item.
+ * STAC link.
  */
-public class Item {
-  public String id;
+public class Link {
+  public String rel;
+  public String href;
   public String type;
-  public JsonNode geometry;
-  public Double [] bbox;
-  public Map<String, JsonNode> properties;
-  public Map<String, JsonNode> assets;
+  public String title;
 }

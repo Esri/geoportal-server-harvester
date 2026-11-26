@@ -33,11 +33,11 @@ import com.esri.geoportal.commons.robots.Bots;
 import com.esri.geoportal.commons.robots.BotsUtils;
 import com.esri.geoportal.commons.utils.SimpleCredentials;
 import com.esri.geoportal.commons.utils.XmlUtils;
-import com.esri.geoportal.geoportal.commons.stac.client.Catalog;
-import com.esri.geoportal.geoportal.commons.stac.client.Client;
-import com.esri.geoportal.geoportal.commons.stac.client.Item;
-import com.esri.geoportal.geoportal.commons.stac.client.Link;
-import com.esri.geoportal.geoportal.commons.stac.client.ResponseWrapper;
+import com.esri.geoportal.commons.stac.client.Catalog;
+import com.esri.geoportal.commons.stac.client.Client;
+import com.esri.geoportal.commons.stac.client.Item;
+import com.esri.geoportal.commons.stac.client.Link;
+import com.esri.geoportal.commons.stac.client.ResponseWrapper;
 import com.esri.geoportal.harvester.api.defs.EntityDefinition;
 import com.esri.geoportal.harvester.api.ex.DataInputException;
 import com.esri.geoportal.harvester.api.ex.DataProcessorException;
@@ -124,7 +124,8 @@ public class StacBroker implements InputBroker {
       Bots bots = BotsUtils.readBots(definition.getBotsConfig(), http, definition.getHostUrl());
       httpClient = new BotsHttpClient(http, bots);
     }
-    client = new Client(httpClient);
+    // pass configured STAC URL so Client.readItem can validate item URLs against the configured origin
+    client = new Client(httpClient, definition.getHostUrl(), null, "");
   }
 
   @Override

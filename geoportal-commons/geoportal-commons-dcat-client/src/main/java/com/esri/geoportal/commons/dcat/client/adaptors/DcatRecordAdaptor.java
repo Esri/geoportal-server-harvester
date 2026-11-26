@@ -25,7 +25,6 @@ import com.esri.geoportal.commons.dcat.client.json.JsonRecord;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import ucar.nc2.grib.TimeCoordUnion.Val;
 
 /**
  * DCAT record adaptor.

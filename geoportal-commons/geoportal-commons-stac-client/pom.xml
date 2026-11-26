@@ -4,9 +4,22 @@
     <parent>
         <groupId>com.esri.geoportal</groupId>
         <artifactId>geoportal-commons</artifactId>
-        <version>4.0.0</version>
+        <version>4.1.0</version>
     </parent>
     <artifactId>geoportal-commons-stac-client</artifactId>
-    <packaging>jar</packaging>
     <name>Esri :: Geoportal Server :: Commons :: STAC Client</name>
+    <description>Harvester client that interacts with the STAC API</description>
+    <packaging>jar</packaging>
+    <dependencies>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>commons-utils</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>geoportal-commons-meta</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+    </dependencies>
 </project>

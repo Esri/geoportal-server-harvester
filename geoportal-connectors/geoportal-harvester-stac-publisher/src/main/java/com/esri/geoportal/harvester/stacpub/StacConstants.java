@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Esri, Inc.
+ * Copyright 2020 Esri, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.esri.geoportal.harvester.stacpub;
 
 /**
- * STAC client.
+ * STAC constants.
  */
-package com.esri.geoportal.geoportal.commons.stac.client;
-
-
+/*package*/ class StacConstants {
+  public static final String P_HOST_URL  = "stac-host-url";
+  public static final String P_COLLECTION_ID  = "stac-collection-id";
+  public static final String P_CLEANUP  = "stac-cleanup";
+}

@@ -71,7 +71,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.transform.TransformerException;
-import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -268,17 +268,22 @@ import org.w3c.dom.Document;
               String url = StringUtils.trimToNull(StringUtils.defaultIfEmpty(dist.getAccessURL(), dist.getDownloadURL()));
               if (url != null) {
                 HashMap<String, Attribute> reference = new HashMap<>();
+                reference.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(url));
                 MimeType mimeType = MimeType.parse(dist.getFormat());
                 if (mimeType != null) {
-                  reference.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(url));
                   reference.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute(generateSchemeName(mimeType)));
                 } else {
                   String schemeName = generateSchemeName(url);
                   if (schemeName != null) {
-                    reference.put(WKAConstants.WKA_RESOURCE_URL, new StringAttribute(url));
                     reference.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute(schemeName));
+                  } else {
+                      schemeName = generateSchemeName(MimeType.parse(dist.getMediaType()));
+                      if (schemeName != null) {
+                        reference.put(WKAConstants.WKA_RESOURCE_URL_SCHEME, new StringAttribute(schemeName));
+                      } 
                   }
                 }
+                references.add(new MapAttribute(reference));
               }
             }
 

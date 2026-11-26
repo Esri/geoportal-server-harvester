@@ -4,11 +4,12 @@
     <parent>
         <groupId>com.esri.geoportal</groupId>
         <artifactId>geoportal-connectors</artifactId>
-        <version>4.0.0</version>
+        <version>4.1.0</version>
     </parent>
     <artifactId>geoportal-harvester-stac</artifactId>
     <packaging>jar</packaging>
     <name>Esri :: Geoportal Server :: Harvester :: Data Source :: STAC</name>
+    <description>Outbound adaptor for publishing content into a STAC API</description>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
