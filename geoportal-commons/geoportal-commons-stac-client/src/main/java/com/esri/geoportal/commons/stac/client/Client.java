@@ -267,9 +267,13 @@ public class Client implements Closeable {
        
     
     private Token generateToken() throws URISyntaxException, UnsupportedEncodingException, IOException {
-        String sOauth2Url = url.toString().replace("/stac","");
-        URL oauth2Url = new URL(sOauth2Url);
-        HttpPost post = new HttpPost(oauth2Url.toURI().resolve(TOKEN_URL));
+        URI oauth2Uri = url.toURI();
+        if (oauth2Uri.getPath().endsWith("/stac/")) {
+            oauth2Uri = oauth2Uri.resolve("../");
+        } else if (oauth2Uri.getPath().endsWith("/stac")) {
+            oauth2Uri = oauth2Uri.resolve(".");
+        }
+        HttpPost post = new HttpPost(oauth2Uri.resolve(TOKEN_URL));
         post.setConfig(DEFAULT_REQUEST_CONFIG);
         post.setHeader("User-Agent", HttpConstants.getUserAgent());
         post.setHeader("Content-Type", "application/x-www-form-urlencoded");
